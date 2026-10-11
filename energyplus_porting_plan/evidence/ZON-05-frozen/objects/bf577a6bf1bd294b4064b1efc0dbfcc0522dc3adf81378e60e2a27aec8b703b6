@@ -1,0 +1,40 @@
+# ZON-05 strict independent PE reader: Source only
+
+This held reader adapts the accepted RAD-01 reader to the genuine ZON single-TU
+core-member helper. It has not been imported or executed. Root and an independent
+source reviewer must accept both build and reader proposals before actual use.
+
+Root supplies `--build <actual-build.json>#<actual-SHA>` and `--output-dir` with
+a fresh directory, through the existing recorded Python invocation. No future
+build, helper, derivative, PE map or execution identity is invented here.
+
+The build schema is zon05-native-build.v1, target zon05_unit_helper, status
+pass-actual-1TU-link-and-preservation. Required actual counts are717-to721,
+three inherited RAD registrations, one new ZON registration and one observed
+ZON compiler command. The actual inventory contains four Native files and one
+compiled source. It retains52 protected artifacts,631 present core objects,
+twelve registered core absences and twelve previously retired Original absences.
+
+The authentic compile-correspondence record must distinguish RAD registration
+from fresh compilation and prove exact actual RAD720 rows. The map identity and
+provider metadata require the exact unchanged correctHumRat member address in
+libenergypluslib.a(ZoneTempPredictorCorrector.cc.obj); selected core hits must be
+positive. The single ZON target LOAD precedes the core archive. This is a core
+provider contract, unlike RAD's derived whole-TU provider contract.
+
+Both actual linked Original and actual derived PE files are independently inspected
+using unchanged tools/porting/native_pe.py. The generic inspect/compare primitives,
+both full actual map comparisons, archived map outputs, runtime-section equality
+and compact stdout remain the accepted RAD mechanism. This source has no engine
+invocation, scientific output parsing, expected answers or numerical comparison.
+
+The report schema is zon05-independent-build-PE-review.v1 and retains status
+pass-exact-retained-PE-runtime-and-actual-build-identity. Full refs include actual
+build, original, derivative, derivative receipt, executed reader and native_pe
+source. No scientific execution, integration certificate or gate PASS is claimed.
+
+Exact RAD before source/README/manifest and generated diff are held here. Source
+hashes/AST/diff correspondence were checked only. No target/import/build/formatter,
+binary/core/weather/scientific payload read, canonical edit or Git action occurred.
+The author also authored the ZON helper/build proposal; independent source review
+does not become independent self-formula certification.

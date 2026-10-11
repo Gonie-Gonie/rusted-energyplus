@@ -1,0 +1,98 @@
+# ZON-05 held Native build adapters
+
+This Source-only proposal adapts the accepted RAD-01 three-script build workflow.
+It prepares genuine configure, one-TU compile, existing debug-derivative and
+actual provider/preservation metadata stages. It does not invoke the humidity
+member or any scientific helper. Root and another author must fully review this
+hold before execution. No actual ZON build or future consumer identity is supplied.
+
+The accepted Native helper is `ZON-05/native-helper-prep-01/manifest.json`,
+5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1.
+Its four admitted source files remain unchanged. The only target source is
+zon05_reference_helper.cpp; two fields headers and its recipe complete the
+four-file runtime source inventory. The helper links the unchanged core method,
+not a derived ZoneTempPredictorCorrector TU. Input-only21 and its43 declared
+ordered operations are later scientific obligations, not build outcomes.
+
+All binding arguments are real `path#sha256` operands supplied by Root. Each
+output directory must be fresh. The three established invocations are:
+
+1. `run-native-build.py`: `--freeze-receipt`, `--freeze-execution`,
+   `--prior-final-preservation`, `--prior-retirement`,
+   `--prior-retirement-execution`, `--prior-configure-execution`,
+   `--prior-compile-execution`, `--prior-native-build`, `--rad-native-build`,
+   `--consumer-native-build`, `--restore-configure-execution`,
+   `--restore-preservation`, `--native-source-manifest`,
+   `--build-source-manifest`, and `--output-dir`.
+2. `derive-and-describe-native-build.py`: `--before-preservation`,
+   `--prior-derivation-execution`, and the same `--output-dir`.
+3. `complete-native-build-metadata.py`: `--before-preservation` and the same
+   `--output-dir`. All three support optional `--root`.
+
+The final CTF10 retirement metadata authenticates48 retained files and twelve
+old Original absences. The genuine RAD build provides its original and derivative,
+making50. The future successful consumer build provides two further full file
+identities, making52. Its schema is ctf10-surface-consumer-native-build.v1, target
+surface_consumer_helper, status pass-actual-5TU-link-and-preservation, with actual
+717-to722 registration and50-artifact preservation. No guessed filename/hash/size
+or scientific result substitutes for that actual runtime operand.
+
+Root first performs the existing genuine configure restore from consumer722 to
+the literal actual CTF10/RAD-before717 inventory. No restore script is authored
+here. Root's runtime record has schema zon05-exact-restore-preservation.v1 and:
+
+- actual_exact_prior_configure_execution; actual_before_compile_inventory;
+  actual_after_compile_inventory; actual_prior717_reference;
+  actual_before_hashes; actual_after_hashes;
+- protected_ref_count52; core_present_count631; actual_compile_rows_before722;
+  actual_compile_rows_after717; absent_registered_object_paths12;
+  prior_original_absent_paths12;
+- literal_prior717_rows_equal and all52_and631_fresh_hashes_unchanged true;
+  scientific_execution_performed and binary_deleted_moved_or_executed false.
+
+Both hash lists must equal the exact52 protected plus631 core refs, in source
+order. This preflight independently fresh-hashes those actual files and checks
+all24 absences again. It binds the actual restore receipt to the authentic prior
+configure argv and to the fresh freeze SourceSnapshot. Completion repeats the
+full fresh guard. It does not reinterpret or rewrite any prior registry.
+
+The ZON recipe includes unchanged RAD02 and all earlier recipes. The configure
+argv retains the actual717 options, replaces CMAKE_PROJECT_INCLUDE only, and
+appends explicit RAD01_SOURCE_DIR and ZON05_SOURCE_DIR. CLK03_REPOSITORY_ROOT is
+checked as the same actual path while its existing forward-slash spelling is
+preserved. The compile argv keeps prior options and requests zon05_unit_helper.
+
+The configured graph is717 inherited rows plus three reintroduced RAD target
+registrations plus one ZON registration, totaling721. Those RAD rows must equal
+the actual RAD720 archive dictionaries exactly, including commands/output/source
+paths and order. Removing RAD/ZON target rows must restore the exact717 list.
+Actual verbose compiler stdout must contain one and only one compile command,
+for zon05_reference_helper.cpp under the ZON target. RAD registrations are not
+claimed as fresh compile commands. Any core, RAD or other compile line fails.
+
+The map parser retains the accepted latest .text address-range check. It requires
+the exact correctHumRat(EnergyPlusData&,int,int) member symbol in the genuine
+libenergypluslib.a(ZoneTempPredictorCorrector.cc.obj) section. Core hits are
+required positive here, not zero. Exactly one ZON helper LOAD precedes the core
+archive. No derived-method provider or substituted implementation is admitted.
+
+Output is zon05-native-build.v1, target zon05_unit_helper, status
+pass-actual-1TU-link-and-preservation. It records actual full original/derivative
+refs, four Native sources, one compiled source, both registration counts, actual
+one compile command, source snapshot, map/provider, preservation, restore,
+consumer and RAD identities. The separate held strict PE reader consumes it.
+
+The proposed existing freezer contract is zon05-frozen-packet.v1, status
+frozen-literal-input-and-policy-before-numerical-execution, numerical_PASS_claimed
+false, top-level native_source_manifest, and source_authorities containing
+actual_scope_check_role real-ZON-05-check-only plus current_after_documents.
+The real freeze recorder stdout must equal the full receipt. Freezer/QA source
+adaptations are later tasks; this hold supplies no runtime freeze or scope facts.
+The helper's exact five-key request and stdout scientific results remain unchanged.
+
+All three RAD before sources, predecessor README/manifest and exact unified diffs
+are retained. Source was read, hashed, diffed and parsed using stdlib AST only.
+No held script was imported/run; no compiler/formatter/target/engine/Git/canonical
+action, binary/core/weather/scientific payload read, new QA framework, gate update
+or numerical PASS occurred. The author wrote the ZON helper and readiness audit;
+this is a build/custody proposal, not independent formula certification.

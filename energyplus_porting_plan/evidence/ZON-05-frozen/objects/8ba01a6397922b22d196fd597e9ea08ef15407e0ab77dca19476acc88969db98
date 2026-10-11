@@ -1,0 +1,34 @@
+{
+  "schema": "zon05-cases-contract.v1",
+  "frozen_before_this_ZON05_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "helper_request": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/helper-request.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170
+  },
+  "source": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/source.json",
+    "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+    "size_bytes": 26039
+  },
+  "tolerances": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/tolerances.json",
+    "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+    "size_bytes": 3451
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "literal_input_fixture": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170
+  },
+  "direct_member_only_parser_history_and_production_invoked": false
+}

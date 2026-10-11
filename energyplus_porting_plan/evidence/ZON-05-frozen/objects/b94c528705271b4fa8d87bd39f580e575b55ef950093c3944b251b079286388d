@@ -1,0 +1,214 @@
+{
+  "schema": "zon05-independent-build-reader-source-preparation.v1",
+  "card": "ZON-05",
+  "status": "held-source-only-awaiting-Root-and-other-author-FULL",
+  "author": "/root/clk02_header_port",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/native-build-review-prep-01/review_build.py",
+      "sha256": "ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+      "size_bytes": 7805,
+      "line_count": 128
+    }
+  ],
+  "before_archives": [
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/review_build.py",
+        "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+        "size_bytes": 5493,
+        "line_count": 105
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-review-prep-01/README.md",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/README.md",
+        "sha256": "b9249414c2f27d253ff054c8410679b366ca3af207902f09f628b36ce7e0d9fc",
+        "size_bytes": 1827,
+        "line_count": 13
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-review-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/manifest.json",
+        "sha256": "4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18",
+        "size_bytes": 4744,
+        "line_count": 138
+      },
+      "archive_bytes_equal_original": true
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/review_build.py",
+        "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+        "size_bytes": 5493,
+        "line_count": 105
+      },
+      "historical_before_path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py",
+      "after": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/review_build.py",
+        "sha256": "ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+        "size_bytes": 7805,
+        "line_count": 128
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/diffs/review_build.py.diff",
+        "sha256": "716c624565acf1e40b34ecbe0272e6e3d228aeff0762afbe610709a76a586079",
+        "size_bytes": 5754,
+        "line_count": 78
+      }
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/ZON-05/native-build-review-prep-01/README.md",
+    "sha256": "bf577a6bf1bd294b4064b1efc0dbfcc0522dc3adf81378e60e2a27aec8b703b6",
+    "size_bytes": 2579,
+    "line_count": 40
+  },
+  "build_source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-build-prep-01/manifest.json",
+    "sha256": "4bf4d13edf3c79c36e063bda4c20755cb3c1d53e4c43f7e5e885334f7e89d293",
+    "size_bytes": 23839,
+    "line_count": 603
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/run-native-build.py",
+      "sha256": "7d0a73df7ef4fee84b78617100fabf9758d5a05cc8ad768599e86df09b8e272b",
+      "size_bytes": 16486,
+      "line_count": 188
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/derive-and-describe-native-build.py",
+      "sha256": "6d41f42ff49478abf371b19984580ad7d65b5ded64c5e22d529118260c917dc3",
+      "size_bytes": 6837,
+      "line_count": 78
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/complete-native-build-metadata.py",
+      "sha256": "a6ec1d3230961ef81ff68a440515fc6098917348c0067376b12fe6af186b0d92",
+      "size_bytes": 11818,
+      "line_count": 116
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": "tools/porting/derive_native_helper.py",
+      "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+      "size_bytes": 12713,
+      "line_count": 241
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 237,
+      "end_line": 243,
+      "sha256": "6afa7afad6a22529b5acc28974cac22578e533b6af9f4b11f028c47906f06587",
+      "size_bytes": 428,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual core member signature"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "start_line": 1,
+      "end_line": 28,
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "single-TU target and unchanged RAD02 include"
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "start_line": 191,
+      "end_line": 346,
+      "sha256": "925306fb8a98d0c6fe51989a479c7a0cac2121f9637fb94ac69b99abf6d5bc4e",
+      "size_bytes": 10606,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "unchanged PE inspect/compare"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/complete-native-build-metadata.py",
+      "start_line": 67,
+      "end_line": 116,
+      "sha256": "9dfad967ea96ce02190a9fbf59230022995e3e353a7040d5ffe9cb26379a3821",
+      "size_bytes": 5686,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual core address provider and full binary build facts"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/derive-and-describe-native-build.py",
+      "start_line": 39,
+      "end_line": 62,
+      "sha256": "7aa5bc5f8e2c6bd8dfeb051e9936e0417cb1d82bf56a477f18a2012866277b6c",
+      "size_bytes": 2507,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "separate RAD registration and actual one ZON compile proof"
+    }
+  ],
+  "runtime_interfaces": {
+    "required_args": [
+      "--build",
+      "--output-dir"
+    ],
+    "report_schema": "zon05-independent-build-PE-review.v1",
+    "report_status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+    "target": "zon05_unit_helper",
+    "native_source_count": 4,
+    "compiled_source_count": 1,
+    "actual_protected_count": 52,
+    "registration_rows": [
+      717,
+      721
+    ],
+    "inherited_RAD_registration_count": 3,
+    "actual_ZON_compile_count": 1,
+    "core_registered_present_absent": [
+      643,
+      631,
+      12
+    ],
+    "required_core_ZoneTPC_provider_positive": true
+  },
+  "source_correspondence": {
+    "all_reader_guard_functions_AST_exact_RAD": true,
+    "both_actual_PE_inspect_compare_and_recorded_maps_text_exact_RAD": true,
+    "native_pe_source_unchanged": true
+  },
+  "future_actual_refs": {
+    "native_build": null,
+    "review_execution": null,
+    "linked_original": null,
+    "derived_helper": null,
+    "actual_PE_maps": null
+  },
+  "source_only_preparation": {
+    "project_imports_or_reviewed_source_execution": false,
+    "targets_compilers_formatters_tests_engines_invoked": false,
+    "scientific_weather_binary_core_payloads_read": false,
+    "canonical_or_Git_mutation": false,
+    "new_QA_or_execution_framework": false,
+    "numerical_or_gate_PASS_claimed": false
+  },
+  "authorship_limits": [
+    "Author wrote ZON Native helper/readiness; source/custody proposal is not independent formula certification.",
+    "Future actual binaries/core files are read only by Root after FULL review; none were read here."
+  ]
+}

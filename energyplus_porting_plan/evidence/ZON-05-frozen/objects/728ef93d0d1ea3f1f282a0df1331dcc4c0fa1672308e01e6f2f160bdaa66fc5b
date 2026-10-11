@@ -68,9 +68,3 @@ ZON-02의 cp/rho 및 HVAC 공급노드 W와 일관성
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
-
-## 확정한 직접 단위 범위
-
-Selected direct-member scope is complete Original correctHumRat4433-4619 and its actual helpers, zone1/space0, mixed-air ThirdOrder, NoAFN, no outdoor-air or latent-source branches. Preserve ordered inlet mass/W operations and integer multipliers, density/latent-heat/capacitance evaluation, existing four-slot working humidity history, lower-then-saturation comparisons and independent positive system-node W/H feedback. Reuse existing PSY state/cache; no stored-W floor or default-W replacement.21 literal input-only cases request43 actual member calls, with repeated operations retaining real state/cache. Inlet-order probes are unit mechanisms and do not expand CON production admission. Current/average W commits, history selection/push/rollback, purchased-air supply ownership and true runtime integration remain pending. Negative-density Native diagnostic backend parity is unavailable, not a manufactured scientific PASS.
-
-원본 helper와 Rust 제안의 독립 소스 검토를 마쳤다. 입력 21개와 호출 43개의 선언, 변수별 허용오차, 미관찰·중단 시 실패 규칙을 실제 출력 전에 고정한다. 실제 원본 실행·같은 입력 Rust 비교·운영 연결은 아직 미실행이다.

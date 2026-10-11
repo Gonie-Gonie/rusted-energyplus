@@ -1,0 +1,105 @@
+--- /dev/null
++++ .runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh
+@@ -0,0 +1,102 @@
++// Read-only direct-member owners. No moisture balance or psychrometric calculation here.
++#ifndef ZON05_REFERENCE_FIELDS_HH
++#define ZON05_REFERENCE_FIELDS_HH
++#include "zon01_reference_fields.hh"
++#include <EnergyPlus/DataHeatBalFanSys.hh>
++#include <EnergyPlus/DataLoopNode.hh>
++#include <EnergyPlus/DataRoomAirModel.hh>
++#include <EnergyPlus/DataZoneEquipment.hh>
++#include <EnergyPlus/DuctLoss.hh>
++#include <EnergyPlus/HybridModel.hh>
++#include <EnergyPlus/IOFiles.hh>
++#include <EnergyPlus/PsychCacheData.hh>
++#include <EnergyPlus/Psychrometrics.hh>
++#include <AirflowNetwork/Solver.hpp>
++
++#if !defined(EP_cache_PsyPsatFnTemp) || defined(EP_IF97)
++#error "ZON05 binds the default cached non-IF97 Original psychrometric lane"
++#endif
++
++#define ZON05_STATE_SCALARS(X) X(ZT) X(MAT) X(ZTAV) X(airHumRat) X(airHumRatAvg) X(airHumRatTemp) X(W1) X(WMX) X(WM2) X(WTimeMinusP) X(airRelHum)
++#define ZON05_ZERO_SOURCES(X) X(OAMFL) X(VAMFL) X(CTMFL) X(EAMFL) X(EAMFLxHumRat) X(SumHmARa) X(SumHmARaW) X(MixingMassFlowZone) X(MixingMassFlowXHumRat) X(MDotOA) X(latentGain) X(latentGainExceptPeople)
++#define ZON05_W_ARRAYS(X) X(WPrevZoneTS) X(DSWPrevZoneTS) X(WPrevZoneTSTemp)
++
++namespace Zon05 {
++using Zon01::bits;
++using Zon01::json;
++using Zon01::scalar;
++
++inline json psychrometric_state(EnergyPlus::EnergyPlusData const &state)
++{
++    auto const &s = *state.dataPsychrometrics;
++    json nondefault = json::array();
++    auto const &cache = state.dataPsychCache->cached_Psat;
++    for (std::size_t i = 0; i < cache.size(); ++i) {
++        auto const &row = cache[i];
++        // Same actual nondefault-row test used by the accepted PSY02 observer.
++        if (row.iTdb != -1000 || std::bit_cast<std::uint64_t>(row.Psat) != 0) {
++            nondefault.push_back({{"index", i}, {"iTdb", row.iTdb}, {"Psat", scalar(row.Psat)}});
++        }
++    }
++    return {{"iconvTol", scalar(s.iconvTol)}, {"last_Patm", scalar(s.last_Patm)},
++            {"last_tBoil", scalar(s.last_tBoil)}, {"Press_Save", scalar(s.Press_Save)},
++            {"tSat_Save", scalar(s.tSat_Save)}, {"useInterpolationPsychTsatFnPb", s.useInterpolationPsychTsatFnPb},
++            {"iPsyErrIndex", s.iPsyErrIndex}, {"Psat_cache_capacity", cache.size()}, {"nondefault_Psat_rows", nondefault},
++            {"cache_hits_or_local_helper_calls_observed", false}};
++}
++
++inline json snapshot(EnergyPlus::EnergyPlusData const &state, std::string const &phase)
++{
++    auto const &geometry = state.dataHeatBal->Zone(1);
++    auto const &owner = state.dataZoneTempPredictorCorrector->zoneHeatBalance(1);
++    auto const &config = state.dataZoneEquip->ZoneEquipConfig(1);
++    json sources = json::object();
++#define OBSERVE_SOURCE(name) sources[#name] = scalar(owner.name);
++    ZON05_ZERO_SOURCES(OBSERVE_SOURCE)
++#undef OBSERVE_SOURCE
++    json inlets = json::array();
++    for (int i = 1; i <= config.NumInletNodes; ++i) {
++        inlets.push_back({{"inlet_ordinal", i}, {"node_id", config.InletNode(i)}});
++    }
++    json nodes = json::array();
++    for (int i = 1; i <= state.dataLoopNodes->NumOfNodes; ++i) {
++        auto const &node = state.dataLoopNodes->Node(i);
++        nodes.push_back({{"node_id", i}, {"name", state.dataLoopNodes->NodeID(i)},
++                         {"MassFlowRate", scalar(node.MassFlowRate)}, {"Temp", scalar(node.Temp)},
++                         {"HumRat", scalar(node.HumRat)}, {"Enthalpy", scalar(node.Enthalpy)}});
++    }
++    return {{"phase", phase}, {"zone_id", 1}, {"space_id", 0}, {"zone_name", geometry.Name},
++            {"zone_fields", Zon01::zone_fields(owner)}, {"moisture_source_terms", sources},
++            {"Volume", scalar(geometry.Volume)}, {"ZoneVolCapMultpMoist", scalar(geometry.ZoneVolCapMultpMoist)},
++            {"Multiplier", geometry.Multiplier}, {"ListMultiplier", geometry.ListMultiplier},
++            {"IsControlled", geometry.IsControlled}, {"IsReturnPlenum", geometry.IsReturnPlenum},
++            {"IsSupplyPlenum", geometry.IsSupplyPlenum}, {"SystemZoneNodeNumber", geometry.SystemZoneNodeNumber},
++            {"leakageParallelPIU_count", geometry.leakageParallelPIUNums.size()},
++            {"NumInletNodes", config.NumInletNodes}, {"InletNode_allocated", config.InletNode.allocated()},
++            {"InletNode_lower", config.InletNode.allocated() ? json(config.InletNode.l()) : json(nullptr)},
++            {"InletNode_upper", config.InletNode.allocated() ? json(config.InletNode.u()) : json(nullptr)},
++            {"inlet_order", inlets}, {"nodes", nodes}, {"Node_allocated", state.dataLoopNodes->Node.allocated()},
++            {"Node_lower", state.dataLoopNodes->Node.allocated() ? json(state.dataLoopNodes->Node.l()) : json(nullptr)},
++            {"Node_upper", state.dataLoopNodes->Node.allocated() ? json(state.dataLoopNodes->Node.u()) : json(nullptr)},
++            {"NodeID_allocated", state.dataLoopNodes->NodeID.allocated()},
++            {"zone_owner_count", state.dataZoneTempPredictorCorrector->zoneHeatBalance.size()},
++            {"zone_geometry_count", state.dataHeatBal->Zone.size()},
++            {"zone_equip_config_count", state.dataZoneEquip->ZoneEquipConfig.size()},
++            {"room_air_model_count", state.dataRoomAir->AirModel.size()},
++            {"NumOfNodes", state.dataLoopNodes->NumOfNodes},
++            {"SumLatentHTRadSys", scalar(state.dataHeatBalFanSys->SumLatentHTRadSys(1))},
++            {"SumLatentPool", scalar(state.dataHeatBalFanSys->SumLatentPool(1))},
++            {"OutBaroPress", scalar(state.dataEnvrn->OutBaroPress)}, {"OutHumRat", scalar(state.dataEnvrn->OutHumRat)},
++            {"TimeStepSysSec", scalar(state.dataHVACGlobal->TimeStepSysSec)},
++            {"ZoneAirSolutionAlgo", static_cast<int>(state.dataHeatBal->ZoneAirSolutionAlgo)},
++            {"RoomAirModel", static_cast<int>(state.dataRoomAir->AirModel(1).AirModel)},
++            {"doSpaceHeatBalance", state.dataHeatBal->doSpaceHeatBalance}, {"DoLatentSizing", state.dataHeatBal->DoLatentSizing},
++            {"AFN_control_type", static_cast<int>(state.afn->simulation_control.type)},
++            {"AFN_multizone_always_simulated", state.afn->multizone_always_simulated},
++            {"AFN_FanActivated", state.afn->AirflowNetworkFanActivated},
++            {"AFN_distribution_simulated", state.afn->distribution_simulated},
++            {"DuctLossSimu", state.dataDuctLoss->DuctLossSimu}, {"FlagHybridModel", state.dataHybridModel->FlagHybridModel},
++            {"context", Zon01::context(state)}, {"psychrometrics", psychrometric_state(state)}};
++}
++} // namespace Zon05
++#endif

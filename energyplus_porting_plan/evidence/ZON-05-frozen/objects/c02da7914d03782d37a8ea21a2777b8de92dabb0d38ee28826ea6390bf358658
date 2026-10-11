@@ -1,0 +1,29 @@
+"""Root fixes the reviewed ZON05 direct-member scope and literal policy before outputs."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/ZON-05';OUT=BASE/'scope-amendment-01'
+def read(p):return json.loads(p.read_bytes())
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+assert not subprocess.check_output(['git','status','--porcelain'])and subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+assert not OUT.exists()and not (BASE/'native-build-01').exists()and not (BASE/'frozen-packet-01').exists()
+native_path=BASE/'native-helper-prep-01/manifest.json';assert ref(native_path)['sha256']=='5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1';native=read(native_path)
+writer_path=BASE/'input-writer-prep-01/manifest.json';assert ref(writer_path)['sha256']=='eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80'
+fixture_path=ROOT/native['input_fixture_proposal']['path'];policy_path=ROOT/native['observation_policy_proposal']['path'];fixture=read(fixture_path);policy=read(policy_path)
+for r in native['own_sources']+[native['input_fixture_proposal'],native['observation_policy_proposal']]:assert ref(ROOT/r['path'])=={k:r[k]for k in ['path','sha256','size_bytes']}
+counts={'cases':len(fixture['cases']),'correctHumRat':sum(len(c['operations'])for c in fixture['cases'])};assert counts=={'cases':21,'correctHumRat':43}
+assert set(fixture)=={'schema','card','expected_values_supplied','source_scope','cases'}and fixture['expected_values_supplied']is False
+documents=[ROOT/'energyplus_porting_plan/plan.json',ROOT/'energyplus_porting_plan/cards/ZON-05.md',ROOT/'energyplus_porting_plan/energyplus_porting_checklist.html']
+(OUT/'before').mkdir(parents=True);before=[]
+for p in documents:
+ dest=OUT/'before'/p.name;shutil.copyfile(p,dest);assert p.read_bytes()==dest.read_bytes();before.append(ref(dest))
+plan=read(documents[0]);task=next(t for t in plan['tasks']if t['id']=='ZON-05');assert all(task[k]=='미확인'for k in ['scope_review','unit_gate','integration_gate','production_gate'])
+note='Selected direct-member scope is complete Original correctHumRat4433-4619 and its actual helpers, zone1/space0, mixed-air ThirdOrder, NoAFN, no outdoor-air or latent-source branches. Preserve ordered inlet mass/W operations and integer multipliers, density/latent-heat/capacitance evaluation, existing four-slot working humidity history, lower-then-saturation comparisons and independent positive system-node W/H feedback. Reuse existing PSY state/cache; no stored-W floor or default-W replacement.21 literal input-only cases request43 actual member calls, with repeated operations retaining real state/cache. Inlet-order probes are unit mechanisms and do not expand CON production admission. Current/average W commits, history selection/push/rollback, purchased-air supply ownership and true runtime integration remain pending. Negative-density Native diagnostic backend parity is unavailable, not a manufactured scientific PASS.'
+inventory={'native_helper':ref(native_path),'input_fixture':ref(fixture_path),'observation_policy':ref(policy_path),'input_writer':ref(writer_path)}
+task.update(scope_review='통과',source_ranges_input_only=native['source_ranges'],zon05_policy_source_inventory=inventory,prospective_direct_unit_counts=counts,prospective_numerical_profiles=policy['required_numerical_profiles'],source_boundary_note=task['source_boundary_note']+'\n\n'+note)
+write(documents[0],plan)
+with documents[1].open('a',encoding='utf8',newline='\n')as stream:stream.write('\n## 확정한 직접 단위 범위\n\n'+note+'\n\n원본 helper와 Rust 제안의 독립 소스 검토를 마쳤다. 입력 21개와 호출 43개의 선언, 변수별 허용오차, 미관찰·중단 시 실패 규칙을 실제 출력 전에 고정한다. 실제 원본 실행·같은 입력 Rust 비교·운영 연결은 아직 미실행이다.\n')
+subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+write(OUT/'amendment.json',{'schema':'zon05-source-scope-amendment.v1','created_utc':datetime.now(timezone.utc).isoformat(),'cards':['ZON-05'],'scope_review_passed':True,'all_other_gates_pending':True,'strict_profiles_settled_before_outputs':True,'actual_ZON05_successful_build_or_engine_execution_performed':False,'actual_ZON05_scientific_execution_performed':False,'zon05_policy_source_inventory':inventory,'requested_counts':counts,'before_documents':before,'after_documents':[ref(p)for p in documents],'recorder_role':'real-ZON-05-check-only','scope_only_no_numerical_PASS':True,'actual_exact_prior_configure_restore':ref(BASE/'restore-preservation-01/preservation.json'),'Root_and_Raw_FULL_Native_and_freezer_accepted':True,'Root_and_Base_FULL_Rust_proposal_accepted_but_unapplied':True,'production_admission_expanded':False})
+print('Root ZON05 actual pre-output scope fixed',ref(OUT/'amendment.json'),flush=True)

@@ -1,0 +1,603 @@
+{
+  "schema": "zon05-native-build-source-preparation.v1",
+  "card": "ZON-05",
+  "status": "held-source-only-awaiting-Root-and-other-author-FULL",
+  "author": "/root/clk02_header_port",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/run-native-build.py",
+      "sha256": "7d0a73df7ef4fee84b78617100fabf9758d5a05cc8ad768599e86df09b8e272b",
+      "size_bytes": 16486,
+      "line_count": 188
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/derive-and-describe-native-build.py",
+      "sha256": "6d41f42ff49478abf371b19984580ad7d65b5ded64c5e22d529118260c917dc3",
+      "size_bytes": 6837,
+      "line_count": 78
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-prep-01/complete-native-build-metadata.py",
+      "sha256": "a6ec1d3230961ef81ff68a440515fc6098917348c0067376b12fe6af186b0d92",
+      "size_bytes": 11818,
+      "line_count": 116
+    }
+  ],
+  "before_archives": [
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-prep-02/run-native-build.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/run-native-build.py",
+        "sha256": "e0a74bb4fddab61db7a61959860aa7905fe6b764e3bfd417fcc0e9f950c7ee73",
+        "size_bytes": 8845,
+        "line_count": 117
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-prep-02/derive-and-describe-native-build.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/derive-and-describe-native-build.py",
+        "sha256": "2829a84a27f0dbc128aa9f27a655c8c3f9a0b496589ebb66a1e274485c5e8449",
+        "size_bytes": 5231,
+        "line_count": 67
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-prep-02/complete-native-build-metadata.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/complete-native-build-metadata.py",
+        "sha256": "99ac6e168cb3d17f9fea5050c0b0b2db6b5a8acbee71c981b62a09dad4e42d7a",
+        "size_bytes": 9114,
+        "line_count": 94
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-prep-02/README.md",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/README.md",
+        "sha256": "dcda6c0b6316287e581f88cfe7ffe3149740ce2b2ca72e0d0a4e2c3ea2670dc6",
+        "size_bytes": 6058,
+        "line_count": 92
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/native-build-prep-02/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/manifest.json",
+        "sha256": "32fea0f69a8cbb6c01d4d80198237c56ec09dcaa4590fb379e7559c9631fa5f2",
+        "size_bytes": 26006,
+        "line_count": 670
+      },
+      "archive_bytes_equal_original": true
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/run-native-build.py",
+        "sha256": "e0a74bb4fddab61db7a61959860aa7905fe6b764e3bfd417fcc0e9f950c7ee73",
+        "size_bytes": 8845,
+        "line_count": 117
+      },
+      "historical_before_path": ".runtime/porting/RAD-01/native-build-prep-02/run-native-build.py",
+      "after": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/run-native-build.py",
+        "sha256": "7d0a73df7ef4fee84b78617100fabf9758d5a05cc8ad768599e86df09b8e272b",
+        "size_bytes": 16486,
+        "line_count": 188
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/diffs/run-native-build.py.diff",
+        "sha256": "7f2914f5a7b3a4bccf77f3adaafc687f22fa4f803ec66838421d39682c4367f2",
+        "size_bytes": 19035,
+        "line_count": 201
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/derive-and-describe-native-build.py",
+        "sha256": "2829a84a27f0dbc128aa9f27a655c8c3f9a0b496589ebb66a1e274485c5e8449",
+        "size_bytes": 5231,
+        "line_count": 67
+      },
+      "historical_before_path": ".runtime/porting/RAD-01/native-build-prep-02/derive-and-describe-native-build.py",
+      "after": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/derive-and-describe-native-build.py",
+        "sha256": "6d41f42ff49478abf371b19984580ad7d65b5ded64c5e22d529118260c917dc3",
+        "size_bytes": 6837,
+        "line_count": 78
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/diffs/derive-and-describe-native-build.py.diff",
+        "sha256": "1112b92b959dfaed8a450666eac23595861ed545688c41d93c94d33ffc43a26a",
+        "size_bytes": 7909,
+        "line_count": 85
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/before/complete-native-build-metadata.py",
+        "sha256": "99ac6e168cb3d17f9fea5050c0b0b2db6b5a8acbee71c981b62a09dad4e42d7a",
+        "size_bytes": 9114,
+        "line_count": 94
+      },
+      "historical_before_path": ".runtime/porting/RAD-01/native-build-prep-02/complete-native-build-metadata.py",
+      "after": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/complete-native-build-metadata.py",
+        "sha256": "a6ec1d3230961ef81ff68a440515fc6098917348c0067376b12fe6af186b0d92",
+        "size_bytes": 11818,
+        "line_count": 116
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/native-build-prep-01/diffs/complete-native-build-metadata.py.diff",
+        "sha256": "acddbb52c00143732b5ba60163c342d022e7c11500ab86f1174c7bc3e0912ce1",
+        "size_bytes": 15271,
+        "line_count": 136
+      }
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/ZON-05/native-build-prep-01/README.md",
+    "sha256": "bf39db5a53a1624c89e6a6a67ffdf59875f2d9cd6390c6fb85398259ba3494a2",
+    "size_bytes": 6272,
+    "line_count": 98
+  },
+  "native_source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+    "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+    "size_bytes": 39009
+  },
+  "inherited_recipe_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_reference.cmake",
+      "sha256": "68d30d74659ce001939e0bb9be4befbfca551e3e005545209bd0215379bab40e",
+      "size_bytes": 2006,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+      "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+      "size_bytes": 2366,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_reference.cmake",
+      "sha256": "671f2fe052386fc9b1ae2ff923e3d96bbb512021fa9c851dcc61e45024678391",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-helper-prep-01/ctf08_reference.cmake",
+      "sha256": "ce35a66bc863e4c56961c6a628df8ece8b966fc0a2c89f4db0875c2e156d4659",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_reference.cmake",
+      "sha256": "3340f70174a3c90653e56a11581cf3f295c8c90b1ba3e9a51d1e657f84ca25c8",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-helper-prep-01/ctf06_reference.cmake",
+      "sha256": "c0a41733e1aa01716f2d93131f27efc9559d60565b9e3b8c81555ce3491c83f1",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_reference.cmake",
+      "sha256": "9ae728e892c0d5ad13c1343df3ad300ff60ae8b1beec84539d7417cb84d73315",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake",
+      "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+      "size_bytes": 2299,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_reference.cmake",
+      "sha256": "5b3f177075f959802c999f2423a9818ce82acf8c1c5149703b54cd3c0769413f",
+      "size_bytes": 2302,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake",
+      "sha256": "e08eb161676abef6aaa30c7417439015dc0766b9bf9a567c7cdcfc699c36d479",
+      "size_bytes": 2142,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference.cmake",
+      "sha256": "8ab75b9120bdab5d8302f14a47b242de8c3c22a0077a91f091c6690c9b762669",
+      "size_bytes": 2255,
+      "line_count": 34
+    },
+    {
+      "path": ".runtime/porting/SCH-01/builder-prep-05/sch01_reference.cmake",
+      "sha256": "cafea9db4714d3d20700f8039a3f522725294dc03e6e5f52f7443ec8c8cbe097",
+      "size_bytes": 1700,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-06/builder-prep-01/clk06_reference.cmake",
+      "sha256": "797d17b962e77cbe7e72cddfe1132808166a7ed607dc7c78dc0c0b34cec5c7cf",
+      "size_bytes": 1790,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-05/builder-prep-02/clk05_reference.cmake",
+      "sha256": "f9996c5507d8104abf7e0109e0c785383fc88df6d1d901513575b84ca4f14a08",
+      "size_bytes": 1731,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-04/native-builder-prep-03/clk04_reference.cmake",
+      "sha256": "60fd233cf5a8f7e383b2a7b1620e111b33e2ba04918fb5f471f290f0afa9709b",
+      "size_bytes": 1745,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-native-prep-01/clk03_production_reference.cmake",
+      "sha256": "65c62ddb332f67fd7b7a75e909311dfc2973c4fbc7c003827ed135108ecc6ecd",
+      "size_bytes": 1979,
+      "line_count": 29
+    },
+    {
+      "path": "tools/porting/clk03_reference.cmake",
+      "sha256": "2bd95d8d6fcdf19b0b2e0930f9ecd99c0b935b0b7f68c7f0766d1c1e900f65a6",
+      "size_bytes": 2001,
+      "line_count": 33
+    },
+    {
+      "path": "tools/porting/clk02_reference.cmake",
+      "sha256": "d3e9342f35ef9be3aa180effad190d3147ae8706e1fbe5ec7f82bef242ec11d5",
+      "size_bytes": 1775,
+      "line_count": 29
+    },
+    {
+      "path": "tools/porting/zon01_reference.cmake",
+      "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1",
+      "size_bytes": 2321,
+      "line_count": 36
+    },
+    {
+      "path": "tools/porting/geo03_reference.cmake",
+      "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a",
+      "size_bytes": 2612,
+      "line_count": 39
+    },
+    {
+      "path": "tools/porting/geo02_reference.cmake",
+      "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6",
+      "size_bytes": 2199,
+      "line_count": 33
+    },
+    {
+      "path": "tools/porting/geo01_reference.cmake",
+      "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d",
+      "size_bytes": 1756,
+      "line_count": 28
+    },
+    {
+      "path": "tools/porting/psy02_reference.cmake",
+      "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490",
+      "size_bytes": 1990,
+      "line_count": 34
+    },
+    {
+      "path": "tools/porting/clk01_reference.cmake",
+      "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f",
+      "size_bytes": 1179,
+      "line_count": 22
+    },
+    {
+      "path": "tools/porting/psy02_reachability.cmake",
+      "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8",
+      "size_bytes": 1819,
+      "line_count": 31
+    }
+  ],
+  "mechanism_sources": [
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": "tools/porting/derive_native_helper.py",
+      "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+      "size_bytes": 12713,
+      "line_count": 241
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/README.md",
+      "sha256": "518bccf4b5c2f96ea4c5905329d56bce8e497d0d080c5cd23bd4436cea1b79d3",
+      "size_bytes": 7698,
+      "line_count": 109
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/manifest.json",
+      "sha256": "69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de",
+      "size_bytes": 37185,
+      "line_count": 916
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705,
+      "line_count": 7244
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "size_bytes": 25280,
+      "line_count": 449
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-02/manifest.json",
+      "sha256": "a585f8bb507a5d046cc726f0da0dc80775abe4a9cee38d151921c9051619b230",
+      "size_bytes": 27329,
+      "line_count": 687
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/run-native-build.py",
+      "sha256": "92059a8cd3874570dda3fff9f6a6da89945dd161541ebaff6335c911f8608d44",
+      "size_bytes": 15749,
+      "line_count": 194
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/derive-and-describe-native-build.py",
+      "sha256": "f281e0b3be896de4e90b1028d3c986d17cacde5ad34766b22f8b632ee3f59533",
+      "size_bytes": 6199,
+      "line_count": 76
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/complete-native-build-metadata.py",
+      "sha256": "727164ddecedf3ddf368f5f79d0c782264d8115307e178e1936e4f68d7995cdb",
+      "size_bytes": 11393,
+      "line_count": 117
+    },
+    {
+      "path": ".runtime/porting/CTF-10/restore-configure-before-surface-consumer-02.py",
+      "sha256": "2642c3098607ad51564d52322d052080a2e21a8eef7c5734a11370fed77e227b",
+      "size_bytes": 4344,
+      "line_count": 42
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4433,
+      "end_line": 4619,
+      "sha256": "3c3f5304c4e9d2ca160f482508dc17ed17538566a6b84f25c78151a7062e155e",
+      "size_bytes": 10253,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "whole unchanged selected humidity member"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 237,
+      "end_line": 243,
+      "sha256": "6afa7afad6a22529b5acc28974cac22578e533b6af9f4b11f028c47906f06587",
+      "size_bytes": 428,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual core member signature"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "start_line": 170,
+      "end_line": 205,
+      "sha256": "1f6b3f1f949713aded7a5a509ce8d4c9f98424ae3f15fba74e989bd40df9ae5c",
+      "size_bytes": 2505,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual direct member call and partial operation transport"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "start_line": 210,
+      "end_line": 241,
+      "sha256": "5c660c700c73e043d046694f9594ab51547e225a6b038ab5bf9769064d6d43f0",
+      "size_bytes": 1960,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "exact five-key argc2 request/stdout interface"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "start_line": 1,
+      "end_line": 28,
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "single-TU target and unchanged RAD02 include"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_reference.cmake",
+      "start_line": 1,
+      "end_line": 30,
+      "sha256": "68d30d74659ce001939e0bb9be4befbfca551e3e005545209bd0215379bab40e",
+      "size_bytes": 2006,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "inherited exact RAD3 registration recipe"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/run-native-build.py",
+      "start_line": 114,
+      "end_line": 180,
+      "sha256": "74a728449b1dfb1131798351fb4583df7f133ac685a802e6cf90f8f98a470881",
+      "size_bytes": 6478,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "existing protected50 and exact717 restore checks"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/complete-native-build-metadata.py",
+      "start_line": 55,
+      "end_line": 117,
+      "sha256": "215f1487b5f5a4bcc71ec4c90434178c1765247785598c06212c02add89d7c42",
+      "size_bytes": 7005,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "future actual consumer pair fullrefs and build contract"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/restore-configure-before-surface-consumer-02.py",
+      "start_line": 1,
+      "end_line": 42,
+      "sha256": "2642c3098607ad51564d52322d052080a2e21a8eef7c5734a11370fed77e227b",
+      "size_bytes": 4344,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "existing Root restore layout; future52 record not authored here"
+    },
+    {
+      "path": "tools/porting/derive_native_helper.py",
+      "start_line": 136,
+      "end_line": 237,
+      "sha256": "95c464c099c3660b4efbabb61e2c7d74bbe5e3806ce8d6874372db7ec8274520",
+      "size_bytes": 6910,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "unchanged derivative and actual map receipts"
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "start_line": 191,
+      "end_line": 346,
+      "sha256": "925306fb8a98d0c6fe51989a479c7a0cac2121f9637fb94ac69b99abf6d5bc4e",
+      "size_bytes": 10606,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "unchanged PE inspect/compare"
+    }
+  ],
+  "actual_metadata_context_only_not_future_operands": [
+    {
+      "path": ".runtime/porting/CTF-10/native-configure-command-01/receipt.json",
+      "sha256": "aee2f78c24eca55faa824f2670602816aed06644de802cb113878052375ef2f5",
+      "size_bytes": 7383,
+      "line_count": 113
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+      "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+      "size_bytes": 3989,
+      "line_count": 96
+    }
+  ],
+  "runtime_interfaces": {
+    "target": "zon05_unit_helper",
+    "build_schema": "zon05-native-build.v1",
+    "build_status": "pass-actual-1TU-link-and-preservation",
+    "before_schema": "zon05-actual-before-build-preservation.v1",
+    "after_schema": "zon05-native-preservation-after.v1",
+    "compile_correspondence_schema": "zon05-actual-compile-row-correspondence.v1",
+    "native_source_count": 4,
+    "compiled_source_count": 1,
+    "compile_graph": {
+      "actual_restore_before": 722,
+      "actual_restore_after": 717,
+      "historical_RAD_rows": 720,
+      "inherited_RAD_registration_rows": 3,
+      "ZON_registration_rows": 1,
+      "current_rows": 721,
+      "actual_ZON_fresh_compile_commands_required": 1
+    },
+    "protected_count": 52,
+    "core_registered_present_absent": [
+      643,
+      631,
+      12
+    ],
+    "old_Original_absences": 12,
+    "consumer_build_schema": "ctf10-surface-consumer-native-build.v1",
+    "consumer_build_is_runtime_operand": true,
+    "restore_schema": "zon05-exact-restore-preservation.v1",
+    "restore_is_Root_runtime_operand_not_new_stage": true,
+    "core_provider_symbol": "EnergyPlus::ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlus::EnergyPlusData&, int, int)",
+    "selected_core_object": "libenergypluslib.a(ZoneTempPredictorCorrector.cc.obj)",
+    "selected_core_hits_required_positive": true,
+    "derived_Original_ZoneTPC_TU": false,
+    "fresh_hashes52_plus631_before_and_after": true,
+    "actual_all24_absences_before_and_after": true,
+    "planned_freeze_schema": "zon05-frozen-packet.v1",
+    "planned_freeze_status": "frozen-literal-input-and-policy-before-numerical-execution",
+    "planned_scope_role": "real-ZON-05-check-only"
+  },
+  "source_correspondence": {
+    "all_existing_common_guard_functions_AST_exact_RAD": true,
+    "Original_helper_four_files_unchanged": true,
+    "recipe_chain_unchanged": true,
+    "prior_configure_arguments_preserved_except_include_and_two_added_dirs": true,
+    "prior_compile_arguments_preserved_except_target_list": true,
+    "actual_RAD_registration_dicts_must_equal_real720_archive": true,
+    "no_prior_core_RAD_or_other_compile_allowed": true
+  },
+  "future_actual_refs": {
+    "scope_amendment": null,
+    "scope_check_execution": null,
+    "packet_freeze": null,
+    "packet_freeze_execution": null,
+    "consumer_native_build": null,
+    "restore_preservation": null,
+    "restore_execution": null,
+    "native_configure": null,
+    "native_compile": null,
+    "native_derivation": null,
+    "native_build": null,
+    "independent_PE": null,
+    "native_execution": null,
+    "OriginalDataQA": null
+  },
+  "authorship_limits": [
+    "Author wrote ZON Native helper/readiness; source/custody proposal is not independent formula certification.",
+    "Future actual binaries/core files are read only by Root after FULL review; none were read here."
+  ],
+  "source_only_preparation": {
+    "project_imports_or_reviewed_source_execution": false,
+    "targets_compilers_formatters_tests_engines_invoked": false,
+    "scientific_weather_binary_core_payloads_read": false,
+    "canonical_or_Git_mutation": false,
+    "new_QA_or_execution_framework": false,
+    "numerical_or_gate_PASS_claimed": false
+  }
+}

@@ -1,0 +1,109 @@
+# ZON-05 genuine direct-member Native source proposal
+
+SOURCE-ONLY, unapplied and unexecuted. This forks the existing ZON-01 helper pattern;
+it adds one test-only target linked to the unchanged EnergyPlus 26.1.0 core. No Original
+body, canonical Rust, plan/card, input model or Git state is edited. There is no new
+freezer, QA, comparer or proof framework. Future actual identities remain null.
+The readiness authority is69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de.
+
+## Selected boundary and input ownership
+
+The one invoked mathematical entry is the genuine linked
+ZoneSpaceHeatBalanceData::correctHumRat(state,1,0), Original4433-4619.
+The concrete owner is a genuinely allocated ZoneHeatBalanceData inherited member.
+It receives explicitly supplied, independently binary64-parsed input-only state.
+Every case creates its own real EnergyPlusData, clears the real psychrometric/cache
+owners, initializes constant state, then allocates actual required owners.
+The actual InitializePsychRoutines110-134 fills cache arrays; cache clear_state alone
+is not described as erasing all cached rows.
+Repeat operations share that case's actual state/cache and invoke the member again;
+they do not replay a recorded answer, commit current W or reset the cache implicitly.
+
+The admitted math branch is zone-only, fully mixed, ThirdOrder, no OA/no latent sources.
+The helper explicitly allocates SumLatentHTRadSys(1), SumLatentPool(1), AirModel(1),
+ZoneEquipConfig(1) and every declared inlet/feedback Node. All B/A source-owner terms
+are explicit zero inputs; latent radiant/pool arrays are explicit source-preparation
+zeros. Return/supply plenums, nonempty PIU lists, AFN multizone/distribution, duct loss,
+Hybrid, space balance and latent sizing are excluded by actual prepared state.
+The complete unchanged Original switch/guards/excluded branches remain in energypluslib.
+
+Multiplier and ListMultiplier are original int inputs. Positive, representable product
+admission prevents undefined source-domain overflow before the real integer multiplication.
+This is a test input-domain check, not a replacement source clamp or normalization.
+Finite positive volume/capacity/pressure/seconds and nonnegative node mass/W define this
+initial physical unit domain. Signed-zero current/working W inputs remain representable.
+The helper calculates no moisture coefficient, normalized flow, rho, Hg, Wsat or result.
+
+The source working W history is supplied as four actual input slots, independently from
+four zone/system history slots. The caller which selects/interpolates that working array
+is NOT invoked or certified. Supplied ZT is the corrected-temperature input boundary;
+the helper does not claim a correctAirTemp/temperature/HVAC trajectory produced it.
+MAT/ZTAV/current/average W and alternative-solver W1/WMX/WM2/WTimeMinusP are retained
+observations. Only real tempW and an actual positive feedback node receive member writes.
+Positive SystemZoneNodeNumber is tested independently of IsControlled, matching4594-4601.
+Input and feedback nodes are distinct in this bounded unit domain; no alias coverage claim.
+
+## Cases and policy before any output
+
+input-only-cases.proposed.json declares21 cases and43 ordered member operations.
+All numbers are literal test inputs; the accompanying bit strings encode those inputs
+only. No expected arrays, source outcomes, warning expectations or coefficients exist.
+Cases vary equal/nonuniform working histories, corrected ZT, pressure, volume, seconds,
+moisture-capacity multiplier, source integer multipliers, dry/moist/zero inlet flow,
+signed zero, subfloor W, source lower/upper guard probe operands and node-write presence.
+Two ordered-three-inlet probes exercise the same controlled source loop, explicitly
+unit-only. They do not admit multiple HVAC objects to CON-01 production. The remaining
+direct-member states are CON-like mathematical inputs, not claimed parsed CON models.
+Guard-probe names express an input-design purpose; actual guard decisions are unobserved.
+No branch result is computed from source math in the helper, input preparation or reader.
+
+observation-policy.proposed.json gives separately named W/H/cache profiles using existing
+PSY-01/02 units/contracts. It was chosen before new observations; no historic result
+metrics were used. It is a prospective proposal, not an executed/frozen tolerance claim.
+Own retention and all identities/order/shape/class/signed-zero obligations are explicit.
+Current/average W and histories are retained, not mislabeled as computed member outputs.
+
+## Actual observations and failure behavior
+
+Before/after snapshots copy actual owner fields, all six existing ZON01 four-slot arrays,
+moisture terms, geometry/capacity inputs, integer multipliers, inlet ID order, node W/H/T/
+mass, allocation bounds/counts, actual source flags, direct-unit clock and psychrometric
+state. Nondefault real Psat cache rows retain actual index/tag/value; no input hash or
+hit flag is reconstructed. The unchanged ZON01 scalar DTO records binary64 bits/class.
+All copies are observer-only; no saturation, helper or balance routine is called by a
+snapshot. Direct helper call counts increment at the real call site; return is marked
+only after normal return. Declared and actual record counts remain separate.
+
+A caught standard exception retains the actual partial state/messages, marks the call
+not returned, stops that case's remaining operations and makes the process exit2.
+This records an exception from the invocation, not a causal fatal/warning classifier.
+Other malformed-input/copy exceptions fail the process without inventing completed rows.
+Native OS termination/missing output stays a failed/unknown actual receipt obligation.
+No case cap, record sampling, default answer or omitted-record success is introduced.
+Message callbacks and err_stream are genuine Native diagnostic context, not paired Rust
+global reporting. Local A/B/C/rho/Hg/Wsat and actual guard decisions remain unavailable.
+
+## Recipe and exact custody
+
+zon05_reference.cmake includes the accepted RAD02 recipe unchanged, preserving its CTF
+and earlier target chain/options. Root must supply the genuine prior RAD/CTF variables
+and ZON05_SOURCE_DIR. The new target has one helper TU and inherited Original core
+definitions/includes/project_fp_options/project_warnings. Existing ZON01 ABI/assertion/
+psych-error guards remain byte-exact in the local copied fields header; default cached
+non-IF97 psychrometrics is additionally required. It generates a real link map later.
+No future compile-entry count, linked binary, map provider or process exit is guessed.
+Root's actual build review must authenticate the compiled source archives, core compiler/
+flags, unchanged Original correctHumRat provider, helper binary/size and map/PE custody.
+The package contains exact before copies and literal full source diffs for review.
+No derived Original TU or passive insertion is needed because the required outputs are
+real public owners; byte-identical pinned Original and its historical archive are bound.
+
+## Remaining gates
+
+Root+independent FULL source review, actual scope/input freeze/build/PE, genuine helper
+execution and OriginalDataQA precede any Rust numerical implementation/run. Actual
+callers/history/average/temperature and PurchasedAir moisture feedback are later genuine
+integration obligations; ZON-02/ZON-04 are still unknown. PSY-02 supports Wsat/cache,
+while completed ZON-01 only covers initialization/first stored entry. No existing result
+substitutes for this member. Full ZON-05, humidity control, adaptive clock/history/HVAC,
+production admission and global diagnostic parity are not certified by this source hold.

@@ -1,0 +1,11 @@
+"""Root literal invocation of the reviewed existing ZON05 packet writer."""
+import hashlib,json,subprocess
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/ZON-05';PREP=BASE/'input-writer-prep-01'
+def arg(p):return p.relative_to(ROOT).as_posix()+'#'+hashlib.sha256(p.read_bytes()).hexdigest()
+manifest=PREP/'manifest.json';assert arg(manifest).endswith('#eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80')
+for row in json.loads(manifest.read_bytes())['own_sources']:assert arg(ROOT/row['path']).endswith('#'+row['sha256'])
+writer=PREP/'freeze_packet.py';command=['python','-X','utf8','-B',writer.relative_to(ROOT).as_posix(),'--approved-source-sha256',hashlib.sha256(writer.read_bytes()).hexdigest()]
+for name,p in {'source-manifest':manifest,'current-card':ROOT/'energyplus_porting_plan/cards/ZON-05.md','actual-scope-amendment':BASE/'scope-amendment-01/amendment.json','actual-scope-amendment-execution':BASE/'scope-check-command-01/receipt.json'}.items():command+=['--'+name,arg(p)]
+command+=['--output-dir',(BASE/'frozen-packet-01').relative_to(ROOT).as_posix()]
+subprocess.run(command,check=True)

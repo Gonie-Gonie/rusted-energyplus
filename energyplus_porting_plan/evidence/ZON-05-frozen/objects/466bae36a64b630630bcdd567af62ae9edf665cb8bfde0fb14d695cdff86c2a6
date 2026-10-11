@@ -1,0 +1,44 @@
+"""Root exact configure replay; actual consumer pair extends protection to52."""
+import hashlib,json,os,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd(); CTF=ROOT/'.runtime/porting/CTF-10'; BASE=ROOT/'.runtime/porting/ZON-05'; OUT=BASE/'restore-preservation-01'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as stream: return hashlib.file_digest(stream,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+final_path=CTF/'retirement-01/after-retirement.json'; assert sha(final_path)=='dd6de8e9ad7f6246909391ecea53ee8f66202266b233c53ad0aaa22c0aad89cf'
+final=read(final_path); kept=final['protected_after']; rad_path=ROOT/'.runtime/porting/RAD-01/native-build-02/native-build.json'; rad=read(rad_path)
+consumer_path=CTF/'surface-consumer-native-build-02/native-build.json'; assert sha(consumer_path)=='9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c'; consumer=read(consumer_path)
+assert consumer['status']=='pass-actual-5TU-link-and-preservation' and consumer['current_compile_rows']==722
+protected=kept['legacy_protected']+kept['retained_CTF10_derivatives']+[rad['linked_original'],rad['helper_binary'],consumer['linked_original'],consumer['helper_binary']]
+assert len(protected)==len({r['path']for r in protected})==52
+core=kept['present_core_objects']; assert len(core)==631
+absences=list(kept['absent_registered_object_paths']); assert len(absences)==12
+prior_absences=[]
+for card in ['04','06','07','08','09']: prior_absences+=kept[f'previously_retired_CTF{card}_original_paths_still_absent']
+prior_absences+=[r['original_link']['historical_path']for r in final['entries']]; assert len(prior_absences)==len(set(prior_absences))==12
+def guard():
+ actual=[]
+ for row in protected+core:
+  p=(ROOT/row['path']).resolve(strict=True); assert p.is_relative_to(ROOT)and p.is_file()
+  now=ref(p); assert now=={k:row[k]for k in ['path','sha256','size_bytes']}; actual.append(now)
+ for path in absences+prior_absences: assert not (ROOT/path).exists(),path
+ return actual
+assert not OUT.exists(); OUT.mkdir(); before=guard()
+live=ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json'; current=read(live); assert len(current)==722
+consumer_inventory=ROOT/read(ROOT/consumer['preservation']['path'])['actual_after_compile_commands']['path']; assert current==read(consumer_inventory)
+shutil.copyfile(live,OUT/'compile-commands-before.json'); assert sha(live)==sha(OUT/'compile-commands-before.json')
+prior_path=CTF/'native-configure-command-01/receipt.json'; assert sha(prior_path)=='aee2f78c24eca55faa824f2670602816aed06644de802cb113878052375ef2f5'
+prior=read(prior_path); assert prior['exit_code']==0 and prior['source_bytes_match_before_and_after']; command=prior['command']
+env=dict(os.environ); env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+receipt_dir=BASE/'restore-configure-command-01'
+subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',receipt_dir.relative_to(ROOT).as_posix(),'--',*command],check=True,env=env)
+receipt=read(receipt_dir/'receipt.json'); assert receipt['command']==command and receipt['exit_code']==0 and receipt['launch_error']is None and receipt['source_bytes_match_before_and_after']
+restored=read(live); assert len(restored)==717; shutil.copyfile(live,OUT/'compile-commands-after.json'); assert sha(live)==sha(OUT/'compile-commands-after.json')
+old_build=read(CTF/'native-build-01/unit/native-build.json'); old_preservation=read(ROOT/old_build['preservation']['path']); prior717=old_preservation['actual_after_compile_commands']; prior717_path=ROOT/prior717['path']
+assert ref(prior717_path)==prior717 and restored==read(prior717_path)
+after=guard(); assert after==before
+record={'schema':'zon05-exact-restore-preservation.v1','observed_utc':datetime.now(timezone.utc).isoformat(),'actual_prior_final_preservation':ref(final_path),'actual_RAD_native_build':ref(rad_path),'actual_consumer_native_build':ref(consumer_path),'actual_exact_prior_configure_execution':ref(receipt_dir/'receipt.json'),'actual_before_compile_inventory':ref(OUT/'compile-commands-before.json'),'actual_after_compile_inventory':ref(OUT/'compile-commands-after.json'),'actual_prior717_reference':ref(prior717_path),'actual_before_hashes':before,'actual_after_hashes':after,'protected_ref_count':52,'core_present_count':631,'absent_registered_object_paths':absences,'prior_original_absent_paths':prior_absences,'actual_compile_rows_before':722,'actual_compile_rows_after':717,'literal_prior717_rows_equal':True,'all52_and631_fresh_hashes_unchanged':True,'scientific_execution_performed':False,'binary_deleted_moved_or_executed':False}
+(OUT/'preservation.json').write_bytes((json.dumps(record,indent=2,allow_nan=False)+'\n').encode('utf8'))
+print('Root exact717 configure restored; actual52 protected/631 present core/24 absences unchanged',ref(OUT/'preservation.json'),flush=True)

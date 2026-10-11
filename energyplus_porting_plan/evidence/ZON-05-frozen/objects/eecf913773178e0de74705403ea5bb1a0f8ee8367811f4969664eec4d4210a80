@@ -1,0 +1,837 @@
+{
+  "schema": "zon05-input-writer-source-preparation.v1",
+  "card": "ZON-05",
+  "status": "SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py",
+      "sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+      "size_bytes": 11482,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/packet_io.py",
+      "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+      "size_bytes": 3893,
+      "line_count": 105
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/ZON-05/input-writer-prep-01/README.md",
+    "sha256": "f153353eac1f31bb3eb2ffb2f901eb2f75cd4df882c14a92e7a2e38d6c8f9d0e",
+    "size_bytes": 3217,
+    "line_count": 50
+  },
+  "before_archives": [
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/freeze_packet.py",
+      "sha256": "f8861c866f55650aec715c0181e2c5ba5c75a18c1e3082baa4cf0ad676e396f2",
+      "size_bytes": 13413,
+      "line_count": 162
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/manifest.json",
+      "sha256": "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
+      "size_bytes": 23365,
+      "line_count": 585
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/README.md",
+      "sha256": "6d24f78506e1b0922bd79a51b4df1b1bf2d619847149af65419f85de18da1583",
+      "size_bytes": 3926,
+      "line_count": 21
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/freeze_packet.py",
+        "sha256": "f8861c866f55650aec715c0181e2c5ba5c75a18c1e3082baa4cf0ad676e396f2",
+        "size_bytes": 13413,
+        "line_count": 162
+      },
+      "after": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py",
+        "sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+        "size_bytes": 11482,
+        "line_count": 142
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/diffs/freeze_packet.py.diff",
+        "sha256": "7e81f1a85a58f7fb9bb9cd7c45e4829d54b51e1f900fb9d413e90146940a3c92",
+        "size_bytes": 18906,
+        "line_count": 214
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/before/packet_io.py",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893,
+        "line_count": 105
+      },
+      "after": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893,
+        "line_count": 105
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/diffs/packet_io.py.diff",
+        "sha256": "f29e649dac36e6d996cbaf0269a9dc32e4bf19f57ae22421293760773e95ee22",
+        "size_bytes": 319,
+        "line_count": 11
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170,
+      "line_count": 3032
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "line_count": 28
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705,
+      "line_count": 7244
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "size_bytes": 25280,
+      "line_count": 449
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "size_bytes": 31704,
+      "line_count": 668
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+      "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+      "size_bytes": 26592,
+      "line_count": 561
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+      "size_bytes": 45326,
+      "line_count": 797
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+      "sha256": "47b8408ba71120bbfbe31e8c10c0e192872abebde7ba93918c643a69fcbf1298",
+      "size_bytes": 11610,
+      "line_count": 219
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "size_bytes": 24717,
+      "line_count": 556
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "size_bytes": 16816,
+      "line_count": 234
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DuctLoss.hh",
+      "sha256": "852851d965effadc13fc2c2aeb530bc33bbbe6bd653e2a07714db8fe27c523db",
+      "size_bytes": 7312,
+      "line_count": 184
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HybridModel.hh",
+      "sha256": "c7aee172a33fcdd657b40181d79fa874b4a7d3489f517a3b6363fe2cab893046",
+      "size_bytes": 7169,
+      "line_count": 155
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "sha256": "08f9d970200b2adb9b69cf3500cb63cf7bf873eb482d705fdc02827a6ce30759",
+      "size_bytes": 38569,
+      "line_count": 739
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "size_bytes": 108928,
+      "line_count": 1739
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f",
+      "size_bytes": 73171,
+      "line_count": 1477
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PsychCacheData.hh",
+      "sha256": "30419f4ea110c4ca8c98b2f78641bb3d1493715a0c16645a288a9888bdb87094",
+      "size_bytes": 6762,
+      "line_count": 206
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21",
+      "size_bytes": 28491,
+      "line_count": 617
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+      "size_bytes": 60978,
+      "line_count": 1104
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+      "size_bytes": 13547,
+      "line_count": 198
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+      "size_bytes": 32371,
+      "line_count": 842
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/manifest.json",
+      "sha256": "69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de",
+      "size_bytes": 37185,
+      "line_count": 916
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/README.md",
+      "sha256": "b50761fb237858ba7884b767a0472b8565facf070874b7b1bb020c570c0b1711",
+      "size_bytes": 8994,
+      "line_count": 125
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/policy-proposal.json",
+      "sha256": "9088b90e1d2d3a487be8b3d9baea9cf76659f611a3af4bf8e11a6af2c3066abc",
+      "size_bytes": 2021,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/task-context.json",
+      "sha256": "17db92781eb94087bb938e8c3b8bb22d91acc7e15afdd844242a8807d3b64931",
+      "size_bytes": 3427,
+      "line_count": 95
+    },
+    {
+      "path": "energyplus_porting_plan/cards/ZON-05.md",
+      "sha256": "728ef93d0d1ea3f1f282a0df1331dcc4c0fa1672308e01e6f2f160bdaa66fc5b",
+      "size_bytes": 2771,
+      "line_count": 70
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee",
+      "size_bytes": 24072,
+      "line_count": 605
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-source.json",
+      "sha256": "c4652cfeb8fbc1629444fa6c246892f4ea2dfe8d45dade76f0bf7261ea464e82",
+      "size_bytes": 11563,
+      "line_count": 301
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+      "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083",
+      "size_bytes": 1615,
+      "line_count": 66
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+      "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13",
+      "size_bytes": 15537,
+      "line_count": 453
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4",
+      "size_bytes": 2624,
+      "line_count": 120
+    },
+    {
+      "path": "tools/porting/zon01_reference_helper.cpp",
+      "sha256": "4345e4407d953eade45c30c3555894d5adb3eba3c16381fdc0391cf5f9b8c060",
+      "size_bytes": 8810,
+      "line_count": 155
+    },
+    {
+      "path": "tools/porting/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": "tools/porting/zon01_reference.cmake",
+      "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1",
+      "size_bytes": 2321,
+      "line_count": 36
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/source/psy02_reference.cpp",
+      "sha256": "26645ac2563c5a96e23760ff81469c1d93241c4acd66e69ff4bbed5c499b552c",
+      "size_bytes": 16023,
+      "line_count": 234
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
+      "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
+      "size_bytes": 24281,
+      "line_count": 604
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_reference.cmake",
+      "sha256": "68d30d74659ce001939e0bb9be4befbfca551e3e005545209bd0215379bab40e",
+      "size_bytes": 2006,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+      "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+      "size_bytes": 2366,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b",
+      "size_bytes": 5993,
+      "line_count": 131
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4433,
+      "last_line": 4619,
+      "symbol_or_boundary": "whole unchanged correctHumRat",
+      "sha256": "3c3f5304c4e9d2ca160f482508dc17ed17538566a6b84f25c78151a7062e155e",
+      "size_bytes": 10253,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 3894,
+      "last_line": 3900,
+      "symbol_or_boundary": "history selection caller is NOT invoked",
+      "sha256": "835334f0ef46b70d31e4733606668cef0a73ade9fab9acf7def3a0cba26fccb0",
+      "size_bytes": 224,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4128,
+      "last_line": 4131,
+      "symbol_or_boundary": "current W commit caller is NOT invoked",
+      "sha256": "c3075c2fc2d80ba754265ea42ac239edf5741ea1e80e7a861952884ab46d1f4f",
+      "size_bytes": 234,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "first_line": 102,
+      "last_line": 213,
+      "symbol_or_boundary": "complete base owner/defaults",
+      "sha256": "5cc51438f790655dfd171e7fb8bf8c7aa31b3e3ea66bf999e108f722fc89147e",
+      "size_bytes": 8707,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "first_line": 241,
+      "last_line": 244,
+      "symbol_or_boundary": "public actual member declaration",
+      "sha256": "87761ea16ddc21459306e7bb3eba1b0a334f69b0718c2f3b48e4c2c670b018c2",
+      "size_bytes": 196,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 99,
+      "last_line": 107,
+      "symbol_or_boundary": "ThirdOrder enum",
+      "sha256": "99ae1c0f9326a050950bd9f43ff8317aa7b4f01999292b6a393ed4ba78814bd0",
+      "size_bytes": 186,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 434,
+      "last_line": 449,
+      "symbol_or_boundary": "zone geometry/node/control",
+      "sha256": "9a5d7e244cc961051688b971cf3f847745d1666d4e445e9675e5da2fc9d26284",
+      "size_bytes": 1288,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 570,
+      "last_line": 578,
+      "symbol_or_boundary": "integer multipliers",
+      "sha256": "bbfcaa3f548460f9acaa88ae1ff467bdc4b476816b6a4daa351300797ccdecbe",
+      "size_bytes": 472,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 597,
+      "last_line": 604,
+      "symbol_or_boundary": "excluded plenums",
+      "sha256": "a0d39a4cd19050620975e38792ff7af78ab1effc415d45f811977e291731f486",
+      "size_bytes": 870,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 675,
+      "last_line": 684,
+      "symbol_or_boundary": "moisture capacity multiplier",
+      "sha256": "09f44e1478369ba4c04cea73a9b010501d71d481e3eb04398d9855785be2ce34",
+      "size_bytes": 1090,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 1833,
+      "last_line": 1837,
+      "symbol_or_boundary": "algorithm/space selector",
+      "sha256": "2a7ef9d503ab72fb75cd07af32c1dbb600468cab0075937ad2ae1208fa9f6b03",
+      "size_bytes": 446,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 1881,
+      "last_line": 1884,
+      "symbol_or_boundary": "latent sizing",
+      "sha256": "cfe4a4d0f866e50bc660ffee1dfaa31f24b6a1b86b871ffec04c73e9d86ac6eb",
+      "size_bytes": 210,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "first_line": 305,
+      "last_line": 372,
+      "symbol_or_boundary": "actual configuration/input nodes/constructor",
+      "sha256": "77808031a26faa0fba41bb0f72fd5579375e75affb75359c6f117cf946fdb078",
+      "size_bytes": 5386,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "first_line": 635,
+      "last_line": 643,
+      "symbol_or_boundary": "real configuration array",
+      "sha256": "86385d6e85955980c6b82372cfd7aa1af8c98e5080616b1d573b5690f3dee6e5",
+      "size_bytes": 449,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+      "first_line": 439,
+      "last_line": 466,
+      "symbol_or_boundary": "node owner defaults/fields",
+      "sha256": "103777316ed8609bea322a878bd6bbf8cb677c6e444578139a54bc452009d0d2",
+      "size_bytes": 1847,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+      "first_line": 533,
+      "last_line": 542,
+      "symbol_or_boundary": "actual node arrays/count",
+      "sha256": "743c92d76bafcb52a85dcdd89f17519aa56a60fd1abf73a1444b1b89df21aed6",
+      "size_bytes": 304,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "first_line": 73,
+      "last_line": 85,
+      "symbol_or_boundary": "actual mixed enum",
+      "sha256": "e952c433677a50ec3940d3ec2c941a1def16308a1d6e40031d63bff81653e0c0",
+      "size_bytes": 506,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "first_line": 168,
+      "last_line": 176,
+      "symbol_or_boundary": "actual default AirModel",
+      "sha256": "b0b0b79d1e84deaed41aa7f477c14e15783ef8a083c784eea6cab14e7b4b904f",
+      "size_bytes": 384,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "first_line": 632,
+      "last_line": 640,
+      "symbol_or_boundary": "actual room-air array",
+      "sha256": "752ad8808c7bff8480a694de0b324540f4f347fc799047d9d663163e67c138a0",
+      "size_bytes": 328,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+      "first_line": 110,
+      "last_line": 120,
+      "symbol_or_boundary": "mandatory latent arrays",
+      "sha256": "053c62e8dcdee924e1044d20426fe8636d3139b56a6e2c9cfce26732e4a595c1",
+      "size_bytes": 694,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "first_line": 488,
+      "last_line": 497,
+      "symbol_or_boundary": "actual source timestep seconds",
+      "sha256": "788ed4c9bbd6b27dc06302a6d763e52128883bf19b0ec3ac719fa70176747bb6",
+      "size_bytes": 844,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "first_line": 125,
+      "last_line": 131,
+      "symbol_or_boundary": "actual pressure",
+      "sha256": "6b90c91e0611b4941f98e65a3fec3d74b92d8e2cf158b19a30c015bf1917ada7",
+      "size_bytes": 634,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DuctLoss.hh",
+      "first_line": 148,
+      "last_line": 156,
+      "symbol_or_boundary": "excluded duct flag",
+      "sha256": "02dca9464510f98862ec375330c6a3fed202fd929166718067923222d3070684",
+      "size_bytes": 363,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HybridModel.hh",
+      "first_line": 119,
+      "last_line": 125,
+      "symbol_or_boundary": "excluded Hybrid flag",
+      "sha256": "402029e32b8a75dd6c2956ddbb31084a9e253768ae05f929fce62dd02980532b",
+      "size_bytes": 348,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "first_line": 76,
+      "last_line": 84,
+      "symbol_or_boundary": "source AFN enum",
+      "sha256": "0b2b826b665548a4c7a7e6f34ab686b787d68a20cef95302ab01917e3cf53824",
+      "size_bytes": 734,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "first_line": 190,
+      "last_line": 206,
+      "symbol_or_boundary": "real simulation-control default",
+      "sha256": "784ac9a55d152678cb9055c4a8363e740c37d8e2b9e240459585507a090c8ec0",
+      "size_bytes": 1095,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "first_line": 480,
+      "last_line": 504,
+      "symbol_or_boundary": "real AFN owner flags",
+      "sha256": "c6304ef956aeb514e6f20873763f95ccab5fd3b59aae5ed996fd2c37a7bef62c",
+      "size_bytes": 1978,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "first_line": 512,
+      "last_line": 547,
+      "symbol_or_boundary": "whole density helper",
+      "sha256": "ebdb4af3f3c4dbef51ec96ebc9a37c5ee6bf316555312774df6c15f302b0dd9e",
+      "size_bytes": 1558,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "first_line": 623,
+      "last_line": 666,
+      "symbol_or_boundary": "whole Hg/H helpers",
+      "sha256": "09689bbc66823e0c23f5a8ef622784c45bad32c87f75444dbedace265ad7b0a7",
+      "size_bytes": 1684,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "first_line": 1000,
+      "last_line": 1071,
+      "symbol_or_boundary": "whole cached Psat",
+      "sha256": "0022822c207e2e6bb57ee650977cb62a1732549eb3b17e958528fbc5d96d15f5",
+      "size_bytes": 3014,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "first_line": 1342,
+      "last_line": 1387,
+      "symbol_or_boundary": "whole W-from-RH",
+      "sha256": "9e2d3cbd4fc80af4344d6a98ce2315eb972b2717bbdf3ac638f86d845f3287e3",
+      "size_bytes": 2177,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "first_line": 1702,
+      "last_line": 1735,
+      "symbol_or_boundary": "actual psych state/reset/init",
+      "sha256": "c071a3e3b600f1641d06fbf51bba93743573881b43863c890d54ba3464255e8c",
+      "size_bytes": 1139,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "first_line": 110,
+      "last_line": 134,
+      "symbol_or_boundary": "actual cache array initialization",
+      "sha256": "d5f82af56c939670da609d314846f42be482d6c52eef7262693d98b92027e114",
+      "size_bytes": 790,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "first_line": 640,
+      "last_line": 784,
+      "symbol_or_boundary": "whole default raw Psat",
+      "sha256": "397e8ebae1f583ee1548036d45864f4bfe8779f522f3e756ec30b81c24897d0d",
+      "size_bytes": 6713,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PsychCacheData.hh",
+      "first_line": 75,
+      "last_line": 106,
+      "symbol_or_boundary": "actual default cache compile variant/shape",
+      "sha256": "c57f9c46915ccad627737092d37ecdc121f786ad59e1239ab393148823fea966",
+      "size_bytes": 938,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PsychCacheData.hh",
+      "first_line": 134,
+      "last_line": 145,
+      "symbol_or_boundary": "actual Psat row initialization",
+      "sha256": "6da4fd042b8b938ada891f5b19f997c35d7278717659ed555a282762becee611",
+      "size_bytes": 189,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PsychCacheData.hh",
+      "first_line": 162,
+      "last_line": 201,
+      "symbol_or_boundary": "actual cache owner/clear behavior",
+      "sha256": "a0c2a48e8d5536e88944c635f931f9dc0386c7378be287520c130122e0f0f66b",
+      "size_bytes": 1059,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "first_line": 320,
+      "last_line": 326,
+      "symbol_or_boundary": "real owned AFN",
+      "sha256": "434e8640bada2b65140a3595662711a4219356aa0af214010fe2428046df41d9",
+      "size_bytes": 322,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "first_line": 573,
+      "last_line": 611,
+      "symbol_or_boundary": "constructor/lifetime/constant-state API",
+      "sha256": "358b1870bf3a395814eda59ab5a040d389b74806241067a353da0664f98de92c",
+      "size_bytes": 1883,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "first_line": 55,
+      "last_line": 63,
+      "symbol_or_boundary": "genuine constructor and AFN allocation",
+      "sha256": "993592c358102ad8366a2865eb8f8133f98944f61de77786638457703e3fee49",
+      "size_bytes": 548,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "first_line": 219,
+      "last_line": 230,
+      "symbol_or_boundary": "psych/cache/RoomAir allocation",
+      "sha256": "578d35019e564767a2fbbc7fa3636b85422efbd260625c52187e6e121851380a",
+      "size_bytes": 843,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "first_line": 309,
+      "last_line": 309,
+      "symbol_or_boundary": "actual default destructor",
+      "sha256": "d8528b0183918c7791ebfac06b0793b6424846066eb412789a3b0b7b2f210b39",
+      "size_bytes": 45,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "first_line": 579,
+      "last_line": 594,
+      "symbol_or_boundary": "actual one-time state init and Psych entry",
+      "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+      "size_bytes": 607,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "first_line": 168,
+      "last_line": 173,
+      "symbol_or_boundary": "genuine error callback",
+      "sha256": "0c36211980bb97a418b18fa6a85a2c325026b992e65a915f1ce72d2a15711106",
+      "size_bytes": 349,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "first_line": 662,
+      "last_line": 671,
+      "symbol_or_boundary": "genuine error stream ownership",
+      "sha256": "6e246fbc24f71f8b63e56684c924da70e75456fe4197434ec4e99c5599664566",
+      "size_bytes": 305,
+      "encoding": "literal original bytes/inclusive lines"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/source/psy02_reference.cpp",
+      "first_line": 51,
+      "last_line": 64,
+      "symbol_or_boundary": "actual psych state/error-index observation pattern",
+      "sha256": "02a971289bc3ebda3bdf6693283656777aa2c8fe522d82d8bf379146f95d40a7",
+      "size_bytes": 781,
+      "encoding": "literal original source bytes/inclusive lines"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/source/psy02_reference.cpp",
+      "first_line": 70,
+      "last_line": 74,
+      "symbol_or_boundary": "actual cache-row copy pattern",
+      "sha256": "acdc65ccf7b01e1d08234e1888ac1e4945ab45e3158d454eceb04c17342c8015",
+      "size_bytes": 299,
+      "encoding": "literal original source bytes/inclusive lines"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/source/psy02_reference.cpp",
+      "first_line": 114,
+      "last_line": 122,
+      "symbol_or_boundary": "accepted nondefault cache-row predicate",
+      "sha256": "818a44ce67825e217d714fe537f10c826564ae585aa7c8a30c657203ae6c572a",
+      "size_bytes": 764,
+      "encoding": "literal original source bytes/inclusive lines"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/source/psy02_reference.cpp",
+      "first_line": 197,
+      "last_line": 203,
+      "symbol_or_boundary": "genuine state/cache/diagnostic setup",
+      "sha256": "50909bc994ba01ab8e1df986f654e1aa9ba17e2f7300781e5a4b0b4287d768f3",
+      "size_bytes": 619,
+      "encoding": "literal original source bytes/inclusive lines"
+    }
+  ],
+  "runtime_interfaces": {
+    "freeze_schema": "zon05-frozen-packet.v1",
+    "freeze_status": "frozen-literal-input-and-policy-before-numerical-execution",
+    "scope_schema": "zon05-source-scope-amendment.v1",
+    "scope_inventory_key": "zon05_policy_source_inventory",
+    "scope_role": "real-ZON-05-check-only",
+    "native_argv": [
+      "actual_derived_executable",
+      "actual_byte_exact_request_path"
+    ],
+    "request_keys": [
+      "schema",
+      "card",
+      "expected_values_supplied",
+      "source_scope",
+      "cases"
+    ],
+    "requested_counts_from_literal_inputs": {
+      "cases": 21,
+      "correctHumRat": 43
+    },
+    "actual_scope_amendment": null,
+    "actual_scope_check_execution": null,
+    "actual_freeze_execution": null,
+    "scientific_execution_performed": false,
+    "numerical_PASS_claimed": false,
+    "gates_updated": false
+  },
+  "authoring_verification": {
+    "AST_only_no_import_or_execution": true,
+    "two_exact_diffs_regenerated": true,
+    "IO_functions_unchanged_namespace_only": true,
+    "all_declared_dependencies_and_ranges_checked": true,
+    "future_Runtime_refs_not_invented": true
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "zon05-before-output-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/ZON-05-frozen/manifest.json",
+    "sha256": "33362394a6aaaa5a661b8f0ed7742a58dafcb54fd86525223d7955b80cd1478d",
+    "size_bytes": 60743
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+    "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+    "size_bytes": 3116
+  },
+  "actual_input_freeze": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/freeze-receipt.json",
+    "sha256": "bebed288efc36cbf52a190f7cb207162a5d437532d2e4b46167e03b79aa0a389",
+    "size_bytes": 21040
+  },
+  "actual_executions": {
+    "scope-check-command-01": {
+      "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+      "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+      "size_bytes": 3006
+    },
+    "freeze-command-01": {
+      "path": ".runtime/porting/ZON-05/freeze-command-01/receipt.json",
+      "sha256": "a772bd11d519663c5633a3af21b66942bbd195ffeaa609f45ab315a0d742a31b",
+      "size_bytes": 2970
+    },
+    "restore-launch-command-01": {
+      "path": ".runtime/porting/ZON-05/restore-launch-command-01/receipt.json",
+      "sha256": "f89c62a7f75c8830dd19a72a66ba01a19527973e212d74aa9d037950b8f0b108",
+      "size_bytes": 2852
+    },
+    "restore-configure-command-01": {
+      "path": ".runtime/porting/ZON-05/restore-configure-command-01/receipt.json",
+      "sha256": "57ec8fa0a899678482b6ccef35865e6b0d9cb290a2704e98ead18bf5d03d0d3c",
+      "size_bytes": 7554
+    }
+  },
+  "actual_exact_restore": {
+    "path": ".runtime/porting/ZON-05/restore-preservation-01/preservation.json",
+    "sha256": "de351b3667bd0bc0616b771f59dfa919769a9bfd9289ae60be7902cc39fbe5a7",
+    "size_bytes": 332081
+  },
+  "Native_Source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+    "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+    "size_bytes": 39009
+  },
+  "input_writer_Source_manifest": {
+    "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+    "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+    "size_bytes": 33168
+  },
+  "build_Source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-build-prep-01/manifest.json",
+    "sha256": "4bf4d13edf3c79c36e063bda4c20755cb3c1d53e4c43f7e5e885334f7e89d293",
+    "size_bytes": 23839
+  },
+  "PE_reader_Source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-build-review-prep-01/manifest.json",
+    "sha256": "b94c528705271b4fa8d87bd39f580e575b55ef950093c3944b251b079286388d",
+    "size_bytes": 8015
+  },
+  "Root_and_other_author_FULL_Native_writer_build_PE_accepted": true,
+  "requested_cases": 21,
+  "requested_correctHumRat_calls": 43,
+  "exact_five_key_request_bytecopy": true,
+  "Root_Rust_math_proposal_FULL_accepted_but_unapplied": true,
+  "actual_ZON05_build_or_Native_scientific_execution_available": false,
+  "actual_original_counts_or_numerical_errors": null,
+  "full_card_gates_updated": false,
+  "production_admission_expanded": false
+}

@@ -1,0 +1,82 @@
+{
+  "schema": "zon05-source-scope-amendment.v1",
+  "created_utc": "2026-10-11T02:25:01.393409+00:00",
+  "cards": [
+    "ZON-05"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_ZON05_successful_build_or_engine_execution_performed": false,
+  "actual_ZON05_scientific_execution_performed": false,
+  "zon05_policy_source_inventory": {
+    "native_helper": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009
+    },
+    "input_fixture": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170
+    },
+    "observation_policy": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609
+    },
+    "input_writer": {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168
+    }
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/ZON-05/scope-amendment-01/before/plan.json",
+      "sha256": "1d39dfabfa9656d0048bebade12e5d5d96721413ef106281756ceca467e1a5a0",
+      "size_bytes": 732938
+    },
+    {
+      "path": ".runtime/porting/ZON-05/scope-amendment-01/before/ZON-05.md",
+      "sha256": "728ef93d0d1ea3f1f282a0df1331dcc4c0fa1672308e01e6f2f160bdaa66fc5b",
+      "size_bytes": 2771
+    },
+    {
+      "path": ".runtime/porting/ZON-05/scope-amendment-01/before/energyplus_porting_checklist.html",
+      "sha256": "8442cae2d6f72fe1a549d510b4054e4426b790465d0989ceee44da01e93bf75e",
+      "size_bytes": 589804
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "c4b57b0272e14e3999b47f04c073c7db4c425343923bad849480cb4fadbe010e",
+      "size_bytes": 755994
+    },
+    {
+      "path": "energyplus_porting_plan/cards/ZON-05.md",
+      "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+      "size_bytes": 4033
+    },
+    {
+      "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "sha256": "a2803a93e7cd45278456a5c4c5b38eb9c6eecfaae5e2d13a526befe8978e450f",
+      "size_bytes": 608072
+    }
+  ],
+  "recorder_role": "real-ZON-05-check-only",
+  "scope_only_no_numerical_PASS": true,
+  "actual_exact_prior_configure_restore": {
+    "path": ".runtime/porting/ZON-05/restore-preservation-01/preservation.json",
+    "sha256": "de351b3667bd0bc0616b771f59dfa919769a9bfd9289ae60be7902cc39fbe5a7",
+    "size_bytes": 332081
+  },
+  "Root_and_Raw_FULL_Native_and_freezer_accepted": true,
+  "Root_and_Base_FULL_Rust_proposal_accepted_but_unapplied": true,
+  "production_admission_expanded": false
+}

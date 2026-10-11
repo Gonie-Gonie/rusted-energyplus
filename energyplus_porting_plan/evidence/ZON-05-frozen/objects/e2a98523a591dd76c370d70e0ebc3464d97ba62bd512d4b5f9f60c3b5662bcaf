@@ -1,0 +1,3032 @@
+{
+  "schema": "zon05-native-unit-request.v1",
+  "card": "ZON-05",
+  "expected_values_supplied": false,
+  "source_scope": "zone-only-mixed-noOA-noLatent-ThirdOrder-direct-member",
+  "cases": [
+    {
+      "case_id": "equal-working-no-inlet",
+      "purpose": "Equal supplied working histories; genuine repeat calls expose cache/retention without a caller commit.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "equal-working-no-inlet-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "equal-working-no-inlet-CALL-2",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "equal-working-no-inlet-CALL-3",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "nonuniform-working",
+      "purpose": "Nonuniform supplied working history; all independent zone/system histories retained.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.009,
+            0.007,
+            0.006,
+            0.004
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f826e978d4fdf3b",
+            "3f7cac083126e979",
+            "3f789374bc6a7efa",
+            "3f70624dd2f1a9fc"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "nonuniform-working-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "nonuniform-working-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "cold-ZT",
+      "purpose": "Change actual ZT while keeping MAT/old W and declared inlet operands independently supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 5.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4014000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "cold-ZT-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "cold-ZT-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "warm-ZT",
+      "purpose": "Change actual ZT while keeping MAT/old W and declared inlet operands independently supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 35.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4041800000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "warm-ZT-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "warm-ZT-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "pressure-80000",
+      "purpose": "Independent source capacity operand variation; no derived rho/C/expected result supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 80000.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f3880000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "pressure-80000-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "pressure-80000-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "volume-200",
+      "purpose": "Independent source capacity operand variation; no derived rho/C/expected result supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 200.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4069000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "volume-200-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "volume-200-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "seconds-300",
+      "purpose": "Independent source capacity operand variation; no derived rho/C/expected result supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 300.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "4072c00000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "seconds-300-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "seconds-300-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "moisture-capacity-2",
+      "purpose": "Independent source capacity operand variation; no derived rho/C/expected result supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 2.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "4000000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "moisture-capacity-2-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "moisture-capacity-2-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "supply-dry",
+      "purpose": "Actual positive mass with separately supplied drier inlet W.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.002,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f60624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "supply-dry-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "supply-dry-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "supply-moist",
+      "purpose": "Actual positive mass with separately supplied moister inlet W.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.016,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f90624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "supply-moist-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "supply-moist-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "controlled-zero-flow",
+      "purpose": "Controlled actual node allocation with declared zero inlet mass.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "controlled-zero-flow-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "controlled-zero-flow-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "ordered-three-inlets",
+      "purpose": "Same controlled source loop; multiple inlet arithmetic is unit-only and does not admit multiple HVAC objects into CON production.",
+      "admission_lane": "unit-only-ordered-inlet-probe",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 4,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.125,
+            "Temp": 19.0,
+            "HumRat": 0.003,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fc0000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f689374bc6a7efa",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.5,
+            "Temp": 19.0,
+            "HumRat": 0.016,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fe0000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f90624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 3,
+            "name": "DECLARED-NODE-3",
+            "MassFlowRate": 1e-08,
+            "Temp": 19.0,
+            "HumRat": 0.007,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3e45798ee2308c3a",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f7cac083126e979",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 4,
+            "name": "DECLARED-NODE-4",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "40c81c8000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          3,
+          1,
+          2
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "ordered-three-inlets-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "ordered-three-inlets-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "reverse-declared-inlet-order",
+      "purpose": "Changed declared source loop order with unchanged physical node owners; no sorting or aggregate precomputation.",
+      "admission_lane": "unit-only-ordered-inlet-probe",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 4,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.125,
+            "Temp": 19.0,
+            "HumRat": 0.003,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fc0000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f689374bc6a7efa",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.5,
+            "Temp": 19.0,
+            "HumRat": 0.016,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fe0000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f90624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 3,
+            "name": "DECLARED-NODE-3",
+            "MassFlowRate": 1e-08,
+            "Temp": 19.0,
+            "HumRat": 0.007,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3e45798ee2308c3a",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f7cac083126e979",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 4,
+            "name": "DECLARED-NODE-4",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "40c81c8000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          2,
+          1,
+          3
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "reverse-declared-inlet-order-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "reverse-declared-inlet-order-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "subfloor-working",
+      "purpose": "Finite subfloor W input exercises source solution behavior independently from helper operand floors.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 1e-06,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            1e-06,
+            1e-06,
+            1e-06,
+            1e-06
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3eb0c6f7a0b5ed8d",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3eb0c6f7a0b5ed8d",
+            "3eb0c6f7a0b5ed8d",
+            "3eb0c6f7a0b5ed8d",
+            "3eb0c6f7a0b5ed8d"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "subfloor-working-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "subfloor-working-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "lower-guard-probe",
+      "purpose": "Nonuniform finite working operands selected from the source lower-guard boundary; no guard outcome predicted.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.001,
+            0.01,
+            0.001,
+            0.007
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f50624dd2f1a9fc",
+            "3f847ae147ae147b",
+            "3f50624dd2f1a9fc",
+            "3f7cac083126e979"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "lower-guard-probe-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "lower-guard-probe-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "saturation-guard-probe",
+      "purpose": "High working-history moisture and cold actual ZT target the source upper-guard boundary without an expected Wsat/result.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 5.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.04,
+            0.04,
+            0.04,
+            0.015
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4014000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3fa47ae147ae147b",
+            "3fa47ae147ae147b",
+            "3fa47ae147ae147b",
+            "3f8eb851eb851eb8"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "saturation-guard-probe-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "saturation-guard-probe-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "positive-zero-working",
+      "purpose": "Supplied signed-zero working/current inputs; actual result class/bits are observed, not predicted.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.0,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "0000000000000000",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "positive-zero-working-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "positive-zero-working-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "negative-zero-working",
+      "purpose": "Supplied signed-zero working/current inputs; actual result class/bits are observed, not predicted.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": -0.0,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ]
+        },
+        "nodes": [],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "8000000000000000",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "8000000000000000",
+            "8000000000000000",
+            "8000000000000000",
+            "8000000000000000"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "negative-zero-working-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "negative-zero-working-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "controlled-no-feedback-node",
+      "purpose": "Actual controlled inlet branch with no positive system feedback node.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 0,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.08,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fb47ae147ae147b",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "uncontrolled-with-feedback-node",
+      "purpose": "Positive allocated system node tests independent node-write condition without claiming an ordinary model parser route.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": false,
+        "SystemZoneNodeNumber": 1,
+        "Multiplier": 1,
+        "ListMultiplier": 1,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    },
+    {
+      "case_id": "integer-zone-multipliers",
+      "purpose": "Representable original integer multiplier operands with actual source divisions; no normalized moisture flow supplied.",
+      "admission_lane": "CON-like-direct-member-unit",
+      "initial": {
+        "zone_name": "DECLARED-DIRECT-MEMBER-ZONE",
+        "IsControlled": true,
+        "SystemZoneNodeNumber": 2,
+        "Multiplier": 2,
+        "ListMultiplier": 3,
+        "Volume": 100.0,
+        "ZoneVolCapMultpMoist": 1.0,
+        "OutBaroPress": 101325.0,
+        "OutHumRat": 0.006,
+        "TimeStepSysSec": 900.0,
+        "TimeStepSys": 0.25,
+        "TimeStepZone": 0.25,
+        "zone_fields": {
+          "ZT": 24.0,
+          "MAT": 18.0,
+          "ZTAV": 21.0,
+          "airHumRat": 0.008,
+          "airHumRatAvg": 0.0075,
+          "airHumRatTemp": 0.006,
+          "W1": 0.005,
+          "WMX": 0.004,
+          "WM2": 0.003,
+          "WTimeMinusP": 0.002,
+          "airRelHum": 37.0,
+          "OAMFL": 0.0,
+          "VAMFL": 0.0,
+          "CTMFL": 0.0,
+          "EAMFL": 0.0,
+          "EAMFLxHumRat": 0.0,
+          "SumHmARa": 0.0,
+          "SumHmARaW": 0.0,
+          "MixingMassFlowZone": 0.0,
+          "MixingMassFlowXHumRat": 0.0,
+          "MDotOA": 0.0,
+          "latentGain": 0.0,
+          "latentGainExceptPeople": 0.0,
+          "WPrevZoneTS": [
+            0.019,
+            0.018,
+            0.017,
+            0.016
+          ],
+          "DSWPrevZoneTS": [
+            0.013,
+            0.012,
+            0.011,
+            0.01
+          ],
+          "WPrevZoneTSTemp": [
+            0.008,
+            0.008,
+            0.008,
+            0.009
+          ]
+        },
+        "nodes": [
+          {
+            "node_id": 1,
+            "name": "DECLARED-NODE-1",
+            "MassFlowRate": 0.48,
+            "Temp": 19.0,
+            "HumRat": 0.004,
+            "Enthalpy": 12345.0,
+            "MassFlowRate_bits": "3fdeb851eb851eb8",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f70624dd2f1a9fc",
+            "Enthalpy_bits": "40c81c8000000000"
+          },
+          {
+            "node_id": 2,
+            "name": "DECLARED-NODE-2",
+            "MassFlowRate": 0.0,
+            "Temp": 19.0,
+            "HumRat": 0.009,
+            "Enthalpy": -321.0,
+            "MassFlowRate_bits": "0000000000000000",
+            "Temp_bits": "4033000000000000",
+            "HumRat_bits": "3f826e978d4fdf3b",
+            "Enthalpy_bits": "c074100000000000"
+          }
+        ],
+        "inlet_node_ids": [
+          1
+        ],
+        "Volume_bits": "4059000000000000",
+        "ZoneVolCapMultpMoist_bits": "3ff0000000000000",
+        "OutBaroPress_bits": "40f8bcd000000000",
+        "OutHumRat_bits": "3f789374bc6a7efa",
+        "TimeStepSysSec_bits": "408c200000000000",
+        "TimeStepSys_bits": "3fd0000000000000",
+        "TimeStepZone_bits": "3fd0000000000000",
+        "zone_field_bits": {
+          "ZT": "4038000000000000",
+          "MAT": "4032000000000000",
+          "ZTAV": "4035000000000000",
+          "airHumRat": "3f80624dd2f1a9fc",
+          "airHumRatAvg": "3f7eb851eb851eb8",
+          "airHumRatTemp": "3f789374bc6a7efa",
+          "W1": "3f747ae147ae147b",
+          "WMX": "3f70624dd2f1a9fc",
+          "WM2": "3f689374bc6a7efa",
+          "WTimeMinusP": "3f60624dd2f1a9fc",
+          "airRelHum": "4042800000000000",
+          "OAMFL": "0000000000000000",
+          "VAMFL": "0000000000000000",
+          "CTMFL": "0000000000000000",
+          "EAMFL": "0000000000000000",
+          "EAMFLxHumRat": "0000000000000000",
+          "SumHmARa": "0000000000000000",
+          "SumHmARaW": "0000000000000000",
+          "MixingMassFlowZone": "0000000000000000",
+          "MixingMassFlowXHumRat": "0000000000000000",
+          "MDotOA": "0000000000000000",
+          "latentGain": "0000000000000000",
+          "latentGainExceptPeople": "0000000000000000",
+          "WPrevZoneTS": [
+            "3f9374bc6a7ef9db",
+            "3f926e978d4fdf3b",
+            "3f916872b020c49c",
+            "3f90624dd2f1a9fc"
+          ],
+          "DSWPrevZoneTS": [
+            "3f8a9fbe76c8b439",
+            "3f889374bc6a7efa",
+            "3f86872b020c49ba",
+            "3f847ae147ae147b"
+          ],
+          "WPrevZoneTSTemp": [
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f80624dd2f1a9fc",
+            "3f826e978d4fdf3b"
+          ]
+        }
+      },
+      "operations": [
+        {
+          "operation_id": "integer-zone-multipliers-CALL-1",
+          "operation": "correctHumRat"
+        },
+        {
+          "operation_id": "integer-zone-multipliers-CALL-2",
+          "operation": "correctHumRat"
+        }
+      ]
+    }
+  ]
+}

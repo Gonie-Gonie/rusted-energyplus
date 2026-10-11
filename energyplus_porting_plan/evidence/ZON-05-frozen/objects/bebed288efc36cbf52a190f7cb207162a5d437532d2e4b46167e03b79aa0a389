@@ -1,0 +1,489 @@
+{
+  "schema": "zon05-frozen-packet.v1",
+  "status": "frozen-literal-input-and-policy-before-numerical-execution",
+  "frozen_before_this_ZON05_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "started_utc": "2026-10-11T02:25:44.674995+00:00",
+  "finished_utc": "2026-10-11T02:25:45.252888+00:00",
+  "source_authorities": {
+    "native_helper_source_manifest": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009
+    },
+    "input_fixture_proposal": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170
+    },
+    "observation_policy_proposal": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609
+    },
+    "writer_source_manifest": {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168
+    },
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/ZON-05.md",
+      "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+      "size_bytes": 4033
+    },
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+      "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+      "size_bytes": 3116
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+      "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+      "size_bytes": 3006
+    },
+    "actual_scope_check_role": "real-ZON-05-check-only",
+    "historical_before_documents": [
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/plan.json",
+        "sha256": "1d39dfabfa9656d0048bebade12e5d5d96721413ef106281756ceca467e1a5a0",
+        "size_bytes": 732938
+      },
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/ZON-05.md",
+        "sha256": "728ef93d0d1ea3f1f282a0df1331dcc4c0fa1672308e01e6f2f160bdaa66fc5b",
+        "size_bytes": 2771
+      },
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/energyplus_porting_checklist.html",
+        "sha256": "8442cae2d6f72fe1a549d510b4054e4426b790465d0989ceee44da01e93bf75e",
+        "size_bytes": 589804
+      }
+    ],
+    "current_after_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "c4b57b0272e14e3999b47f04c073c7db4c425343923bad849480cb4fadbe010e",
+        "size_bytes": 755994
+      },
+      {
+        "path": "energyplus_porting_plan/cards/ZON-05.md",
+        "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+        "size_bytes": 4033
+      },
+      {
+        "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+        "sha256": "a2803a93e7cd45278456a5c4c5b38eb9c6eecfaae5e2d13a526befe8978e450f",
+        "size_bytes": 608072
+      }
+    ],
+    "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment"
+  },
+  "source_preparation_approval": {
+    "approved_writer_sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+    "source_manifest": {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168
+    },
+    "reviewed_sources": [
+      {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py",
+        "sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+        "size_bytes": 11482
+      },
+      {
+        "path": ".runtime/porting/ZON-05/input-writer-prep-01/packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    ]
+  },
+  "helper_request": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/helper-request.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d3cb07196bf34e3ddc4488822bbe5f60d0a3c8ec5b3bd1113f58dd1657f12655",
+    "size_bytes": 5721
+  },
+  "projection": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/projection.json",
+    "sha256": "e06fd15767ee5f3c4889f5bcca65c0144db9a1bbc4a876d8b39f4955a0ae0960",
+    "size_bytes": 7738
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/source.json",
+      "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+      "size_bytes": 26039
+    },
+    "cases": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/cases.json",
+      "sha256": "8ba01a6397922b22d196fd597e9ea08ef15407e0ab77dca19476acc88969db98",
+      "size_bytes": 1282
+    },
+    "tolerances": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/tolerances.json",
+      "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+      "size_bytes": 3451
+    }
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "native_source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+    "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+    "size_bytes": 39009
+  },
+  "observation_policy": {
+    "schema": "zon05-direct-member-observation-policy-proposal.v1",
+    "card": "ZON-05",
+    "status": "prospective-source-only-before-new-output",
+    "selected_source": "correctHumRat4433-4619, zone1/space0, ThirdOrder, mixed, noOA/noLatent",
+    "unit_domain": "21 declared independent input-only cases, 43 real member operations if all return",
+    "production_admission_expanded": false,
+    "required_numerical_profiles": {
+      "airHumRatTemp": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13
+      },
+      "SystemNode.HumRat": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "SystemNode.Enthalpy": {
+        "unit": "J/kg",
+        "atol": 1e-07,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "unit": "Pa",
+        "atol": 1e-08,
+        "rtol": 1e-13
+      }
+    },
+    "state_retention": "Actual pre/post scalar/array/input/source terms and every non-feedback node remain exact own bits. Four slots required for every captured history array. Temporary W and positive system-node W/H use their named profiles.",
+    "cache_state": "Actual indices/tags/capacity/shape/control state exact; nondefault values use their profile and own unchanged rows retain bits. No cache-HIT classification or hash/tag recomputation in readers.",
+    "source_direct_member_state": "Current W/average W/zone+system+working histories are observed retained only. No correctAirTemp, selection, current/average commit, history push, parser, or calendar caller is invoked.",
+    "class": "exact",
+    "signed_zero": "exact when both numerical results are zero",
+    "nan_payload_bits": "record only; finite request domain, no physical-validity inferred from any nonfinite output",
+    "identity_inputs_order_counts_outcomes": "exact IDs/names/input bits/ordered inlet associations/multiplier integers/clock fields/invocations/return/exception/completeness",
+    "diagnostics": "Actual message indices/order/level/text and err_stream retained as Native-only context. No causal warning classifier or Rust global diagnostic backend parity.",
+    "internal_locals_unobserved": [
+      "MoistureMassFlowRate",
+      "ZoneMassFlowRate",
+      "LatentGain",
+      "RhoAir",
+      "H2OHtOfVap",
+      "A",
+      "B",
+      "C",
+      "WZSat",
+      "lower_guard_taken",
+      "saturation_guard_taken"
+    ],
+    "no_local_or_expected_answer_recomputation": true,
+    "process_or_copy_failure": "required FAIL; partial or absent records never PASS",
+    "missing_on_one_or_both_sides": "required FAIL",
+    "unsupported_stopped_unreached": "unavailable/noPASS",
+    "no_tolerance_relaxation_after_outputs": true,
+    "complete_ZON05_PASS_claimed": false,
+    "gate_updates": false
+  },
+  "executed_writer_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+        "size_bytes": 11482
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "51669dfb1d3cbd7b30818366ca33a5c6f68316f8c114969007e2603128cee7ee",
+        "size_bytes": 11482
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/002-manifest.json",
+        "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+        "size_bytes": 39009
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/003-input-only-cases.proposed.json",
+        "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+        "size_bytes": 94170
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/004-observation-policy.proposed.json",
+        "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+        "size_bytes": 2609
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/005-manifest.json",
+        "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+        "size_bytes": 33168
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/006-ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "size_bytes": 404705
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/007-ZoneTempPredictorCorrector.hh",
+        "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+        "size_bytes": 25280
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/008-DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/009-DataZoneEquipment.hh",
+        "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+        "size_bytes": 31704
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/010-DataLoopNode.hh",
+        "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+        "size_bytes": 26592
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/011-DataRoomAirModel.hh",
+        "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+        "size_bytes": 45326
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/012-DataHeatBalFanSys.hh",
+        "sha256": "47b8408ba71120bbfbe31e8c10c0e192872abebde7ba93918c643a69fcbf1298",
+        "size_bytes": 11610
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/013-DataHVACGlobals.hh",
+        "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+        "size_bytes": 24717
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/014-DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "size_bytes": 16816
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DuctLoss.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/015-DuctLoss.hh",
+        "sha256": "852851d965effadc13fc2c2aeb530bc33bbbe6bd653e2a07714db8fe27c523db",
+        "size_bytes": 7312
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HybridModel.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/016-HybridModel.hh",
+        "sha256": "c7aee172a33fcdd657b40181d79fa874b4a7d3489f517a3b6363fe2cab893046",
+        "size_bytes": 7169
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/017-Solver.hpp",
+        "sha256": "08f9d970200b2adb9b69cf3500cb63cf7bf873eb482d705fdc02827a6ce30759",
+        "size_bytes": 38569
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/018-Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+        "size_bytes": 108928
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/019-Psychrometrics.cc",
+        "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f",
+        "size_bytes": 73171
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PsychCacheData.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/020-PsychCacheData.hh",
+        "sha256": "30419f4ea110c4ca8c98b2f78641bb3d1493715a0c16645a288a9888bdb87094",
+        "size_bytes": 6762
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/021-EnergyPlusData.hh",
+        "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21",
+        "size_bytes": 28491
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/022-EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "size_bytes": 60978
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/023-DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "size_bytes": 13547
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/024-IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "size_bytes": 32371
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/025-zon05_reference_helper.cpp",
+        "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+        "size_bytes": 14797
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/026-zon05_reference_fields.hh",
+        "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+        "size_bytes": 6453
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/027-zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+        "size_bytes": 5146
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/028-zon05_reference.cmake",
+        "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+        "size_bytes": 1799
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/029-plan.json",
+        "sha256": "c4b57b0272e14e3999b47f04c073c7db4c425343923bad849480cb4fadbe010e",
+        "size_bytes": 755994
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/ZON-05.md",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/030-ZON-05.md",
+        "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+        "size_bytes": 4033
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/frozen-packet-01/source-archives/031-energyplus_porting_checklist.html",
+        "sha256": "a2803a93e7cd45278456a5c4c5b38eb9c6eecfaae5e2d13a526befe8978e450f",
+        "size_bytes": 608072
+      }
+    }
+  ],
+  "scope_execution_exit_zero_source_guard_verified": true,
+  "scientific_operands_evaluated": false,
+  "expected_arrays_or_method_outcomes_generated": false,
+  "numerical_PASS_claimed": false,
+  "canonical_files_updated": false,
+  "gates_updated": false,
+  "production_geometry_certified": false
+}

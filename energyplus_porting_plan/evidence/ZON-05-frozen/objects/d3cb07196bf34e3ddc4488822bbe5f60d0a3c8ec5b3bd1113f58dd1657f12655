@@ -1,0 +1,133 @@
+{
+  "schema": "zon05-native-admission-contract.v1",
+  "frozen_before_this_ZON05_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+    "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+    "size_bytes": 3116
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+    "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+    "size_bytes": 3006
+  },
+  "observation_policy": {
+    "schema": "zon05-direct-member-observation-policy-proposal.v1",
+    "card": "ZON-05",
+    "status": "prospective-source-only-before-new-output",
+    "selected_source": "correctHumRat4433-4619, zone1/space0, ThirdOrder, mixed, noOA/noLatent",
+    "unit_domain": "21 declared independent input-only cases, 43 real member operations if all return",
+    "production_admission_expanded": false,
+    "required_numerical_profiles": {
+      "airHumRatTemp": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13
+      },
+      "SystemNode.HumRat": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "SystemNode.Enthalpy": {
+        "unit": "J/kg",
+        "atol": 1e-07,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "unit": "Pa",
+        "atol": 1e-08,
+        "rtol": 1e-13
+      }
+    },
+    "state_retention": "Actual pre/post scalar/array/input/source terms and every non-feedback node remain exact own bits. Four slots required for every captured history array. Temporary W and positive system-node W/H use their named profiles.",
+    "cache_state": "Actual indices/tags/capacity/shape/control state exact; nondefault values use their profile and own unchanged rows retain bits. No cache-HIT classification or hash/tag recomputation in readers.",
+    "source_direct_member_state": "Current W/average W/zone+system+working histories are observed retained only. No correctAirTemp, selection, current/average commit, history push, parser, or calendar caller is invoked.",
+    "class": "exact",
+    "signed_zero": "exact when both numerical results are zero",
+    "nan_payload_bits": "record only; finite request domain, no physical-validity inferred from any nonfinite output",
+    "identity_inputs_order_counts_outcomes": "exact IDs/names/input bits/ordered inlet associations/multiplier integers/clock fields/invocations/return/exception/completeness",
+    "diagnostics": "Actual message indices/order/level/text and err_stream retained as Native-only context. No causal warning classifier or Rust global diagnostic backend parity.",
+    "internal_locals_unobserved": [
+      "MoistureMassFlowRate",
+      "ZoneMassFlowRate",
+      "LatentGain",
+      "RhoAir",
+      "H2OHtOfVap",
+      "A",
+      "B",
+      "C",
+      "WZSat",
+      "lower_guard_taken",
+      "saturation_guard_taken"
+    ],
+    "no_local_or_expected_answer_recomputation": true,
+    "process_or_copy_failure": "required FAIL; partial or absent records never PASS",
+    "missing_on_one_or_both_sides": "required FAIL",
+    "unsupported_stopped_unreached": "unavailable/noPASS",
+    "no_tolerance_relaxation_after_outputs": true,
+    "complete_ZON05_PASS_claimed": false,
+    "gate_updates": false
+  },
+  "helper_request": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/helper-request.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170
+  },
+  "projection": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-01/projection.json",
+    "sha256": "e06fd15767ee5f3c4889f5bcca65c0144db9a1bbc4a876d8b39f4955a0ae0960",
+    "size_bytes": 7738
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/source.json",
+      "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+      "size_bytes": 26039
+    },
+    "cases": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/cases.json",
+      "sha256": "8ba01a6397922b22d196fd597e9ea08ef15407e0ab77dca19476acc88969db98",
+      "size_bytes": 1282
+    },
+    "tolerances": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-01/tolerances.json",
+      "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+      "size_bytes": 3451
+    }
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799
+    }
+  ],
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  }
+}

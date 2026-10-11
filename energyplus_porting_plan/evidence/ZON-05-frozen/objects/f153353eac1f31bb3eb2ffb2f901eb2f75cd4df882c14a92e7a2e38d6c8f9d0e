@@ -1,0 +1,50 @@
+# ZON-05 literal direct-member packet proposal
+
+This held Source-only adaptation of the accepted RAD-01 writer is unexecuted.
+It reuses that stage and its contained stdlib IO helper. It does not execute a
+target, evaluate operands, generate expected outcomes, or update gates.
+
+The authentic Native01 fixture is copied byte for byte as helper-request.json:
+exactly schema, card, expected_values_supplied, source_scope and cases. Its 21
+declared cases contain 43 ordered correctHumRat requests. There are no extra
+contract fields in that request. Admission, projection, source, cases and
+tolerance contracts remain separate authenticated sidecars.
+
+The literal accepted observation policy is copied into freeze, admission,
+projection and tolerances. Its four numerical profiles, class/shape/signed-zero
+rules, state retention and diagnostic limits are unchanged. Finite inputs do
+not imply finite outputs or a successful call. The writer never reads outputs.
+
+Root must supply the actual reviewed writer SHA, source manifest, current
+ZON-05 card, actual scope amendment, actual scope-check recorder and fresh
+output directory. The amendment schema is zon05-source-scope-amendment.v1;
+cards is [ZON-05]; zon05_policy_source_inventory contains native_helper,
+input_fixture, observation_policy and input_writer. It must truthfully declare
+all_other_gates_pending, strict_profiles_settled_before_outputs and
+actual_ZON05_successful_build_or_engine_execution_performed:false, with the
+literal requested_counts. The singular check role is real-ZON-05-check-only.
+Its genuine successful check_plan.py --check --card ZON-05 recorder and actual
+before archives/current after-document identities are authenticated, not
+invented by this writer. Source ranges retain Native01 first_line/last_line.
+
+The resulting zon05-frozen-packet.v1 references helper_request,
+native_admission_contract, projection, contracts.{source,cases,tolerances},
+native_source_manifest, observation_policy and source_authorities. Status is
+frozen-literal-input-and-policy-before-numerical-execution. All actual future
+scope, build, execution and numerical results remain absent at Source prep.
+
+Native is intentionally argc2: actual derived executable and this request.
+It emits its actual result JSON on recorder stdout; it does not read sidecars
+or claim its own request/binary/contract digests. Factual QA must join those
+identities externally through the real freeze/build/PE/command records.
+Candidate observation may use request_path request_sha frozen_packet_path
+frozen_packet_sha runtime_sources_path as its separate argc5 transport.
+
+Exact RAD03 before copies and two generated diffs are retained. IO changes
+only its contained card namespace; every IO function is otherwise byte-exact.
+The Native4 sources, fixture, policy, whole Original dependencies and all49
+pinned ranges are in the manifest. No project source is imported or executed
+to author or verify this proposal; only stdlib AST/hash/diff metadata is used.
+Header authored the Native direct-member wrapper and this transport. Raw
+owns the separate pending Rust humidity kernel. Review of this proposal is
+not an independent scientific formula certificate or full ZON-05 completion.
