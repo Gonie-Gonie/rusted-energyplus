@@ -510,3 +510,25 @@ psychrometric 입력·cache는 이번 fixture에 없어 PSY 상태 동등성도 
 기존 PSY caller-output 계약으로 한정한다. RH·sky·solar 계산값 8종은
 UNPAIRED로 보고하며 수치 PASS 판정은 없다. 전체 원본 기상 비트 동등성의
 미확인 상태와 실패 진단을 유지한다.
+
+## 실내 대류 계수의 단일 저장소
+
+Dispatcher는 convection metadata만 보존하고 실제 SurfHConvInt는 호출자의
+열수지 저장소를 대여해 직접 쓴다. Runtime은 SurfaceHeatBalanceState의 기존
+계수에 쓰며 중복 coefficient 또는 copy-back은 없다. 전체 계수 배열의 개수와
+순서별 Surface ID를 setup·backend·Config·계수 변경 전에 검증한다. 기존 선택
+example은 입력 scalar와 JSON schema를 유지하며 하나의 외부 계수 배열을 쓴다.
+
+기존 8개 테스트를 유지하고, 연결 검사 표에 empty/stale/reordered/extra 계수
+거부와 실패 후 소유자 보존을 추가했다. 최종 Source `0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292`에서
+fmt, source-quality, all-target workspace Clippy(-D warnings), 관련 8개 테스트가
+통과했다. 같은 작업에서 직전4a34c965의 전체4,974 passed/0 failed/ignored2
+검증을 보존하고, 이 네 파일의 저장소 정리를 위해 전체 테스트를 중복 실행하지
+않았다. 수식·cadence 변경이나 새 Native 수치 동등성은 주장하지 않는다.
+
+[계수 저장소 검증 요약](../evidence/SRC-06-ordinary-inside-convection-borrow/summary.json),
+[색인](../evidence/SRC-06-ordinary-inside-convection-borrow/manifest.json),
+[전체 검증 기록](../evidence/SRC-06-ordinary-inside-convection-borrow/evidence.zip)에
+실제 변경과 Original 구간, 독립 Source 검토 및 QA를 보존한다. 전체 InitSurface/
+Setup 호출 연결과 ordinary dispatcher 활성화는 계속 구현 중이다. SRC-06 네 gate와
+A14/54, B14/64는 유지한다.

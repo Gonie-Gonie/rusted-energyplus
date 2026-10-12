@@ -1,0 +1,65 @@
+{
+  "schema": "src06-inside-convection-borrow-summary.v1",
+  "status": "Sole caller-owned HConv storage implemented; ordinary activation and full port incomplete",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/0d/0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292",
+    "sha256": "0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292"
+  },
+  "QA": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-fmt-01/receipt.json",
+      "sha256": "0149a2773ef7d6e576f778f957bfd95ad2fc0d686d99e194b8918201d94ee268",
+      "size_bytes": 3279
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-source-quality-01/receipt.json",
+      "sha256": "ec3666b63452e51ca3864c718e9ffb8bfe924a012ad71c062b8d93dcc329b0e7",
+      "size_bytes": 3342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-clippy-01/receipt.json",
+      "sha256": "3c893bbb9d99f442ea7e41ef2cef40a9671be58cf0b510770a0672e090155e70",
+      "size_bytes": 3326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-tests-01/receipt.json",
+      "sha256": "b2ed53c2239341e9f2383acd93ffd801fe6d1612a4ce7bd22e6f7fa383d295d9",
+      "size_bytes": 3346
+    }
+  ],
+  "tests": {
+    "selected_existing_bodies": 8,
+    "passed": 8,
+    "failed": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "behavior": [
+    "Dispatcher retains only convection metadata; actual coefficient storage is borrowed",
+    "Runtime setter writes the sole SurfaceHeatBalanceState coefficient directly",
+    "Full coefficient count and ordered Surface IDs validated before setup/backend/Config/output writes",
+    "Selected example keeps its original scalar inputs and JSON schema with one external array"
+  ],
+  "limitations": [
+    "No formula or cadence change; no new Native numerical comparison",
+    "Whole InitSurface/Setup and ordinary dispatcher activation still held",
+    "All SRC-06 gates and A14/54 B14/64 unchanged"
+  ],
+  "validation_scope": "All-target workspace Clippy plus existing eight dispatcher tests; previous4a34c965 whole workspace4974/0/2 retained, not rerun for this bounded ownership refactor",
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-inside-convection-coefficient-borrow-review-01/review.json",
+    "sha256": "1eeddbfc683522f8ba78f2fdfe151bc147b5845d7c7867d23da15445876b8fe1",
+    "size_bytes": 8759
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-convection-borrow/manifest.json",
+    "sha256": "69f529591b592685ebb71c32c5809dc1cb10bfc8543ae0237fc8744753d813eb",
+    "size_bytes": 12850
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-convection-borrow/evidence.zip",
+    "sha256": "899dba2ae63e90d6a7198966e9edafd9d5e1d37597bc711979331c52e18e135a",
+    "size_bytes": 394649
+  },
+  "gates_updated": false
+}

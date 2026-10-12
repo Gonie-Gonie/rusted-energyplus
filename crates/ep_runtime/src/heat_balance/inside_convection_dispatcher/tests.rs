@@ -78,14 +78,15 @@ fn surfaces() -> Vec<InsideConvectionSurface> {
 }
 fn state(
     layout: &InsideConvectionLayout,
-) -> Result<InsideConvectionState, InsideConvectionUnavailable> {
-    InsideConvectionState::new(
+) -> Result<(InsideConvectionState, [(SurfaceId, f64); 2]), InsideConvectionUnavailable> {
+    let state = InsideConvectionState::new(
         layout,
         vec![
-            InsideConvectionSurfaceState::new(SurfaceId(8), -7.0, [11, 12]),
-            InsideConvectionSurfaceState::new(SurfaceId(2), -8.0, [21, 22]),
+            InsideConvectionSurfaceState::new(SurfaceId(8), [11, 12]),
+            InsideConvectionSurfaceState::new(SurfaceId(2), [21, 22]),
         ],
-    )
+    )?;
+    Ok((state, [(SurfaceId(8), -7.0), (SurfaceId(2), -8.0)]))
 }
 fn readiness() -> InsideConvectionReadiness {
     InsideConvectionReadiness {
@@ -125,6 +126,7 @@ fn run(
     layout: &InsideConvectionLayout,
     state: &mut InsideConvectionState,
     zone_equipment: &mut [(ZoneId, [bool; 3])],
+    coefficients: &mut [(SurfaceId, f64)],
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
@@ -153,6 +155,7 @@ fn run(
         NoUserConvectionInput::new([0; 6])?,
         state,
         zone_equipment,
+        coefficients,
         space_air,
         temperatures,
         readiness,
@@ -167,7 +170,7 @@ fn run(
 fn true_first_call_executes_static_setup_and_separate_space_mat()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let mut space_air = SpaceAirTemperatures::allocate(&layout);
     space_air.write_all(
@@ -195,6 +198,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -223,16 +227,16 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
     assert_eq!(state.surfaces[0].reference_air, [11, 12]);
     assert_eq!(state.surfaces[1].reference_air, [21, 22]);
     assert_eq!(
-        state.surfaces[0].coefficient,
+        coefficients[0].1,
         detailed_inside_coefficient_w_per_m2_k(24.0, 18.0, 0.0, 0.1)
     );
     assert_eq!(
-        state.surfaces[1].coefficient,
+        coefficients[1].1,
         detailed_inside_coefficient_w_per_m2_k(24.0, 26.0, 0.0, 0.1)
     );
-    assert_ne!(state.surfaces[0].coefficient, state.surfaces[1].coefficient);
-    let first_coefficient = state.surfaces[0].coefficient;
-    let second_coefficient = state.surfaces[1].coefficient;
+    assert_ne!(coefficients[0].1, coefficients[1].1);
+    let first_coefficient = coefficients[0].1;
+    let second_coefficient = coefficients[1].1;
     let first_map = space_air.reference_air_by_layout(&layout)?;
     assert_eq!(first_map[&SurfaceId(8)], 18.0);
     assert_eq!(first_map[&SurfaceId(2)], 26.0);
@@ -243,6 +247,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempIn,
@@ -253,8 +258,8 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
         &ReportInputs::default(),
         &mut scan,
     )?;
-    assert_ne!(state.surfaces[0].coefficient, first_coefficient);
-    assert_eq!(state.surfaces[1].coefficient, second_coefficient);
+    assert_ne!(coefficients[0].1, first_coefficient);
+    assert_eq!(coefficients[1].1, second_coefficient);
     let next_map = space_air.reference_air_by_layout(&layout)?;
     assert_eq!(next_map[&SurfaceId(8)], 20.0);
     assert_eq!(next_map[&SurfaceId(2)], 26.0);
@@ -266,7 +271,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
 fn readiness_changes_only_reached_flags_and_retains_first_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
@@ -284,6 +289,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         temperatures,
         ready,
@@ -302,6 +308,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         temperatures,
         ready,
@@ -317,6 +324,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         temperatures,
         ready,
@@ -328,10 +336,9 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
     assert!(state.my_environment);
     assert_eq!(state.surfaces[0].interior_geometry[0], 41.0);
     assert!(
-        state
-            .surfaces
+        coefficients
             .iter()
-            .all(|r| r.coefficient.to_bits() == 0.7_f64.to_bits())
+            .all(|r| r.1.to_bits() == 0.7_f64.to_bits())
     );
     Ok(())
 }
@@ -340,16 +347,18 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
 fn full_temperature_membership_and_stale_layout_stop_before_writes()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
+    let coefficient_before = coefficients;
     let rows = [(SurfaceId(2), 23.0), (SurfaceId(8), 23.0)];
     let mut scan = ReportScanState::default();
     let result = run(
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempIn,
@@ -367,6 +376,7 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
         ))
     ));
     assert_eq!(state, before);
+    assert_eq!(coefficients, coefficient_before);
     assert!(scan.get_report_input);
     let valid_rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
     for mut invalid in [
@@ -378,6 +388,44 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
         let result = run(
             &layout,
             &mut state,
+            &mut invalid[..],
+            &mut coefficients[..],
+            &space_air,
+            InsideSurfaceTemperatures {
+                owner: InsideSurfaceTemperatureOwner::SurfTempIn,
+                rows: &valid_rows,
+            },
+            readiness(),
+            0.1,
+            &ReportInputs::default(),
+            &mut scan,
+        );
+        assert!(matches!(
+            result,
+            Err(InsideConvectionError::Unavailable(
+                InsideConvectionUnavailable::Association
+            ))
+        ));
+        assert_eq!(state, before);
+        assert_eq!(coefficients, coefficient_before);
+        assert_eq!(invalid, unchanged);
+        assert!(scan.get_report_input);
+    }
+    for mut invalid in [
+        Vec::new(),
+        vec![(SurfaceId(8), -7.0), (SurfaceId(3), -8.0)],
+        vec![(SurfaceId(2), -8.0), (SurfaceId(8), -7.0)],
+        vec![
+            (SurfaceId(8), -7.0),
+            (SurfaceId(2), -8.0),
+            (SurfaceId(9), -9.0),
+        ],
+    ] {
+        let unchanged = invalid.clone();
+        let result = run(
+            &layout,
+            &mut state,
+            &mut active_elements[..],
             &mut invalid[..],
             &space_air,
             InsideSurfaceTemperatures {
@@ -397,6 +445,7 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
         ));
         assert_eq!(state, before);
         assert_eq!(invalid, unchanged);
+        assert_eq!(active_elements[0].1, [true; 3]);
         assert!(scan.get_report_input);
     }
     let duplicate = InsideConvectionLayout::new(
@@ -447,7 +496,7 @@ fn selected_space_reset_and_copy_preserve_independent_ztav()
 fn reached_details_unavailable_retains_static_and_scan_prefix()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState {
@@ -460,6 +509,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
         &layout,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -482,7 +532,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
             && state.active_surface_check
             && state.my_environment
     );
-    assert_eq!(state.surfaces[0].coefficient, -7.0);
+    assert_eq!(coefficients[0].1, -7.0);
     assert_eq!(state.surfaces[0].interior_geometry[0], 3.0);
     assert!(!scan.get_report_input && scan.surface_details);
     Ok(())
@@ -502,7 +552,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
         }
     }
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState::default();
@@ -538,6 +588,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -562,7 +613,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
             && state.node_check
             && state.active_surface_check
     );
-    assert_eq!(state.surfaces[0].coefficient, -7.0);
+    assert_eq!(coefficients[0].1, -7.0);
     assert_eq!(state.surfaces[0].interior_geometry[0], 3.0);
     Ok(())
 }
@@ -604,10 +655,11 @@ fn roof_shared_edge_cancellation_and_compass_boundaries_are_literal()
 fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
-    let mut state = state(&layout)?;
+    let (mut state, mut coefficients) = state(&layout)?;
     let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
+    let coefficient_before = coefficients;
     let mut surfaces = surfaces();
     surfaces[0].tilt = 0.0;
     surfaces[0].vertices = vec![
@@ -640,6 +692,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
         &mut active_elements[..],
+        &mut coefficients[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -658,6 +711,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
         ))
     ));
     assert_eq!(state, before);
+    assert_eq!(coefficients, coefficient_before);
     assert!(scan.get_report_input);
     assert!(stream.is_empty() && console.is_empty());
     Ok(())

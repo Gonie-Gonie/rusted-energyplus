@@ -1,0 +1,281 @@
+{
+  "schema": "src06-inside-convection-borrow-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/0d/0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292",
+    "sha256": "0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292"
+  },
+  "changes": [
+    {
+      "canonical": {
+        "path": "crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+        "sha256": "dd1419a96e50edd5ce8ace0e7dfed7eba98255dd88f7b34b02fde5f1cfa5fc9a",
+        "size_bytes": 35167
+      },
+      "complete_final_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/src06_tarp_dispatcher_main-0.diff",
+        "sha256": "210d6b15e1fec2d4cdbf2326026986f193f5962fa7a87a45d7f72aecb0b341e7",
+        "size_bytes": 2094
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+        "sha256": "96c568d53b1b3925efb65ec9d950297c1f824b5cbe87e3b84e3628134fdead57",
+        "size_bytes": 18488
+      },
+      "complete_final_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/fields-1.diff",
+        "sha256": "b709c7484f28bfe55da87e96dedd5cc19f8851106ecc0eb3063175088c39212a",
+        "size_bytes": 2279
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "0e9415b6e0589945f7bc35bc61947c2cb9a0a2e637898fd920d78cbddddd5875",
+        "size_bytes": 22384
+      },
+      "complete_final_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/tests-2.diff",
+        "sha256": "c11fb41d943158830fe67d544bbe648fee74e5c1634db0ec53e95e7ceffd467c",
+        "size_bytes": 10903
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+        "sha256": "05c58a7e87bf57f0df9a0709a73ba010bebff7c5fa731c9a926957b032ecf5de",
+        "size_bytes": 33724
+      },
+      "complete_final_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/inside_convection_dispatcher-3.diff",
+        "sha256": "93953967be40e4b95abaff0a44528898bd4a049bd888975678c1d5e30c86f005",
+        "size_bytes": 6210
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/manifest.json",
+      "sha256": "dc8fc073e82be6b96dd5e23401195068dcfa20fa216197ebf6f93e87f1c596f6",
+      "size_bytes": 7900
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/README.md",
+      "sha256": "f5e5fed875c7db1a72c1fe09b7737ab740795f3c45514558f554efdcc26c78dd",
+      "size_bytes": 1558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-inside-convection-coefficient-borrow-review-01/review.json",
+      "sha256": "1eeddbfc683522f8ba78f2fdfe151bc147b5845d7c7867d23da15445876b8fe1",
+      "size_bytes": 8759
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/before/crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+      "sha256": "a8e6043b8c9ccad4000b11ce2cfe843eae755d447386b358d313d74c87db6d2d",
+      "size_bytes": 34953
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/proposed/crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+      "sha256": "dd1419a96e50edd5ce8ace0e7dfed7eba98255dd88f7b34b02fde5f1cfa5fc9a",
+      "size_bytes": 35167
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/00-direct.diff",
+      "sha256": "0592d8ab781cfef40e02b05401165a65efd049b76aa2a593671bdfc90bb96924",
+      "size_bytes": 2089
+    },
+    {
+      "path": "crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+      "sha256": "dd1419a96e50edd5ce8ace0e7dfed7eba98255dd88f7b34b02fde5f1cfa5fc9a",
+      "size_bytes": 35167
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/before/crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+      "sha256": "f89877f73ee563fd9cbfe24e2504745dcf7c5ff71489ceb45e08840588dd7dcc",
+      "size_bytes": 18389
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/proposed/crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+      "sha256": "96c568d53b1b3925efb65ec9d950297c1f824b5cbe87e3b84e3628134fdead57",
+      "size_bytes": 18488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/01-direct.diff",
+      "sha256": "cc6027cc4e90766bdae42e7ca0deaab9bdcf8fff23edcadb98dd2ba1c3f4f6a7",
+      "size_bytes": 2274
+    },
+    {
+      "path": "crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+      "sha256": "96c568d53b1b3925efb65ec9d950297c1f824b5cbe87e3b84e3628134fdead57",
+      "size_bytes": 18488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/before/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "57d9cfa06fbea04d898e6dc4c61a5393eeb819456d07751faf2294266e2f9989",
+      "size_bytes": 20575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "201f407a305ab8392452d52e21efd6b254148dd3d2dea777b0449022e6f9825e",
+      "size_bytes": 22337
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/02-direct.diff",
+      "sha256": "054c536b3505230dfee39e3c34ddbb83c75e4407e32da15153c73206e9b58a5e",
+      "size_bytes": 10847
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "0e9415b6e0589945f7bc35bc61947c2cb9a0a2e637898fd920d78cbddddd5875",
+      "size_bytes": 22384
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/before/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "sha256": "f2273cb6015e4bb06a7442cb89cb79082b8653d2eecae21c0e287657a34039d0",
+      "size_bytes": 32173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "sha256": "05c58a7e87bf57f0df9a0709a73ba010bebff7c5fa731c9a926957b032ecf5de",
+      "size_bytes": 33724
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/03-direct.diff",
+      "sha256": "f63a258dea173c5e0a3955f637fc86869c534133b3c712e94695a6325f339224",
+      "size_bytes": 6205
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "sha256": "05c58a7e87bf57f0df9a0709a73ba010bebff7c5fa731c9a926957b032ecf5de",
+      "size_bytes": 33724
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+      "size_bytes": 336899
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/Original-ConvectionCoefficients.cc-141-214.txt",
+      "sha256": "3c706e2a3f61434a3d0fe6db25e8a722bc997caaa7d955b6bf76312f44748e06",
+      "size_bytes": 3691
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/Original-ConvectionCoefficients.cc-279-343.txt",
+      "sha256": "f1a970d96c3d22e32dcb78230ed5a453a57f2a2dbc4b6aff159dd60713adfc5f",
+      "size_bytes": 3522
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-coefficient-borrow-prep-01/Original-ConvectionCoefficients.cc-1954-1976.txt",
+      "sha256": "01cdb4c861cef893b0d04b9306232bb3e61f96be05735504a11147b46be3c8de",
+      "size_bytes": 1310
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-fmt-01/receipt.json",
+      "sha256": "0149a2773ef7d6e576f778f957bfd95ad2fc0d686d99e194b8918201d94ee268",
+      "size_bytes": 3279
+    },
+    {
+      "path": ".runtime/porting/source-objects/0d/0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292",
+      "sha256": "0d07ae29f9a8a664e69f19846b13f84fa26b75bb3aaa94baa2b8423c11c08292",
+      "size_bytes": 1645502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-source-quality-01/receipt.json",
+      "sha256": "ec3666b63452e51ca3864c718e9ffb8bfe924a012ad71c062b8d93dcc329b0e7",
+      "size_bytes": 3342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-source-quality-01/stdout.log",
+      "sha256": "db7145205e7faae5881b44a27df77aad0385e199896f1f6b8e8ea082c50ccc37",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-source-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-clippy-01/receipt.json",
+      "sha256": "3c893bbb9d99f442ea7e41ef2cef40a9671be58cf0b510770a0672e090155e70",
+      "size_bytes": 3326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-clippy-01/stderr.log",
+      "sha256": "f1036d829b92209aacf1630b45af5b802cd554f2c2b760f33ed45e7ecf5000a7",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-tests-01/receipt.json",
+      "sha256": "b2ed53c2239341e9f2383acd93ffd801fe6d1612a4ce7bd22e6f7fa383d295d9",
+      "size_bytes": 3346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-tests-01/stdout.log",
+      "sha256": "4b065b7b394b26c37f8f88ec4ab05691c8862acc70e7411d48a10099c08cc21a",
+      "size_bytes": 1114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-tests-01/stderr.log",
+      "sha256": "89144e987ca10619fc59b625f830377b86e832f59d38e29b2ed28dce321d5fb7",
+      "size_bytes": 254
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/src06_tarp_dispatcher_main-0.diff",
+      "sha256": "210d6b15e1fec2d4cdbf2326026986f193f5962fa7a87a45d7f72aecb0b341e7",
+      "size_bytes": 2094
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/fields-1.diff",
+      "sha256": "b709c7484f28bfe55da87e96dedd5cc19f8851106ecc0eb3063175088c39212a",
+      "size_bytes": 2279
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/tests-2.diff",
+      "sha256": "c11fb41d943158830fe67d544bbe648fee74e5c1634db0ec53e95e7ceffd467c",
+      "size_bytes": 10903
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-final-diffs-01/inside_convection_dispatcher-3.diff",
+      "sha256": "93953967be40e4b95abaff0a44528898bd4a049bd888975678c1d5e30c86f005",
+      "size_bytes": 6210
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-inside-convection-borrow-application-01.json",
+      "sha256": "0b8a9b1811188dc9ef56e35c0ee3feb1ca51465b4a5abf4afcc007f084cf449c",
+      "size_bytes": 736
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-inside-convection-borrow-Root-01.py",
+      "sha256": "5bb977ec47d0abc1c40dc29450aff71d0b40ab5741e86f7ed4ab7f65b8628175",
+      "size_bytes": 2040
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-inside-convection-borrow-Root-01.py",
+      "sha256": "bc2f804b2ccce9372a9f97ea0747252ce5bf5520d17008e113ba93c77fb1901e",
+      "size_bytes": 8179
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-convection-borrow/evidence.zip",
+    "sha256": "899dba2ae63e90d6a7198966e9edafd9d5e1d37597bc711979331c52e18e135a",
+    "size_bytes": 394649
+  },
+  "archive_member_count": 43,
+  "gates_updated": false
+}

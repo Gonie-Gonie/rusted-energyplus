@@ -321,6 +321,7 @@ struct Fixture {
     zones: Vec<InsideConvectionZone>,
     surfaces: Vec<InsideConvectionSurface>,
     state: InsideConvectionState,
+    coefficients: Vec<(SurfaceId, f64)>,
     active_elements: Vec<(ZoneId, [bool; 3])>,
     space_air: SpaceAirTemperatures,
     zone_mat: f64,
@@ -391,6 +392,7 @@ impl Fixture {
         let mut associations = Vec::new();
         let mut surfaces = Vec::new();
         let mut states = Vec::new();
+        let mut coefficients = Vec::new();
         let mut ti = Vec::new();
         let mut tmp = Vec::new();
         let mut names = BTreeSet::new();
@@ -471,7 +473,6 @@ impl Fixture {
             });
             let mut state = InsideConvectionSurfaceState::new(
                 surface_id,
-                real(&row["SurfHConvInt"])?,
                 [
                     integer(&row["SurfTAirRef"])?,
                     integer(&row["SurfTAirRefRpt"])?,
@@ -483,6 +484,7 @@ impl Fixture {
                 _ => return Err("actual default/explicit TARP required".into()),
             };
             states.push(state);
+            coefficients.push((surface_id, real(&row["SurfHConvInt"])?));
             ti.push((surface_id, real(&row["SurfTempIn"])?));
             tmp.push((surface_id, real(&row["SurfTempInTmp"])?));
         }
@@ -551,6 +553,7 @@ impl Fixture {
             zones,
             surfaces,
             state,
+            coefficients,
             active_elements,
             space_air,
             zone_mat: real(&zone["MAT"])?,
@@ -576,6 +579,7 @@ impl Fixture {
             &self.surfaces,
             &self.state,
             &self.active_elements,
+            &self.coefficients,
             &self.space_air,
             self.zone_mat,
             self.low_limit,
@@ -719,6 +723,7 @@ fn case(
             no_user,
             &mut fixture.state,
             &mut fixture.active_elements[..],
+            &mut fixture.coefficients[..],
             &fixture.space_air,
             InsideSurfaceTemperatures {
                 owner: temperature_owner,

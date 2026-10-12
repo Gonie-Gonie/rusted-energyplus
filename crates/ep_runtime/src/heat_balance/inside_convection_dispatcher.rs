@@ -330,7 +330,7 @@ pub struct InsideConvectionSurface {
     pub vertices: Vec<[f64; 3]>,
 }
 
-/// Retained selected SurfIntConv/SurfExtConv and SurfHConvInt owners.
+/// Retained selected SurfIntConv/SurfExtConv metadata owners.
 /// Unwritten classification/model-equation members remain independently stored.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsideConvectionSurfaceState {
@@ -338,8 +338,6 @@ pub struct InsideConvectionSurfaceState {
     pub surface_id: SurfaceId,
     /// Retained model, not overwritten by local SetByZone resolution.
     pub model: InsideConvectionModel,
-    /// SurfHConvInt, changed only by the reached actual calculation.
-    pub coefficient: f64,
     /// SurfTAirRef and SurfTAirRefRpt, unchanged by selected TARP.
     pub reference_air: [i32; 2],
     /// SurfIntConv zoneWallHeight/zonePerimLength/zoneHorizHydrDiam/windowWallRatio.
@@ -356,13 +354,12 @@ pub struct InsideConvectionSurfaceState {
     pub exterior_classification: [i32; 10],
 }
 impl InsideConvectionSurfaceState {
-    /// Real selected surfIntConv/surfExtConv defaults plus actual caller HConv/ref.
+    /// Real selected surfIntConv/surfExtConv defaults plus actual caller reference air.
     #[must_use]
-    pub fn new(surface_id: SurfaceId, coefficient: f64, reference_air: [i32; 2]) -> Self {
+    pub fn new(surface_id: SurfaceId, reference_air: [i32; 2]) -> Self {
         Self {
             surface_id,
             model: InsideConvectionModel::SetByZone,
-            coefficient,
             reference_air,
             interior_geometry: [0.0; 4],
             window_location: 0,
@@ -406,11 +403,46 @@ impl ZoneEquipmentActiveElements for [(ZoneId, [bool; 3])] {
     }
 }
 
-/// Persistent genuine first-call/setup flags and selected surface owners.
+/// Borrow the caller's sole SurfHConvInt storage in actual surface array order.
+/// Complete identity validation precedes all dispatcher/setup/backend writes.
+pub trait InsideConvectionCoefficients {
+    /// Number of actual coefficient rows, including the full surface domain.
+    fn surface_count(&self) -> usize;
+    /// Actual surface identity at an already validated array index.
+    fn surface_id(&self, index: usize) -> SurfaceId;
+    /// Commit the reached result directly to its caller-owned coefficient.
+    fn set_coefficient(&mut self, index: usize, value: f64);
+}
+
+impl InsideConvectionCoefficients for [(SurfaceId, f64)] {
+    fn surface_count(&self) -> usize {
+        self.len()
+    }
+    fn surface_id(&self, index: usize) -> SurfaceId {
+        self[index].0
+    }
+    fn set_coefficient(&mut self, index: usize, value: f64) {
+        self[index].1 = value;
+    }
+}
+
+impl InsideConvectionCoefficients for [super::state::SurfaceHeatBalanceState] {
+    fn surface_count(&self) -> usize {
+        self.len()
+    }
+    fn surface_id(&self, index: usize) -> SurfaceId {
+        self[index].surface_id
+    }
+    fn set_coefficient(&mut self, index: usize, value: f64) {
+        self[index].inside_convection_coefficient_w_per_m2_k = value;
+    }
+}
+
+/// Persistent genuine first-call/setup flags and selected surface metadata owners.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsideConvectionState {
     layout: InsideConvectionLayout,
-    /// Actual ordered surface metadata and HConv owners.
+    /// Actual ordered convection metadata; HConv remains caller-owned.
     pub surfaces: Vec<InsideConvectionSurfaceState>,
     /// GetUserSuppliedConvectionCoeffs, constructor true.
     pub get_user_input: bool,
@@ -432,7 +464,7 @@ pub struct InsideConvectionState {
     pub user_model_counts: [usize; 2],
 }
 impl InsideConvectionState {
-    /// Retain actual dispatcher seeds; SpaceAir and Config remain caller owners.
+    /// Retain actual dispatcher seeds; HConv, SpaceAir and Config remain caller owners.
     pub fn new(
         layout: &InsideConvectionLayout,
         surfaces: Vec<InsideConvectionSurfaceState>,
@@ -495,17 +527,24 @@ pub struct InsideConvectionReadiness {
     pub equipment_simulated_once: bool,
 }
 
-fn validate<C: ZoneEquipmentActiveElements + ?Sized>(
+fn validate<C: ZoneEquipmentActiveElements + ?Sized, H: InsideConvectionCoefficients + ?Sized>(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     state: &InsideConvectionState,
     zone_equipment: &C,
+    coefficients: &H,
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
 ) -> Result<(), InsideConvectionUnavailable> {
     space_air.validate(layout)?;
     if state.layout != *layout
+        || coefficients.surface_count() != layout.surfaces().len()
+        || layout
+            .surfaces()
+            .iter()
+            .enumerate()
+            .any(|(index, row)| coefficients.surface_id(index) != row.surface_id)
         || zones
             .iter()
             .map(|r| r.zone_id)
@@ -703,13 +742,17 @@ fn setup_static(
 /// Execute the genuine selected no-user first call, readiness transitions and
 /// opaque TARP traversal. Unsupported branches stop explicitly; success covers
 /// this declared selected domain, never full adaptive/window/user setup.
-pub fn initialize_inside_convection<C: ZoneEquipmentActiveElements + ?Sized>(
+pub fn initialize_inside_convection<
+    C: ZoneEquipmentActiveElements + ?Sized,
+    H: InsideConvectionCoefficients + ?Sized,
+>(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     no_user_input: NoUserConvectionInput,
     state: &mut InsideConvectionState,
     zone_equipment: &mut C,
+    coefficients: &mut H,
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
@@ -724,6 +767,7 @@ pub fn initialize_inside_convection<C: ZoneEquipmentActiveElements + ?Sized>(
         surfaces,
         state,
         zone_equipment,
+        coefficients,
         space_air,
         temperatures,
     )?;
@@ -837,7 +881,7 @@ pub fn initialize_inside_convection<C: ZoneEquipmentActiveElements + ?Sized>(
             if coefficient < actual_low_limit {
                 coefficient = actual_low_limit;
             }
-            state.surfaces[index].coefficient = coefficient;
+            coefficients.set_coefficient(index, coefficient);
         }
     }
     // Actual WindowSurface ranges are empty in this selected opaque domain.
