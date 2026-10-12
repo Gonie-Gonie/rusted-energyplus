@@ -1,0 +1,2610 @@
+{
+  "schema": "src06-geometry-equipment-genuine-getter-replay.v1",
+  "actual_138_case_fixture": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/selected-cases.json",
+    "sha256": "b5d13ffe85c1695d805ba2492537b5f4443c3461313806e91187f64a577310dd",
+    "size_bytes": 3384982
+  },
+  "actual_factual_report": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/review.json",
+    "sha256": "0c485eff914c0def87199b8a31e6a090d81c2af2c22b440fd8c77926964572ba",
+    "size_bytes": 34995
+  },
+  "supplied_input_inventory_source_audit": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-positive-input-audit-01/manifest.json",
+    "sha256": "ea23e3405f47afbc43d4641dde6dd1af184106696fbd83ea38774bd40a3138f7",
+    "size_bytes": 33213
+  },
+  "supplied_input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+    "size_bytes": 9275
+  },
+  "supplied_family_counts": {
+    "Version": 1,
+    "Timestep": 1,
+    "Building": 1,
+    "HeatBalanceAlgorithm": 1,
+    "SurfaceConvectionAlgorithm:Inside": 1,
+    "SurfaceConvectionAlgorithm:Outside": 1,
+    "SimulationControl": 1,
+    "RunPeriod": 1,
+    "Site:Location": 1,
+    "SizingPeriod:DesignDay": 2,
+    "Material:NoMass": 2,
+    "Material": 1,
+    "Construction": 3,
+    "Zone": 1,
+    "ScheduleTypeLimits": 2,
+    "GlobalGeometryRules": 1,
+    "BuildingSurface:Detailed": 6,
+    "Output:Diagnostics": 1,
+    "Output:VariableDictionary": 1,
+    "Output:Surfaces:Drawing": 1,
+    "Output:Constructions": 1,
+    "Output:Meter:MeterFileOnly": 3,
+    "OutputControl:Table:Style": 1,
+    "Output:Table:SummaryReports": 1,
+    "Exterior:Lights": 1,
+    "OtherEquipment": 2,
+    "Schedule:Constant": 1,
+    "ZoneAirHeatBalanceAlgorithm": 1,
+    "Output:Variable": 55
+  },
+  "selection": [
+    {
+      "source_case_index": 0,
+      "whole_object_sha256": "ee1900ce69e02233a1aa60cfbab8eabfd1c32d17d84a46107864ae8f962e27af"
+    },
+    {
+      "source_case_index": 1,
+      "whole_object_sha256": "508ad68fea0f1f6187acfdd765d07ddf99bb5e8e4b4c8373e101e262e28ebd00"
+    },
+    {
+      "source_case_index": 2,
+      "whole_object_sha256": "b2a1cb5dfbaf9cd1168b1054641642437f8b839fd8bfd39d0d268337bf6048b7"
+    },
+    {
+      "source_case_index": 3,
+      "whole_object_sha256": "42407daaa4155140bee91291b38af0502b170dbe1cbb5e97fc64f9c91065a8f4"
+    },
+    {
+      "source_case_index": 6,
+      "whole_object_sha256": "6699daaa035c6dc045c0d2709a24263309b3939a713e40d0d636a43d5c837bce"
+    },
+    {
+      "source_case_index": 7,
+      "whole_object_sha256": "c267aa5ebb27dd061579ec7ea8c2ee37fee40945fb5b511bad475345a135476d"
+    },
+    {
+      "source_case_index": 8,
+      "whole_object_sha256": "8f584331331a76ae2d6e87613cbce29892e56d0a9fac1b6a6a8b53ed0e1e65d0"
+    },
+    {
+      "source_case_index": 13,
+      "whole_object_sha256": "7c6a3abad6dd9a13c697f3b19182b13952517e40029deb10583a9aa4a45e3272"
+    }
+  ],
+  "scope": "one genuine GetZoneEquipment pair at source index13 plus seven actual count/find inputs; not thirteen presence cases or InputProcessor before/after parity",
+  "cases": [
+    {
+      "operation": "zone_equipment_initial_counts",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "zone_equipment_initial_counts",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 3,
+        "invocation_ordinal": 1,
+        "locals": {
+          "NumOfZoneEquipLists": 0,
+          "numControlledSpaces": 0,
+          "numControlledZones": 0
+        },
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": true,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": false,
+              "array_address": 2250822585840,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "SupplyAirPath": {
+              "allocated": false,
+              "array_address": 2250822585760,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": false,
+              "array_address": 2250822585384,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585464,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "ZoneEquipList": {
+              "allocated": false,
+              "array_address": 2250822585680,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": null,
+            "zone_equipment_list_counts": null
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "zone_supply_path_actual_count",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "zone_supply_path_actual_count",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 4,
+        "invocation_ordinal": 1,
+        "locals": {},
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": true,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": false,
+              "array_address": 2250822585840,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "SupplyAirPath": {
+              "allocated": false,
+              "array_address": 2250822585760,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": false,
+              "array_address": 2250822585384,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585464,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "ZoneEquipList": {
+              "allocated": false,
+              "array_address": 2250822585680,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": null,
+            "zone_equipment_list_counts": null
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "zone_return_path_actual_count",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "zone_return_path_actual_count",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 5,
+        "invocation_ordinal": 1,
+        "locals": {},
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": true,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": false,
+              "array_address": 2250822585840,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": false,
+              "array_address": 2250822585384,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585464,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "ZoneEquipList": {
+              "allocated": false,
+              "array_address": 2250822585680,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": null,
+            "zone_equipment_list_counts": null
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "node_list_actual_count",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "node_list_actual_count",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 7,
+        "invocation_ordinal": 1,
+        "locals": {},
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": true,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": true,
+              "array_address": 2250822585840,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066624,
+              "upper": 0
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": true,
+              "array_address": 2250822585384,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250785066752,
+              "upper": 1
+            },
+            "ZoneEquipConfig": {
+              "allocated": true,
+              "array_address": 2250822585464,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250780567808,
+              "upper": 1,
+              "values": [
+                {
+                  "EquipListIndex": 0,
+                  "InCeilingActiveElement": false,
+                  "InFloorActiveElement": false,
+                  "InWallActiveElement": false,
+                  "IsControlled": false,
+                  "NumExhaustNodes": 0,
+                  "NumInletNodes": 0,
+                  "NumReturnNodes": 0,
+                  "ZoneName": "Uncontrolled Zone",
+                  "ZoneNode": 0,
+                  "address": 2250780567808,
+                  "index": 1
+                }
+              ]
+            },
+            "ZoneEquipList": {
+              "allocated": true,
+              "array_address": 2250822585680,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250822596416,
+              "upper": 1
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": [
+              {
+                "index": 1,
+                "value": 0
+              }
+            ],
+            "zone_equipment_list_counts": [
+              {
+                "NumOfEquipTypes": 0,
+                "index": 1
+              }
+            ]
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipmentData",
+        "procedure": "GetNodeListsInput",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "space_splitter_actual_find",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "space_splitter_actual_find",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 10,
+        "invocation_ordinal": 1,
+        "locals": {
+          "CurrentModuleObject": "SpaceHVAC:ZoneEquipmentSplitter",
+          "object_found": 0
+        },
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": false,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": true,
+              "array_address": 2250822585840,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066624,
+              "upper": 0
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": true,
+              "array_address": 2250822585384,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250785066752,
+              "upper": 1
+            },
+            "ZoneEquipConfig": {
+              "allocated": true,
+              "array_address": 2250822585464,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250780567808,
+              "upper": 1,
+              "values": [
+                {
+                  "EquipListIndex": 1,
+                  "InCeilingActiveElement": false,
+                  "InFloorActiveElement": false,
+                  "InWallActiveElement": false,
+                  "IsControlled": false,
+                  "NumExhaustNodes": 0,
+                  "NumInletNodes": 0,
+                  "NumReturnNodes": 0,
+                  "ZoneName": "Uncontrolled Zone",
+                  "ZoneNode": 0,
+                  "address": 2250780567808,
+                  "index": 1
+                }
+              ]
+            },
+            "ZoneEquipList": {
+              "allocated": true,
+              "array_address": 2250822585680,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250822596416,
+              "upper": 1
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": [
+              {
+                "index": 1,
+                "value": 0
+              }
+            ],
+            "zone_equipment_list_counts": [
+              {
+                "NumOfEquipTypes": 0,
+                "index": 1
+              }
+            ]
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "space_equipment_mixer_actual_find",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "space_equipment_mixer_actual_find",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 11,
+        "invocation_ordinal": 1,
+        "locals": {
+          "CurrentModuleObject": "SpaceHVAC:ZoneEquipmentMixer",
+          "object_found": 0
+        },
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": false,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": true,
+              "array_address": 2250822585840,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066624,
+              "upper": 0
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": true,
+              "array_address": 2250822585384,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250785066752,
+              "upper": 1
+            },
+            "ZoneEquipConfig": {
+              "allocated": true,
+              "array_address": 2250822585464,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250780567808,
+              "upper": 1,
+              "values": [
+                {
+                  "EquipListIndex": 1,
+                  "InCeilingActiveElement": false,
+                  "InFloorActiveElement": false,
+                  "InWallActiveElement": false,
+                  "IsControlled": false,
+                  "NumExhaustNodes": 0,
+                  "NumInletNodes": 0,
+                  "NumReturnNodes": 0,
+                  "ZoneName": "Uncontrolled Zone",
+                  "ZoneNode": 0,
+                  "address": 2250780567808,
+                  "index": 1
+                }
+              ]
+            },
+            "ZoneEquipList": {
+              "allocated": true,
+              "array_address": 2250822585680,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250822596416,
+              "upper": 1
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": [
+              {
+                "index": 1,
+                "value": 0
+              }
+            ],
+            "zone_equipment_list_counts": [
+              {
+                "NumOfEquipTypes": 0,
+                "index": 1
+              }
+            ]
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "space_return_mixer_actual_find",
+      "phase": "kickoff",
+      "event": {
+        "checkpoint": "space_return_mixer_actual_find",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 12,
+        "invocation_ordinal": 1,
+        "locals": {
+          "CurrentModuleObject": "SpaceHVAC:ZoneReturnMixer",
+          "object_found": 0
+        },
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": false,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": true,
+              "array_address": 2250822585840,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066624,
+              "upper": 0
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": true,
+              "array_address": 2250822585384,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250785066752,
+              "upper": 1
+            },
+            "ZoneEquipConfig": {
+              "allocated": true,
+              "array_address": 2250822585464,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250780567808,
+              "upper": 1,
+              "values": [
+                {
+                  "EquipListIndex": 1,
+                  "InCeilingActiveElement": false,
+                  "InFloorActiveElement": false,
+                  "InWallActiveElement": false,
+                  "IsControlled": false,
+                  "NumExhaustNodes": 0,
+                  "NumInletNodes": 0,
+                  "NumReturnNodes": 0,
+                  "ZoneName": "Uncontrolled Zone",
+                  "ZoneNode": 0,
+                  "address": 2250780567808,
+                  "index": 1
+                }
+              ]
+            },
+            "ZoneEquipList": {
+              "allocated": true,
+              "array_address": 2250822585680,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250822596416,
+              "upper": 1
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": [
+              {
+                "index": 1,
+                "value": 0
+              }
+            ],
+            "zone_equipment_list_counts": [
+              {
+                "NumOfEquipTypes": 0,
+                "index": 1
+              }
+            ]
+          }
+        },
+        "parent_invocation_ordinal": 1,
+        "parent_procedure": "GetZoneEquipment",
+        "procedure": "GetZoneEquipmentData",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    },
+    {
+      "operation": "function:GetZoneEquipment:get_zone_equipment_return",
+      "phase": "kickoff",
+      "before": {
+        "checkpoint": "get_zone_equipment_entry",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 1,
+        "invocation_ordinal": 1,
+        "locals": {},
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": true,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 0,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": false,
+              "array_address": 2250820426144,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ReturnAirPath": {
+              "allocated": false,
+              "array_address": 2250822585840,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "SupplyAirPath": {
+              "allocated": false,
+              "array_address": 2250822585760,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": false,
+              "array_address": 2250822585384,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "ZoneEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585464,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "ZoneEquipList": {
+              "allocated": false,
+              "array_address": 2250822585680,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": true,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": false,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": null,
+            "zone_equipment_list_counts": null
+          }
+        },
+        "parent_invocation_ordinal": null,
+        "parent_procedure": null,
+        "procedure": "GetZoneEquipment",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      },
+      "after": {
+        "checkpoint": "get_zone_equipment_return",
+        "clock": {
+          "BeginDayFlag": true,
+          "BeginEnvrnFlag": true,
+          "BeginHourFlag": true,
+          "BeginSimFlag": true,
+          "BeginTimeStepFlag": true,
+          "CalendarYear": 0,
+          "CurrentTime": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "DayOfMonth": 21,
+          "DayOfSim": 1,
+          "FirstTimeStepSysFlag": false,
+          "FracTimeStepZone": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "HourOfDay": 1,
+          "InsideSurfIterations": 0,
+          "KickOffSimulation": true,
+          "KindOfSim": 1,
+          "Month": 12,
+          "NumOfSysTimeSteps": 1,
+          "ShortenTimeStepSys": false,
+          "SysSizingCalc": false,
+          "SysTimeElapsed": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStep": 1,
+          "TimeStepSys": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepSysSec": {
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TimeStepZone": {
+            "value_bits": "3fd0000000000000",
+            "value_class": "finite"
+          },
+          "TimeStepZoneSec": {
+            "value_bits": "408c200000000000",
+            "value_class": "finite"
+          },
+          "UseZoneTimeStepHistory": true,
+          "WarmupFlag": true,
+          "ZoneSizingCalc": false,
+          "environment_index": 1,
+          "environment_name": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+          "state_address": 938511161664
+        },
+        "counted_as_PASS": false,
+        "event_ordinal": 17,
+        "invocation_ordinal": 1,
+        "locals": {},
+        "owners": {
+          "availability": {
+            "GetAvailMgrInputFlag": true,
+            "InitSysAvailManagers_MyOneTimeFlag": true,
+            "MyEnvrnFlag": true,
+            "MyOneTimeFlag": true,
+            "ZoneComp": {
+              "allocated": false,
+              "array_address": 2250774861160,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "components": null,
+            "manager_counts": {
+              "NumDiffTSysAvailMgrs": 0,
+              "NumHiTurnOffSysAvailMgrs": 0,
+              "NumHiTurnOnSysAvailMgrs": 0,
+              "NumHybridVentSysAvailMgrs": 0,
+              "NumLoTurnOffSysAvailMgrs": 0,
+              "NumLoTurnOnSysAvailMgrs": 0,
+              "NumNCycSysAvailMgrs": 0,
+              "NumNVentSysAvailMgrs": 0,
+              "NumOptStartSysAvailMgrs": 0,
+              "NumSchedOffSysAvailMgrs": 0,
+              "NumSchedOnSysAvailMgrs": 0,
+              "NumSchedSysAvailMgrs": 0
+            }
+          },
+          "nodes": {
+            "GetNodeInputFlag": false,
+            "MarkedNode": {
+              "allocated": false,
+              "array_address": 2250794883832,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "MoreNodeInfo": {
+              "allocated": false,
+              "array_address": 2250794883752,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "Node": {
+              "allocated": false,
+              "array_address": 2250794883304,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeID": {
+              "allocated": false,
+              "array_address": 2250794883224,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeRef": {
+              "allocated": false,
+              "array_address": 2250788881272,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NodeSetpointCheck": {
+              "allocated": false,
+              "array_address": 2250794883912,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null
+            },
+            "NumOfNodeLists": 0,
+            "NumOfNodes": 0,
+            "NumOfUniqueNodeNames": 0,
+            "selected_index": 0,
+            "selected_value": null,
+            "values": null
+          },
+          "readiness": {
+            "CurZoneEqNum": 0,
+            "LowHConvLimit": {
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            "NumOfTimeStepInDay": 96,
+            "NumOfZoneEquipLists": 0,
+            "NumOfZones": 1,
+            "NumPrimaryAirSys": 0,
+            "NumReturnAirPaths": 0,
+            "NumSupplyAirPaths": 0,
+            "PrioritySimOrder": {
+              "allocated": true,
+              "array_address": 2250820426144,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785065792,
+              "upper": 0
+            },
+            "ReturnAirPath": {
+              "allocated": true,
+              "array_address": 2250822585840,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066624,
+              "upper": 0
+            },
+            "SupplyAirPath": {
+              "allocated": true,
+              "array_address": 2250822585760,
+              "lower": 1,
+              "size": 0,
+              "storage_address": 2250785066048,
+              "upper": 0
+            },
+            "ZoneEqSizing": {
+              "allocated": false,
+              "count": 0,
+              "owner_address": 2250787441880
+            },
+            "ZoneEquipAvail": {
+              "allocated": true,
+              "array_address": 2250822585384,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250785066752,
+              "upper": 1
+            },
+            "ZoneEquipConfig": {
+              "allocated": true,
+              "array_address": 2250822585464,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250780567808,
+              "upper": 1,
+              "values": [
+                {
+                  "EquipListIndex": 1,
+                  "InCeilingActiveElement": false,
+                  "InFloorActiveElement": false,
+                  "InWallActiveElement": false,
+                  "IsControlled": false,
+                  "NumExhaustNodes": 0,
+                  "NumInletNodes": 0,
+                  "NumReturnNodes": 0,
+                  "ZoneName": "Uncontrolled Zone",
+                  "ZoneNode": 0,
+                  "address": 2250780567808,
+                  "index": 1
+                }
+              ]
+            },
+            "ZoneEquipList": {
+              "allocated": true,
+              "array_address": 2250822585680,
+              "lower": 1,
+              "size": 1,
+              "storage_address": 2250822596416,
+              "upper": 1
+            },
+            "flags": {
+              "ActiveSurfaceCheck": true,
+              "AirLoopInputsFilled": false,
+              "BeginEnvrnFlag": true,
+              "DoingSizing": false,
+              "FirstPassZoneEquipFlag": true,
+              "FirstRoofSurf": true,
+              "GetUserSuppliedConvectionCoeffs": true,
+              "GetZoneEquipmentDataErrorsFound": false,
+              "GetZoneEquipmentInputFlag": false,
+              "HVAC_MyEnvrnFlag2": true,
+              "InitZoneEquipmentEnvrnFlag": true,
+              "InitZoneEquipmentOneTimeFlag": true,
+              "MyEnvirnFlag": true,
+              "NodeCheck": true,
+              "SysSizingCalc": false,
+              "ZoneEquipInputsFilled": true,
+              "ZoneEquipSimulatedOnce": false,
+              "ZoneSizingCalc": false,
+              "doSpaceHeatBalanceSimulation": false,
+              "doSpaceHeatBalanceSizing": false
+            },
+            "numSpaces": 1,
+            "spaceEquipConfig": {
+              "allocated": false,
+              "array_address": 2250822585544,
+              "lower": null,
+              "size": 0,
+              "storage_address": null,
+              "upper": null,
+              "values": null
+            },
+            "zone_algorithms": [
+              {
+                "IntConvAlgo": 4,
+                "SystemZoneNodeNumber": 0,
+                "index": 1
+              }
+            ],
+            "zone_equipment_availability": [
+              {
+                "index": 1,
+                "value": 0
+              }
+            ],
+            "zone_equipment_list_counts": [
+              {
+                "NumOfEquipTypes": 0,
+                "index": 1
+              }
+            ]
+          }
+        },
+        "parent_invocation_ordinal": null,
+        "parent_procedure": null,
+        "procedure": "GetZoneEquipment",
+        "readiness_owner_protocol": "src06-ordinary-readiness-native.v1"
+      }
+    }
+  ]
+}

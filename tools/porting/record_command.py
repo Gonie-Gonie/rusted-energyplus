@@ -120,7 +120,9 @@ def cargo_artifacts(command: list[str], stdout: Path) -> dict:
 
     Cache hits are valid. No timestamp heuristic identifies a compiled artifact.
     """
-    requested = (command[:2] == ["cargo", "build"] and
+    requested = (len(command) >= 2 and
+                 Path(command[0]).name.lower() in ("cargo", "cargo.exe") and
+                 command[1] == "build" and
                  "--message-format=json-render-diagnostics" in command)
     result = {"requested": requested, "captured_utc": utc_now(),
               "status": "not_requested", "rows": [], "error": None}

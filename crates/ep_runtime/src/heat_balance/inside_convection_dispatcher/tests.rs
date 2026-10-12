@@ -85,7 +85,6 @@ fn state(
             InsideConvectionSurfaceState::new(SurfaceId(8), -7.0, [11, 12]),
             InsideConvectionSurfaceState::new(SurfaceId(2), -8.0, [21, 22]),
         ],
-        vec![(ZoneId(7), [true; 3])],
     )
 }
 fn readiness() -> InsideConvectionReadiness {
@@ -125,6 +124,7 @@ fn error_state() -> SourceErrorState {
 fn run(
     layout: &InsideConvectionLayout,
     state: &mut InsideConvectionState,
+    zone_equipment: &mut [(ZoneId, [bool; 3])],
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
@@ -152,6 +152,7 @@ fn run(
         &surfaces(),
         NoUserConvectionInput::new([0; 6])?,
         state,
+        zone_equipment,
         space_air,
         temperatures,
         readiness,
@@ -167,6 +168,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let mut space_air = SpaceAirTemperatures::allocate(&layout);
     space_air.write_all(
         &layout,
@@ -192,6 +194,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
     run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -239,6 +242,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
     run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempIn,
@@ -263,6 +267,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
     let mut scan = ReportScanState::default();
@@ -278,6 +283,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
     run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         temperatures,
         ready,
@@ -286,13 +292,16 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
         &mut scan,
     )?;
     assert!(state.node_check && state.active_surface_check);
-    assert_eq!(state.active_elements[0].1, [true; 3]);
+    assert_eq!(active_elements[0].1, [true; 3]);
+    // The same independent Config owner can change between actual calls.
+    active_elements[0].1 = [false, true, false];
     state.surfaces[0].interior_geometry[0] = 41.0;
     ready.system_sizing = false;
     ready.begin_environment = false;
     run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         temperatures,
         ready,
@@ -301,7 +310,21 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
         &mut scan,
     )?;
     assert!(!state.node_check && !state.active_surface_check);
-    assert_eq!(state.active_elements[0].1, [false; 3]);
+    assert_eq!(active_elements[0].1, [false; 3]);
+    // Once the actual setup flag clears, a later caller write is retained.
+    active_elements[0].1 = [true, false, true];
+    run(
+        &layout,
+        &mut state,
+        &mut active_elements[..],
+        &space_air,
+        temperatures,
+        ready,
+        0.7,
+        &ReportInputs::default(),
+        &mut scan,
+    )?;
+    assert_eq!(active_elements[0].1, [true, false, true]);
     assert!(state.my_environment);
     assert_eq!(state.surfaces[0].interior_geometry[0], 41.0);
     assert!(
@@ -318,6 +341,7 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
     let rows = [(SurfaceId(2), 23.0), (SurfaceId(8), 23.0)];
@@ -325,6 +349,7 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
     let result = run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempIn,
@@ -343,6 +368,37 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
     ));
     assert_eq!(state, before);
     assert!(scan.get_report_input);
+    let valid_rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
+    for mut invalid in [
+        Vec::new(),
+        vec![(ZoneId(8), [false; 3])],
+        vec![(ZoneId(7), [false; 3]), (ZoneId(8), [true; 3])],
+    ] {
+        let unchanged = invalid.clone();
+        let result = run(
+            &layout,
+            &mut state,
+            &mut invalid[..],
+            &space_air,
+            InsideSurfaceTemperatures {
+                owner: InsideSurfaceTemperatureOwner::SurfTempIn,
+                rows: &valid_rows,
+            },
+            readiness(),
+            0.1,
+            &ReportInputs::default(),
+            &mut scan,
+        );
+        assert!(matches!(
+            result,
+            Err(InsideConvectionError::Unavailable(
+                InsideConvectionUnavailable::Association
+            ))
+        ));
+        assert_eq!(state, before);
+        assert_eq!(invalid, unchanged);
+        assert!(scan.get_report_input);
+    }
     let duplicate = InsideConvectionLayout::new(
         vec![ZoneId(7)],
         vec![(SpaceId(3), ZoneId(7))],
@@ -392,6 +448,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState {
         get_report_input: false,
@@ -402,6 +459,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
     let result = run(
         &layout,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -445,6 +503,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
     }
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState::default();
     let mut reports = ReportInputs::default();
@@ -478,6 +537,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
         &surfaces(),
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
@@ -545,6 +605,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let mut active_elements = [(ZoneId(7), [true; 3])];
     let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
     let mut surfaces = surfaces();
@@ -578,6 +639,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
         &surfaces,
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
+        &mut active_elements[..],
         &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,

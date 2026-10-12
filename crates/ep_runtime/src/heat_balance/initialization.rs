@@ -11,6 +11,7 @@ pub use schedule_cache::{
 };
 pub(crate) use schedule_cache::{
     initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,
+    initialize_heat_balance_state_with_initialization_context_and_equipment_profiled,
     initialize_heat_balance_state_with_initialization_context_profiled,
 };
 
@@ -49,10 +50,51 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     mut initialization: Option<
         &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
     >,
+    equipment_input: Option<super::ordinary_equipment::OrdinaryEquipmentInput>,
 ) -> Result<HeatBalanceState, RuntimeError> {
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
     }
+    // SurfaceGeometry290->298->548: actual admitted surface-data validation
+    // precedes GetZoneEquipment, and volume calculation follows the getter.
+    // Retain these real geometry/boundary returns for the later surface owner;
+    // no second geometry calculation or Native endpoint is used.
+    let admitted_surface_data = equipment_input
+        .map(|_| {
+            if model.typed.surfaces.is_empty() {
+                return Err(RuntimeError::WarmupUnavailable {
+                    reason: "missing admitted surface data before GetZoneEquipment".into(),
+                });
+            }
+            super::inside_convection_layout::InsideConvectionLayout::from_typed_model(&model.typed)
+                .map_err(|_| RuntimeError::WarmupUnavailable {
+                    reason: "invalid surface associations before GetZoneEquipment".into(),
+                })?;
+            model
+                .typed
+                .surfaces
+                .iter()
+                .map(|surface| {
+                    let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
+                        .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
+                            surface_name: surface.name.0.clone(),
+                            reason: error.to_string(),
+                        })?;
+                    let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
+                    Ok::<_, RuntimeError>((geometry, boundary))
+                })
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .transpose()?;
+    let equipment = equipment_input
+        .map(|input| {
+            super::ordinary_equipment::OrdinaryEquipment::for_geometry(&model.typed, input).map_err(
+                |reason| RuntimeError::WarmupUnavailable {
+                    reason: format!("ordinary geometry equipment unavailable: {reason}"),
+                },
+            )
+        })
+        .transpose()?;
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     let mut zone_geometry_returns = Vec::with_capacity(model.typed.zones.len());
@@ -117,12 +159,16 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     // Validate actual declared references before selected public generation
     // can reject an unsupported boundary family. Preserve the existing
     // MissingSurface/ZoneBoundaryTarget contract without widening support.
-    let boundary_targets = model
-        .typed
-        .surfaces
-        .iter()
-        .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
-        .collect::<Result<Vec<_>, _>>()?;
+    let boundary_targets = if let Some(data) = &admitted_surface_data {
+        data.iter().map(|(_, boundary)| *boundary).collect()
+    } else {
+        model
+            .typed
+            .surfaces
+            .iter()
+            .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
+            .collect::<Result<Vec<_>, _>>()?
+    };
     let mut construction_thermal_data = if let Some(actual) = initialization {
         actual.prepare_registry(&model.typed)?;
         crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
@@ -160,12 +206,16 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .surfaces
         .iter()
         .zip(boundary_targets)
-        .map(|(surface, boundary)| {
-            let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
-                .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
-                    surface_name: surface.name.0.clone(),
-                    reason: error.to_string(),
-                })?;
+        .enumerate()
+        .map(|(index, (surface, boundary))| {
+            let geometry = if let Some(data) = &admitted_surface_data {
+                data[index].0
+            } else {
+                crate::geometry::surface_geometry_properties(&surface.vertices)
+                    .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
+                        surface_name: surface.name.0.clone(), reason: error.to_string(),
+                    })?
+            };
             let area_m2 = geometry.area_m2;
             let azimuth_deg = geometry.azimuth_deg;
             let tilt_deg = geometry.tilt_deg;
@@ -296,12 +346,14 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             });
     }
 
-    Ok(finish_heat_balance_state(
+    let mut state = finish_heat_balance_state(
         zones,
         initialized_geometry,
         surfaces,
         surface_indexes,
         construction_thermal_data,
         ctf_surface_lifecycle,
-    ))
+    );
+    state.ordinary_equipment = equipment;
+    Ok(state)
 }

@@ -43,7 +43,7 @@ pub(crate) use crate::heat_balance::initialization::{
 };
 use crate::heat_balance::initialization::{
     initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,
-    initialize_heat_balance_state_with_initialization_context_profiled,
+    initialize_heat_balance_state_with_initialization_context_and_equipment_profiled,
 };
 #[cfg(test)]
 use crate::heat_balance::inside_convection::{
@@ -375,7 +375,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     if model.typed.zones.is_empty() {
         return Err(RuntimeError::NoZones);
     }
-
+    let equipment_input = reporting
+        .map(|input| {
+            input
+                .equipment_input
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "missing actual ordinary raw equipment input before initialization"
+                        .into(),
+                })
+        })
+        .transpose()?;
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let first_hour_interpolation_starting_values =
@@ -432,13 +441,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 &schedule_cache,
             );
             let mut state = if let Some(context) = initialization.as_deref_mut() {
-                initialize_heat_balance_state_with_initialization_context_profiled(
+                initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
                     model,
                     options.initial_zone_air_temperature_c,
                     ctf_coefficients,
                     &schedule_cache,
                     &mut schedule_cache_profile,
                     context,
+                    equipment_input,
                 )?
             } else {
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
@@ -450,6 +460,11 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 )?
             };
             if reporting.is_some() {
+                if state.ordinary_equipment.is_none() {
+                    return Err(RuntimeError::WarmupUnavailable {
+                        reason: "missing retained geometry equipment owner".into(),
+                    });
+                }
                 crate::heat_balance::convection::surface_environment::ordinary::invoke(
                     model,
                     &mut state,

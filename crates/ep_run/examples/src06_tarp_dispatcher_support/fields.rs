@@ -1,5 +1,5 @@
 //! Read-only actual retained dispatcher owners and real borrowed backend transport.
-use ep_model::{ReportInputs, SurfaceId};
+use ep_model::{ReportInputs, SurfaceId, ZoneId};
 use ep_runtime::heat_balance::error_backend::{
     SourceErrorBackend, SourceErrorState, SourceErrorTracking,
 };
@@ -160,6 +160,7 @@ impl Caller {
         surfaces: &[InsideConvectionSurface],
         no_user: NoUserConvectionInput,
         state: &mut InsideConvectionState,
+        active_elements: &mut [(ZoneId, [bool; 3])],
         space_air: &SpaceAirTemperatures,
         temperatures: InsideSurfaceTemperatures<'_>,
         readiness: InsideConvectionReadiness,
@@ -198,6 +199,7 @@ impl Caller {
             surfaces,
             no_user,
             state,
+            active_elements,
             space_air,
             temperatures,
             readiness,
@@ -235,6 +237,7 @@ pub(super) fn snapshot(
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     state: &InsideConvectionState,
+    active_elements: &[(ZoneId, [bool; 3])],
     space_air: &SpaceAirTemperatures,
     zone_mat: f64,
     actual_low_limit: f64,
@@ -277,7 +280,7 @@ pub(super) fn snapshot(
         "MyEnvirnFlag":state.my_environment,"FirstRoofSurf":state.first_roof_surface,"CubeRootOfOverallBuildingVolume":scalar(state.cube_root_building_volume),
         "RoofLongAxisOutwardAzimuth":scalar(state.roof_long_axis_outward_azimuth),"TotUserIntConvModels":state.user_model_counts[0],"TotUserExtConvModels":state.user_model_counts[1],
         "hcIntUserCurve":empty_user(&state.user_arrays[0],true),"hcExtUserCurve":empty_user(&state.user_arrays[1],true),"userIntConvModels":empty_user(&state.user_arrays[2],false),"userExtConvModels":empty_user(&state.user_arrays[3],false),
-        "ZoneEquipConfig_selected_members":objexx(&state.active_elements,|v|json!({"InWallActiveElement":v.1[0],"InCeilingActiveElement":v.1[1],"InFloorActiveElement":v.1[2]})),
+        "ZoneEquipConfig_selected_members":objexx(active_elements,|v|json!({"InWallActiveElement":v.1[0],"InCeilingActiveElement":v.1[1],"InFloorActiveElement":v.1[2]})),
         "Node_allocated_input_owner":readiness.nodes_allocated,"Scan_cache":cache(&caller.scan),"backend":backend(&caller.state)},
         "error_stream":bytes(&caller.error),"console":bytes(&caller.console),"eio":bytes(&caller.eio),"callbacks":&*callbacks,"actual_callback_count":callbacks.len(),
         "inner_surface_visit_trace_available":false,"unavailable_owner_families":UNAVAILABLE})

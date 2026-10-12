@@ -378,7 +378,35 @@ impl InsideConvectionSurfaceState {
 #[derive(Clone, Debug, PartialEq)]
 pub enum AbsentUserConvectionRecord {}
 
-/// Persistent genuine first-call/setup flags and all selected mutated owners.
+/// Borrow actual ordered ZoneEquipConfig active-element members from their owner.
+/// The dispatcher validates full cardinality and identity before any write.
+pub trait ZoneEquipmentActiveElements {
+    /// Number of retained Config rows in actual zone array order.
+    fn zone_count(&self) -> usize;
+    /// Actual zone identity at an already validated row index.
+    fn zone_id(&self, index: usize) -> ZoneId;
+    /// Current wall, ceiling and floor members; no persistent projection.
+    fn active_elements(&self, index: usize) -> [bool; 3];
+    /// Write the actual retained row after full membership validation.
+    fn set_active_elements(&mut self, index: usize, flags: [bool; 3]);
+}
+
+impl ZoneEquipmentActiveElements for [(ZoneId, [bool; 3])] {
+    fn zone_count(&self) -> usize {
+        self.len()
+    }
+    fn zone_id(&self, index: usize) -> ZoneId {
+        self[index].0
+    }
+    fn active_elements(&self, index: usize) -> [bool; 3] {
+        self[index].1
+    }
+    fn set_active_elements(&mut self, index: usize, flags: [bool; 3]) {
+        self[index].1 = flags;
+    }
+}
+
+/// Persistent genuine first-call/setup flags and selected surface owners.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsideConvectionState {
     layout: InsideConvectionLayout,
@@ -402,25 +430,18 @@ pub struct InsideConvectionState {
     pub user_arrays: [Option<Vec<AbsentUserConvectionRecord>>; 4],
     /// TotUserIntConvModels and TotUserExtConvModels.
     pub user_model_counts: [usize; 2],
-    /// Actual ZoneEquipConfig wall/ceiling/floor active-element members.
-    pub active_elements: Vec<(ZoneId, [bool; 3])>,
 }
 impl InsideConvectionState {
-    /// Retain actual dispatcher seeds; SpaceAir remains owned by the caller.
+    /// Retain actual dispatcher seeds; SpaceAir and Config remain caller owners.
     pub fn new(
         layout: &InsideConvectionLayout,
         surfaces: Vec<InsideConvectionSurfaceState>,
-        active_elements: Vec<(ZoneId, [bool; 3])>,
     ) -> Result<Self, InsideConvectionUnavailable> {
         if surfaces.len() != layout.surfaces().len()
             || surfaces
                 .iter()
                 .zip(layout.surfaces())
                 .any(|(a, b)| a.surface_id != b.surface_id)
-            || active_elements
-                .iter()
-                .map(|r| r.0)
-                .ne(layout.zones().iter().copied())
         {
             return Err(InsideConvectionUnavailable::Association);
         }
@@ -436,7 +457,6 @@ impl InsideConvectionState {
             roof_long_axis_outward_azimuth: 0.0,
             user_arrays: std::array::from_fn(|_| None),
             user_model_counts: [0; 2],
-            active_elements,
         })
     }
 }
@@ -475,11 +495,12 @@ pub struct InsideConvectionReadiness {
     pub equipment_simulated_once: bool,
 }
 
-fn validate(
+fn validate<C: ZoneEquipmentActiveElements + ?Sized>(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     state: &InsideConvectionState,
+    zone_equipment: &C,
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
 ) -> Result<(), InsideConvectionUnavailable> {
@@ -489,11 +510,12 @@ fn validate(
             .iter()
             .map(|r| r.zone_id)
             .ne(layout.zones().iter().copied())
-        || state
-            .active_elements
+        || zone_equipment.zone_count() != layout.zones().len()
+        || layout
+            .zones()
             .iter()
-            .map(|r| r.0)
-            .ne(layout.zones().iter().copied())
+            .enumerate()
+            .any(|(index, &zone)| zone_equipment.zone_id(index) != zone)
         || surfaces
             .iter()
             .map(|r| r.surface_id)
@@ -681,12 +703,13 @@ fn setup_static(
 /// Execute the genuine selected no-user first call, readiness transitions and
 /// opaque TARP traversal. Unsupported branches stop explicitly; success covers
 /// this declared selected domain, never full adaptive/window/user setup.
-pub fn initialize_inside_convection(
+pub fn initialize_inside_convection<C: ZoneEquipmentActiveElements + ?Sized>(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     no_user_input: NoUserConvectionInput,
     state: &mut InsideConvectionState,
+    zone_equipment: &mut C,
     space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
@@ -695,7 +718,15 @@ pub fn initialize_inside_convection(
     scan: &mut ReportScanState,
     backend: &mut SourceErrorBackend<'_>,
 ) -> Result<(), InsideConvectionError> {
-    validate(layout, zones, surfaces, state, space_air, temperatures)?;
+    validate(
+        layout,
+        zones,
+        surfaces,
+        state,
+        zone_equipment,
+        space_air,
+        temperatures,
+    )?;
     if no_user_input.counts() != [0; 6] {
         return Err(InsideConvectionUnavailable::UserConvectionInput.into());
     }
@@ -745,7 +776,7 @@ pub fn initialize_inside_convection(
         && !readiness.zone_sizing
         && readiness.equipment_simulated_once
     {
-        for (zone, active) in &mut state.active_elements {
+        for (zone_index, zone) in layout.zones().iter().enumerate() {
             let mut count = [0; 3];
             let mut area = [0.0; 3];
             for group in layout.groups().iter().filter(|g| g.zone_id == *zone) {
@@ -767,7 +798,10 @@ pub fn initialize_inside_convection(
                     area[kind] += surfaces[index].area;
                 }
             }
-            *active = std::array::from_fn(|i| count[i] > 0 && area[i] > 0.0);
+            zone_equipment.set_active_elements(
+                zone_index,
+                std::array::from_fn(|i| count[i] > 0 && area[i] > 0.0),
+            );
         }
         state.active_surface_check = false;
     }

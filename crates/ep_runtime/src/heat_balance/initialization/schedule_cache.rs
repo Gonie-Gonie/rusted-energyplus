@@ -39,6 +39,7 @@ pub fn initialize_heat_balance_state_with_initialization_context(
         &schedule_cache,
         None,
         Some(context),
+        None,
     )
 }
 
@@ -75,6 +76,7 @@ pub(crate) fn initialize_heat_balance_state_with_ctf_coefficients_and_schedule_c
         schedule_cache,
         None,
         None,
+        None,
     )
 }
 
@@ -92,6 +94,7 @@ pub(crate) fn initialize_heat_balance_state_with_ctf_coefficients_and_schedule_c
         schedule_cache,
         Some(&mut profile.initialization),
         None,
+        None,
     )
 }
 
@@ -103,6 +106,26 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_profiled
     profile: &mut HeatBalanceInternalGainScheduleOperationProfile,
     context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
 ) -> Result<HeatBalanceState, RuntimeError> {
+    initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+        model,
+        initial_zone_air_temperature_c,
+        coefficients,
+        schedule_cache,
+        profile,
+        context,
+        None,
+    )
+}
+
+pub(crate) fn initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+    model: &SimulationModel,
+    initial_zone_air_temperature_c: f64,
+    coefficients: &[ConstructionCtfCoefficientOverride],
+    schedule_cache: &ScheduleSeriesCache,
+    profile: &mut HeatBalanceInternalGainScheduleOperationProfile,
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    equipment_input: Option<super::super::ordinary_equipment::OrdinaryEquipmentInput>,
+) -> Result<HeatBalanceState, RuntimeError> {
     initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         model,
         initial_zone_air_temperature_c,
@@ -110,6 +133,7 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_profiled
         schedule_cache,
         Some(&mut profile.initialization),
         Some(context),
+        equipment_input,
     )
 }
 

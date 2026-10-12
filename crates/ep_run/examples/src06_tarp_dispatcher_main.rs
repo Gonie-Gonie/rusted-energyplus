@@ -321,6 +321,7 @@ struct Fixture {
     zones: Vec<InsideConvectionZone>,
     surfaces: Vec<InsideConvectionSurface>,
     state: InsideConvectionState,
+    active_elements: Vec<(ZoneId, [bool; 3])>,
     space_air: SpaceAirTemperatures,
     zone_mat: f64,
     low_limit: f64,
@@ -513,18 +514,15 @@ impl Fixture {
             .map_err(|_| "actual owner layout unavailable")?;
         let elements = &input["zone_equipment_active_elements"];
         keys(elements, &["wall", "ceiling", "floor"])?;
-        let state = InsideConvectionState::new(
-            &layout,
-            states,
-            vec![(
-                ZoneId(1),
-                [
-                    boolean(&elements["wall"])?,
-                    boolean(&elements["ceiling"])?,
-                    boolean(&elements["floor"])?,
-                ],
-            )],
-        )?;
+        let active_elements = vec![(
+            ZoneId(1),
+            [
+                boolean(&elements["wall"])?,
+                boolean(&elements["ceiling"])?,
+                boolean(&elements["floor"])?,
+            ],
+        )];
+        let state = InsideConvectionState::new(&layout, states)?;
         let mut space_air = SpaceAirTemperatures::allocate(&layout);
         let mut air = space_air.rows().to_vec();
         for (owner, row) in air.iter_mut().zip(space_rows) {
@@ -553,6 +551,7 @@ impl Fixture {
             zones,
             surfaces,
             state,
+            active_elements,
             space_air,
             zone_mat: real(&zone["MAT"])?,
             low_limit: 0.1,
@@ -576,6 +575,7 @@ impl Fixture {
             &self.zones,
             &self.surfaces,
             &self.state,
+            &self.active_elements,
             &self.space_air,
             self.zone_mat,
             self.low_limit,
@@ -718,6 +718,7 @@ fn case(
             &fixture.surfaces,
             no_user,
             &mut fixture.state,
+            &mut fixture.active_elements[..],
             &fixture.space_air,
             InsideSurfaceTemperatures {
                 owner: temperature_owner,

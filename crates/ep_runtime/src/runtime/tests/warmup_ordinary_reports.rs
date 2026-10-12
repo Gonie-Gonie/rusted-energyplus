@@ -22,8 +22,14 @@ fn ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day(
             crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
                 &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false,do_space_heat_balance_for_sizing:false,do_space_heat_balance_for_simulation:false,
                     no_user_convection_input:crate::heat_balance::inside_convection_dispatcher::NoUserConvectionInput::new([0;6])?,
-                    low_hconv_limit_w_per_m2_k:0.375})?
+                    low_hconv_limit_w_per_m2_k:0.375,
+                    equipment_input:Some(crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_family_inventory([],4)?)})?
         };
+        let equipment=simulation.state.ordinary_equipment.as_mut().ok_or("missing actual geometry equipment owner")?;
+        let view=equipment.config_view()?;
+        use crate::heat_balance::inside_convection_dispatcher::ZoneEquipmentActiveElements;
+        assert_eq!(view.zone_id(0),model.typed.zones[0].id);
+        assert_eq!(view.active_elements(0),[false;3]);
         for surface in &simulation.state.surfaces {
             assert!(surface.outdoor_environment.manager_invoked);
             assert_eq!(surface.outdoor_environment.row.centroid_height_m.to_bits(),surface.geometry.centroid_m.z_m.to_bits());

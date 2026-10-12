@@ -148,6 +148,7 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
         do_space_heat_balance_for_simulation,
         no_user_convection_input,
         low_hconv_limit_w_per_m2_k,
+        equipment_input: None,
     })
 }
 
@@ -168,6 +169,7 @@ mod tests {
                 do_space_heat_balance_for_simulation: false,
                 no_user_convection_input: NoUserConvectionInput::new([0; 6])?,
                 low_hconv_limit_w_per_m2_k: 0.1,
+                equipment_input: None,
             }
         );
         let raw = parse_epjson_str(

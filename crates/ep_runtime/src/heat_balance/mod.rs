@@ -41,6 +41,7 @@ pub mod inside_convection_dispatcher;
 pub mod inside_convection_layout;
 pub mod longwave;
 pub mod manager;
+pub mod ordinary_equipment;
 pub(crate) mod ordinary_inside_temperatures;
 pub mod predefined_tables;
 pub mod radiation;

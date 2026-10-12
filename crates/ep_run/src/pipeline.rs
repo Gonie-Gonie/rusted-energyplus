@@ -3582,7 +3582,9 @@ fn prepare_runtime_inputs(
         weather_series,
         ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
         {
-            Some(crate::warmup_report_controls::resolve(raw_model)?)
+            let mut input = crate::warmup_report_controls::resolve(raw_model)?;
+            input.equipment_input = Some(crate::ordinary_equipment_input::resolve(raw_model)?);
+            Some(input)
         } else {
             None
         },

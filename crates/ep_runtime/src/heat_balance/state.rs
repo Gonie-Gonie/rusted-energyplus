@@ -53,6 +53,8 @@ pub struct HeatBalanceState {
     /// Actual admitted uncontrolled warmup demand/daily convergence owners.
     /// None means no warmup owner has been invoked; it supplies no zero loads.
     pub warmup_convergence: Option<HeatBalanceWarmupConvergenceState>,
+    /// Retained actual geometry GetZoneEquipment owner for explicit ordinary input.
+    pub(crate) ordinary_equipment: Option<super::ordinary_equipment::OrdinaryEquipment>,
     /// Present only for the explicitly admitted ordinary A temperature route.
     pub(crate) ordinary_inside_temperatures:
         Option<super::ordinary_inside_temperatures::OrdinaryInsideTemperatures>,
@@ -1118,4 +1120,7 @@ pub struct HeatBalanceOrdinaryWarmupReportInputs {
     pub no_user_convection_input: super::inside_convection_dispatcher::NoUserConvectionInput,
     /// Actual HeatBalanceAlgorithm N2 or retained Source constructor default.
     pub low_hconv_limit_w_per_m2_k: f64,
+    /// Actual raw geometry-equipment admission; None is reporting-only input.
+    /// The explicit ordinary runtime entrypoint rejects None before initialization.
+    pub equipment_input: Option<super::ordinary_equipment::OrdinaryEquipmentInput>,
 }
