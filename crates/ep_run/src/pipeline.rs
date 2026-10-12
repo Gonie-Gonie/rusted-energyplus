@@ -3621,6 +3621,11 @@ fn prepare_runtime_inputs(
                             .ok_or("missing real IP projection")?,
                     )?,
                     schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
+                    sizing: crate::ordinary_sizing_input::resolve(raw_model)?,
+                    input_weather_file_path: config
+                        .weather_path
+                        .clone()
+                        .ok_or("actual weather path missing")?,
                     cli_dd_only: false,
                     cli_annual: false,
                     reverse_design_days: pending_ordinary_weather
@@ -3699,6 +3704,7 @@ fn execute_rust_runtime(
         }
         {
             ctf_outputs.initialize_source_state(&model.typed.report_inputs)?;
+            ctf_outputs.initialize_source_run_prefix(&model.typed.report_inputs)?;
             let pending = runtime_inputs
                 .pending_ordinary_weather
                 .take()

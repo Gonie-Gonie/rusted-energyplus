@@ -58,6 +58,22 @@ pub struct CtfInitializationReports {
     /// Sole real built-in and selected constant schedules.
     pub(crate) selected_schedule_manager:
         Option<super::selected_schedule_manager::SelectedScheduleManager>,
+    /// Sole reached OutputProcessor time targets, extended by later registrations.
+    pub(crate) output_registration: super::source_output_registration::SourceOutputRegistration,
+    /// Actual222 electric constructor; later moved into the gain provider.
+    pub(crate) facility_electric_service:
+        Option<super::facility_electric_service::FacilityElectricService>,
+    /// Actual223 coil report constructor storage.
+    pub(crate) coil_selection_report: Option<super::run_input_prefix::SelectedCoilSelectionReport>,
+    /// Actual227/228 BranchInputManager owner, retaining failed getter prefixes.
+    pub(crate) selected_branches: super::run_input_prefix::SelectedBranches,
+    /// Actual231 PluginManager constructor result, retained for the run.
+    pub(crate) selected_plugin_manager: Option<super::run_input_prefix::SelectedPluginManager>,
+    /// Same DataSizing/SizingManager owner through234 and later consumers.
+    pub(crate) selected_sizing_manager: super::selected_sizing::SelectedSizingManager,
+    /// Same three DataHeatBalance space-control fields before and after241.
+    pub(crate) heat_balance_space_controls:
+        super::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls,
     /// Sole selected CurveManager retained collections.
     pub(crate) selected_curves: Option<super::setup_postludes::SelectedCurves>,
     /// Distinct HeatBalanceManager getter module carrier, not dataIPShortCut.

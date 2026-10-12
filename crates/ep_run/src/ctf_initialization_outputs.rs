@@ -122,6 +122,26 @@ impl CtfRunOutputs {
             .map_err(|e| e.to_string())
     }
 
+    pub(crate) fn initialize_source_run_prefix(
+        &mut self,
+        report_inputs: &ep_model::ReportInputs,
+    ) -> Result<(), String> {
+        let mut backend = SourceErrorBackend {
+            state: &mut self.state,
+            error_stream: Some(&mut self.error),
+            console: &mut self.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        self.reports
+            .initialize_source_run_prefix(report_inputs, &mut backend)
+            .map_err(|e| e.to_string())
+    }
+
     pub(crate) fn source_zone_timesteps_per_hour(&self) -> Result<u32, String> {
         self.reports
             .source_zone_timesteps_per_hour()
@@ -264,6 +284,7 @@ mod tests {
             "Version":{"v":{"version_identifier":"26.1"}},
             "Building":{"b":{"solar_distribution":"MinimalShadowing"}},
             "Timestep":{"t":{}},"Zone":{"z":{}},
+            "Output:Table:SummaryReports":{"summary":{"reports":[{"report_name":"AllSummary"}]}},
             "Output:Diagnostics":{"d":{"diagnostics":[{"key":"DisplayAdvancedReportVariables"}]}}
         }"#,
         )?;
@@ -272,6 +293,7 @@ mod tests {
             let operands = SourceInitializationInput {
                 project: crate::ordinary_project_data::resolve(&raw, raw.is_epjson(), &input)?,
                 schedules: crate::ordinary_schedule_input::resolve(&raw)?,
+                sizing: crate::ordinary_sizing_input::resolve(&raw)?,
                 ..SourceInitializationInput::default()
             };
             Ok((input, operands))
@@ -359,6 +381,29 @@ mod tests {
             reporting.advanced_report_variables,
             "effective actual diagnostic owner reaches HB"
         );
+        assert!(
+            success
+                .reports
+                .selected_input_processor
+                .as_ref()
+                .ok_or("sole IP missing")?
+                .is_object_unused("Output:Table:SummaryReports", "summary")
+        );
+        success.initialize_source_run_prefix(&ep_model::ReportInputs::default())?;
+        assert!(success.reports.setup_simulation_registry_prepared);
+        assert!(success.reports.registry.report_count > 0);
+        assert!(
+            !success.state.doing_sizing,
+            "actual240 must follow successful234"
+        );
+        assert!(
+            !success
+                .reports
+                .selected_input_processor
+                .as_ref()
+                .ok_or("sole IP missing")?
+                .is_object_unused("Output:Table:SummaryReports", "summary")
+        );
         success.persist(&dir)?;
         let actual_eio = std::fs::read(dir.join("eplusrs.eio"))?;
         let eio = String::from_utf8(actual_eio.clone())?;
@@ -382,7 +427,59 @@ mod tests {
         success.initialize_source_state(&ep_model::ReportInputs::default())?;
         success.persist(&dir)?;
         assert_eq!(std::fs::read(dir.join("eplusrs.eio"))?, actual_eio);
+        let reached_reports = success.reports.registry.report_count;
+        let repeated = success
+            .initialize_source_run_prefix(&ep_model::ReportInputs::default())
+            .err()
+            .ok_or("actual duplicate pointer did not stop")?;
+        assert!(repeated.contains("SetupTimePointers was already called for Zone"));
+        assert!(
+            success.reports.registry.report_count > reached_reports,
+            "actual repeated215 occurs before duplicate218 fatal"
+        );
+        assert!(!success.state.doing_sizing);
+        assert!(
+            !success
+                .reports
+                .selected_input_processor
+                .as_ref()
+                .ok_or("sole IP missing")?
+                .is_object_unused("Output:Table:SummaryReports", "summary")
+        );
+        success.persist(&dir)?;
+        assert_eq!(std::fs::read(dir.join("eplusrs.eio"))?, actual_eio);
         drop(success);
+
+        // A genuine association failure reached inside234 keeps233 true and
+        // retains all real six-handler/file/registry prefixes without retry.
+        let mut sizing_failure = CtfRunOutputs::new("26.1");
+        let (input, mut operands) = make_input()?;
+        operands.sizing.summary_report_objects[0].object_name = "wrong permanent key".into();
+        sizing_failure.reports.initialize_input_processor(input)?;
+        sizing_failure.prepare_source_environment(&dir, operands)?;
+        sizing_failure.initialize_source_state(&ep_model::ReportInputs::default())?;
+        let sizing_error = sizing_failure
+            .initialize_source_run_prefix(&ep_model::ReportInputs::default())
+            .err()
+            .ok_or("actual234 association did not fail")?;
+        assert!(sizing_error.contains("summary permanent/extensible association"));
+        assert!(
+            sizing_failure.state.doing_sizing,
+            "Err234 must not execute240"
+        );
+        assert!(sizing_failure.reports.setup_simulation_registry_prepared);
+        assert!(sizing_failure.reports.registry.report_count > 0);
+        assert!(
+            sizing_failure
+                .reports
+                .selected_input_processor
+                .as_ref()
+                .ok_or("sole IP missing")?
+                .is_object_unused("Output:Table:SummaryReports", "summary")
+        );
+        sizing_failure.persist(&dir)?;
+        assert_eq!(std::fs::read(dir.join("eplusrs.eio"))?, actual_eio);
+        drop(sizing_failure);
         for name in [
             "eplusrs.eso",
             "eplusrs.eio",

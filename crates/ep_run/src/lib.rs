@@ -24,6 +24,7 @@ mod ordinary_equipment_input;
 mod ordinary_input_processor;
 mod ordinary_project_data;
 mod ordinary_schedule_input;
+mod ordinary_sizing_input;
 mod outputs;
 mod pipeline;
 mod porting_scope;

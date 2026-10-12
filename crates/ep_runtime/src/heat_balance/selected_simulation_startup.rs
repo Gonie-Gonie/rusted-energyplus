@@ -1,5 +1,5 @@
 //! Actual consumed EMS and HVAC startup owner slice; later checks remain held.
-use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
+use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
 use super::report_scan::{
     ReportScanDiagnostic, ReportScanFailure, ReportScanState, ReportScanUnavailable,
     SourceReportScanInput, try_scan_for_reports, try_scan_for_reports_with_input,
@@ -11,6 +11,8 @@ use ep_model::ReportInputs;
 pub(crate) enum StartupError {
     Backend(SourceErrorBackendFailure),
     Scan(ReportScanUnavailable),
+    Fatal(SourceFatalStop),
+    Filesystem(std::io::Error),
     Unavailable(&'static str),
 }
 impl From<SourceErrorBackendFailure> for StartupError {
@@ -23,6 +25,8 @@ impl std::fmt::Display for StartupError {
         match self {
             Self::Backend(e) => std::fmt::Display::fmt(e, f),
             Self::Scan(e) => write!(f, "startup report request unavailable: {e:?}"),
+            Self::Fatal(e) => std::fmt::Display::fmt(e, f),
+            Self::Filesystem(e) => std::fmt::Display::fmt(e, f),
             Self::Unavailable(e) => write!(f, "selected simulation startup unavailable: {e}"),
         }
     }
@@ -31,6 +35,8 @@ impl std::error::Error for StartupError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Backend(e) => Some(e),
+            Self::Fatal(e) => Some(e),
+            Self::Filesystem(e) => Some(e),
             Self::Scan(_) | Self::Unavailable(_) => None,
         }
     }
@@ -78,9 +84,49 @@ impl Default for SelectedHvacGlobals {
     }
 }
 
+/// Sole actual preconstruction bound, initialized before any window allocation.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub(crate) struct SelectedConstructionBounds {
+    pub(crate) max_solid_window_layers: i32,
+}
+impl SelectedConstructionBounds {
+    pub(crate) fn set_preconstruction_input_parameters(
+        &mut self,
+        input: &SelectedInputProcessor,
+    ) -> Result<(), StartupError> {
+        self.max_solid_window_layers = 7;
+        if input.get_num_objects_found("Construction:ComplexFenestrationState") > 0 {
+            self.max_solid_window_layers = self.max_solid_window_layers.max(10);
+        }
+        let constructions = input.get_num_objects_found("Construction:WindowEquivalentLayer");
+        if constructions > 0 {
+            // The real positive loop must read getObjectItem; this admitted route
+            // does not replace its layer fields with counts or guessed bounds.
+            return Err(StartupError::Unavailable(
+                "positive WindowEquivalentLayer getter",
+            ));
+        }
+        Ok(())
+    }
+}
+
+mod checks;
+pub(crate) use checks::{check_environment_specifications, check_for_requested_reporting};
+
+fn fatal(backend: &mut SourceErrorBackend<'_>, message: &str) -> Result<(), StartupError> {
+    match backend.show_fatal_error(message) {
+        Ok(never) => match never {},
+        Err(error) => Err(StartupError::Fatal(error)),
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedSimulationStartup {
     pub(crate) runtime_language: SelectedRuntimeLanguage,
+    pub(crate) construction_bounds: SelectedConstructionBounds,
+    pub(crate) plant_loops: Option<Vec<()>>,
+    /// Actual SimulationManager205 result, written before either init guard.
+    pub(crate) run_periods_in_input: bool,
     pub(crate) hvac_globals: SelectedHvacGlobals,
 }
 impl SelectedSimulationStartup {
@@ -197,6 +243,46 @@ impl SelectedSimulationStartup {
             backend.show_warning_error("CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested.")?;
             backend.show_continue_error("No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your EnergyManagementSystem.")?;
         }
+        Ok(())
+    }
+    pub(crate) fn is_input_object_used(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        shortcut: &mut SourceInputProcessorShortCut,
+        globals: &mut SelectedHeatBalanceGlobals,
+        report_inputs: &ReportInputs,
+        scan: &mut ReportScanState,
+        external_hvac_manager: bool,
+        running_via_api: bool,
+        active_callback_count: usize,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<(), StartupError> {
+        globals.air_loop_hvac_doas_used_in_sim =
+            input.get_num_objects_found("AirLoopHVAC:DedicatedOutdoorAirSystem") > 0;
+        self.check_if_any_ems(
+            input,
+            shortcut,
+            globals,
+            report_inputs,
+            scan,
+            external_hvac_manager,
+            running_via_api,
+            active_callback_count,
+            backend,
+        )?;
+        shortcut.current_module_object = "PlantLoop".into();
+        let plant = input.get_num_objects_found(&shortcut.current_module_object);
+        shortcut.current_module_object = "CondenserLoop".into();
+        let condenser = input.get_num_objects_found(&shortcut.current_module_object);
+        globals.any_plant_in_model = plant > 0 || condenser > 0;
+        if !globals.any_plant_in_model {
+            self.plant_loops = Some(Vec::new());
+        }
+        globals.any_slabs_in_model = input.get_num_objects_found("Site:GroundDomain:Slab") > 0;
+        globals.any_basements_in_model =
+            input.get_num_objects_found("Site:GroundDomain:Basement") > 0;
+        globals.any_ideal_cond_ent_setpoint_in_model =
+            input.get_num_objects_found("SetpointManager:CondenserEnteringReset:Ideal") > 0;
         Ok(())
     }
 }

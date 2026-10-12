@@ -18,6 +18,7 @@ use ep_model::ReportInputs;
 use std::io;
 
 mod files;
+mod run_prefix;
 pub(crate) use files::ScheduleAuditFileHost;
 pub use files::{SourceInitializationFilePaths, SourceInitializationFiles};
 
@@ -28,6 +29,10 @@ pub struct SourceInitializationInput {
     pub project: super::selected_project_data::SelectedProjectDataInput,
     /// Actual source-ordered constant schedule inputs.
     pub schedules: super::selected_schedule_manager::SelectedScheduleInput,
+    /// Actual ordered SummaryReports inputs for ManageSizing234.
+    pub sizing: super::selected_sizing::SelectedSizingInput,
+    /// Caller-supplied genuine weather path for CheckEnvironment213 fileExists.
+    pub input_weather_file_path: std::path::PathBuf,
     /// Genuine command-line DesignDay-only request, separate from process settings.
     pub cli_dd_only: bool,
     /// Genuine command-line annual request, separate from process settings.
@@ -286,6 +291,15 @@ impl CtfInitializationReports {
             .source_initialization_weather
             .as_mut()
             .ok_or(SourceInitializationError::Association("pre-weather owner"))?;
+        // Actual RunSimulation205 precedes both EnergyPlusData guards. No
+        // query is repeated when the parent guard already entered on an Err.
+        if !self.source_initialization_guards.init_constant_state_called
+            && !self.source_initialization_guards.init_state_called
+        {
+            startup.run_periods_in_input = input.get_num_objects_found("RunPeriod") > 0
+                || input.get_num_objects_found("RunPeriod:CustomRange") > 0
+                || project.system.full_annual_run;
+        }
         if !self.source_initialization_guards.init_constant_state_called {
             self.source_initialization_guards.init_constant_state_called = true;
             // Ordinals1/2 are literal-empty. Ordinal3 clears only the four caches.

@@ -19,6 +19,8 @@ pub(crate) struct SelectedHeatBalanceGlobals {
     pub(crate) display_zone_air_heat_balance_off_balance: bool,
     pub(crate) do_coil_direct_solutions: bool,
     pub(crate) create_perf_log: bool,
+    /// DataGlobals.hh107; positive PerformancePrecision override remains unavailable.
+    pub(crate) override_timestep: bool,
     /// DataGlobals.hh124; actual GetProjectData may later set it true.
     pub(crate) do_pure_load_calc: bool,
     /// DataGlobals.hh180, actual isInputObjectUsed DOAS count writer.
