@@ -1,0 +1,562 @@
+{
+  "schema": "src06-output-prescan-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d2/d277882b8cf1a63bda2fff8bf8b2dd2574524f2f8829eb67b286cc867a45983c",
+    "sha256": "d277882b8cf1a63bda2fff8bf8b2dd2574524f2f8829eb67b286cc867a45983c"
+  },
+  "assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/manifest.json",
+    "sha256": "c3508f56c775e10468f1dd33c9b36d84cb7219a7b029b84facf4fea020734cff",
+    "size_bytes": 17019
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/review.json",
+    "sha256": "83eb1fa9e23c4a31659e9ec58d8b3c737144012fc4f580c9e682c6ec5b5e8c04",
+    "size_bytes": 6288
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/manifest.json",
+      "sha256": "c3508f56c775e10468f1dd33c9b36d84cb7219a7b029b84facf4fea020734cff",
+      "size_bytes": 17019
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_prescan.rs",
+      "sha256": "27397abe79aeaf02a5ed7a147457f3f42f36cca0f2879c4f18669332aa94f42d",
+      "size_bytes": 9871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/00.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/00.after",
+      "sha256": "27397abe79aeaf02a5ed7a147457f3f42f36cca0f2879c4f18669332aa94f42d",
+      "size_bytes": 9871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/00.diff",
+      "sha256": "3220f74cbf10fb9f466090de1a42fc0321890c3bcc3eae5684a3625672a51b99",
+      "size_bytes": 10274
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor/reporting_prescan.rs",
+      "sha256": "a70c75ecb755a067a53739ac06d67e1f7e2a58cf5ddbe9ac9307a03b4f4e0ea9",
+      "size_bytes": 2314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/01.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/01.after",
+      "sha256": "a70c75ecb755a067a53739ac06d67e1f7e2a58cf5ddbe9ac9307a03b4f4e0ea9",
+      "size_bytes": 2314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/01.diff",
+      "sha256": "4311bb5634aa363128237eaec30a531ed3e599f32a249c022b08c2472257ebce",
+      "size_bytes": 2527
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+      "size_bytes": 2432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/02.before",
+      "sha256": "5bff9c1d3cc0e07c1fbc6c52f395e48edf72ffde7c6bd20adf1fc0a96385cc62",
+      "size_bytes": 2401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/02.after",
+      "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+      "size_bytes": 2432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/02.diff",
+      "sha256": "bb7372273fb6dda948cbee1e810e59fcc5d3b25be0e230d08e264b15f6fff5ea",
+      "size_bytes": 297
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+      "size_bytes": 16257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/03.before",
+      "sha256": "775d58c8b12ecfe4d1cacd4138b1b45fa2a92e744e979b9fb84177270a3542c0",
+      "size_bytes": 14789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/03.after",
+      "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+      "size_bytes": 16257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/03.diff",
+      "sha256": "0d07e324bce1c48d7cf512a527e2a977f9f9f70bafc19c0dacb669aa89d468b4",
+      "size_bytes": 2408
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor.rs",
+      "sha256": "01fdcf5a480b9276caffc629263f35dda57202ccd5035f7262049be73ffcbec9",
+      "size_bytes": 1723
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/04.before",
+      "sha256": "1afb80fd8ac941891da58db463085df07b63e3c2437ce3fcd09581a4096d46f7",
+      "size_bytes": 1628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/04.after",
+      "sha256": "01fdcf5a480b9276caffc629263f35dda57202ccd5035f7262049be73ffcbec9",
+      "size_bytes": 1723
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/04.diff",
+      "sha256": "a85e63bb52067e9a6bea024b30c7b58d1c0fa2dc59d286d61d461cec2b183f82",
+      "size_bytes": 334
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+      "size_bytes": 825011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/05.before",
+      "sha256": "984f05f8d2d612f634ac9c024a404b437b299cba80447f6d47586d481254a130",
+      "size_bytes": 824319
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/05.after",
+      "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+      "size_bytes": 825011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/05.diff",
+      "sha256": "6930f36191d9816f7d87722be29bf76db991ec7111698012e4bfe63f7d30c4d6",
+      "size_bytes": 1649
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor_tests.rs",
+      "sha256": "bdf4a64a5e6a2fb65bd51ff6ad15cacd97c55cbb8b451b0ad17e8367e137b3b1",
+      "size_bytes": 8912
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/06.before",
+      "sha256": "09f3c2b6270a152644076035498f78109cd3f4ebb97e935b8accfb0894efc8ca",
+      "size_bytes": 5157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/06.after",
+      "sha256": "bdf4a64a5e6a2fb65bd51ff6ad15cacd97c55cbb8b451b0ad17e8367e137b3b1",
+      "size_bytes": 8912
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/06.diff",
+      "sha256": "2fc9973b09202cf6a1383d9bddf50cf15b9941fe202194f88334fb900066f743",
+      "size_bytes": 4143
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "size_bytes": 168527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/00.source",
+      "sha256": "4760c4385fda631c8fe0e9cf876744bdf965e5b10815e7867103e3644b2cc606",
+      "size_bytes": 950
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "size_bytes": 122929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/01.source",
+      "sha256": "36b626e177984f85eecbfb2a5a3979e72424a15b4fb3d8b87e22a7248be07381",
+      "size_bytes": 5960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/02.source",
+      "sha256": "bad27773cfe69d1bd33fa4c7901d2feab3755ee25f5478731ec7f0ffdbd0e5ba",
+      "size_bytes": 10111
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/03.source",
+      "sha256": "96be7a66ed6c68d04201c2ec34887a8d9f3953dfbde9ad2f167d62a5a2735e49",
+      "size_bytes": 28691
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/04.source",
+      "sha256": "967cda902366998b33fa505ae1ed6a4f7dc7c37d319f2531a23b8e4c3256136e",
+      "size_bytes": 1725
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.cc",
+      "sha256": "db83c2fbae521494c1435c93ca56a1d1b4fb232a153bc3375ae0e1765fbcac7b",
+      "size_bytes": 11758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/05.source",
+      "sha256": "feb1aceebeb6cb8c61f2ee73c8d4a105028a21d01b648d4873a7d7d052b7c375",
+      "size_bytes": 2740
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.hh",
+      "sha256": "ffb67fb6de0404a49535f9752ca37d8030b8c9a1024ce1ab7347233055278a58",
+      "size_bytes": 6146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/06.source",
+      "sha256": "145150433abf79c5f94a90f9e01135c48651d4240ce0cd2f063f64dcb2420c9e",
+      "size_bytes": 1925
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+      "size_bytes": 81995
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/07.source",
+      "sha256": "94c0a32faab3210b5ed19eac07a5917b66e3264d89a5a2710d5f07becb1776d5",
+      "size_bytes": 181
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh",
+      "sha256": "f9276d98b79dcf4260f8daea44c577198bc12e438e24afc52076552f02775a98",
+      "size_bytes": 21581
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/08.source",
+      "sha256": "715ed047a0d3b06fb83d452e1c5a7b5da0947a8afc0457fb36d77bafa25da59b",
+      "size_bytes": 731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/09.source",
+      "sha256": "d25418d6d72e1ff0c957612ff89675c8c6807a0a00c94868b0a721a84c763b1e",
+      "size_bytes": 180
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh",
+      "sha256": "b191c211ba3f76eb46910860fdb54cb4aae62c78934dd9352a985bf155778130",
+      "size_bytes": 4169
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/Original/10.source",
+      "sha256": "08074a707c9f6c2374173aacd5df1bfeb5a255554881512a0f1ef4005080a255",
+      "size_bytes": 210
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-output-prescan-Root-01.py",
+      "sha256": "305e042510f0918d0c68981e20650bf5637828fc88a4cc0d63c4d912296aebaf",
+      "size_bytes": 8696
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-output-prescan-Root-01.py",
+      "sha256": "39e5698ae054981c53cd370aa478939bf6e359fa1e112511a76a7223d9b851bc",
+      "size_bytes": 5117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fix-output-prescan-visibility-Root-01.py",
+      "sha256": "80112d47c8c4d249819875c9aa06883a3c76711cd35ec9cbbdf17a7bdeda1322",
+      "size_bytes": 2544
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/manifest.json",
+      "sha256": "7851721b4793474b2227041faab8369bf8f8b043c007992e8f58bac64d73f8f9",
+      "size_bytes": 16077
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-02/visibility.parent.diff",
+      "sha256": "da5414b3a117c9653e9b420cc114b2ddaed7d34473c2a135d8137916e95b5059",
+      "size_bytes": 598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/00.after",
+      "sha256": "27397abe79aeaf02a5ed7a147457f3f42f36cca0f2879c4f18669332aa94f42d",
+      "size_bytes": 9871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/00.diff",
+      "sha256": "3220f74cbf10fb9f466090de1a42fc0321890c3bcc3eae5684a3625672a51b99",
+      "size_bytes": 10274
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/01.after",
+      "sha256": "b8e9319e00f9e35444e783901cb7d0fb7e1f150474af45ccb5bc9c488283961f",
+      "size_bytes": 2314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/01.diff",
+      "sha256": "2c52251dfe65f2a50da2fb6f4df2b2de466093421c642793b0a715fa0a4a8250",
+      "size_bytes": 2527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/02.after",
+      "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+      "size_bytes": 2432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/02.diff",
+      "sha256": "bb7372273fb6dda948cbee1e810e59fcc5d3b25be0e230d08e264b15f6fff5ea",
+      "size_bytes": 297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/03.after",
+      "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+      "size_bytes": 16257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/03.diff",
+      "sha256": "0d07e324bce1c48d7cf512a527e2a977f9f9f70bafc19c0dacb669aa89d468b4",
+      "size_bytes": 2408
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/04.after",
+      "sha256": "01fdcf5a480b9276caffc629263f35dda57202ccd5035f7262049be73ffcbec9",
+      "size_bytes": 1723
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/04.diff",
+      "sha256": "a85e63bb52067e9a6bea024b30c7b58d1c0fa2dc59d286d61d461cec2b183f82",
+      "size_bytes": 334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/05.after",
+      "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+      "size_bytes": 825011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/05.diff",
+      "sha256": "6930f36191d9816f7d87722be29bf76db991ec7111698012e4bfe63f7d30c4d6",
+      "size_bytes": 1649
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/06.after",
+      "sha256": "bdf4a64a5e6a2fb65bd51ff6ad15cacd97c55cbb8b451b0ad17e8367e137b3b1",
+      "size_bytes": 8912
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/06.diff",
+      "sha256": "2fc9973b09202cf6a1383d9bddf50cf15b9941fe202194f88334fb900066f743",
+      "size_bytes": 4143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/review.json",
+      "sha256": "83eb1fa9e23c4a31659e9ec58d8b3c737144012fc4f580c9e682c6ec5b5e8c04",
+      "size_bytes": 6288
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+      "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+      "size_bytes": 225982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/00-OutputProcessor.cc-495-534.literal",
+      "sha256": "61f0afd9b79186055a71b4576e9fbef714ad8ddb0ab8202bb97db09a13d0b03b",
+      "size_bytes": 1904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/01-DataOutputs.hh-68-76.literal",
+      "sha256": "d5919566d8819115dc47a5ef31cf8c6ba5d7cda351cbdf7122562369f3076363",
+      "size_bytes": 288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/02-DataOutputs.cc-73-136.literal",
+      "sha256": "2055dc0ef186c9dc8faf0915cf8669ef126c3578ce6659b5f52828130557a2a3",
+      "size_bytes": 4925
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+      "sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f",
+      "size_bytes": 33012
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/03-UtilityRoutines.hh-600-634.literal",
+      "sha256": "a287bdde4b691452b01a5c20f2c91af242a8c1847e596076d711128df57d1a26",
+      "size_bytes": 1273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/decision-map.md",
+      "sha256": "8a41b70bb498554a914f0f47db2b3a4bf6e96ee52dfbd12399e26ed28a746b07",
+      "size_bytes": 2190
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/corrected-visibility-parent-label.diff",
+      "sha256": "32dd32e32c78bcd26af5b97ce682c36663f6026293149b5511e4b236df869e39",
+      "size_bytes": 633
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-diff-label-qualification-01/qualification.json",
+      "sha256": "49fdd5ce0e2979568557e2308530736fd76794d9ebd8263f24b9964da539dfcf",
+      "size_bytes": 1146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-solar-init-caller-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "d533216735bf5137966cfd6de52c7f07752a10709809967106fc1f1e31d43cae",
+      "size_bytes": 14727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-output-prescan-Source-review-01/held-registration-helper.literal",
+      "sha256": "8a0129b767129d56e8365893f27ea4dc1b676a4a1507d4204e5a1faee1c7b6d9",
+      "size_bytes": 286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-diff-label-qualification-01/visibility.parent.correct-label.diff",
+      "sha256": "3e3d91bf1ed4f23d893c2d2e10d709db1034f293c6127614308f4d292502d959",
+      "size_bytes": 622
+    },
+    {
+      "path": ".runtime/porting/SRC-06/qualify-output-prescan-diff-label-Root-01.py",
+      "sha256": "fd6210902491afe397165bb99205eb9962d3d5e15c0785c97945068a0c517f28",
+      "size_bytes": 2234
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-02/receipt.json",
+      "sha256": "14708b8f4aba7eb72096017bfd68ba70ac09a07c3adf8c1fd7d00367bae2b933",
+      "size_bytes": 3513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/d2/d277882b8cf1a63bda2fff8bf8b2dd2574524f2f8829eb67b286cc867a45983c",
+      "sha256": "d277882b8cf1a63bda2fff8bf8b2dd2574524f2f8829eb67b286cc867a45983c",
+      "size_bytes": 1648346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-02/receipt.json",
+      "sha256": "387eb1116e116359d18a365d8b6d74206bd5220b3b0f5cb18b277eb39b9014f6",
+      "size_bytes": 3569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-02/stdout.log",
+      "sha256": "3db6120270e6f1e147921f505e49941bdcdc5d998e35415c8ddefd098cd1fdd5",
+      "size_bytes": 247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-02/stderr.log",
+      "sha256": "7890a655971d336ea71b5a48112fd457b3880283548a38fb792e6bccf9a9427f",
+      "size_bytes": 242
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-cli-tests-01/receipt.json",
+      "sha256": "be1b285e8589c19656582ec076794236970e0cedd5cc4edcc6f6efdd1d35a956",
+      "size_bytes": 3600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-cli-tests-01/stdout.log",
+      "sha256": "679dbdedc58f01bce7ee907bfb414d3218e05f772bf90d3ff7cdf4153a33ac99",
+      "size_bytes": 170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-cli-tests-01/stderr.log",
+      "sha256": "b2dbb0bd58cc10007e9d889adee9a08800c4dca4c2b5570059fbda897e8fec1a",
+      "size_bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-clippy-01/receipt.json",
+      "sha256": "977ab18a78845cb08deab93cc5983765f7e2e1cdc6fcabc05ecdf6fabbde16f6",
+      "size_bytes": 3560
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-clippy-01/stderr.log",
+      "sha256": "f53199d611186f5246d90bbb37c879af4d8b50326bd70bf4e4cc8cc0c2361452",
+      "size_bytes": 581
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-quality-01/receipt.json",
+      "sha256": "23015af93c062d1185cf8266e56e6eea02016dae45589d094331be517e14f8d9",
+      "size_bytes": 3555
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-quality-01/stdout.log",
+      "sha256": "5b27cb5f6471cfd94b14d708b22ce140b1e09f19031025673bb0f69f7a01e3df",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/20/200b71e13f860284915e62b844156edcc982a7a295c7fd4cc94f1506d4f60eff",
+      "sha256": "200b71e13f860284915e62b844156edcc982a7a295c7fd4cc94f1506d4f60eff",
+      "size_bytes": 1648346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-01/receipt.json",
+      "sha256": "0c86f7ffbaee1316f88556925ba659f3ea43c5085273fb8b74e7e66801bae436",
+      "size_bytes": 3512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-01/receipt.json",
+      "sha256": "33cf204db60c3eef8fd561683724b984e64c37d66a5b21c6be7ce8e3885d376a",
+      "size_bytes": 3570
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-output-prescan-admission-tests-01/stderr.log",
+      "sha256": "22d02db4a9582caa52b56cf705446299a7781e1c4dd8d471a1bffdcc7b46a7f7",
+      "size_bytes": 1914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-output-prescan-Root-01.py",
+      "sha256": "81e5a692e31b13833af0ec87d418fc575a7ce1bbf4661c68220839283d9f7d7a",
+      "size_bytes": 9880
+    }
+  ],
+  "historical_references": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/ordinary_input_processor/reporting_prescan.rs",
+        "sha256": "b8e9319e00f9e35444e783901cb7d0fb7e1f150474af45ccb5bc9c488283961f",
+        "size_bytes": 2314
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-output-prescan-assembly-01/01.after",
+        "sha256": "b8e9319e00f9e35444e783901cb7d0fb7e1f150474af45ccb5bc9c488283961f",
+        "size_bytes": 2314
+      },
+      "qualification": "Exact assembly01 raw bridge before crate-visibility correction; history and failed QA retained."
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-output-prescan/evidence.zip",
+    "sha256": "29291cced708d75897052135ccd6f42fe575b8eadf698c75c03616c046941d76",
+    "size_bytes": 961083
+  },
+  "archive_member_count": 104,
+  "archive_scope": "Seven active Rust files, full exact before/after/diffs, eleven finite Original ranges and their complete authenticated files, review/label qualification and actual QA receipts/logs/source snapshot indexes. This is not a transitive whole-workspace Source-object/Native execution bundle.",
+  "gates_updated": false
+}

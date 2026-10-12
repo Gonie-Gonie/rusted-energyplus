@@ -842,6 +842,8 @@ struct PreparedRuntimeInputs {
     ordinary_warmup_reporting: Option<ep_runtime::HeatBalanceOrdinaryWarmupReportInputs>,
     selected_input_processor:
         Option<ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor>,
+    reporting_prescan_input:
+        Option<ep_runtime::heat_balance::source_output_prescan::SourceReportingPreScanInput>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -3592,6 +3594,13 @@ fn prepare_runtime_inputs(
         } else {
             None
         },
+        reporting_prescan_input: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+            Some(crate::ordinary_input_processor::resolve_reporting_prescan(
+                raw_model,
+            )?)
+        } else {
+            None
+        },
         ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
         {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
@@ -3638,6 +3647,12 @@ fn execute_rust_runtime(
                 initialization
                     .reports
                     .initialize_input_processor(input)
+                    .map_err(|error| error.to_string())?;
+            }
+            if let Some(raw) = runtime_inputs.reporting_prescan_input.take() {
+                initialization.reports.reporting_prescan_input = Some(raw);
+                initialization
+                    .post_input_processing()
                     .map_err(|error| error.to_string())?;
             }
             let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {

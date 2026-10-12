@@ -113,5 +113,93 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             .is_some_and(|input| input.family("oversized").is_some()),
         "input must remain retained when allocation sizing stops"
     );
+    // Direct-JSON pre-scan keeps lexical spelling separately from getter alphas.
+    let raw = parse_epjson_str(&format!(
+        r#"{{{base},"Output:Variable":{{
+        "z":{{"variable_name":"case var [W]","key_value":"key"}},
+        "a":{{"variable_name":"CaSe VaR  ","key_value":"KeY"}},
+        "b":{{"variable_name":"CASE VAR","key_value":"*"}},
+        "c":{{"variable_name":"Tabbed\t  ","key_value":"  "}},
+        "d":{{"variable_name":"Fallback","key_value":""}}
+    }},"Output:Table:SummaryReports":{{"s":{{"reports":[{{"report_name":"AllSummary"}}]}}}}}}"#
+    ))?;
+    let projection = resolve_reporting_prescan(&raw)?;
+    assert_eq!(
+        projection
+            .variables
+            .iter()
+            .map(|row| row.object_name.as_str())
+            .collect::<Vec<_>>(),
+        ["a", "b", "c", "d", "z"]
+    );
+    assert_eq!(projection.variables[0].variable_name, "CaSe VaR  ");
+    assert_eq!(projection.variables[2].key, "  ");
+    assert_eq!(projection.variables[4].variable_name, "case var [W]");
+    let input = resolve(&raw)?;
+    let unused = input.clone();
+    let mut outputs = crate::ctf_initialization_outputs::CtfRunOutputs::new("26.1");
+    let mut context = outputs.context();
+    context.reports.initialize_input_processor(input)?;
+    context.reports.reporting_prescan_input = Some(projection.clone());
+    context.backend.state.doing_input_processing = true;
+    let scratch = context.reports.input_processor_shortcut.clone();
+    context.post_input_processing()?;
+    assert!(!context.backend.state.doing_input_processing);
+    let mut expected_scratch = scratch;
+    expected_scratch.current_module_object = "Output:PreprocessorMessage".into();
+    assert_eq!(context.reports.input_processor_shortcut, expected_scratch);
+    assert_eq!(
+        context.reports.selected_input_processor.as_ref(),
+        Some(&unused)
+    );
+    let prescan = &context.reports.output_prescan;
+    assert_eq!(prescan.max_considered_output_variables, 10000);
+    assert_eq!(prescan.num_considered_output_variables, 5);
+    assert_eq!(prescan.output_variables_for_simulation.len(), 3);
+    let keys = &prescan.output_variables_for_simulation["case var"];
+    assert_eq!(keys.variable_name, "CaSe VaR");
+    assert_eq!(keys.keys.len(), 2);
+    assert_eq!(keys.keys["key"].key, "KeY");
+    assert_eq!(keys.keys["key"].variable_name, "CaSe VaR");
+    assert_eq!(keys.keys["*"].variable_name, "CASE VAR");
+    assert!(prescan.find_item("unlisted key", "CASE VAR"));
+    assert!(prescan.find_item("  ", "tabbed\t"));
+    assert!(!prescan.find_item("", "tabbed\t"));
+    assert!(!prescan.find_item("  ", "tabbed"));
+    assert!(prescan.find_item("anything", "fallback"));
+    assert!(!prescan.find_item("anything", "case var [W]"));
+    context.post_input_processing()?;
+    assert_eq!(
+        context
+            .reports
+            .output_prescan
+            .num_considered_output_variables,
+        10
+    );
+    let retained = context.reports.output_prescan.clone();
+    assert!(
+        context
+            .reports
+            .output_prescan
+            .add_record("bad.regex", "unreached")
+            .is_err()
+    );
+    assert_eq!(context.reports.output_prescan, retained);
+    let mut bad_projection = projection;
+    bad_projection.variables[1].key = "bad.regex".into();
+    context.reports.reporting_prescan_input = Some(bad_projection);
+    assert!(context.post_input_processing().is_err());
+    assert_eq!(
+        context
+            .reports
+            .output_prescan
+            .num_considered_output_variables,
+        11
+    );
+    assert!(!context.reports.output_prescan.find_item("*", "unreached"));
+    assert_eq!(
+        context.reports.selected_input_processor.as_ref(),
+        Some(&unused)
+    );
     Ok(())
 }

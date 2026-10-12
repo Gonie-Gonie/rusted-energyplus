@@ -6,7 +6,9 @@ use ep_runtime::heat_balance::selected_input_processor::{
 };
 use std::collections::BTreeMap;
 
+mod reporting_prescan;
 mod schema;
+pub(crate) use reporting_prescan::resolve as resolve_reporting_prescan;
 
 fn json_size(value: &RawValue) -> usize {
     match value {

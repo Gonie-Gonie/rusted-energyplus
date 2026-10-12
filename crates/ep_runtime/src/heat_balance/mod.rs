@@ -50,6 +50,7 @@ pub mod reports;
 pub(crate) mod run_period;
 pub mod selected_input_processor;
 pub mod solar;
+pub mod source_output_prescan;
 pub(crate) mod source_round_format;
 pub mod state;
 pub mod summary;

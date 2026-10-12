@@ -29,6 +29,12 @@ pub struct CtfInitializationReports {
     pub selected_input_processor: Option<super::selected_input_processor::SelectedInputProcessor>,
     /// Sole shared input arrays allocated before the ordinary runtime getters.
     pub input_processor_shortcut: super::selected_input_processor::SourceInputProcessorShortCut,
+    /// Raw direct-JSON output pre-scan operands, retained independently of getters.
+    pub reporting_prescan_input: Option<super::source_output_prescan::SourceReportingPreScanInput>,
+    /// Sole selected OutputsData pre-scan owner; not OutputProcessor registration.
+    pub output_prescan: super::source_output_prescan::SourceOutputPreScan,
+    /// Actual SimulationManager PreP_Fatal constructor member, initially false.
+    pub simulation_preprocessor_fatal: bool,
     /// Full allocated predefined string-entry owner.
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.
@@ -171,6 +177,30 @@ pub struct CtfInitializationContext<'a> {
 }
 
 impl CtfInitializationContext<'_> {
+    /// Reach actual PostIPProcessing for the raw-admitted ordinary caller.
+    ///
+    /// # Errors
+    /// Missing owners and reached Source failures retain all preceding state.
+    pub fn post_input_processing(
+        &mut self,
+    ) -> Result<(), super::source_output_prescan::SourcePreScanError> {
+        use super::source_output_prescan::{SourcePreScanError, post_input_processing};
+        let input = self.reports.selected_input_processor.as_ref().ok_or(
+            SourcePreScanError::Unavailable("missing sole admitted input"),
+        )?;
+        let raw = self.reports.reporting_prescan_input.as_ref().ok_or(
+            SourcePreScanError::Unavailable("missing raw reporting pre-scan operands"),
+        )?;
+        post_input_processing(
+            input,
+            &mut self.reports.input_processor_shortcut,
+            raw,
+            &mut self.reports.output_prescan,
+            self.reports.simulation_preprocessor_fatal,
+            &mut self.backend,
+        )
+    }
+
     /// Run the first report-cache query reached by ordinary no-EMS init_state.
     /// A genuinely already-scanned cache is retained without replaying its query
     /// or diagnostics; it is not relabelled as a newly reached preparation.

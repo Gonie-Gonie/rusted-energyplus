@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 16개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 17개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -102,6 +102,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 공통 InputProcessor / shortcut | [요약](../evidence/SRC-06-ordinary-shared-input/summary.json) · [색인](../evidence/SRC-06-ordinary-shared-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-shared-input/evidence.zip) | 입력 존재·JSON 크기, count 비변경·definition null 삽입, 실제 최대값의 여섯 배열·이동/오류 보존. 이 증거 당시 metadata 60종; 전체 parser/startup 증명은 아님. |
 | 공통 보고 입력 getter / unused | [요약](../evidence/SRC-06-ordinary-shared-report-input/summary.json) · [색인](../evidence/SRC-06-ordinary-shared-report-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-shared-report-input/evidence.zip) | 실제 다섯 report family의 여섯 배열 reset→정확 identity erase→alpha/default 쓰기, cache/error-prefix·metadata 87종. fmt·quality·all-target Clippy와 기존 테스트 8/0/0; 전체 workspace 중복 실행·새 Native 비교 없음. |
 | 실제 입력 형식 / IDF 필드 개수 | [요약](../evidence/SRC-06-ordinary-input-origin/summary.json) · [색인](../evidence/SRC-06-ordinary-input-origin/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-input-origin/evidence.zip) | 전체 입력 형식을 family order와 독립 보존; 프로젝트 네 family의 실제 IDF field count, IDF 전용 NumAlpha·빈 필드와 실패 시 원상 보존. 전체 GetProjectData/startup 활성화는 아님. |
+| 실제 PostIP / 출력 사전 검색 | [요약](../evidence/SRC-06-ordinary-output-prescan/summary.json) · [색인](../evidence/SRC-06-ordinary-output-prescan/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-output-prescan/evidence.zip) | 실제 raw lexical 입력·첫 이름 표기·중복 count·공백/단위·wildcard와 반복/오류 상태를 보존. 전체 startup/RE2/API/monthly 완료는 아님. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -132,6 +133,10 @@ Assembly01의 실제 Clippy 실패(exit101)는 보존했다. Assembly02는 중�
 ## 실제 입력 형식 단위의 QA
 
 최종 Source `bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa`에서 fmt와 RawModel 전체 16개·compiler report 8개·raw admission 1개 테스트, 합계 **25 passed / 0 failed / 0 ignored**를 확인했다. 새 테스트 본문·binary는 없다. all-target Clippy와 source-quality는 직전 assembly01에서 통과했고, 이후에는 두 테스트 입력 쌍의 누락 객체만 고쳤다. 다섯 파일의 production bytes가 동일함을 검토해 두 정적 검사와 전체 workspace 테스트는 반복하지 않았다. 과거 RawModel 15 passed/1 failed(exit101) 기록은 별도 Source로 보존했다. IDF `Output:VariableDictionary;`의 실제 NumAlpha0과 epJSON의 min_fields1을 구분하며 기본 alpha 값 REGULAR는 둘 다 보존한다. 모든 gate와 A/B 완료 수는 그대로다.
+
+## 실제 PostIP 사전 검색 단위의 QA
+
+최종 Source `d277882b8cf1a63bda2fff8bf8b2dd2574524f2f8829eb67b286cc867a45983c`에서 fmt·all-target workspace Clippy와 기존 raw admission·실제 CLI 테스트 **2 passed / 0 failed / 0 ignored**를 확인했다. 새 테스트 본문·binary는 없다. source-quality는 직전 Source에서 통과했으며, 이후 child 함수 공개 범위 한 토큰만 고쳐 전체 파일 역변환과 나머지 여섯 파일 동일성을 확인했다. 첫 컴파일의 실제 E0364/E0603 실패와 supplemental diff의 파일명 header 오기는 역사 및 별도 정정 증거로 남겼다. 입력·상태·scratch/unused 보존의 선택 검증이며 전체 workspace 중복 실행이나 새 Native 수치 비교는 수행하지 않았다. 모든 gate와 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 
