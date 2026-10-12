@@ -1,0 +1,3 @@
+# Keep archived proof objects out of ordinary ripgrep searches.
+# Use rg --no-ignore for an intentional search of archived bytes.
+/energyplus_porting_plan/evidence/**/objects/
