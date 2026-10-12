@@ -19,6 +19,7 @@ mod geo02_trace;
 mod geo03_trace;
 mod geometry_trace;
 mod oracle;
+mod ordinary_design_day_input;
 mod ordinary_equipment_input;
 mod outputs;
 mod pipeline;

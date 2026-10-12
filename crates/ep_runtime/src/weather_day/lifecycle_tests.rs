@@ -85,6 +85,7 @@ fn consume_complete_day(
 #[test]
 fn warmup_hooks_copy_current_first_day_without_reading_or_prefetching()
 -> Result<(), Box<dyn std::error::Error>> {
+    super::production::design_day_native_tests::verify_actual_design_day_weather()?;
     let series = ProductionWeatherTimestepSeries::from_bytes(
         DECOY_BYTES.to_vec(),
         configuration(6, 30, 7, 2, FirstHourInterpolationStartingValues::Hour24)?,

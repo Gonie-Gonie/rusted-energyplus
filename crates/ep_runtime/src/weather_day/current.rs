@@ -156,6 +156,10 @@ impl WeatherSession {
             )
             .map_err(WeatherDayError::admission)?;
         }
+        state.environment.current_month_day = format!(
+            "{:02}/{:02}",
+            state.environment.month, state.environment.day_of_month
+        );
         state.global.weight_now = *state
             .weather
             .interpolation
@@ -226,6 +230,10 @@ impl WeatherSession {
         }
         if current.out_dew_point_temp > current.out_wet_bulb_temp {
             current.out_dew_point_temp = current.out_wet_bulb_temp;
+        }
+        // Selected DD profiles have no scheduled carriers after this real reset.
+        for input in &mut self.configuration.design_days {
+            input.reset_site_schedule_values();
         }
         current.wind_speed = today.wind_speed;
         current.wind_dir = today.wind_dir;

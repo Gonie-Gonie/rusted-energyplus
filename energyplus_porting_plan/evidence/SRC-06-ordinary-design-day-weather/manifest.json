@@ -1,0 +1,2232 @@
+{
+  "schema": "src06-design-day-weather-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/48/481e55f10a8302f3b37d5451e0db700751ab9b1eae890af2320a1643056a2661",
+    "sha256": "481e55f10a8302f3b37d5451e0db700751ab9b1eae890af2320a1643056a2661"
+  },
+  "changes": [
+    {
+      "canonical": {
+        "path": ".gitattributes",
+        "sha256": "f603b618b76520ba29dfe34fd18ecef07c3b043169b1cf37b3d6d697d6599b06",
+        "size_bytes": 880
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/.gitattributes.diff",
+        "sha256": "fcac4cfbfeeb11f06c2bcce10393556fe2dbd03582cf6589e5a855473fea4ab7",
+        "size_bytes": 426
+      }
+    },
+    {
+      "canonical": {
+        "path": "Cargo.lock",
+        "sha256": "77de325cfaaebc75404faba3cf156cfffa9e69d63496c95e83724cf4ca8f34a5",
+        "size_bytes": 13229
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/Cargo.lock.diff",
+        "sha256": "7eb7d62fdde7b782fc4779896728f023c5c7de18cae2bbde59760b6b0ddbc1ec",
+        "size_bytes": 9842
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+        "size_bytes": 32611
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_raw_model__src__idf_order.rs.diff",
+        "sha256": "c761a2c5ccb390a2869aa4ff09220b3de230f02cfda62857ba445dd60f2fef91",
+        "size_bytes": 1708
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/src/lib.rs",
+        "sha256": "f351354625b606de49bb0f0c0cb80dc8e8f7f5dcec439a395b8ffe0b7ea265b4",
+        "size_bytes": 1110
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__lib.rs.diff",
+        "sha256": "e2f535248bc26af53ffb4bd50cbe85356c33867788b9480bbaf782834ea31289",
+        "size_bytes": 225
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/src/ordinary_design_day_input.rs",
+        "sha256": "3bf89d41b8472e957cff795c1999235e6e69f8044d31abcf921eb6ab45d1b58e",
+        "size_bytes": 8341
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_design_day_input.rs.diff",
+        "sha256": "9065617505288c7cf942e6f567c857ab78cc466e2ebade31d0c91db18b61232f",
+        "size_bytes": 8670
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/src/ordinary_design_day_input_tests.rs",
+        "sha256": "31e231c5f14abadec40316aad63da2f6db0b1d698055efb683b87469dfdb5d31",
+        "size_bytes": 9294
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_design_day_input_tests.rs.diff",
+        "sha256": "e15c856b14101170ffbfbf7f580387463c46caf48b3b5632dc15d547e25b308b",
+        "size_bytes": 9653
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "1e3e60923ce397b30730d6a689f3632e3806f43a71bdad1723a8ea1ed21bb553",
+        "size_bytes": 19906
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_equipment_input.rs.diff",
+        "sha256": "9b63dc02dfd96872722d8c7bd8f87c4da30225aff864f03c2ee85c60f4fac41c",
+        "size_bytes": 449
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "57fdaa67c7daf78c1642748e2097ff47bea0c3af88d50779b46784349a18d909",
+        "size_bytes": 823690
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__pipeline.rs.diff",
+        "sha256": "4531c754a5015f48cedbfe9c65be6dfc0ce37be77149d49b229fc0dbe1da394e",
+        "size_bytes": 826
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+        "size_bytes": 407
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__Cargo.toml.diff",
+        "sha256": "aa48ac44b08a5374c9e734a92fa7249ef078bb619466d0e26eec5c0bceee2e5b",
+        "size_bytes": 276
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+        "sha256": "3ef63e4335d70ff64cdbc6154eea5de332cd64a2e0eb113313d164cffe48ccfa",
+        "size_bytes": 12473
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+        "sha256": "fc07b89afd39c53952cadd80053d614b6f55a0a14178ff8cb1aaa9ca2a07e6f4",
+        "size_bytes": 1482
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "sha256": "886ee965f984da7ddf2ee58e55b781fb1a2fb3d6394db7bb36e641d15d8ff456",
+        "size_bytes": 18277
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__ctf_reports.rs.diff",
+        "sha256": "d862a4b75de65fe3631becef3b2f86e4765cc5a4ac922bf85dced1248b0ce995",
+        "size_bytes": 2247
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "1f5d927cbaa4184f438421859165e182b45f9b47cf6cbdfcd5c325350b5d37ef",
+        "size_bytes": 20334
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+        "sha256": "b1d8a576a80bd6f4d13dfe9c094c04510d3bef83b9b541145bd6214eebe692ab",
+        "size_bytes": 693
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/configuration.rs",
+        "sha256": "baa14588709d0131b61288e6930b2e2ee6a47f71f6e1894c789eec32affd69d5",
+        "size_bytes": 7688
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__configuration.rs.diff",
+        "sha256": "f66c89406c2698d3b8a8b1243b0c973f15327267ead3d6106462741c5710d41c",
+        "size_bytes": 1938
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+        "size_bytes": 14880
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__context.rs.diff",
+        "sha256": "bf98031f58d39233066eb967a927b312cbf70833f1d4e1779223c938523039a7",
+        "size_bytes": 2549
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "2d048835f37cc4cfd4f8b630c0401dc4d0911e5b2580d2727505e56e93d31f13",
+        "size_bytes": 15500
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__current.rs.diff",
+        "sha256": "8033d80328d57bfa444d6fc62dece4e7c63a682540ce89bf8adb7386c8afe025",
+        "size_bytes": 935
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day.rs",
+        "sha256": "dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71",
+        "size_bytes": 7772
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+        "sha256": "a5969486bdfdd20c47d74122c9f7380a25a1823302e0041665e8f9e6eea20efa",
+        "size_bytes": 8099
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day/producer.rs",
+        "sha256": "657d660df02876b8a5bb1ed050bd5ea4faaca9db3840bee4586279b4b372efb3",
+        "size_bytes": 12326
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+        "sha256": "0302ba51d32147f927115f85c8c1eb76ccb39641cfb69bb9c31a223be5a13b02",
+        "size_bytes": 12758
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day/reports.rs",
+        "sha256": "74edf8eb908eb7f3cdad27a5f099c050f1d946da5842d0a98846356031aa65d8",
+        "size_bytes": 3172
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__reports.rs.diff",
+        "sha256": "f386b16958eab99a7a438804fd93154c06e126e0e4120f8efdf4ff723f8adf25",
+        "size_bytes": 3400
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day/solar.rs",
+        "sha256": "4ce786d1f281b56bc849267709873876e4601c51181cc6b6cc13f9482ee6f9b2",
+        "size_bytes": 4577
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__solar.rs.diff",
+        "sha256": "bf0e7c75979e281bc8f2d6d326fa386d6763ccbb9463f7a5e35da5670e1c85c2",
+        "size_bytes": 4874
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day_native_state_tests.rs",
+        "sha256": "5f08a30e6f094bf8dc91f467a427b9dc0b0637b3b9a19c87fd7d3b38048876e8",
+        "size_bytes": 11506
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day_native_state_tests.rs.diff",
+        "sha256": "0064a4e418d6a7df3119e1d59b5f605f73e66740f3ff6ca595809ab9b91283fe",
+        "size_bytes": 11994
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+        "sha256": "b7a47c552c89b61f8078997a0d9a13dff0bd67fdb236c8e214f6c1b8e3633ef6",
+        "size_bytes": 17538
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+        "sha256": "ceb984bee09f87be95bf1a9d9549ee168d434b34c1524c55790a5f22042c05f2",
+        "size_bytes": 18162
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+        "size_bytes": 22959
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__lifecycle.rs.diff",
+        "sha256": "dbd8af35250e3316162e8f70da8b266ec8bf0b4d071ce27e033993aa7a5b8dcb",
+        "size_bytes": 2079
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+        "sha256": "7845332db6c52160405d753a5dde520ca2752810ace9cba0c2ca24b8197e43e2",
+        "size_bytes": 10817
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__lifecycle_tests.rs.diff",
+        "sha256": "b4276bbdceffa604f52fedb1f2e8b2d00964002e2e55cef1f67138b3c1489496",
+        "size_bytes": 528
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "b5b96d34e9404aef11a1c00cad31d8e0aa44bb124f8f8a6599438301ba7e4248",
+        "size_bytes": 1536
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__mod.rs.diff",
+        "sha256": "db2bca0ed4218943f9f11290f24075ccfe0c5a3f7ac47d202d4aaabdf7768c1a",
+        "size_bytes": 993
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+        "size_bytes": 21027
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__production.rs.diff",
+        "sha256": "eea69fb3f54f64f04da80294e85c3c256719321fbd132aa23894565dd48a1f2b",
+        "size_bytes": 3083
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/production/setup.rs",
+        "sha256": "f879b3cf532aed6d48ecc93504a502708382ba59505462b58779afd654712f06",
+        "size_bytes": 13691
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__production__setup.rs.diff",
+        "sha256": "0bc0b8a2ab66e0daf5303e6a2441c4c74f41a71a40f99a3e14174365b71f72db",
+        "size_bytes": 14170
+      }
+    },
+    {
+      "canonical": {
+        "path": "crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+        "size_bytes": 18107
+      },
+      "complete_direct_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__tests.rs.diff",
+        "sha256": "23ea9bf23f36ccc3e6cebde88fc187781c60798241716258e46bc742e6e5def8",
+        "size_bytes": 1182
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-02/manifest.json",
+      "sha256": "be2bc85e874848ecb61dc6fac6af26190a52fabe6f756b12ffc7eb739af2b515",
+      "size_bytes": 33163
+    },
+    {
+      "path": ".runtime/porting/source-objects/af/af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18",
+      "sha256": "af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18",
+      "size_bytes": 1642318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "ed6f7148f8e956a1a27eed0d24b351a26204c395158dcf32e039a764713b1e42",
+      "size_bytes": 32076
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+      "size_bytes": 32611
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/00.diff",
+      "sha256": "560e3278e9992e359ba99b729afeedd08a9e1bd65d1afba093787006d358b78d",
+      "size_bytes": 1703
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_run/src/lib.rs",
+      "sha256": "773b2a9b59adc00614402a661b2e24ab69719e846786af1c9e3287b091e6e0fb",
+      "size_bytes": 1079
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_run/src/lib.rs",
+      "sha256": "f351354625b606de49bb0f0c0cb80dc8e8f7f5dcec439a395b8ffe0b7ea265b4",
+      "size_bytes": 1110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/01.diff",
+      "sha256": "53123951eea743eb4a1a2e6568aa6b6c57553e766c979f723ff3e5a7c02b0556",
+      "size_bytes": 220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_run/src/ordinary_design_day_input.rs",
+      "sha256": "f659c3648b7b1f63e0c501ab95c2de1842a7c01904cba129d7e59e4bc5772d0f",
+      "size_bytes": 7573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/02.diff",
+      "sha256": "5b43908d7ab777b9bca488320e711478774fe8959839c067960044a79fe42093",
+      "size_bytes": 7825
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_run/src/pipeline.rs",
+      "sha256": "48c88cc89264f503c26589887796cc5ee6de7ccde11c0651235f46d63ef03896",
+      "size_bytes": 823400
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "57fdaa67c7daf78c1642748e2097ff47bea0c3af88d50779b46784349a18d909",
+      "size_bytes": 823690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/03.diff",
+      "sha256": "62b35ca386faab87c639260a27709352fe0e532cfeaa02d949e0008b7848212e",
+      "size_bytes": 821
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_runtime/src/weather_day/configuration.rs",
+      "sha256": "9c159f7dca667858934f342ad2e381a15f06899ba0a9403c9cf8394feb1905c2",
+      "size_bytes": 7136
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/configuration.rs",
+      "sha256": "baa14588709d0131b61288e6930b2e2ee6a47f71f6e1894c789eec32affd69d5",
+      "size_bytes": 7688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/04.diff",
+      "sha256": "381e0931fe301c87e77eadb255af0761d0e52b7d2307897d268b9cce1e1251db",
+      "size_bytes": 1933
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "07cd947f07be2d8f094e742c25afde67888fa197f04db3abe7235c8c75f39cc6",
+      "size_bytes": 14072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "bec31e713cdce2ac3575bee80bd1b053ecc1b9bacd54f1e540d7339f2a00c1ca",
+      "size_bytes": 14716
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/05.diff",
+      "sha256": "da3cc9adc32e4e33eda094f4ca4b3ab388799bb139d7d5e0943762651e615f1e",
+      "size_bytes": 1741
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "3021cea19e030728bec4f13bc457179d1decedcbe299d4f93125485e6b7243bd",
+      "size_bytes": 15140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "dfa4e6948eb3023b2fdf083c2dc83b55028e5020d7754d2219f0411f92927d90",
+      "size_bytes": 15458
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/06.diff",
+      "sha256": "207268a9cc94b6bcef3c7599ad7af010db131f7f913fef578807c0b7c1d7674f",
+      "size_bytes": 940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "2858684a11009e599b584f1333290660c596b5bf784b3c4d1bebf3eac6dc86fe",
+      "size_bytes": 11004
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/07.diff",
+      "sha256": "8ae7501e4672d56e821ac347a39f869b9bfb2a73855e2063857204f96b1c9bfd",
+      "size_bytes": 11336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-02/proposed/crates/ep_runtime/src/weather_day/design_day/reports.rs",
+      "sha256": "609935a8f9376e99036336c73b69342dd2732defafab5b96c65260bc7f03d637",
+      "size_bytes": 2797
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-02/diffs/reports.direct.diff",
+      "sha256": "6fc50391c62957f3ce973197399002abda841e3ee4c702d16f0d95a7bffd6981",
+      "size_bytes": 2988
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/design_day/solar.rs",
+      "sha256": "c2c3000ba36799cc8886f0db58b640e5716cced2f21befc67032805d41e267ba",
+      "size_bytes": 3970
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/09.diff",
+      "sha256": "d4b154e772a049103fe279ce105d9fa38261feaa9df23ebea4454ec4994cefb1",
+      "size_bytes": 4182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "8159841e7ec104ae1d1eeb2beaf0f6736aaa9a1682caecfa2390cbfff1c2dcdf",
+      "size_bytes": 7510
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/10.diff",
+      "sha256": "1095f94b266488d40136fd45445605cec2da46abce9a2659677e2adc74c65756",
+      "size_bytes": 7806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "c74e9a42cbf083cf237c1c881015a745fd5360d30aafe4dbf3129723040edf86",
+      "size_bytes": 22126
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "c14e80c74823c12ae57ade0fff46c7b60304812e5b18ddbf06c635cd1759eafd",
+      "size_bytes": 22651
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/11.diff",
+      "sha256": "ffa007cabd4a5939a8cb1b5220f0ba89f18803a779b6b69300f52eca40571500",
+      "size_bytes": 1556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/base/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "d1222d48afb659125663dd72549073a20bd0d0205e681bc7dbe46799454587b6",
+      "size_bytes": 17837
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "db69f9a5b908b7512e914eb2bfc5b3905b557e94024d89cc147bef6bbfaf746f",
+      "size_bytes": 18062
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/diffs/12.diff",
+      "sha256": "2f8558e008cf78b07f72dea6502f802aa285874132437636b27e60e2af5319a3",
+      "size_bytes": 841
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+      "size_bytes": 490422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-775-847.txt",
+      "sha256": "1a0817d87a0d3ecbd223f6b7fc829de749a7187590f16f5be6609856980858e4",
+      "size_bytes": 4615
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-853-880.txt",
+      "sha256": "4a4356d2028fe23b2ee2bdc2d5707a0eed43f0ff94706560d75917d6a4923dbf",
+      "size_bytes": 2043
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-989-1010.txt",
+      "sha256": "645efe9ed4651c68cfa44d93dd38c55212499eb4b091a1e94137c736442593ad",
+      "size_bytes": 1505
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-1725-1812.txt",
+      "sha256": "799e452371192898431fdec4ec8ae0274d2f998126e78ab365cf561e275d627e",
+      "size_bytes": 5141
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-1848-1863.txt",
+      "sha256": "0d1918f69a44b53ea09bbc1630ce83d83bccd42b131501ac662f4220d6a2d071",
+      "size_bytes": 1318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-1953-1993.txt",
+      "sha256": "8054d4033483b8da954df286404c026b3a029b28afd4ea330aab8048ff429760",
+      "size_bytes": 2064
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-2076-2094.txt",
+      "sha256": "1663acc07da0dd3ca29049e52d13c0a5fbafbe08de2b889199c1ff1817035859",
+      "size_bytes": 1362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-2148-2181.txt",
+      "sha256": "a283592da7808c56aba400ce490759cb18b1ed972a4c0b4cd465a70e52078a29",
+      "size_bytes": 2071
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-3494-4022.txt",
+      "sha256": "2948f06422e9dc53d1fd1b6d217dfa0d2aa59305c3dc6b33913c1235dfd8f0e7",
+      "size_bytes": 30874
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-4128-4273.txt",
+      "sha256": "290da2e3306a105f707e0775755fa98907b6e3d2014b5ea38b776fb510ea889d",
+      "size_bytes": 9189
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-5936-6180.txt",
+      "sha256": "511ecba9d691825aa7d6d5e5453a26e95b2732a11793d42090d10ebcd619a2c4",
+      "size_bytes": 13437
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-6227-6367.txt",
+      "sha256": "261234d2611d3d5a1b5e3934f0b38e4ac3794b38931bf9250deb9613c8599b5f",
+      "size_bytes": 8317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-6446-6467.txt",
+      "sha256": "e118e3f8f680a4064b18a180a930d45f1434eee7a2a4dd5e14f0c07dd9580c66",
+      "size_bytes": 1528
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.cc-6549-6654.txt",
+      "sha256": "b380e4a676548db4f798dd6d7968a6a22cc54b49c446fa5d2224591b461b6312",
+      "size_bytes": 5660
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc",
+      "size_bytes": 53352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.hh-176-225.txt",
+      "sha256": "3736cf3d50c6bab2ab12cfa4b302f4f47710baf3daba03f24984eb67da63d996",
+      "size_bytes": 4096
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.hh-305-319.txt",
+      "sha256": "acc140c75dc63cda2e47583ca57f070091dd7f95b4eb0ac04678a6cf6d218629",
+      "size_bytes": 982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/WeatherManager.hh-755-782.txt",
+      "sha256": "0da097cf42972aae943a50275daa3949fe9259c5f0b5385d1fbd807f11dc7d90",
+      "size_bytes": 1271
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "size_bytes": 16816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataEnvironment.hh-81-81.txt",
+      "sha256": "8500a5062b75dabcedd0f7fee47ade669c24ea975f18e77829c2039c1269540a",
+      "size_bytes": 122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataEnvironment.hh-172-191.txt",
+      "sha256": "5cb87c9251fb07fe5abadbc37da8d508e9c7057fe5d010dda6ce5994423cace8",
+      "size_bytes": 2191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataEnvironment.hh-200-206.txt",
+      "sha256": "ad0fe825dc293ae6e9bd63539f17f4affa98d21b084a402a1c3fe752bae4a5c9",
+      "size_bytes": 593
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "size_bytes": 168527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/SimulationManager.cc-201-219.txt",
+      "sha256": "abc0cba336fe77fcafcdc7a4f3e87ba2355cc480da696fd282085c26461c7ffd",
+      "size_bytes": 1160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/SimulationManager.cc-1106-1153.txt",
+      "sha256": "abf4fe8d500728c58dee0b60d7a82832e8af7229d2d0887033afc07ba6ea9fb6",
+      "size_bytes": 3042
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSystemVariables.cc",
+      "sha256": "ea4bc880d10f573ab355309566f5b7c93d9fe0f8e5672a2d7a5743b0f4d7a90f",
+      "size_bytes": 18009
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataSystemVariables.cc-74-81.txt",
+      "sha256": "d77b385a7aafbfe6d09f39133f0294ca8a98c44d9514e353a5d7f0f136d4cb2e",
+      "size_bytes": 495
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataSystemVariables.cc-210-220.txt",
+      "sha256": "49fbefcc5aa15963954ed60876ec0ef23bcf3dc18af8c680f3ce0e699cec73ed",
+      "size_bytes": 528
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/DataSystemVariables.cc-260-267.txt",
+      "sha256": "c264062994ddc893667c00d2a941a496e8bf5a6fe9a908dab8218bd85aa6ad42",
+      "size_bytes": 351
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "size_bytes": 122929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/InputProcessor.cc-954-970.txt",
+      "sha256": "5b0b444e26416b6592e4fb6f16dc8798c566a981c6b2aae3f9d88cd28157731d",
+      "size_bytes": 754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/InputProcessor.cc-1216-1255.txt",
+      "sha256": "da49cc32522e405ee28f93e37209894da105285fe0a51991e98eaae03b189060",
+      "size_bytes": 1443
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+      "sha256": "a833c153bbd89783a6075056c0ff791a2dec041df4badfdfa499fd0bd1b53674",
+      "size_bytes": 169800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/OutputReportPredefined.cc-1766-1835.txt",
+      "sha256": "c725c5543234ad49bfac50b73a0a1e9b472c6e1add668ef876ca7d02e269ab9e",
+      "size_bytes": 3172
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "size_bytes": 108928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/Psychrometrics.hh-1223-1268.txt",
+      "sha256": "8156330b7c7109dd52d4957307ee34a7ccd612dd40867ae33b4db5e92345a595",
+      "size_bytes": 2101
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/Psychrometrics.hh-1281-1329.txt",
+      "sha256": "a7cf47c33d450d5afb6d9b5f71cf71fd328618b7e809a4beb5b35db6d1b0262f",
+      "size_bytes": 2204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/Psychrometrics.hh-1529-1552.txt",
+      "sha256": "d30ee7ba22e9b3a4f3cecb6c12073b732a7239539d3da88e4bb98a95b7ca12e3",
+      "size_bytes": 1074
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "size_bytes": 27600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/Fmath.hh-88-96.txt",
+      "sha256": "1b79e90995478fc80680db8d944c55418e5f2d646e79262dc7aaea8e53cb3e01",
+      "size_bytes": 111
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/Fmath.hh-337-343.txt",
+      "sha256": "87136c075a12342a20889402c2a829de3567b5d26fe0822c03bce7bfc52f6417",
+      "size_bytes": 107
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494",
+      "size_bytes": 7439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/Original/EnergyPlus.hh-160-168.txt",
+      "sha256": "432df973777d73931a73a04f103890b1d4215add56b5e2ec34ca835859401ab5",
+      "size_bytes": 222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/official-schema-excerpt.json",
+      "sha256": "5a085cf4a125997416fb0b3f3cff3803a4dc925f2863597fe9c77a07e44a3d2d",
+      "size_bytes": 23013
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/manifest.json",
+      "sha256": "a931ba3e0236d8c9803bc3f5d05c11b235f8b81e59a0ee6aa4e7ae6f41348020",
+      "size_bytes": 15207
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-envelope-gather-prep-01/manifest.json",
+      "sha256": "3af59c57442b05d970250daeb812795948db5dea8d6e96fcae25281484ae2cbe",
+      "size_bytes": 2629
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-producer-Header-02.py",
+      "sha256": "1eab78c9bc292392d26934e5aa28f38133e3d04aaf341168c4dbb95596cef31e",
+      "size_bytes": 3273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-02/README.md",
+      "sha256": "7d59f9ef96387c91fc37eb5bf3501fc01d03783c4a227a33b4cffa91bf193ad1",
+      "size_bytes": 821
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/manifest.json",
+      "sha256": "106ced4549dcd28ba771fdd3295dd5115901d9175be08ed47aa71a319203aa3d",
+      "size_bytes": 32704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-01/proposed/crates/ep_runtime/src/weather_day/design_day/reports.rs",
+      "sha256": "5b14f57927f7e7a15a7a10f38c41a9b9282caf49f42ce3d31d0baa407aed3cda",
+      "size_bytes": 2796
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-producer-prep-02/diffs/reports.parent.diff",
+      "sha256": "30941c1fff5db7c798fff5c53750d3fe6487def93db37275d05856ee9ed9d62a",
+      "size_bytes": 783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/manifest.json",
+      "sha256": "5e95d12c684ba54007379c0556c22c6df5b015c1976d629b95b0cf90f7e57db5",
+      "size_bytes": 13715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-03/manifest.json",
+      "sha256": "8afdd3cb68475cc75c6a25f3312e6ee3592490fa2628a49397b377120684882a",
+      "size_bytes": 25907
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/Cargo.toml",
+      "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+      "size_bytes": 407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/01.diff",
+      "sha256": "a1bbc8b3b3a9330b4e50922990cc9944349d800646942e3713955b3fe5d2077f",
+      "size_bytes": 293
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/Cargo.toml",
+      "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+      "size_bytes": 407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "56bced0c94678e450f64a1f1c253f0eec020e4a9a11779686f68287487766ced",
+      "size_bytes": 1371
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "bacc7a9884da76e41265fe9136499e4381ec426bbb3fa51494621943fb7fc694",
+      "size_bytes": 1536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/03.diff",
+      "sha256": "1ed18766d25e91cbc93eb00e6952150c6cad81230320a9b73f2f043cf533ff01",
+      "size_bytes": 929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "bacc7a9884da76e41265fe9136499e4381ec426bbb3fa51494621943fb7fc694",
+      "size_bytes": 1536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/03.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "9db2169ac76007b6695d104cca93757c9b051b585573cb028b0fb8071ab847b4",
+      "size_bytes": 20170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "13538b4e80e873281c0f909b01dc7edd1fb7509a8843ef0b0523ccda380b7126",
+      "size_bytes": 20934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/04.diff",
+      "sha256": "1e071f91aaaaab7c77ccaf97a94e57243dd14ec4836f18248461ee0c3c0efb48",
+      "size_bytes": 2878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "e217881ec5cdd385ab6f94e5b988c11d8f036c94f3f1a09972c3a330ec78fe5e",
+      "size_bytes": 20703
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/04.diff",
+      "sha256": "bf9cf264c33b0485c420b83a87cd68b188e5dd8fe7f8907f76133c34d1dd3e70",
+      "size_bytes": 1809
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "07cd947f07be2d8f094e742c25afde67888fa197f04db3abe7235c8c75f39cc6",
+      "size_bytes": 14072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+      "size_bytes": 14880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/05.diff",
+      "sha256": "fd6f7cab0f07c0065c00061847336b5848a69a4023d53923584c7d03c0b89c99",
+      "size_bytes": 2566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "be853f464a4855c426f1a68a8f56b8f6d4a6a0563b0a7f0ba3ecaa7c3ea0cac5",
+      "size_bytes": 14245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/05.diff",
+      "sha256": "412483548f14e875aa1a7588f9fe5a88da4f27017052586777f0ca1a391612ca",
+      "size_bytes": 2275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "c74e9a42cbf083cf237c1c881015a745fd5360d30aafe4dbf3129723040edf86",
+      "size_bytes": 22126
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "fb454277a330a0692579e5e7f4d2cb8afc3a583c59779cee36185b60d4e0510f",
+      "size_bytes": 22865
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/06.diff",
+      "sha256": "83988d97cfd8881a60d30b5fd595ec174e86f17ea99a794aa4857c82fdfeb36f",
+      "size_bytes": 1996
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "d39990b2be961ba5c628fd34357b190745fecfbdf83dc129ce9bebc61f1cd86c",
+      "size_bytes": 22329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/06.diff",
+      "sha256": "06e6b2e820c04997efd0f4daed50f9967d4dc8ffa99ef386e23da224c2462f6d",
+      "size_bytes": 2534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/proposed/crates/ep_runtime/src/weather_day/production/setup.rs",
+      "sha256": "5e147c1301549e814c4d326599d9a82ed4a58ccdc4809848abecc3397cb0dfb4",
+      "size_bytes": 13059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/diffs/06.diff",
+      "sha256": "5e165547799bd9b242d2363a128935dcbca3bf96ed737ba3fbf1443692fa3dee",
+      "size_bytes": 13479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-01/proposed/crates/ep_runtime/src/weather_day/production/setup.rs",
+      "sha256": "5529a6e4b77eabb1816a52a2bb89d322790b9df6c4086c76488e570228d4d372",
+      "size_bytes": 10773
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/parent-diffs/07.diff",
+      "sha256": "cecd6b37e92b495e4d21dce5e4590f0bb9f6163afc142ccce25c371627a0035b",
+      "size_bytes": 3497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/weather_day/production/setup.rs",
+      "sha256": "b40ead605a27f45280666b4b00ac118e06869db583d49214ab745cbd62d40e50",
+      "size_bytes": 11587
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/parent-diffs/06.diff",
+      "sha256": "1fa5090531f0a751d9058a4cd3f48d5c43208b3e83dfcf0218911fe32bfbed19",
+      "size_bytes": 4292
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "138e195c3a0a0408a139b8dd1f9fff5b057163d601d242dbf4edb34fcfabbaa5",
+      "size_bytes": 11631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "4ad828e3864805b168fd9126335df0450b8832352bf628db3a2497cf91c234c3",
+      "size_bytes": 12465
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/diffs/07.diff",
+      "sha256": "a9eb4f611f2e14fd4bfdfd595f07017b3ede47827d9a29ce47dc8b21e031996d",
+      "size_bytes": 1468
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "5bd509cc229bb110c94395464b3ba8eafc1bab761a0fc91f76eec261c99f9aa5",
+      "size_bytes": 11843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/parent-diffs/07.diff",
+      "sha256": "2ceb6dc6b4f6ef0821cda53b4cc4b668101966749433177a7d6b0aeb89dbb57f",
+      "size_bytes": 914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/base/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "aa9277ee7065df137590e657fe59b9add00b33233b1c6ceb3efd83310c82bd90",
+      "size_bytes": 20184
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "1f5d927cbaa4184f438421859165e182b45f9b47cf6cbdfcd5c325350b5d37ef",
+      "size_bytes": 20334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/diffs/10.diff",
+      "sha256": "39f8dca2b4d186717137cbad0bc7097b3466acfb42eb825d79582bf6de7c911c",
+      "size_bytes": 710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "7ad81d05c9b9ac6e45a8c29a43ad5784201a19b9ef7da31e027004d632530140",
+      "size_bytes": 2400
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-caller-prep-03/proposed/crates/ep_runtime/src/heat_balance/setup_simulation.rs",
+      "sha256": "74b3f9443c5a1d454d2500ab8bd75a2985b953acf096a19b09f32d1af4ffc442",
+      "size_bytes": 10229
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/README.md",
+      "sha256": "d1e834c9b35bfcc960380ead5f68d40bfe19a43f6aa617314baf9b00addc777d",
+      "size_bytes": 1326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-weather-host-prep-04/prepare.py",
+      "sha256": "86cae554b8bd6bee41963a45a632d99619eb0a54e9eff6d4d00895eeb13e78f2",
+      "size_bytes": 7202
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-plan-01.json",
+      "sha256": "a35c77ed3eec082aa5b26cc59a3e01409687071d885175a3978b947aa5cc0330",
+      "size_bytes": 27062
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-envelope-gather-prep-01/base/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "816fa153bcc3e25823da10a16f0d7c4e7567555098242c08b3a09461f6f95757",
+      "size_bytes": 18033
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-envelope-gather-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "7a6ee6969650a5caeeead447eaf7441e209bb445a82c1428672fefeeee22d481",
+      "size_bytes": 18450
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-envelope-gather-prep-01/diffs/01.diff",
+      "sha256": "a7296a8307851959ac2516d7f1a123c41970d02f8be4cc6fe23114db4eeb661d",
+      "size_bytes": 2755
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/application.json",
+      "sha256": "7b4550a16afcfcbd87c408442bc5d994950f40fff458595a03cdaa681e847172",
+      "size_bytes": 15730
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-capture-command-01/receipt.json",
+      "sha256": "7952d77089e5c74bd9e78c94c33f6e04a464d504d65d2d09d3f3ea28ecb26fbf",
+      "size_bytes": 3458
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+      "size_bytes": 32611
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/00.diff",
+      "sha256": "560e3278e9992e359ba99b729afeedd08a9e1bd65d1afba093787006d358b78d",
+      "size_bytes": 1703
+    },
+    {
+      "path": "crates/ep_run/src/lib.rs",
+      "sha256": "f351354625b606de49bb0f0c0cb80dc8e8f7f5dcec439a395b8ffe0b7ea265b4",
+      "size_bytes": 1110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/01.diff",
+      "sha256": "53123951eea743eb4a1a2e6568aa6b6c57553e766c979f723ff3e5a7c02b0556",
+      "size_bytes": 220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/02.diff",
+      "sha256": "5b43908d7ab777b9bca488320e711478774fe8959839c067960044a79fe42093",
+      "size_bytes": 7825
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "57fdaa67c7daf78c1642748e2097ff47bea0c3af88d50779b46784349a18d909",
+      "size_bytes": 823690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/03.diff",
+      "sha256": "62b35ca386faab87c639260a27709352fe0e532cfeaa02d949e0008b7848212e",
+      "size_bytes": 821
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/configuration.rs",
+      "sha256": "baa14588709d0131b61288e6930b2e2ee6a47f71f6e1894c789eec32affd69d5",
+      "size_bytes": 7688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/04.diff",
+      "sha256": "381e0931fe301c87e77eadb255af0761d0e52b7d2307897d268b9cce1e1251db",
+      "size_bytes": 1933
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+      "size_bytes": 14880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/05.diff",
+      "sha256": "30e43e9d8554b0b9f208ec9e8adfd8c250a8f13d8d1855328d0ce9fd725f1f59",
+      "size_bytes": 2544
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/06.diff",
+      "sha256": "207268a9cc94b6bcef3c7599ad7af010db131f7f913fef578807c0b7c1d7674f",
+      "size_bytes": 940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/07.diff",
+      "sha256": "8ae7501e4672d56e821ac347a39f869b9bfb2a73855e2063857204f96b1c9bfd",
+      "size_bytes": 11336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/08.diff",
+      "sha256": "6fc50391c62957f3ce973197399002abda841e3ee4c702d16f0d95a7bffd6981",
+      "size_bytes": 2988
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/09.diff",
+      "sha256": "d4b154e772a049103fe279ce105d9fa38261feaa9df23ebea4454ec4994cefb1",
+      "size_bytes": 4182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/10.diff",
+      "sha256": "1095f94b266488d40136fd45445605cec2da46abce9a2659677e2adc74c65756",
+      "size_bytes": 7806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/11.diff",
+      "sha256": "61f16d86d9aef5add55a04e8795a6abe5cda01fba526e5c49ab38a6b50cf35c8",
+      "size_bytes": 1974
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/12.diff",
+      "sha256": "2f8558e008cf78b07f72dea6502f802aa285874132437636b27e60e2af5319a3",
+      "size_bytes": 841
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+      "size_bytes": 407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/13.diff",
+      "sha256": "23fb31fbeba3460d20487dd2e6a034e4d0decbf59cee311ec9cd5c7cc92b43de",
+      "size_bytes": 271
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/14.diff",
+      "sha256": "3fc14029b84a00509ea044e8b8b682061b86ff68521dc0721f834a8fdaf51b1b",
+      "size_bytes": 907
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/15.diff",
+      "sha256": "1cf353d9623ec4a1e69285971fd136c0e575cc04e6061a34ceb16ac4914ad9eb",
+      "size_bytes": 2856
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/16.diff",
+      "sha256": "5e165547799bd9b242d2363a128935dcbca3bf96ed737ba3fbf1443692fa3dee",
+      "size_bytes": 13479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/17.diff",
+      "sha256": "a9eb4f611f2e14fd4bfdfd595f07017b3ede47827d9a29ce47dc8b21e031996d",
+      "size_bytes": 1468
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "1f5d927cbaa4184f438421859165e182b45f9b47cf6cbdfcd5c325350b5d37ef",
+      "size_bytes": 20334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/18.diff",
+      "sha256": "8a31fd5a0fe8d48cb8bf3512012126a416f370489be21f49fd05d816d3fa0b30",
+      "size_bytes": 688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-application-01/19.diff",
+      "sha256": "001f0e92597f6ba5e4ce17e4589cd17996dd888ec5160798deb66cbf24b8c255",
+      "size_bytes": 2459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-design-day-weather-Root-01.py",
+      "sha256": "f1e3ef4f11867611293fcc48fd612ce284979e7029fc686db3036c83a2cce2d4",
+      "size_bytes": 3183
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/manifest.json",
+      "sha256": "73f18a49cddf4c35d0bab493be8b1d57da8895e7d12954ae9dfdc8e4f85cfc66",
+      "size_bytes": 8731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/prepare_sources.py",
+      "sha256": "3c24d2f95390fcbf94052016279520d4cbd84172667f93672f7bc5d5dcf87110",
+      "size_bytes": 12226
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/README.md",
+      "sha256": "f7fe88f3959858edcc3fe0c5bdb97c81397a818f5610908d02a2d1cc7f4e50a7",
+      "size_bytes": 1828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/manifest.json",
+      "sha256": "577b28bd0beaf583b58dc04b4c4d55465ebb15fa0346fdd8285169def22cb162",
+      "size_bytes": 9854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_observer.cc",
+      "sha256": "fd76c6a34f103b6311e54738e21d5b4c54284a6afb359c7e2860be75715fdcd5",
+      "size_bytes": 16473
+    },
+    {
+      "path": ".runtime/porting/source-objects/90/90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+      "sha256": "90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+      "size_bytes": 1642317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/surface_consumer_main.cpp",
+      "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+      "size_bytes": 2216
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/WeatherManager.design_day.cc",
+      "sha256": "6c93b5c46d4ed0fba1f5f8dc6fa2cd418325f28e1b84d9308ea6385684796bfa",
+      "size_bytes": 491550
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/SimulationManager.design_day.cc",
+      "sha256": "62bee0e5cd876fc6229d36108605f516f62302d005d79f9b00e7033c48294447",
+      "size_bytes": 169073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/surface_consumer_observer.cc",
+      "sha256": "ea51cea85d3c57d1be768bc3447ab1965d53c1d6adfee71815cfb4813eaeea75",
+      "size_bytes": 29579
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+      "size_bytes": 24694
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+      "size_bytes": 46621
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/WeatherManager.design_day.cc.diff",
+      "sha256": "4f0a495103906a0434a97f48c7ae2a349f5a0aed4738423346419f77731a7f2a",
+      "size_bytes": 3548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/SimulationManager.design_day.cc.diff",
+      "sha256": "cd573849b2b2b32e75876fa71507ef313ac18801162fc4ddf804c43e83319464",
+      "size_bytes": 2284
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/source-additions.json",
+      "sha256": "a62501ed6e2ba11dec6845090105b3c13b361e86294a0186eb738f0908bc1a89",
+      "size_bytes": 18830
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/Original-ranges.json",
+      "sha256": "1aed9efbd5bec22b8f020b149914dcb4d29ff46cba82fa527680c28f8b5e861d",
+      "size_bytes": 16185
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/surface_consumer_observer.hh",
+      "sha256": "7d654ff12b31e1fc5377e3651069b044f0da505ba9a95f570e33e77290f04c9f",
+      "size_bytes": 2362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/ordinary_design_day_reference.cmake",
+      "sha256": "88aa4901ae2f675f7335d4362c51796e0b722d8694e5a59a2b6dc85fecb65603",
+      "size_bytes": 2515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-01/manifest.json",
+      "sha256": "7639949ff797795da7b45fb2ff71db943fddeba6b1fc5afdea8fe86d5f42a51f",
+      "size_bytes": 6430
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-01/surface_consumer_observer.cc",
+      "sha256": "c9b03d9c7e3fa128574d5f76ef68103bc5857f499e608aa4af3ef5761840e53c",
+      "size_bytes": 23471
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/surface_consumer_observer.cc.parent.diff",
+      "sha256": "12a839eb2a042c6461a76288b645ad2f1ab8c1d1bc5274c9e4e8319204816f67",
+      "size_bytes": 9838
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-01/surface_consumer_observer.hh",
+      "sha256": "f33a1379a9814725dd7e3f65b480e052a0b123972014e43944e8135e54250739",
+      "size_bytes": 2288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-prep-02/surface_consumer_observer.hh.parent.diff",
+      "sha256": "7d6b3a7e58a6d36e7ba5e90bfbf7e2a740ec20906c60e79c31bde15f5e9389fd",
+      "size_bytes": 897
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-prep-01/manifest.json",
+      "sha256": "d7fb51dac17665b37f96b2c9693c492e4b2eeb643368b13b4fbcab138ffc9650",
+      "size_bytes": 1832
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-prep-01/extract.py",
+      "sha256": "acd14ed5a72e0d1d68982552dcd86587be8169d238586d38abc9981ce685190d",
+      "size_bytes": 13347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-prep-01/README.md",
+      "sha256": "1c443c14942003ffb227ee307f30f8ed14bbcae9dc525f988a29d408b40e7ba2",
+      "size_bytes": 1117
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+      "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+      "size_bytes": 2385
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-actual-01/fixture.json",
+      "sha256": "98c6673bd0ac9557c35051b9b612c7a98729e2bd64fc7dbb0b568fe5ae784be2",
+      "size_bytes": 3509853
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-actual-01/metadata.json",
+      "sha256": "1d6b39168495bb029cfc6b921cbb4a4726815f4d664616eb9e31c64d5d1ab945",
+      "size_bytes": 1861
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fixture-prep-01/seal.py",
+      "sha256": "55806a9f926d77422fd61002ce6a3e3803001c6968971900f1233823571105f3",
+      "size_bytes": 1340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-site-comparison-prep-Header-01/manifest.json",
+      "sha256": "51a95655d06352025a1f91c205f3f98a30369b7c5793a42cd9568b5325756792",
+      "size_bytes": 1296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-site-comparison-prep-Header-01/site_and_solar.rs",
+      "sha256": "46a8405b7200412fb96aafbfd3d1034160a2b1d7fec88a86c64e3b5f34b74203",
+      "size_bytes": 2626
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-site-comparison-prep-Header-01/README.md",
+      "sha256": "a60896014f0bab3ece79076c68cde89b3b71ce1b17b4f92e74e5d2b297c688e6",
+      "size_bytes": 985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-fixture-review-01/review.json",
+      "sha256": "4ea023f416a82a2b0da051c654e5164440825fa96988421adfafb3353ad7e1fc",
+      "size_bytes": 2928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/manifest.json",
+      "sha256": "ef9a5e935a8ce2963f72d7a38932ef24a1f4f01e150fe726f2f99e27ad6d09a1",
+      "size_bytes": 2913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/base/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "73afd89a7cd8f17391b6e3180c74a396968a96555007f55544b2d325458ea2cb",
+      "size_bytes": 19738
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/proposed/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "1e3e60923ce397b30730d6a689f3632e3806f43a71bdad1723a8ea1ed21bb553",
+      "size_bytes": 19906
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/00.complete.diff",
+      "sha256": "5dd928c3c9269993c94d598892c64ab72db8a637a1d09709cedc37eb04222911",
+      "size_bytes": 444
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/base/crates/ep_run/src/ordinary_design_day_input_tests.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/proposed/crates/ep_run/src/ordinary_design_day_input_tests.rs",
+      "sha256": "7f86d175f7777b425298854ea94b501ee52435b9af10662ecac3d37f09b3b33c",
+      "size_bytes": 8364
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/01.complete.diff",
+      "sha256": "4cb4395302eda2d6d3345e462a8ecc55b60e19d34c7fd27ae2b7770c3f1561d6",
+      "size_bytes": 8628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-raw-comparison-prep-Header-01/README.md",
+      "sha256": "6a1ca8558a48231d9747534f2930221afaea2816059eae20786a56ec396dafdb",
+      "size_bytes": 1599
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_design_day_input.rs",
+      "sha256": "3bf89d41b8472e957cff795c1999235e6e69f8044d31abcf921eb6ab45d1b58e",
+      "size_bytes": 8341
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/manifest.json",
+      "sha256": "d7d5d99d4c58f715f8d4dbf6fe8a4c39fcd83a36eb8b5cb09be9165fce1e72b3",
+      "size_bytes": 3087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/before.rs",
+      "sha256": "80dc554164c8d289681a576ba339ccefa35ae4a957dbe530897ba1ed686d6d20",
+      "size_bytes": 11412
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/proposed.rs",
+      "sha256": "f0dd5eb38b4ce05373bb55caa4c91d77ff8fb5571143b45eb961de53d51d718f",
+      "size_bytes": 16523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/complete.diff",
+      "sha256": "70b441dfd08fe2bfd5b60c0ec76aa2d452bf3a57868ad9163012784c8a2af2c3",
+      "size_bytes": 9258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/scope.json",
+      "sha256": "ef5a0ef78d5bbb4a2da879d522ca15a9709e0c5d3b5b1ad04add9b6f4e1405ee",
+      "size_bytes": 2511
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-prep-Header-01/README.md",
+      "sha256": "aae71894478b29be6677d6b00c85400a7922378fd3ec6384bdf414ed13b2dee0",
+      "size_bytes": 1436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-qualified-comparison-Header-01.py",
+      "sha256": "47f0e70026bf7dba03aeb89ce4baf0bd5e641ecace343d29f71d2432b26716e6",
+      "size_bytes": 13013
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day_native_state_tests.rs",
+      "sha256": "5f08a30e6f094bf8dc91f467a427b9dc0b0637b3b9a19c87fd7d3b38048876e8",
+      "size_bytes": 11506
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-02/stderr.log",
+      "sha256": "b69f8ab74379c078c864588e32b10658e11aa73a5df29d05270dfffc3f8708f8",
+      "size_bytes": 1264
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+      "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083",
+      "size_bytes": 1615
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4",
+      "size_bytes": 2624
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e",
+      "size_bytes": 8788
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-qualified-comparison-application-01.json",
+      "sha256": "5a798e06abcf653f0a2e793e2979406049d5190c447612d9a7e15048f93980e2",
+      "size_bytes": 507
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-producer-Source-review-01/review.json",
+      "sha256": "977084c88f0c79e30156e98e6b583de936d0b23106395f6e2c5a94ac1786c10f",
+      "size_bytes": 686
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-native-Source-review-01/review.json",
+      "sha256": "cb6759232df999401ba8f93618ed81c5d2028e7be26cbae31ebe485337990eb4",
+      "size_bytes": 978
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-native-Source-review-02/review.json",
+      "sha256": "66ddb4f0234f49905aeea4e12ef9c0fde028aa8d9434b60832b2c411221acdd5",
+      "size_bytes": 1885
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-native-environment-review-02/review.json",
+      "sha256": "472b01f08e27e8f602481437221d31c556e2d3fd78bbd74ffc9d83987021f911",
+      "size_bytes": 2378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-environment-02/frozen-environment.json",
+      "sha256": "54ad7290f4e223ebc61c64580796b6e2a16f6107147ae71d47fd43a300a5db9f",
+      "size_bytes": 50929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-environment-01/frozen-environment.json",
+      "sha256": "041b12431103d115d98942aa8639a98c626efe40bd6466630a6790cef78c8152",
+      "size_bytes": 50930
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-environment-01/frozen-environment.json",
+      "sha256": "884dfdf545ec2cefdd125bf8d4ffeb9a6645b65446c5ca8761bf2e584e1f5a6d",
+      "size_bytes": 51139
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-prep-01/manifest.json",
+      "sha256": "8d918512ba3349c850ce8713f3f28de6870b77dddefc612f813b07bb478eb01f",
+      "size_bytes": 2885
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-launcher-Source-review-01/review.json",
+      "sha256": "acaa3dcdfcf251f5b491b662abe0db9bbfb30b06983350873dfc1baea7957fd0",
+      "size_bytes": 2883
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-prep-01/build.py",
+      "sha256": "6b160b4fbb011f4219959457f9ae284a239bc86b8c3bb52bcda6376b116dfb06",
+      "size_bytes": 17973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-capture-prep-01/manifest.json",
+      "sha256": "a92b8af6417e7e84804cf7db29e6a6e050cb8198e21478ace4779c14cacc0eb2",
+      "size_bytes": 1958
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-capture-prep-01/capture.py",
+      "sha256": "166863334d9b946f19025e470b92054572eed63d86ddc5465fdbee749cfd70dd",
+      "size_bytes": 12320
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-provider-Source-review-01/review.json",
+      "sha256": "db43d221f4a1202d43521d8d2d97b762b016593474bd15d3495444ad2b3afb7e",
+      "size_bytes": 1773
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-provider-review-prep-01/manifest.json",
+      "sha256": "f3e7550df640a8c2d8f3c4e7c7a0a46d860b5e392e644e3628a7afd939fceea8",
+      "size_bytes": 1669
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-ordinary-design-day-providers-01.py",
+      "sha256": "9887f9ccf09c564b10d59ac42af2d31cd1494c8c88254a35220e736468594383",
+      "size_bytes": 13184
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-ordinary-radiation-producer-providers-Header-01.py",
+      "sha256": "a87fcd81c76518c8bccd53424e7ca4503fdfd525f84d5850e1d8cd1573888cb6",
+      "size_bytes": 13035
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-review-01/review.json",
+      "sha256": "2f028517ea0795a5b3435466c8dcf3faeaa4bf01145333c9d5c94653a20d8ad1",
+      "size_bytes": 7066
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-01/native-build.json",
+      "sha256": "0046c83006cbcdf5f7f325ddee24e1ec9231ee61303f1cebbc23fce30c63e7e7",
+      "size_bytes": 63550
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-review-01/actual-PE.json",
+      "sha256": "84caeba3afda32ef6c03c75e7de0e49cc4e55f6602689e4fe5514a68f1934c8a",
+      "size_bytes": 16047
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-review-01/actual-address-bound-providers.json",
+      "sha256": "9008cd55fad4b8a39521468708770b2202b6f08c2356d6630c0200628c14f568",
+      "size_bytes": 29473
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-review-01/addr2line-command-01/receipt.json",
+      "sha256": "a41eb5cb5d491ff790927a78c5ff6f97bfa4e124ac8d85cbfbd3abf97bbd8192",
+      "size_bytes": 3320
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-01/configure-command-01/receipt.json",
+      "sha256": "aecb2b46c1995d033678957b7cfcfbcf6ac1f78f2cd744760895afd7546b6426",
+      "size_bytes": 3475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-01/dry-run-command-01/receipt.json",
+      "sha256": "7b5c3ef3449b737c04b50d9eef3e7ca47f72936011bdfa927d58ade7168be1f2",
+      "size_bytes": 2908
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-build-01/compile-command-01/receipt.json",
+      "sha256": "73ea5f5e6f85be0ddd7342f3c59a5df663cf5639ec5bd0fc5a92cc9d421ffe0f",
+      "size_bytes": 2985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/native-build.json",
+      "sha256": "72c06c51c737eb46a6b69e4dc1431a88ac1dde8a3c6ed448fc57c899c81bc0cd",
+      "size_bytes": 56510
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-acceptance-01/review.json",
+      "sha256": "c15f3142d607bbc04b29b8973f0c8c08c8093339b75014907e106b3e8d190b8b",
+      "size_bytes": 2407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-provider-acceptance-01/pe.json",
+      "sha256": "d8aa9b931f4fdde2245281915162b87b9c26470333afb12f0f83178a193e2d2f",
+      "size_bytes": 15579
+    },
+    {
+      "path": ".runtime/porting/SRC-06/close-design-day-provider-Root-01.py",
+      "sha256": "3a91c1809643f77383ae212077e07a4be13cf79943b2e4987f9ae1be07caaaad",
+      "size_bytes": 9000
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/review.json",
+      "sha256": "8c0871203600d7e02e0e10ef47f87c734c31a590896d7e2da7aa0273f13a4059",
+      "size_bytes": 5007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-01/review.json",
+      "sha256": "aea29a07346d4cec4f7dd8d61d592a9571a23b3341baa7adf75bc5bb7846a368",
+      "size_bytes": 8312
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "b7a47c552c89b61f8078997a0d9a13dff0bd67fdb236c8e214f6c1b8e3633ef6",
+      "size_bytes": 17538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/sources/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "b7a47c552c89b61f8078997a0d9a13dff0bd67fdb236c8e214f6c1b8e3633ef6",
+      "size_bytes": 17538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/00.diff",
+      "sha256": "ecba6231de5d7e4e052fcb33bead36152a629b6d660d873555c7300143505c4f",
+      "size_bytes": 649
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/sources/crates/ep_runtime/src/weather_day/design_day_native_state_tests.rs",
+      "sha256": "5f08a30e6f094bf8dc91f467a427b9dc0b0637b3b9a19c87fd7d3b38048876e8",
+      "size_bytes": 11506
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_design_day_input_tests.rs",
+      "sha256": "31e231c5f14abadec40316aad63da2f6db0b1d698055efb683b87469dfdb5d31",
+      "size_bytes": 9294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/sources/crates/ep_run/src/ordinary_design_day_input_tests.rs",
+      "sha256": "31e231c5f14abadec40316aad63da2f6db0b1d698055efb683b87469dfdb5d31",
+      "size_bytes": 9294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-final-tests-review-02/02.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-design-day-qualified-comparison-Source-review-01/review.json",
+      "sha256": "b257a13a40d1666495471acee5b7f44c41c322af35990e26f79e6ce6126291dc",
+      "size_bytes": 972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-01/receipt.json",
+      "sha256": "ba6352370aeb80c51fb92635aa5b2fae514cb2364bbcd86655d2efd3cd77aa57",
+      "size_bytes": 5268
+    },
+    {
+      "path": ".runtime/porting/source-objects/be/be1c6503771dca4a2ceea43a36d8cc70ebc05dbe15523a82b3319fdb3e42cf38",
+      "sha256": "be1c6503771dca4a2ceea43a36d8cc70ebc05dbe15523a82b3319fdb3e42cf38",
+      "size_bytes": 1645143
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-01/stderr.log",
+      "sha256": "9a8f3f82da77cb60745a39a0a1a36239c9e6ab07486d8ec1466da9490d2ac000",
+      "size_bytes": 274
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-02/receipt.json",
+      "sha256": "212d9f6683e61800c53351db8641bcc7635af8f917772afb50b5ef630cb0dae3",
+      "size_bytes": 5280
+    },
+    {
+      "path": ".runtime/porting/source-objects/15/153bf46bef0ab21018d99c3be63b7756f88277a901ae63e583acce443590c070",
+      "sha256": "153bf46bef0ab21018d99c3be63b7756f88277a901ae63e583acce443590c070",
+      "size_bytes": 1645149
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-02/stderr.log",
+      "sha256": "15f822b3e741a4e648dc8953d31b566b5e29b0f38541cecb15d80deba4349e65",
+      "size_bytes": 654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-03/receipt.json",
+      "sha256": "2ba29ead22cd8ef9c69fa96ec802098e39d4cf07e9a74488bd1f16c48b8d03b6",
+      "size_bytes": 5280
+    },
+    {
+      "path": ".runtime/porting/source-objects/0e/0ebf1a0513e61af70f45ee524d99d2a18357b8a9d775e436d1d8de8bef55c04c",
+      "sha256": "0ebf1a0513e61af70f45ee524d99d2a18357b8a9d775e436d1d8de8bef55c04c",
+      "size_bytes": 1645150
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-03/stdout.log",
+      "sha256": "1df1e3c6f4999f4a5c90f44ea07eb6e7c5215e9cfdd77e5e8c187fd1ab7f6494",
+      "size_bytes": 357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-focused-03/stderr.log",
+      "sha256": "f1446adaf59e596f74c22a36464cd7f9e929d9dcb40eb05f17a115a654cf69de",
+      "size_bytes": 770
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-01/receipt.json",
+      "sha256": "05c71a2c7b66a1922f42418cab3b803faf92eaa02b3cbd37bf5b779b0e2c2142",
+      "size_bytes": 5294
+    },
+    {
+      "path": ".runtime/porting/source-objects/a0/a05c3be5e2ee29937034fa35fd5719521faf974dfdc596be21f7474c5b2f9a5c",
+      "sha256": "a05c3be5e2ee29937034fa35fd5719521faf974dfdc596be21f7474c5b2f9a5c",
+      "size_bytes": 1645151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-01/stdout.log",
+      "sha256": "1df1e3c6f4999f4a5c90f44ea07eb6e7c5215e9cfdd77e5e8c187fd1ab7f6494",
+      "size_bytes": 357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-01/stderr.log",
+      "sha256": "75c177ef524a322e0c87e35e4e9a5b96c93394f73e0fc738aab510cd08e21eb7",
+      "size_bytes": 326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-01/receipt.json",
+      "sha256": "e1a1889333ceb64915c8592730381312073c7eede42c6e3a09e08a83a933ba71",
+      "size_bytes": 5528
+    },
+    {
+      "path": ".runtime/porting/source-objects/65/65c745dd4eef47d75b1639d279241d4ab944cd279765d7f3eedbb904489f5a4a",
+      "sha256": "65c745dd4eef47d75b1639d279241d4ab944cd279765d7f3eedbb904489f5a4a",
+      "size_bytes": 1645502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-01/stderr.log",
+      "sha256": "ddf32db050acf1162dbac8a92f5c8bc3c85f677b17cb82474707a69aef84a7f0",
+      "size_bytes": 1239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fmt-check-02/receipt.json",
+      "sha256": "20e3d8a5eb89538db22b277a1bca8de0b2ce045a50938022508578afc7b91a4c",
+      "size_bytes": 5491
+    },
+    {
+      "path": ".runtime/porting/source-objects/48/481e55f10a8302f3b37d5451e0db700751ab9b1eae890af2320a1643056a2661",
+      "sha256": "481e55f10a8302f3b37d5451e0db700751ab9b1eae890af2320a1643056a2661",
+      "size_bytes": 1645502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fmt-check-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-fmt-check-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-source-quality-02/receipt.json",
+      "sha256": "f1635420dca53c4229a27f2b2a629352896c87834eb0346cb1de74bee3482ecd",
+      "size_bytes": 5543
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-source-quality-02/stdout.log",
+      "sha256": "db7145205e7faae5881b44a27df77aad0385e199896f1f6b8e8ea082c50ccc37",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-source-quality-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-02/receipt.json",
+      "sha256": "ef6dc40302023de594867110fef2276ad0881ab3c982de2c02712895db9ead2e",
+      "size_bytes": 5526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-clippy-02/stderr.log",
+      "sha256": "423c56a6bc2dc22ca2ef53795977d901bc5258d82a1c6744d425b55467871cb3",
+      "size_bytes": 167
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-workspace-01/receipt.json",
+      "sha256": "58f048769f8fd44f501e8c6e1452f53ef7b3f8c8693ec0457b5ce545b9cef928",
+      "size_bytes": 5474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-workspace-01/stdout.log",
+      "sha256": "058775369237820a4bf05ad82933529a5661f289dd6ea79f8a426425ecbe3952",
+      "size_bytes": 760892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-workspace-01/stderr.log",
+      "sha256": "c1d6683c9149fa64f051c64a87315083925f368b520f40bb5da0a730fbb94dc5",
+      "size_bytes": 1638
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-02/receipt.json",
+      "sha256": "fbe3d34d4cf4ba8ad00e59791506a085c8974c486e8d69947fd793e21c15dafc",
+      "size_bytes": 5524
+    },
+    {
+      "path": ".runtime/porting/source-objects/fc/fc52bb41b9eeb2d392fc649b8a47ffc4464d8c532715724da90decdf365664c2",
+      "sha256": "fc52bb41b9eeb2d392fc649b8a47ffc4464d8c532715724da90decdf365664c2",
+      "size_bytes": 1645502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-rust-bit-diagnostic-02/stdout.log",
+      "sha256": "843d8375a29ad52b0973047735bde2f2ef6818de15239ab28e9320a1c3b8125b",
+      "size_bytes": 357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-capture-command-01/stdout.log",
+      "sha256": "d865891b93ad1ae629d7f9540262e3edcd18eb02d20d65e0df630101764fd51f",
+      "size_bytes": 256
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-native-capture-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-comparison-policy-01.json",
+      "sha256": "5f5392164928b3fbe348248e15ca922028fcd0902774105a29a885e63e8bf206",
+      "size_bytes": 3646
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-design-day-weather-Root-02.py",
+      "sha256": "0961986dcc32ecdb2e045ed2ba72227b7646d5b4538bb838f45effe37c77b11c",
+      "size_bytes": 11406
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-design-day-weather-Root-01.py",
+      "sha256": "94371ade684747b63df54f707a28bcae571feee79ca845427a6999d1ebe78b36",
+      "size_bytes": 10443
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-publication-reference-audit-01.json",
+      "sha256": "bef819e34d053becac781bf03ccf3c49c66ffde8824dc60dd0e4b704a48dba03",
+      "size_bytes": 6501
+    },
+    {
+      "path": ".runtime/porting/SRC-06/audit-design-day-publication-refs-Root-01.py",
+      "sha256": "1de31f4783dd1707842f07d7365922bbbe2fdc87ffa9269c172b1e1b712b8ac6",
+      "size_bytes": 1511
+    },
+    {
+      "path": ".runtime/porting/SRC-06/write-design-day-comparison-policy-Root-01.py",
+      "sha256": "2a5f89aa4f9c5bc062fec5749fa955edb0c2cfb58e5e9d33a9adc14d879e6871",
+      "size_bytes": 1806
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/fixtures/ordinary_design_day_native.json",
+      "sha256": "98c6673bd0ac9557c35051b9b612c7a98729e2bd64fc7dbb0b568fe5ae784be2",
+      "size_bytes": 3509853
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-design-day-native-fixture-Root-01.py",
+      "sha256": "45314e65b8a151537ca59508ff2e720d7f7dd2bc594758a65e8c44029ce73a48",
+      "size_bytes": 828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-design-day-raw-regression-Root-01.py",
+      "sha256": "c5b78393c28961a4d1311d3b881f78f3367ced962fc451afaa3c5b9ebe91f5b4",
+      "size_bytes": 981
+    },
+    {
+      "path": ".runtime/porting/SRC-06/append-design-day-site-helper-Root-01.py",
+      "sha256": "e51b51e2f77bf195cc12b9b8b0c7581ade210da569deebc8e4c095b1e52acc7c",
+      "size_bytes": 774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-design-day-qualified-comparison-Root-01.py",
+      "sha256": "9a588bb57d79f53dd505fe34e901d80cc3673a9197fe43e70481fc787fcd124c",
+      "size_bytes": 1590
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "f603b618b76520ba29dfe34fd18ecef07c3b043169b1cf37b3d6d697d6599b06",
+      "size_bytes": 880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/.gitattributes.diff",
+      "sha256": "fcac4cfbfeeb11f06c2bcce10393556fe2dbd03582cf6589e5a855473fea4ab7",
+      "size_bytes": 426
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "77de325cfaaebc75404faba3cf156cfffa9e69d63496c95e83724cf4ca8f34a5",
+      "size_bytes": 13229
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/Cargo.lock.diff",
+      "sha256": "7eb7d62fdde7b782fc4779896728f023c5c7de18cae2bbde59760b6b0ddbc1ec",
+      "size_bytes": 9842
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_raw_model__src__idf_order.rs.diff",
+      "sha256": "c761a2c5ccb390a2869aa4ff09220b3de230f02cfda62857ba445dd60f2fef91",
+      "size_bytes": 1708
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__lib.rs.diff",
+      "sha256": "e2f535248bc26af53ffb4bd50cbe85356c33867788b9480bbaf782834ea31289",
+      "size_bytes": 225
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_design_day_input.rs.diff",
+      "sha256": "9065617505288c7cf942e6f567c857ab78cc466e2ebade31d0c91db18b61232f",
+      "size_bytes": 8670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_design_day_input_tests.rs.diff",
+      "sha256": "e15c856b14101170ffbfbf7f580387463c46caf48b3b5632dc15d547e25b308b",
+      "size_bytes": 9653
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "1e3e60923ce397b30730d6a689f3632e3806f43a71bdad1723a8ea1ed21bb553",
+      "size_bytes": 19906
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__ordinary_equipment_input.rs.diff",
+      "sha256": "9b63dc02dfd96872722d8c7bd8f87c4da30225aff864f03c2ee85c60f4fac41c",
+      "size_bytes": 449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_run__src__pipeline.rs.diff",
+      "sha256": "4531c754a5015f48cedbfe9c65be6dfc0ce37be77149d49b229fc0dbe1da394e",
+      "size_bytes": 826
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__Cargo.toml.diff",
+      "sha256": "aa48ac44b08a5374c9e734a92fa7249ef078bb619466d0e26eec5c0bceee2e5b",
+      "size_bytes": 276
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "3ef63e4335d70ff64cdbc6154eea5de332cd64a2e0eb113313d164cffe48ccfa",
+      "size_bytes": 12473
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "fc07b89afd39c53952cadd80053d614b6f55a0a14178ff8cb1aaa9ca2a07e6f4",
+      "size_bytes": 1482
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "886ee965f984da7ddf2ee58e55b781fb1a2fb3d6394db7bb36e641d15d8ff456",
+      "size_bytes": 18277
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__ctf_reports.rs.diff",
+      "sha256": "d862a4b75de65fe3631becef3b2f86e4765cc5a4ac922bf85dced1248b0ce995",
+      "size_bytes": 2247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "b1d8a576a80bd6f4d13dfe9c094c04510d3bef83b9b541145bd6214eebe692ab",
+      "size_bytes": 693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__configuration.rs.diff",
+      "sha256": "f66c89406c2698d3b8a8b1243b0c973f15327267ead3d6106462741c5710d41c",
+      "size_bytes": 1938
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__context.rs.diff",
+      "sha256": "bf98031f58d39233066eb967a927b312cbf70833f1d4e1779223c938523039a7",
+      "size_bytes": 2549
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "2d048835f37cc4cfd4f8b630c0401dc4d0911e5b2580d2727505e56e93d31f13",
+      "size_bytes": 15500
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__current.rs.diff",
+      "sha256": "8033d80328d57bfa444d6fc62dece4e7c63a682540ce89bf8adb7386c8afe025",
+      "size_bytes": 935
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71",
+      "size_bytes": 7772
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "a5969486bdfdd20c47d74122c9f7380a25a1823302e0041665e8f9e6eea20efa",
+      "size_bytes": 8099
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "657d660df02876b8a5bb1ed050bd5ea4faaca9db3840bee4586279b4b372efb3",
+      "size_bytes": 12326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "0302ba51d32147f927115f85c8c1eb76ccb39641cfb69bb9c31a223be5a13b02",
+      "size_bytes": 12758
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/reports.rs",
+      "sha256": "74edf8eb908eb7f3cdad27a5f099c050f1d946da5842d0a98846356031aa65d8",
+      "size_bytes": 3172
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__reports.rs.diff",
+      "sha256": "f386b16958eab99a7a438804fd93154c06e126e0e4120f8efdf4ff723f8adf25",
+      "size_bytes": 3400
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/solar.rs",
+      "sha256": "4ce786d1f281b56bc849267709873876e4601c51181cc6b6cc13f9482ee6f9b2",
+      "size_bytes": 4577
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day__solar.rs.diff",
+      "sha256": "bf0e7c75979e281bc8f2d6d326fa386d6763ccbb9463f7a5e35da5670e1c85c2",
+      "size_bytes": 4874
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day_native_state_tests.rs.diff",
+      "sha256": "0064a4e418d6a7df3119e1d59b5f605f73e66740f3ff6ca595809ab9b91283fe",
+      "size_bytes": 11994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "ceb984bee09f87be95bf1a9d9549ee168d434b34c1524c55790a5f22042c05f2",
+      "size_bytes": 18162
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+      "size_bytes": 22959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__lifecycle.rs.diff",
+      "sha256": "dbd8af35250e3316162e8f70da8b266ec8bf0b4d071ce27e033993aa7a5b8dcb",
+      "size_bytes": 2079
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+      "sha256": "7845332db6c52160405d753a5dde520ca2752810ace9cba0c2ca24b8197e43e2",
+      "size_bytes": 10817
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__lifecycle_tests.rs.diff",
+      "sha256": "b4276bbdceffa604f52fedb1f2e8b2d00964002e2e55cef1f67138b3c1489496",
+      "size_bytes": 528
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "b5b96d34e9404aef11a1c00cad31d8e0aa44bb124f8f8a6599438301ba7e4248",
+      "size_bytes": 1536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__mod.rs.diff",
+      "sha256": "db2bca0ed4218943f9f11290f24075ccfe0c5a3f7ac47d202d4aaabdf7768c1a",
+      "size_bytes": 993
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+      "size_bytes": 21027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__production.rs.diff",
+      "sha256": "eea69fb3f54f64f04da80294e85c3c256719321fbd132aa23894565dd48a1f2b",
+      "size_bytes": 3083
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production/setup.rs",
+      "sha256": "f879b3cf532aed6d48ecc93504a502708382ba59505462b58779afd654712f06",
+      "size_bytes": 13691
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__production__setup.rs.diff",
+      "sha256": "0bc0b8a2ab66e0daf5303e6a2441c4c74f41a71a40f99a3e14174365b71f72db",
+      "size_bytes": 14170
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+      "size_bytes": 18107
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-final-source-diffs-01/crates__ep_runtime__src__weather_day__tests.rs.diff",
+      "sha256": "23ea9bf23f36ccc3e6cebde88fc187781c60798241716258e46bc742e6e5def8",
+      "size_bytes": 1182
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-weather/evidence.zip",
+    "sha256": "f4c1657d3abc489288b7ef9c8a23d272b3e62e87bfde031568367f58fca2b3f8",
+    "size_bytes": 3688761
+  },
+  "archive_member_count": 356,
+  "external_historical_references_not_rehashed": [
+    {
+      "path": "crates/ep_run/src/ordinary_design_day_input.rs",
+      "sha256": "f659c3648b7b1f63e0c501ab95c2de1842a7c01904cba129d7e59e4bc5772d0f",
+      "size_bytes": 7573
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "dfa4e6948eb3023b2fdf083c2dc83b55028e5020d7754d2219f0411f92927d90",
+      "size_bytes": 15458
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "2858684a11009e599b584f1333290660c596b5bf784b3c4d1bebf3eac6dc86fe",
+      "size_bytes": 11004
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/reports.rs",
+      "sha256": "609935a8f9376e99036336c73b69342dd2732defafab5b96c65260bc7f03d637",
+      "size_bytes": 2797
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day/solar.rs",
+      "sha256": "c2c3000ba36799cc8886f0db58b640e5716cced2f21befc67032805d41e267ba",
+      "size_bytes": 3970
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "8159841e7ec104ae1d1eeb2beaf0f6736aaa9a1682caecfa2390cbfff1c2dcdf",
+      "size_bytes": 7510
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "fb454277a330a0692579e5e7f4d2cb8afc3a583c59779cee36185b60d4e0510f",
+      "size_bytes": 22865
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "db69f9a5b908b7512e914eb2bfc5b3905b557e94024d89cc147bef6bbfaf746f",
+      "size_bytes": 18062
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "bacc7a9884da76e41265fe9136499e4381ec426bbb3fa51494621943fb7fc694",
+      "size_bytes": 1536
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "13538b4e80e873281c0f909b01dc7edd1fb7509a8843ef0b0523ccda380b7126",
+      "size_bytes": 20934
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production/setup.rs",
+      "sha256": "5e147c1301549e814c4d326599d9a82ed4a58ccdc4809848abecc3397cb0dfb4",
+      "size_bytes": 13059
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "4ad828e3864805b168fd9126335df0450b8832352bf628db3a2497cf91c234c3",
+      "size_bytes": 12465
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "65c831321d3d6d0dab2aba78ef8157a4a1df8a5d0ace22386425cf5a9d4172d9",
+      "size_bytes": 18160
+    },
+    {
+      "path": ".runtime/ep261-gcc13-o0/compile_commands.json",
+      "sha256": "d4e70d866ddbfdbbd97d62769f20b07a16341b6a0d88dd1de7982ebf2a8f3305",
+      "size_bytes": 4172904,
+      "historical_only": true,
+      "reason": "Preparation database preceded actual six-TU target regeneration; actual build commands/closure are separately retained"
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "73afd89a7cd8f17391b6e3180c74a396968a96555007f55544b2d325458ea2cb",
+      "size_bytes": 19738
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-native-build-01/bin/ordinary_design_day_helper.exe",
+      "sha256": "332abb23280dfc5e1a78a76b99b94b9d9433de9c341916e3931123d60b5a8635",
+      "size_bytes": 1305674673
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-native-build-01/bin/ordinary_design_day_helper.exe",
+      "sha256": "332abb23280dfc5e1a78a76b99b94b9d9433de9c341916e3931123d60b5a8635",
+      "size_bytes": 1305674673
+    },
+    {
+      "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+      "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+      "size_bytes": 1832731010
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-native-build-01/bin/ordinary_design_day_helper.exe",
+      "sha256": "332abb23280dfc5e1a78a76b99b94b9d9433de9c341916e3931123d60b5a8635",
+      "size_bytes": 1305674673
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-native-capture-01/custody.json",
+      "sha256": "22117c1af2ef1463c67ed4dfdc8e27b2920440a4203f3f67715c1496cde8c62f",
+      "size_bytes": 25797
+    },
+    {
+      "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-design-day-native-capture-01\\A-24H.observation.json",
+      "sha256": "ca68e9fad0ff7c3fa95ec4cf7441ee69e1bfca9a42c25affb530a87db812a2c5",
+      "size_bytes": 37256469
+    }
+  ],
+  "reference_scope": "Finite listed Source/fixture/metadata only; large Native image/map/core/raw remain custody references",
+  "gates_updated": false
+}

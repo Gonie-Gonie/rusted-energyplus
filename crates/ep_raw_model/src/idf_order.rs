@@ -84,6 +84,12 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneProperty:LocalEnvironment",
         name_field_index: 0,
     },
+    // WeatherManager::GetDesignDayData calls getObjectItem in input order;
+    // ReverseDD remaps the first two owners only after this effective ordering.
+    IdfOrderTarget {
+        object_type: "SizingPeriod:DesignDay",
+        name_field_index: 0,
+    },
     // SurfaceGeometry::GetSurfaceData preserves IDF declaration order within
     // its Wall/Floor/Roof groups. Native epJSON keeps its own map order.
     IdfOrderTarget {
@@ -573,6 +579,10 @@ mod tests {
     "#;
 
     const SELECTED_SCHEDULE_EPJSON: &str = r#"{
+        "SizingPeriod:DesignDay": {
+            "A Design": {"month": 7},
+            "Z Design": {"month": 12}
+        },
         "ScheduleTypeLimits": {
             "A Type": {"lower_limit_value": 0, "upper_limit_value": 1},
             "Z Type": {"lower_limit_value": 0, "upper_limit_value": 1}
@@ -588,6 +598,8 @@ mod tests {
     }"#;
 
     const SELECTED_SCHEDULE_IDF: &str = r#"
+        SizingPeriod:DesignDay,z design,12;
+        SizingPeriod:DesignDay,a design,7;
         Schedule:Constant,z constant,Z Type,1;
         ScheduleTypeLimits,z type,0,1,Continuous,Dimensionless;
         Schedule:Compact,z compact,Z Type,Through:12/31,For:AllDays,Until:24:00,1;
@@ -634,6 +646,7 @@ mod tests {
         let direct = parse_epjson_str(SELECTED_SCHEDULE_EPJSON)?;
 
         for (object_type, earlier, later) in [
+            ("SizingPeriod:DesignDay", "Z Design", "A Design"),
             ("ScheduleTypeLimits", "Z Type", "A Type"),
             ("Schedule:Constant", "Z Constant", "A Constant"),
             ("Schedule:Compact", "Z Compact", "A Compact"),

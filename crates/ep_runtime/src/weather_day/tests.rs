@@ -130,6 +130,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             calendar_year_chr: "calendar-canary".into(),
         },
         environment: WeatherEnvironmentState {
+            previous_sol_rad_positive: true,
             current_weather: super::CurrentWeatherState {
                 out_dry_bulb_temp: -0.0,
                 out_dew_point_temp: real(304, 0),
@@ -190,6 +191,9 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             elevation: real(100, 5),
             std_baro_press: real(100, 6),
             environment_name: "environment-canary".into(),
+            current_month_day: "current-month-day-canary".into(),
+            environment_start_end: "environment-start-end-canary".into(),
+            run_period_environment: true,
             end_month_flag: true,
             end_year_flag: true,
         },
@@ -208,6 +212,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             get_branch_input_one_time_flag: false,
             get_environment_first_call: false,
             first_call: false,
+            print_design_day_header: true,
             water_mains_parameter_report: false,
             last_hour_set: true,
             weather_file_exists: true,

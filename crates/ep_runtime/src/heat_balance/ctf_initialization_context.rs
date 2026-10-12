@@ -21,6 +21,9 @@ use std::io::{self, Write};
 pub struct CtfInitializationReports {
     /// Genuine full registration state; repeated caller invocations append normally.
     pub registry: PredefinedRegistry,
+    /// True only after the selected Setup caller reached SetPredefinedTables215.
+    /// Legacy callers still register normally; this is not inferred from size.
+    pub setup_simulation_registry_prepared: bool,
     /// Full allocated predefined string-entry owner.
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.
@@ -183,6 +186,21 @@ impl CtfInitializationContext<'_> {
             self.backend.show_continue_error("No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your EnergyManagementSystem.")
                 .map_err(|error| CtfInitializationError::Postlude(CtfInitPostludeError::Backend(error)))?;
         }
+        Ok(())
+    }
+
+    /// Perform the real early SetPredefinedTables prefix for the selected weather host.
+    /// The success-only retained flag prevents only this route's later duplicate.
+    /// Legacy initialization keeps its established repeated registration behavior.
+    ///
+    /// # Errors
+    /// Returns the actual registry/backend failure with the completed prefix retained.
+    pub fn prepare_setup_weather_registry(
+        &mut self,
+        model: &TypedModel,
+    ) -> Result<(), CtfInitializationError> {
+        self.prepare_registry(model)?;
+        self.reports.setup_simulation_registry_prepared = true;
         Ok(())
     }
 

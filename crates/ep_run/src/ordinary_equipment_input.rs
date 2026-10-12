@@ -465,6 +465,11 @@ mod tests {
             resolve(&parse_epjson_str("{}")?).is_err(),
             "no inferred timing or geometry defaults"
         );
+        super::design_day_projection::verify_admitted_design_day_projection()?;
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "ordinary_design_day_input_tests.rs"]
+mod design_day_projection;

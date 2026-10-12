@@ -436,7 +436,7 @@ fmt, workspace Clippy(-D warnings), source-quality와 전체 테스트 1회가 �
 [119개 member의 ZIP](../evidence/SRC-06-ordinary-solar-initialization/evidence.zip)에 보존한다.
 
 실제 SetupSimulation kickoff는 기준 입력의 DesignDay2개도 방문한다.
-현재 없는 DesignDay 생산자, 실제 InitSurface 전체 suffix, 공유 firstTime,
+이 단계에서 미구현이던 DesignDay 생산자, 실제 InitSurface 전체 suffix, 공유 firstTime,
 radiant enclosure·ScriptF cache·반복 caller와 ordinary 활성화는 계속 포팅한다.
 SRC-06의 네 gate와 A14/54, B14/64는 변경하지 않는다.
 
@@ -469,3 +469,44 @@ illuminance는 이 단위의 구현 범위가 아니다. DesignDay의 site sched
 
 실제 SetupSimulation, 첫 DesignDay에서의 지연 초기화, InitSurface 전체 suffix와
 ordinary 반복 호출 연결은 계속 포팅한다. 모든 SRC-06 gate 및 A14/54, B14/64는 유지한다.
+
+## DesignDay 입력·기상 생산자와 실제 초기화 관측
+
+실제 IDF 선언 순서와 epJSON lexical 순서를 보존한 DesignDay 입력을 weather
+configuration으로 전달한다. REVERSEDD는 원본의 첫 문자 규칙으로 한 번 읽고
+첫 두 입력만 교환한다. SimulationControl의 여섯 입력 스위치는 kickoff와
+구분한다. 선택된 DefaultMultipliers, WetBulb/DewPoint, ASHRAEClearSky,
+ClarkAllen 경로에서 일일 계수와 96개 Today/Tomorrow 슬롯을 생산한다.
+현재 연도는 실제 초기화 시 로컬 시계에서 읽으며 fixture 연도로 대체하지 않는다.
+
+기상 subsystem의 초기화 API는 실제 첫 시간·반복 첫 시간·마지막 시간 호출을
+구분하고, 이중 호출에서 별도 EPW 행을 읽지 않는다. 실제 초기 registry와
+설계일별 여섯 보고 셀을 연결하며, 기존 ordinary caller의 registration은 유지한다.
+전체 SetupSimulation의 Exterior·HeatBalance·후속 비용/고장/curve 호출 완료는
+이 weather API만으로 주장하지 않는다.
+
+원본 엔진 1회 실행에서 관측한 110개 이벤트 중 DesignDay 두 개의 실제 호출
+6회와 전체 기상 배열·입력 getter·연도·보고 셀 12개를 추렸다. 독립 검토에서
+원본 이벤트와 fixture의 전체 선택 tree를 정확히 대조했다. 기존 테스트 두 개에
+raw 입력 순서/ReverseDD와 weather 초기화 비교를 넣고 테스트 수·binary는 늘리지 않았다.
+
+정수·플래그·배열 범위·보고서 문자열은 정확히 일치했다. 계산된 실수의 strict-bit
+진단은 실패했으며 원본 기록을 보존한다: 9종 값에서 최대 절대 차이
+2.2737367544323206e-13. 원인은 확정하지 않았다. 기존 PSY 계약이 있는 caller
+온도/습도비/엔탈피/밀도 평가와, 계약이 없어 미대조인 RH·sky·solar를 구분한다.
+새 허용오차를 만들어 strict-bit 실패를 PASS로 바꾸지 않는다. 중간 원본
+psychrometric 입력·cache는 이번 fixture에 없어 PSY 상태 동등성도 주장하지 않는다.
+
+[DesignDay 검증 범위와 제한](../evidence/SRC-06-ordinary-design-day-weather/summary.json),
+[실제 파일 색인](../evidence/SRC-06-ordinary-design-day-weather/manifest.json),
+[검증 기록 ZIP](../evidence/SRC-06-ordinary-design-day-weather/evidence.zip)에 구현,
+원본 관측 경로, 실패 진단과 QA를 보존한다. 전체 Setup/InitSurface와 ordinary
+활성화는 계속 구현 중이며 SRC-06 gate와 A14/54, B14/64는 변경하지 않는다.
+
+최종 Source `481e55f10a8302f3b37d5451e0db700751ab9b1eae890af2320a1643056a2661`에서 fmt, source-quality, workspace Clippy
+(-D warnings), 전체 테스트 1회가 통과했다: 18개 그룹, 4,974 passed,
+0 failed, 기존 ignored 2개. 기존 두 테스트 본문을 확장했고 test/binary 수는
+늘리지 않았다. scoped 회귀의 통과 범위는 배열 전달·소유자·명시된 exact 값과
+기존 PSY caller-output 계약으로 한정한다. RH·sky·solar 계산값 8종은
+UNPAIRED로 보고하며 수치 PASS 판정은 없다. 전체 원본 기상 비트 동등성의
+미확인 상태와 실패 진단을 유지한다.

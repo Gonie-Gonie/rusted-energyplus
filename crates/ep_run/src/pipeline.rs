@@ -3517,6 +3517,10 @@ fn prepare_runtime_inputs(
             let environment_inputs = crate::weather_solar_controls::capture_environment_inputs()?;
             configuration.solar_controls =
                 crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
+            if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+                let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
+                crate::ordinary_design_day_input::project(raw_model, &mut configuration, reverse)?;
+            }
             let weather_series = ProductionWeatherTimestepSeries::from_bytes(
                 std::fs::read(weather_path).map_err(|error| error.to_string())?,
                 configuration,

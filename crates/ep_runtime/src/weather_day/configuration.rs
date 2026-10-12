@@ -1,6 +1,6 @@
 //! Calendar and input controls supplied to the live weather reader.
 
-use super::{WeatherDayError, WeatherEnvironmentState};
+use super::{DesignDayInput, SetupSimulationControls, WeatherDayError, WeatherEnvironmentState};
 use crate::time_axis::{TimeAxis, TimePoint};
 use ep_model::{DayOfWeek, FirstHourInterpolationStartingValues, RunPeriod, SiteLocation};
 
@@ -29,7 +29,7 @@ impl WeatherSolarControls {
     }
 }
 
-/// Calendar metadata and input controls, containing no selected weather values.
+/// Calendar/input controls and the retained actual selected DesignDay producers.
 #[derive(Clone, Debug)]
 pub struct WeatherEnvironmentConfiguration {
     /// Weather-aware hourly axis, used only for caller clocks and date rules.
@@ -40,6 +40,12 @@ pub struct WeatherEnvironmentConfiguration {
     pub site: SiteLocation,
     /// Caller-prepared number of preceding design-day environments.
     pub design_day_count: i32,
+    /// Actual selected DesignDay owners in effective GetDesignDayData order.
+    pub design_days: Vec<DesignDayInput>,
+    /// Actual captured REVERSEDD switch, independent of the effective IDF order.
+    pub reverse_design_days: bool,
+    /// Actual six raw SimulationControl switches; legacy routes leave this unset.
+    pub setup_simulation_controls: Option<SetupSimulationControls>,
     /// Caller-prepared count of input-file special-day objects.
     pub input_special_day_count: i32,
     /// Explicitly resolved caller controls, copied before the first source read.
@@ -97,6 +103,9 @@ impl WeatherEnvironmentConfiguration {
             run_period: run_period.clone(),
             site: site.clone(),
             design_day_count,
+            design_days: Vec::new(),
+            reverse_design_days: false,
+            setup_simulation_controls: None,
             input_special_day_count,
             solar_controls: WeatherSolarControls::default(),
         })

@@ -163,24 +163,40 @@ impl PredefinedStringTable {
         Ok(())
     }
 
-    /// Selected real PreDefTableEntry with three decimal places and fixed notation.
-    /// Ordinary positive film coefficients bound this caller's U below 1e8.
-    /// Other formatting branches are explicitly unavailable, never approximated.
+    /// Real PreDefTableEntry selected fixed-notation branch, default precision 2.
+    pub(crate) fn fixed_real_entry_2(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: f64,
+    ) -> Result<(), CtfReportUnavailable> {
+        self.fixed_real_entry(column, object, value, 2)
+    }
+
+    /// Real PreDefTableEntry fixed-notation branch with explicit precision 3.
     pub(crate) fn fixed_real_entry_3(
         &mut self,
         column: i32,
         object: &str,
         value: f64,
     ) -> Result<(), CtfReportUnavailable> {
+        self.fixed_real_entry(column, object, value, 3)
+    }
+
+    fn fixed_real_entry(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: f64,
+        precision: i32,
+    ) -> Result<(), CtfReportUnavailable> {
         if !value.is_finite() || value.abs() >= 1e8 {
             return Err(CtfReportUnavailable::DecimalRepresentation);
         }
-        let mut text = formatting::fixed(value, 11, 3);
+        let mut text = formatting::fixed(value, 11, precision as usize);
         if text.len() > 12 {
             text = "  Too Big".to_string();
         }
-        // The shared string overload performs the exact increment/allocation and
-        // common charEntry/objectName/indexColumn writes without clearing tails.
         self.string_entry(column, object, &text)?;
         let index = usize::try_from(self.num_table_entry - 1)
             .map_err(|_| CtfReportUnavailable::TableOwner)?;
@@ -190,7 +206,7 @@ impl PredefinedStringTable {
             .and_then(|rows| rows.get_mut(index))
             .ok_or(CtfReportUnavailable::TableOwner)?;
         entry.original_real_entry = value;
-        entry.significant_digits = 3;
+        entry.significant_digits = precision;
         entry.original_entry_is_real = true;
         Ok(())
     }

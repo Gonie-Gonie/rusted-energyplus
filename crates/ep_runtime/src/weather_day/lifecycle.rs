@@ -140,6 +140,11 @@ impl WeatherSession {
             self.state.environment.cur_envir_num = 0;
             return Ok(false);
         }
+        self.admit_selected_run_period()
+    }
+
+    // Same real admitted getter body shared by legacy and Setup traversal.
+    pub(super) fn admit_selected_run_period(&mut self) -> Result<bool, WeatherDayError> {
         let first = self
             .configuration
             .day_point(1)
@@ -190,6 +195,9 @@ impl WeatherSession {
             ));
         }
         self.available = true;
+        if self.state.global.do_weath_sim {
+            self.state.environment.run_period_environment = true;
+        }
         let leap = self.state.weather.leap_year_add;
         let ok = header.data_periods.values.iter().any(|period| {
             let start = ordinal(period.start_month, period.start_day, leap);
@@ -207,6 +215,17 @@ impl WeatherSession {
             return Err(WeatherDayError::source_fatal(
                 "run period outside weather DATA PERIODS",
             ));
+        }
+        if self.state.global.do_weath_sim {
+            self.state.environment.environment_start_end = format!(
+                "{:02}/{:02}/{} - {:02}/{:02}/{}",
+                self.configuration.run_period.begin_month,
+                self.configuration.run_period.begin_day_of_month,
+                first.year,
+                self.configuration.run_period.end_month,
+                self.configuration.run_period.end_day_of_month,
+                last.year
+            );
         }
         self.state.environment.run_period_start_day_of_week = weekday_index(first.day_of_week);
         self.state.weather.cur_sim_day_for_end_of_run_period =
@@ -309,7 +328,7 @@ impl WeatherSession {
         Ok(())
     }
 
-    fn initialize_missing_values(&mut self) {
+    pub(super) fn initialize_missing_values(&mut self) {
         let missing = &mut self.state.missing_values;
         missing.base.out_baro_press = self.state.environment.std_baro_press;
         missing.base.out_dry_bulb_temp = 6.0;

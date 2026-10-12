@@ -6,6 +6,7 @@
 
 mod configuration;
 mod current;
+mod design_day;
 mod error;
 pub mod handoff;
 mod hourly;
@@ -20,12 +21,14 @@ pub mod state;
 
 pub use configuration::WeatherSolarControls;
 pub use current::CurrentWeatherState;
+pub use design_day::{DesignDayHumidity, DesignDayInput, DesignDayParameters};
 pub use error::WeatherDayError;
 pub use handoff::update_weather_data;
 pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession};
 pub use production::{
     ProductionCtfHistoryClock, ProductionSolarMetadata, ProductionWarmupReportContext,
-    ProductionWeatherContext, ProductionWeatherTimestepSeries, WeatherDayPhase,
+    ProductionWeatherContext, ProductionWeatherTimestepSeries, SetupSimulationCall,
+    SetupSimulationControls, SetupSimulationRole, WeatherDayPhase,
 };
 pub use sky::{WeatherSky, default_clark_allen_sky_emissivity, default_weather_file_sky};
 pub use state::{

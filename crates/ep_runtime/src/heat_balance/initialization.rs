@@ -193,7 +193,10 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             .collect::<Result<Vec<_>, _>>()?
     };
     let mut construction_thermal_data = if let Some(actual) = initialization.as_deref_mut() {
-        actual.prepare_registry(&model.typed)?;
+        if !actual.reports.setup_simulation_registry_prepared {
+            // Legacy/None routes retain genuine repeated registration.
+            actual.prepare_registry(&model.typed)?;
+        }
         crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
             &model.typed,
             &actual.reports.registry,

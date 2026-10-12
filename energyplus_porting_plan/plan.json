@@ -12551,6 +12551,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-current-solar/summary.json",
         "sha256": "9a8a063c1f9fcd9dffaa7dd604cb9e6d270363f503a51de19eda2211d734fd14",
         "size_bytes": 7489
+      },
+      "actual_selected_design_day_weather": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-weather/summary.json",
+        "sha256": "9840b77c6a98315b5e25aa79aa59f693186f62b7ab931acb6e1dd08972b8e371",
+        "size_bytes": 8414
       }
     },
     {

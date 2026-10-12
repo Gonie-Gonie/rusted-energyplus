@@ -9,7 +9,10 @@ use super::{
 };
 use crate::weather::{EpwRecord, WeatherTimestepSample};
 use ep_model::FirstHourInterpolationStartingValues;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
+
+mod setup;
+pub use setup::{SetupSimulationCall, SetupSimulationControls, SetupSimulationRole};
 
 /// Explicit caller phase; repeated warmup days retain independent call identities.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -114,7 +117,7 @@ pub struct ProductionWarmupReportContext {
     pub time_step: i32,
     /// Actual TimeStepsInHour allocation input.
     pub time_steps_in_hour: i32,
-    /// WeatherManager's literal KindOfSim == RunPeriodWeather result.
+    /// Actual retained RunPeriodEnvironment after the selected getter branch.
     pub run_period_environment: bool,
     /// Actual admitted environment owner.
     pub environment_name: String,
@@ -127,6 +130,11 @@ pub struct ProductionWarmupReportContext {
 #[derive(Debug)]
 pub struct ProductionWeatherTimestepSeries {
     session: RefCell<WeatherSession>,
+    // Separate real kickoff lifecycle; the ordinary phase/duplicate guard is unchanged.
+    setup_started: Cell<bool>,
+    setup_completed: Cell<bool>,
+    // Actual first ReadUserWeatherInput/GetDesignDayData report suffix only.
+    setup_design_day_reports_registered: Cell<bool>,
     prepared_phase: RefCell<Option<WeatherDayPhase>>,
     current_phase: RefCell<Option<WeatherDayPhase>>,
     last_consumed: RefCell<Option<(usize, u32)>>,
@@ -142,6 +150,9 @@ impl ProductionWeatherTimestepSeries {
     ) -> Result<Self, WeatherDayError> {
         Ok(Self {
             session: RefCell::new(WeatherSession::new(bytes, configuration)?),
+            setup_started: Cell::new(false),
+            setup_completed: Cell::new(false),
+            setup_design_day_reports_registered: Cell::new(false),
             prepared_phase: RefCell::new(None),
             current_phase: RefCell::new(None),
             last_consumed: RefCell::new(None),
@@ -161,6 +172,10 @@ impl ProductionWeatherTimestepSeries {
         self.admit_phase(phase)?;
         let mut session = self.session.borrow_mut();
         session.set_phase(phase, true);
+        if self.setup_completed.get() {
+            // RunSimulation does not restore BeginSim after actual kickoff.
+            session.state.global.begin_sim_flag = false;
+        }
         session.get_next_environment()?;
         session.initialize_weather()?;
         *self.prepared_phase.borrow_mut() = Some(phase);
@@ -460,7 +475,7 @@ impl ProductionWeatherTimestepSeries {
             hour: global.hour_of_day,
             time_step: global.time_step,
             time_steps_in_hour: global.time_steps_in_hour,
-            run_period_environment: global.kind_of_sim == 3,
+            run_period_environment: session.state.environment.run_period_environment,
             environment_name: session.state.environment.environment_name.clone(),
         })
     }
@@ -471,3 +486,7 @@ impl ProductionWeatherTimestepSeries {
         super::production_trace::WeatherSessionSnapshot::from_session(&self.session.borrow())
     }
 }
+
+#[cfg(test)]
+#[path = "design_day_native_tests.rs"]
+pub(super) mod design_day_native_tests;

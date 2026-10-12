@@ -112,6 +112,8 @@ impl Default for WeatherGlobalState {
 pub struct WeatherEnvironmentState {
     /// Selected mutable environment after SetCurrentWeather.
     pub current_weather: CurrentWeatherState,
+    /// Actual InitSolarHeatGains environment owner (DataEnvironment.hh148).
+    pub previous_sol_rad_positive: bool,
     /// Source warning switch controlling hourly solar counts and negative sentinels.
     pub display_weather_missing_data_warnings: bool,
     /// Source override to suppress all hourly solar.
@@ -176,6 +178,12 @@ pub struct WeatherEnvironmentState {
     pub std_baro_press: f64,
     /// Source environment name.
     pub environment_name: String,
+    /// Actual CurMnDy formatting owner, written by DD setup and current weather.
+    pub current_month_day: String,
+    /// Actual EnvironmentStartEnd adaptive-report formatting carrier.
+    pub environment_start_end: String,
+    /// Actual retained RunPeriodEnvironment, assigned by the environment getter.
+    pub run_period_environment: bool,
     /// Source end-month flag.
     pub end_month_flag: bool,
     /// Source end-year flag.
@@ -186,6 +194,7 @@ impl Default for WeatherEnvironmentState {
     fn default() -> Self {
         Self {
             current_weather: CurrentWeatherState::default(),
+            previous_sol_rad_positive: false,
             display_weather_missing_data_warnings: false,
             ignore_solar_radiation: false,
             ignore_beam_radiation: false,
@@ -218,6 +227,9 @@ impl Default for WeatherEnvironmentState {
             elevation: 0.0,
             std_baro_press: 101325.0,
             environment_name: String::new(),
+            current_month_day: String::new(),
+            environment_start_end: String::new(),
+            run_period_environment: false,
             end_month_flag: false,
             end_year_flag: false,
         }
@@ -271,6 +283,8 @@ pub struct WeatherOwnerState {
     pub get_environment_first_call: bool,
     /// Native first weather-manager call flag.
     pub first_call: bool,
+    /// Actual PrintDDHeader constructor and BeginSim SetUpDesignDay owner.
+    pub print_design_day_header: bool,
     /// Native water-mains reporting flag.
     pub water_mains_parameter_report: bool,
     /// Whether the first-hour cache has been seeded.
@@ -344,6 +358,7 @@ impl Default for WeatherOwnerState {
             get_branch_input_one_time_flag: true,
             get_environment_first_call: true,
             first_call: true,
+            print_design_day_header: true,
             water_mains_parameter_report: true,
             last_hour_set: false,
             weather_file_exists: false,
