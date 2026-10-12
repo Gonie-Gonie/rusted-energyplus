@@ -1,0 +1,2289 @@
+{
+  "schema": "src06-finite-inside-tmp-evidence-manifest.v1",
+  "summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-tmp/summary.json",
+    "sha256": "15269955100effb10aa1318cc3307ed70ba4b54edca7032e1bbde2b80165b931",
+    "size_bytes": 3116
+  },
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-tmp/evidence.zip",
+    "sha256": "1b4011a2da3957bdc8621e5b67d319064703f2d845f1b0af66e2c534f4a624fd",
+    "size_bytes": 12949562
+  },
+  "selected_artifact_count": 205,
+  "deduplicated_members": 189,
+  "uncompressed_bytes": 30783060,
+  "artifacts": [
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/review.json",
+        "sha256": "0c485eff914c0def87199b8a31e6a090d81c2af2c22b440fd8c77926964572ba",
+        "size_bytes": 34995
+      },
+      "roles": [
+        "Native_facts"
+      ],
+      "archive_member": "objects/0c/0c485eff914c0def87199b8a31e6a090d81c2af2c22b440fd8c77926964572ba"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-command-01/receipt.json",
+        "sha256": "7e9fe320b85e1fb3e2256cf82431455298ca306bd36238ecf33876334f4b6897",
+        "size_bytes": 3194
+      },
+      "roles": [
+        "Native_factual_command",
+        "Native_factual_command"
+      ],
+      "archive_member": "objects/7e/7e9fe320b85e1fb3e2256cf82431455298ca306bd36238ecf33876334f4b6897"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/custody.json",
+        "sha256": "3675b32e742d53174a501acaed3ccfae7293e16cc5fae559cf2f79dcea9b6d49",
+        "size_bytes": 15909
+      },
+      "roles": [
+        "Native_capture_custody"
+      ],
+      "archive_member": "objects/36/3675b32e742d53174a501acaed3ccfae7293e16cc5fae559cf2f79dcea9b6d49"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-capture-command-01/receipt.json",
+        "sha256": "bdb9d32c7af3719ec04899cc21416ecd9937517390894c543454a2c94d0c0f8e",
+        "size_bytes": 3099
+      },
+      "roles": [
+        "Native_capture_command",
+        "Native_capture_command"
+      ],
+      "archive_member": "objects/bd/bdb9d32c7af3719ec04899cc21416ecd9937517390894c543454a2c94d0c0f8e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/native-build.json",
+        "sha256": "eca7721c184a71954247b68e39f92e62108b96cb8089d3e4e589341c3ddb1da8",
+        "size_bytes": 105449
+      },
+      "roles": [
+        "Native_build"
+      ],
+      "archive_member": "objects/ec/eca7721c184a71954247b68e39f92e62108b96cb8089d3e4e589341c3ddb1da8"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-archive-01/receipt.json",
+        "sha256": "04287981a77f24fed82aa3eeead703bdd28746678183a94a7520fdabee68a2a4",
+        "size_bytes": 2089
+      },
+      "roles": [
+        "Native_compression"
+      ],
+      "archive_member": "objects/04/04287981a77f24fed82aa3eeead703bdd28746678183a94a7520fdabee68a2a4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/manifest.json",
+        "sha256": "56a1f41b1edf5162564416c51b1019aeea4f7c9fda10c68c528956938cd02d7d",
+        "size_bytes": 11080
+      },
+      "roles": [
+        "Rust_preparation"
+      ],
+      "archive_member": "objects/56/56a1f41b1edf5162564416c51b1019aeea4f7c9fda10c68c528956938cd02d7d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-application-01/application.json",
+        "sha256": "c3798e0e7eafce4bd44102abf47f829055d2953fe874b985b276f2fb61fa1bcd",
+        "size_bytes": 2925
+      },
+      "roles": [
+        "Rust_application"
+      ],
+      "archive_member": "objects/c3/c3798e0e7eafce4bd44102abf47f829055d2953fe874b985b276f2fb61fa1bcd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-format-command-01/receipt.json",
+        "sha256": "fef3571157c0be32769286482364948cb439f824fd7269e91fc7748d09bf49a3",
+        "size_bytes": 3699
+      },
+      "roles": [
+        "formatter_command",
+        "formatter_command"
+      ],
+      "archive_member": "objects/fe/fef3571157c0be32769286482364948cb439f824fd7269e91fc7748d09bf49a3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-fmt-check-command-01/receipt.json",
+        "sha256": "4bd0f56d7846b45bd053905304ce1bedb2661f09819b1d5482d8a52391405d04",
+        "size_bytes": 3728
+      },
+      "roles": [
+        "QA_fmt",
+        "QA_fmt"
+      ],
+      "archive_member": "objects/4b/4bd0f56d7846b45bd053905304ce1bedb2661f09819b1d5482d8a52391405d04"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-clippy-command-01/receipt.json",
+        "sha256": "2a1337b699027c0bab3d66cc529be034b37591a87f348bce2edb7d3c56dc0cb4",
+        "size_bytes": 3780
+      },
+      "roles": [
+        "QA_clippy",
+        "QA_clippy"
+      ],
+      "archive_member": "objects/2a/2a1337b699027c0bab3d66cc529be034b37591a87f348bce2edb7d3c56dc0cb4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-workspace-command-01/receipt.json",
+        "sha256": "cc7044c6cfe5f0276d42cae1f03d3d610ad00168473930765686b76f22e86281",
+        "size_bytes": 3752
+      },
+      "roles": [
+        "QA_workspace",
+        "QA_workspace"
+      ],
+      "archive_member": "objects/cc/cc7044c6cfe5f0276d42cae1f03d3d610ad00168473930765686b76f22e86281"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-focused-command-01/receipt.json",
+        "sha256": "03ae9dc09970e89614ee1aa091bf79d0d938ba01904948d74067b957229a178c",
+        "size_bytes": 3824
+      },
+      "roles": [
+        "QA_focused",
+        "QA_focused"
+      ],
+      "archive_member": "objects/03/03ae9dc09970e89614ee1aa091bf79d0d938ba01904948d74067b957229a178c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-source-quality-command-01/receipt.json",
+        "sha256": "3e3ac3c0e4ac2702a2fe31de03e12ee3a16f0e801a5e8d54f4cd4e152d8fe1ec",
+        "size_bytes": 3777
+      },
+      "roles": [
+        "QA_source_quality",
+        "QA_source_quality"
+      ],
+      "archive_member": "objects/3e/3e3ac3c0e4ac2702a2fe31de03e12ee3a16f0e801a5e8d54f4cd4e152d8fe1ec"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/manifest.json",
+        "sha256": "0c5bede0eaa98c8792701ecc885da23517cfba3a90df68651b8b9e10afb0f92f",
+        "size_bytes": 10755
+      },
+      "roles": [
+        "Rust_replay_preparation"
+      ],
+      "archive_member": "objects/0c/0c5bede0eaa98c8792701ecc885da23517cfba3a90df68651b8b9e10afb0f92f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Owner-ordinary-inside-tmp-replay-Source-review-01/review.json",
+        "sha256": "dcb8849f1da7cb3ec35a41335730ed1b352c996dbec9a9aa6a20b4c4517cbaea",
+        "size_bytes": 1985
+      },
+      "roles": [
+        "Rust_replay_review"
+      ],
+      "archive_member": "objects/dc/dcb8849f1da7cb3ec35a41335730ed1b352c996dbec9a9aa6a20b4c4517cbaea"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-application-01/application.json",
+        "sha256": "0dc5ecbd491ae6bf44b572979c79b48c444fd1608ae5415acf5edc95d381d8ad",
+        "size_bytes": 2313
+      },
+      "roles": [
+        "Rust_replay_application"
+      ],
+      "archive_member": "objects/0d/0dc5ecbd491ae6bf44b572979c79b48c444fd1608ae5415acf5edc95d381d8ad"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_readiness_tmp_selected_cases.json",
+        "sha256": "24d8e59b12a976e962f9cfc72fc1c3e694057c2b8257b51638e937aeb96a275d",
+        "size_bytes": 517298
+      },
+      "roles": [
+        "Rust_replay_fixture",
+        "actual_Rust_replay_fixture"
+      ],
+      "archive_member": "objects/24/24d8e59b12a976e962f9cfc72fc1c3e694057c2b8257b51638e937aeb96a275d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/selected-cases.json",
+        "sha256": "b5d13ffe85c1695d805ba2492537b5f4443c3461313806e91187f64a577310dd",
+        "size_bytes": 3384982
+      },
+      "roles": [
+        "Native_selected_fixture"
+      ],
+      "archive_member": "objects/b5/b5d13ffe85c1695d805ba2492537b5f4443c3461313806e91187f64a577310dd"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-archive-01/A-24H.observation.json.gz",
+        "sha256": "60e9abf65fc45acac559c6027e4f465ff7459b008487311b39de421acc4165a7",
+        "size_bytes": 18794273
+      },
+      "roles": [
+        "Native_complete_compressed_capture"
+      ],
+      "archive_member": "objects/60/60e9abf65fc45acac559c6027e4f465ff7459b008487311b39de421acc4165a7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-command-01/stdout.log",
+        "sha256": "44244eb9d6269224c943c54c5f6510e44e385ed08affe58f57726abcfb63dd9c",
+        "size_bytes": 596
+      },
+      "roles": [
+        "Native_factual_command_stdout"
+      ],
+      "archive_member": "objects/44/44244eb9d6269224c943c54c5f6510e44e385ed08affe58f57726abcfb63dd9c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_factual_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-capture-command-01/stdout.log",
+        "sha256": "d088f2ddf83ff7bf91dd4ad8c0bddfa9ed606bffbdb7e427fa4544a66c915396",
+        "size_bytes": 255
+      },
+      "roles": [
+        "Native_capture_command_stdout"
+      ],
+      "archive_member": "objects/d0/d088f2ddf83ff7bf91dd4ad8c0bddfa9ed606bffbdb7e427fa4544a66c915396"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-capture-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_capture_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "formatter_command_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "formatter_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-fmt-check-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_fmt_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-fmt-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_fmt_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-clippy-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_clippy_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-clippy-command-01/stderr.log",
+        "sha256": "2adb8a3508b7569ca5de1bc1e0a4b047ab23e08217078a8cc97861d8513ce8e2",
+        "size_bytes": 363
+      },
+      "roles": [
+        "QA_clippy_stderr"
+      ],
+      "archive_member": "objects/2a/2adb8a3508b7569ca5de1bc1e0a4b047ab23e08217078a8cc97861d8513ce8e2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-workspace-command-01/stdout.log",
+        "sha256": "f7ca48318253505609d0c8812800fc71faf6fe354768a4474b49874619722fad",
+        "size_bytes": 765343
+      },
+      "roles": [
+        "QA_workspace_stdout"
+      ],
+      "archive_member": "objects/f7/f7ca48318253505609d0c8812800fc71faf6fe354768a4474b49874619722fad"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-workspace-command-01/stderr.log",
+        "sha256": "025d17e675d6ff1972e977b8b86aeeb1e7ddf7dfced524323492680584e1c1fb",
+        "size_bytes": 1420
+      },
+      "roles": [
+        "QA_workspace_stderr"
+      ],
+      "archive_member": "objects/02/025d17e675d6ff1972e977b8b86aeeb1e7ddf7dfced524323492680584e1c1fb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-focused-command-01/stdout.log",
+        "sha256": "a0f0aa37b8eb0a63802770c67a4610b84c5e1ea6291d864c52d781ddde9f40d0",
+        "size_bytes": 4616
+      },
+      "roles": [
+        "QA_focused_stdout"
+      ],
+      "archive_member": "objects/a0/a0f0aa37b8eb0a63802770c67a4610b84c5e1ea6291d864c52d781ddde9f40d0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-focused-command-01/stderr.log",
+        "sha256": "6df842836c9ed600f7ae55cd865ae1d5f5d2a24f43f078250a498aa32699fff6",
+        "size_bytes": 254
+      },
+      "roles": [
+        "QA_focused_stderr"
+      ],
+      "archive_member": "objects/6d/6df842836c9ed600f7ae55cd865ae1d5f5d2a24f43f078250a498aa32699fff6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-source-quality-command-01/stdout.log",
+        "sha256": "4632fcbb61c0132efab7285f7ae7905fe3530ad8b06c71e3c308db5194dfa2c0",
+        "size_bytes": 82
+      },
+      "roles": [
+        "QA_source_quality_stdout"
+      ],
+      "archive_member": "objects/46/4632fcbb61c0132efab7285f7ae7905fe3530ad8b06c71e3c308db5194dfa2c0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-source-quality-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_source_quality_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/configure-command-01/receipt.json",
+        "sha256": "d0050b791647c20e2e2b89436638e2002df8458445ed9b6a064708a62f6942ca",
+        "size_bytes": 3468
+      },
+      "roles": [
+        "actual_Native_configure"
+      ],
+      "archive_member": "objects/d0/d0050b791647c20e2e2b89436638e2002df8458445ed9b6a064708a62f6942ca"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/configure-command-01/stdout.log",
+        "sha256": "31060a8385f808d6f061737e723967895cb586548e10ea5d985721f6cdf60672",
+        "size_bytes": 743
+      },
+      "roles": [
+        "actual_Native_configure_stdout"
+      ],
+      "archive_member": "objects/31/31060a8385f808d6f061737e723967895cb586548e10ea5d985721f6cdf60672"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/configure-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_configure_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/dry-run-command-01/receipt.json",
+        "sha256": "baf5aea20a9c00841a7e7e77a0f9907085850bc6184138c0739366dd1547d8e5",
+        "size_bytes": 2912
+      },
+      "roles": [
+        "actual_Native_dry_run"
+      ],
+      "archive_member": "objects/ba/baf5aea20a9c00841a7e7e77a0f9907085850bc6184138c0739366dd1547d8e5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/dry-run-command-01/stdout.log",
+        "sha256": "72b2b96bbf21ac3bfada505463efb2a3e29b803aa6704f0d6d5abab704ad8e16",
+        "size_bytes": 79785
+      },
+      "roles": [
+        "actual_Native_dry_run_stdout"
+      ],
+      "archive_member": "objects/72/72b2b96bbf21ac3bfada505463efb2a3e29b803aa6704f0d6d5abab704ad8e16"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/dry-run-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_dry_run_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/compile-command-01/receipt.json",
+        "sha256": "dd325d04d53b1a3f6270f4fce80a2bc6f5c696a3170c2ae53b20589fa3f90f1f",
+        "size_bytes": 2989
+      },
+      "roles": [
+        "actual_Native_compile"
+      ],
+      "archive_member": "objects/dd/dd325d04d53b1a3f6270f4fce80a2bc6f5c696a3170c2ae53b20589fa3f90f1f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/compile-command-01/stdout.log",
+        "sha256": "fb4c3741db25cac3187d7a4dfecec79b09987d56280bd9f79d5dfe7a13f38642",
+        "size_bytes": 79937
+      },
+      "roles": [
+        "actual_Native_compile_stdout"
+      ],
+      "archive_member": "objects/fb/fb4c3741db25cac3187d7a4dfecec79b09987d56280bd9f79d5dfe7a13f38642"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-02/compile-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_compile_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/manifest.json",
+        "sha256": "d24e0d8c8d36a38918598d02ff233a41231750454d49c8a67e925e3ea3ec2ad3",
+        "size_bytes": 21403
+      },
+      "roles": [
+        "Native_Source_manifest"
+      ],
+      "archive_member": "objects/d2/d24e0d8c8d36a38918598d02ff233a41231750454d49c8a67e925e3ea3ec2ad3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-environment-02/frozen-environment.json",
+        "sha256": "46e23f75cf27a0213474147ea27d0e36ab91fbdd5f38296732993680cb49fa8d",
+        "size_bytes": 54196
+      },
+      "roles": [
+        "actual_frozen_environment"
+      ],
+      "archive_member": "objects/46/46e23f75cf27a0213474147ea27d0e36ab91fbdd5f38296732993680cb49fa8d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/18/181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/surface_consumer_observer.hh",
+        "sha256": "4316dba4f2b53198e7e3c5ad212dca9c6b3b419df1eab1eef4c73cb2bcac88b1",
+        "size_bytes": 2981
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/43/4316dba4f2b53198e7e3c5ad212dca9c6b3b419df1eab1eef4c73cb2bcac88b1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/surface_consumer_observer.cc",
+        "sha256": "88ca8b2f8ef9c48b3463d6b21203a8744a7869e482852fdd88773d16061f6032",
+        "size_bytes": 15818
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/88/88ca8b2f8ef9c48b3463d6b21203a8744a7869e482852fdd88773d16061f6032"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/readiness_helpers.inc",
+        "sha256": "7e0e02932a7f3ec179dbcdc0c652cb8fec47f4bd09b7bb9d93802bbcbd7f843c",
+        "size_bytes": 9471
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/7e/7e0e02932a7f3ec179dbcdc0c652cb8fec47f4bd09b7bb9d93802bbcbd7f843c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/record_readiness.inc",
+        "sha256": "54c5d0f17000adfeabad0471edc11b0c00c1b2ef4f465bea5d8ba83739030441",
+        "size_bytes": 3424
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/54/54c5d0f17000adfeabad0471edc11b0c00c1b2ef4f465bea5d8ba83739030441"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/ordinary_readiness_reference.cmake",
+        "sha256": "94d42b2a54aa13c385696f3436dd23dfb855966014df3990856c2e470dc25c74",
+        "size_bytes": 3039
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/94/94d42b2a54aa13c385696f3436dd23dfb855966014df3990856c2e470dc25c74"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "5cc662c56f6e1b810fa4ff670574fff918385dfdfe3f5687725e32fc1c4c9bbc",
+        "size_bytes": 704620
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/5c/5cc662c56f6e1b810fa4ff670574fff918385dfdfe3f5687725e32fc1c4c9bbc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/ZoneTempPredictorCorrector.surface_consumer.cc",
+        "sha256": "3e38329c0741957755f0dab6a6705caee999d443279b8a0e8ad60402bb8ead75",
+        "size_bytes": 406611
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/3e/3e38329c0741957755f0dab6a6705caee999d443279b8a0e8ad60402bb8ead75"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/HVACManager.surface_consumer.cc",
+        "sha256": "9103a5d68bd30036003e60404310189d37cd8720bb025214ec46cee6bc270a57",
+        "size_bytes": 204930
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/91/9103a5d68bd30036003e60404310189d37cd8720bb025214ec46cee6bc270a57"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/ConvectionCoefficients.surface_consumer.cc",
+        "sha256": "7889af1a67cffbd402f4cbe662636d89daee377c5b80272cdf06d41be31981d8",
+        "size_bytes": 344270
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/78/7889af1a67cffbd402f4cbe662636d89daee377c5b80272cdf06d41be31981d8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/ZoneEquipmentManager.surface_consumer.cc",
+        "sha256": "b7f7c5c4f8737d7ae70609a67acffc66324618436515a7fd9a175f086dd37b11",
+        "size_bytes": 433551
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/b7/b7f7c5c4f8737d7ae70609a67acffc66324618436515a7fd9a175f086dd37b11"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/DataZoneEquipment.surface_consumer.cc",
+        "sha256": "247b0387176e874c2d7942a637a5e7c5a4fbf18aac3484f892e5354f6a3ec675",
+        "size_bytes": 146067
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/24/247b0387176e874c2d7942a637a5e7c5a4fbf18aac3484f892e5354f6a3ec675"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/SystemAvailabilityManager.surface_consumer.cc",
+        "sha256": "e0b1499eb8d8ff4084b012d8cf50b99fff91e2a0a2569f44d5af0b044aca4d3e",
+        "size_bytes": 291295
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/e0/e0b1499eb8d8ff4084b012d8cf50b99fff91e2a0a2569f44d5af0b044aca4d3e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/NodeInputManager.surface_consumer.cc",
+        "sha256": "2901bd7e7bac874ea91e43a5a796067a75368725adc9d3d5be14bff339bd0e51",
+        "size_bytes": 72514
+      },
+      "roles": [
+        "Native_derived_observer_Source"
+      ],
+      "archive_member": "objects/29/2901bd7e7bac874ea91e43a5a796067a75368725adc9d3d5be14bff339bd0e51"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/HeatBalanceSurfaceManager.cc.Original.diff",
+        "sha256": "37eee2d303c91c2a4f1d5749c3a1974bea419c1b380e7603461bcf94c17c2bc2",
+        "size_bytes": 12720
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/37/37eee2d303c91c2a4f1d5749c3a1974bea419c1b380e7603461bcf94c17c2bc2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/ZoneTempPredictorCorrector.cc.Original.diff",
+        "sha256": "97fd97fb5a0e84badcbeb9d2e49cfa6b2da64c6471e0a9b9bae7464cc7355f18",
+        "size_bytes": 4353
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/97/97fd97fb5a0e84badcbeb9d2e49cfa6b2da64c6471e0a9b9bae7464cc7355f18"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/HVACManager.cc.Original.diff",
+        "sha256": "ab39bf591409e4c76c27f138be6053cb1d34b33bbe8f2a6222a6bd91f5a47b06",
+        "size_bytes": 10951
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/ab/ab39bf591409e4c76c27f138be6053cb1d34b33bbe8f2a6222a6bd91f5a47b06"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/ConvectionCoefficients.cc.Original.diff",
+        "sha256": "7e8bf7b51f7a947847d3fc64d4dc9c426538f6ffc91fd594b491a92346994c74",
+        "size_bytes": 10040
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/7e/7e8bf7b51f7a947847d3fc64d4dc9c426538f6ffc91fd594b491a92346994c74"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/ZoneEquipmentManager.cc.Original.diff",
+        "sha256": "d81aaa1195f2d8d4e96f7d43c4fe46358829ac5efa2ca146422eb4aad7e873b7",
+        "size_bytes": 7991
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/d8/d81aaa1195f2d8d4e96f7d43c4fe46358829ac5efa2ca146422eb4aad7e873b7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/DataZoneEquipment.cc.Original.diff",
+        "sha256": "fd489ce1ce11a23014c573c74ab7a32f0e87f48c28500093348f49e8fb83bbd4",
+        "size_bytes": 6415
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/fd/fd489ce1ce11a23014c573c74ab7a32f0e87f48c28500093348f49e8fb83bbd4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/SystemAvailabilityManager.cc.Original.diff",
+        "sha256": "bc5fe3f3c2f77d1cdc56a8c6fa540195c7c8e48dcc5846037f637bf644f68bab",
+        "size_bytes": 4381
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/bc/bc5fe3f3c2f77d1cdc56a8c6fa540195c7c8e48dcc5846037f637bf644f68bab"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/NodeInputManager.cc.Original.diff",
+        "sha256": "c5f804a18fb66fcdfb79bb7b00a5b1cc9bebf178cbefa5256471c8cb100f3073",
+        "size_bytes": 4429
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/c5/c5f804a18fb66fcdfb79bb7b00a5b1cc9bebf178cbefa5256471c8cb100f3073"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/surface_consumer_observer.hh.temperature-parent.diff",
+        "sha256": "4023206d6486fb207fe638a039f710518d497885cd1b71d3b94fecbc0f7dcdf9",
+        "size_bytes": 2609
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/40/4023206d6486fb207fe638a039f710518d497885cd1b71d3b94fecbc0f7dcdf9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/diffs/surface_consumer_observer.cc.temperature-parent.diff",
+        "sha256": "2d0abd285a3faf8e5cacbb5afabcc0c566f6843f43184760c0d1397f0e13c4f0",
+        "size_bytes": 9173
+      },
+      "roles": [
+        "Native_full_Original_diff"
+      ],
+      "archive_member": "objects/2d/2d0abd285a3faf8e5cacbb5afabcc0c566f6843f43184760c0d1397f0e13c4f0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/source-additions.json",
+        "sha256": "2b08a66ea3363cf3b1ee2af6c06607d5d48e4af2385e637fcd2dbd1779c9292a",
+        "size_bytes": 56433
+      },
+      "roles": [
+        "Native_source_additions"
+      ],
+      "archive_member": "objects/2b/2b08a66ea3363cf3b1ee2af6c06607d5d48e4af2385e637fcd2dbd1779c9292a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/actual-return-Source-inventory.json",
+        "sha256": "e393bf2cb55d6c4c9a4a531153873578ebbe154158b22cc053ec5898bbb0f88c",
+        "size_bytes": 2064
+      },
+      "roles": [
+        "Native_actual_return_Source_inventory"
+      ],
+      "archive_member": "objects/e3/e393bf2cb55d6c4c9a4a531153873578ebbe154158b22cc053ec5898bbb0f88c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/prepare_sources.py",
+        "sha256": "0494a61a75c24f762d1e631ecba80f66bd6c28b695919183304bd7b527bebb92",
+        "size_bytes": 25479
+      },
+      "roles": [
+        "Native_authoring_Source"
+      ],
+      "archive_member": "objects/04/0494a61a75c24f762d1e631ecba80f66bd6c28b695919183304bd7b527bebb92"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/README.md",
+        "sha256": "cc6f4c730172fc35e2fc8798b00e701b997f07b936ee2dfa7c8666433f554b61",
+        "size_bytes": 6728
+      },
+      "roles": [
+        "Native_README"
+      ],
+      "archive_member": "objects/cc/cc6f4c730172fc35e2fc8798b00e701b997f07b936ee2dfa7c8666433f554b61"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges.json",
+        "sha256": "58d4f9e3a72bfda4403bc7b6f728e6232091c864633eb8633c4369688601c29b",
+        "size_bytes": 15963
+      },
+      "roles": [
+        "Native_literal_Original_range_inventory"
+      ],
+      "archive_member": "objects/58/58d4f9e3a72bfda4403bc7b6f728e6232091c864633eb8633c4369688601c29b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.455-480.txt",
+        "sha256": "2aee52b838abea8ac8b68ebdfaa6d1eeaf19487ca94692248df65e096c533205",
+        "size_bytes": 1061
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/2a/2aee52b838abea8ac8b68ebdfaa6d1eeaf19487ca94692248df65e096c533205"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.1406-1453.txt",
+        "sha256": "efbad3cd2c4953eb42d77f8846062c3a11cc27449a23d5e2fc330179dce4c418",
+        "size_bytes": 3492
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/ef/efbad3cd2c4953eb42d77f8846062c3a11cc27449a23d5e2fc330179dce4c418"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.2208-2251.txt",
+        "sha256": "9387f14ca10e8c96504d8a37c17b0912254d306baac2ed03941a017aff084e64",
+        "size_bytes": 2259
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/93/9387f14ca10e8c96504d8a37c17b0912254d306baac2ed03941a017aff084e64"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.2252-2322.txt",
+        "sha256": "52f39ced4b6b731e24b635f071fccf44eed406c868a972781b8136e2753ac322",
+        "size_bytes": 5168
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/52/52f39ced4b6b731e24b635f071fccf44eed406c868a972781b8136e2753ac322"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.7938-7947.txt",
+        "sha256": "2f234dd4fa23fc0b88d17c31e7a14682ae993cfd6d3d9460c2a7883225be7e08",
+        "size_bytes": 746
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/2f/2f234dd4fa23fc0b88d17c31e7a14682ae993cfd6d3d9460c2a7883225be7e08"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.8818-8827.txt",
+        "sha256": "aae672b337e030e41fbc920d5d202982142276f70cbc4fecfa480ac30fbe7188",
+        "size_bytes": 824
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/aa/aae672b337e030e41fbc920d5d202982142276f70cbc4fecfa480ac30fbe7188"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.8855-8934.txt",
+        "sha256": "bd1ec1e9f7fb6fc29afa064d165cded5b373f1d89c14361bc95de2611b00250e",
+        "size_bytes": 7222
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/bd/bd1ec1e9f7fb6fc29afa064d165cded5b373f1d89c14361bc95de2611b00250e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.9031-9056.txt",
+        "sha256": "c9d22d19a579b1cabb0c098824ce62dd00e45d172940a489ee02428a57a78421",
+        "size_bytes": 2715
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/c9/c9d22d19a579b1cabb0c098824ce62dd00e45d172940a489ee02428a57a78421"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HeatBalanceSurfaceManager.cc.9157-9162.txt",
+        "sha256": "d2a93f7a106a7fba0456226f7110bd22c5243a508bc8c1d96ec0f6d7b5e2f8fd",
+        "size_bytes": 520
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/d2/d2a93f7a106a7fba0456226f7110bd22c5243a508bc8c1d96ec0f6d7b5e2f8fd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HVACManager.cc.810-867.txt",
+        "sha256": "7f756e73258853bd95dc45688a9437afe95d56822171a9a3abcf1b5099dc0f26",
+        "size_bytes": 3050
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/7f/7f756e73258853bd95dc45688a9437afe95d56822171a9a3abcf1b5099dc0f26"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HVACManager.cc.1800-1900.txt",
+        "sha256": "eb6604b525edc6ee1e6b613f0e37b80e6c4b4690e66f55db0e71dc478e7e6f5c",
+        "size_bytes": 6276
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/eb/eb6604b525edc6ee1e6b613f0e37b80e6c4b4690e66f55db0e71dc478e7e6f5c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/HVACManager.cc.1929-1946.txt",
+        "sha256": "9375e53ca9f1638f9ea1fef3f2e66a14ded43fefc32f639dc455f1fac5b105f2",
+        "size_bytes": 694
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/93/9375e53ca9f1638f9ea1fef3f2e66a14ded43fefc32f639dc455f1fac5b105f2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/ConvectionCoefficients.cc.141-391.txt",
+        "sha256": "33ed5400df105176fe1789c17d5aa3cb43d739d008a03842525d5274b97de6c5",
+        "size_bytes": 13178
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/33/33ed5400df105176fe1789c17d5aa3cb43d739d008a03842525d5274b97de6c5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/ConvectionCoefficients.cc.3101-3149.txt",
+        "sha256": "86f9421081369b40bbd97e47ec91e17f9d92d6b7e9d8159722d47d02f1f984d8",
+        "size_bytes": 2265
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/86/86f9421081369b40bbd97e47ec91e17f9d92d6b7e9d8159722d47d02f1f984d8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/ZoneEquipmentManager.cc.141-316.txt",
+        "sha256": "2b68854581b0fe2c66a8fd771d9e458db2ad89a655b1e4dcb970d5f7bf44b91c",
+        "size_bytes": 8444
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/2b/2b68854581b0fe2c66a8fd771d9e458db2ad89a655b1e4dcb970d5f7bf44b91c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/ZoneEquipmentManager.cc.3538-3646.txt",
+        "sha256": "a05b2a1fe2e79d0c91af2ff2d4f94308a4d4a3aebe56c9b9244cadf100ac9965",
+        "size_bytes": 5517
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/a0/a05b2a1fe2e79d0c91af2ff2d4f94308a4d4a3aebe56c9b9244cadf100ac9965"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/ZoneEquipmentManager.cc.4118-4193.txt",
+        "sha256": "b4bdb4a19909b59eb68016919280c313e8d2962f652d3271bf1b53437a2bc0f3",
+        "size_bytes": 4012
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/b4/b4bdb4a19909b59eb68016919280c313e8d2962f652d3271bf1b53437a2bc0f3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/DataZoneEquipment.cc.167-300.txt",
+        "sha256": "877fbe707a9eb8c064a26d2b90c19709abbbd7121fd7c360618ec96d45ef28f9",
+        "size_bytes": 6726
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/87/877fbe707a9eb8c064a26d2b90c19709abbbd7121fd7c360618ec96d45ef28f9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/DataZoneEquipment.cc.517-625.txt",
+        "sha256": "c7d729e23c5aca28c98538f12e97f22bd94458b6b346914beb5933959907dd17",
+        "size_bytes": 6430
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/c7/c7d729e23c5aca28c98538f12e97f22bd94458b6b346914beb5933959907dd17"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/DataZoneEquipment.cc.800-812.txt",
+        "sha256": "93faa2fea9c7eae610a631539cb75ad810443492f6a79493655d2ef5f87a107c",
+        "size_bytes": 412
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/93/93faa2fea9c7eae610a631539cb75ad810443492f6a79493655d2ef5f87a107c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/SystemAvailabilityManager.cc.136-308.txt",
+        "sha256": "8483512901c577210f22c8b0924d9d0081ff92477822f88e3fb153a4768cb3ee",
+        "size_bytes": 9291
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/84/8483512901c577210f22c8b0924d9d0081ff92477822f88e3fb153a4768cb3ee"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/SystemAvailabilityManager.cc.310-411.txt",
+        "sha256": "dcb841c3f544fb48a3d561e5335e299165f8cabb3b7a9cc654aeb7035536f9de",
+        "size_bytes": 4800
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/dc/dcb841c3f544fb48a3d561e5335e299165f8cabb3b7a9cc654aeb7035536f9de"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/SystemAvailabilityManager.cc.1207-1217.txt",
+        "sha256": "7228da33700cbe2761b316761b7062d5d57eaf68389bbbb06242c02357ad4875",
+        "size_bytes": 443
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/72/7228da33700cbe2761b316761b7062d5d57eaf68389bbbb06242c02357ad4875"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/NodeInputManager.cc.80-116.txt",
+        "sha256": "46ddce00bbff268d61c42eb4f1673321b0ef006f7f1dd33516233f134c1fa842",
+        "size_bytes": 2148
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/46/46ddce00bbff268d61c42eb4f1673321b0ef006f7f1dd33516233f134c1fa842"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/NodeInputManager.cc.516-589.txt",
+        "sha256": "13ba09e1832cd2b94bd66958e30391b9a812b9e0d46464cce817e8c437c0b778",
+        "size_bytes": 3984
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/13/13ba09e1832cd2b94bd66958e30391b9a812b9e0d46464cce817e8c437c0b778"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/NodeInputManager.cc.640-738.txt",
+        "sha256": "65f6414029cf799da8851ec89266a4a60f2fb9450b7d77628513f608cc45505b",
+        "size_bytes": 4730
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/65/65f6414029cf799da8851ec89266a4a60f2fb9450b7d77628513f608cc45505b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-prep-03/Original-ranges/NodeInputManager.cc.810-825.txt",
+        "sha256": "9c3d872b250e8f9c696d27efcda79e4b679b1f13daea462d4c50426f2ba16be6",
+        "size_bytes": 478
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/9c/9c3d872b250e8f9c696d27efcda79e4b679b1f13daea462d4c50426f2ba16be6"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+        "sha256": "e00a9f1c630c07341c7899c2ab0fa3795f89400ef25802cfee294ee23753fb8e",
+        "size_bytes": 13572
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/e0/e00a9f1c630c07341c7899c2ab0fa3795f89400ef25802cfee294ee23753fb8e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+        "sha256": "4e611c63cfb491326342efea0804ce79f063a0d309363bd6f8a3d9309f07bcb9",
+        "size_bytes": 9287
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/4e/4e611c63cfb491326342efea0804ce79f063a0d309363bd6f8a3d9309f07bcb9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+        "sha256": "b6656d7e24bae612ee7b53b9f74652f4a4253f3063792f7535d5568274f7f31d",
+        "size_bytes": 13030
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/b6/b6656d7e24bae612ee7b53b9f74652f4a4253f3063792f7535d5568274f7f31d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/00.diff",
+        "sha256": "15dd69e5135070e1de9e7beb0d482b82c49777918ebc781a41c22314714d158e",
+        "size_bytes": 8200
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/15/15dd69e5135070e1de9e7beb0d482b82c49777918ebc781a41c22314714d158e"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+        "sha256": "833fc516ecc46577c1ac712ef698191b8d01f8a8a6f250c0d171b9e393375d4f",
+        "size_bytes": 37646
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/83/833fc516ecc46577c1ac712ef698191b8d01f8a8a6f250c0d171b9e393375d4f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+        "sha256": "3d9f3a73fb81ebc4e9c906895047f3407e6977c56fbd5139d53885b4c60f47bc",
+        "size_bytes": 20668
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/3d/3d9f3a73fb81ebc4e9c906895047f3407e6977c56fbd5139d53885b4c60f47bc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+        "sha256": "d4d8f1e40419d8521652e41aecdcf63a51861ddb54ed98ebd642880b64bff66e",
+        "size_bytes": 20902
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/d4/d4d8f1e40419d8521652e41aecdcf63a51861ddb54ed98ebd642880b64bff66e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/01.diff",
+        "sha256": "f06a2483143d5642ec33fe350779f3896f65e5fc952a67297e6b527f72aa0c37",
+        "size_bytes": 1320
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/f0/f06a2483143d5642ec33fe350779f3896f65e5fc952a67297e6b527f72aa0c37"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+        "sha256": "6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda",
+        "size_bytes": 21118
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/62/6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/heat_balance/surface_loop.rs",
+        "sha256": "f10dfdec56b688fcf263d9355838cb113af90c23d5c3eb1701aa74d018ff29a2",
+        "size_bytes": 20637
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/f1/f10dfdec56b688fcf263d9355838cb113af90c23d5c3eb1701aa74d018ff29a2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_loop.rs",
+        "sha256": "6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda",
+        "size_bytes": 21118
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/62/6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/02.diff",
+        "sha256": "2e1a6cd257e2c47a5c031c68c4f65b51cece36dc6562b7727151d4a0e9928935",
+        "size_bytes": 2107
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/2e/2e1a6cd257e2c47a5c031c68c4f65b51cece36dc6562b7727151d4a0e9928935"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "a2d0c8314d0b25eed35974bddb54b2aec17a09761835579580da1a6092fb5dea",
+        "size_bytes": 44587
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/a2/a2d0c8314d0b25eed35974bddb54b2aec17a09761835579580da1a6092fb5dea"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "d73774ba7dd213188a459fe58f218df17cd4ba2426c384f3430069891d1d5445",
+        "size_bytes": 44073
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/d7/d73774ba7dd213188a459fe58f218df17cd4ba2426c384f3430069891d1d5445"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "8a6b0ac1bc539f8e1f909527dc54a6bef28b44a1b7cb62ad7edf47105ca2c818",
+        "size_bytes": 44536
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/8a/8a6b0ac1bc539f8e1f909527dc54a6bef28b44a1b7cb62ad7edf47105ca2c818"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/03.diff",
+        "sha256": "c44d76c214e2983c0401eafe385892b4c21c72febe3b92b1f23c94cf518a5d3a",
+        "size_bytes": 1239
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/c4/c44d76c214e2983c0401eafe385892b4c21c72febe3b92b1f23c94cf518a5d3a"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246",
+        "size_bytes": 33103
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/b4/b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "853443be8e43973901482cdc1611743a881d8f699e157c552203768a91eb67a3",
+        "size_bytes": 33067
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/85/853443be8e43973901482cdc1611743a881d8f699e157c552203768a91eb67a3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246",
+        "size_bytes": 33103
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/b4/b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/04.diff",
+        "sha256": "5a8c1df94df78d8ff8e033f61065eb080d4e6305aa165897e63e3cc27f1c8eaf",
+        "size_bytes": 431
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/5a/5a8c1df94df78d8ff8e033f61065eb080d4e6305aa165897e63e3cc27f1c8eaf"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+        "sha256": "815ca6692dfa6c8da036476bc86eb76df7e3c0f075d6eda9808fd94227ae375f",
+        "size_bytes": 16450
+      },
+      "roles": [
+        "current_Rust_Source"
+      ],
+      "archive_member": "objects/81/815ca6692dfa6c8da036476bc86eb76df7e3c0f075d6eda9808fd94227ae375f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/before/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+        "sha256": "e7223b9e337f76a35e1e2bc693d289b6fa78b6a39f1097f669a5b70fec95832d",
+        "size_bytes": 14467
+      },
+      "roles": [
+        "Rust_before_archive"
+      ],
+      "archive_member": "objects/e7/e7223b9e337f76a35e1e2bc693d289b6fa78b6a39f1097f669a5b70fec95832d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/proposed/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+        "sha256": "815ca6692dfa6c8da036476bc86eb76df7e3c0f075d6eda9808fd94227ae375f",
+        "size_bytes": 16450
+      },
+      "roles": [
+        "Rust_proposed"
+      ],
+      "archive_member": "objects/81/815ca6692dfa6c8da036476bc86eb76df7e3c0f075d6eda9808fd94227ae375f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/diffs/05.diff",
+        "sha256": "791a0d0b6d5963804daa995389619f7bb4bfe35338a13dd60cfe110849e7eacf",
+        "size_bytes": 4625
+      },
+      "roles": [
+        "Rust_direct_diff"
+      ],
+      "archive_member": "objects/79/791a0d0b6d5963804daa995389619f7bb4bfe35338a13dd60cfe110849e7eacf"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/Original/HeatBalanceSurfaceManager.cc.1442-1445.txt",
+        "sha256": "102c78d966fcab76626c62890708a14b764ed6fb3aeddb98d8175eef377143e8",
+        "size_bytes": 354
+      },
+      "roles": [
+        "Rust_literal_Original_range",
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/10/102c78d966fcab76626c62890708a14b764ed6fb3aeddb98d8175eef377143e8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/Original/HeatBalanceSurfaceManager.cc.2251-2321.txt",
+        "sha256": "c67db4ddae711ea40ed0e37d91398e14bce73ae164bafce15de08d3961b47501",
+        "size_bytes": 5228
+      },
+      "roles": [
+        "Rust_literal_Original_range",
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/c6/c67db4ddae711ea40ed0e37d91398e14bce73ae164bafce15de08d3961b47501"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/Original/HeatBalanceSurfaceManager.cc.8912-8933.txt",
+        "sha256": "48eac2bddec3ef10c79cdbf1a3b4e591ba28fc1523d2cdd3db71e41af8ab017f",
+        "size_bytes": 2206
+      },
+      "roles": [
+        "Rust_literal_Original_range",
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/48/48eac2bddec3ef10c79cdbf1a3b4e591ba28fc1523d2cdd3db71e41af8ab017f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-prep-02/Original/DataHeatBalance.hh.429-432.txt",
+        "sha256": "46fd4ca62d02296b00c3ca63ac91c7e45588daf6c750f604675a70efb641c4d8",
+        "size_bytes": 316
+      },
+      "roles": [
+        "Rust_literal_Original_range",
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/46/46fd4ca62d02296b00c3ca63ac91c7e45588daf6c750f604675a70efb641c4d8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+        "sha256": "d2002ff6878a498b706952eb65e2f83212b8bd38784c89a4bcfdc97839d0bd1c",
+        "size_bytes": 34497
+      },
+      "roles": [
+        "accepted_Rust_replay_Source_or_fixture"
+      ],
+      "archive_member": "objects/d2/d2002ff6878a498b706952eb65e2f83212b8bd38784c89a4bcfdc97839d0bd1c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/before/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+        "sha256": "d4d8f1e40419d8521652e41aecdcf63a51861ddb54ed98ebd642880b64bff66e",
+        "size_bytes": 20902
+      },
+      "roles": [
+        "Rust_replay_before"
+      ],
+      "archive_member": "objects/d4/d4d8f1e40419d8521652e41aecdcf63a51861ddb54ed98ebd642880b64bff66e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/test-extension.diff",
+        "sha256": "f50b881a4858eca614fdb1ab301189da6b2563a466c08acceb73bee178adf599",
+        "size_bytes": 14062
+      },
+      "roles": [
+        "Rust_replay_full_diff"
+      ],
+      "archive_member": "objects/f5/f50b881a4858eca614fdb1ab301189da6b2563a466c08acceb73bee178adf599"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/proposed/crates/ep_runtime/src/heat_balance/fixtures/ordinary_readiness_tmp_selected_cases.json",
+        "sha256": "24d8e59b12a976e962f9cfc72fc1c3e694057c2b8257b51638e937aeb96a275d",
+        "size_bytes": 517298
+      },
+      "roles": [
+        "accepted_Rust_replay_Source_or_fixture"
+      ],
+      "archive_member": "objects/24/24d8e59b12a976e962f9cfc72fc1c3e694057c2b8257b51638e937aeb96a275d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/Original/DataSurfaces.hh.149-159.txt",
+        "sha256": "444d1068155373850ee730af2a44a4f806026989f9c66d64aa2af74f78132433",
+        "size_bytes": 408
+      },
+      "roles": [
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/44/444d1068155373850ee730af2a44a4f806026989f9c66d64aa2af74f78132433"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/Original/DataSurfaces.hh.320-329.txt",
+        "sha256": "73e2920b4f5d4b2855088131d02901a441bf5da693eba574634fd2dbe8bbe7f0",
+        "size_bytes": 285
+      },
+      "roles": [
+        "Rust_replay_literal_Original_range"
+      ],
+      "archive_member": "objects/73/73e2920b4f5d4b2855088131d02901a441bf5da693eba574634fd2dbe8bbe7f0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-ordinary-inside-tmp-replay-01.py",
+        "sha256": "d4109888b0663a35c88777a341e0e66079faa36c582fa1f99f8b9d415ea53ecb",
+        "size_bytes": 10361
+      },
+      "roles": [
+        "Rust_replay_preparation_Source"
+      ],
+      "archive_member": "objects/d4/d4109888b0663a35c88777a341e0e66079faa36c582fa1f99f8b9d415ea53ecb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-extension-01.rs",
+        "sha256": "c0d58520c557a2beedfd85b37bde27489ee65912990b64f2113ac83ff5586010",
+        "size_bytes": 13595
+      },
+      "roles": [
+        "Rust_replay_appended_Rust_Source"
+      ],
+      "archive_member": "objects/c0/c0d58520c557a2beedfd85b37bde27489ee65912990b64f2113ac83ff5586010"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-prep-01/README.md",
+        "sha256": "54519ff9d8d661e79c4754af8f1bdba259f10342ba2e08bab47f361a3ba16913",
+        "size_bytes": 2157
+      },
+      "roles": [
+        "Rust_replay_README"
+      ],
+      "archive_member": "objects/54/54519ff9d8d661e79c4754af8f1bdba259f10342ba2e08bab47f361a3ba16913"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-replay-application-01/Root-Source-acceptance.json",
+        "sha256": "aff48a6820625ae21a8ef34f23388ff289458b412e7bf7ecbefe0809343a1f72",
+        "size_bytes": 1214
+      },
+      "roles": [
+        "Root_Rust_replay_Source_acceptance"
+      ],
+      "archive_member": "objects/af/aff48a6820625ae21a8ef34f23388ff289458b412e7bf7ecbefe0809343a1f72"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-application-01/Root-Source-acceptance.json",
+        "sha256": "cf24aab300da5777205ea63baa36dd0a89c9b14aab3206b6cc35ba0b7fb71158",
+        "size_bytes": 1778
+      },
+      "roles": [
+        "Root_Rust_Source_acceptance"
+      ],
+      "archive_member": "objects/cf/cf24aab300da5777205ea63baa36dd0a89c9b14aab3206b6cc35ba0b7fb71158"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Owner-ordinary-inside-tmp-Source-review-02/review.json",
+        "sha256": "45c45753b8f163211201e1d0af68da904d1fc699c4aa92cbc09fe9460294fc3e",
+        "size_bytes": 2406
+      },
+      "roles": [
+        "independent_Rust_Source_review"
+      ],
+      "archive_member": "objects/45/45c45753b8f163211201e1d0af68da904d1fc699c4aa92cbc09fe9460294fc3e"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json",
+        "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+        "size_bytes": 268293
+      },
+      "roles": [
+        "retained_old_Native_fixture"
+      ],
+      "archive_member": "objects/b7/b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/before.json",
+        "sha256": "b3059d83916e4c1893873f1d579b8343dcefe8cc4526d4b140b46516f7792b39",
+        "size_bytes": 13139
+      },
+      "roles": [
+        "actual_Native_before"
+      ],
+      "archive_member": "objects/b3/b3059d83916e4c1893873f1d579b8343dcefe8cc4526d4b140b46516f7792b39"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-provider-review-01/review.json",
+        "sha256": "ee788d036cf6b53803b21beb50388010b21a764faaf66994fef11f3fcdd8bd4a",
+        "size_bytes": 2266
+      },
+      "roles": [
+        "actual_Native_provider_review"
+      ],
+      "archive_member": "objects/ee/ee788d036cf6b53803b21beb50388010b21a764faaf66994fef11f3fcdd8bd4a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-provider-review-01/runtime-closure.json",
+        "sha256": "5485d9594522d115bca66dd8c9b962caad48fb37e7de601353188f70113704bd",
+        "size_bytes": 2982
+      },
+      "roles": [
+        "actual_Native_runtime_closure"
+      ],
+      "archive_member": "objects/54/5485d9594522d115bca66dd8c9b962caad48fb37e7de601353188f70113704bd"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/native-stdout.log",
+        "sha256": "0d1fac73dc03c9fa2e434180364a7962df1ea0dccea6efde83d3e850de5e878d",
+        "size_bytes": 974
+      },
+      "roles": [
+        "actual_Native_native_stdout"
+      ],
+      "archive_member": "objects/0d/0d1fac73dc03c9fa2e434180364a7962df1ea0dccea6efde83d3e850de5e878d"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/native-stderr.log",
+        "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+        "size_bytes": 36
+      },
+      "roles": [
+        "actual_Native_native_stderr"
+      ],
+      "archive_member": "objects/ce/ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.audit",
+        "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+        "size_bytes": 1569
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/6e/6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.bnd",
+        "sha256": "eb82cf117ff9acb46d0b0722309c67828532adacadb33f7a3887d141cfdbf02b",
+        "size_bytes": 6365
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/eb/eb82cf117ff9acb46d0b0722309c67828532adacadb33f7a3887d141cfdbf02b"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.dxf",
+        "sha256": "690e2e8193c88a36cb0bd363a0a0ba0a8ff42e0113499a1236a4ae48c90b88f8",
+        "size_bytes": 6096
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/69/690e2e8193c88a36cb0bd363a0a0ba0a8ff42e0113499a1236a4ae48c90b88f8"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.eio",
+        "sha256": "6bd78a76d1f43aa686663c30c1e843b1d71e11a785a9355649e31c117a11773a",
+        "size_bytes": 15376
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/6b/6bd78a76d1f43aa686663c30c1e843b1d71e11a785a9355649e31c117a11773a"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.end",
+        "sha256": "7c561e2d6883aed27319d1a6df968bc7d2b3ab88cd29d3c44a4248812af250c8",
+        "size_bytes": 98
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/7c/7c561e2d6883aed27319d1a6df968bc7d2b3ab88cd29d3c44a4248812af250c8"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.err",
+        "sha256": "7b7e9616949731c4bacbe9c55ce3d93d4211e5c0a570b9e4adc8c33613f98545",
+        "size_bytes": 897
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/7b/7b7e9616949731c4bacbe9c55ce3d93d4211e5c0a570b9e4adc8c33613f98545"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.eso",
+        "sha256": "704bcf0d445e8bb6c4e60a3d04e97cc322917067ccdf1dcc15698085c42fce7b",
+        "size_bytes": 112213
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/70/704bcf0d445e8bb6c4e60a3d04e97cc322917067ccdf1dcc15698085c42fce7b"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.mdd",
+        "sha256": "d9055ef6d5e160598b6c120c4080d5354520bcf220bfe95019a3d32822dd3831",
+        "size_bytes": 3851
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/d9/d9055ef6d5e160598b6c120c4080d5354520bcf220bfe95019a3d32822dd3831"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.mtd",
+        "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+        "size_bytes": 7539
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/c2/c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.mtr",
+        "sha256": "1078b4a68321a743aa54b8aa0ab3f87f205e6a49f2283080fafa301f8133225f",
+        "size_bytes": 2490
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/10/1078b4a68321a743aa54b8aa0ab3f87f205e6a49f2283080fafa301f8133225f"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.rdd",
+        "sha256": "340c033553225350eeeee3d985dd86213abbf975ff11cf3ac42d769d26528ff8",
+        "size_bytes": 30562
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/34/340c033553225350eeeee3d985dd86213abbf975ff11cf3ac42d769d26528ff8"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplusout.shd",
+        "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+        "size_bytes": 1557
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/f6/f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplustbl.csv",
+        "sha256": "971cedf4ea01dc9cb1a4957e6dba224b6c5845b0ee0cd14a1c386ca5d311b5cb",
+        "size_bytes": 84703
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/97/971cedf4ea01dc9cb1a4957e6dba224b6c5845b0ee0cd14a1c386ca5d311b5cb"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplustbl.htm",
+        "sha256": "6be86639d409f79888cb8857a13425390752bb26b990d59adfb188dc8d38592e",
+        "size_bytes": 354322
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/6b/6be86639d409f79888cb8857a13425390752bb26b990d59adfb188dc8d38592e"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplustbl.tab",
+        "sha256": "e06624fd11300015e2c8b3d53618152e6a7b1e257e78abebd5e124128c908f28",
+        "size_bytes": 84700
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/e0/e06624fd11300015e2c8b3d53618152e6a7b1e257e78abebd5e124128c908f28"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplustbl.txt",
+        "sha256": "0d66a2b1f13b4906800f1c8808cf5b24cf5aa885b2fc1ce396901283a093d340",
+        "size_bytes": 163344
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/0d/0d66a2b1f13b4906800f1c8808cf5b24cf5aa885b2fc1ce396901283a093d340"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-readiness-native-capture-01/A-24H/eplustbl.xml",
+        "sha256": "c5ccea559cd448f4ab66f182bc95a6c71eac59786a8b16ca44dbed122d98d29e",
+        "size_bytes": 226145
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/c5/c5ccea559cd448f4ab66f182bc95a6c71eac59786a8b16ca44dbed122d98d29e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/actual-PE.json",
+        "sha256": "3aa3c8165ed8c463d9d162fd4a3d048296177bc25b6dd9c2731c5f76e333987d",
+        "size_bytes": 16047
+      },
+      "roles": [
+        "actual_Native_actual_PE"
+      ],
+      "archive_member": "objects/3a/3aa3c8165ed8c463d9d162fd4a3d048296177bc25b6dd9c2731c5f76e333987d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/actual-address-bound-providers.json",
+        "sha256": "aecc3aaf3831c9c5b4a9fd44ba97ca4e87d1017e9bcd2bdd92f3e2818b0936ab",
+        "size_bytes": 75922
+      },
+      "roles": [
+        "actual_Native_actual_address_bound_providers"
+      ],
+      "archive_member": "objects/ae/aecc3aaf3831c9c5b4a9fd44ba97ca4e87d1017e9bcd2bdd92f3e2818b0936ab"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/addr2line-command-01/receipt.json",
+        "sha256": "22bebcb40fd22a82261f93de21627575615ae21bd8da5671aa9e18403f7111f4",
+        "size_bytes": 3846
+      },
+      "roles": [
+        "actual_Native_addr2line"
+      ],
+      "archive_member": "objects/22/22bebcb40fd22a82261f93de21627575615ae21bd8da5671aa9e18403f7111f4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/addr2line-command-01/stdout.log",
+        "sha256": "65004df6df16bf945db1554518f860d754d55c5171a3afceb7167b3d79db9fd5",
+        "size_bytes": 9562
+      },
+      "roles": [
+        "actual_Native_addr2line_stdout"
+      ],
+      "archive_member": "objects/65/65004df6df16bf945db1554518f860d754d55c5171a3afceb7167b3d79db9fd5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/addr2line-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_addr2line_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-provider-review-01/pe.json",
+        "sha256": "4ba967a4901cb8ecfe915295fb62fe0c42e0e9129878a365bed2dde42efd7bb6",
+        "size_bytes": 15579
+      },
+      "roles": [
+        "Root_actual_full_PE_review"
+      ],
+      "archive_member": "objects/4b/4ba967a4901cb8ecfe915295fb62fe0c42e0e9129878a365bed2dde42efd7bb6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-factual-prep-02/verify_native.py",
+        "sha256": "72cce5d73f88e926c61f1ba8b04eca7d962e4012bf1187408ef38f7a5ea441e5",
+        "size_bytes": 35238
+      },
+      "roles": [
+        "executed_full_stream_checker_Source",
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/72/72cce5d73f88e926c61f1ba8b04eca7d962e4012bf1187408ef38f7a5ea441e5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+        "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+        "size_bytes": 2385
+      },
+      "roles": [
+        "accepted_stream_parser_Source"
+      ],
+      "archive_member": "objects/8e/8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-archive-prep-01/compress.py",
+        "sha256": "3d6900f5ab2beb5329c429a1e3c6b0985301c5da6aaa09f68cbb5702bfca6c6c",
+        "size_bytes": 4204
+      },
+      "roles": [
+        "executed_compression_Source"
+      ],
+      "archive_member": "objects/3d/3d6900f5ab2beb5329c429a1e3c6b0985301c5da6aaa09f68cbb5702bfca6c6c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/close-readiness-provider-Root-01.py",
+        "sha256": "52f0fc173f7653a2133e763c48872b8b577495fd5d77ac5c69f9895d10958bbc",
+        "size_bytes": 8176
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/52/52f0fc173f7653a2133e763c48872b8b577495fd5d77ac5c69f9895d10958bbc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/review-ordinary-readiness-providers-Header-01.py",
+        "sha256": "7a9dddb82484c2ab8bd6720d75dc5bb110750e6a02c375b9570b6d8d31a22c0e",
+        "size_bytes": 13332
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/7a/7a9dddb82484c2ab8bd6720d75dc5bb110750e6a02c375b9570b6d8d31a22c0e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-provider-review-01/review.json",
+        "sha256": "d21c6fdca2628f6fd7a6002716f33006d41d46bfeee5c14a084631f64686fc7d",
+        "size_bytes": 7415
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/d2/d21c6fdca2628f6fd7a6002716f33006d41d46bfeee5c14a084631f64686fc7d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-Native-Source-review-03/review.json",
+        "sha256": "7b687ed590a10593990ec751d3a9578b61a8ec2a087ee36db1a713badfdc5dfb",
+        "size_bytes": 1165
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/7b/7b687ed590a10593990ec751d3a9578b61a8ec2a087ee36db1a713badfdc5dfb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-Native-Source-review-03/review.json",
+        "sha256": "079b9e3f27307c9f7d86a5dd16879092afc8755a050357a7858b356c0dde154e",
+        "size_bytes": 2619
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/07/079b9e3f27307c9f7d86a5dd16879092afc8755a050357a7858b356c0dde154e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-capture-custody-review-01/review.json",
+        "sha256": "9d8fae881e977c435bad5dca5541bc72cd256ce699e1029d5d27f2e520bad74a",
+        "size_bytes": 2531
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/9d/9d8fae881e977c435bad5dca5541bc72cd256ce699e1029d5d27f2e520bad74a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-actual-facts-review-01/review.json",
+        "sha256": "1f69acde264ba2319940f2cff2cf59625b43f8bface5ff8f6a143c207c70b2f5",
+        "size_bytes": 3690
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/1f/1f69acde264ba2319940f2cff2cf59625b43f8bface5ff8f6a143c207c70b2f5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-factual-Source-review-02/review.json",
+        "sha256": "10d467b639c2dab4aac9aed53b7f541cd735706dd010fb2a0bc9418b3bf52039",
+        "size_bytes": 788
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/10/10d467b639c2dab4aac9aed53b7f541cd735706dd010fb2a0bc9418b3bf52039"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-factual-Source-review-02/review.json",
+        "sha256": "960afb01d6e203c699cd42fb0c8d6a538bf4d8bde48087476614d4d1e9b2507d",
+        "size_bytes": 2137
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/96/960afb01d6e203c699cd42fb0c8d6a538bf4d8bde48087476614d4d1e9b2507d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-readiness-factual-Source-review-01/review.json",
+        "sha256": "df18bb791208830b9d3e73b9574241051aeaa8b51a7827b73de0e6c2f5b75adf",
+        "size_bytes": 1517
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/df/df18bb791208830b9d3e73b9574241051aeaa8b51a7827b73de0e6c2f5b75adf"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-readiness-factual-Source-review-01/rejection-after-independent-review.json",
+        "sha256": "aa6daf42a60a812b01d0c6e38c88fc1fb2421092c72eae23c2f91a1ac2a5f44e",
+        "size_bytes": 816
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/aa/aa6daf42a60a812b01d0c6e38c88fc1fb2421092c72eae23c2f91a1ac2a5f44e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-01/Root-preconfigure-failure-note.json",
+        "sha256": "6db7972c9c2a1348f2c4d5c129bfff78235e0902d815ee889ec12914ba48f7ee",
+        "size_bytes": 853
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/6d/6db7972c9c2a1348f2c4d5c129bfff78235e0902d815ee889ec12914ba48f7ee"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-prep-04/manifest.json",
+        "sha256": "4004b52ef12bc05c76da0358cbd793f2ab9e681b848a7913dd218137e6ddbf16",
+        "size_bytes": 4799
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/40/4004b52ef12bc05c76da0358cbd793f2ab9e681b848a7913dd218137e6ddbf16"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-build-prep-04/build.py",
+        "sha256": "029c9118710139cab037ccef4b1f7aab3490b35072cd22247fb3e9c778241b60",
+        "size_bytes": 16095
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/02/029c9118710139cab037ccef4b1f7aab3490b35072cd22247fb3e9c778241b60"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-capture-prep-02/manifest.json",
+        "sha256": "488fbe099bd524028d4bbfc4c994b5fb2c2a3e0f58586f76ea329224f3bd8da7",
+        "size_bytes": 3077
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/48/488fbe099bd524028d4bbfc4c994b5fb2c2a3e0f58586f76ea329224f3bd8da7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-capture-prep-02/capture.py",
+        "sha256": "62d39686788cde7f513cc100ead6d5fd72b395b3d3961d5dc6f3e9aba4f3a159",
+        "size_bytes": 11045
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/62/62d39686788cde7f513cc100ead6d5fd72b395b3d3961d5dc6f3e9aba4f3a159"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-factual-prep-02/manifest.json",
+        "sha256": "d79edc7ad8f47e2c94ec8ebe343f50b93bb9aafe1a408bafdc37de45f2d0b899",
+        "size_bytes": 3006
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/d7/d79edc7ad8f47e2c94ec8ebe343f50b93bb9aafe1a408bafdc37de45f2d0b899"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-factual-prep-01/verify_native.py",
+        "sha256": "f874efa955077548a21e72050ac8a011823e24588f428a55dd946848cfedf3e1",
+        "size_bytes": 34621
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/f8/f874efa955077548a21e72050ac8a011823e24588f428a55dd946848cfedf3e1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-inside-tmp-Root-01.py",
+        "sha256": "9491dcad2a2b8ded5dc737ac86e477a12f62b399d29739642e20d456cc343f25",
+        "size_bytes": 4786
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/94/9491dcad2a2b8ded5dc737ac86e477a12f62b399d29739642e20d456cc343f25"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-inside-tmp-replay-Root-01.py",
+        "sha256": "af57c60189e59adfe990b7089c92f3ebe130e6114bf59447fa58cd481c41e34e",
+        "size_bytes": 4694
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history"
+      ],
+      "archive_member": "objects/af/af57c60189e59adfe990b7089c92f3ebe130e6114bf59447fa58cd481c41e34e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/publish-inside-tmp-Root-01.py",
+        "sha256": "7a83342665e76159f0511b1cbd4d5f689dc802fee3a86ad8ffc37a7cc5c5f272",
+        "size_bytes": 7722
+      },
+      "roles": [
+        "finite_approval_Source_or_failure_history",
+        "publication_Source"
+      ],
+      "archive_member": "objects/7a/7a83342665e76159f0511b1cbd4d5f689dc802fee3a86ad8ffc37a7cc5c5f272"
+    },
+    {
+      "original": {
+        "path": "tools/porting/record_command.py",
+        "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "size_bytes": 8453
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/test.ps1",
+        "sha256": "03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095",
+        "size_bytes": 2410
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/03/03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095"
+    },
+    {
+      "original": {
+        "path": "scripts/lib/common.ps1",
+        "sha256": "bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97",
+        "size_bytes": 1052
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/bd/bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/source-quality-gate.ps1",
+        "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+        "size_bytes": 3432
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/73/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/docs-check.ps1",
+        "sha256": "98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3",
+        "size_bytes": 10863
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/98/98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/capability-registry-check.ps1",
+        "sha256": "de2250adaa094aaff4389bf7fbfcacca622d957aa69202e87d44beadf13be042",
+        "size_bytes": 1141
+      },
+      "roles": [
+        "actual_check_wrapper_Source"
+      ],
+      "archive_member": "objects/de/de2250adaa094aaff4389bf7fbfcacca622d957aa69202e87d44beadf13be042"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-inside-tmp-publication-Root-01.py",
+        "sha256": "8cc5741e036370e010aad99163853acc671f61849a82f242769841b31d8a8f8f",
+        "size_bytes": 9750
+      },
+      "roles": [
+        "publication_preparer_Source"
+      ],
+      "archive_member": "objects/8c/8cc5741e036370e010aad99163853acc671f61849a82f242769841b31d8a8f8f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-publication-inputs-01.json",
+        "sha256": "5a8c5455a8dd31904c19595b91d44860173c06475befd5e5b1f380a08dd7b900",
+        "size_bytes": 65979
+      },
+      "roles": [
+        "publication_inputs"
+      ],
+      "archive_member": "objects/5a/5a8c5455a8dd31904c19595b91d44860173c06475befd5e5b1f380a08dd7b900"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/21/21d06c68d0fbce17b4ea5f83e2716a0ec3c643953cbfa3f633936485b16b2450",
+        "sha256": "21d06c68d0fbce17b4ea5f83e2716a0ec3c643953cbfa3f633936485b16b2450",
+        "size_bytes": 1640175
+      },
+      "roles": [
+        "current_Source_metadata_only"
+      ],
+      "archive_member": "objects/21/21d06c68d0fbce17b4ea5f83e2716a0ec3c643953cbfa3f633936485b16b2450"
+    }
+  ],
+  "large_Native_binaries_maps_objects_core_and_provider_binaries": "Identity/provenance metadata only; no transitive replay claim."
+}

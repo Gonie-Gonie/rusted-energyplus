@@ -12521,6 +12521,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-shared-space-air/summary.json",
         "sha256": "ca1bec1e572572f6f4fb564f42a56005757e4a2cccbb64ed6879f81bb873ba54",
         "size_bytes": 3176
+      },
+      "actual_selected_ordinary_inside_tmp": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-tmp/summary.json",
+        "sha256": "15269955100effb10aa1318cc3307ed70ba4b54edca7032e1bbde2b80165b931",
+        "size_bytes": 3116
       }
     },
     {

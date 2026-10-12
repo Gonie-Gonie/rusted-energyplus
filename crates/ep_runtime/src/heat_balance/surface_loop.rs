@@ -178,6 +178,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
             frozen_inside_ctf_outside_temperatures.as_ref(),
             use_inside_ctf_outside_temperature_for_conduction_report,
             None,
+            None,
         );
         if freeze_outside_balance_for_surface_iterations
             && frozen_outside_boundary_balances.is_none()
@@ -283,6 +284,8 @@ pub(crate) fn run_surface_balance_passes(
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
     // Some is a complete caller-validated surface -> actual SpaceMAT snapshot.
     ordinary_reference_air_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
+    // Some is created before this pass only by the complete associated ordinary owner.
+    mut ordinary_inside_tmp: Option<super::ordinary_inside_temperatures::OrdinaryInsideTmp<'_>>,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         let temperature_overrides = if surface_iteration_index == 0 {
@@ -409,7 +412,7 @@ pub(crate) fn run_surface_balance_passes(
                 .and_then(|snapshots| snapshots.get(&surface.surface_id).copied());
             surface.inside_ctf_outside_temperature_c =
                 inside_ctf_outside_temperature_c.unwrap_or(surface.outside_face_temperature_c);
-            surface.inside_face_temperature_c =
+            let solved_inside_face_temperature_c =
                 energyplus_ctf_inside_face_temperature_c_with_outside_temperature(
                     surface,
                     CtfInsideFaceBalanceInput {
@@ -420,6 +423,11 @@ pub(crate) fn run_surface_balance_passes(
                     },
                     inside_ctf_outside_temperature_c,
                 );
+            surface.inside_face_temperature_c = if let Some(tmp) = ordinary_inside_tmp.as_mut() {
+                tmp.retain_solved_and_copy(surface_index, solved_inside_face_temperature_c)
+            } else {
+                solved_inside_face_temperature_c
+            };
             if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
                 && !use_previous_inside_for_adiabatic_boundary
             {

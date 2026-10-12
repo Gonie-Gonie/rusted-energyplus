@@ -601,6 +601,16 @@ where
         } else {
             None
         };
+    // The sink validates the complete arrays/associations before radiation or solve writes.
+    // Its borrow is consumed by this one admitted ordinary pass only.
+    let ordinary_inside_tmp = state
+        .ordinary_inside_temperatures
+        .as_mut()
+        .map(|owner| {
+            owner.inside_tmp_for_pass(&state.surfaces, state.surface_indexes.ctf_surface_indices())
+        })
+        .transpose()
+        .map_err(Error::from)?;
     let interleaved_surface_zone_balance_result =
         surface_manager::calc_heat_balance_inside_surf_source_order_path(|| {
             if runtime_config.timestep.interleave_zone_air_surface_passes {
@@ -671,6 +681,7 @@ where
                     None,
                     false,
                     ordinary_reference_air_temperatures.as_ref(),
+                    ordinary_inside_tmp,
                 );
 
                 if runtime_config
@@ -725,6 +736,7 @@ where
                         None,
                         None,
                         false,
+                        None,
                         None,
                     );
                 }

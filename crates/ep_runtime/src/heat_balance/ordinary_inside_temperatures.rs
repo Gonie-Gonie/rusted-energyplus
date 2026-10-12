@@ -23,6 +23,24 @@ pub(crate) struct OrdinaryInsideTemperatures {
     pub(crate) low_hconv_limit_w_per_m2_k: f64,
     /// Separate SurfTempInsOld allocation; BeginEnvrn does not reset it.
     pub(crate) inside_old: Vec<(SurfaceId, f64)>,
+    /// Independent complete SurfTempInTmp allocation for represented HT surfaces.
+    pub(crate) inside_tmp: Vec<(SurfaceId, f64)>,
+    /// Retained Zone.spaceIndexes / HT traversal, resolved once at allocation.
+    heat_transfer_indices: Vec<usize>,
+}
+
+/// Only a complete, associated owner can create this borrowed ordinary-pass sink.
+pub(crate) struct OrdinaryInsideTmp<'a> {
+    rows: &'a mut [(SurfaceId, f64)],
+}
+
+impl OrdinaryInsideTmp<'_> {
+    pub(crate) fn retain_solved_and_copy(&mut self, index: usize, solved: f64) -> f64 {
+        // HBSM8913 and8933 ownership sequence, with the existing Rust solver scalar.
+        // No second solve, lookup, fallback or per-surface allocation occurs.
+        self.rows[index].1 = solved;
+        self.rows[index].1
+    }
 }
 
 impl OrdinaryInsideTemperatures {
@@ -35,6 +53,18 @@ impl OrdinaryInsideTemperatures {
         let [zone_id] = layout.zones() else {
             return Err(Unavailable::OrdinaryTemperatureOwner);
         };
+        let heat_transfer_indices = layout
+            .groups()
+            .iter()
+            .flat_map(|group| &group.surfaces)
+            .map(|id| {
+                layout
+                    .surfaces()
+                    .iter()
+                    .position(|row| row.surface_id == *id)
+                    .ok_or(Unavailable::OrdinaryTemperatureOwner)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(Self {
             zone_zt: (*zone_id, 23.0),
             space_air: SpaceAirTemperatures::allocate(&layout),
@@ -45,6 +75,12 @@ impl OrdinaryInsideTemperatures {
                 .iter()
                 .map(|s| (s.surface_id, 0.0))
                 .collect(),
+            inside_tmp: layout
+                .surfaces()
+                .iter()
+                .map(|s| (s.surface_id, 0.0))
+                .collect(),
+            heat_transfer_indices,
             layout,
         })
     }
@@ -56,11 +92,98 @@ impl OrdinaryInsideTemperatures {
         Ok(())
     }
 
+    fn validate_temperature_arrays(&self) -> Result<(), Unavailable> {
+        let associations = self.layout.surfaces();
+        if self.inside_old.len() != associations.len()
+            || self.inside_tmp.len() != associations.len()
+            || self
+                .inside_old
+                .iter()
+                .zip(associations)
+                .any(|(row, association)| row.0 != association.surface_id)
+            || self
+                .inside_tmp
+                .iter()
+                .zip(associations)
+                .any(|(row, association)| row.0 != association.surface_id)
+            || self.heat_transfer_indices.len() != associations.len()
+            || self
+                .heat_transfer_indices
+                .iter()
+                .zip(
+                    self.layout
+                        .groups()
+                        .iter()
+                        .flat_map(|group| &group.surfaces),
+                )
+                .any(|(&index, id)| associations.get(index).map(|row| row.surface_id) != Some(*id))
+        {
+            return Err(Unavailable::OrdinaryTemperatureOwner);
+        }
+        Ok(())
+    }
+
+    fn validate_surface_rows(
+        &self,
+        surfaces: &[SurfaceHeatBalanceState],
+    ) -> Result<(), Unavailable> {
+        self.validate_temperature_arrays()?;
+        if surfaces.len() != self.layout.surfaces().len()
+            || surfaces
+                .iter()
+                .zip(self.layout.surfaces())
+                .any(|(surface, association)| {
+                    (surface.surface_id, surface.zone_id)
+                        != (association.surface_id, association.zone_id)
+                })
+        {
+            return Err(Unavailable::OrdinaryTemperatureOwner);
+        }
+        Ok(())
+    }
+
+    fn validate_inside_indices(&self, indices: &[usize]) -> Result<(), Unavailable> {
+        // The admitted model represents every surface as CTF/HT; partial,
+        // reordered, duplicate or out-of-range traversal is unavailable.
+        if indices.len() != self.layout.surfaces().len()
+            || indices
+                .iter()
+                .copied()
+                .enumerate()
+                .any(|(expected, actual)| expected != actual)
+        {
+            return Err(Unavailable::OrdinaryTemperatureOwner);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn inside_tmp_for_pass(
+        &mut self,
+        surfaces: &[SurfaceHeatBalanceState],
+        indices: &[usize],
+    ) -> Result<OrdinaryInsideTmp<'_>, Unavailable> {
+        self.validate_surface_rows(surfaces)?;
+        self.validate_inside_indices(indices)?;
+        Ok(OrdinaryInsideTmp {
+            rows: self.inside_tmp.as_mut_slice(),
+        })
+    }
+
     pub(crate) fn begin_environment(
         &mut self,
         zones: &mut [ZoneHeatBalanceState],
     ) -> Result<(), Unavailable> {
         self.validate_zones(zones)?;
+        self.validate_temperature_arrays()?;
+        let space_rows = self.space_air.rows();
+        if space_rows.len() != self.layout.spaces().len()
+            || space_rows
+                .iter()
+                .zip(self.layout.spaces())
+                .any(|(row, &(space, zone))| (row.space_id, row.zone_id) != (space, zone))
+        {
+            return Err(Unavailable::OrdinaryTemperatureOwner);
+        }
         // HBSM2231-2250 reconstructs both Zone and Space owners, even with
         // space simulation disabled. Other constructor fields remain separate.
         self.zone_zt.1 = 23.0;
@@ -68,7 +191,13 @@ impl OrdinaryInsideTemperatures {
         zones[0].zone_timestep_average_air_temperature_c = 23.0;
         self.space_air
             .reset_begin_environment(&self.layout)
-            .map_err(|_| Unavailable::OrdinaryTemperatureOwner)
+            .map_err(|_| Unavailable::OrdinaryTemperatureOwner)?;
+        // HBSM2252-2260: only the admitted complete HT traversal is reset.
+        // The model does not represent Native non-HT TotSurfaces rows.
+        for &index in &self.heat_transfer_indices {
+            self.inside_tmp[index].1 = 23.0;
+        }
+        Ok(())
     }
 
     pub(crate) fn retain_solution(&mut self, id: ZoneId, zt: f64) -> Result<(), Unavailable> {
@@ -133,15 +262,7 @@ impl OrdinaryInsideTemperatures {
         &mut self,
         surfaces: &[SurfaceHeatBalanceState],
     ) -> Result<(), Unavailable> {
-        if self.inside_old.len() != surfaces.len()
-            || self
-                .inside_old
-                .iter()
-                .zip(surfaces)
-                .any(|(old, s)| old.0 != s.surface_id)
-        {
-            return Err(Unavailable::OrdinaryTemperatureOwner);
-        }
+        self.validate_surface_rows(surfaces)?;
         // Actual inside-pass entry, before radiation or any inside solve writes.
         // Existing outside-stage writes are retained as real incoming owners.
         for (old, surface) in self.inside_old.iter_mut().zip(surfaces) {
@@ -200,6 +321,7 @@ pub(crate) fn prepare(
         low_hconv_limit_w_per_m2_k,
     )?;
     validate(&owner, model, &state.zones, &state.surfaces)?;
+    owner.validate_inside_indices(state.surface_indexes.ctf_surface_indices())?;
     state.ordinary_inside_temperatures = Some(owner);
     Ok(())
 }
@@ -217,23 +339,10 @@ fn validate(
     )?;
     let current = InsideConvectionLayout::from_typed_model(model)
         .map_err(|_| Unavailable::OrdinaryTemperatureOwner)?;
-    if current != owner.layout
-        || surfaces.len() != owner.layout.surfaces().len()
-        || surfaces.len() != owner.inside_old.len()
-        || surfaces
-            .iter()
-            .zip(&owner.inside_old)
-            .any(|(s, old)| s.surface_id != old.0)
-        || surfaces
-            .iter()
-            .zip(owner.layout.surfaces())
-            .any(|(s, association)| {
-                (s.surface_id, s.zone_id) != (association.surface_id, association.zone_id)
-            })
-    {
+    if current != owner.layout {
         return Err(Unavailable::OrdinaryTemperatureOwner);
     }
-    Ok(())
+    owner.validate_surface_rows(surfaces)
 }
 
 pub(crate) fn validate_step(
@@ -245,6 +354,7 @@ pub(crate) fn validate_step(
     if let Some(owner) = &state.ordinary_inside_temperatures {
         admit_config(config, passes)?;
         validate(owner, model, &state.zones, &state.surfaces)?;
+        owner.validate_inside_indices(state.surface_indexes.ctf_surface_indices())?;
     }
     Ok(())
 }

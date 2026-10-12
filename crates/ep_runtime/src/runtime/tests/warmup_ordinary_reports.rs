@@ -30,6 +30,11 @@ fn ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day(
         }
         let temperatures=simulation.state.ordinary_inside_temperatures.as_ref().ok_or("missing ordinary temperature owner")?;
         assert_eq!(temperatures.inside_old.len(),simulation.state.surfaces.len());
+        assert_eq!(temperatures.inside_tmp.len(),simulation.state.surfaces.len());
+        for (&(id, tmp), surface) in temperatures.inside_tmp.iter().zip(&simulation.state.surfaces) {
+            assert_eq!(id,surface.surface_id);
+            assert_eq!(tmp.to_bits(),surface.inside_face_temperature_c.to_bits());
+        }
         assert_eq!(temperatures.no_user_convection_input.counts(),[0;6]);
         assert_eq!(temperatures.low_hconv_limit_w_per_m2_k.to_bits(),0.375_f64.to_bits());
         for space in temperatures.space_air.rows() {
@@ -136,6 +141,24 @@ fn assert_selected_temperature_resets_and_prefix(
     assert_eq!(*owner, input_prefix);
     let original_id = state.surfaces.first().ok_or("missing actual surface")?.surface_id;
     let stale_id = ep_model::SurfaceId(original_id.0.wrapping_add(1));
+    assert!(owner.inside_tmp_for_pass(&state.surfaces, &[]).is_err());
+    assert_eq!(*owner,input_prefix);
+    owner.inside_tmp[0].0 = stale_id;
+    let invalid_tmp_prefix = owner.clone();
+    let zone_prefix = state.zones.iter().map(|zone|
+        (zone.mean_air_temperature_c.to_bits(), zone.zone_timestep_average_air_temperature_c.to_bits()))
+        .collect::<Vec<_>>();
+    assert!(owner.prepare_inside_entry(model, &state.zones, &mut state.surfaces).is_err());
+    assert!(owner.inside_tmp_for_pass(&state.surfaces, state.surface_indexes.ctf_surface_indices()).is_err());
+    assert!(owner.begin_environment(&mut state.zones).is_err());
+    assert_eq!(*owner,invalid_tmp_prefix);
+    assert_eq!(state.zones.iter().map(|zone|
+        (zone.mean_air_temperature_c.to_bits(), zone.zone_timestep_average_air_temperature_c.to_bits()))
+        .collect::<Vec<_>>(),zone_prefix);
+    assert_eq!(state.surfaces.iter().map(|surface|
+        (surface.inside_face_temperature_c.to_bits(),surface.inside_reference_air_temperature_c.to_bits()))
+        .collect::<Vec<_>>(),surface_prefix);
+    owner.inside_tmp[0].0 = original_id;
     state.surfaces[0].surface_id = stale_id;
     owner.inside_old[0].0 = stale_id;
     let old_before_validation = owner.inside_old.iter()
@@ -153,6 +176,8 @@ fn assert_selected_temperature_resets_and_prefix(
     owner.inside_old[0].0 = original_id;
     let last_surface = state.surfaces.pop().ok_or("missing surface prefix")?;
     let last_old = owner.inside_old.pop().ok_or("missing Old prefix")?;
+    let last_tmp = owner.inside_tmp.pop().ok_or("missing Tmp prefix")?;
+    let tmp_prefix = owner.inside_tmp.iter().map(|&(id,value)| (id,value.to_bits())).collect::<Vec<_>>();
     let old_prefix = owner.inside_old.iter().map(|&(id, value)| (id, value.to_bits())).collect::<Vec<_>>();
     let ref_air_prefix = state.surfaces.iter().map(|surface|
         surface.inside_reference_air_temperature_c.to_bits()).collect::<Vec<_>>();
@@ -162,7 +187,10 @@ fn assert_selected_temperature_resets_and_prefix(
     assert_eq!(state.surfaces.iter().map(|surface| surface.inside_reference_air_temperature_c.to_bits())
         .collect::<Vec<_>>(), ref_air_prefix);
     state.surfaces.push(last_surface);
+    assert_eq!(owner.inside_tmp.iter().map(|&(id,value)| (id,value.to_bits())).collect::<Vec<_>>(),tmp_prefix);
     owner.inside_old.push(last_old);
+    owner.inside_tmp.push(last_tmp);
+    owner.inside_tmp[0].1 = -0.0;
     let zone = state.zones.first_mut().ok_or("missing actual zone")?;
     let surface = state.surfaces.first_mut().ok_or("missing actual surface")?;
     let id = surface.surface_id;
@@ -174,6 +202,7 @@ fn assert_selected_temperature_resets_and_prefix(
     state.surfaces[0].inside_face_temperature_c = -0.0;
     owner.capture_inside_entry(&state.surfaces).map_err(|_| "inside capture unavailable")?;
     assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(owner.inside_tmp[0].1.to_bits(),(-0.0_f64).to_bits());
     state.surfaces[0].inside_face_temperature_c = 39.0;
     assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
 
@@ -205,6 +234,9 @@ fn assert_selected_temperature_resets_and_prefix(
     assert_eq!(state.zones[0].zone_timestep_average_air_temperature_c, 23.0);
     assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
     assert_eq!(state.surfaces[0].inside_face_temperature_c, 39.0);
+    for &(_,tmp) in &owner.inside_tmp {
+        assert_eq!(tmp.to_bits(),23.0_f64.to_bits());
+    }
     for space in owner.space_air.rows() {
         assert_eq!((space.mat, space.zt, space.ztav), (23.0, 23.0, 23.0));
     }

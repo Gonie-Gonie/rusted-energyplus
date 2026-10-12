@@ -1,0 +1,67 @@
+{
+  "schema": "src06-actual-ordinary-independent-inside-tmp.v1",
+  "status": "bounded owner transitions implemented and actual Native cases replayed",
+  "current_Source": {
+    "path": ".runtime/porting/source-objects/21/21d06c68d0fbce17b4ea5f83e2716a0ec3c643953cbfa3f633936485b16b2450",
+    "sha256": "21d06c68d0fbce17b4ea5f83e2716a0ec3c643953cbfa3f633936485b16b2450"
+  },
+  "publication_inputs": {
+    "path": ".runtime/porting/SRC-06/ordinary-inside-tmp-publication-inputs-01.json",
+    "sha256": "5a8c5455a8dd31904c19595b91d44860173c06475befd5e5b1f380a08dd7b900",
+    "size_bytes": 65979
+  },
+  "actual_Native_facts": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/review.json",
+    "sha256": "0c485eff914c0def87199b8a31e6a090d81c2af2c22b440fd8c77926964572ba",
+    "size_bytes": 34995
+  },
+  "actual_Native_fixture": {
+    "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/ordinary-readiness-native-factual-01/selected-cases.json",
+    "sha256": "b5d13ffe85c1695d805ba2492537b5f4443c3461313806e91187f64a577310dd",
+    "size_bytes": 3384982
+  },
+  "Rust_replay_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_readiness_tmp_selected_cases.json",
+    "sha256": "24d8e59b12a976e962f9cfc72fc1c3e694057c2b8257b51638e937aeb96a275d",
+    "size_bytes": 517298
+  },
+  "actual_Native_event_count": 322474,
+  "validated_Native_selected_pairs": {
+    "scratch_surface_allocation_before": 1,
+    "scratch_surface_reset_before": 4,
+    "convection_user_input_before": 1,
+    "initial_convection_tmp_before": 2025,
+    "ctf_surface_solve_before": 74682,
+    "ctf_surface_solve_after_copy_before": 74682,
+    "ctf_convection_in_before": 4,
+    "convection_active_surface_setup_before": 1
+  },
+  "complete_actual_primary_HT_groups_by_phase": {
+    "kickoff": 283,
+    "warmup_first_day": 666,
+    "warmup_later_day": 10928,
+    "run": 570
+  },
+  "actual_Native_mismatches": 0,
+  "workspace_tests": {
+    "groups": 18,
+    "passed": 4969,
+    "failed": 0,
+    "ignored": 2
+  },
+  "implementation": "Independent complete represented-HT Tmp allocation, BeginEnvironment HT reset, and existing ordinary solver result retained in Tmp before immediate In copy.",
+  "replay_scope": "Actual allocation/reset and four same-invocation complete primary HT groups; copied scalar bits and independent owner retention. Native solved values are tests-only inputs to the copy operation.",
+  "limitations": [
+    "No CTF solve/coefficient equation parity is claimed.",
+    "Native readiness/caller order is observed but not yet ported.",
+    "Ordinary dispatcher remains inactive; radiation/cache, iteration30 refresh, term rebuild and full ordinary comparison remain pending.",
+    "No Native non-HT, TDD/window or full ZTAV lifecycle replay is claimed."
+  ],
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-tmp/evidence.zip",
+    "sha256": "1b4011a2da3957bdc8621e5b67d319064703f2d845f1b0af66e2c534f4a624fd",
+    "size_bytes": 12949562
+  }
+}

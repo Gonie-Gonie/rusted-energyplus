@@ -266,3 +266,48 @@ The ordinary dispatcher remains inactive. Independent SurfTempInTmp, actual
 equipment/Node readiness, radiation/cache lifecycle, positive completed-
 iteration30 refresh, immediate CTF term rebuild and full ordinary solver/handoff
 comparison remain pending. All four SRC-06 gates and A14/54/B14/64 are unchanged.
+
+## Actual independent ordinary inside scratch temperatures
+
+The ordinary owner now allocates a separate complete represented-HT
+SurfTempInTmp array. BeginEnvironment resets Tmp to23 without resetting Old.
+Complete surface identities, associations and CTF indices are validated before
+any writes. The existing inside solver keeps its operands, call and arithmetic;
+its returned value is retained in Tmp and immediately copied to In through the
+validated borrowed owner. No second solve or per-surface allocation is added.
+
+One genuine A-24H Native run produced322,474 selected events. The complete
+stream checker validated74,682 primary solve pairs and74,682 immediate-copy
+pairs, one allocation, four resets,2,025 initial-convection pairs and four
+positive completed-iteration30 refresh pairs, with zero factual mismatches.
+Readiness and caller order were observed, not implemented by this unit. The
+complete raw stream is retained as a gzip whose decoded length, SHA and CRC
+were checked against the original capture. The build, provider addresses,
+normal outputs and earlier preconfigure failure remain in the evidence.
+
+Seven unchanged actual cases from the138-case Native fixture extend one
+existing private replay test: allocation, two resets and four complete primary
+HT groups covering kickoff, first/later warmup and run. The24 adjacent
+solve/copy triplets supply actual solved values only as test inputs to the
+private copy operation. Replay checks exact copied bits and independent owner
+retention; it does not compare CTF equations. Initial Native In and HConv are
+not manufactured as effects of the Rust BeginEnvironment operation.
+
+Final Source `21d06c68` passed fmt, workspace Clippy with warnings denied,
+the source-quality guard and one workspace test run:4,969 passed,0 failed,
+2 existing ignored. The affected ordinary filter passed36 tests. Existing
+tests were extended; no test functions or binaries were added. No changed
+file exceeds its source-size limit; the previously recorded global size debt
+is not claimed as a passing global gate.
+
+[Inside scratch-temperature evidence](../evidence/SRC-06-ordinary-inside-tmp/summary.json)
+contains the summary, indexed manifest and finite ZIP with205 selected
+artifact references. Large executable, map, core and provider payloads remain
+provenance references, without a transitive replay claim.
+
+Independent represented-HT Tmp allocation/reset/copy is complete within this
+bounded owner scope. Native non-HT/TDD/window branches, real equipment/Node
+readiness, radiation/cache lifecycle, positive completed-iteration30 refresh,
+immediate CTF term rebuild, full ZTAV and ordinary solver/handoff comparison
+remain pending. The ordinary dispatcher remains inactive. All four SRC-06 gates
+and A14/54/B14/64 are unchanged.
