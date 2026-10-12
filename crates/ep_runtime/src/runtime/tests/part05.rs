@@ -612,7 +612,7 @@
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
-            );
+            )?;
             crate::heat_balance::ctf_surface_lifecycle::ensure_available(&state)?;
             state.ctf_history_caller_clock.commit(clock)
                 .map_err(RuntimeError::CtfSurfaceLifecycle)?;

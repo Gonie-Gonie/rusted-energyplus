@@ -35,7 +35,7 @@
             1,
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
-        );
+        )?;
         crate::heat_balance::ctf_surface_lifecycle::ensure_available(&cached_state)?;
         cached_state.ctf_history_caller_clock.commit(cached_clock)
             .map_err(RuntimeError::CtfSurfaceLifecycle)?;
@@ -227,7 +227,7 @@
                 1,
                 None,
                 HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
-            );
+            )?;
             crate::heat_balance::ctf_surface_lifecycle::ensure_available(&cached_state)?;
             cached_state.ctf_history_caller_clock.commit(cached_clock)
                 .map_err(RuntimeError::CtfSurfaceLifecycle)?;
@@ -248,7 +248,7 @@
                 1,
                 None,
                 HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
-            );
+            )?;
             crate::heat_balance::ctf_surface_lifecycle::ensure_available(&live_state)?;
             live_state.ctf_history_caller_clock.commit(live_clock)
                 .map_err(RuntimeError::CtfSurfaceLifecycle)?;

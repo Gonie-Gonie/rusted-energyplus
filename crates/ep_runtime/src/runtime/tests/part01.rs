@@ -13,7 +13,7 @@
         HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
         InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, OutputSeries,
         QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
-        STEFAN_BOLTZMANN_W_PER_M2_K4, ScheduleSeriesKind, SimulationMode, SimulationState,
+        ScheduleSeriesKind, SimulationMode, SimulationState,
         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         SurfaceOutsideBalanceDiagnostics,
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,

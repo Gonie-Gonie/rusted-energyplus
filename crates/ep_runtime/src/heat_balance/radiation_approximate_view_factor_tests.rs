@@ -315,3 +315,154 @@ fn actual_native_scriptf_lu_calls_replay_complete_working_and_inverse_bits()
     }
     Ok(())
 }
+
+// Contract tests only, not generated Native numerical expectations.
+#[test]
+fn selected_fix_and_scriptf_unsupported_inputs_are_unavailable_before_mutation() {
+    for areas in [
+        vec![],
+        vec![1.0; 3],
+        vec![0.0; 4],
+        vec![-1.0; 4],
+        vec![f64::NAN; 4],
+        vec![10.0, 1.0, 1.0, 1.0],
+    ] {
+        let factors = vec![0.0; areas.len() * areas.len()];
+        assert!(fix_energyplus_approximate_view_factors(&areas, &factors).is_none());
+    }
+    assert!(fix_energyplus_approximate_view_factors(&[1.0; 4], &[0.0; 15]).is_none());
+    assert!(fix_energyplus_approximate_view_factors(&[1.0; 4], &[f64::INFINITY; 16]).is_none());
+    for emissivity in [-1.0, 1.0, f64::NAN, f64::INFINITY] {
+        let mut emissivities = [0.5, emissivity];
+        let before = emissivities.map(f64::to_bits);
+        assert!(
+            energyplus_scriptf_from_view_factors(&[1.0; 2], &[0.0; 4], &mut emissivities).is_none()
+        );
+        assert_eq!(emissivities.map(f64::to_bits), before);
+    }
+}
+
+// Genuine factual report363017cc: all one Fix and four ScriptF calls admitted.
+// Preserve every complete actual call; use only BEFORE numeric inputs.
+#[test]
+fn actual_native_fix_and_scriptf_calls_replay_all_dimensionless_output_bits()
+-> Result<(), Box<dyn std::error::Error>> {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "fixtures/ordinary_radiation_producer_native_cases.json"
+    ))?;
+    assert_eq!(
+        fixture["schema"].as_str(),
+        Some("src06-actual-native-radiation-producer-cases.v1")
+    );
+    assert_eq!(fixture["all_actual_calls_preserved"].as_bool(), Some(true));
+    assert_eq!(
+        fixture["comparison_policy"]["sha256"].as_str(),
+        Some("a07993df86d78f7bf87bc55e60f66f9a1b09d7ec8c42eb45151ae2ba73c0e942")
+    );
+    let cases = fixture["cases"]
+        .as_array()
+        .ok_or("actual producer cases absent")?;
+    assert_eq!(cases.len(), 5);
+    let decode = |owner: &serde_json::Value,
+                  key: &str,
+                  length: usize|
+     -> Result<Vec<f64>, Box<dyn std::error::Error>> {
+        let rows = owner[key]
+            .as_array()
+            .ok_or("actual full producer array absent")?;
+        assert_eq!(rows.len(), length);
+        assert_eq!(owner["size"].as_u64(), Some(u64::try_from(length)?));
+        if key == "flat_values" {
+            assert_eq!(
+                owner["contents_initialized_by_actual_producer"].as_bool(),
+                Some(true)
+            );
+        }
+        rows.iter()
+            .enumerate()
+            .map(|(index, row)| {
+                let (ordinal_key, ordinal) = if key == "flat_values" {
+                    ("offset", index)
+                } else {
+                    ("index", index + 1)
+                };
+                assert_eq!(row[ordinal_key].as_u64(), Some(u64::try_from(ordinal)?));
+                let bits = row["value"]["value_bits"]
+                    .as_str()
+                    .ok_or("actual producer bits absent")?;
+                assert_eq!(bits.len(), 16);
+                let value = f64::from_bits(u64::from_str_radix(bits, 16)?);
+                assert!(
+                    value.is_finite(),
+                    "actual producer value is numerically excluded"
+                );
+                Ok(value)
+            })
+            .collect()
+    };
+    let compare = |actual: &[f64], expected: &[f64], call_index: usize, label: &str| {
+        assert_eq!(actual.len(), expected.len());
+        for (offset, (actual, expected)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "actual Native call {call_index}, {label} offset {offset}"
+            );
+        }
+        actual.len()
+    };
+    let mut calls = [0_usize; 2];
+    let mut compared_values = 0;
+    for (call_index, case) in cases.iter().enumerate() {
+        // Any excluded call prevents whole-table numeric success; never skip it.
+        assert_eq!(case["numerical_admitted"].as_bool(), Some(true));
+        assert!(
+            case["numerical_exclusions"]
+                .as_array()
+                .ok_or("actual exclusions absent")?
+                .is_empty()
+        );
+        let n = usize::try_from(
+            case["dimension"]
+                .as_u64()
+                .ok_or("actual dimension absent")?,
+        )?;
+        let extent = n.checked_mul(n).ok_or("actual producer extent overflow")?;
+        assert!(n > 0);
+        match case["operation"].as_str() {
+            Some("fix_view_factors") => {
+                let before = &case["entry"]["producer"];
+                let after = &case["returned"]["producer"];
+                let areas = decode(&before["A"], "values", n)?;
+                let input_f = decode(&before["F"], "flat_values", extent)?;
+                let expected_f = decode(&after["F"], "flat_values", extent)?;
+                let actual_f = fix_energyplus_approximate_view_factors(&areas, &input_f)
+                    .ok_or("real Rust Fix unavailable for admitted Native input")?;
+                compared_values += compare(&actual_f, &expected_f, call_index, "fixed F");
+                calls[0] += 1;
+            }
+            Some("calc_scriptf") => {
+                let before = &case["inputs_before"]["producer"];
+                let after = &case["outputs_after"]["producer"];
+                assert!(before["ScriptF"]["flat_values"].is_null());
+                let areas = decode(&before["A"], "values", n)?;
+                let input_f = decode(&before["F"], "flat_values", extent)?;
+                let mut emissivities = decode(&before["EMISS"], "values", n)?;
+                let expected_f = decode(&after["ScriptF"], "flat_values", extent)?;
+                let expected_emissivities = decode(&after["EMISS"], "values", n)?;
+                let actual_f =
+                    energyplus_scriptf_from_view_factors(&areas, &input_f, &mut emissivities)
+                        .ok_or("real Rust ScriptF unavailable for admitted Native input")?;
+                compared_values +=
+                    compare(&actual_f, &expected_f, call_index, "dimensionless ScriptF");
+                compared_values +=
+                    compare(&emissivities, &expected_emissivities, call_index, "EMISS");
+                calls[1] += 1;
+            }
+            _ => return Err("unknown actual producer operation".into()),
+        }
+    }
+    assert_eq!(calls, [1, 4]);
+    assert_eq!(compared_values, 204);
+    Ok(())
+}

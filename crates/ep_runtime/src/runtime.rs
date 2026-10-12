@@ -63,9 +63,8 @@ use crate::heat_balance::manager::init_heat_balance_source_order_path;
 #[cfg(test)]
 use crate::heat_balance::radiation::{
     InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
-    STEFAN_BOLTZMANN_W_PER_M2_K4, energyplus_approximate_view_factors,
-    energyplus_scriptf_from_view_factors, fix_energyplus_approximate_view_factors,
-    update_surface_inside_longwave_exchange_probe,
+    energyplus_approximate_view_factors, energyplus_scriptf_from_view_factors,
+    fix_energyplus_approximate_view_factors, update_surface_inside_longwave_exchange_probe,
     update_surface_inside_scriptf_longwave_exchange_probe,
 };
 #[cfg(test)]
@@ -553,7 +552,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 surface_iteration_count,
                 inside_hconv_reevaluation_interval,
                 surface_loop_zone_air_correction,
-            );
+            )
         },
     )?;
     let run_period_initial_zone_air_states = state

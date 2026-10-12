@@ -9,7 +9,8 @@ use crate::heat_balance::inside_convection::{
     heat_balance_inside_convection_coefficient_inputs, heat_balance_inside_convection_coefficients,
 };
 use crate::heat_balance::radiation::{
-    InteriorLongwaveExchangeProbe, update_surface_inside_longwave_exchange_probe,
+    InteriorLongwaveExchangeProbe, InteriorRadiationUnavailable,
+    update_surface_inside_longwave_exchange_probe,
     update_surface_inside_scriptf_flat_access_longwave_exchange_probe,
     update_surface_inside_scriptf_longwave_exchange_probe,
 };
@@ -63,7 +64,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) -> InterleavedSurfaceZoneBalanceResult {
+) -> Result<InterleavedSurfaceZoneBalanceResult, InteriorRadiationUnavailable> {
     let inside_hconv_reevaluation_interval =
         inside_hconv_reevaluation_interval.filter(|interval| *interval > 0);
     let mut inside_convection_coefficients =
@@ -179,7 +180,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
             use_inside_ctf_outside_temperature_for_conduction_report,
             None,
             None,
-        );
+        )?;
         if freeze_outside_balance_for_surface_iterations
             && frozen_outside_boundary_balances.is_none()
         {
@@ -250,12 +251,12 @@ pub(crate) fn run_interleaved_surface_zone_balance(
         }
     }
 
-    InterleavedSurfaceZoneBalanceResult {
+    Ok(InterleavedSurfaceZoneBalanceResult {
         inside_ctf_outside_temperature_snapshots: frozen_inside_ctf_outside_temperatures,
         inside_surface_iteration_count,
         max_inside_surface_delta_c: final_max_inside_surface_delta_c,
         max_delta_surface_name: final_max_delta_surface_name,
-    }
+    })
 }
 
 pub(crate) fn run_surface_balance_passes(
@@ -286,7 +287,7 @@ pub(crate) fn run_surface_balance_passes(
     ordinary_reference_air_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     // Some is created before this pass only by the complete associated ordinary owner.
     mut ordinary_inside_tmp: Option<super::ordinary_inside_temperatures::OrdinaryInsideTmp<'_>>,
-) {
+) -> Result<(), InteriorRadiationUnavailable> {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         let temperature_overrides = if surface_iteration_index == 0 {
             first_pass_longwave_temperatures
@@ -300,21 +301,21 @@ pub(crate) fn run_surface_balance_passes(
                     surfaces,
                     surface_indexes,
                     temperature_overrides,
-                );
+                )?;
             }
             InteriorLongwaveExchangeProbe::EnergyPlusScriptF => {
                 update_surface_inside_scriptf_longwave_exchange_probe(
                     surfaces,
                     surface_indexes,
                     temperature_overrides,
-                );
+                )?;
             }
             InteriorLongwaveExchangeProbe::EnergyPlusScriptFFlatAccess => {
                 update_surface_inside_scriptf_flat_access_longwave_exchange_probe(
                     surfaces,
                     surface_indexes,
                     temperature_overrides,
-                );
+                )?;
             }
         }
         for surface_index in surface_indexes.ctf_surface_indices().iter().copied() {
@@ -440,4 +441,5 @@ pub(crate) fn run_surface_balance_passes(
             );
         }
     }
+    Ok(())
 }

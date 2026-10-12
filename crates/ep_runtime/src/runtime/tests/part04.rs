@@ -228,7 +228,7 @@
             false,
             None,
             None,
-        );
+        )?;
 
         let surface = &state.surfaces[0];
         assert_eq!(surface.outside_face_temperature_c, 12.0);
@@ -308,7 +308,7 @@
             false,
             None,
             None,
-        );
+        )?;
 
         let surface = &state.surfaces[0];
         assert!((surface.outside_face_temperature_c - 12.0).abs() > 1.0e-6);
@@ -405,7 +405,7 @@
             &mut state.surfaces,
             &state.surface_indexes,
             None,
-        );
+        )?;
 
         for surface in &state.surfaces {
             assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-12);
@@ -428,7 +428,7 @@
             &mut state.surfaces,
             &state.surface_indexes,
             None,
-        );
+        )?;
 
         assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
         for surface in state.surfaces.iter().skip(1) {
@@ -458,10 +458,65 @@
             &mut state.surfaces,
             &state.surface_indexes,
             None,
-        );
+        )?;
 
         for surface in &state.surfaces {
             assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-9);
+        }
+
+        // Original one-surface caller branch: zero net self-exchange, while
+        // full input validation still precedes any staged zero-flux commit.
+        let update_probes = [
+            update_surface_inside_longwave_exchange_probe,
+            update_surface_inside_scriptf_longwave_exchange_probe,
+            crate::heat_balance::radiation::update_surface_inside_scriptf_flat_access_longwave_exchange_probe,
+        ];
+        for update in update_probes {
+            let mut one_surface = [state.surfaces[0].clone()];
+            let mut indexes = state.surface_indexes.clone();
+            indexes.surfaces_by_zone = vec![vec![0]];
+            one_surface[0].inside_net_longwave_w_per_m2 = 12.0;
+            update(&mut one_surface, &indexes, None)?;
+            assert_eq!(one_surface[0].inside_net_longwave_w_per_m2.to_bits(), 0.0_f64.to_bits());
+            one_surface[0].inside_net_longwave_w_per_m2 = -0.0;
+            one_surface[0].inside_face_temperature_c = f64::NAN;
+            assert!(update(&mut one_surface, &indexes, None).is_err());
+            assert_eq!(one_surface[0].inside_net_longwave_w_per_m2.to_bits(), (-0.0_f64).to_bits());
+            one_surface[0].inside_face_temperature_c = 21.0;
+            indexes.surfaces_by_zone[0].push(0);
+            assert!(update(&mut one_surface, &indexes, None).is_err());
+            assert_eq!(one_surface[0].inside_net_longwave_w_per_m2.to_bits(), (-0.0_f64).to_bits());
+        }
+
+        // Same existing probe test: unsupported transactions retain every
+        // surface flux, including a supported first zone before a bad second.
+        for case in 0..5 {
+            let mut unsupported = state.clone();
+            for (index, surface) in unsupported.surfaces.iter_mut().enumerate() {
+                surface.inside_net_longwave_w_per_m2 = 100.0 + index as f64;
+            }
+            match case {
+                0 => unsupported.surface_indexes.surfaces_by_zone[0].push(0),
+                1 => unsupported.surfaces[0].inside_face_temperature_c = f64::NAN,
+                2 => unsupported.surfaces[0].area_m2 = 1000.0,
+                3 => unsupported.surfaces[0].inside_thermal_absorptance = 1.0,
+                _ => {
+                    let mut extra_zone = unsupported.surfaces.clone();
+                    for (index,surface) in extra_zone.iter_mut().enumerate() {
+                        surface.zone_id = ZoneId(1);
+                        surface.surface_id = SurfaceId(100+index as u32);
+                    }
+                    extra_zone[0].inside_thermal_absorptance = 1.0;
+                    let first = unsupported.surfaces.len();
+                    unsupported.surfaces.extend(extra_zone);
+                    unsupported.surface_indexes.surfaces_by_zone.push((first..unsupported.surfaces.len()).collect());
+                }
+            }
+            let before = unsupported.surfaces.iter().map(|s|s.inside_net_longwave_w_per_m2.to_bits()).collect::<Vec<_>>();
+            assert!(update_surface_inside_scriptf_longwave_exchange_probe(
+                &mut unsupported.surfaces, &unsupported.surface_indexes, None,
+            ).is_err());
+            assert_eq!(unsupported.surfaces.iter().map(|s|s.inside_net_longwave_w_per_m2.to_bits()).collect::<Vec<_>>(),before);
         }
 
         Ok(())
@@ -481,7 +536,7 @@
             &mut state.surfaces,
             &state.surface_indexes,
             None,
-        );
+        )?;
 
         assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
         let zone_exchange_w = state
@@ -519,7 +574,7 @@
             energyplus_scriptf_from_view_factors(&areas, &internal_view_factors, &mut emissivities)
                 .expect("script F matrix");
         let dimensionless = |sender_index: usize, receiver_index: usize| {
-            script_f[sender_index * surface_count + receiver_index] / STEFAN_BOLTZMANN_W_PER_M2_K4
+            script_f[sender_index * surface_count + receiver_index]
         };
 
         assert!((dimensionless(0, 4) - 0.3366).abs() < 5.0e-4);
@@ -562,7 +617,7 @@
         let view_factors = fix_energyplus_approximate_view_factors(
             &areas,
             &energyplus_approximate_view_factors(&snapshots),
-        );
+        ).expect("supported balanced finite enclosure");
         let printed_final_view_factors = [
             [0.0000, 0.078565, 0.078565, 0.078565, 0.3823, 0.3823],
             [0.078565, 0.0000, 0.078565, 0.078565, 0.3823, 0.3823],

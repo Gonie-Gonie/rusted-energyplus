@@ -58,11 +58,15 @@ pub(crate) use purchased_air::advance_heat_balance_state_one_timestep_with_direc
 /// gains while keeping the public zone-temperature comparison diagnostic-only.
 /// Ordinary CTF owners require a genuine caller clock; use
 /// [`advance_heat_balance_state_one_timestep_with_clock`] for a fallible manual step.
+///
+/// # Errors
+/// Returns the typed error when the required prepared caller-clock or source-owner
+/// precondition is unavailable, or the selected radiation path is unsupported.
 pub fn advance_heat_balance_state_one_timestep(
     model: &TypedModel,
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
-) {
+) -> Result<(), crate::error::RuntimeError> {
     advance_heat_balance_state_one_timestep_internal(
         model,
         state,
@@ -72,7 +76,7 @@ pub fn advance_heat_balance_state_one_timestep(
         1,
         None,
         HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
-    );
+    )
 }
 
 /// Advance one real prepared manual step with an explicitly supplied caller clock.
@@ -100,10 +104,9 @@ pub fn advance_heat_balance_state_one_timestep_with_clock(
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
             Some(clock),
-            |_state| Ok::<(), super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>(()),
+            |_state| Ok::<(), crate::error::RuntimeError>(()),
         )
     })
-    .map_err(crate::error::RuntimeError::CtfSurfaceLifecycle)
 }
 
 pub(crate) fn advance_heat_balance_state_one_timestep_internal(
@@ -115,7 +118,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
+) -> Result<(), crate::error::RuntimeError> {
     advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
         model,
         None,
@@ -127,7 +130,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
         surface_iteration_count,
         inside_hconv_reevaluation_interval,
         surface_loop_zone_air_correction,
-    );
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -142,7 +145,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cac
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
+) -> Result<(), crate::error::RuntimeError> {
     advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
         model,
         Some(schedule_cache),
@@ -154,7 +157,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cac
         surface_iteration_count,
         inside_hconv_reevaluation_interval,
         surface_loop_zone_air_correction,
-    );
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -169,7 +172,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cac
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
+) -> Result<(), crate::error::RuntimeError> {
     advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
         model,
         Some(schedule_cache),
@@ -181,7 +184,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cac
         surface_iteration_count,
         inside_hconv_reevaluation_interval,
         surface_loop_zone_air_correction,
-    );
+    )
 }
 
 #[cfg(test)]
@@ -196,7 +199,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_live_schedul
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
+) -> Result<(), crate::error::RuntimeError> {
     advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
         model,
         None,
@@ -208,7 +211,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_live_schedul
         surface_iteration_count,
         inside_hconv_reevaluation_interval,
         surface_loop_zone_air_correction,
-    );
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -223,8 +226,8 @@ fn advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
-    let result = manager::manage_heat_balance_source_order_path(|| {
+) -> Result<(), crate::error::RuntimeError> {
+    manager::manage_heat_balance_source_order_path(|| {
         advance_heat_balance_state_one_timestep_source_order_path(
             model,
             schedule_cache,
@@ -237,13 +240,9 @@ fn advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache
             inside_hconv_reevaluation_interval,
             surface_loop_zone_air_correction,
             None,
-            |_state| Ok::<(), super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>(()),
+            |_state| Ok::<(), crate::error::RuntimeError>(()),
         )
-    });
-    match result {
-        Ok(()) => {}
-        Err(_error) => {} // The actual owner retains the typed failure for Result callers.
-    }
+    })
 }
 
 fn advance_heat_balance_state_one_timestep_source_order_path<PredictorHook, Output, Error>(
@@ -262,7 +261,8 @@ fn advance_heat_balance_state_one_timestep_source_order_path<PredictorHook, Outp
 ) -> Result<Output, Error>
 where
     PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
-    Error: From<super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>,
+    Error: From<super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>
+        + From<super::radiation::InteriorRadiationUnavailable>,
 {
     super::ordinary_inside_temperatures::validate_step(
         model,
@@ -612,96 +612,43 @@ where
         .transpose()
         .map_err(Error::from)?;
     let interleaved_surface_zone_balance_result =
-        surface_manager::calc_heat_balance_inside_surf_source_order_path(|| {
-            if runtime_config.timestep.interleave_zone_air_surface_passes {
-                Some(run_interleaved_surface_zone_balance(
-                    model,
-                    &mut state.surfaces,
-                    &state.surface_indexes,
-                    &mut state.zones,
-                    Some(&previous_surface_inside_temperatures),
-                    input,
-                    weather_context,
-                    surface_iteration_count,
-                    runtime_config
-                        .timestep
-                        .use_previous_inside_for_outdoor_boundary,
-                    runtime_config
-                        .timestep
-                        .use_previous_inside_for_adiabatic_boundary,
-                    runtime_config.timestep.use_quick_outside_conduction,
-                    Some(&previous_surface_outside_temperatures),
-                    use_doe2_outside_convection,
-                    interior_longwave_exchange_probe,
-                    runtime_config.freeze_inside_convection_coefficients,
-                    use_current_inside_for_first_longwave,
-                    runtime_config.use_third_order_zone_air_correction,
-                    runtime_config.freeze_surface_reference_air,
-                    converge_interleaved_surface_iterations_to_energyplus_tolerance,
-                    freeze_outside_balance_for_surface_iterations,
-                    freeze_inside_ctf_outside_temperature_for_surface_iterations,
-                    use_inside_ctf_outside_temperature_for_conduction_report,
-                    inside_hconv_reevaluation_interval,
-                    surface_loop_zone_air_correction,
-                ))
-            } else {
-                let current_zone_temperatures = state
-                    .zones
-                    .iter()
-                    .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-                    .collect::<BTreeMap<_, _>>();
-                run_surface_balance_passes(
-                    model,
-                    &mut state.surfaces,
-                    &state.surface_indexes,
-                    Some(&previous_surface_inside_temperatures),
-                    Some(&previous_surface_inside_temperatures),
-                    None,
-                    &current_zone_temperatures,
-                    input,
-                    weather_context,
-                    surface_iteration_count,
-                    runtime_config
-                        .timestep
-                        .use_previous_inside_for_outdoor_boundary,
-                    runtime_config
-                        .timestep
-                        .use_previous_inside_for_adiabatic_boundary,
-                    runtime_config.timestep.use_quick_outside_conduction,
-                    if runtime_config.timestep.use_quick_outside_conduction {
-                        Some(&previous_surface_outside_temperatures)
-                    } else {
-                        None
-                    },
-                    use_doe2_outside_convection,
-                    interior_longwave_exchange_probe,
-                    None,
-                    None,
-                    None,
-                    None,
-                    false,
-                    ordinary_reference_air_temperatures.as_ref(),
-                    ordinary_inside_tmp,
-                );
-
-                if runtime_config
-                    .timestep
-                    .rebalance_surfaces_after_zone_air_correction
-                {
-                    zone_predictor_corrector::correct_step_source_order_path(|| {
-                        correct_zone_air_temperatures_from_current_surfaces(
-                            &state.surfaces,
-                            &state.surface_indexes,
-                            &mut state.zones,
-                            input.timestep_seconds,
-                            weather_context,
-                            input.outdoor_dry_bulb_c,
-                            true,
-                            runtime_config.use_third_order_zone_air_correction,
-                            false,
-                        );
-                    });
-                    let corrected_zone_temperatures = state
+        surface_manager::calc_heat_balance_inside_surf_source_order_path(
+            || -> Result<_, Error> {
+                if runtime_config.timestep.interleave_zone_air_surface_passes {
+                    run_interleaved_surface_zone_balance(
+                        model,
+                        &mut state.surfaces,
+                        &state.surface_indexes,
+                        &mut state.zones,
+                        Some(&previous_surface_inside_temperatures),
+                        input,
+                        weather_context,
+                        surface_iteration_count,
+                        runtime_config
+                            .timestep
+                            .use_previous_inside_for_outdoor_boundary,
+                        runtime_config
+                            .timestep
+                            .use_previous_inside_for_adiabatic_boundary,
+                        runtime_config.timestep.use_quick_outside_conduction,
+                        Some(&previous_surface_outside_temperatures),
+                        use_doe2_outside_convection,
+                        interior_longwave_exchange_probe,
+                        runtime_config.freeze_inside_convection_coefficients,
+                        use_current_inside_for_first_longwave,
+                        runtime_config.use_third_order_zone_air_correction,
+                        runtime_config.freeze_surface_reference_air,
+                        converge_interleaved_surface_iterations_to_energyplus_tolerance,
+                        freeze_outside_balance_for_surface_iterations,
+                        freeze_inside_ctf_outside_temperature_for_surface_iterations,
+                        use_inside_ctf_outside_temperature_for_conduction_report,
+                        inside_hconv_reevaluation_interval,
+                        surface_loop_zone_air_correction,
+                    )
+                    .map(Some)
+                    .map_err(Error::from)
+                } else {
+                    let current_zone_temperatures = state
                         .zones
                         .iter()
                         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
@@ -710,10 +657,10 @@ where
                         model,
                         &mut state.surfaces,
                         &state.surface_indexes,
+                        Some(&previous_surface_inside_temperatures),
+                        Some(&previous_surface_inside_temperatures),
                         None,
-                        None,
-                        None,
-                        &corrected_zone_temperatures,
+                        &current_zone_temperatures,
                         input,
                         weather_context,
                         surface_iteration_count,
@@ -736,13 +683,72 @@ where
                         None,
                         None,
                         false,
-                        None,
-                        None,
-                    );
+                        ordinary_reference_air_temperatures.as_ref(),
+                        ordinary_inside_tmp,
+                    )
+                    .map_err(Error::from)?;
+
+                    if runtime_config
+                        .timestep
+                        .rebalance_surfaces_after_zone_air_correction
+                    {
+                        zone_predictor_corrector::correct_step_source_order_path(|| {
+                            correct_zone_air_temperatures_from_current_surfaces(
+                                &state.surfaces,
+                                &state.surface_indexes,
+                                &mut state.zones,
+                                input.timestep_seconds,
+                                weather_context,
+                                input.outdoor_dry_bulb_c,
+                                true,
+                                runtime_config.use_third_order_zone_air_correction,
+                                false,
+                            );
+                        });
+                        let corrected_zone_temperatures = state
+                            .zones
+                            .iter()
+                            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+                            .collect::<BTreeMap<_, _>>();
+                        run_surface_balance_passes(
+                            model,
+                            &mut state.surfaces,
+                            &state.surface_indexes,
+                            None,
+                            None,
+                            None,
+                            &corrected_zone_temperatures,
+                            input,
+                            weather_context,
+                            surface_iteration_count,
+                            runtime_config
+                                .timestep
+                                .use_previous_inside_for_outdoor_boundary,
+                            runtime_config
+                                .timestep
+                                .use_previous_inside_for_adiabatic_boundary,
+                            runtime_config.timestep.use_quick_outside_conduction,
+                            if runtime_config.timestep.use_quick_outside_conduction {
+                                Some(&previous_surface_outside_temperatures)
+                            } else {
+                                None
+                            },
+                            use_doe2_outside_convection,
+                            interior_longwave_exchange_probe,
+                            None,
+                            None,
+                            None,
+                            None,
+                            false,
+                            None,
+                            None,
+                        )
+                        .map_err(Error::from)?;
+                    }
+                    Ok(None)
                 }
-                None
-            }
-        });
+            },
+        )?;
 
     if runtime_config.timestep.interleave_zone_air_surface_passes
         && matches!(

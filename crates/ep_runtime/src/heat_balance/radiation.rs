@@ -33,11 +33,84 @@ pub(crate) struct InteriorLongwaveSurfaceSnapshot {
     pub(crate) thermal_absorptance: f64,
 }
 
+/// Actual selected diagnostic probe inputs are outside the implemented scope.
+/// This is a Rust unavailable boundary, never a substitute Original fatal.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InteriorRadiationUnavailable {
+    /// The zone surface domain is incomplete, duplicated or inconsistently associated.
+    SurfaceLayout,
+    /// A real probe operand is nonfinite or outside its admitted physical domain.
+    SurfaceInput {
+        /// Actual typed surface carrying the unsupported operand.
+        surface_id: SurfaceId,
+    },
+    /// A real zone requires an unported Fix/ScriptF numeric or diagnostic branch.
+    ZoneNumericDomain {
+        /// Actual zero-based caller zone index; no enclosure owner is inferred.
+        zone_index: usize,
+    },
+    /// A computed probe flux is nonfinite; no staged surface flux was committed.
+    SurfaceOutput,
+}
+
+impl std::fmt::Display for InteriorRadiationUnavailable {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "selected interior radiation unavailable: {self:?}"
+        )
+    }
+}
+impl std::error::Error for InteriorRadiationUnavailable {}
+
+fn validate_radiation_probe_inputs(
+    surfaces: &[SurfaceHeatBalanceState],
+    indexes: &HeatBalanceSurfaceIndexes,
+    temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) -> Result<(), InteriorRadiationUnavailable> {
+    let mut seen = vec![false; surfaces.len()];
+    for (zone_index, indices) in indexes.surfaces_by_zone.iter().enumerate() {
+        if indices.len().checked_mul(indices.len()).is_none() {
+            return Err(InteriorRadiationUnavailable::SurfaceLayout);
+        }
+        for index in indices {
+            let surface = surfaces
+                .get(*index)
+                .ok_or(InteriorRadiationUnavailable::SurfaceLayout)?;
+            if seen[*index] || usize::try_from(surface.zone_id.0).ok() != Some(zone_index) {
+                return Err(InteriorRadiationUnavailable::SurfaceLayout);
+            }
+            seen[*index] = true;
+            let temperature = temperature_overrides
+                .and_then(|values| values.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            if !surface.area_m2.is_finite()
+                || surface.area_m2 <= 0.0
+                || !surface.azimuth_deg.is_finite()
+                || !surface.tilt_deg.is_finite()
+                || !surface.inside_thermal_absorptance.is_finite()
+                || !(0.0..=1.0).contains(&surface.inside_thermal_absorptance)
+                || !temperature.is_finite()
+                || !(temperature + KELVIN_OFFSET).max(0.0).powi(4).is_finite()
+            {
+                return Err(InteriorRadiationUnavailable::SurfaceInput {
+                    surface_id: surface.surface_id,
+                });
+            }
+        }
+    }
+    if seen.iter().any(|present| !present) {
+        return Err(InteriorRadiationUnavailable::SurfaceLayout);
+    }
+    Ok(())
+}
+
 pub(crate) fn update_surface_inside_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
     surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
-) {
+) -> Result<(), InteriorRadiationUnavailable> {
+    validate_radiation_probe_inputs(surfaces, surface_indexes, temperature_overrides)?;
     let snapshots = surfaces
         .iter()
         .map(|surface| {
@@ -58,8 +131,14 @@ pub(crate) fn update_surface_inside_longwave_exchange_probe(
         .collect::<Vec<_>>();
 
     let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
-    for surface_indices in &surface_indexes.surfaces_by_zone {
-        if surface_indices.len() <= 1 {
+    for (zone_index, surface_indices) in surface_indexes.surfaces_by_zone.iter().enumerate() {
+        if surface_indices.is_empty() {
+            continue;
+        }
+        // InitInteriorRadExchange576-588 explicitly initializes a one-surface
+        // enclosure to zero without Fix/ScriptF; its net self-exchange is zero.
+        // Keep this known caller branch separate from unsupported numeric input.
+        if surface_indices.len() == 1 {
             continue;
         }
         let zone_snapshots = surface_indices
@@ -70,13 +149,12 @@ pub(crate) fn update_surface_inside_longwave_exchange_probe(
             .iter()
             .map(|surface| surface.area_m2)
             .collect::<Vec<_>>();
-        if areas.iter().any(|area| *area <= f64::EPSILON) {
-            continue;
-        }
-        let view_factors = fix_energyplus_approximate_view_factors(
+        let Some(view_factors) = fix_energyplus_approximate_view_factors(
             &areas,
             &energyplus_approximate_view_factors(&zone_snapshots),
-        );
+        ) else {
+            return Err(InteriorRadiationUnavailable::ZoneNumericDomain { zone_index });
+        };
         let surface_count = zone_snapshots.len();
 
         for (receiver_zone_index, receiver) in zone_snapshots.iter().enumerate() {
@@ -101,35 +179,42 @@ pub(crate) fn update_surface_inside_longwave_exchange_probe(
         }
     }
 
+    if longwave_terms_w_per_m2
+        .iter()
+        .any(|value| !value.is_finite())
+    {
+        return Err(InteriorRadiationUnavailable::SurfaceOutput);
+    }
     for (surface, net_longwave_w_per_m2) in surfaces.iter_mut().zip(longwave_terms_w_per_m2) {
         surface.inside_net_longwave_w_per_m2 = net_longwave_w_per_m2;
     }
+    Ok(())
 }
 
 pub(crate) fn update_surface_inside_scriptf_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
     surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
-) {
+) -> Result<(), InteriorRadiationUnavailable> {
     update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         surfaces,
         surface_indexes,
         temperature_overrides,
         false,
-    );
+    )
 }
 
 pub(crate) fn update_surface_inside_scriptf_flat_access_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
     surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
-) {
+) -> Result<(), InteriorRadiationUnavailable> {
     update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         surfaces,
         surface_indexes,
         temperature_overrides,
         true,
-    );
+    )
 }
 
 fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
@@ -137,7 +222,8 @@ fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
     surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
     use_energyplus_flat_lsr_access: bool,
-) {
+) -> Result<(), InteriorRadiationUnavailable> {
+    validate_radiation_probe_inputs(surfaces, surface_indexes, temperature_overrides)?;
     let snapshots = surfaces
         .iter()
         .map(|surface| {
@@ -158,17 +244,22 @@ fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         .collect::<Vec<_>>();
 
     let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
-    for surface_indices in &surface_indexes.surfaces_by_zone {
-        if surface_indices.len() <= 1 {
+    for (zone_index, surface_indices) in surface_indexes.surfaces_by_zone.iter().enumerate() {
+        if surface_indices.is_empty() {
+            continue;
+        }
+        // InitInteriorRadExchange576-588 explicitly initializes a one-surface
+        // enclosure to zero without Fix/ScriptF; its net self-exchange is zero.
+        // Keep this known caller branch separate from unsupported numeric input.
+        if surface_indices.len() == 1 {
             continue;
         }
         let zone_snapshots = surface_indices
             .iter()
             .map(|surface_index| snapshots[*surface_index])
             .collect::<Vec<_>>();
-        let Some(script_f) = energyplus_scriptf_longwave_matrix_w_per_m2_k4(&zone_snapshots) else {
-            continue;
-        };
+        let script_f = energyplus_scriptf_longwave_matrix_w_per_m2_k4(&zone_snapshots)
+            .ok_or(InteriorRadiationUnavailable::ZoneNumericDomain { zone_index })?;
         let surface_count = zone_snapshots.len();
         for (receiver_zone_index, receiver) in zone_snapshots.iter().enumerate() {
             let mut net_longwave_w_per_m2 = 0.0;
@@ -188,9 +279,16 @@ fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         }
     }
 
+    if longwave_terms_w_per_m2
+        .iter()
+        .any(|value| !value.is_finite())
+    {
+        return Err(InteriorRadiationUnavailable::SurfaceOutput);
+    }
     for (surface, net_longwave_w_per_m2) in surfaces.iter_mut().zip(longwave_terms_w_per_m2) {
         surface.inside_net_longwave_w_per_m2 = net_longwave_w_per_m2;
     }
+    Ok(())
 }
 
 fn energyplus_scriptf_longwave_matrix_w_per_m2_k4(
@@ -212,12 +310,19 @@ fn energyplus_scriptf_longwave_matrix_w_per_m2_k4(
     let direct_view_factors = fix_energyplus_approximate_view_factors(
         &areas,
         &energyplus_approximate_view_factors(surfaces),
-    );
+    )?;
     let mut emissivities = surfaces
         .iter()
-        .map(|surface| surface.thermal_absorptance.clamp(0.0, 0.99999))
+        .map(|surface| surface.thermal_absorptance)
         .collect::<Vec<_>>();
-    energyplus_scriptf_from_view_factors(&areas, &direct_view_factors, &mut emissivities)
+    let mut script_f =
+        energyplus_scriptf_from_view_factors(&areas, &direct_view_factors, &mut emissivities)?;
+    // CalcScriptF returns dimensionless coefficients. This existing probe is
+    // the consumed scaling boundary, not the unported ordinary cache owner.
+    for value in &mut script_f {
+        *value *= STEFAN_BOLTZMANN_W_PER_M2_K4;
+    }
+    Some(script_f)
 }
 
 /// Caller-owned identity of the selected single-zone enclosure.
@@ -465,95 +570,89 @@ fn energyplus_surface_sees_surface(
         || (from_surface.tilt_deg - to_surface.tilt_deg).abs() > 10.0
 }
 
+/// Selected warning-free balanced N>3 numeric branch of Original FixViewFactors.
+/// Diagnostic and persistent-owner branches are explicitly unavailable here.
 pub(crate) fn fix_energyplus_approximate_view_factors(
     areas: &[f64],
     view_factors: &[f64],
-) -> Vec<f64> {
+) -> Option<Vec<f64>> {
     let surface_count = areas.len();
-    if surface_count == 0 || view_factors.len() != surface_count * surface_count {
-        return view_factors.to_vec();
+    let extent = surface_count.checked_mul(surface_count)?;
+    if surface_count <= 3
+        || view_factors.len() != extent
+        || areas.iter().any(|area| !area.is_finite() || *area <= 0.0)
+        || view_factors.iter().any(|value| !value.is_finite())
+    {
+        return None;
     }
-
     let original_check = (view_factors.iter().sum::<f64>() - surface_count as f64).abs();
-    let mut fixed_area_factors = view_factors.to_vec();
     let total_area = areas.iter().sum::<f64>();
-    if surface_count > 3 && total_area > f64::EPSILON {
-        if let Some((largest_index, largest_area)) = areas
-            .iter()
-            .copied()
-            .enumerate()
-            .max_by(|left, right| left.1.total_cmp(&right.1))
-        {
-            if largest_area > 0.99 * (total_area - largest_area) {
-                fixed_area_factors[largest_index * surface_count + largest_index] =
-                    (1.2 * largest_area / total_area).min(0.9);
-            }
+    let mut largest_area = areas[0];
+    for area in &areas[1..] {
+        if *area > largest_area {
+            largest_area = *area;
         }
     }
-
-    let mut area_factor_matrix = vec![0.0; surface_count * surface_count];
-    for from_index in 0..surface_count {
-        for to_index in 0..surface_count {
-            area_factor_matrix[to_index * surface_count + from_index] =
-                fixed_area_factors[to_index * surface_count + from_index] * areas[from_index];
+    // The Original unbalanced branch writes persistent LargestSurf; the small
+    // enclosure branch emits diagnostics and commits Zone.EnforcedReciprocity.
+    // Neither owner is represented by this existing private numeric interface.
+    if !total_area.is_finite() || largest_area > 0.99 * (total_area - largest_area) {
+        return None;
+    }
+    let mut area_factors = vec![0.0; extent];
+    for i in 0..surface_count {
+        for j in 0..surface_count {
+            area_factors[j * surface_count + i] = view_factors[j * surface_count + i] * areas[i];
         }
     }
-    fixed_area_factors = average_with_transpose(&area_factor_matrix, surface_count);
-
-    if surface_count <= 3 {
-        let mut fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
-        let row_sum = fixed_factors.iter().sum::<f64>();
-        if row_sum > surface_count as f64 + 0.01 {
-            let max_surface_sum = max_surface_view_factor_sum(&fixed_factors, surface_count);
-            if max_surface_sum > 1.0 {
-                for factor in &mut fixed_factors {
-                    *factor /= max_surface_sum;
-                }
-            }
-        }
-        return fixed_factors;
-    }
-
+    let mut fixed_area_factors = average_with_transpose(&area_factors, surface_count);
     let mut convergence_old = 10.0;
-    let mut fixed_factors = view_factors.to_vec();
-    for _ in 0..400 {
-        for from_index in 0..surface_count {
-            let column_sum = (0..surface_count)
-                .map(|to_index| fixed_area_factors[to_index * surface_count + from_index])
+    let mut iterations = 0;
+    loop {
+        iterations += 1;
+        for i in 0..surface_count {
+            let sum = (0..surface_count)
+                .map(|j| fixed_area_factors[j * surface_count + i])
                 .sum::<f64>();
-            let coefficient = if column_sum.abs() > 1.0e-10 {
-                areas[from_index] / column_sum
+            let coefficient = if sum.abs() > 1.0e-10 {
+                areas[i] / sum
             } else {
                 1.0
             };
-            for to_index in 0..surface_count {
-                fixed_area_factors[to_index * surface_count + from_index] *= coefficient;
+            for j in 0..surface_count {
+                fixed_area_factors[j * surface_count + i] *= coefficient;
             }
         }
-
         fixed_area_factors = average_with_transpose(&fixed_area_factors, surface_count);
-        fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
-        for (view_factor, area_factor) in
-            fixed_factors.iter_mut().zip(fixed_area_factors.iter_mut())
-        {
-            if view_factor.abs() < 1.0e-10 {
-                *view_factor = 0.0;
-                *area_factor = 0.0;
+        let mut fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
+        for i in 0..surface_count {
+            for j in 0..surface_count {
+                let offset = j * surface_count + i;
+                if fixed_factors[offset].abs() < 1.0e-10 {
+                    fixed_factors[offset] = 0.0;
+                    fixed_area_factors[offset] = 0.0;
+                }
             }
         }
-
         let convergence_new = (fixed_factors.iter().sum::<f64>() - surface_count as f64).abs();
-        if (convergence_old - convergence_new).abs() < 1.0e-5 || convergence_new <= 0.001 {
-            let row_sum = fixed_factors.iter().sum::<f64>();
-            if convergence_new < original_check || (row_sum - surface_count as f64).abs() < 0.001 {
-                return fixed_factors;
-            }
-            return view_factors.to_vec();
-        }
+        let converged =
+            (convergence_old - convergence_new).abs() < 1.0e-5 || convergence_new <= 0.001;
         convergence_old = convergence_new;
+        // Original increments before work, then tests >400 after convergence.
+        // Its iteration401 diagnostic/failure path is an unavailable boundary.
+        if iterations > 400 || fixed_factors.iter().any(|value| !value.is_finite()) {
+            return None;
+        }
+        if converged {
+            if convergence_new < original_check
+                || (fixed_factors.iter().sum::<f64>() - surface_count as f64).abs() < 0.001
+            {
+                return Some(fixed_factors);
+            }
+            // Original emits a completeness warning for the remaining branch.
+            return None;
+        }
     }
-
-    fixed_factors
 }
 
 fn average_with_transpose(matrix: &[f64], surface_count: usize) -> Vec<f64> {
@@ -571,9 +670,6 @@ fn area_factors_to_view_factors(area_factors: &[f64], areas: &[f64]) -> Vec<f64>
     let surface_count = areas.len();
     let mut view_factors = vec![0.0; area_factors.len()];
     for from_index in 0..surface_count {
-        if areas[from_index] <= f64::EPSILON {
-            continue;
-        }
         for to_index in 0..surface_count {
             view_factors[to_index * surface_count + from_index] =
                 area_factors[to_index * surface_count + from_index] / areas[from_index];
@@ -582,67 +678,69 @@ fn area_factors_to_view_factors(area_factors: &[f64], areas: &[f64]) -> Vec<f64>
     view_factors
 }
 
-fn max_surface_view_factor_sum(view_factors: &[f64], surface_count: usize) -> f64 {
-    (0..surface_count)
-        .map(|from_index| {
-            (0..surface_count)
-                .map(|to_index| view_factors[to_index * surface_count + from_index])
-                .sum::<f64>()
-        })
-        .fold(0.0, f64::max)
-}
-
+/// Literal dimensionless CalcScriptF flat walks on the admitted finite domain.
+/// Above-limit emissivity requires an unported warning/mutation owner and is
+/// rejected before mutation; this helper does not activate ordinary radiation.
 pub(crate) fn energyplus_scriptf_from_view_factors(
     areas: &[f64],
     view_factors: &[f64],
     emissivities: &mut [f64],
 ) -> Option<Vec<f64>> {
     let surface_count = areas.len();
+    let extent = surface_count.checked_mul(surface_count)?;
     if surface_count == 0
-        || view_factors.len() != surface_count * surface_count
+        || view_factors.len() != extent
         || emissivities.len() != surface_count
+        || areas.iter().any(|area| !area.is_finite() || *area <= 0.0)
+        || view_factors.iter().any(|value| !value.is_finite())
+        || emissivities
+            .iter()
+            .any(|value| !value.is_finite() || *value < 0.0 || *value > 0.99999)
     {
         return None;
     }
-
-    let mut coefficient_matrix = vec![0.0; surface_count * surface_count];
-    for row in 0..surface_count {
-        for col in 0..surface_count {
-            coefficient_matrix[row * surface_count + col] =
-                areas[row] * view_factors[row * surface_count + col];
+    let mut coefficient_matrix = vec![0.0; extent];
+    let mut offset = 0;
+    for _j in 0..surface_count {
+        for area in areas {
+            coefficient_matrix[offset] = *area * view_factors[offset];
+            offset += 1;
         }
     }
-
     let mut excitation = vec![0.0; surface_count];
-    for index in 0..surface_count {
-        emissivities[index] = emissivities[index].clamp(0.0, 0.99999);
-        let emissivity = emissivities[index];
-        let emissivity_area_factor = areas[index] / (1.0 - emissivity);
-        excitation[index] = -emissivity * emissivity_area_factor;
-        coefficient_matrix[index * surface_count + index] -= emissivity_area_factor;
+    offset = 0;
+    for i in 0..surface_count {
+        let emissivity = emissivities[i];
+        let factor = areas[i] / (1.0 - emissivity);
+        excitation[i] = -emissivity * factor;
+        coefficient_matrix[offset] -= factor;
+        offset += surface_count + 1;
     }
-
     let mut inverse = invert_square_matrix(&mut coefficient_matrix, surface_count)?;
-    for col in 0..surface_count {
-        for row in 0..surface_count {
-            inverse[row * surface_count + col] *= excitation[col];
+    offset = 0;
+    for excite in excitation {
+        for _i in 0..surface_count {
+            inverse[offset] *= excite;
+            offset += 1;
         }
     }
-
-    let mut script_f = vec![0.0; surface_count * surface_count];
-    for receiver_index in 0..surface_count {
-        let emissivity = emissivities[receiver_index];
-        let emissivity_factor = emissivity / (1.0 - emissivity);
-        for sender_index in 0..surface_count {
-            let inverse_value = inverse[receiver_index * surface_count + sender_index];
-            let script_f_value = if receiver_index == sender_index {
-                emissivity_factor * (inverse_value - emissivity)
+    let mut script_f = vec![0.0; extent];
+    let mut output_offset = 0;
+    for (i, emissivity) in emissivities.iter().copied().enumerate() {
+        let factor = emissivity / (1.0 - emissivity);
+        offset = i;
+        for j in 0..surface_count {
+            script_f[output_offset] = if i == j {
+                factor * (inverse[offset] - emissivity)
             } else {
-                emissivity_factor * inverse_value
+                factor * inverse[offset]
             };
-            script_f[sender_index * surface_count + receiver_index] =
-                script_f_value * STEFAN_BOLTZMANN_W_PER_M2_K4;
+            offset += surface_count;
+            output_offset += 1;
         }
+    }
+    if script_f.iter().any(|value| !value.is_finite()) {
+        return None;
     }
     Some(script_f)
 }

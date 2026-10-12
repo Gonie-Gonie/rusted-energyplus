@@ -45,7 +45,7 @@ where
         u32,
         Option<u32>,
         HeatBalanceSurfaceLoopZoneAirCorrection,
-    ),
+    ) -> Result<(), RuntimeError>,
 {
     run_heat_balance_run_period_warmup_with_reporting(
         simulation_model,
@@ -95,7 +95,7 @@ where
         u32,
         Option<u32>,
         HeatBalanceSurfaceLoopZoneAirCorrection,
-    ),
+    ) -> Result<(), RuntimeError>,
 {
     let hourly_count =
         weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
@@ -201,7 +201,7 @@ where
                     surface_iteration_count,
                     inside_hconv_reevaluation_interval,
                     surface_loop_zone_air_correction,
-                );
+                )?;
                 super::ctf_surface_lifecycle::ensure_available(state)?;
                 let reporting = state
                     .warmup_convergence

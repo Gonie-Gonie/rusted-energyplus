@@ -212,28 +212,23 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
             }
         }
     }
-    // Do not claim the compiler's absent-Timestep default (6) equals Original's
-    // missing-input default (4). This slice admits only an explicit real input.
+    // A present Timestep object's omitted field uses the real schema default 6.
+    // A wholly absent object remains unavailable: Original then defaults to 4,
+    // while the compiler currently defaults to 6.
     let single = |family: &str| {
         raw.objects
             .get(&ObjectType(family.into()))
             .filter(|objects| objects.len() == 1)
             .and_then(|objects| objects.values().next())
     };
-    let timestep = single("Timestep")
-        .and_then(|object| field(object, "number_of_timesteps_per_hour"))
-        .and_then(number)
+    let timestep_object =
+        single("Timestep").ok_or("ordinary equipment requires one actual Timestep object")?;
+    let timestep = field(timestep_object, "number_of_timesteps_per_hour")
+        .map_or(Some(6.0), number)
         .filter(|n| n.fract() == 0.0 && (1.0..=60.0).contains(n) && 60 % (*n as usize) == 0)
-        .ok_or("ordinary equipment requires an explicit divisor-of-60 Timestep")?
-        as usize;
+        .ok_or("ordinary equipment requires a divisor-of-60 Timestep")? as usize;
     if single("Version").and_then(|object| text(object, "version_identifier")) != Some("26.1") {
         return Err("ordinary equipment requires the explicit supported Version 26.1".into());
-    }
-    if !single("Building").is_some_and(|object| {
-        field(object, "solar_distribution")
-            .is_some_and(|value| text_is(value, &["MinimalShadowing"]))
-    }) {
-        return Err("ordinary equipment requires explicit Building MinimalShadowing".into());
     }
     let zone_name = raw
         .objects
@@ -390,6 +385,51 @@ mod tests {
         ] {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
+        }
+        for (name, input, expected_timestep) in [
+            (
+                "present empty Timestep uses schema default",
+                base.replace("\"number_of_timesteps_per_hour\":4", ""),
+                Some(6),
+            ),
+            (
+                "explicit six remains six",
+                base.replace(
+                    "\"number_of_timesteps_per_hour\":4",
+                    "\"number_of_timesteps_per_hour\":6",
+                ),
+                Some(6),
+            ),
+            ("explicit four remains four", base.to_owned(), Some(4)),
+            (
+                "absent Timestep remains unavailable",
+                base.replace(
+                    "\"Timestep\":{\"t\":{\"number_of_timesteps_per_hour\":4}},",
+                    "",
+                ),
+                None,
+            ),
+            (
+                "missing solar field is not an equipment branch",
+                base.replace("\"solar_distribution\":\"MinimalShadowing\"", ""),
+                Some(4),
+            ),
+            (
+                "explicit FullExterior is not an equipment branch",
+                base.replace("MinimalShadowing", "FullExterior"),
+                Some(4),
+            ),
+        ] {
+            let actual = resolve(&parse_epjson_str(&format!("{{{input}}}"))?);
+            if let Some(timestep) = expected_timestep {
+                assert_eq!(
+                    actual?,
+                    OrdinaryEquipmentInput::from_family_inventory([], timestep)?,
+                    "{name}"
+                );
+            } else {
+                assert!(actual.is_err(), "{name}");
+            }
         }
         for timestep in ["0", "7", "61", "4.5", "\"4\"", "null"] {
             let raw = parse_epjson_str(&format!(

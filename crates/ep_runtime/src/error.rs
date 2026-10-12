@@ -17,6 +17,8 @@ pub enum RuntimeError {
     SurfaceOutdoorEnvironment(
         Box<crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentError>,
     ),
+    /// Reached selected probe requires unsupported radiation operands or owners.
+    InteriorRadiation(crate::heat_balance::radiation::InteriorRadiationUnavailable),
     /// No zones were available to simulate.
     NoZones,
     /// Actual warmup demand/topology/daily owner is outside this bounded Source route.
@@ -124,6 +126,7 @@ pub enum RuntimeError {
 impl Display for RuntimeError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::InteriorRadiation(error) => Display::fmt(error, formatter),
             Self::CtfInitialization(error) => Display::fmt(error, formatter),
             Self::WarmupOutput(error) => Display::fmt(error, formatter),
             Self::SurfaceOutdoorEnvironment(error) => Display::fmt(error, formatter),
@@ -237,6 +240,7 @@ impl Display for RuntimeError {
 impl std::error::Error for RuntimeError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
+            Self::InteriorRadiation(error) => Some(error),
             Self::CtfInitialization(error) => Some(error.as_ref()),
             Self::WarmupOutput(error) => Some(error.as_ref()),
             Self::SurfaceOutdoorEnvironment(error) => Some(error.as_ref()),
@@ -327,5 +331,20 @@ impl PartialEq for WarmupOutputError {
 impl From<crate::heat_balance::error_backend::SourceErrorBackendFailure> for RuntimeError {
     fn from(error: crate::heat_balance::error_backend::SourceErrorBackendFailure) -> Self {
         Self::WarmupOutput(Box::new(WarmupOutputError::Backend(error)))
+    }
+}
+
+impl From<crate::heat_balance::radiation::InteriorRadiationUnavailable> for RuntimeError {
+    fn from(error: crate::heat_balance::radiation::InteriorRadiationUnavailable) -> Self {
+        Self::InteriorRadiation(error)
+    }
+}
+impl From<crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>
+    for RuntimeError
+{
+    fn from(
+        error: crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable,
+    ) -> Self {
+        Self::CtfSurfaceLifecycle(error)
     }
 }

@@ -258,6 +258,7 @@
                 zone.zone_timestep_average_air_temperature_c = temperature_c;
                 crate::heat_balance::warmup::report_uncontrolled_sensible_loads(state);
                 state.timestep_index += 1;
+                Ok(())
             },
         )?;
 

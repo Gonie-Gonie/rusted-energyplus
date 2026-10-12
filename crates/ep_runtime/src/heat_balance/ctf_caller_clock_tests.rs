@@ -7,7 +7,7 @@ use crate::heat_balance::state::{
     HeatBalanceWarmupOptions,
 };
 use crate::heat_balance::timestep::{
-    advance_heat_balance_state_one_timestep_internal,
+    advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
     advance_heat_balance_state_one_timestep_with_clock,
 };
 use crate::heat_balance::warmup::run_heat_balance_run_period_warmup;
@@ -148,6 +148,25 @@ fn warmup_options() -> HeatBalanceWarmupOptions {
 fn manual_explicit_clock_runs_two_real_steps_with_distinct_weather() -> TestResult {
     let model = model();
     let mut state = state(&model)?;
+    // The same public manual path returns its real missing-clock precondition;
+    // it must neither panic nor silently report a completed timestep.
+    let mut missing_clock = state.clone();
+    let result = advance_heat_balance_state_one_timestep(
+        &model.typed,
+        &mut missing_clock,
+        HeatBalanceStepInput {
+            outdoor_dry_bulb_c: 7.0,
+            hour_ending: 1,
+            timestep_seconds: 1200.0,
+        },
+    );
+    assert!(matches!(
+        result,
+        Err(RuntimeError::CtfSurfaceLifecycle(Error::MissingCallerClock))
+    ));
+    assert_eq!(missing_clock.timestep_index, 0);
+    assert_eq!(missing_clock.ctf_history_caller_clock.committed_steps(), 0);
+    assert!(missing_clock.ctf_history_caller_clock.pending().is_none());
     let generation = state
         .ctf_surface_lifecycle
         .as_ref()
@@ -229,7 +248,7 @@ fn legacy_warmup_to_run_keeps_one_environment_and_real_clock_owner() -> TestResu
             }
             advance_heat_balance_state_one_timestep_internal(
                 model, state, input, weather, runtime, iterations, hconv, correction,
-            );
+            )
         },
     )
     .map_err(|error| format!("warmup: {error:?}"))?;
@@ -271,7 +290,7 @@ fn legacy_warmup_to_run_keeps_one_environment_and_real_clock_owner() -> TestResu
                 1,
                 None,
                 HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
-            );
+            )?;
             crate::heat_balance::ctf_surface_lifecycle::ensure_available(state)
         },
     )
@@ -340,7 +359,7 @@ fn failed_legacy_step_keeps_pending_clock_and_cannot_replay() -> TestResult {
                 calls.set(calls.get() + 1);
                 advance_heat_balance_state_one_timestep_internal(
                     model, state, input, weather, runtime, iterations, hconv, correction,
-                );
+                )
             },
         );
         assert!(matches!(
@@ -389,6 +408,7 @@ fn controlled_graph_cannot_supply_default_warmup_zero_loads() -> TestResult {
         &mut day_end,
         |_, _, _, _, _, _, _, _| {
             calls.set(calls.get() + 1);
+            Ok(())
         },
     );
     assert!(matches!(

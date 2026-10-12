@@ -57,7 +57,7 @@ pub(crate) fn sample_heat_balance_run_period(
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
-            );
+            )?;
             crate::heat_balance::ctf_surface_lifecycle::ensure_available(state)?;
             if state
                 .warmup_convergence

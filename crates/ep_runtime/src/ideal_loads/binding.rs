@@ -1435,6 +1435,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
 /// predictor/corrector loop.
 #[derive(Clone, Debug, PartialEq)]
 pub enum DirectZonePurchasedAirRuntimeStepError {
+    /// Reached selected probe requires unsupported radiation operands or owners.
+    InteriorRadiation(crate::heat_balance::radiation::InteriorRadiationUnavailable),
     /// Actual selected surface coefficient/history owner rejected this step.
     CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
     /// The heat-balance state initialized from the bound model did not retain
@@ -2733,3 +2735,11 @@ fn runtime_invariant<T>(
 #[cfg(test)]
 #[path = "binding_tests.rs"]
 mod tests;
+
+impl From<crate::heat_balance::radiation::InteriorRadiationUnavailable>
+    for DirectZonePurchasedAirRuntimeStepError
+{
+    fn from(error: crate::heat_balance::radiation::InteriorRadiationUnavailable) -> Self {
+        Self::InteriorRadiation(error)
+    }
+}
