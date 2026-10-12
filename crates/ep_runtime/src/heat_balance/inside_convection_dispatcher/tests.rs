@@ -125,6 +125,7 @@ fn error_state() -> SourceErrorState {
 fn run(
     layout: &InsideConvectionLayout,
     state: &mut InsideConvectionState,
+    space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
     low: f64,
@@ -151,6 +152,7 @@ fn run(
         &surfaces(),
         NoUserConvectionInput::new([0; 6])?,
         state,
+        space_air,
         temperatures,
         readiness,
         low,
@@ -165,7 +167,8 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
-    state.space_air.write_all(
+    let mut space_air = SpaceAirTemperatures::allocate(&layout);
+    space_air.write_all(
         &layout,
         &[
             SpaceAirTemperature {
@@ -189,6 +192,7 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
     run(
         &layout,
         &mut state,
+        &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
             rows: &rows,
@@ -224,6 +228,33 @@ fn true_first_call_executes_static_setup_and_separate_space_mat()
         detailed_inside_coefficient_w_per_m2_k(24.0, 26.0, 0.0, 0.1)
     );
     assert_ne!(state.surfaces[0].coefficient, state.surfaces[1].coefficient);
+    let first_coefficient = state.surfaces[0].coefficient;
+    let second_coefficient = state.surfaces[1].coefficient;
+    let first_map = space_air.reference_air_by_layout(&layout)?;
+    assert_eq!(first_map[&SurfaceId(8)], 18.0);
+    assert_eq!(first_map[&SurfaceId(2)], 26.0);
+    let mut declared = space_air.rows().to_vec();
+    declared[0].mat = 20.0;
+    space_air.write_all(&layout, &declared)?;
+    run(
+        &layout,
+        &mut state,
+        &space_air,
+        InsideSurfaceTemperatures {
+            owner: InsideSurfaceTemperatureOwner::SurfTempIn,
+            rows: &rows,
+        },
+        readiness(),
+        0.1,
+        &ReportInputs::default(),
+        &mut scan,
+    )?;
+    assert_ne!(state.surfaces[0].coefficient, first_coefficient);
+    assert_eq!(state.surfaces[1].coefficient, second_coefficient);
+    let next_map = space_air.reference_air_by_layout(&layout)?;
+    assert_eq!(next_map[&SurfaceId(8)], 20.0);
+    assert_eq!(next_map[&SurfaceId(2)], 26.0);
+    assert_eq!(space_air.rows(), declared);
     Ok(())
 }
 
@@ -232,6 +263,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let space_air = SpaceAirTemperatures::allocate(&layout);
     let rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
     let mut scan = ReportScanState::default();
     let temperatures = InsideSurfaceTemperatures {
@@ -246,6 +278,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
     run(
         &layout,
         &mut state,
+        &space_air,
         temperatures,
         ready,
         0.7,
@@ -260,6 +293,7 @@ fn readiness_changes_only_reached_flags_and_retains_first_setup()
     run(
         &layout,
         &mut state,
+        &space_air,
         temperatures,
         ready,
         0.7,
@@ -284,12 +318,14 @@ fn full_temperature_membership_and_stale_layout_stop_before_writes()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
     let rows = [(SurfaceId(2), 23.0), (SurfaceId(8), 23.0)];
     let mut scan = ReportScanState::default();
     let result = run(
         &layout,
         &mut state,
+        &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempIn,
             rows: &rows,
@@ -356,6 +392,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState {
         get_report_input: false,
         surface_details: true,
@@ -365,6 +402,7 @@ fn reached_details_unavailable_retains_static_and_scan_prefix()
     let result = run(
         &layout,
         &mut state,
+        &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
             rows: &rows,
@@ -407,6 +445,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
     }
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let space_air = SpaceAirTemperatures::allocate(&layout);
     let mut scan = ReportScanState::default();
     let mut reports = ReportInputs::default();
     reports.objects.push(ep_model::ReportInputObject {
@@ -439,6 +478,7 @@ fn real_warning_sink_failure_preserves_static_prefix_and_error_cause()
         &surfaces(),
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
+        &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
             rows: &rows,
@@ -505,6 +545,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
 -> Result<(), Box<dyn std::error::Error>> {
     let layout = layout()?;
     let mut state = state(&layout)?;
+    let space_air = SpaceAirTemperatures::allocate(&layout);
     let before = state.clone();
     let mut surfaces = surfaces();
     surfaces[0].tilt = 0.0;
@@ -537,6 +578,7 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
         &surfaces,
         NoUserConvectionInput::new([0; 6])?,
         &mut state,
+        &space_air,
         InsideSurfaceTemperatures {
             owner: InsideSurfaceTemperatureOwner::SurfTempInTmp,
             rows: &rows,

@@ -229,8 +229,40 @@ This proof does not compare zone solvers: actual Native uses ThirdOrder while
 the existing Rust A admission remains SimplifiedAnalytical. Native observes one
 Space and reference flag-1 only; multiple-space and explicit0 actual coverage,
 full ZTAV averaging and every Native invocation's Rust replay are not claimed.
-Shared SpaceAir identity with the dispatcher, independent SurfTempInTmp,
-genuine equipment/Node readiness, actual radiation/cache lifecycle, positive
+Independent SurfTempInTmp, genuine equipment/Node readiness, actual
+radiation/cache lifecycle, positive
 completed-iteration30 refresh and immediate CTF term rebuild remain unfinished.
 The ordinary dispatcher is still inactive. All four full-card gates and
 A14/54/B14/64 remain unchanged.
+
+## Actual shared SpaceAir borrow and complete selected Rust regression
+
+The selected dispatcher now borrows the caller's SpaceAir owner. It no longer
+allocates a second MAT/ZT/ZTAV array; the ordinary owner keeps its existing
+allocation. The complete validated SpaceMAT mapping is shared with the ordinary
+inside balance. The selected observer likewise owns one external array with the
+same seeds and write order. An existing two-space test now changes the borrowed
+MAT between calls and checks the affected coefficient and reference-air mapping
+while retaining the other space and independent ZT/ZTAV values. No test was added.
+
+Final Source `02b03300` passed fmt, workspace Clippy with warnings denied and
+one workspace test run: 4,969 passed, 0 failed, 2 existing ignored. A genuine
+current Cargo artifact then processed the unchanged eight selected input cases
+and made all 20 dispatcher calls. The complete old/new Rust observations match:
+16,398 objects, 3,067 arrays and 57,930 exact leaves, including binary64 signed
+zero, owners, branches, stops, unavailable labels, IO and callbacks. Complete
+stderr and actual exit also match. A prospective list of 53 invocation, current
+Source SHA/size and physical-file-path leaves is authenticated separately; no
+scientific owner or output is excluded. The uncapped difference ledger is empty.
+
+This is a current Rust regression against the previously accepted Native-paired
+Rust capture. No new Native execution or direct Native comparison was performed.
+The historical 264 optional Native-only contexts remain outside PASS. The
+[shared SpaceAir evidence](../evidence/SRC-06-ordinary-shared-space-air/summary.json)
+retains the finite Source, execution and whole-result comparison records in three
+files; large binaries and whole Source payloads remain provenance references.
+
+The ordinary dispatcher remains inactive. Independent SurfTempInTmp, actual
+equipment/Node readiness, radiation/cache lifecycle, positive completed-
+iteration30 refresh, immediate CTF term rebuild and full ordinary solver/handoff
+comparison remain pending. All four SRC-06 gates and A14/54/B14/64 are unchanged.

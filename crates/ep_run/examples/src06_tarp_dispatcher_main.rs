@@ -321,6 +321,7 @@ struct Fixture {
     zones: Vec<InsideConvectionZone>,
     surfaces: Vec<InsideConvectionSurface>,
     state: InsideConvectionState,
+    space_air: SpaceAirTemperatures,
     zone_mat: f64,
     low_limit: f64,
     temp_in: Vec<(SurfaceId, f64)>,
@@ -512,7 +513,7 @@ impl Fixture {
             .map_err(|_| "actual owner layout unavailable")?;
         let elements = &input["zone_equipment_active_elements"];
         keys(elements, &["wall", "ceiling", "floor"])?;
-        let mut state = InsideConvectionState::new(
+        let state = InsideConvectionState::new(
             &layout,
             states,
             vec![(
@@ -524,11 +525,12 @@ impl Fixture {
                 ],
             )],
         )?;
-        let mut air = state.space_air.rows().to_vec();
+        let mut space_air = SpaceAirTemperatures::allocate(&layout);
+        let mut air = space_air.rows().to_vec();
         for (owner, row) in air.iter_mut().zip(space_rows) {
             owner.mat = real(&row["MAT"])?;
         }
-        state.space_air.write_all(&layout, &air)?;
+        space_air.write_all(&layout, &air)?;
         let zones = vec![InsideConvectionZone {
             zone_id: ZoneId(1),
             tarp: true,
@@ -551,6 +553,7 @@ impl Fixture {
             zones,
             surfaces,
             state,
+            space_air,
             zone_mat: real(&zone["MAT"])?,
             low_limit: 0.1,
             temp_in: ti,
@@ -573,6 +576,7 @@ impl Fixture {
             &self.zones,
             &self.surfaces,
             &self.state,
+            &self.space_air,
             self.zone_mat,
             self.low_limit,
             &self.temp_in,
@@ -607,7 +611,7 @@ impl Fixture {
             equipment_simulated_once: boolean(&op["ZoneEquipSimulatedOnce"])?,
         };
         self.zone_mat = real(&op["zone_MAT"])?;
-        let mut air = self.state.space_air.rows().to_vec();
+        let mut air = self.space_air.rows().to_vec();
         let mat = rows(&op["space_MAT"])?;
         require(
             mat.len() == air.len()
@@ -618,7 +622,7 @@ impl Fixture {
         for (row, value) in air.iter_mut().zip(mat) {
             row.mat = real(value)?;
         }
-        self.state.space_air.write_all(&self.layout, &air)?;
+        self.space_air.write_all(&self.layout, &air)?;
         for (row, value) in self.temp_in.iter_mut().zip(rows(&op["SurfTempIn"])?) {
             row.1 = real(value)?;
         }
@@ -714,6 +718,7 @@ fn case(
             &fixture.surfaces,
             no_user,
             &mut fixture.state,
+            &fixture.space_air,
             InsideSurfaceTemperatures {
                 owner: temperature_owner,
                 rows: temperatures,

@@ -12516,6 +12516,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-temperature-owners/summary.json",
         "sha256": "22b8c678136e8d70b79b333c8add1f718db044088fa3e23fb77aab7ce4602835",
         "size_bytes": 12312
+      },
+      "actual_shared_space_air_regression": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-shared-space-air/summary.json",
+        "sha256": "ca1bec1e572572f6f4fb564f42a56005757e4a2cccbb64ed6879f81bb873ba54",
+        "size_bytes": 3176
       }
     },
     {

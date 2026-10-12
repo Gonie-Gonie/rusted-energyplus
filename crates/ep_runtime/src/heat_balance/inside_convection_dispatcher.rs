@@ -16,6 +16,7 @@ use super::report_scan::{
 };
 use ep_model::{ReportInputs, SpaceId, SurfaceId, SurfaceType, ZoneId};
 pub use geometry::ConvectionGeometrySummary;
+use std::collections::BTreeMap;
 
 /// A missing or unsupported actual owner; never an invented Native outcome.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -206,6 +207,33 @@ impl SpaceAirTemperatures {
         }
         Ok(())
     }
+    /// Snapshot the actual shared SpaceMAT for the ordinary inside-balance entry.
+    pub(crate) fn reference_air_by_layout(
+        &self,
+        layout: &InsideConvectionLayout,
+    ) -> Result<BTreeMap<SurfaceId, f64>, InsideConvectionUnavailable> {
+        let rows = self.rows();
+        if rows.len() != layout.spaces().len()
+            || rows
+                .iter()
+                .zip(layout.spaces())
+                .any(|(row, &(space, zone))| (row.space_id, row.zone_id) != (space, zone))
+        {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        layout
+            .surfaces()
+            .iter()
+            .map(|surface| {
+                let row = rows
+                    .iter()
+                    .find(|row| row.space_id == surface.space_id && row.zone_id == surface.zone_id)
+                    .ok_or(InsideConvectionUnavailable::Association)?;
+                Ok((surface.surface_id, row.mat))
+            })
+            .collect()
+    }
+
     fn validate(&self, layout: &InsideConvectionLayout) -> Result<(), InsideConvectionUnavailable> {
         if self.rows.len() != layout.spaces().len()
             || self
@@ -354,8 +382,6 @@ pub enum AbsentUserConvectionRecord {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsideConvectionState {
     layout: InsideConvectionLayout,
-    /// Separate persistent actual space-air array.
-    pub space_air: SpaceAirTemperatures,
     /// Actual ordered surface metadata and HConv owners.
     pub surfaces: Vec<InsideConvectionSurfaceState>,
     /// GetUserSuppliedConvectionCoeffs, constructor true.
@@ -380,7 +406,7 @@ pub struct InsideConvectionState {
     pub active_elements: Vec<(ZoneId, [bool; 3])>,
 }
 impl InsideConvectionState {
-    /// Allocate selected persistent air owners and retain actual surface seeds.
+    /// Retain actual dispatcher seeds; SpaceAir remains owned by the caller.
     pub fn new(
         layout: &InsideConvectionLayout,
         surfaces: Vec<InsideConvectionSurfaceState>,
@@ -400,7 +426,6 @@ impl InsideConvectionState {
         }
         Ok(Self {
             layout: layout.clone(),
-            space_air: SpaceAirTemperatures::allocate(layout),
             surfaces,
             get_user_input: true,
             node_check: true,
@@ -455,9 +480,10 @@ fn validate(
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     state: &InsideConvectionState,
+    space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
 ) -> Result<(), InsideConvectionUnavailable> {
-    state.space_air.validate(layout)?;
+    space_air.validate(layout)?;
     if state.layout != *layout
         || zones
             .iter()
@@ -661,6 +687,7 @@ pub fn initialize_inside_convection(
     surfaces: &[InsideConvectionSurface],
     no_user_input: NoUserConvectionInput,
     state: &mut InsideConvectionState,
+    space_air: &SpaceAirTemperatures,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
     actual_low_limit: f64,
@@ -668,7 +695,7 @@ pub fn initialize_inside_convection(
     scan: &mut ReportScanState,
     backend: &mut SourceErrorBackend<'_>,
 ) -> Result<(), InsideConvectionError> {
-    validate(layout, zones, surfaces, state, temperatures)?;
+    validate(layout, zones, surfaces, state, space_air, temperatures)?;
     if no_user_input.counts() != [0; 6] {
         return Err(InsideConvectionUnavailable::UserConvectionInput.into());
     }
@@ -753,8 +780,7 @@ pub fn initialize_inside_convection(
         state.my_environment = true;
     }
     for group in layout.groups() {
-        let mat = state
-            .space_air
+        let mat = space_air
             .rows
             .iter()
             .find(|r| r.space_id == group.space_id)

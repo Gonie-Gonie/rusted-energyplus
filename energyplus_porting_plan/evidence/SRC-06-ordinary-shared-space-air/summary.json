@@ -1,0 +1,77 @@
+{
+  "schema": "src06-shared-space-air-selected-regression-summary.v1",
+  "status": "identical-whole-selected-released-Rust-observation",
+  "actual_publication_inputs": {
+    "path": ".runtime/porting/SRC-06/ordinary-shared-space-air-publication-inputs-01.json",
+    "sha256": "29a88b6545418140ae944e7463a82256e67537b69cbe02fc9b45c9a6c5584455"
+  },
+  "actual_current_Source": {
+    "path": ".runtime/porting/source-objects/02/02b033004b50c388feb757e5662a802701c31889fed457540f9bde18fd329820",
+    "sha256": "02b033004b50c388feb757e5662a802701c31889fed457540f9bde18fd329820",
+    "size_bytes": 1640174
+  },
+  "shared_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-shared-space-air-prep-01/manifest.json",
+    "sha256": "22ba5a37be58c5c42a2bdd91eb74d11dd1d315976677f85740759d9d81ccc3d1",
+    "size_bytes": 10139
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-shared-space-air-application-01/application.json",
+    "sha256": "25e4b954e27708b02b60fa595664d7858df2b1751463ad3d46f7384b94044dbf",
+    "size_bytes": 2491
+  },
+  "changed_current_source_files": 5,
+  "literal_Original_ranges": 4,
+  "actual_final_workspace_test_totals": {
+    "groups": 18,
+    "passed": 4969,
+    "failed": 0,
+    "ignored": 2
+  },
+  "actual_whole_Rust_regression": {
+    "path": ".runtime/porting/SRC-06/ordinary-shared-space-air-parity-01/comparison.json",
+    "sha256": "284d812377667291be68862eebede2315493c9827fc0601854140d35600a0167",
+    "size_bytes": 2771
+  },
+  "whole_JSON_comparison_counts": {
+    "objects": 16398,
+    "arrays": 3067,
+    "exact_leaves": 57930
+  },
+  "selected_cases": 8,
+  "actual_selected_calls": 20,
+  "differences": 0,
+  "authenticated_execution_metadata_leaves": 53,
+  "historical_optional_Native_unpaired_excluded": 264,
+  "actual_driver_outer_executions": {
+    "build": null,
+    "capture": null,
+    "parity": {
+      "path": ".runtime/porting/SRC-06/ordinary-shared-space-air-parity-command-01/receipt.json",
+      "sha256": "d5c83ea1858df6af1429111955ae7f284a6e49b2ea07b848af1d54caa3027823",
+      "size_bytes": 3912
+    }
+  },
+  "null_outer_receipt_scope": "A null build/capture outer receipt means none retained for that historical driver invocation; genuine nested build/capture command receipts and logs are archived. No outer receipt reconstructed.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-shared-space-air/evidence.zip",
+    "sha256": "f601bee8351f499f1f27450ec3c3b2a0354e284f43ff5640f33a27ec98905510",
+    "size_bytes": 595745
+  },
+  "scope": "One borrowed SpaceAir owner and delegation; whole released-Rust selected observation regression. Prior Native pairing is historical provenance only.",
+  "pending": [
+    "actual ordinary readiness producers",
+    "ordinary dispatcher/cadence handoff",
+    "SurfTempInTmp and real inside iteration loop",
+    "actual zone solution algorithm parity"
+  ],
+  "SRC06_all_four_gates_pending": true,
+  "A_completed": 14,
+  "A_total": 54,
+  "B_completed": 14,
+  "B_total": 64,
+  "new_direct_Native_comparison_claimed": false,
+  "whole_ordinary_handoff_PASS_claimed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

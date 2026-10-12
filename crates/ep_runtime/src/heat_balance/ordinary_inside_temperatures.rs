@@ -107,26 +107,9 @@ impl OrdinaryInsideTemperatures {
     }
 
     fn reference_air_by_layout(&self) -> Result<BTreeMap<SurfaceId, f64>, Unavailable> {
-        let rows = self.space_air.rows();
-        if rows.len() != self.layout.spaces().len()
-            || rows
-                .iter()
-                .zip(self.layout.spaces())
-                .any(|(row, &(space, zone))| (row.space_id, row.zone_id) != (space, zone))
-        {
-            return Err(Unavailable::OrdinaryTemperatureOwner);
-        }
-        self.layout
-            .surfaces()
-            .iter()
-            .map(|surface| {
-                let row = rows
-                    .iter()
-                    .find(|row| row.space_id == surface.space_id && row.zone_id == surface.zone_id)
-                    .ok_or(Unavailable::OrdinaryTemperatureOwner)?;
-                Ok((surface.surface_id, row.mat))
-            })
-            .collect()
+        self.space_air
+            .reference_air_by_layout(&self.layout)
+            .map_err(|_| Unavailable::OrdinaryTemperatureOwner)
     }
 
     pub(crate) fn prepare_inside_entry(
