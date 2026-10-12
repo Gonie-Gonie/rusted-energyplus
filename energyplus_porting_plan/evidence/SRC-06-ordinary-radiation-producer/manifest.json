@@ -1,0 +1,3212 @@
+{
+  "schema": "src06-finite-radiation-producer-evidence-manifest.v1",
+  "summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/summary.json",
+    "sha256": "f7e63f6bb3fb17c369ee01eb131f62e699a98157158a9126a35e3965ee90b34b",
+    "size_bytes": 13417
+  },
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/evidence.zip",
+    "sha256": "3b4cb066d5e083d69fe01a3a993c187160ef033d63c894ab066c94369770339f",
+    "size_bytes": 3736961
+  },
+  "selected_artifact_count": 288,
+  "deduplicated_members": 242,
+  "uncompressed_bytes": 26871196,
+  "artifacts": [
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-inputs-Root-01/inputs.json",
+        "sha256": "630ec3f295423dc8ef6e98179a6c097c0fb61ff018866704a74864089051601b",
+        "size_bytes": 8169
+      },
+      "roles": [
+        "actual_publication_inputs"
+      ],
+      "archive_member": "objects/63/630ec3f295423dc8ef6e98179a6c097c0fb61ff018866704a74864089051601b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/manifest.json",
+        "sha256": "577b28bd0beaf583b58dc04b4c4d55465ebb15fa0346fdd8285169def22cb162",
+        "size_bytes": 9854
+      },
+      "roles": [
+        "Native_preparation"
+      ],
+      "archive_member": "objects/57/577b28bd0beaf583b58dc04b4c4d55465ebb15fa0346fdd8285169def22cb162"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/native-build.json",
+        "sha256": "72c06c51c737eb46a6b69e4dc1431a88ac1dde8a3c6ed448fc57c899c81bc0cd",
+        "size_bytes": 56510
+      },
+      "roles": [
+        "Native_build"
+      ],
+      "archive_member": "objects/72/72c06c51c737eb46a6b69e4dc1431a88ac1dde8a3c6ed448fc57c899c81bc0cd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-capture-command-01/receipt.json",
+        "sha256": "a2d1c71cafcb5d5f7cf949dbc79c42e3a04304543a28d5a8d7368b8b212179da",
+        "size_bytes": 3393
+      },
+      "roles": [
+        "Native_capture_execution"
+      ],
+      "archive_member": "objects/a2/a2d1c71cafcb5d5f7cf949dbc79c42e3a04304543a28d5a8d7368b8b212179da"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-01/report.json",
+        "sha256": "363017cc6be86bcc46442bfeef6ff3ac65a4c139e40ebf9a87041b9c5b01b0c6",
+        "size_bytes": 4180
+      },
+      "roles": [
+        "Native_facts"
+      ],
+      "archive_member": "objects/36/363017cc6be86bcc46442bfeef6ff3ac65a4c139e40ebf9a87041b9c5b01b0c6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-command-01/receipt.json",
+        "sha256": "422a2b3bf1af8fcc6550af19741ff6ead98fca186d1c0ee151ec90b2c091b0b7",
+        "size_bytes": 3291
+      },
+      "roles": [
+        "Native_factual_execution"
+      ],
+      "archive_member": "objects/42/422a2b3bf1af8fcc6550af19741ff6ead98fca186d1c0ee151ec90b2c091b0b7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-actual-factual-review-01/review.json",
+        "sha256": "502b01a3d9cd2779341178d0d86be9dda7bc9a49f9f87100d9a3a262a552beb7",
+        "size_bytes": 2681
+      },
+      "roles": [
+        "Native_independent_factual_review"
+      ],
+      "archive_member": "objects/50/502b01a3d9cd2779341178d0d86be9dda7bc9a49f9f87100d9a3a262a552beb7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/review.json",
+        "sha256": "9e06aedd4256bc65adbd4a68783dacdfcda31028c0c790b4366604b4bcaf82f7",
+        "size_bytes": 6613
+      },
+      "roles": [
+        "Native_independent_provider_review"
+      ],
+      "archive_member": "objects/9e/9e06aedd4256bc65adbd4a68783dacdfcda31028c0c790b4366604b4bcaf82f7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-replay-prep-Root-01/manifest.json",
+        "sha256": "ed59a081abaf7af1dbbcc848d2733b304ab66ac7da58e0c9ff4e3a18af16520e",
+        "size_bytes": 2386
+      },
+      "roles": [
+        "Rust_actual_replay_preparation"
+      ],
+      "archive_member": "objects/ed/ed59a081abaf7af1dbbcc848d2733b304ab66ac7da58e0c9ff4e3a18af16520e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/manifest.json",
+        "sha256": "d9eedbf78299419f4e4799904b91598325a08269fcd4201a879a862d1f43cf94",
+        "size_bytes": 14405
+      },
+      "roles": [
+        "Rust_merged_preparation"
+      ],
+      "archive_member": "objects/d9/d9eedbf78299419f4e4799904b91598325a08269fcd4201a879a862d1f43cf94"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-merged-Source-review-01/review.json",
+        "sha256": "af6786cec0c8d5be51bc8ebf1a272ed0a2786c59c4e85fe3c3bda9d89b0c59cb",
+        "size_bytes": 2810
+      },
+      "roles": [
+        "Rust_merged_independent_Source_review"
+      ],
+      "archive_member": "objects/af/af6786cec0c8d5be51bc8ebf1a272ed0a2786c59c4e85fe3c3bda9d89b0c59cb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/comparison-policy.json",
+        "sha256": "a07993df86d78f7bf87bc55e60f66f9a1b09d7ec8c42eb45151ae2ba73c0e942",
+        "size_bytes": 2719
+      },
+      "roles": [
+        "comparison_policy"
+      ],
+      "archive_member": "objects/a0/a07993df86d78f7bf87bc55e60f66f9a1b09d7ec8c42eb45151ae2ba73c0e942"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-01/cases.json",
+        "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+        "size_bytes": 219335
+      },
+      "roles": [
+        "Native_complete_all_calls_fixture"
+      ],
+      "archive_member": "objects/7d/7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H.observation.json",
+        "sha256": "eb20048a65aa71ac02fe56282171902a7791003892a4855e8fe74f0ccfbeecff",
+        "size_bytes": 218801
+      },
+      "roles": [
+        "Native_complete_raw_capture"
+      ],
+      "archive_member": "objects/eb/eb20048a65aa71ac02fe56282171902a7791003892a4855e8fe74f0ccfbeecff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-prep-01/verify_native.py",
+        "sha256": "5299ae0c6e5fb53d5e27bcf930c2d0099828730799a5961c00857a644def9c02",
+        "size_bytes": 40176
+      },
+      "roles": [
+        "Native_executed_factual_checker_Source"
+      ],
+      "archive_member": "objects/52/5299ae0c6e5fb53d5e27bcf930c2d0099828730799a5961c00857a644def9c02"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/custody.json",
+        "sha256": "6a3058ae084231814001b37f9778211560bdc7356f3a490a8be92e8984193b01",
+        "size_bytes": 24348
+      },
+      "roles": [
+        "Native_capture_custody"
+      ],
+      "archive_member": "objects/6a/6a3058ae084231814001b37f9778211560bdc7356f3a490a8be92e8984193b01"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-capture-command-01/stdout.log",
+        "sha256": "ec75aae6c676181bd3fa7e1b715dbdb34ddfbc0923b7693ee9bdfea5f012693e",
+        "size_bytes": 264
+      },
+      "roles": [
+        "Native_capture_execution:complete_stdout"
+      ],
+      "archive_member": "objects/ec/ec75aae6c676181bd3fa7e1b715dbdb34ddfbc0923b7693ee9bdfea5f012693e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-capture-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_capture_execution:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "size_bytes": 8453
+      },
+      "roles": [
+        "Native_capture_execution:executed_recorder_Source",
+        "Native_factual_execution:executed_recorder_Source",
+        "Native_actual_addr2line_execution:executed_recorder_Source",
+        "Native_actual_build:configure:executed_recorder_Source",
+        "Native_actual_build:dry_run:executed_recorder_Source",
+        "Native_actual_build:compile:executed_recorder_Source"
+      ],
+      "archive_member": "objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-command-01/stdout.log",
+        "sha256": "c1af61a5b4af60b87aa5a0886f6355a07d30652dfbd79a1d9525b7ee5a03beda",
+        "size_bytes": 290
+      },
+      "roles": [
+        "Native_factual_execution:complete_stdout"
+      ],
+      "archive_member": "objects/c1/c1af61a5b4af60b87aa5a0886f6355a07d30652dfbd79a1d9525b7ee5a03beda"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_factual_execution:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/before.json",
+        "sha256": "ac4ded0a6c05c06197df362fc1de276435aba634583571f1e27bbc4fa30648f5",
+        "size_bytes": 21393
+      },
+      "roles": [
+        "Native_capture:before"
+      ],
+      "archive_member": "objects/ac/ac4ded0a6c05c06197df362fc1de276435aba634583571f1e27bbc4fa30648f5"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/native-stdout.log",
+        "sha256": "4dd35ce0005a9d1fd743b0e194f0c3059e0124a5978b379a8deda0d50f33a4e4",
+        "size_bytes": 974
+      },
+      "roles": [
+        "Native_capture:native_stdout"
+      ],
+      "archive_member": "objects/4d/4dd35ce0005a9d1fd743b0e194f0c3059e0124a5978b379a8deda0d50f33a4e4"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/native-stderr.log",
+        "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+        "size_bytes": 36
+      },
+      "roles": [
+        "Native_capture:native_stderr"
+      ],
+      "archive_member": "objects/ce/ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f"
+    },
+    {
+      "original": {
+        "path": ".runtime/energyplus/26.1.0/Energy+.idd",
+        "sha256": "7d30c281aa21d63555c753a953124da03d88b6b149dc19e3649f2cbe6c944c68",
+        "size_bytes": 4613646
+      },
+      "roles": [
+        "Native_fixed_input:actual_IDD"
+      ],
+      "archive_member": "objects/7d/7d30c281aa21d63555c753a953124da03d88b6b149dc19e3649f2cbe6c944c68"
+    },
+    {
+      "original": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      },
+      "roles": [
+        "Native_fixed_input:actual_weather"
+      ],
+      "archive_member": "objects/c1/c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275
+      },
+      "roles": [
+        "Native_fixed_input:actual_A24_input"
+      ],
+      "archive_member": "objects/db/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.audit",
+        "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+        "size_bytes": 1569
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/6e/6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.bnd",
+        "sha256": "a211276bc11bd8b25b346d6405930d4b91a4cb5acb10265573c2c5b170081dbf",
+        "size_bytes": 6365
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/a2/a211276bc11bd8b25b346d6405930d4b91a4cb5acb10265573c2c5b170081dbf"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.dxf",
+        "sha256": "63c6d3e03437079597cd690b1b4e2fdc1a30c6ecdb7384ffce58551ead7645a9",
+        "size_bytes": 6096
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/63/63c6d3e03437079597cd690b1b4e2fdc1a30c6ecdb7384ffce58551ead7645a9"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.eio",
+        "sha256": "2bcd355d81c43a5678bca068a25393125ec779106a3057c7df9d5741f10e5c5c",
+        "size_bytes": 15376
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/2b/2bcd355d81c43a5678bca068a25393125ec779106a3057c7df9d5741f10e5c5c"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.end",
+        "sha256": "d85d1b985544652bfb3cfe238a6ed1cb07465ec45a7ceec320674099db1d729d",
+        "size_bytes": 98
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/d8/d85d1b985544652bfb3cfe238a6ed1cb07465ec45a7ceec320674099db1d729d"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.err",
+        "sha256": "340b82851015842196901fef7325fa28f0d99a12fec002aa48aa575d0bee9d0f",
+        "size_bytes": 897
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/34/340b82851015842196901fef7325fa28f0d99a12fec002aa48aa575d0bee9d0f"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.eso",
+        "sha256": "b474ef33043e08d780736098cff4b5345babc497f54e95d58466954fc080f396",
+        "size_bytes": 112213
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/b4/b474ef33043e08d780736098cff4b5345babc497f54e95d58466954fc080f396"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.mdd",
+        "sha256": "ee6f570b56af176931cd66f3ea33bb38c9bd38a129906a2346e882e9c4e81ce5",
+        "size_bytes": 3851
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/ee/ee6f570b56af176931cd66f3ea33bb38c9bd38a129906a2346e882e9c4e81ce5"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.mtd",
+        "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+        "size_bytes": 7539
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/c2/c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.mtr",
+        "sha256": "ff524330ffe3c4264a9291d27853180fe0b4bdf2a28efa9864b749e04dd8cdc9",
+        "size_bytes": 2490
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/ff/ff524330ffe3c4264a9291d27853180fe0b4bdf2a28efa9864b749e04dd8cdc9"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.rdd",
+        "sha256": "229cc827748e8950b39212a6f1e879ff884acbf23973ecf776331dab039dea68",
+        "size_bytes": 30562
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/22/229cc827748e8950b39212a6f1e879ff884acbf23973ecf776331dab039dea68"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplusout.shd",
+        "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+        "size_bytes": 1557
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/f6/f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplustbl.csv",
+        "sha256": "9952f9130e4c6372390314b9692130e5cd42841219f679ae1896e2d37437cd6d",
+        "size_bytes": 84703
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/99/9952f9130e4c6372390314b9692130e5cd42841219f679ae1896e2d37437cd6d"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplustbl.htm",
+        "sha256": "4e61f57b3dc1f4b4401869365b0d1f4bc3b453636f30f27ffd731e14f4c5b490",
+        "size_bytes": 354322
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/4e/4e61f57b3dc1f4b4401869365b0d1f4bc3b453636f30f27ffd731e14f4c5b490"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplustbl.tab",
+        "sha256": "0c5a5c6e5b4a7f455578951e6dfed428e5525e3a8a493daf29d4b8d18ab76364",
+        "size_bytes": 84700
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/0c/0c5a5c6e5b4a7f455578951e6dfed428e5525e3a8a493daf29d4b8d18ab76364"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplustbl.txt",
+        "sha256": "26402115492b3ea7d02640b2baa66c33d67dc5d7a6c436eccb4c8f6e72d6ffe3",
+        "size_bytes": 163344
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/26/26402115492b3ea7d02640b2baa66c33d67dc5d7a6c436eccb4c8f6e72d6ffe3"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H/eplustbl.xml",
+        "sha256": "26261d41aa2ecb9705adff260a63dad1c34d8c8bf34e3047511fea46d23ca45a",
+        "size_bytes": 226145
+      },
+      "roles": [
+        "Native_complete_normal_engine_output"
+      ],
+      "archive_member": "objects/26/26261d41aa2ecb9705adff260a63dad1c34d8c8bf34e3047511fea46d23ca45a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-producer-provider-review-01/runtime-closure.json",
+        "sha256": "1e93c8940adf67951d0d2b6448df6fa3fc01d35b34f499e5d38927b70a61b830",
+        "size_bytes": 3064
+      },
+      "roles": [
+        "Native_actual_runtime_closure_metadata"
+      ],
+      "archive_member": "objects/1e/1e93c8940adf67951d0d2b6448df6fa3fc01d35b34f499e5d38927b70a61b830"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-producer-provider-review-01/review.json",
+        "sha256": "dc0a970955ff6f773f0c89b8dea060c5a9c25f929fc91970545b08db866a24f0",
+        "size_bytes": 2455
+      },
+      "roles": [
+        "Native_Root_provider_review"
+      ],
+      "archive_member": "objects/dc/dc0a970955ff6f773f0c89b8dea060c5a9c25f929fc91970545b08db866a24f0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/actual-PE.json",
+        "sha256": "05bab9a87e6b90b923d0f1b3573813cbee227d47877d8b85f1282f78d4bfba96",
+        "size_bytes": 16047
+      },
+      "roles": [
+        "Native_provider:actual_PE"
+      ],
+      "archive_member": "objects/05/05bab9a87e6b90b923d0f1b3573813cbee227d47877d8b85f1282f78d4bfba96"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/actual-address-bound-providers.json",
+        "sha256": "5407fc356e0273aeca85ef28c0763948af72c646df4a813f74506b94fe427151",
+        "size_bytes": 27944
+      },
+      "roles": [
+        "Native_provider:actual_address_bound_providers"
+      ],
+      "archive_member": "objects/54/5407fc356e0273aeca85ef28c0763948af72c646df4a813f74506b94fe427151"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/addr2line-command-01/receipt.json",
+        "sha256": "4188963bef6c96206197aab9e3fdda7489c782cbc941cd5957ab5320751bf478",
+        "size_bytes": 3304
+      },
+      "roles": [
+        "Native_actual_addr2line_execution"
+      ],
+      "archive_member": "objects/41/4188963bef6c96206197aab9e3fdda7489c782cbc941cd5957ab5320751bf478"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/addr2line-command-01/stdout.log",
+        "sha256": "f89300a86330f3f1efe8a1419d8eb80d774ca1b002e635e51ff8e1a127162791",
+        "size_bytes": 4026
+      },
+      "roles": [
+        "Native_actual_addr2line_execution:complete_stdout"
+      ],
+      "archive_member": "objects/f8/f89300a86330f3f1efe8a1419d8eb80d774ca1b002e635e51ff8e1a127162791"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-provider-review-01/addr2line-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_actual_addr2line_execution:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/configure-command-01/receipt.json",
+        "sha256": "bd1f5757224d495321d5f8c8333d9b0f185363a2ddc8cddff659a64f8ae9fa55",
+        "size_bytes": 3531
+      },
+      "roles": [
+        "Native_actual_build:configure"
+      ],
+      "archive_member": "objects/bd/bd1f5757224d495321d5f8c8333d9b0f185363a2ddc8cddff659a64f8ae9fa55"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/configure-command-01/stdout.log",
+        "sha256": "03a50c3bdc8dd2ddaf5f6e6643bdfeb6dd6f13647cc84d02c8c49bdd4a01acd0",
+        "size_bytes": 743
+      },
+      "roles": [
+        "Native_actual_build:configure:complete_stdout"
+      ],
+      "archive_member": "objects/03/03a50c3bdc8dd2ddaf5f6e6643bdfeb6dd6f13647cc84d02c8c49bdd4a01acd0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/configure-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_actual_build:configure:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/dry-run-command-01/receipt.json",
+        "sha256": "95dfb747d502c5b71d7ab56a7034e5dc71f53af5a5b0943d2c7961251ec71fdc",
+        "size_bytes": 2934
+      },
+      "roles": [
+        "Native_actual_build:dry_run"
+      ],
+      "archive_member": "objects/95/95dfb747d502c5b71d7ab56a7034e5dc71f53af5a5b0943d2c7961251ec71fdc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/dry-run-command-01/stdout.log",
+        "sha256": "9367cf0e61d47e8329b61fddb6d49033041a833acd7ec04d90ca99a418d820e0",
+        "size_bytes": 33650
+      },
+      "roles": [
+        "Native_actual_build:dry_run:complete_stdout"
+      ],
+      "archive_member": "objects/93/9367cf0e61d47e8329b61fddb6d49033041a833acd7ec04d90ca99a418d820e0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/dry-run-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_actual_build:dry_run:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/compile-command-01/receipt.json",
+        "sha256": "549346502a93551f3bc3bc139872f3ae14d476b61ba17ca11a7e598d235fc04d",
+        "size_bytes": 3009
+      },
+      "roles": [
+        "Native_actual_build:compile"
+      ],
+      "archive_member": "objects/54/549346502a93551f3bc3bc139872f3ae14d476b61ba17ca11a7e598d235fc04d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/compile-command-01/stdout.log",
+        "sha256": "ae1641d2250fce49ad8c08e8218da0264a555f72cb55b2bce9b11676734dbf93",
+        "size_bytes": 33805
+      },
+      "roles": [
+        "Native_actual_build:compile:complete_stdout"
+      ],
+      "archive_member": "objects/ae/ae1641d2250fce49ad8c08e8218da0264a555f72cb55b2bce9b11676734dbf93"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-01/compile-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_actual_build:compile:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-environment-01/frozen-environment.json",
+        "sha256": "884dfdf545ec2cefdd125bf8d4ffeb9a6645b65446c5ca8761bf2e584e1f5a6d",
+        "size_bytes": 51139
+      },
+      "roles": [
+        "Native_explicit_environment_metadata_only"
+      ],
+      "archive_member": "objects/88/884dfdf545ec2cefdd125bf8d4ffeb9a6645b65446c5ca8761bf2e584e1f5a6d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-prep-01/manifest.json",
+        "sha256": "ed05441c545d1143fdf9179b4a9981df084883da786535b05bc7cdf39e1ca006",
+        "size_bytes": 3230
+      },
+      "roles": [
+        "Native_executed_build_preparation"
+      ],
+      "archive_member": "objects/ed/ed05441c545d1143fdf9179b4a9981df084883da786535b05bc7cdf39e1ca006"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-prep-01/build.py",
+        "sha256": "5c58dc59c6a1566b5babcccc047cb367a9293e81c7d50e95a1866315dc344755",
+        "size_bytes": 17782
+      },
+      "roles": [
+        "Native_executed_build:launcher_Source"
+      ],
+      "archive_member": "objects/5c/5c58dc59c6a1566b5babcccc047cb367a9293e81c7d50e95a1866315dc344755"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-build-prep-01/additive-reference.cmake",
+        "sha256": "7ddcf8cdab617ef673675b11a1098124a178761cafd61adcde95bd1545c239ca",
+        "size_bytes": 335
+      },
+      "roles": [
+        "Native_executed_build:additive_wrapper"
+      ],
+      "archive_member": "objects/7d/7ddcf8cdab617ef673675b11a1098124a178761cafd61adcde95bd1545c239ca"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-capture-prep-01/manifest.json",
+        "sha256": "884a46586356791922280167595e203245f724efabbce6db00303442d185be1f",
+        "size_bytes": 2655
+      },
+      "roles": [
+        "Native_executed_capture_preparation"
+      ],
+      "archive_member": "objects/88/884a46586356791922280167595e203245f724efabbce6db00303442d185be1f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-capture-prep-01/capture.py",
+        "sha256": "855a822f022fff1e09c9f591cb0b6b45a1820bad8fc3ba77890b3be292bbcbbe",
+        "size_bytes": 12038
+      },
+      "roles": [
+        "Native_executed_capture_Source"
+      ],
+      "archive_member": "objects/85/855a822f022fff1e09c9f591cb0b6b45a1820bad8fc3ba77890b3be292bbcbbe"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/prepare_sources.py",
+        "sha256": "1e90b1c7696f2af44d0360d0f7d1be07e3d025a8da9e7938f4da97d4c2328ef3",
+        "size_bytes": 19361
+      },
+      "roles": [
+        "Native_Source:Source_author"
+      ],
+      "archive_member": "objects/1e/1e90b1c7696f2af44d0360d0f7d1be07e3d025a8da9e7938f4da97d4c2328ef3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/README.md",
+        "sha256": "fbd941cb0e49ee2d8d87d957da4859efca3c2d8a0745ef435f019ef80349ab5e",
+        "size_bytes": 3418
+      },
+      "roles": [
+        "Native_Source:README"
+      ],
+      "archive_member": "objects/fb/fbd941cb0e49ee2d8d87d957da4859efca3c2d8a0745ef435f019ef80349ab5e"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+        "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+        "size_bytes": 120027
+      },
+      "roles": [
+        "Native_Source:Original",
+        "Original_numeric_Source",
+        "regression_Original_Source"
+      ],
+      "archive_member": "objects/36/36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/Original-ranges.json",
+        "sha256": "ce66ec1a4cdea055ac8ee1bae460f531d3e6e45c934f1ab8ef74a61fb4dd9834",
+        "size_bytes": 11491
+      },
+      "roles": [
+        "Native_Source:Original_ranges"
+      ],
+      "archive_member": "objects/ce/ce66ec1a4cdea055ac8ee1bae460f531d3e6e45c934f1ab8ef74a61fb4dd9834"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_observer.hh",
+        "sha256": "fb6df65d8dbe8ed32ee398fc6b4ca170ab547542a5d1390aa488626afdfc93bb",
+        "size_bytes": 3029
+      },
+      "roles": [
+        "Native_Source:header"
+      ],
+      "archive_member": "objects/fb/fb6df65d8dbe8ed32ee398fc6b4ca170ab547542a5d1390aa488626afdfc93bb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/ordinary_radiation_producer_reference.cmake",
+        "sha256": "27e2e29ee2e58a5aa6cdff465ad8086e690262dc6758096595fe408dc6f7861b",
+        "size_bytes": 2709
+      },
+      "roles": [
+        "Native_Source:CMake_recipe"
+      ],
+      "archive_member": "objects/27/27e2e29ee2e58a5aa6cdff465ad8086e690262dc6758096595fe408dc6f7861b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/source-additions.json",
+        "sha256": "a9339f9bd0809ed437163fb7ae2bd69d9b2817a3fa2f97990b603ff6a34bc25d",
+        "size_bytes": 5650
+      },
+      "roles": [
+        "Native_Source:literal_source_additions"
+      ],
+      "archive_member": "objects/a9/a9339f9bd0809ed437163fb7ae2bd69d9b2817a3fa2f97990b603ff6a34bc25d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216
+      },
+      "roles": [
+        "Native_actual_compile_Source"
+      ],
+      "archive_member": "objects/18/181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/HeatBalanceIntRadExchange.radiation_producer.cc",
+        "sha256": "9c56f00e38bed8312e7b9c29189ed746b977bf3b388de9b2aa80fe16fe57cd50",
+        "size_bytes": 123547
+      },
+      "roles": [
+        "Native_actual_compile_Source"
+      ],
+      "archive_member": "objects/9c/9c56f00e38bed8312e7b9c29189ed746b977bf3b388de9b2aa80fe16fe57cd50"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_observer.cc",
+        "sha256": "fd76c6a34f103b6311e54738e21d5b4c54284a6afb359c7e2860be75715fdcd5",
+        "size_bytes": 16473
+      },
+      "roles": [
+        "Native_actual_compile_Source"
+      ],
+      "archive_member": "objects/fd/fd76c6a34f103b6311e54738e21d5b4c54284a6afb359c7e2860be75715fdcd5"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+        "size_bytes": 24694
+      },
+      "roles": [
+        "Native_actual_compile_Source"
+      ],
+      "archive_member": "objects/27/2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+        "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+        "size_bytes": 46621
+      },
+      "roles": [
+        "Native_actual_compile_Source"
+      ],
+      "archive_member": "objects/b8/b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/HeatBalanceIntRadExchange.radiation_producer.cc.diff",
+        "sha256": "fd7e37024bfe705b0a7539ab872d23c77539f6b7ce4f48509d250ef12349ea1a",
+        "size_bytes": 6293
+      },
+      "roles": [
+        "Native_complete_Source_diff"
+      ],
+      "archive_member": "objects/fd/fd7e37024bfe705b0a7539ab872d23c77539f6b7ce4f48509d250ef12349ea1a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_observer.cc.diff",
+        "sha256": "606a075276b123e8cbf058dfcb301573894d0a5c5ca731981039441061f86e97",
+        "size_bytes": 9732
+      },
+      "roles": [
+        "Native_complete_Source_diff"
+      ],
+      "archive_member": "objects/60/606a075276b123e8cbf058dfcb301573894d0a5c5ca731981039441061f86e97"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/surface_consumer_observer.hh.diff",
+        "sha256": "d9a8b8e4513202ea468bd8277a161d70aaa44ebe5adc59556f33b827cc2875f7",
+        "size_bytes": 1944
+      },
+      "roles": [
+        "Native_complete_Source_diff"
+      ],
+      "archive_member": "objects/d9/d9a8b8e4513202ea468bd8277a161d70aaa44ebe5adc59556f33b827cc2875f7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/ordinary_radiation_producer_reference.cmake.diff",
+        "sha256": "907b9b44df7608b64f017ee8fc04ff3d2c23613add3fcc1fb4e1ed552c73e2e9",
+        "size_bytes": 5138
+      },
+      "roles": [
+        "Native_complete_Source_diff"
+      ],
+      "archive_member": "objects/90/907b9b44df7608b64f017ee8fc04ff3d2c23613add3fcc1fb4e1ed552c73e2e9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-03/manifest.json",
+        "sha256": "0d305fb8390db48c96798e17a582f0c7ead2e9ecfa5a47aae3c98852af4e6d77",
+        "size_bytes": 24971
+      },
+      "roles": [
+        "Rust_held_Rad03_preparation"
+      ],
+      "archive_member": "objects/0d/0d305fb8390db48c96798e17a582f0c7ead2e9ecfa5a47aae3c98852af4e6d77"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/manifest.json",
+        "sha256": "cb115a61f98df433e69314650d22e4033ebdcb206151fe8e9b48ca82975d08db",
+        "size_bytes": 11411
+      },
+      "roles": [
+        "Rust_numeric_Original_range_authority"
+      ],
+      "archive_member": "objects/cb/cb115a61f98df433e69314650d22e4033ebdcb206151fe8e9b48ca82975d08db"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-03/prepare.py",
+        "sha256": "dbd46cec80908c5d9a416ed296d4e7df46f1c70b08d30553e0fedb5558aecbc4",
+        "size_bytes": 12577
+      },
+      "roles": [
+        "Rust_Rad03:author_Source"
+      ],
+      "archive_member": "objects/db/dbd46cec80908c5d9a416ed296d4e7df46f1c70b08d30553e0fedb5558aecbc4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-03/README.md",
+        "sha256": "110e4744d7f6fe1aa53568547908236f425c5df354d776bad02af424c35107a0",
+        "size_bytes": 1841
+      },
+      "roles": [
+        "Rust_Rad03:README"
+      ],
+      "archive_member": "objects/11/110e4744d7f6fe1aa53568547908236f425c5df354d776bad02af424c35107a0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/77/779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+        "sha256": "779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+        "size_bytes": 1640176
+      },
+      "roles": [
+        "Rust_Rad03:Source_basis"
+      ],
+      "archive_member": "objects/77/779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-02/manifest.json",
+        "sha256": "07c4c0977f62c06a85d515f7388994aff846238ac34dd663c192cef5eed4d6c0",
+        "size_bytes": 19411
+      },
+      "roles": [
+        "Rust_Rad03:immediate_parent_held_proposal"
+      ],
+      "archive_member": "objects/07/07c4c0977f62c06a85d515f7388994aff846238ac34dd663c192cef5eed4d6c0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-Source-review-02/review.json",
+        "sha256": "5d9bcc08d57bab0ba89daa0348542ce2f9263ad6094361ea12ac63118c407853",
+        "size_bytes": 2041
+      },
+      "roles": [
+        "Rust_Rad03:immediate_parent_independent_rejection"
+      ],
+      "archive_member": "objects/5d/5d9bcc08d57bab0ba89daa0348542ce2f9263ad6094361ea12ac63118c407853"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceIntRadExchange.cc.1521-1795.txt",
+        "sha256": "5fafb6b3c0a226fb87305de2ea578baa277538f9784342bc81ca9f6ad200efa5",
+        "size_bytes": 14459
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/5f/5fafb6b3c0a226fb87305de2ea578baa277538f9784342bc81ca9f6ad200efa5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceIntRadExchange.cc.1806-1903.txt",
+        "sha256": "44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e",
+        "size_bytes": 4819
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/44/44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceIntRadExchange.cc.196-271.txt",
+        "sha256": "752a844c839a7244911f5097c15d331a1fa80d92195e59381cb05e242a1baa71",
+        "size_bytes": 5425
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/75/752a844c839a7244911f5097c15d331a1fa80d92195e59381cb05e242a1baa71"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceIntRadExchange.cc.449-803.txt",
+        "sha256": "5dd79f6750335113d78d2fbb8d3835e57e0dcd73b65e1d07d4b5bd3fc7ea836f",
+        "size_bytes": 22052
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/5d/5dd79f6750335113d78d2fbb8d3835e57e0dcd73b65e1d07d4b5bd3fc7ea836f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceIntRadExchange.cc.807-1100.txt",
+        "sha256": "a9d939178cf57b61615fd29890cb975d8932c2787030f03c707de8f424a1f548",
+        "size_bytes": 16802
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/a9/a9d939178cf57b61615fd29890cb975d8932c2787030f03c707de8f424a1f548"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+        "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+        "size_bytes": 22000
+      },
+      "roles": [
+        "Original_numeric_Source"
+      ],
+      "archive_member": "objects/92/9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/Array2.hh.604-627.txt",
+        "sha256": "e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d",
+        "size_bytes": 448
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/e2/e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972
+      },
+      "roles": [
+        "Original_numeric_Source"
+      ],
+      "archive_member": "objects/0d/0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceSurfaceManager.cc.438-450.txt",
+        "sha256": "0255731ed7a8725e3c1ffaf79b689ea70348f750fc10799201ef6ad0aadb1f99",
+        "size_bytes": 450
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/02/0255731ed7a8725e3c1ffaf79b689ea70348f750fc10799201ef6ad0aadb1f99"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceSurfaceManager.cc.7038-7051.txt",
+        "sha256": "442da932d193a2657c6a40993753aa0c238dd18ee5b0ddf97c22734a6934daeb",
+        "size_bytes": 785
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/44/442da932d193a2657c6a40993753aa0c238dd18ee5b0ddf97c22734a6934daeb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-prep-01/Original/HeatBalanceSurfaceManager.cc.8805-8830.txt",
+        "sha256": "1c9389f161ae8b9a8d4ffed774e4dd327fa7d1d001114f2ef4e05bbe73d5ea11",
+        "size_bytes": 1957
+      },
+      "roles": [
+        "Original_numeric_literal_range"
+      ],
+      "archive_member": "objects/1c/1c9389f161ae8b9a8d4ffed774e4dd327fa7d1d001114f2ef4e05bbe73d5ea11"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-radiation-merge-Root-01.py",
+        "sha256": "dbe0a32a492cace6da92951ef707ad743a65df75dc4c18c36f3b17958be39964",
+        "size_bytes": 3847
+      },
+      "roles": [
+        "Root_merge_Source"
+      ],
+      "archive_member": "objects/db/dbe0a32a492cace6da92951ef707ad743a65df75dc4c18c36f3b17958be39964"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/eb/eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+        "sha256": "eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "historical_Owner_Source_metadata_only"
+      ],
+      "archive_member": "objects/eb/eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-replay-Root-01.rs",
+        "sha256": "6cd686b3fec5d25b59ef9ec0578ccb0b00fd8dfdbdf3ee6876b2f1506afe2e38",
+        "size_bytes": 4886
+      },
+      "roles": [
+        "reviewed_complete_actual_replay_fragment"
+      ],
+      "archive_member": "objects/6c/6cd686b3fec5d25b59ef9ec0578ccb0b00fd8dfdbdf3ee6876b2f1506afe2e38"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-radiation-producer-replay-Root-01.py",
+        "sha256": "6853ffb29676f770a330b9ca31c31399e650d7dbece6e70d4a5f1acf00022ea2",
+        "size_bytes": 3627
+      },
+      "roles": [
+        "actual_replay_preparer_Source"
+      ],
+      "archive_member": "objects/68/6853ffb29676f770a330b9ca31c31399e650d7dbece6e70d4a5f1acf00022ea2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/78/78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2",
+        "sha256": "78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "final_actual_QA_Source_metadata"
+      ],
+      "archive_member": "objects/78/78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/application.json",
+        "sha256": "7d1a4efe406981a67d1fa22a626b1e74d5489dcdc2c1c980cd32be1fb519abe2",
+        "size_bytes": 11445
+      },
+      "roles": [
+        "actual_Rust_application"
+      ],
+      "archive_member": "objects/7d/7d1a4efe406981a67d1fa22a626b1e74d5489dcdc2c1c980cd32be1fb519abe2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/21/215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41",
+        "sha256": "215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "historical_app03_final_Source_metadata"
+      ],
+      "archive_member": "objects/21/215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "57b781163991f9303b78b52e0a54749722da280419cfc09c27a44331d108ce86",
+        "size_bytes": 31453
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/57/57b781163991f9303b78b52e0a54749722da280419cfc09c27a44331d108ce86"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/44/44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3",
+        "sha256": "44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3",
+        "size_bytes": 27776
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/44/44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__radiation.rs.diff",
+        "sha256": "285e27c538517b4db2981f5c2f86de4f71a7d986130da40a4c3423d44f290c30",
+        "size_bytes": 21142
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/28/285e27c538517b4db2981f5c2f86de4f71a7d986130da40a4c3423d44f290c30"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/90/9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9",
+        "sha256": "9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9",
+        "size_bytes": 32375
+      },
+      "roles": [
+        "final_formatted_Source_archive",
+        "regression_final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/90/9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9",
+        "size_bytes": 32375
+      },
+      "roles": [
+        "final_current_Source",
+        "regression_final_current_Source"
+      ],
+      "archive_member": "objects/90/9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+        "sha256": "6ee1c37d743fd4744aaa9e39593f65ffe44ae19f59a27cc122776ead48c719b0",
+        "size_bytes": 18110
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/6e/6ee1c37d743fd4744aaa9e39593f65ffe44ae19f59a27cc122776ead48c719b0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/86/86930fa581da1a2510f598154abc8154bb2365ecc3d96f3fa1b6d04dc3e8dcf3",
+        "sha256": "86930fa581da1a2510f598154abc8154bb2365ecc3d96f3fa1b6d04dc3e8dcf3",
+        "size_bytes": 12254
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/86/86930fa581da1a2510f598154abc8154bb2365ecc3d96f3fa1b6d04dc3e8dcf3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__radiation_approximate_view_factor_tests.rs.diff",
+        "sha256": "299aeb7cff819afd2750b96af0ad920a4070392b98c050e1ea922364b502910f",
+        "size_bytes": 6274
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/29/299aeb7cff819afd2750b96af0ad920a4070392b98c050e1ea922364b502910f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/9f/9fb85b16bfe1fce7b4a32ec90c634b26e5d602f0191b85177fab219ae3ddf877",
+        "sha256": "9fb85b16bfe1fce7b4a32ec90c634b26e5d602f0191b85177fab219ae3ddf877",
+        "size_bytes": 18814
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/9f/9fb85b16bfe1fce7b4a32ec90c634b26e5d602f0191b85177fab219ae3ddf877"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+        "sha256": "9fb85b16bfe1fce7b4a32ec90c634b26e5d602f0191b85177fab219ae3ddf877",
+        "size_bytes": 18814
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/9f/9fb85b16bfe1fce7b4a32ec90c634b26e5d602f0191b85177fab219ae3ddf877"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "c344af46a3754d796f8cc32d879931bda6f56f19bea71d9292633e58c785cadb",
+        "size_bytes": 34958
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/c3/c344af46a3754d796f8cc32d879931bda6f56f19bea71d9292633e58c785cadb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/b4/b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246",
+        "sha256": "b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246",
+        "size_bytes": 33103
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/b4/b4c3e28b73f623a5bd6c348785696fc96fee9efb06b8aff5c682da7306fda246"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__runtime__tests__part04.rs.diff",
+        "sha256": "ee8a32ea2892f6d2c5d2a86a3745967b2adfd26068932ce647eea1f09358fb1b",
+        "size_bytes": 4476
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/ee/ee8a32ea2892f6d2c5d2a86a3745967b2adfd26068932ce647eea1f09358fb1b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/86/86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574",
+        "sha256": "86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574",
+        "size_bytes": 36419
+      },
+      "roles": [
+        "final_formatted_Source_archive",
+        "regression_final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/86/86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574",
+        "size_bytes": 36419
+      },
+      "roles": [
+        "final_current_Source",
+        "regression_final_current_Source"
+      ],
+      "archive_member": "objects/86/86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/surface_loop.rs",
+        "sha256": "d7ae8251d94daaf9a6f245aa86cd8cef26b9c55545b146aaa736a657245fb426",
+        "size_bytes": 21249
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/d7/d7ae8251d94daaf9a6f245aa86cd8cef26b9c55545b146aaa736a657245fb426"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/62/6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda",
+        "sha256": "6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda",
+        "size_bytes": 21118
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/62/6226841d806fc08f17eff23c2aced698e7dae5afb9146ef5e404dbe3fd3c1fda"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__surface_loop.rs.diff",
+        "sha256": "96274326c89dcd4d31790dc47cee4442e0d70ef725c7a1264b2901e658ce1cd4",
+        "size_bytes": 3467
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/96/96274326c89dcd4d31790dc47cee4442e0d70ef725c7a1264b2901e658ce1cd4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/d4/d4ddad33b5b9f5d69ed4fbe23e5122a7a8695d8cecc5d6dd3281786f475e5b1c",
+        "sha256": "d4ddad33b5b9f5d69ed4fbe23e5122a7a8695d8cecc5d6dd3281786f475e5b1c",
+        "size_bytes": 21253
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/d4/d4ddad33b5b9f5d69ed4fbe23e5122a7a8695d8cecc5d6dd3281786f475e5b1c"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+        "sha256": "d4ddad33b5b9f5d69ed4fbe23e5122a7a8695d8cecc5d6dd3281786f475e5b1c",
+        "size_bytes": 21253
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/d4/d4ddad33b5b9f5d69ed4fbe23e5122a7a8695d8cecc5d6dd3281786f475e5b1c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "fb3f678cba86b15f27263a41f053eca9f4e6ac474957b8d4ec885010d56093dd",
+        "size_bytes": 44890
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/fb/fb3f678cba86b15f27263a41f053eca9f4e6ac474957b8d4ec885010d56093dd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/a2/a2d0c8314d0b25eed35974bddb54b2aec17a09761835579580da1a6092fb5dea",
+        "sha256": "a2d0c8314d0b25eed35974bddb54b2aec17a09761835579580da1a6092fb5dea",
+        "size_bytes": 44587
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/a2/a2d0c8314d0b25eed35974bddb54b2aec17a09761835579580da1a6092fb5dea"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__timestep.rs.diff",
+        "sha256": "df25d7b5a4b76018fe90fdfd06de79ce70aff7e43e4777998db56b679af6212c",
+        "size_bytes": 7075
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/df/df25d7b5a4b76018fe90fdfd06de79ce70aff7e43e4777998db56b679af6212c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/fa/fae37a9e8d54d1b64d27cfdbaa6a48abf999d8ee1ca7dee49eb58b9901feb7e7",
+        "sha256": "fae37a9e8d54d1b64d27cfdbaa6a48abf999d8ee1ca7dee49eb58b9901feb7e7",
+        "size_bytes": 45517
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/fa/fae37a9e8d54d1b64d27cfdbaa6a48abf999d8ee1ca7dee49eb58b9901feb7e7"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "fae37a9e8d54d1b64d27cfdbaa6a48abf999d8ee1ca7dee49eb58b9901feb7e7",
+        "size_bytes": 45517
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/fa/fae37a9e8d54d1b64d27cfdbaa6a48abf999d8ee1ca7dee49eb58b9901feb7e7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/error.rs",
+        "sha256": "4cdd4b0080fd89ff306a88487fc4fcaf3f41d7d8090158514c8561534d9879f2",
+        "size_bytes": 13837
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/4c/4cdd4b0080fd89ff306a88487fc4fcaf3f41d7d8090158514c8561534d9879f2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/f4/f497daa1e1129d5c1613e1322aee6a944d4cb42574dd02755443596e32f60311",
+        "sha256": "f497daa1e1129d5c1613e1322aee6a944d4cb42574dd02755443596e32f60311",
+        "size_bytes": 13044
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/f4/f497daa1e1129d5c1613e1322aee6a944d4cb42574dd02755443596e32f60311"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__error.rs.diff",
+        "sha256": "50e462a773409028f8a946422059c2aded594888813ac22ee5326b74aa16232f",
+        "size_bytes": 2083
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/50/50e462a773409028f8a946422059c2aded594888813ac22ee5326b74aa16232f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/4f/4f6396cdf2fcf276047d031a0720f82ce7b2c6b1ce323a5a146eeffbcbe347aa",
+        "sha256": "4f6396cdf2fcf276047d031a0720f82ce7b2c6b1ce323a5a146eeffbcbe347aa",
+        "size_bytes": 13856
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/4f/4f6396cdf2fcf276047d031a0720f82ce7b2c6b1ce323a5a146eeffbcbe347aa"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/error.rs",
+        "sha256": "4f6396cdf2fcf276047d031a0720f82ce7b2c6b1ce323a5a146eeffbcbe347aa",
+        "size_bytes": 13856
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/4f/4f6396cdf2fcf276047d031a0720f82ce7b2c6b1ce323a5a146eeffbcbe347aa"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/ideal_loads/binding.rs",
+        "sha256": "b8292a105f5f6d0e4539f9563130574d26e409285fe60bd659c31b55604cb0fe",
+        "size_bytes": 187203
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/b8/b8292a105f5f6d0e4539f9563130574d26e409285fe60bd659c31b55604cb0fe"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/31/318475449354d888c57703754a22bd2a11ecddac3526cc235fd153da37360db9",
+        "sha256": "318475449354d888c57703754a22bd2a11ecddac3526cc235fd153da37360db9",
+        "size_bytes": 186780
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/31/318475449354d888c57703754a22bd2a11ecddac3526cc235fd153da37360db9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__ideal_loads__binding.rs.diff",
+        "sha256": "eb90d0b631b2c01690e0fda9b3c9f51d5f168b3811bc31dc432d053f833881c8",
+        "size_bytes": 1029
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/eb/eb90d0b631b2c01690e0fda9b3c9f51d5f168b3811bc31dc432d053f833881c8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/cc/cc4458068a48cec4f00c93b3ee2c58c721d0ba0a23933b35dcf14a9cfce86322",
+        "sha256": "cc4458068a48cec4f00c93b3ee2c58c721d0ba0a23933b35dcf14a9cfce86322",
+        "size_bytes": 187207
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/cc/cc4458068a48cec4f00c93b3ee2c58c721d0ba0a23933b35dcf14a9cfce86322"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+        "sha256": "cc4458068a48cec4f00c93b3ee2c58c721d0ba0a23933b35dcf14a9cfce86322",
+        "size_bytes": 187207
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/cc/cc4458068a48cec4f00c93b3ee2c58c721d0ba0a23933b35dcf14a9cfce86322"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+        "size_bytes": 23780
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/74/7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/a6/a6b319e9e7c4502970647c948f98d604c724af5d8ae60e94548cc790a965242c",
+        "sha256": "a6b319e9e7c4502970647c948f98d604c724af5d8ae60e94548cc790a965242c",
+        "size_bytes": 23723
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/a6/a6b319e9e7c4502970647c948f98d604c724af5d8ae60e94548cc790a965242c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+        "sha256": "c002973b32e7cd11891e6df7d40257dba53a895f79131d3d700782ac3d975f11",
+        "size_bytes": 998
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/c0/c002973b32e7cd11891e6df7d40257dba53a895f79131d3d700782ac3d975f11"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/74/7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+        "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+        "size_bytes": 23780
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/74/7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+        "size_bytes": 23780
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/74/7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/runtime.rs",
+        "sha256": "dd4f556b9c13c128a0b4090c5e68ffdeec8eb07326617839aa2d8292e2718fc6",
+        "size_bytes": 29381
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/dd/dd4f556b9c13c128a0b4090c5e68ffdeec8eb07326617839aa2d8292e2718fc6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/45/455eaa04c574377e8de4601e697fe552f076deaf0f7635906d9d1f069d6151b4",
+        "sha256": "455eaa04c574377e8de4601e697fe552f076deaf0f7635906d9d1f069d6151b4",
+        "size_bytes": 29382
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/45/455eaa04c574377e8de4601e697fe552f076deaf0f7635906d9d1f069d6151b4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__runtime.rs.diff",
+        "sha256": "85b13f9a7faf6bf5b83135458f8816c3cee176e877fa3ba8ac194022c05fef64",
+        "size_bytes": 355
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/85/85b13f9a7faf6bf5b83135458f8816c3cee176e877fa3ba8ac194022c05fef64"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/71/710182558c06827cecfb24e6dfd7bc8abe76ed03f3bcf5d9c122f8a6cc2e91f3",
+        "sha256": "710182558c06827cecfb24e6dfd7bc8abe76ed03f3bcf5d9c122f8a6cc2e91f3",
+        "size_bytes": 29347
+      },
+      "roles": [
+        "final_formatted_Source_archive",
+        "final_test_import_correction_Source_archive"
+      ],
+      "archive_member": "objects/71/710182558c06827cecfb24e6dfd7bc8abe76ed03f3bcf5d9c122f8a6cc2e91f3"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "710182558c06827cecfb24e6dfd7bc8abe76ed03f3bcf5d9c122f8a6cc2e91f3",
+        "size_bytes": 29347
+      },
+      "roles": [
+        "final_current_Source",
+        "final_current_test_import_correction_Source"
+      ],
+      "archive_member": "objects/71/710182558c06827cecfb24e6dfd7bc8abe76ed03f3bcf5d9c122f8a6cc2e91f3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+        "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+        "size_bytes": 3173
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/de/def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/1f/1faa1f6d714126a15c7192c36d7b5c4fc995d7a64b66036e6130082d053169de",
+        "sha256": "1faa1f6d714126a15c7192c36d7b5c4fc995d7a64b66036e6130082d053169de",
+        "size_bytes": 3172
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/1f/1faa1f6d714126a15c7192c36d7b5c4fc995d7a64b66036e6130082d053169de"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+        "sha256": "68ea9b7b7f966ce733fa374e18715bc301d20a75541a7fef55464cdc450303e4",
+        "size_bytes": 502
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/68/68ea9b7b7f966ce733fa374e18715bc301d20a75541a7fef55464cdc450303e4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/de/def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+        "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+        "size_bytes": 3173
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/de/def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+        "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+        "size_bytes": 3173
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/de/def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+        "sha256": "a48cb6241c41f1c041aae67bb077ed39cc43dc832c08804d5442a5c56b2f210d",
+        "size_bytes": 14901
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/a4/a48cb6241c41f1c041aae67bb077ed39cc43dc832c08804d5442a5c56b2f210d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/90/9096d11237d9006ea6082ed6f88e946bcd4a121e00da6808b767c651b7af6982",
+        "sha256": "9096d11237d9006ea6082ed6f88e946bcd4a121e00da6808b767c651b7af6982",
+        "size_bytes": 14087
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/90/9096d11237d9006ea6082ed6f88e946bcd4a121e00da6808b767c651b7af6982"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__heat_balance__ctf_caller_clock_tests.rs.diff",
+        "sha256": "e97d783117eff66e0967bc39a18530b9b6cb516adec7bdf3aeae2dac03522e95",
+        "size_bytes": 2530
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/e9/e97d783117eff66e0967bc39a18530b9b6cb516adec7bdf3aeae2dac03522e95"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/d7/d75663fdeb6a287d2b1eee5c6bb04774baae8432e0afac4b2f35863c7450ffe2",
+        "sha256": "d75663fdeb6a287d2b1eee5c6bb04774baae8432e0afac4b2f35863c7450ffe2",
+        "size_bytes": 14919
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/d7/d75663fdeb6a287d2b1eee5c6bb04774baae8432e0afac4b2f35863c7450ffe2"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+        "sha256": "d75663fdeb6a287d2b1eee5c6bb04774baae8432e0afac4b2f35863c7450ffe2",
+        "size_bytes": 14919
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/d7/d75663fdeb6a287d2b1eee5c6bb04774baae8432e0afac4b2f35863c7450ffe2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/runtime/tests/part05.rs",
+        "sha256": "bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18",
+        "size_bytes": 30794
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/bf/bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/d3/d301f5fe35d8c4f2a3be714220dd83a1ce9c5d604b79a71aa52cfc2fa76a5e44",
+        "sha256": "d301f5fe35d8c4f2a3be714220dd83a1ce9c5d604b79a71aa52cfc2fa76a5e44",
+        "size_bytes": 30793
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/d3/d301f5fe35d8c4f2a3be714220dd83a1ce9c5d604b79a71aa52cfc2fa76a5e44"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__runtime__tests__part05.rs.diff",
+        "sha256": "fe79badfb2ee9ed84bad4b22f6a4258f80eb1ea1356c744c5adbf47012da97f2",
+        "size_bytes": 539
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/fe/fe79badfb2ee9ed84bad4b22f6a4258f80eb1ea1356c744c5adbf47012da97f2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/bf/bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18",
+        "sha256": "bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18",
+        "size_bytes": 30794
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/bf/bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part05.rs",
+        "sha256": "bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18",
+        "size_bytes": 30794
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/bf/bfcc3f011d0bfcf9be00dfb932318123472e4b636f3a9fc8727289094a73df18"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/runtime/tests/part13.rs",
+        "sha256": "bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af",
+        "size_bytes": 14324
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/bb/bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/62/62e4fd7407c17d16b12a3660aa4da5a7df425cb00b66c2f9fd381c60e5f79ff8",
+        "sha256": "62e4fd7407c17d16b12a3660aa4da5a7df425cb00b66c2f9fd381c60e5f79ff8",
+        "size_bytes": 14321
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/62/62e4fd7407c17d16b12a3660aa4da5a7df425cb00b66c2f9fd381c60e5f79ff8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__runtime__tests__part13.rs.diff",
+        "sha256": "bf03aa4af8152491d0a09c1db9b8d9e1b7cbcd79e27b5ec48c7ca1b6d78e3492",
+        "size_bytes": 1295
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/bf/bf03aa4af8152491d0a09c1db9b8d9e1b7cbcd79e27b5ec48c7ca1b6d78e3492"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/bb/bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af",
+        "sha256": "bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af",
+        "size_bytes": 14324
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/bb/bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part13.rs",
+        "sha256": "bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af",
+        "size_bytes": 14324
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/bb/bbe4ea4fdedc8bf8d44e217a5268efc62d084674c14e7814bf86c402c18298af"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56",
+        "size_bytes": 27242
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/23/23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/ba/ba23468529b2d578c158683d62d2b1c65b2d9629d84e1bcb85deb10e8cc3f0bd",
+        "sha256": "ba23468529b2d578c158683d62d2b1c65b2d9629d84e1bcb85deb10e8cc3f0bd",
+        "size_bytes": 27219
+      },
+      "roles": [
+        "actual_preapplication_Source"
+      ],
+      "archive_member": "objects/ba/ba23468529b2d578c158683d62d2b1c65b2d9629d84e1bcb85deb10e8cc3f0bd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/diffs/crates__ep_runtime__src__runtime__tests__part07.rs.diff",
+        "sha256": "9e8d91a8f48f72503768b00b63749f5a1dac1bb730b33b11e08962b8102031be",
+        "size_bytes": 397
+      },
+      "roles": [
+        "reviewed_direct_application_diff"
+      ],
+      "archive_member": "objects/9e/9e8d91a8f48f72503768b00b63749f5a1dac1bb730b33b11e08962b8102031be"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/23/23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56",
+        "sha256": "23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56",
+        "size_bytes": 27242
+      },
+      "roles": [
+        "final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/23/23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56",
+        "size_bytes": 27242
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/23/23577c1ccf64433be99502e81f583da8a8aac743f16a8457510bd2b0ad18fa56"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-merged-prep-Root-01/proposed/crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_producer_native_cases.json",
+        "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+        "size_bytes": 219335
+      },
+      "roles": [
+        "reviewed_merged_literal_Source"
+      ],
+      "archive_member": "objects/7d/7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_producer_native_cases.json",
+        "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+        "size_bytes": 219335
+      },
+      "roles": [
+        "final_current_Source"
+      ],
+      "archive_member": "objects/7d/7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/c3/c329499d6db8e695b9f263bdd2e4e75dc9d63132d1dbae3445b9ca1e43ca9bc2",
+        "sha256": "c329499d6db8e695b9f263bdd2e4e75dc9d63132d1dbae3445b9ca1e43ca9bc2",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "actual_literal_application_Source_metadata"
+      ],
+      "archive_member": "objects/c3/c329499d6db8e695b9f263bdd2e4e75dc9d63132d1dbae3445b9ca1e43ca9bc2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-01/receipt.json",
+        "sha256": "085da0a56d348c004947a3683cf309feb30ea00b45e24e86232a01ac2a045203",
+        "size_bytes": 4966
+      },
+      "roles": [
+        "actual_formatter_command"
+      ],
+      "archive_member": "objects/08/085da0a56d348c004947a3683cf309feb30ea00b45e24e86232a01ac2a045203"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_formatter_command:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_formatter_command:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "size_bytes": 8557
+      },
+      "roles": [
+        "actual_formatter_command:executed_recorder_Source",
+        "actual_previous_import_correction_formatter:executed_recorder_Source",
+        "actual_correction_formatter_command:executed_recorder_Source",
+        "actual_regression_formatter:executed_recorder_Source",
+        "actual_prior_workspace_failure:executed_recorder_Source",
+        "actual_prior_clippy_failure:executed_recorder_Source",
+        "actual_prior_runtime_diagnostic:executed_recorder_Source",
+        "actual_QA:fmt:executed_recorder_Source",
+        "actual_QA:clippy:executed_recorder_Source",
+        "actual_QA:workspace:executed_recorder_Source",
+        "actual_QA:source_quality:executed_recorder_Source",
+        "historical_initial_focused_execution:executed_recorder_Source"
+      ],
+      "archive_member": "objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-01/application.json",
+        "sha256": "367cc833bc7445e4744b17c8a0aefae2fab4963baebc05c31f6399d6ca1e77f8",
+        "size_bytes": 7998
+      },
+      "roles": [
+        "actual_initial_Rust_application"
+      ],
+      "archive_member": "objects/36/367cc833bc7445e4744b17c8a0aefae2fab4963baebc05c31f6399d6ca1e77f8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/69/690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc",
+        "sha256": "690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "actual_initial_formatted_Source_metadata"
+      ],
+      "archive_member": "objects/69/690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/eb/ebdd152356606c2fcc7f89d152823cde18e9fe1b499f66e090e4f42ec6422271",
+        "sha256": "ebdd152356606c2fcc7f89d152823cde18e9fe1b499f66e090e4f42ec6422271",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "actual_correction_literal_Source_metadata"
+      ],
+      "archive_member": "objects/eb/ebdd152356606c2fcc7f89d152823cde18e9fe1b499f66e090e4f42ec6422271"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/application.json",
+        "sha256": "fd753bf0a8d1fcb52bea3c0a2a01f3332ecccfbc8fa3e6b5d577dfc117e22b89",
+        "size_bytes": 10116
+      },
+      "roles": [
+        "actual_previous_import_correction_application"
+      ],
+      "archive_member": "objects/fd/fd753bf0a8d1fcb52bea3c0a2a01f3332ecccfbc8fa3e6b5d577dfc117e22b89"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-02/receipt.json",
+        "sha256": "392bbd4323ea5ec909abb176fe9e9331e8fec5bf72959080d406e2f66c8c6854",
+        "size_bytes": 4606
+      },
+      "roles": [
+        "actual_previous_import_correction_formatter"
+      ],
+      "archive_member": "objects/39/392bbd4323ea5ec909abb176fe9e9331e8fec5bf72959080d406e2f66c8c6854"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-02/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_previous_import_correction_formatter:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_previous_import_correction_formatter:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.before.rs",
+        "sha256": "8544825d3b05e4bf6c6f671993ee22f96fe2dd190f7a6399ae447516c16c7b60",
+        "size_bytes": 99327
+      },
+      "roles": [
+        "actual_test_import_correction_base"
+      ],
+      "archive_member": "objects/85/8544825d3b05e4bf6c6f671993ee22f96fe2dd190f7a6399ae447516c16c7b60"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.corrected.rs",
+        "sha256": "ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6",
+        "size_bytes": 99297
+      },
+      "roles": [
+        "actual_test_import_correction_literal"
+      ],
+      "archive_member": "objects/ea/ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.complete.diff",
+        "sha256": "4c15b93050f627932925cfff9ab8bc6a0dc740cb6de7285ab200fff08a647814",
+        "size_bytes": 724
+      },
+      "roles": [
+        "actual_test_import_complete_correction_diff"
+      ],
+      "archive_member": "objects/4c/4c15b93050f627932925cfff9ab8bc6a0dc740cb6de7285ab200fff08a647814"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/ea/ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6",
+        "sha256": "ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6",
+        "size_bytes": 99297
+      },
+      "roles": [
+        "final_test_import_correction_Source_archive"
+      ],
+      "archive_member": "objects/ea/ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/runtime/tests/part01.rs",
+        "sha256": "ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6",
+        "size_bytes": 99297
+      },
+      "roles": [
+        "final_current_test_import_correction_Source"
+      ],
+      "archive_member": "objects/ea/ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.before.rs",
+        "sha256": "dd4f556b9c13c128a0b4090c5e68ffdeec8eb07326617839aa2d8292e2718fc6",
+        "size_bytes": 29381
+      },
+      "roles": [
+        "actual_test_import_correction_base"
+      ],
+      "archive_member": "objects/dd/dd4f556b9c13c128a0b4090c5e68ffdeec8eb07326617839aa2d8292e2718fc6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.corrected.rs",
+        "sha256": "3b8d406b1f76d6107a777b4e09450feaafd27819f6cba9735c279bd6665bc845",
+        "size_bytes": 29351
+      },
+      "roles": [
+        "actual_test_import_correction_literal"
+      ],
+      "archive_member": "objects/3b/3b8d406b1f76d6107a777b4e09450feaafd27819f6cba9735c279bd6665bc845"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.complete.diff",
+        "sha256": "890cdccaa8c8d9876b030baf020007470948d8a782f2f164dd172bec35939bcc",
+        "size_bytes": 539
+      },
+      "roles": [
+        "actual_test_import_complete_correction_diff"
+      ],
+      "archive_member": "objects/89/890cdccaa8c8d9876b030baf020007470948d8a782f2f164dd172bec35939bcc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-03/receipt.json",
+        "sha256": "746624f032ed01ea27872c574c5999c27988bcf33647d2b6606e3cfb63d7eb77",
+        "size_bytes": 4608
+      },
+      "roles": [
+        "actual_correction_formatter_command"
+      ],
+      "archive_member": "objects/74/746624f032ed01ea27872c574c5999c27988bcf33647d2b6606e3cfb63d7eb77"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-03/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_correction_formatter_command:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-03/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_correction_formatter_command:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-application-Root-01/application.json",
+        "sha256": "287b2d723c2fe69bc4f22c10b256844934c8479f76ecd39d708373a9902934c9",
+        "size_bytes": 6646
+      },
+      "roles": [
+        "actual_regression_application"
+      ],
+      "archive_member": "objects/28/287b2d723c2fe69bc4f22c10b256844934c8479f76ecd39d708373a9902934c9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/52/52a6d42ef9e51788d2374b41f3b701161c003c19d08126b69c9f49f37dfb796c",
+        "sha256": "52a6d42ef9e51788d2374b41f3b701161c003c19d08126b69c9f49f37dfb796c",
+        "size_bytes": 1641591
+      },
+      "roles": [
+        "actual_regression_literal_Source_metadata"
+      ],
+      "archive_member": "objects/52/52a6d42ef9e51788d2374b41f3b701161c003c19d08126b69c9f49f37dfb796c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/manifest.json",
+        "sha256": "a2dc0826f48f2105885ac2e9b27c67b5875f7412e8460b8f8f3ed5acc856b268",
+        "size_bytes": 4850
+      },
+      "roles": [
+        "reviewed_regression_preparation"
+      ],
+      "archive_member": "objects/a2/a2dc0826f48f2105885ac2e9b27c67b5875f7412e8460b8f8f3ed5acc856b268"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/README.md",
+        "sha256": "dbf6b7a7edc7fe5c8674d6aac2a111daa40d2d8fc4acd3ab10e5c701f23982ac",
+        "size_bytes": 1823
+      },
+      "roles": [
+        "reviewed_regression_preparation:README"
+      ],
+      "archive_member": "objects/db/dbf6b7a7edc7fe5c8674d6aac2a111daa40d2d8fc4acd3ab10e5c701f23982ac"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-equipment-default-regression-01.py",
+        "sha256": "1c41d0ec0baca5c17318447f71500d61ca94752f13e761f1e9ffc043861569cb",
+        "size_bytes": 8369
+      },
+      "roles": [
+        "reviewed_regression_preparation:author_Source"
+      ],
+      "archive_member": "objects/1c/1c41d0ec0baca5c17318447f71500d61ca94752f13e761f1e9ffc043861569cb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/official-schema-excerpt.json",
+        "sha256": "759ee4c79c61a27b0f279a2a601f769cb2a835eca992da266e442161bb13f76d",
+        "size_bytes": 6632
+      },
+      "roles": [
+        "regression_official_schema_two_family_excerpt"
+      ],
+      "archive_member": "objects/75/759ee4c79c61a27b0f279a2a601f769cb2a835eca992da266e442161bb13f76d"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+        "size_bytes": 168527
+      },
+      "roles": [
+        "regression_Original_Source"
+      ],
+      "archive_member": "objects/bf/bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/Original/SimulationManager.cc-805-878.txt",
+        "sha256": "face9a505876a3f39aae1a2ac918da7f8f7f3d92d75dd59114c76ef23ea2a4b7",
+        "size_bytes": 5268
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/fa/face9a505876a3f39aae1a2ac918da7f8f7f3d92d75dd59114c76ef23ea2a4b7"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      },
+      "roles": [
+        "regression_Original_Source"
+      ],
+      "archive_member": "objects/2f/2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/Original/InputProcessor.cc-860-878.txt",
+        "sha256": "24b8bad74f29b487e4141da473ea924da7b9f1145d40ab99e9558c3660e316fe",
+        "size_bytes": 599
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/24/24b8bad74f29b487e4141da473ea924da7b9f1145d40ab99e9558c3660e316fe"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103
+      },
+      "roles": [
+        "regression_Original_Source"
+      ],
+      "archive_member": "objects/d8/d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/Original/HeatBalanceManager.cc-631-657.txt",
+        "sha256": "55a5fe45c784724aebf48428d0cead13f356fd5bfece78e1da769614bb4dbf7a",
+        "size_bytes": 1784
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/55/55a5fe45c784724aebf48428d0cead13f356fd5bfece78e1da769614bb4dbf7a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/manifest.json",
+        "sha256": "72cbd5967351bcf0a78d61a75221bcd1470b1690aa64b1090f784f63b90ffe9f",
+        "size_bytes": 5440
+      },
+      "roles": [
+        "reviewed_regression_preparation"
+      ],
+      "archive_member": "objects/72/72cbd5967351bcf0a78d61a75221bcd1470b1690aa64b1090f784f63b90ffe9f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/README.md",
+        "sha256": "bd54622be89c6e7b2133806a763b8cf84da40ff6840c9cde2adb978d7ad44108",
+        "size_bytes": 1850
+      },
+      "roles": [
+        "reviewed_regression_preparation:README"
+      ],
+      "archive_member": "objects/bd/bd54622be89c6e7b2133806a763b8cf84da40ff6840c9cde2adb978d7ad44108"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-radiation-single-surface-Header-02.py",
+        "sha256": "b8620c3174449a41560b540a72ac30509b638e67e521d7f017a2e63884e50afe",
+        "size_bytes": 2451
+      },
+      "roles": [
+        "reviewed_regression_preparation:Source_author"
+      ],
+      "archive_member": "objects/b8/b8620c3174449a41560b540a72ac30509b638e67e521d7f017a2e63884e50afe"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-01/Original-176-199.cc.txt",
+        "sha256": "f472d808bfb9ba22c1df5d44e1ab2482ef2068f8046912e2ffe96cac95c9a104",
+        "size_bytes": 1326
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/f4/f472d808bfb9ba22c1df5d44e1ab2482ef2068f8046912e2ffe96cac95c9a104"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-01/Original-483-591.cc.txt",
+        "sha256": "9abf332401437c1aa4cd1a9c81718b253b2f29bedd9541120ebb8de350340417",
+        "size_bytes": 6544
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/9a/9abf332401437c1aa4cd1a9c81718b253b2f29bedd9541120ebb8de350340417"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-01/Original-358-411.cc.txt",
+        "sha256": "5d04fcaf58d2cac96c15661fae26b63c3f185bd34a418c5afb56b3da025d8ab3",
+        "size_bytes": 4193
+      },
+      "roles": [
+        "regression_Original_literal_range"
+      ],
+      "archive_member": "objects/5d/5d04fcaf58d2cac96c15661fae26b63c3f185bd34a418c5afb56b3da025d8ab3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/before.rs",
+        "sha256": "0610a545d83a921b79859946b0e589f58410728a2c614cf2cce81693597b242b",
+        "size_bytes": 17480
+      },
+      "roles": [
+        "regression_actual_base"
+      ],
+      "archive_member": "objects/06/0610a545d83a921b79859946b0e589f58410728a2c614cf2cce81693597b242b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/proposed.rs",
+        "sha256": "cafba51ff2a994008e3e7c89a0c984fdaea72037b61c0d67781c5c7e90018416",
+        "size_bytes": 18470
+      },
+      "roles": [
+        "regression_reviewed_literal_proposal"
+      ],
+      "archive_member": "objects/ca/cafba51ff2a994008e3e7c89a0c984fdaea72037b61c0d67781c5c7e90018416"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-prep-01/complete.diff",
+        "sha256": "969902b747bbab03caa3b42d8b313fe97d5d7217f99c20a3e641ad9759fb9385",
+        "size_bytes": 3410
+      },
+      "roles": [
+        "regression_complete_reviewed_diff"
+      ],
+      "archive_member": "objects/96/969902b747bbab03caa3b42d8b313fe97d5d7217f99c20a3e641ad9759fb9385"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/28/28873ff615e85fa5f272aa2e88078bfc27fb7627185ca839369fb5f37bf9702f",
+        "sha256": "28873ff615e85fa5f272aa2e88078bfc27fb7627185ca839369fb5f37bf9702f",
+        "size_bytes": 18980
+      },
+      "roles": [
+        "regression_final_formatted_Source_archive"
+      ],
+      "archive_member": "objects/28/28873ff615e85fa5f272aa2e88078bfc27fb7627185ca839369fb5f37bf9702f"
+    },
+    {
+      "original": {
+        "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "28873ff615e85fa5f272aa2e88078bfc27fb7627185ca839369fb5f37bf9702f",
+        "size_bytes": 18980
+      },
+      "roles": [
+        "regression_final_current_Source"
+      ],
+      "archive_member": "objects/28/28873ff615e85fa5f272aa2e88078bfc27fb7627185ca839369fb5f37bf9702f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-01/before/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "4c1aea8d5bf592adcb63a64907accab3d281e81549d92c72e42941ee1ba591b2",
+        "size_bytes": 31747
+      },
+      "roles": [
+        "regression_actual_base"
+      ],
+      "archive_member": "objects/4c/4c1aea8d5bf592adcb63a64907accab3d281e81549d92c72e42941ee1ba591b2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/proposed/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9",
+        "size_bytes": 32375
+      },
+      "roles": [
+        "regression_reviewed_literal_proposal"
+      ],
+      "archive_member": "objects/90/9006305798e842571d9cc2868ec4486d6377e7a0742cc55696ed9eedde4ad7d9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/radiation.rs.complete.diff",
+        "sha256": "ad34b87be0abb2612f216b838c54d4df2b671de6d7eb2e58cd906bedda82f4e9",
+        "size_bytes": 1272
+      },
+      "roles": [
+        "regression_complete_reviewed_diff"
+      ],
+      "archive_member": "objects/ad/ad34b87be0abb2612f216b838c54d4df2b671de6d7eb2e58cd906bedda82f4e9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-01/before/crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "c344af46a3754d796f8cc32d879931bda6f56f19bea71d9292633e58c785cadb",
+        "size_bytes": 34958
+      },
+      "roles": [
+        "regression_actual_base"
+      ],
+      "archive_member": "objects/c3/c344af46a3754d796f8cc32d879931bda6f56f19bea71d9292633e58c785cadb"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/proposed/crates/ep_runtime/src/runtime/tests/part04.rs",
+        "sha256": "86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574",
+        "size_bytes": 36419
+      },
+      "roles": [
+        "regression_reviewed_literal_proposal"
+      ],
+      "archive_member": "objects/86/86d984d388358f8c8ee76fd6e35d71fa0f558579d15d894a502eaade96a05574"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-single-surface-prep-02/part04.rs.complete.diff",
+        "sha256": "c2690b622113f5b90e4886fee8f3ac712232c5a388bcc764dddbde6a5ea7d5b5",
+        "size_bytes": 1814
+      },
+      "roles": [
+        "regression_complete_reviewed_diff"
+      ],
+      "archive_member": "objects/c2/c2690b622113f5b90e4886fee8f3ac712232c5a388bcc764dddbde6a5ea7d5b5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-application-Root-01/application-literal.json",
+        "sha256": "77ef1b4dfa8f9f653e4cc869d78dd5dd7914ad3b220e3c6c0b618e36cc911034",
+        "size_bytes": 5342
+      },
+      "roles": [
+        "actual_regression_literal_application"
+      ],
+      "archive_member": "objects/77/77ef1b4dfa8f9f653e4cc869d78dd5dd7914ad3b220e3c6c0b618e36cc911034"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-radiation-regressions-Root-01.py",
+        "sha256": "0d41c91ce59a48875abad3c086dcc00b0847446b0e2cfe0b3775152f4faa5732",
+        "size_bytes": 4735
+      },
+      "roles": [
+        "actual_regression_application_Source"
+      ],
+      "archive_member": "objects/0d/0d41c91ce59a48875abad3c086dcc00b0847446b0e2cfe0b3775152f4faa5732"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Owner-radiation-single-surface-Source-review-02/review.json",
+        "sha256": "f8bfbd0d0a489795b18e0ae3eb21146d04f08418a387b401cb81af19d779e5ec",
+        "size_bytes": 1568
+      },
+      "roles": [
+        "regression_preparation_independent_review"
+      ],
+      "archive_member": "objects/f8/f8bfbd0d0a489795b18e0ae3eb21146d04f08418a387b401cb81af19d779e5ec"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-supplement-01/supplement.json",
+        "sha256": "a4050bdba48594b207fae6ee4d9e6c01bdc57dc68f833da8a0c4172d9cb73826",
+        "size_bytes": 693
+      },
+      "roles": [
+        "regression_FullExterior_Original_supplement"
+      ],
+      "archive_member": "objects/a4/a4050bdba48594b207fae6ee4d9e6c01bdc57dc68f833da8a0c4172d9cb73826"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-default-regression-supplement-01/HeatBalanceManager.cc-620-639.txt",
+        "sha256": "553c698e288a5ab9b18f835c7c6ea1fa41393956b7c40c8c167cbc5c498acd2b",
+        "size_bytes": 1525
+      },
+      "roles": [
+        "regression_FullExterior_Original_literal_620_639"
+      ],
+      "archive_member": "objects/55/553c698e288a5ab9b18f835c7c6ea1fa41393956b7c40c8c167cbc5c498acd2b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-fmt-01/receipt.json",
+        "sha256": "4d5ebe235e9ef50fe18e9f725e56438252d6e518c4ba15eef8cb6e85782e2088",
+        "size_bytes": 4719
+      },
+      "roles": [
+        "actual_regression_formatter"
+      ],
+      "archive_member": "objects/4d/4d5ebe235e9ef50fe18e9f725e56438252d6e518c4ba15eef8cb6e85782e2088"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-fmt-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_regression_formatter:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-fmt-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_regression_formatter:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-01/receipt.json",
+        "sha256": "7f3cad862968e407f016e0de0ee7df9749d4ed6e9e54643dbbcdd8e70c308b6f",
+        "size_bytes": 4669
+      },
+      "roles": [
+        "actual_prior_workspace_failure"
+      ],
+      "archive_member": "objects/7f/7f3cad862968e407f016e0de0ee7df9749d4ed6e9e54643dbbcdd8e70c308b6f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-01/stdout.log",
+        "sha256": "cd9576acccae7b103535d1dda76937b16ace646f9b3e190060ba3dc0b5e9a1ef",
+        "size_bytes": 242162
+      },
+      "roles": [
+        "actual_prior_workspace_failure:complete_stdout"
+      ],
+      "archive_member": "objects/cd/cd9576acccae7b103535d1dda76937b16ace646f9b3e190060ba3dc0b5e9a1ef"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-01/stderr.log",
+        "sha256": "a52abe55134c03c1596839ed947844ea2df94e998ceddb75f724ae12f60561e2",
+        "size_bytes": 1586
+      },
+      "roles": [
+        "actual_prior_workspace_failure:complete_stderr"
+      ],
+      "archive_member": "objects/a5/a52abe55134c03c1596839ed947844ea2df94e998ceddb75f724ae12f60561e2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-01/receipt.json",
+        "sha256": "c7ac441295fbb353153d8fa64fbb2e205a68c1a1678d2e33dc6d00ba403adfa8",
+        "size_bytes": 4696
+      },
+      "roles": [
+        "actual_prior_clippy_failure"
+      ],
+      "archive_member": "objects/c7/c7ac441295fbb353153d8fa64fbb2e205a68c1a1678d2e33dc6d00ba403adfa8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_prior_clippy_failure:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-01/stderr.log",
+        "sha256": "cb996a381415dcb11746860515ace31520d1eefca95b1b817a2e64850504024d",
+        "size_bytes": 721
+      },
+      "roles": [
+        "actual_prior_clippy_failure:complete_stderr"
+      ],
+      "archive_member": "objects/cb/cb996a381415dcb11746860515ace31520d1eefca95b1b817a2e64850504024d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-runtime-diagnostic-01/receipt.json",
+        "sha256": "00862f8304ef8d3ea417a40467585dfa201bc4dd28abff7283d56550538eda8f",
+        "size_bytes": 4734
+      },
+      "roles": [
+        "actual_prior_runtime_diagnostic"
+      ],
+      "archive_member": "objects/00/00862f8304ef8d3ea417a40467585dfa201bc4dd28abff7283d56550538eda8f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-runtime-diagnostic-01/stdout.log",
+        "sha256": "b425ccb6db9218c5047cc6c888d802bdd7e34a7af76cdcd71f798c5fb228a047",
+        "size_bytes": 524381
+      },
+      "roles": [
+        "actual_prior_runtime_diagnostic:complete_stdout"
+      ],
+      "archive_member": "objects/b4/b425ccb6db9218c5047cc6c888d802bdd7e34a7af76cdcd71f798c5fb228a047"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-runtime-diagnostic-01/stderr.log",
+        "sha256": "8bc209dd430fec91b06ed3b550f9d187b2887b5366cc50d0a9923637b572e52a",
+        "size_bytes": 254
+      },
+      "roles": [
+        "actual_prior_runtime_diagnostic:complete_stderr"
+      ],
+      "archive_member": "objects/8b/8bc209dd430fec91b06ed3b550f9d187b2887b5366cc50d0a9923637b572e52a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-radiation-regression-application-formatter-review-01/review.json",
+        "sha256": "a7e160c558ea0168a9dc0a3150ac3de013205df020a35cda3bb5a290481596fc",
+        "size_bytes": 4814
+      },
+      "roles": [
+        "actual_formatter_review",
+        "actual_application_review:1"
+      ],
+      "archive_member": "objects/a7/a7e160c558ea0168a9dc0a3150ac3de013205df020a35cda3bb5a290481596fc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-regression-actual-review-01/review.json",
+        "sha256": "f95dbfa9bc5c937ebc20523f429c898f82963620398e6f6efd550e4e903204c6",
+        "size_bytes": 3119
+      },
+      "roles": [
+        "actual_application_review:0"
+      ],
+      "archive_member": "objects/f9/f95dbfa9bc5c937ebc20523f429c898f82963620398e6f6efd550e4e903204c6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-check-03/receipt.json",
+        "sha256": "3ac8acb910945cd910a18128ae07efe8b8beed3d3a39fe70e782f1a624f49ad9",
+        "size_bytes": 4741
+      },
+      "roles": [
+        "actual_QA:fmt"
+      ],
+      "archive_member": "objects/3a/3ac8acb910945cd910a18128ae07efe8b8beed3d3a39fe70e782f1a624f49ad9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-check-03/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_QA:fmt:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-check-03/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_QA:fmt:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-03/receipt.json",
+        "sha256": "804618d0ca7ac95b58c0957ff4a3ccbb7fb1ecd7d06997a61e08d756fe7ee53d",
+        "size_bytes": 4801
+      },
+      "roles": [
+        "actual_QA:clippy"
+      ],
+      "archive_member": "objects/80/804618d0ca7ac95b58c0957ff4a3ccbb7fb1ecd7d06997a61e08d756fe7ee53d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-03/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_QA:clippy:complete_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-03/stderr.log",
+        "sha256": "2adb8a3508b7569ca5de1bc1e0a4b047ab23e08217078a8cc97861d8513ce8e2",
+        "size_bytes": 363
+      },
+      "roles": [
+        "actual_QA:clippy:complete_stderr"
+      ],
+      "archive_member": "objects/2a/2adb8a3508b7569ca5de1bc1e0a4b047ab23e08217078a8cc97861d8513ce8e2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-02/receipt.json",
+        "sha256": "52143148df3e308cbc4703c266751bb33decb1c5fb826c19b247a2a83bc98bdd",
+        "size_bytes": 4777
+      },
+      "roles": [
+        "actual_QA:workspace"
+      ],
+      "archive_member": "objects/52/52143148df3e308cbc4703c266751bb33decb1c5fb826c19b247a2a83bc98bdd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-02/stdout.log",
+        "sha256": "bfb0026e32a280c0d0ddc3592ae367656dd7184606629b424190d2dc1301d1cd",
+        "size_bytes": 766020
+      },
+      "roles": [
+        "actual_QA:workspace:complete_stdout"
+      ],
+      "archive_member": "objects/bf/bfb0026e32a280c0d0ddc3592ae367656dd7184606629b424190d2dc1301d1cd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-02/stderr.log",
+        "sha256": "648cc0df26affa0b8d3534736613ae2324e760b82e7c4391f205fdbf335c90c8",
+        "size_bytes": 1420
+      },
+      "roles": [
+        "actual_QA:workspace:complete_stderr"
+      ],
+      "archive_member": "objects/64/648cc0df26affa0b8d3534736613ae2324e760b82e7c4391f205fdbf335c90c8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-source-quality-03/receipt.json",
+        "sha256": "3b5f416112c63091d5169615d1f9ad377639bd295b1d2b6a09cb2e07a4101e3d",
+        "size_bytes": 4803
+      },
+      "roles": [
+        "actual_QA:source_quality"
+      ],
+      "archive_member": "objects/3b/3b5f416112c63091d5169615d1f9ad377639bd295b1d2b6a09cb2e07a4101e3d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-source-quality-03/stdout.log",
+        "sha256": "ec3fbc636312c154e4699315f87bc83565067605d3a1b26fe2b3d0badd37d01f",
+        "size_bytes": 82
+      },
+      "roles": [
+        "actual_QA:source_quality:complete_stdout"
+      ],
+      "archive_member": "objects/ec/ec3fbc636312c154e4699315f87bc83565067605d3a1b26fe2b3d0badd37d01f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-source-quality-03/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_QA:source_quality:complete_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-focused-01/receipt.json",
+        "sha256": "74c25019c59d2837e86677be8c5a2f99a74e7d6978feed9efaf19c3db1d6850a",
+        "size_bytes": 5106
+      },
+      "roles": [
+        "historical_initial_focused_execution"
+      ],
+      "archive_member": "objects/74/74c25019c59d2837e86677be8c5a2f99a74e7d6978feed9efaf19c3db1d6850a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-focused-01/stdout.log",
+        "sha256": "283c3caacb52cc2b12a35289cb347abcf9e610eb8e8af90656c6f07d96366284",
+        "size_bytes": 1046
+      },
+      "roles": [
+        "historical_initial_focused_execution:complete_stdout"
+      ],
+      "archive_member": "objects/28/283c3caacb52cc2b12a35289cb347abcf9e610eb8e8af90656c6f07d96366284"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-focused-01/stderr.log",
+        "sha256": "5001e93e3b63fc9e498440a01ab76840dda419e8923da19198e605427b85f7f1",
+        "size_bytes": 895
+      },
+      "roles": [
+        "historical_initial_focused_execution:complete_stderr"
+      ],
+      "archive_member": "objects/50/5001e93e3b63fc9e498440a01ab76840dda419e8923da19198e605427b85f7f1"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/test.ps1",
+        "sha256": "03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095",
+        "size_bytes": 2410
+      },
+      "roles": [
+        "QA_runner_review_time_Source"
+      ],
+      "archive_member": "objects/03/03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095"
+    },
+    {
+      "original": {
+        "path": "scripts/lib/common.ps1",
+        "sha256": "bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97",
+        "size_bytes": 1052
+      },
+      "roles": [
+        "QA_runner_review_time_Source"
+      ],
+      "archive_member": "objects/bd/bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/source-quality-gate.ps1",
+        "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+        "size_bytes": 3432
+      },
+      "roles": [
+        "QA_runner_review_time_Source"
+      ],
+      "archive_member": "objects/73/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-prep-04/manifest.json",
+        "sha256": "37d363711ac36a36a74c33adcc7aedaa2827baa5e3c4d180db79095d15723ec7",
+        "size_bytes": 6269
+      },
+      "roles": [
+        "publication_Source_preparation"
+      ],
+      "archive_member": "objects/37/37d363711ac36a36a74c33adcc7aedaa2827baa5e3c4d180db79095d15723ec7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-prep-04/publish.py",
+        "sha256": "0613450cbbcabaf3c55e74cd0d0aedbdc1f16a5c0d05cf5b0d3074932e2670d7",
+        "size_bytes": 36537
+      },
+      "roles": [
+        "executed_publication_Source"
+      ],
+      "archive_member": "objects/06/0613450cbbcabaf3c55e74cd0d0aedbdc1f16a5c0d05cf5b0d3074932e2670d7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-prep-04/README.md",
+        "sha256": "475f3ca1c6226ef5d0b55d73cf7ce52eaed871f460cc4d0e823524546faa24a8",
+        "size_bytes": 4378
+      },
+      "roles": [
+        "publication_packet_contract"
+      ],
+      "archive_member": "objects/47/475f3ca1c6226ef5d0b55d73cf7ce52eaed871f460cc4d0e823524546faa24a8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-prep-04/docs-update-proposal.md",
+        "sha256": "34375aad75137ea7a67ecf8ec441cfacd00af82a4c0612fc2dd9c408a9370fee",
+        "size_bytes": 2399
+      },
+      "roles": [
+        "unapplied_docs_update_proposal"
+      ],
+      "archive_member": "objects/34/34375aad75137ea7a67ecf8ec441cfacd00af82a4c0612fc2dd9c408a9370fee"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-radiation-producer-Root-01.py",
+        "sha256": "0a0ae5c618b515e32af162e0cbf24ee50112969861931e3fdafa082a3d914203",
+        "size_bytes": 3105
+      },
+      "roles": [
+        "actual_initial_or_import_application_Source"
+      ],
+      "archive_member": "objects/0a/0a0ae5c618b515e32af162e0cbf24ee50112969861931e3fdafa082a3d914203"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/correct-radiation-import-Root-01.py",
+        "sha256": "fa1e1362fbef1395e4a3c0c1196d4ebf029cfa1be571afe9c2352a9c25550753",
+        "size_bytes": 3387
+      },
+      "roles": [
+        "actual_initial_or_import_application_Source"
+      ],
+      "archive_member": "objects/fa/fa1e1362fbef1395e4a3c0c1196d4ebf029cfa1be571afe9c2352a9c25550753"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/correct-radiation-import-Root-02.py",
+        "sha256": "4bdf603ffc5b71e85e407f0b6196c1ceb51df6b131e96486ae1513fc9cc9c9a6",
+        "size_bytes": 3369
+      },
+      "roles": [
+        "actual_initial_or_import_application_Source"
+      ],
+      "archive_member": "objects/4b/4bdf603ffc5b71e85e407f0b6196c1ceb51df6b131e96486ae1513fc9cc9c9a6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/formatter-diff-index.json",
+        "sha256": "7a36daf9bdbd9b3f68f7f5c4bb3a2d370a2a5bbb6f5c5b8be1a327d077863db1",
+        "size_bytes": 13344
+      },
+      "roles": [
+        "complete_initial_formatter_diff_index"
+      ],
+      "archive_member": "objects/7a/7a36daf9bdbd9b3f68f7f5c4bb3a2d370a2a5bbb6f5c5b8be1a327d077863db1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/00-formatter.diff",
+        "sha256": "463620c5248cad95ec4fe169354b06ec364ea22015561a9b7d91ec68d3e17ab4",
+        "size_bytes": 5874
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/46/463620c5248cad95ec4fe169354b06ec364ea22015561a9b7d91ec68d3e17ab4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/01-formatter.diff",
+        "sha256": "32a0ceadf0509ce3a2b55666cfeda080df4691f0e5938605e88eba0c8756d9e9",
+        "size_bytes": 7459
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/32/32a0ceadf0509ce3a2b55666cfeda080df4691f0e5938605e88eba0c8756d9e9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/03-formatter.diff",
+        "sha256": "83827372349a294ba2ede428840bfa3552173d99bf898cbef07b8ce13cbe3ea1",
+        "size_bytes": 655
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/83/83827372349a294ba2ede428840bfa3552173d99bf898cbef07b8ce13cbe3ea1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/04-formatter.diff",
+        "sha256": "5d64747fc8e8ffab7897d153c66c16e286ec386452a7890a6cd33ce585e47375",
+        "size_bytes": 11010
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/5d/5d64747fc8e8ffab7897d153c66c16e286ec386452a7890a6cd33ce585e47375"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/05-formatter.diff",
+        "sha256": "b3d9e1773b75c8ab1107f14c53cceb1a376f01f76a42d8a02ce4e89042ffe574",
+        "size_bytes": 658
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/b3/b3d9e1773b75c8ab1107f14c53cceb1a376f01f76a42d8a02ce4e89042ffe574"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/06-formatter.diff",
+        "sha256": "fdc80cae5ade37c03e11a88a5370b28a11b209f23ba370f4910a7783102b05d4",
+        "size_bytes": 563
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/fd/fdc80cae5ade37c03e11a88a5370b28a11b209f23ba370f4910a7783102b05d4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/10-formatter.diff",
+        "sha256": "e6139ac8279a921c8f2cb826ca80d64b4b8eedc906eeb5a4191d707238f6e3ae",
+        "size_bytes": 1070
+      },
+      "roles": [
+        "complete_nonempty_initial_formatter_diff"
+      ],
+      "archive_member": "objects/e6/e6139ac8279a921c8f2cb826ca80d64b4b8eedc906eeb5a4191d707238f6e3ae"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-01/historical-preservation-proof.json",
+        "sha256": "82e1b4d040da1acc8fd133b59751fba7e8c7ca5947c405a456231cd7b6fc31fe",
+        "size_bytes": 1920
+      },
+      "roles": [
+        "historical_private_LU_and_prior_test_preservation"
+      ],
+      "archive_member": "objects/82/82e1b4d040da1acc8fd133b59751fba7e8c7ca5947c405a456231cd7b6fc31fe"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-producer-application-formatter-review-03/runtime-fmt03.complete.diff",
+        "sha256": "095f34d3a6b9be0fb1c374e4018a581fb2182f07482260512c6d56dbfe6577c7",
+        "size_bytes": 682
+      },
+      "roles": [
+        "complete_final_import_formatter_diff"
+      ],
+      "archive_member": "objects/09/095f34d3a6b9be0fb1c374e4018a581fb2182f07482260512c6d56dbfe6577c7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-radiation-regression-application-formatter-review-01/ordinary_equipment_input.rs.formatter.diff",
+        "sha256": "ed8e88b5cb6e13ddff7ca77ecbde26cf4fd112232dc1e0349a9c3520f9438e84",
+        "size_bytes": 3273
+      },
+      "roles": [
+        "complete_regression_formatter_diff"
+      ],
+      "archive_member": "objects/ed/ed8e88b5cb6e13ddff7ca77ecbde26cf4fd112232dc1e0349a9c3520f9438e84"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-equipment-default-regression-Source-review-01/review.json",
+        "sha256": "14e33753a087ca2c1d9503bb15d39009c08fa01ca9c812138f159b96fe76878f",
+        "size_bytes": 2753
+      },
+      "roles": [
+        "independent_equipment_default_Source_review"
+      ],
+      "archive_member": "objects/14/14e33753a087ca2c1d9503bb15d39009c08fa01ca9c812138f159b96fe76878f"
+    },
+    {
+      "original": {
+        "path": ".gitattributes",
+        "sha256": "3ce9fd4c030ae64c3298f65e86e48d06a0d20fe25d8f5a9968aebe8ef6bec41c",
+        "size_bytes": 798
+      },
+      "roles": [
+        "actual_binary_fixture_attributes"
+      ],
+      "archive_member": "objects/3c/3ce9fd4c030ae64c3298f65e86e48d06a0d20fe25d8f5a9968aebe8ef6bec41c"
+    }
+  ],
+  "archive_scope": "Explicit finite Source, diffs, original9ranges, actual raw/allcalls, metadata, full receipts/logs and17 normal outputs; no recursive reference walk or large Native payload."
+}

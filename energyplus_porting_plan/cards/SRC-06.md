@@ -363,3 +363,42 @@ One conventional table reuses eight complete historical Native objects: seven co
 Actual checkpoint checks on Source eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae passed: formatting check, source quality and 41 affected tests. Clippy and the full workspace are consolidated with the following radiation integration; this checkpoint claims neither run. The complete released-Rust dispatcher regression retained all eight cases and 20 calls: 16398 JSON objects, 3067 arrays and 57930 exact leaves, with 53 prospective execution-metadata joins and zero differences. This is a whole selected Rust regression; its accepted historical Native pairing is provenance, not a new direct Native comparison. Prior failed or interrupted executions remain in the finite packet.
 
 [Bounded getter, sole Config and selected regression evidence](../evidence/SRC-06-ordinary-geometry-equipment/summary.json) archives the selected Source/diffs/literal Original ranges, eight whole Native objects and actual QA/build/capture/regression records and logs. The full 138-case fixture, large raw Native capture, binaries/maps/core/providers and transitive historical Source payloads remain identity references. Full InputProcessor/scratch parity, gain registration/equations, full Config/Node ABI, availability/HVAC Manage and Sim tails, AnyEMS readiness, ordinary dispatcher/cadence, radiation enclosure/cache/caller and complete zone solution/handoff remain unfinished. All four SRC-06 gates and A14/54/B14/64 stay unchanged.
+
+## 실제 FixViewFactors / CalcScriptF 선택 수치 생산자
+
+Original 순서의 FixViewFactors와 무차원 CalcScriptF 생산자를 연결했다.
+실제 A-24H Native 실행의 전체 58개 이벤트 중 Fix 1회와 ScriptF 4회를
+모두 채택하여 F, ScriptF, EMISS의 204개 출력 binary64 비트를 비교한다.
+절대·상대·ULP 허용오차는 모두 0이며 signed zero도 정확히 일치한다.
+관측된 호출은 Fix kickoff 1회, ScriptF kickoff 1회와 첫 warmup day 3회다.
+후속 warmup/run, pivot swap/tie, singular/tiny 및 지원하지 않는 경고·상태
+분기의 수치 검증은 아직 없다. 기존 LU 테스트와 과거 fixture는 보존했다.
+
+Probe 입력은 전체 zone/surface 연결과 유한성을 먼저 검증하고, 모든 zone의
+결과를 임시 저장한 뒤 성공할 때 함께 반영한다. 지원 불가 오류는 실제
+surface/timestep/warmup/run/PurchasedAir 호출을 따라 전달되며 public manual
+step API도 Result를 반환한다. Original 초기화가 N1에서 Fix/ScriptF를
+건너뛰는 규칙을 따라 단일 표면의 교환량을 0으로 처리한다. 이 N1 처리는
+소스에 근거하며 Native N1 관측을 주장하지 않는다. N2/N3은 지원 불가다.
+Timestep 객체가 존재하고 필드만 생략되면 실제 schema 기본값 6을 사용한다.
+객체 전체가 없을 때의 Original/compiler 기본값 차이는 지원 불가로 남긴다.
+
+최종 Source `78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2`에서
+fmt, workspace Clippy(-D warnings), source-quality와 전체 테스트가 통과했다:
+18개 그룹, 4,974 passed, 0 failed, 기존 ignored 2개. 이전 focused 6개 통과는
+Source `690a7374`의 과거 실행이며 최종 Source 검증으로 대신하지 않는다.
+수정 전 workspace 실패(exit 1), Clippy 실패(exit 101), runtime 진단 성공
+(exit 0)의 실제 로그와 Source도 함께 보존한다. 최종 workspace 실행은
+204개 비트 검증과 N1·기본값 회귀 및 이전에 실패한 CLI 경로를 포함한다.
+새 테스트 binary나 관측 framework는 추가하지 않았다.
+
+[실제 수치 생산자 요약](../evidence/SRC-06-ordinary-radiation-producer/summary.json),
+[파일 색인](../evidence/SRC-06-ordinary-radiation-producer/manifest.json),
+[검증 기록 ZIP](../evidence/SRC-06-ordinary-radiation-producer/evidence.zip)은
+288개 artifact 참조와 CRC/SHA/크기를 다시 검증한 242개 ZIP member를 담는다.
+대형 Native 실행 파일·map·core·provider는 기존 provenance 참조이며 이번
+변경에서 다시 읽거나 전체 빌드 재현을 주장하지 않는다.
+
+실제 enclosure/cache/first-call/report/sigma 소유권, ordinary radiation 활성화,
+실제 반복 cadence와 전체 zone 해법·handoff 일치는 아직 미완료다.
+네 SRC-06 gate와 A14/54, B14/64는 그대로 유지한다.

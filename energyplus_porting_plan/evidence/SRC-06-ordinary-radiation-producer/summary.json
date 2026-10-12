@@ -1,0 +1,309 @@
+{
+  "schema": "src06-actual-selected-radiation-producer.v1",
+  "status": "All five admitted genuine Native Fix/ScriptF calls replayed with all204 dimensionless output/EMISS bits exact in the existing Rust test.",
+  "current_Source": {
+    "path": ".runtime/porting/source-objects/78/78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2",
+    "sha256": "78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2"
+  },
+  "historical_Native_Source": "779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+  "historical_Owner_Source": {
+    "path": ".runtime/porting/source-objects/eb/eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+    "sha256": "eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+    "size_bytes": 1641591
+  },
+  "publication_inputs": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-publication-inputs-Root-01/inputs.json",
+    "sha256": "630ec3f295423dc8ef6e98179a6c097c0fb61ff018866704a74864089051601b",
+    "size_bytes": 8169
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/application.json",
+    "sha256": "7d1a4efe406981a67d1fa22a626b1e74d5489dcdc2c1c980cd32be1fb519abe2",
+    "size_bytes": 11445
+  },
+  "regression_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-application-Root-01/application.json",
+    "sha256": "287b2d723c2fe69bc4f22c10b256844934c8479f76ecd39d708373a9902934c9",
+    "size_bytes": 6646
+  },
+  "actual_Native_facts": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-factual-01/report.json",
+    "sha256": "363017cc6be86bcc46442bfeef6ff3ac65a4c139e40ebf9a87041b9c5b01b0c6"
+  },
+  "actual_complete_Native_capture": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-producer-native-capture-01/A-24H.observation.json",
+    "sha256": "eb20048a65aa71ac02fe56282171902a7791003892a4855e8fe74f0ccfbeecff",
+    "size_bytes": 218801
+  },
+  "actual_complete_Native_fixture": {
+    "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/ordinary-radiation-producer-factual-01/cases.json",
+    "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+    "size_bytes": 219335
+  },
+  "Rust_replay_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_producer_native_cases.json",
+    "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+    "size_bytes": 219335
+  },
+  "comparison_policy": {
+    "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/ordinary-radiation-producer-native-prep-01/comparison-policy.json",
+    "sha256": "a07993df86d78f7bf87bc55e60f66f9a1b09d7ec8c42eb45151ae2ba73c0e942",
+    "size_bytes": 2719
+  },
+  "actual_Native_event_count": 58,
+  "actual_Native_call_counts": {
+    "FixViewFactors": 1,
+    "CalcScriptF": 4,
+    "CalcMatrixInverse": 4
+  },
+  "numerically_admitted_calls": 5,
+  "numerical_exclusions": {},
+  "exact_F_ScriptF_and_EMISS_output_endpoints": 204,
+  "actual_phase_call_counts": {
+    "FixViewFactors:kickoff": 1,
+    "CalcScriptF:kickoff": 1,
+    "CalcScriptF:warmup_first_day": 3
+  },
+  "actual_pivots": 24,
+  "actual_swaps": 0,
+  "absolute_tolerance": 0,
+  "relative_tolerance": 0,
+  "ULP_tolerance": 0,
+  "signed_zero_bits_exact": true,
+  "historical_focused_tests": {
+    "actual_execution": {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-focused-01/receipt.json",
+      "sha256": "74c25019c59d2837e86677be8c5a2f99a74e7d6978feed9efaf19c3db1d6850a",
+      "size_bytes": 5106
+    },
+    "Source_snapshot": {
+      "path": ".runtime/porting/source-objects/69/690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc",
+      "sha256": "690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc"
+    },
+    "groups": 2,
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "final_Source_QA": false
+  },
+  "workspace_tests": {
+    "groups": 18,
+    "passed": 4974,
+    "failed": 0,
+    "ignored": 2
+  },
+  "actual_QA_commands": {
+    "fmt": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "clippy": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "clippy",
+      "--locked",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "workspace": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/test.ps1"
+    ],
+    "source_quality": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/source-quality-gate.ps1"
+    ]
+  },
+  "formatter_Source_before": {
+    "path": ".runtime/porting/source-objects/c3/c329499d6db8e695b9f263bdd2e4e75dc9d63132d1dbae3445b9ca1e43ca9bc2",
+    "sha256": "c329499d6db8e695b9f263bdd2e4e75dc9d63132d1dbae3445b9ca1e43ca9bc2"
+  },
+  "formatter_Source_after": {
+    "path": ".runtime/porting/source-objects/69/690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc",
+    "sha256": "690a7374325fb37a3f892594c77bcd3ed57dff444c79b608de4dc7f42943e8fc"
+  },
+  "formatter_source_bytes_match_before_and_after": false,
+  "bounded_test_import_corrections": [
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part01.rs",
+      "base": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.before.rs",
+        "sha256": "8544825d3b05e4bf6c6f671993ee22f96fe2dd190f7a6399ae447516c16c7b60",
+        "size_bytes": 99327
+      },
+      "proposed": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.corrected.rs",
+        "sha256": "ea391070e757971abb60f50cd95b0c4ccf31fcab7afc06c5713462546ba4e8f6",
+        "size_bytes": 99297
+      },
+      "complete_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/part01.complete.diff",
+        "sha256": "4c15b93050f627932925cfff9ab8bc6a0dc740cb6de7285ab200fff08a647814",
+        "size_bytes": 724
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime.rs",
+      "base": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.before.rs",
+        "sha256": "dd4f556b9c13c128a0b4090c5e68ffdeec8eb07326617839aa2d8292e2718fc6",
+        "size_bytes": 29381
+      },
+      "proposed": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.corrected.rs",
+        "sha256": "3b8d406b1f76d6107a777b4e09450feaafd27819f6cba9735c279bd6665bc845",
+        "size_bytes": 29351
+      },
+      "complete_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-03/runtime.complete.diff",
+        "sha256": "890cdccaa8c8d9876b030baf020007470948d8a782f2f164dd172bec35939bcc",
+        "size_bytes": 539
+      }
+    }
+  ],
+  "previous_import_correction_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-application-Root-02/application.json",
+    "sha256": "fd753bf0a8d1fcb52bea3c0a2a01f3332ecccfbc8fa3e6b5d577dfc117e22b89",
+    "size_bytes": 10116
+  },
+  "inherited_application_actual_formatted_files_stage": "Historical initial formatter085/Source690a only; final authority is actual final Source archives and current guards.",
+  "correction_formatter": {
+    "actual_execution": {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-fmt-03/receipt.json",
+      "sha256": "746624f032ed01ea27872c574c5999c27988bcf33647d2b6606e3cfb63d7eb77",
+      "size_bytes": 4608
+    },
+    "Source_before": {
+      "path": ".runtime/porting/source-objects/eb/ebdd152356606c2fcc7f89d152823cde18e9fe1b499f66e090e4f42ec6422271",
+      "sha256": "ebdd152356606c2fcc7f89d152823cde18e9fe1b499f66e090e4f42ec6422271"
+    },
+    "Source_after": {
+      "path": ".runtime/porting/source-objects/21/215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41",
+      "sha256": "215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41"
+    },
+    "source_bytes_match_before_and_after": false
+  },
+  "regression_formatter": {
+    "actual_execution": {
+      "path": ".runtime/porting/SRC-06/ordinary-radiation-regression-fmt-01/receipt.json",
+      "sha256": "4d5ebe235e9ef50fe18e9f725e56438252d6e518c4ba15eef8cb6e85782e2088",
+      "size_bytes": 4719
+    },
+    "Source_before": {
+      "path": ".runtime/porting/source-objects/52/52a6d42ef9e51788d2374b41f3b701161c003c19d08126b69c9f49f37dfb796c",
+      "sha256": "52a6d42ef9e51788d2374b41f3b701161c003c19d08126b69c9f49f37dfb796c"
+    },
+    "Source_after": {
+      "path": ".runtime/porting/source-objects/78/78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2",
+      "sha256": "78050bebaad0910a239a6b2d0d289dffb1638cf54e6f289c1e04e8ffd84f8df2"
+    },
+    "source_bytes_match_before_and_after": false
+  },
+  "actual_regression_discovery_commands": [
+    {
+      "role": "actual_prior_workspace_failure",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-workspace-01/receipt.json",
+        "sha256": "7f3cad862968e407f016e0de0ee7df9749d4ed6e9e54643dbbcdd8e70c308b6f",
+        "size_bytes": 4669
+      },
+      "actual_exit_code": 1,
+      "actual_Source": {
+        "path": ".runtime/porting/source-objects/21/215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41",
+        "sha256": "215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41"
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/test.ps1"
+      ]
+    },
+    {
+      "role": "actual_prior_clippy_failure",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-clippy-01/receipt.json",
+        "sha256": "c7ac441295fbb353153d8fa64fbb2e205a68c1a1678d2e33dc6d00ba403adfa8",
+        "size_bytes": 4696
+      },
+      "actual_exit_code": 101,
+      "actual_Source": {
+        "path": ".runtime/porting/source-objects/79/79cd8a648991a35f26fe24cb9cf08d20cb95f569cdf80e09e66d24330d61684d",
+        "sha256": "79cd8a648991a35f26fe24cb9cf08d20cb95f569cdf80e09e66d24330d61684d"
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "role": "actual_prior_runtime_diagnostic",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-producer-runtime-diagnostic-01/receipt.json",
+        "sha256": "00862f8304ef8d3ea417a40467585dfa201bc4dd28abff7283d56550538eda8f",
+        "size_bytes": 4734
+      },
+      "actual_exit_code": 0,
+      "actual_Source": {
+        "path": ".runtime/porting/source-objects/21/215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41",
+        "sha256": "215efe0979ad645ccbfd164c4fd039671c8e502262a093f07ec7939452037e41"
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/test.ps1",
+        "-Package",
+        "ep_runtime",
+        "-Lib"
+      ]
+    }
+  ],
+  "single_surface_regression": "Original init skips Fix/ScriptF for N1; explicit no-exchange staging after global validation in all probe modes. Source-derived, no Native N1 capture claim. N2/N3 remain unavailable.",
+  "equipment_default_regression": "Present-empty Timestep uses actual schema6; wholly absent object remains unavailable. Existing physical-scope guard owns solar admission.",
+  "unavailability": "Typed probe errors propagate through actual surface/timestep/warmup/run/PurchasedAir paths; all zone fluxes stage before commit. Public manual step is fallible.",
+  "limits": [
+    "Observed Fix kickoff1 and ScriptF kickoff1/warmup-first-day3 only; no later/run calls observed.",
+    "No pivot swaps/ties/singular/tiny or unsupported warning/state branches certified; actual Fix owner diagnostic outputs remain factual evidence only.",
+    "Ordinary enclosure/cache/raw-family/first-call/report/sigma ownership and activation, zone solver/cadence and whole-port parity remain unclaimed.",
+    "Large Native binary/map/core/object/DLL identities are existing metadata provenance only; no fresh byte scan, archive or transitive replay claim.",
+    "Final Source authority is genuine stable QA metadata plus fourteen affected Rust paths, the separately authenticated whole JSON fixture, the two explicit inherited-import correction paths and three reviewed regression paths; no duplicate whole-tree snapshot or JSON Source-membership claim is performed."
+  ],
+  "SRC06_gates_preserved": {
+    "scope_review": "미확인",
+    "unit_gate": "미확인",
+    "integration_gate": "미확인",
+    "production_gate": "미확인"
+  },
+  "SRC06_applicability_preserved": "A/B",
+  "gates_updated": false,
+  "ordinary_radiation_activation_claimed": false,
+  "scientific_wholeport_PASS_claimed": false,
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/evidence.zip",
+    "sha256": "3b4cb066d5e083d69fe01a3a993c187160ef033d63c894ab066c94369770339f",
+    "size_bytes": 3736961
+  }
+}

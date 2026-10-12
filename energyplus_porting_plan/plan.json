@@ -12536,6 +12536,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-geometry-equipment/summary.json",
         "sha256": "5304f1babb24867f09414f68a04ce09db59d80e46e7fa6f815576db7b11422c8",
         "size_bytes": 8094
+      },
+      "actual_selected_ordinary_radiation_producer": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/summary.json",
+        "sha256": "f7e63f6bb3fb17c369ee01eb131f62e699a98157158a9126a35e3965ee90b34b",
+        "size_bytes": 13417
       }
     },
     {
