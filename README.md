@@ -29,13 +29,20 @@ Use focused checks while implementing a card:
 ```powershell
 python tools/porting/check_plan.py --check
 python tools/porting/sync_plan_views.py --check
-cargo fmt --all -- --check
-cargo test -p ep_runtime <card_test_filter> --lib
+.\scripts\dev.cmd check -Package ep_runtime -Filter <card_test_filter> -Lib
 ```
 
+Use `dev test -Package <crate> -Filter <test_filter>` for a single test area,
+`dev test` for the workspace once, and `dev check -Full` for the broader
+integration checks at a milestone. `-Plan` prints the selected commands without
+running them. The default `dev check` covers `ep_runtime`; select every affected
+package explicitly when changing another layer or a public interface. See
+[Contributing](CONTRIBUTING.md#test-selection) for the change-to-test mapping.
+
 Run the card's EnergyPlus comparison and execution test before closing its
-gates. Run the broader repository checks at integration milestones. Commit
-and push each reviewable unit after its relevant validation.
+gates. Commit and push each reviewable unit after its relevant validation.
+Do not repeat a focused suite after the same unchanged code has passed the
+workspace suite.
 After reviewing a card and updating its evidence and gate metadata, run
 `python tools/porting/sync_plan_views.py --write` to refresh the checklist and
 offline HTML plan. Browser checks are local work notes; recorded repository

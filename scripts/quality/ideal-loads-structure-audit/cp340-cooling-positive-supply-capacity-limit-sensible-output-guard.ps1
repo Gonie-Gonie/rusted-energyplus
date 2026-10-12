@@ -31,9 +31,9 @@ $cp340Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supp
 $cp340PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_capacity_limit_sensible_output_guard\validation.rs"
 $cp340PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_capacity_limit_sensible_output_guard\serialization.rs"
 $cp340PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_capacity_limit_sensible_output_guard\serialization\snapshot.rs"
-$cp340RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp340RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp340DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_positive_supply_capacity_limit_sensible_output_guard_assertions.rs"
-$cp340NonDirectTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp340NonDirectTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 
 foreach ($cp340RequiredFile in @(
         $cp340Module,

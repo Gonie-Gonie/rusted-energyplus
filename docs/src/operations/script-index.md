@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-07-14
+last_reviewed: 2026-10-12
 ---
 
 # Script Index
@@ -40,7 +40,7 @@ Read the table by evidence lane, not just by folder:
 - `*-conformance` compare commands are promoted only when the matching case
   manifest has `comparison_class = "conformance"`, `conformance_claim = true`,
   declared variables, tolerances, reports, and a blocking gate.
-- diagnostic and smoke commands may run in `check`, but they do not support a
+- diagnostic and smoke commands may run in `check -Full`, but they do not support a
   compatibility claim by themselves.
 - release report commands generate evidence packages; they do not promote new
   variables unless the promoted compare gates already exist.
@@ -56,8 +56,8 @@ matplotlib for document layout and charts.
 | `oracle-smoke` | setup | run EnergyPlus oracle example and conversion | no | `.runtime/oracle-smoke` |
 | `source-smoke` | setup | verify reference source checkout | yes | console output |
 | `python-smoke` | setup | verify portable Python and the pinned report-generation venv | yes | console output |
-| `check` | quality | run fmt, clippy, tests, smoke gates, docs, and guards | yes | console output |
-| `test` | quality | run Rust workspace tests | yes | console output |
+| `check` | quality | format, lint, and test `ep_runtime` or selected packages; `-Full` adds workspace integration; `-Plan` previews commands | full integration | console output |
+| `test` | quality | run workspace tests once; select packages with `-Package`, names with `-Filter`, and library targets with `-Lib` | yes | console output |
 | `docs-generate` | quality | regenerate mdBook generated references from `specs/` and tracked case manifests | yes for docs/spec changes | `docs/src/generated`, `tools/docs/generated-docs.manifest.json` |
 | `docs-check` | quality | build mdBook | yes | `docs/book` |
 | `file-size-check` | quality | warn/fail on oversized source files with explicit legacy waivers | yes | console output |

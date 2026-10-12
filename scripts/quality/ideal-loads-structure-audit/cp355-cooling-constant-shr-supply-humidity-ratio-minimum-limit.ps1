@@ -44,7 +44,7 @@ $cp355PipelineValidation = "crates\ep_run\src\pipeline\$cp355PipelineStem\valida
 $cp355PipelineTests = "crates\ep_run\src\pipeline\$cp355PipelineStem\validation\tests.rs"
 $cp355Serialization = "crates\ep_run\src\pipeline\$cp355PipelineStem\serialization.rs"
 $cp355SnapshotSerialization = "crates\ep_run\src\pipeline\$cp355PipelineStem\serialization\snapshot.rs"
-$cp355ArbitraryTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp355ArbitraryTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp355ArbitraryAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp353_assertions.rs"
 $cp355Audit = "scripts\quality\ideal-loads-structure-audit\cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1"
 

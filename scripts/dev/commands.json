@@ -56,13 +56,13 @@
                          "name":  "check",
                          "path":  "quality\\check.ps1",
                          "group":  "quality",
-                         "help":  "Run fmt, clippy, tests, smoke gates, docs, and guards."
+                         "help":  "Check ep_runtime or selected packages; -Full runs workspace integration, -Plan previews commands."
                      },
                      {
                          "name":  "test",
                          "path":  "quality\\test.ps1",
                          "group":  "quality",
-                         "help":  "Run the Rust workspace tests."
+                         "help":  "Run workspace tests once; narrow with -Package/-Filter/-Lib, inspect with -List/-Plan."
                      },
                      {
                          "name":  "docs-check",

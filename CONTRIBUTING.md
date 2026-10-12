@@ -15,17 +15,56 @@ For this repository, that means:
 
 ## Local Gates
 
-Use the same scripts locally and in CI:
+Use the existing command wrapper to select the checks needed by the change:
 
 ```powershell
-.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
-.\scripts\dev.cmd check
-.\scripts\dev.cmd oracle-smoke
-.\scripts\dev.cmd v0.1-verify
-.\scripts\dev.cmd raw-model-smoke
-.\scripts\dev.cmd typed-model-smoke
-.\scripts\dev.cmd package
+.\scripts\dev.cmd check -Package ep_runtime -Filter surface_environment -Lib
+.\scripts\dev.cmd test -Package ep_run
+.\scripts\dev.cmd test
+.\scripts\dev.cmd check -Full
 ```
+
+The first two commands are examples for iteration; choose the affected area.
+Run workspace tests once when integrating a reviewable unit. Run `check -Full`
+at a broader integration milestone, when its oracle and tooling prerequisites
+are available. It includes the repository's comparison and documentation
+checks. Packaging and historical release verification are separate operations.
+`-Plan` shows the exact scope without starting Cargo or a comparison.
+
+## Test Selection
+
+| Change | During implementation | Before integration |
+| --- | --- | --- |
+| Runtime equation, branch or state update | `check -Package ep_runtime -Filter <module_or_test> -Lib` | Workspace tests once; the affected card's same-input Native comparison and connected execution |
+| IDF/epJSON parsing or compilation | `check -Package ep_raw_model,ep_compiler -Filter <area> -Lib` | Workspace tests, including affected model/run consumers |
+| Run pipeline or CLI | `check -Package ep_run,ep_cli -Filter <area>` | Workspace tests; the affected end-to-end scenario |
+| Shared model, public API or Cargo configuration | Relevant package checks | Workspace Clippy and tests once |
+| Plan or evidence metadata | `python tools/porting/check_plan.py --check` and `python tools/porting/sync_plan_views.py --check` | Affected documentation/spec checks |
+| Test runner or PowerShell script | Parse scripts; inspect `-Plan` and invalid selector combinations | Run the affected real command and relevant script/spec checks |
+
+Package lists use commas through `dev.cmd`. A filter that selects no tests is
+an error. Listing tests with `-List` does not count as executing them. Inspect
+the printed scope before relying on a quick check; a package test does not
+exercise every consumer of its public API.
+
+Keep one behavioral regression for each distinct failure or contract. Cover
+parallel input cases in a named table where their setup and assertions match.
+Retain separate tests for different state transitions, error prefixes, branch
+boundaries, signed zero/nonfinite behavior and caller integration. Do not add
+tests solely to copy an ID, count source files, enforce a historical line cap,
+or mirror a private implementation. Repository structure belongs to the
+existing structure and file-size checks.
+
+Focused checks provide feedback during editing. A successful workspace suite
+already includes those unit tests; do not run them again for the same source.
+Repeat validation only after a relevant change, a failure, or a new unresolved
+concern. Record the actual command and scope with each porting result. Card
+completion still requires its scope, unit, integration and production gates;
+test counts or a successful build do not replace that evidence.
+
+Development and test builds share the workspace's debug-free, non-incremental
+profile, avoiding a second cache created by command-specific profile overrides.
+An explicit debugging session can override it with Cargo's `--config` options.
 
 ## Commit Message Shape
 

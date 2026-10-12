@@ -31,9 +31,9 @@ $cp330Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_f
 $cp330PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_positive_guard\validation.rs"
 $cp330PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_positive_guard\serialization.rs"
 $cp330PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_positive_guard\serialization\snapshot.rs"
-$cp330RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp330RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp330DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_supply_mass_flow_positive_guard_assertions.rs"
-$cp330NonDirectTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp330NonDirectTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 
 foreach ($cp330RequiredFile in @(
         $cp330Module,

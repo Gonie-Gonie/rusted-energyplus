@@ -120,16 +120,6 @@ fn cp424_validation_has_no_numerical_coupling_dto_feed() {
     assert!(validate(&model, &output, &lifecycle, &predecessor).is_ok());
 }
 
-#[test]
-fn cp424_integration_roots_stay_within_historical_caps() {
-    let state = include_str!("init/state.rs");
-    let witnesses = include_str!("init/state/witnesses.rs");
-    let calc = include_str!("calc.rs");
-    assert!(state.lines().filter(|line| !line.trim().is_empty()).count() <= 380);
-    assert!(witnesses.lines().count() <= 279);
-    assert!(calc.lines().count() <= 99);
-}
-
 fn validator_fixture() -> (
     SimulationModel,
     DirectZonePurchasedAirScheduledCouplingOutput,

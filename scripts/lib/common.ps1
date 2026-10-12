@@ -25,9 +25,14 @@ function Get-RepoRoot {
 function Invoke-DevCommand {
     param(
         [Parameter(Mandatory = $true)][string]$Command,
-        [string[]]$Arguments = @()
+        [string[]]$Arguments = @(),
+        [switch]$Plan
     )
 
+    if ($Plan) {
+        Write-Host (".\scripts\dev.cmd " + $Command + " " + ($Arguments -join " ")).TrimEnd()
+        return
+    }
     $runner = Join-Path (Get-ScriptsRoot) "dev.ps1"
     & $runner $Command @Arguments
     if (-not $?) {

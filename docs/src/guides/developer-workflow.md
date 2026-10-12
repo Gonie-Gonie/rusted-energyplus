@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-12
 ---
 
 # Developer Workflow
@@ -11,12 +11,22 @@ Use `scripts/dev.cmd` as the single entry point:
 
 ```powershell
 .\scripts\dev.cmd list
-.\scripts\dev.cmd test
-.\scripts\dev.cmd docs-generate
-.\scripts\dev.cmd docs-check
-.\scripts\dev.cmd file-size-check
-.\scripts\dev.cmd check
+.\scripts\dev.cmd check -Package ep_runtime -Filter surface_environment -Lib
+.\scripts\dev.cmd test -Package ep_compare -Filter series_v2 -Lib
+.\scripts\dev.cmd check -Full -Plan
 ```
+
+`check` defaults to the `ep_runtime` package: formatting, package lint, and one
+package test invocation. Select the package and test-name substring for the
+area being changed. `-Package ep_runtime,ep_model` selects multiple packages;
+`-Lib` selects library tests. `-Plan` prints commands without running them,
+and `-List` lists matching test names. A filtered run must execute at least one test; zero matches and ignored-only matches fail.
+
+At integration milestones, run `.\scripts\dev.cmd check -Full` for workspace
+lint/tests and the broader conformance, documentation, and claim guards.
+`-Full` cannot be combined with partial package or test selectors.
+`.\scripts\dev.cmd test` runs workspace tests once. For docs-only work, use
+`docs-generate`, `docs-check`, and the relevant spec validator.
 
 For input and execution-plan inspection, the CLI also provides:
 

@@ -46,7 +46,7 @@ $cp365Serialization = "crates\ep_run\src\pipeline\$cp365PipelineStem\serializati
 $cp365SnapshotSerialization = "crates\ep_run\src\pipeline\$cp365PipelineStem\serialization\snapshot.rs"
 $cp365ParentAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp364_assertions.rs"
 $cp365ArbitraryAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp365_assertions.rs"
-$cp365ArbitraryRoot = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp365ArbitraryRoot = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp365Audit = "scripts\quality\ideal-loads-structure-audit\cp365-cooling-constant-supply-humidity-ratio-assignment.ps1"
 
 function Assert-Cp365TextContains {

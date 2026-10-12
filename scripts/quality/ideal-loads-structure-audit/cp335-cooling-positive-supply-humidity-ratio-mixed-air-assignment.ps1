@@ -32,9 +32,9 @@ $cp335Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supp
 $cp335PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_humidity_ratio_mixed_air_assignment\validation.rs"
 $cp335PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_humidity_ratio_mixed_air_assignment\serialization.rs"
 $cp335PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_humidity_ratio_mixed_air_assignment\serialization\snapshot.rs"
-$cp335RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp335RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp335DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_positive_supply_humidity_ratio_mixed_air_assignment_assertions.rs"
-$cp335NonDirectTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp335NonDirectTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 
 foreach ($cp335RequiredFile in @(
         $cp335Module,

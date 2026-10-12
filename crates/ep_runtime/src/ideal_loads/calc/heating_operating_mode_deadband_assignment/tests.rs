@@ -269,32 +269,6 @@ fn cp434_hot_release_and_retained_validation_are_bounded() {
     );
 }
 
-#[test]
-fn cp434_subtree_is_exactly_eleven_files_and_each_core_file_is_bounded() {
-    let files = [
-        include_str!("../heating_operating_mode_deadband_assignment.rs"),
-        include_str!("release.rs"),
-        include_str!("state.rs"),
-        include_str!("tests.rs"),
-        include_str!("transition.rs"),
-        include_str!("release/error.rs"),
-        include_str!("release/committed.rs"),
-        include_str!("release/prefix.rs"),
-        include_str!("release/runtime_validation.rs"),
-        include_str!("release/snapshot_validation.rs"),
-        include_str!("tests/schema_prefix.rs"),
-        include_str!("tests/committed_seal.rs"),
-        include_str!("transition/accounting.rs"),
-        include_str!("transition/snapshot.rs"),
-    ];
-    assert_eq!(files.len() - 1, 13);
-    assert!(
-        files
-            .into_iter()
-            .all(|source| source.lines().count() <= 500)
-    );
-}
-
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn cp434_all_snapshots_for_successor_tests()
 -> Vec<super::PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot> {

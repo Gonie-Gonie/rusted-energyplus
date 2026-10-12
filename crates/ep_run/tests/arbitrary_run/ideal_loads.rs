@@ -2,39 +2,30 @@
 
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
     SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
 };
 use serde_json::Value;
 
-#[allow(dead_code)]
-#[path = "arbitrary_run/fixtures.rs"]
-mod fixtures;
+use super::{read_json, unique_case_dir, write_text};
 
-use fixtures::*;
+use super::fixtures::*;
 
-#[allow(dead_code)]
-#[path = "arbitrary_run/output_manifest.rs"]
-mod output_manifest;
-
-use output_manifest::{
+use super::output_manifest::{
     DIAGNOSTIC_RUNTIME_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest,
 };
 
-#[path = "arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions.rs"]
+#[path = "../arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions.rs"]
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions;
 
 use cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions::assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment;
 
-#[path = "arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions.rs"]
+#[path = "../arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions.rs"]
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions;
 
 use cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions::assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment;
-#[path = "arbitrary_run_ideal_loads/cp353_assertions.rs"]
+#[path = "../arbitrary_run_ideal_loads/cp353_assertions.rs"]
 mod cp353_assertions;
 
 #[test]
@@ -1075,24 +1066,6 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     Ok(())
 }
 
-fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
-    let path = std::env::temp_dir().join(format!(
-        "rusted-energyplus-ep-run-{name}-{}-{timestamp}",
-        std::process::id()
-    ));
-    if path.exists() {
-        std::fs::remove_dir_all(&path)?;
-    }
-    std::fs::create_dir_all(&path)?;
-    Ok(path)
-}
-
-fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
-    std::fs::write(path, contents)?;
-    Ok(())
-}
-
 fn finite_limit_hysteresis_fixture() -> String {
     IDEAL_LOADS_EPJSON
         .replace(
@@ -1196,9 +1169,4 @@ fn assert_direct_ideal_loads_fixture_runs(
     assert_eq!(summary["source_order_gate"]["matches"], true);
     let results = read_json(&output_dir.join("results").join("result-store.json"))?;
     Ok((summary, results))
-}
-
-fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
-    let contents = std::fs::read_to_string(path)?;
-    Ok(serde_json::from_str(&contents)?)
 }

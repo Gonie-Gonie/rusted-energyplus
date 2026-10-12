@@ -2226,7 +2226,7 @@ port_ticket_mappings = [
   "src/EnergyPlus/ExternalInterface.cc|WarnIfExternalInterfaceObjectsAreUsed|WarnIfExternalInterfaceObjectsAreUsed|Environment",
 ]
 rust_target = [
-  "crates/ep_compiler/src/compiler.rs::Compiler::validate_scalar_schedule_type_limits",
+  "crates/ep_compiler/src/compiler.rs::Compiler::validate_schedule_type_limits",
   "crates/ep_compiler/src/compiler.rs::Compiler::validate_scalar_schedule_value",
   "crates/ep_runtime/src/schedules/external_interface.rs::external_interface_fmu_export_cached_schedule_series",
   "scripts/compare/compare-calendar-schedule-fmu-export-bounded-initial-value-exact.ps1",

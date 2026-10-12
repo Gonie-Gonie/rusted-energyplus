@@ -33,9 +33,9 @@ $cp333Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supp
 $cp333PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_temperature_minimum_limit\validation.rs"
 $cp333PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_temperature_minimum_limit\serialization.rs"
 $cp333PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_temperature_minimum_limit\serialization\snapshot.rs"
-$cp333RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp333RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp333DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_positive_supply_temperature_minimum_limit_assertions.rs"
-$cp333NonDirectTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp333NonDirectTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 
 foreach ($cp333RequiredFile in @(
         $cp333Module,

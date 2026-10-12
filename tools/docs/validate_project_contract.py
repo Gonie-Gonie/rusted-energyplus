@@ -208,6 +208,7 @@ def run_domain_claim_self_tests(
     ledger: dict[str, Any],
     contract: dict[str, Any],
 ) -> list[str]:
+    """Own domain claim mutations; ledger tests retain routine evidence and seed checks."""
     passed: list[str] = []
 
     def raw_routine(candidate: dict[str, Any], routine_id: str) -> dict[str, Any]:

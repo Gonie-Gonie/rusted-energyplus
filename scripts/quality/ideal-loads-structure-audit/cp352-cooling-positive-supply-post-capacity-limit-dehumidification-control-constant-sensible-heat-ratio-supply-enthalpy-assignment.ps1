@@ -45,7 +45,7 @@ $cp352PipelineValidation = "crates\ep_run\src\pipeline\$cp352PipelineStem\valida
 $cp352PipelineTests = "crates\ep_run\src\pipeline\$cp352PipelineStem\validation\tests.rs"
 $cp352Serialization = "crates\ep_run\src\pipeline\$cp352PipelineStem\serialization.rs"
 $cp352SnapshotSerialization = "crates\ep_run\src\pipeline\$cp352PipelineStem\serialization\snapshot.rs"
-$cp352ArbitraryTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp352ArbitraryTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp352Audit = "scripts\quality\ideal-loads-structure-audit\cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1"
 
 function Get-Cp352RustBraceBlock {

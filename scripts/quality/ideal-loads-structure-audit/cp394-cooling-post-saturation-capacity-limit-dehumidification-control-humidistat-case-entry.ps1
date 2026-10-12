@@ -98,7 +98,7 @@ foreach ($directory in @($root, $coupledDir, $pipelineDir)) {
         Assert-LineLimit -Path $file.FullName -Limit 500 -Description "CP394 bounded recursive file"
     }
 }
-Assert-LineLimit -Path "crates\ep_run\tests\arbitrary_run_ideal_loads.rs" -Limit 1200 -Description "CP394 arbitrary-run root cap"
+Assert-LineLimit -Path "crates\ep_run\tests\arbitrary_run\ideal_loads.rs" -Limit 1200 -Description "CP394 arbitrary-run root cap"
 
 if ((Get-FileHash -Algorithm SHA256 -LiteralPath $source).Hash -cne $hash) { throw "CP394 PurchasedAirManager.cc SHA-256 drift" }
 $lines = Get-Content -Encoding UTF8 -LiteralPath $source

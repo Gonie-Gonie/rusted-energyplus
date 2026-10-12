@@ -2,16 +2,26 @@
 status: active
 claim_level: none
 owner: qa
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-12
 ---
 
 # Verification
 
-The standard local gate is:
+During development, select the affected package and test-name substring:
 
 ```powershell
-.\scripts\dev.cmd check
+.\scripts\dev.cmd check -Package ep_runtime -Filter surface_environment -Lib
+.\scripts\dev.cmd check -Full -Plan
 ```
+
+`check` defaults to workspace formatting, `ep_runtime` lint, and one package test
+invocation. `-Plan` prints commands; `-List` lists matching tests. A filtered run must execute at least one test; zero matches and ignored-only
+matches fail. `test` without selectors runs workspace tests once.
+
+The integration gate is `.\scripts\dev.cmd check -Full`. It runs workspace
+lint/tests once, then the broader conformance, documentation, and claim guards.
+It rejects partial package/test selectors. Run it at integration milestones
+and before release validation; use focused checks while implementing a card.
 
 Documentation and generated specs:
 
@@ -40,7 +50,7 @@ runtime behavior was simulated or compared with EnergyPlus.
 Support assessment is the internal gate for arbitrary IDF/epJSON runs. It
 loads capability rules, checks active objects and algorithms, classifies the
 run state, and writes `support-assessment.json` plus `support-report.md`.
-The run-framework smoke is part of the standard local gate because it verifies
+The run-framework smoke is part of the full integration gate because it verifies
 supported, blocked, oracle-baseline, compare, exit-code, and output-layout
 contracts end to end:
 

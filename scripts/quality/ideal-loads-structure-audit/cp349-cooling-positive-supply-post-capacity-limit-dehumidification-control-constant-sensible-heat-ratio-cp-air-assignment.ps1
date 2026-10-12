@@ -37,7 +37,7 @@ $cp349Pipeline = "crates\ep_run\src\pipeline\$cp349PipelineStem.rs"
 $cp349PipelineValidation = "crates\ep_run\src\pipeline\$cp349PipelineStem\validation.rs"
 $cp349Serialization = "crates\ep_run\src\pipeline\$cp349PipelineStem\serialization.rs"
 $cp349SnapshotSerialization = "crates\ep_run\src\pipeline\$cp349PipelineStem\serialization\snapshot.rs"
-$cp349ArbitraryTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp349ArbitraryTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp349Audit = "scripts\quality\ideal-loads-structure-audit\cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1"
 function Get-Cp349RustBraceBlock {
     param([Parameter(Mandatory = $true)][string]$Text, [Parameter(Mandatory = $true)][string]$AnchorPattern, [Parameter(Mandatory = $true)][string]$Description)

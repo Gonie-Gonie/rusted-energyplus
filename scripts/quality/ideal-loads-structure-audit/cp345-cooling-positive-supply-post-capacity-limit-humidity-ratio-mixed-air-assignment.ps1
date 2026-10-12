@@ -35,7 +35,7 @@ $cp345Pipeline = "crates\ep_run\src\pipeline\$cp345PipelineStem.rs"
 $cp345PipelineValidation = "crates\ep_run\src\pipeline\$cp345PipelineStem\validation.rs"
 $cp345PipelineSerialization = "crates\ep_run\src\pipeline\$cp345PipelineStem\serialization.rs"
 $cp345PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\$cp345PipelineStem\serialization\snapshot.rs"
-$cp345ArbitraryIdealLoadsTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp345ArbitraryIdealLoadsTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp345SourceHash = "54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005"
 $cp345SourceStatementPattern = 'PurchAir\.SupplyHumRat\s*=\s*PurchAir\.MixedAirHumRat\s*;'
 $cp345FirstExcludedPattern =

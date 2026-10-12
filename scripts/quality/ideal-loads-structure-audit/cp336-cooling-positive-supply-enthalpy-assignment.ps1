@@ -34,9 +34,9 @@ $cp336Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supp
 $cp336PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_enthalpy_assignment\validation.rs"
 $cp336PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_enthalpy_assignment\serialization.rs"
 $cp336PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_positive_supply_enthalpy_assignment\serialization\snapshot.rs"
-$cp336RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp336RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp336DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_positive_supply_enthalpy_assignment_assertions.rs"
-$cp336NonDirectTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp336NonDirectTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 
 foreach ($cp336RequiredFile in @(
         $cp336Module,

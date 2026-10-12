@@ -107,7 +107,7 @@ none
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-07 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
-| docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-10-07 |
+| docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-10-12 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/capability-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
@@ -117,13 +117,13 @@ none
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/variable-coverage.md | generated | Generated References | present | none |  |  |  |
-| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |
+| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-12 |
 | docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
 | docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | none |  |  |  |
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |
 | docs/src/introduction.md | spec-explanation | Summary | n/a | present | active | docs | 2026-06-05 |
 | docs/src/operations/documentation-framework.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
-| docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-07-14 |
+| docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-10-12 |
 | docs/src/operations/supported-object-coverage.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-07-14 |
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |

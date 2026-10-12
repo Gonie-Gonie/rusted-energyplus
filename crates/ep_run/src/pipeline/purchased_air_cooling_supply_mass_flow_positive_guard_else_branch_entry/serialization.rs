@@ -29,27 +29,3 @@ pub(in crate::pipeline) fn lifecycle_json(
         "latest": state.latest.map(snapshot_json),
     })
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn serializer_carries_two_route_arrays_and_no_numerical_feed() {
-        let source = include_str!("serialization.rs")
-            .split_once("#[cfg(test)]")
-            .map_or(include_str!("serialization.rs"), |(production, _)| {
-                production
-            });
-        assert_eq!(source.matches("route_counts\":").count(), 2);
-        for forbidden in [
-            "DirectZonePurchasedAirCouplingInput",
-            "numerical_dto",
-            "prediction",
-            "feedback",
-            "nodes",
-            "loads",
-            "reports",
-        ] {
-            assert!(!source.contains(forbidden), "{forbidden}");
-        }
-    }
-}

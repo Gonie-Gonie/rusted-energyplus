@@ -3,8 +3,7 @@
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
 use std::collections::BTreeSet;
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::path::PathBuf;
 
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
@@ -12,49 +11,47 @@ use ep_run::{
 };
 use serde_json::Value;
 
-#[allow(dead_code)]
-#[path = "arbitrary_run/fixtures.rs"]
-mod fixtures;
+use super::{read_json, unique_case_dir, write_text};
 
-use fixtures::ONE_DAY_EPW;
+use super::fixtures::ONE_DAY_EPW;
 
-#[path = "arbitrary_run_direct_zone_coupled/cooling_mixed_air_call_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_mixed_air_call_assertions.rs"]
 mod cooling_mixed_air_call_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_cp_air_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_cp_air_assignment_assertions.rs"]
 mod cooling_positive_supply_capacity_limit_cp_air_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_guard_assertions.rs"]
 mod cooling_positive_supply_capacity_limit_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_sensible_output_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_sensible_output_assignment_assertions.rs"]
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_sensible_output_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_sensible_output_guard_assertions.rs"]
 mod cooling_positive_supply_capacity_limit_sensible_output_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_cp_air_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_cp_air_assignment_assertions.rs"]
 mod cooling_positive_supply_cp_air_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_enthalpy_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_enthalpy_assignment_assertions.rs"]
 mod cooling_positive_supply_enthalpy_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_humidity_ratio_mixed_air_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_humidity_ratio_mixed_air_assignment_assertions.rs"]
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_assignment_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_assignment_assertions.rs"]
 mod cooling_positive_supply_temperature_assignment_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_minimum_limit_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_minimum_limit_assertions.rs"]
 mod cooling_positive_supply_temperature_minimum_limit_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_mixed_air_limit_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_positive_supply_temperature_mixed_air_limit_assertions.rs"]
 mod cooling_positive_supply_temperature_mixed_air_limit_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_ems_override_body_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_ems_override_body_assertions.rs"]
 mod cooling_supply_mass_flow_ems_override_body_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_ems_override_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_ems_override_guard_assertions.rs"]
 mod cooling_supply_mass_flow_ems_override_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_limit_body_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_limit_body_assertions.rs"]
 mod cooling_supply_mass_flow_limit_body_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_limit_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_limit_guard_assertions.rs"]
 mod cooling_supply_mass_flow_limit_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_maximum_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_maximum_assertions.rs"]
 mod cooling_supply_mass_flow_maximum_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_positive_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_positive_guard_assertions.rs"]
 mod cooling_supply_mass_flow_positive_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_assertions.rs"]
 mod cooling_supply_mass_flow_very_small_guard_assertions;
-#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_body_assertions.rs"]
+#[path = "../arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_body_assertions.rs"]
 mod cooling_supply_mass_flow_very_small_guard_body_assertions;
 
 use cooling_mixed_air_call_assertions::assert_cooling_mixed_air_call;
@@ -3280,27 +3277,4 @@ fn assert_close(actual: f64, expected: f64, tolerance: f64) {
         (actual - expected).abs() <= tolerance,
         "expected {expected}, got {actual}, tolerance {tolerance}"
     );
-}
-
-fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
-    let path = std::env::temp_dir().join(format!(
-        "rusted-energyplus-ep-run-{name}-{}-{timestamp}",
-        std::process::id()
-    ));
-    if path.exists() {
-        std::fs::remove_dir_all(&path)?;
-    }
-    std::fs::create_dir_all(&path)?;
-    Ok(path)
-}
-
-fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
-    std::fs::write(path, contents)?;
-    Ok(())
-}
-
-fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
-    let contents = std::fs::read_to_string(path)?;
-    Ok(serde_json::from_str(&contents)?)
 }

@@ -256,26 +256,6 @@ fn public_release_seals_begin_environment_density_before_rejecting_private_body(
     assert!(transition.contains("standard_air_density_kg_per_m3 <= 0.0"));
 }
 
-#[test]
-fn cp436_subtree_is_twelve_files_and_every_file_is_bounded() {
-    let files = [
-        include_str!("../heating_outdoor_air_maximum_flow_body_volume_flow_assignment.rs"),
-        include_str!("release.rs"),
-        include_str!("state.rs"),
-        include_str!("tests.rs"),
-        include_str!("transition.rs"),
-        include_str!("release/error.rs"),
-        include_str!("release/prefix.rs"),
-        include_str!("release/runtime_validation.rs"),
-        include_str!("release/snapshot_validation.rs"),
-        include_str!("tests/schema_prefix.rs"),
-        include_str!("transition/accounting.rs"),
-        include_str!("transition/snapshot.rs"),
-    ];
-    assert_eq!(files.len(), 12);
-    assert!(files.into_iter().all(|source| source.lines().count() <= 500));
-}
-
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn cp436_all_snapshots_for_successor_tests(
 ) -> Vec<super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot> {

@@ -25,7 +25,7 @@ $cp329Pipeline = "crates\ep_run\src\pipeline\purchased_air_cooling_mixed_air_cal
 $cp329PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_mixed_air_call\validation.rs"
 $cp329PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_mixed_air_call\serialization.rs"
 $cp329PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_mixed_air_call\serialization\snapshot.rs"
-$cp329RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp329RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp329DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_mixed_air_call_assertions.rs"
 
 foreach ($cp329RequiredFile in @(

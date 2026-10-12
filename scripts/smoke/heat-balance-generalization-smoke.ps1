@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$SkipRustTests)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -15,18 +15,23 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-$tests = @(
-    "heat_balance_adiabatic_surfaces_do_not_create_artificial_losses",
-    "heat_balance_interzone_surface_uses_adjacent_zone_temperature",
-    "heat_balance_missing_interzone_surface_target_fails",
-    "heat_balance_trace_writes_zone_air_temperature_results"
-)
+if ($SkipRustTests) {
+    Write-Host "Rust test execution omitted by explicit -SkipRustTests; the integration caller runs workspace tests once."
+}
+else {
+    $tests = @(
+        "heat_balance_adiabatic_surfaces_do_not_create_artificial_losses",
+        "heat_balance_interzone_surface_uses_adjacent_zone_temperature",
+        "heat_balance_missing_interzone_surface_target_fails",
+        "heat_balance_trace_writes_zone_air_temperature_results"
+    )
 
-foreach ($test in $tests) {
-    Write-Host "Running ep_runtime::$test"
-    & $cargo.Source test -p ep_runtime $test --quiet
-    if ($LASTEXITCODE -ne 0) {
-        throw "Heat-balance generalization smoke failed at $test."
+    foreach ($test in $tests) {
+        Write-Host "Running ep_runtime::$test"
+        & $cargo.Source test -p ep_runtime $test --quiet
+        if ($LASTEXITCODE -ne 0) {
+            throw "Heat-balance generalization smoke failed at $test."
+        }
     }
 }
 

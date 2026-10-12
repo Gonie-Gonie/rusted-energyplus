@@ -43,7 +43,7 @@ $cp363Serialization = "crates\ep_run\src\pipeline\$cp363PipelineStem\serializati
 $cp363SnapshotSerialization = "crates\ep_run\src\pipeline\$cp363PipelineStem\serialization\snapshot.rs"
 $cp363ParentAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp362_assertions.rs"
 $cp363ArbitraryAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp363_assertions.rs"
-$cp363ArbitraryRoot = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp363ArbitraryRoot = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp363Audit = "scripts\quality\ideal-loads-structure-audit\cp363-cooling-humidistat-case-break.ps1"
 
 function Assert-Cp363TextContains {

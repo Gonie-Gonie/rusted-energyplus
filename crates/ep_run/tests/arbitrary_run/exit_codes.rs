@@ -2,20 +2,14 @@
 
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
     SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
 };
-use serde_json::Value;
 
-#[allow(dead_code)]
-#[path = "arbitrary_run/fixtures.rs"]
-mod fixtures;
+use super::{read_json, unique_case_dir, write_text};
 
-use fixtures::*;
+use super::fixtures::*;
 
 #[test]
 fn invalid_weather_file_returns_runtime_failure() -> Result<(), Box<dyn std::error::Error>> {
@@ -164,27 +158,4 @@ fn full_trace_preserves_nonempty_output_directory_when_overwrite_is_denied()
     assert_eq!(std::fs::read_dir(&output_dir)?.count(), 1);
     std::fs::remove_dir_all(&case_dir)?;
     Ok(())
-}
-
-fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
-    let path = std::env::temp_dir().join(format!(
-        "rusted-energyplus-ep-run-exit-codes-{name}-{}-{timestamp}",
-        std::process::id()
-    ));
-    if path.exists() {
-        std::fs::remove_dir_all(&path)?;
-    }
-    std::fs::create_dir_all(&path)?;
-    Ok(path)
-}
-
-fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
-    std::fs::write(path, contents)?;
-    Ok(())
-}
-
-fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
-    let contents = std::fs::read_to_string(path)?;
-    Ok(serde_json::from_str(&contents)?)
 }

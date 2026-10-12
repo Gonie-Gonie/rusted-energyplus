@@ -1586,7 +1586,7 @@ Assert-Contains -Path $boundedScalarGate -Pattern 'Rust rejected before TypedMod
 Assert-Contains -Path $boundedScalarGate -Pattern 'diagnostic_text_parity_claimed = $false' -Description "bounded scalar diagnostic-text nonclaim artifact"
 Assert-Contains -Path $boundedScalarGate -Pattern 'process_exit_code_parity_claimed = $false' -Description "bounded scalar exit nonclaim artifact"
 Assert-Contains -Path $boundedScalarGate -Pattern 'Bounded scalar ScheduleTypeLimits paired gate passed.' -Description "bounded scalar gate success"
-Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern 'validate_scalar_schedule_type_limits' -Description "bounded scalar common validator"
+Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern 'validate_schedule_type_limits' -Description "bounded scalar common validator"
 Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern 'f64::from(f32::EPSILON)' -Description "bounded scalar EnergyPlus epsilon mapping"
 Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern 'ScheduleValueOutsideTypeLimits' -Description "bounded scalar compiler error"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'id = "schedule_type_limits_scalar_bounds"' -Description "bounded scalar algorithm ledger"

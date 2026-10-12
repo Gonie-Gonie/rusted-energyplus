@@ -45,7 +45,7 @@ $cp364Serialization = "crates\ep_run\src\pipeline\$cp364PipelineStem\serializati
 $cp364SnapshotSerialization = "crates\ep_run\src\pipeline\$cp364PipelineStem\serialization\snapshot.rs"
 $cp364ParentAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp363_assertions.rs"
 $cp364ArbitraryAssertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp364_assertions.rs"
-$cp364ArbitraryRoot = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp364ArbitraryRoot = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp364Audit = "scripts\quality\ideal-loads-structure-audit\cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1"
 
 function Assert-Cp364TextContains {

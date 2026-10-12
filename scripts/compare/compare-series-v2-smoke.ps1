@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$SkipRustTests)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -32,14 +32,19 @@ if ($null -eq (Get-Command cargo -ErrorAction SilentlyContinue)) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-cargo test -p ep_compare -- series_v2
-if ($LASTEXITCODE -ne 0) {
-    throw "ep_compare series_v2 tests failed"
+if ($SkipRustTests) {
+    Write-Host "Rust test execution omitted by explicit -SkipRustTests; the integration caller runs workspace tests once."
 }
+else {
+    cargo test -p ep_compare -- series_v2
+    if ($LASTEXITCODE -ne 0) {
+        throw "ep_compare series_v2 tests failed"
+    }
 
-cargo test -p ep_compare -- parses_eso_time_series
-if ($LASTEXITCODE -ne 0) {
-    throw "ep_compare ESO time-series tests failed"
+    cargo test -p ep_compare -- parses_eso_time_series
+    if ($LASTEXITCODE -ne 0) {
+        throw "ep_compare ESO time-series tests failed"
+    }
 }
 
 Assert-Contains -Path "crates\ep_compare\src\series.rs" -Pattern "SeriesComparisonV2" -Description "v2 comparison summary"

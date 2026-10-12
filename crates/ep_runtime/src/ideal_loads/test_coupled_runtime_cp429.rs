@@ -86,13 +86,3 @@ fn cp429_binding_pipeline_and_validator_keep_numerical_dto_unchanged() {
         assert!(!validator.contains(forbidden), "{forbidden}");
     }
 }
-
-#[test]
-fn cp429_integration_roots_stay_within_historical_caps() {
-    let state = include_str!("init/state.rs");
-    let witnesses = include_str!("init/state/witnesses.rs");
-    let calc = include_str!("calc.rs");
-    assert!(state.lines().filter(|line| !line.trim().is_empty()).count() <= 380);
-    assert!(witnesses.lines().count() <= 279);
-    assert!(calc.lines().count() <= 99);
-}

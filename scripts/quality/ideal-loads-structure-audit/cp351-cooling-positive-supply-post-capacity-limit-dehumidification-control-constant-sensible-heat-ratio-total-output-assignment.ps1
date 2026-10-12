@@ -43,7 +43,7 @@ $cp351PipelineValidation = "crates\ep_run\src\pipeline\$cp351PipelineStem\valida
 $cp351PipelineTests = "crates\ep_run\src\pipeline\$cp351PipelineStem\validation\tests.rs"
 $cp351Serialization = "crates\ep_run\src\pipeline\$cp351PipelineStem\serialization.rs"
 $cp351SnapshotSerialization = "crates\ep_run\src\pipeline\$cp351PipelineStem\serialization\snapshot.rs"
-$cp351ArbitraryTests = "crates\ep_run\tests\arbitrary_run_ideal_loads.rs"
+$cp351ArbitraryTests = "crates\ep_run\tests\arbitrary_run\ideal_loads.rs"
 $cp351Compiler = "crates\ep_compiler\src\compiler.rs"
 $cp351Audit = "scripts\quality\ideal-loads-structure-audit\cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1"
 

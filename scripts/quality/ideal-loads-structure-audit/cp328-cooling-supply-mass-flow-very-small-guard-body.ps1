@@ -26,7 +26,7 @@ $cp328PipelineValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_sup
 $cp328PipelineSnapshotValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_very_small_guard_body\validation\snapshot.rs"
 $cp328PipelineSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_very_small_guard_body\serialization.rs"
 $cp328PipelineSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_supply_mass_flow_very_small_guard_body\serialization\snapshot.rs"
-$cp328RunTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
+$cp328RunTests = "crates\ep_run\tests\arbitrary_run\direct_zone_coupled.rs"
 $cp328DirectAssertions = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled\cooling_supply_mass_flow_very_small_guard_body_assertions.rs"
 
 foreach ($cp328RequiredFile in @(

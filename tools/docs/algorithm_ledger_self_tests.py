@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mutation self-tests for routine completion and full-domain claim gates."""
+"""Mutation self-tests for routine completion and immutable domain seeds."""
 
 from __future__ import annotations
 
@@ -73,6 +73,7 @@ def run_completion_self_tests(repo_root: Path) -> int:
     baseline_routine_errors = routine_errors(ledger)
     if baseline_routine_errors:
         raise AssertionError(f"baseline routine contract is invalid: {baseline_routine_errors}")
+    # Shared full-domain claim mutations live in project-contract self-tests.
     baseline_domain_errors = domain_errors(ledger, contract)
     if baseline_domain_errors:
         raise AssertionError(f"baseline domain completion contract is invalid: {baseline_domain_errors}")
@@ -460,32 +461,6 @@ return AlternativeCall(value)
     routine["unsupported_active_branches"] = ["self-test active branch"]
     expect_error("complete_rejects_unsupported_active_branch", routine_errors(candidate), "must not retain unsupported_active_branches")
 
-    candidate_contract = copy.deepcopy(contract)
-    candidate_contract["domain_claim"][0]["required_routines"] = []
-    expect_error("empty_required_routines", domain_errors(ledger, candidate_contract), "required_routines must not be empty")
-
-    candidate_contract = copy.deepcopy(contract)
-    required = candidate_contract["domain_claim"][0]["required_routines"]
-    required.append(required[0])
-    expect_error("duplicate_required_routine", domain_errors(ledger, candidate_contract), "must not contain duplicates")
-
-    candidate_contract = copy.deepcopy(contract)
-    candidate_contract["domain_claim"][0]["required_routines"][0] = "zone_air_heat_balance"
-    expect_error("algorithm_row_cannot_replace_routine", domain_errors(ledger, candidate_contract), "unknown required routine")
-
-    candidate_contract = copy.deepcopy(contract)
-    plant_routine = candidate_contract["domain_claim"][2]["required_routines"][0]
-    candidate_contract["domain_claim"][0]["required_routines"][0] = plant_routine
-    expect_error("wrong_domain_required_routine", domain_errors(ledger, candidate_contract), "required routine belongs to plant")
-
-    candidate_contract = copy.deepcopy(contract)
-    candidate_contract["domain_claim"][1]["required_routines"].remove("sim_purchased_air")
-    expect_error(
-        "tracked_required_routine_cannot_be_omitted",
-        domain_errors(ledger, candidate_contract),
-        "must exactly match required_for_full_domain routine records",
-    )
-
     candidate_ledger = copy.deepcopy(ledger)
     candidate_contract = copy.deepcopy(contract)
     find_raw_routine(candidate_ledger, "sim_purchased_air")["required_for_full_domain"] = False
@@ -495,40 +470,6 @@ return AlternativeCall(value)
         domain_errors(candidate_ledger, candidate_contract),
         "must retain immutable minimum seed",
     )
-
-    candidate_ledger = copy.deepcopy(ledger)
-    candidate_contract = copy.deepcopy(contract)
-    heat_claim = candidate_contract["domain_claim"][0]
-    heat_claim["routine_inventory_complete"] = True
-    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
-    for routine_id in heat_claim["required_routines"]:
-        find_raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
-    find_raw_routine(candidate_ledger, heat_claim["required_routines"][0])["completion_status"] = "implemented"
-    expect_error("full_domain_rejects_implemented_routine", domain_errors(candidate_ledger, candidate_contract), "every required routine at family_gated or complete")
-
-    candidate_ledger = copy.deepcopy(ledger)
-    candidate_contract = copy.deepcopy(contract)
-    heat_claim = candidate_contract["domain_claim"][0]
-    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
-    for routine_id in heat_claim["required_routines"]:
-        find_raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
-    expect_error("full_domain_rejects_incomplete_inventory", domain_errors(candidate_ledger, candidate_contract), "routine_inventory_complete=true")
-
-    candidate_ledger = copy.deepcopy(ledger)
-    candidate_contract = copy.deepcopy(contract)
-    heat_claim = candidate_contract["domain_claim"][0]
-    heat_claim["routine_inventory_complete"] = True
-    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
-    for routine_id in heat_claim["required_routines"]:
-        find_raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
-    positive_errors = domain_errors(candidate_ledger, candidate_contract)
-    if positive_errors:
-        raise AssertionError(f"family_gated full-domain positive case failed: {positive_errors}")
-    passed.append("family_gated_full_domain_positive")
-
-    candidate_contract = copy.deepcopy(contract)
-    candidate_contract["claims"]["full_runtime_compatibility"] = True
-    expect_error("full_runtime_remains_locked", domain_errors(ledger, candidate_contract), "full runtime compatibility remains locked")
 
     print("Algorithm routine completion self-test")
     print(f"  mutations: {len(passed)}")

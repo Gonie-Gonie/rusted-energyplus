@@ -1902,14 +1902,6 @@ mod tests {
     }
 
     #[test]
-    fn ids_are_copyable_values() {
-        let first = ZoneId(7);
-        let second = first;
-
-        assert_eq!(first, second);
-    }
-
-    #[test]
     fn name_map_resolves_trimmed_case_insensitive_names() {
         let mut names = NameMap::default();
         assert_eq!(names.insert("Zone One", ZoneId(0)), None);

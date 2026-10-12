@@ -7835,6 +7835,9 @@ fn markdown_cell(value: &str) -> String {
 }
 
 #[cfg(test)]
+mod serializer_source_tests;
+
+#[cfg(test)]
 mod tests {
     use std::path::Path;
 
