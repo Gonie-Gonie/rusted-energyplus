@@ -203,3 +203,115 @@ fn association_errors_are_unavailable_and_empty_direct_helper_is_empty()
     assert!(empty.warnings.is_empty());
     Ok(())
 }
+
+// Genuine Native factual report ae64c773: all four actual calls admitted.
+// The complete actual cases fixture is copied unchanged; no sampling or projection.
+#[test]
+fn actual_native_scriptf_lu_calls_replay_complete_working_and_inverse_bits()
+-> Result<(), Box<dyn std::error::Error>> {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "fixtures/ordinary_radiation_lu_native_cases.json"
+    ))?;
+    assert_eq!(
+        fixture["schema"].as_str(),
+        Some("src06-actual-native-radiation-lu-cases.v1")
+    );
+    assert_eq!(fixture["all_actual_calls_preserved"].as_bool(), Some(true));
+    assert_eq!(
+        fixture["comparison_policy"]["sha256"].as_str(),
+        Some("6319883465b7a3d6d7006f9bbedfb7e5780de65bb516aa57a1ff9fa3389b958f")
+    );
+    let cases = fixture["cases"]
+        .as_array()
+        .ok_or("actual LU cases absent")?;
+    let expected_calls: usize = 4;
+    let expected_admitted: usize = 4;
+    assert!(expected_calls > 0 && expected_admitted > 0);
+    assert_eq!(cases.len(), expected_calls);
+    let admitted = cases
+        .iter()
+        .filter(|case| case["numerical_admitted"].as_bool() == Some(true))
+        .count();
+    assert_eq!(admitted, expected_admitted);
+    assert_eq!(cases.len() - admitted, expected_calls - expected_admitted);
+    // An excluded actual call stays in the table and prevents complete-table
+    // numerical success. No nonfinite/nonpositive call is silently skipped.
+    assert_eq!(
+        expected_admitted, expected_calls,
+        "actual factual report contains numerical exclusions"
+    );
+
+    let decode = |matrix: &serde_json::Value,
+                  dimension: usize|
+     -> Result<Vec<f64>, Box<dyn std::error::Error>> {
+        let extent = dimension
+            .checked_mul(dimension)
+            .ok_or("actual LU extent overflow")?;
+        let rows = matrix["flat_values"]
+            .as_array()
+            .ok_or("actual initialized LU matrix absent")?;
+        assert_eq!(rows.len(), extent);
+        assert_eq!(matrix["size"].as_u64(), Some(u64::try_from(extent)?));
+        assert_eq!(
+            matrix["contents_initialized_by_actual_producer"].as_bool(),
+            Some(true)
+        );
+        rows.iter()
+            .enumerate()
+            .map(|(offset, row)| {
+                assert_eq!(row["offset"].as_u64(), Some(u64::try_from(offset)?));
+                let bits = row["value"]["value_bits"]
+                    .as_str()
+                    .ok_or("actual LU binary64 bits absent")?;
+                assert_eq!(bits.len(), 16);
+                let value = f64::from_bits(u64::from_str_radix(bits, 16)?);
+                assert!(
+                    value.is_finite(),
+                    "actual LU matrix is numerically excluded"
+                );
+                Ok(value)
+            })
+            .collect()
+    };
+    for (call_index, case) in cases.iter().enumerate() {
+        assert_eq!(case["operation"].as_str(), Some("radiation_lu_inverse"));
+        assert_eq!(case["numerical_admitted"].as_bool(), Some(true));
+        assert!(
+            case["numerical_exclusions"]
+                .as_array()
+                .ok_or("actual LU exclusions ledger absent")?
+                .is_empty()
+        );
+        let dimension = usize::try_from(
+            case["dimension"]
+                .as_u64()
+                .ok_or("actual LU dimension absent")?,
+        )?;
+        assert!(dimension > 0);
+        assert!(case["inverse_entry"]["matrices"]["I"]["flat_values"].is_null());
+        let mut working = decode(&case["inverse_entry"]["matrices"]["A"], dimension)?;
+        let expected_working = decode(&case["inverse_return"]["matrices"]["A"], dimension)?;
+        let expected_inverse = decode(&case["inverse_return"]["matrices"]["I"], dimension)?;
+        // Inputs come only from the actual entry A. Native returned A/I remain
+        // test expectations and are never supplied to the real helper.
+        let inverse = invert_square_matrix(&mut working, dimension)
+            .ok_or("real Rust inverse unavailable for admitted actual Native input")?;
+        assert_eq!(working.len(), expected_working.len());
+        assert_eq!(inverse.len(), expected_inverse.len());
+        for (offset, (actual, expected)) in working.iter().zip(&expected_working).enumerate() {
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "actual Native call {call_index}, reduced A offset {offset}"
+            );
+        }
+        for (offset, (actual, expected)) in inverse.iter().zip(&expected_inverse).enumerate() {
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "actual Native call {call_index}, inverse I offset {offset}"
+            );
+        }
+    }
+    Ok(())
+}

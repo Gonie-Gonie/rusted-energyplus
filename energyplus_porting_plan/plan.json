@@ -12526,6 +12526,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-tmp/summary.json",
         "sha256": "15269955100effb10aa1318cc3307ed70ba4b54edca7032e1bbde2b80165b931",
         "size_bytes": 3116
+      },
+      "actual_selected_ordinary_radiation_lu": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-lu/summary.json",
+        "sha256": "e001786af82a08fcd8a6c15afb672ea770d41d7432b4522369602f8d87d92187",
+        "size_bytes": 4650
       }
     },
     {

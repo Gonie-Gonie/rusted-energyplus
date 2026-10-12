@@ -7,4 +7,5 @@ energyplus_porting_plan/evidence/**/evidence.zip binary
 # Native-selected test data must survive checkout with its authenticated bytes.
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json binary
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_readiness_tmp_selected_cases.json binary
+crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_lu_native_cases.json binary
 

@@ -1,0 +1,127 @@
+{
+  "schema": "src06-actual-private-radiation-lu.v1",
+  "status": "bounded private LU reduction and inverse replayed bit-exact against all admitted genuine Native calls",
+  "current_Source": {
+    "path": ".runtime/porting/source-objects/77/779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+    "sha256": "779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4"
+  },
+  "publication_inputs": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-inputs-01.json",
+    "sha256": "c800578cf2b7198206fcd821b9b8c68868bd1a4f65535d65844423b14c841772",
+    "size_bytes": 61303
+  },
+  "actual_Native_facts": {
+    "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-01/report.json",
+    "sha256": "ae64c77326c4c432793d4ab0470b9211f3e3baf214678f33a9cb7282d2809516",
+    "size_bytes": 3771
+  },
+  "actual_complete_Native_capture": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H.observation.json",
+    "sha256": "5f8f666603cb77aa4f265e25a37868260cb5414ab29fbf413c5befa6b8fe7fcc",
+    "size_bytes": 146748
+  },
+  "actual_complete_Native_fixture": {
+    "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-01/cases.json",
+    "sha256": "048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174",
+    "size_bytes": 147067
+  },
+  "Rust_replay_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_lu_native_cases.json",
+    "sha256": "048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174",
+    "size_bytes": 147067
+  },
+  "comparison_policy": {
+    "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/comparison-policy.json",
+    "sha256": "6319883465b7a3d6d7006f9bbedfb7e5780de65bb516aa57a1ff9fa3389b958f",
+    "size_bytes": 2301
+  },
+  "actual_Native_event_count": 48,
+  "actual_Native_call_count": 4,
+  "numerically_admitted_calls": 4,
+  "numerical_exclusions": {},
+  "exact_A_and_I_output_endpoints": 288,
+  "actual_phase_call_counts": {
+    "kickoff": 1,
+    "warmup_first_day": 3
+  },
+  "actual_pivots": 24,
+  "actual_swaps": 0,
+  "absolute_tolerance": 0,
+  "relative_tolerance": 0,
+  "ULP_tolerance": 0,
+  "signed_zero_bits_exact": true,
+  "focused_tests": {
+    "groups": 1,
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "workspace_tests": {
+    "groups": 18,
+    "passed": 4970,
+    "failed": 0,
+    "ignored": 2
+  },
+  "actual_QA_commands": {
+    "QA_fmt": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "QA_clippy": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "clippy",
+      "--locked",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "QA_workspace": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/test.ps1"
+    ],
+    "QA_focused": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/test.ps1",
+      "-Package",
+      "ep_runtime",
+      "-Filter",
+      "scriptf",
+      "-Lib"
+    ],
+    "QA_source_quality": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/source-quality-gate.ps1"
+    ]
+  },
+  "implementation": "The existing private inverse destructively reduces its same coefficient buffer and returns the Original-order full inverse; its existing caller passes that buffer mutably.",
+  "replay_scope": "Every admitted actual inverse-entry A is supplied only to the private helper in a conventional Rust test; every returned destructive A and I scalar is compared as raw binary64 bits.",
+  "limitations": [
+    "Only actual kickoff1 and warmup_first_day3 calls were reached; no run/later calls observed.",
+    "No pivot swaps observed; first-tie, singular/exactzero and tiny-pivot numerical coverage remain uncertified.",
+    "Cmatrix/ScriptF producer, cache, ordinary radiation activation and whole-port parity remain unclaimed.",
+    "Large binaries/maps/objects/core/providers and historical parents remain identity/provenance metadata only; no transitive replay claim."
+  ],
+  "scientific_wholeport_PASS_claimed": false,
+  "gates_updated": false,
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-lu/evidence.zip",
+    "sha256": "e3882749f3d80734ce87c4440258eee4b6ba48fda2e975f0f3d900efb93398d9",
+    "size_bytes": 826592
+  }
+}

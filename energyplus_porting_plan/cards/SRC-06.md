@@ -311,3 +311,44 @@ readiness, radiation/cache lifecycle, positive completed-iteration30 refresh,
 immediate CTF term rebuild, full ZTAV and ordinary solver/handoff comparison
 remain pending. The ordinary dispatcher remains inactive. All four SRC-06 gates
 and A14/54/B14/64 are unchanged.
+
+## Actual consumed radiation LU and inverse
+
+The existing private radiation inverse now reduces its caller's coefficient
+buffer in place and returns the inverse using the Original LU index and
+arithmetic order. The existing ScriptF caller passes the same buffer mutably.
+The former augmented Gauss-Jordan operation and its numerical epsilon skips
+are removed. This change does not activate ordinary interior radiation.
+
+One genuine A-24H Native execution produced48 complete selected events:
+four admitted N6 inverse calls,24 pivots and no swaps. The complete factual
+checker and an independent review validated all events, matrix shapes,
+transactions, parent clocks and returned buffers. The observations include
+one kickoff and three first-day warmup calls; no run or later-warmup call
+was reached. The actual pre-call inverse buffer is unallocated, and its
+contents are not invented.
+
+One conventional private Rust table supplies each actual entry coefficient
+matrix to the consumed helper and compares all288 returned coefficient and
+inverse scalars as binary64 bits. All four cases are admitted with no
+exclusions: absolute, relative and ULP tolerance are zero, including signed
+zero. The existing seven tests in the module remain intact.
+
+Final Source `779fc206` passed fmt, workspace Clippy with warnings denied,
+source-quality and one workspace test run:4,970 passed,0 failed,2 existing
+ignored. The affected ScriptF filter passed4 tests. No extra test binary or
+observer framework was added. Both affected Rust files are below their
+source-size limits; no global size-debt gate is claimed.
+
+[Bounded radiation LU evidence](../evidence/SRC-06-ordinary-radiation-lu/summary.json)
+retains186 finite artifact references in the summary, indexed manifest and
+CRC/SHA-verified evidence ZIP. Historical Native Source identities and the
+formatter's actual Source change remain recorded. Large executable, map,
+core, object and provider payloads are identity/provenance references only,
+without a transitive build or replay claim.
+
+Pivot swaps, first ties, singular/exact-zero and tiny-pivot numerical coverage
+remain uncertified. The coefficient/ScriptF producers, actual enclosure
+ownership, cache lifecycle, EIO rows and ordinary radiation callers remain
+unfinished. Equipment/Node readiness and full ordinary solver/handoff parity
+also remain pending. All four SRC-06 gates and A14/54/B14/64 are unchanged.

@@ -622,7 +622,7 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
         coefficient_matrix[index * surface_count + index] -= emissivity_area_factor;
     }
 
-    let mut inverse = invert_square_matrix(&coefficient_matrix, surface_count)?;
+    let mut inverse = invert_square_matrix(&mut coefficient_matrix, surface_count)?;
     for col in 0..surface_count {
         for row in 0..surface_count {
             inverse[row * surface_count + col] *= excitation[col];
@@ -647,62 +647,68 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
     Some(script_f)
 }
 
-fn invert_square_matrix(matrix: &[f64], dimension: usize) -> Option<Vec<f64>> {
-    if dimension == 0 || matrix.len() != dimension * dimension {
+fn invert_square_matrix(matrix: &mut [f64], dimension: usize) -> Option<Vec<f64>> {
+    let matrix_extent = dimension.checked_mul(dimension)?;
+    if dimension == 0 || matrix.len() != matrix_extent {
         return None;
     }
 
-    let augmented_width = dimension * 2;
-    let mut augmented = vec![0.0; dimension * augmented_width];
-    for row in 0..dimension {
-        for col in 0..dimension {
-            augmented[row * augmented_width + col] = matrix[row * dimension + col];
-        }
-        augmented[row * augmented_width + dimension + row] = 1.0;
+    let mut inverse = vec![0.0; matrix_extent];
+    for i in 0..dimension {
+        inverse[i * dimension + i] = 1.0;
     }
 
-    for pivot_col in 0..dimension {
-        let pivot_row = (pivot_col..dimension).max_by(|left, right| {
-            augmented[*left * augmented_width + pivot_col]
-                .abs()
-                .total_cmp(&augmented[*right * augmented_width + pivot_col].abs())
-        })?;
-        let pivot = augmented[pivot_row * augmented_width + pivot_col];
-        if pivot.abs() <= 1.0e-12 {
+    // CalcMatrixInverse uses these literal row-major Array2 indices. Preserve
+    // its flat walks rather than reinterpreting the Source's row labels.
+    for i in 0..dimension {
+        let mut pivot_index = i;
+        let mut pivot_magnitude = matrix[i * dimension + i].abs();
+        for k in i + 1..dimension {
+            let candidate = matrix[i * dimension + k].abs();
+            if candidate > pivot_magnitude {
+                pivot_index = k;
+                pivot_magnitude = candidate;
+            }
+        }
+        if pivot_magnitude == 0.0 {
             return None;
         }
-        if pivot_row != pivot_col {
-            for col in 0..augmented_width {
-                augmented.swap(
-                    pivot_col * augmented_width + col,
-                    pivot_row * augmented_width + col,
-                );
+
+        if pivot_index != i {
+            for j in 0..dimension {
+                matrix.swap(j * dimension + i, j * dimension + pivot_index);
+                inverse.swap(j * dimension + i, j * dimension + pivot_index);
             }
         }
 
-        let pivot = augmented[pivot_col * augmented_width + pivot_col];
-        for col in 0..augmented_width {
-            augmented[pivot_col * augmented_width + col] /= pivot;
-        }
-        for row in 0..dimension {
-            if row == pivot_col {
-                continue;
-            }
-            let factor = augmented[row * augmented_width + pivot_col];
-            if factor.abs() <= 1.0e-15 {
-                continue;
-            }
-            for col in 0..augmented_width {
-                augmented[row * augmented_width + col] -=
-                    factor * augmented[pivot_col * augmented_width + col];
+        let diagonal_inverse = 1.0 / matrix[i * dimension + i];
+        for k in i + 1..dimension {
+            let multiplier = matrix[i * dimension + k] * diagonal_inverse;
+            matrix[i * dimension + k] = multiplier;
+            if multiplier != 0.0 {
+                for j in i + 1..dimension {
+                    matrix[j * dimension + k] -= multiplier * matrix[j * dimension + i];
+                }
+                for j in 0..dimension {
+                    let inverse_ji = inverse[j * dimension + i];
+                    if inverse_ji != 0.0 {
+                        inverse[j * dimension + k] -= multiplier * inverse_ji;
+                    }
+                }
             }
         }
     }
 
-    let mut inverse = vec![0.0; dimension * dimension];
-    for row in 0..dimension {
-        for col in 0..dimension {
-            inverse[row * dimension + col] = augmented[row * augmented_width + dimension + col];
+    for k in (0..dimension).rev() {
+        let diagonal_inverse = 1.0 / matrix[k * dimension + k];
+        for j in 0..dimension {
+            inverse[j * dimension + k] *= diagonal_inverse;
+        }
+        for i in 0..k {
+            let coefficient = matrix[k * dimension + i];
+            for j in 0..dimension {
+                inverse[j * dimension + i] -= coefficient * inverse[j * dimension + k];
+            }
         }
     }
     Some(inverse)

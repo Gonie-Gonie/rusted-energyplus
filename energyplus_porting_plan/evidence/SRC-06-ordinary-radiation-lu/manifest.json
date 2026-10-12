@@ -1,0 +1,2084 @@
+{
+  "schema": "src06-finite-radiation-lu-evidence-manifest.v1",
+  "summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-lu/summary.json",
+    "sha256": "e001786af82a08fcd8a6c15afb672ea770d41d7432b4522369602f8d87d92187",
+    "size_bytes": 4650
+  },
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-lu/evidence.zip",
+    "sha256": "e3882749f3d80734ce87c4440258eee4b6ba48fda2e975f0f3d900efb93398d9",
+    "size_bytes": 826592
+  },
+  "selected_artifact_count": 186,
+  "deduplicated_members": 167,
+  "uncompressed_bytes": 5095328,
+  "artifacts": [
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-01/report.json",
+        "sha256": "ae64c77326c4c432793d4ab0470b9211f3e3baf214678f33a9cb7282d2809516",
+        "size_bytes": 3771
+      },
+      "roles": [
+        "Native_facts"
+      ],
+      "archive_member": "objects/ae/ae64c77326c4c432793d4ab0470b9211f3e3baf214678f33a9cb7282d2809516"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-command-01/receipt.json",
+        "sha256": "3021a231285533fb1c964da95d1fd8554222a2715408e53622b165e020b650eb",
+        "size_bytes": 3277
+      },
+      "roles": [
+        "Native_factual_command",
+        "Native_factual_command"
+      ],
+      "archive_member": "objects/30/3021a231285533fb1c964da95d1fd8554222a2715408e53622b165e020b650eb"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/custody.json",
+        "sha256": "d5af9e5457abd1a5ff28bfa41b8b78e4fef894ad2fb1afec4f869acb3e4865fe",
+        "size_bytes": 19729
+      },
+      "roles": [
+        "Native_capture_custody"
+      ],
+      "archive_member": "objects/d5/d5af9e5457abd1a5ff28bfa41b8b78e4fef894ad2fb1afec4f869acb3e4865fe"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-command-01/receipt.json",
+        "sha256": "760bb77da68f285aa8248b9d44d35d9740dc286bf5c714981bb7d7c380b236d9",
+        "size_bytes": 3357
+      },
+      "roles": [
+        "Native_capture_command",
+        "Native_capture_command"
+      ],
+      "archive_member": "objects/76/760bb77da68f285aa8248b9d44d35d9740dc286bf5c714981bb7d7c380b236d9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/native-build.json",
+        "sha256": "88148fc0cc55cff4c6e6ca85ad70de68b4922d63be78ebf24ec5fa9e44981d78",
+        "size_bytes": 55750
+      },
+      "roles": [
+        "Native_build"
+      ],
+      "archive_member": "objects/88/88148fc0cc55cff4c6e6ca85ad70de68b4922d63be78ebf24ec5fa9e44981d78"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/manifest.json",
+        "sha256": "96ffe6ce65f76b796ea7738a2a1859db2c98799b01342b932200259b3c9b50af",
+        "size_bytes": 6461
+      },
+      "roles": [
+        "Rust_preparation"
+      ],
+      "archive_member": "objects/96/96ffe6ce65f76b796ea7738a2a1859db2c98799b01342b932200259b3c9b50af"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-application-01/application.json",
+        "sha256": "cb1921266ef330eaff4af70c6dd8001fba3ebb5c32f6784e824ba25b649f06a7",
+        "size_bytes": 1285
+      },
+      "roles": [
+        "Rust_application"
+      ],
+      "archive_member": "objects/cb/cb1921266ef330eaff4af70c6dd8001fba3ebb5c32f6784e824ba25b649f06a7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-application-formatter-review-01/review.json",
+        "sha256": "f1bb19d5f6c0eeaea77b3ac8df387257a048aeb91892db91b1d6201680e7cfe4",
+        "size_bytes": 5306
+      },
+      "roles": [
+        "formatter_review"
+      ],
+      "archive_member": "objects/f1/f1bb19d5f6c0eeaea77b3ac8df387257a048aeb91892db91b1d6201680e7cfe4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/manifest.json",
+        "sha256": "85dc345436f22f044e56ca582edcebd25f45bfb7f0a422da911a2231ac1e1e64",
+        "size_bytes": 7676
+      },
+      "roles": [
+        "Rust_replay_preparation"
+      ],
+      "archive_member": "objects/85/85dc345436f22f044e56ca582edcebd25f45bfb7f0a422da911a2231ac1e1e64"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Owner-ordinary-radiation-lu-replay-Source-review-01/review.json",
+        "sha256": "c265ae7c8c01f10ca5c222840b4e770eec85daa6cafa541704297b639b63c143",
+        "size_bytes": 2192
+      },
+      "roles": [
+        "Rust_replay_review"
+      ],
+      "archive_member": "objects/c2/c265ae7c8c01f10ca5c222840b4e770eec85daa6cafa541704297b639b63c143"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-application-01/application.json",
+        "sha256": "d686d5dd906caf95fa5d6556731a0c9d5fe83d3fbf45332546dffcb3607c7a72",
+        "size_bytes": 1316
+      },
+      "roles": [
+        "Rust_replay_application"
+      ],
+      "archive_member": "objects/d6/d686d5dd906caf95fa5d6556731a0c9d5fe83d3fbf45332546dffcb3607c7a72"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_lu_native_cases.json",
+        "sha256": "048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174",
+        "size_bytes": 147067
+      },
+      "roles": [
+        "Rust_replay_fixture",
+        "current_Rust_Source_or_fixture"
+      ],
+      "archive_member": "objects/04/048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-format-command-01/receipt.json",
+        "sha256": "23ffcca2b5b14981154bc00128dc3fa2998065771ddb3e19f578f684a05c806f",
+        "size_bytes": 3190
+      },
+      "roles": [
+        "formatter_command",
+        "formatter_command"
+      ],
+      "archive_member": "objects/23/23ffcca2b5b14981154bc00128dc3fa2998065771ddb3e19f578f684a05c806f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-fmt-check-command-01/receipt.json",
+        "sha256": "f89f274200d2fc106cd720dd950103a5adb2292c6287782b8a1a4f8d11fb8ff7",
+        "size_bytes": 3211
+      },
+      "roles": [
+        "QA_fmt",
+        "QA_fmt"
+      ],
+      "archive_member": "objects/f8/f89f274200d2fc106cd720dd950103a5adb2292c6287782b8a1a4f8d11fb8ff7"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-clippy-command-01/receipt.json",
+        "sha256": "fc4e1eeb37dab787da01d5507c787b91ec3b17bbf8aef32c4a1e84d2828f2626",
+        "size_bytes": 3272
+      },
+      "roles": [
+        "QA_clippy",
+        "QA_clippy"
+      ],
+      "archive_member": "objects/fc/fc4e1eeb37dab787da01d5507c787b91ec3b17bbf8aef32c4a1e84d2828f2626"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-workspace-command-01/receipt.json",
+        "sha256": "1f2c8413df35a17f623e1a324386b05f5b861c229d7d97a47f9bf907642f8094",
+        "size_bytes": 3244
+      },
+      "roles": [
+        "QA_workspace",
+        "QA_workspace"
+      ],
+      "archive_member": "objects/1f/1f2c8413df35a17f623e1a324386b05f5b861c229d7d97a47f9bf907642f8094"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-focused-command-01/receipt.json",
+        "sha256": "d0931b03b722b4b5ac54af48143aac261efb7c670a79f3ef807246942268636f",
+        "size_bytes": 3315
+      },
+      "roles": [
+        "QA_focused",
+        "QA_focused"
+      ],
+      "archive_member": "objects/d0/d0931b03b722b4b5ac54af48143aac261efb7c670a79f3ef807246942268636f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-source-quality-command-01/receipt.json",
+        "sha256": "2702ec16b1ecdb70d0274149ea946193647203ee73f37cd9db92139927a1b295",
+        "size_bytes": 3268
+      },
+      "roles": [
+        "QA_source_quality",
+        "QA_source_quality"
+      ],
+      "archive_member": "objects/27/2702ec16b1ecdb70d0274149ea946193647203ee73f37cd9db92139927a1b295"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-01/cases.json",
+        "sha256": "048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174",
+        "size_bytes": 147067
+      },
+      "roles": [
+        "Native_all_calls_fixture"
+      ],
+      "archive_member": "objects/04/048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H.observation.json",
+        "sha256": "5f8f666603cb77aa4f265e25a37868260cb5414ab29fbf413c5befa6b8fe7fcc",
+        "size_bytes": 146748
+      },
+      "roles": [
+        "Native_complete_raw_capture"
+      ],
+      "archive_member": "objects/5f/5f8f666603cb77aa4f265e25a37868260cb5414ab29fbf413c5befa6b8fe7fcc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/comparison-policy.json",
+        "sha256": "6319883465b7a3d6d7006f9bbedfb7e5780de65bb516aa57a1ff9fa3389b958f",
+        "size_bytes": 2301
+      },
+      "roles": [
+        "comparison_policy",
+        "Native_comparison_policy"
+      ],
+      "archive_member": "objects/63/6319883465b7a3d6d7006f9bbedfb7e5780de65bb516aa57a1ff9fa3389b958f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-command-01/stdout.log",
+        "sha256": "05c4b720d240845a12b22d8811342d0a459990959ce74d3fc5fe78e73f151071",
+        "size_bytes": 291
+      },
+      "roles": [
+        "Native_factual_command_stdout"
+      ],
+      "archive_member": "objects/05/05c4b720d240845a12b22d8811342d0a459990959ce74d3fc5fe78e73f151071"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-factual-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_factual_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-command-01/stdout.log",
+        "sha256": "5f6cbfc37c4c8b077a27b73c4ba0e3133b46d7d737a1db3d3bd6417d99690a7b",
+        "size_bytes": 258
+      },
+      "roles": [
+        "Native_capture_command_stdout"
+      ],
+      "archive_member": "objects/5f/5f6cbfc37c4c8b077a27b73c4ba0e3133b46d7d737a1db3d3bd6417d99690a7b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "Native_capture_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "formatter_command_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "formatter_command_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-fmt-check-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_fmt_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-fmt-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_fmt_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-clippy-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_clippy_stdout"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-clippy-command-01/stderr.log",
+        "sha256": "64563988b591acd0f8b7777a9e6102472898a3d648db63fa963ff8fa2105c89b",
+        "size_bytes": 363
+      },
+      "roles": [
+        "QA_clippy_stderr"
+      ],
+      "archive_member": "objects/64/64563988b591acd0f8b7777a9e6102472898a3d648db63fa963ff8fa2105c89b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-workspace-command-01/stdout.log",
+        "sha256": "f359f3160ec8d5d91eccc263210b76fc77a5ec6675dca305ad43bab084d39630",
+        "size_bytes": 765485
+      },
+      "roles": [
+        "QA_workspace_stdout"
+      ],
+      "archive_member": "objects/f3/f359f3160ec8d5d91eccc263210b76fc77a5ec6675dca305ad43bab084d39630"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-workspace-command-01/stderr.log",
+        "sha256": "09d09fefbafdaf1cb5d1fd42c83c3ac9d4a55a1ed328a0251121ebed759ee5d0",
+        "size_bytes": 1420
+      },
+      "roles": [
+        "QA_workspace_stderr"
+      ],
+      "archive_member": "objects/09/09d09fefbafdaf1cb5d1fd42c83c3ac9d4a55a1ed328a0251121ebed759ee5d0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-focused-command-01/stdout.log",
+        "sha256": "5bd371ec60f70b9c1905e33026eb8ae411677eeb81762a185fc6cff029f97f87",
+        "size_bytes": 621
+      },
+      "roles": [
+        "QA_focused_stdout"
+      ],
+      "archive_member": "objects/5b/5bd371ec60f70b9c1905e33026eb8ae411677eeb81762a185fc6cff029f97f87"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-focused-command-01/stderr.log",
+        "sha256": "e58835a074359050eab7df813975327e917abbb1258156f567261978a851b6e1",
+        "size_bytes": 254
+      },
+      "roles": [
+        "QA_focused_stderr"
+      ],
+      "archive_member": "objects/e5/e58835a074359050eab7df813975327e917abbb1258156f567261978a851b6e1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-source-quality-command-01/stdout.log",
+        "sha256": "4632fcbb61c0132efab7285f7ae7905fe3530ad8b06c71e3c308db5194dfa2c0",
+        "size_bytes": 82
+      },
+      "roles": [
+        "QA_source_quality_stdout"
+      ],
+      "archive_member": "objects/46/4632fcbb61c0132efab7285f7ae7905fe3530ad8b06c71e3c308db5194dfa2c0"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-source-quality-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "QA_source_quality_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/configure-command-01/receipt.json",
+        "sha256": "1169650a5497aa3e10f2d0df00b953e7ecc94de5023cec5a371579a5b2417db4",
+        "size_bytes": 3489
+      },
+      "roles": [
+        "actual_Native_configure"
+      ],
+      "archive_member": "objects/11/1169650a5497aa3e10f2d0df00b953e7ecc94de5023cec5a371579a5b2417db4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/configure-command-01/stdout.log",
+        "sha256": "f839a41c60ef7f37eb0a950681a2d802fc6cde7a2888b92a3c97952eaea2840e",
+        "size_bytes": 743
+      },
+      "roles": [
+        "actual_Native_configure_stdout"
+      ],
+      "archive_member": "objects/f8/f839a41c60ef7f37eb0a950681a2d802fc6cde7a2888b92a3c97952eaea2840e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/configure-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_configure_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/dry-run-command-01/receipt.json",
+        "sha256": "900a0b6cef1a3c1c7eafdbfc9bb4ec2ea8f814f4a2047291d82ca343f7f01aca",
+        "size_bytes": 2916
+      },
+      "roles": [
+        "actual_Native_dry_run"
+      ],
+      "archive_member": "objects/90/900a0b6cef1a3c1c7eafdbfc9bb4ec2ea8f814f4a2047291d82ca343f7f01aca"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/dry-run-command-01/stdout.log",
+        "sha256": "8e2600bae4fe33f5d61d2c3747943f2b25b6e58c02b2c0e61cca154ab3223392",
+        "size_bytes": 33650
+      },
+      "roles": [
+        "actual_Native_dry_run_stdout"
+      ],
+      "archive_member": "objects/8e/8e2600bae4fe33f5d61d2c3747943f2b25b6e58c02b2c0e61cca154ab3223392"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/dry-run-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_dry_run_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/compile-command-01/receipt.json",
+        "sha256": "be522b08a9947dfdc5c9ffc0d1031190659ba484bfc443976c722cb89302b88e",
+        "size_bytes": 2991
+      },
+      "roles": [
+        "actual_Native_compile"
+      ],
+      "archive_member": "objects/be/be522b08a9947dfdc5c9ffc0d1031190659ba484bfc443976c722cb89302b88e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/compile-command-01/stdout.log",
+        "sha256": "45738c03adbc1c208968f7c582a872a71613625f728a860d983df00070f434c3",
+        "size_bytes": 33799
+      },
+      "roles": [
+        "actual_Native_compile_stdout"
+      ],
+      "archive_member": "objects/45/45738c03adbc1c208968f7c582a872a71613625f728a860d983df00070f434c3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-01/compile-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_compile_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/manifest.json",
+        "sha256": "40521179667b8488f58a45d90c19169ea037e7ae41e9ed91116081b89a1f653a",
+        "size_bytes": 6603
+      },
+      "roles": [
+        "Native_Source_manifest"
+      ],
+      "archive_member": "objects/40/40521179667b8488f58a45d90c19169ea037e7ae41e9ed91116081b89a1f653a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-environment-01/frozen-environment.json",
+        "sha256": "ac428b9f8680a01bad8ab398c1e990652aa28119890c1b28e71a042fbe630ed5",
+        "size_bytes": 51123
+      },
+      "roles": [
+        "actual_frozen_environment_metadata",
+        "ordinary-radiation-lu-native-environment-01_frozen_environment"
+      ],
+      "archive_member": "objects/ac/ac428b9f8680a01bad8ab398c1e990652aa28119890c1b28e71a042fbe630ed5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216
+      },
+      "roles": [
+        "Native_compiled_Source"
+      ],
+      "archive_member": "objects/18/181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/HeatBalanceIntRadExchange.radiation_lu.cc",
+        "sha256": "b9687749a078d6524acac78afe39fdcd7db99a98421148049c02fefcc2946a62",
+        "size_bytes": 121708
+      },
+      "roles": [
+        "Native_compiled_Source"
+      ],
+      "archive_member": "objects/b9/b9687749a078d6524acac78afe39fdcd7db99a98421148049c02fefcc2946a62"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/surface_consumer_observer.cc",
+        "sha256": "8b11d48a11acfc5adb510390a2e87ed91806fd2a14ee1a6753f7786f06812936",
+        "size_bytes": 10805
+      },
+      "roles": [
+        "Native_compiled_Source"
+      ],
+      "archive_member": "objects/8b/8b11d48a11acfc5adb510390a2e87ed91806fd2a14ee1a6753f7786f06812936"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+        "size_bytes": 24694
+      },
+      "roles": [
+        "Native_compiled_Source"
+      ],
+      "archive_member": "objects/27/2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+        "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+        "size_bytes": 46621
+      },
+      "roles": [
+        "Native_compiled_Source"
+      ],
+      "archive_member": "objects/b8/b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/prepare_sources.py",
+        "sha256": "1e29364ba7542a80ec6128236d6772db300ab6a6511c1afa2727f8df9637841a",
+        "size_bytes": 9688
+      },
+      "roles": [
+        "Native_Source_author"
+      ],
+      "archive_member": "objects/1e/1e29364ba7542a80ec6128236d6772db300ab6a6511c1afa2727f8df9637841a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/README.md",
+        "sha256": "15446840b9e430b7163a15adf3125976848e3f7d80e1c5dbd6dece4dda8ea338",
+        "size_bytes": 5502
+      },
+      "roles": [
+        "Native_README"
+      ],
+      "archive_member": "objects/15/15446840b9e430b7163a15adf3125976848e3f7d80e1c5dbd6dece4dda8ea338"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+        "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+        "size_bytes": 120027
+      },
+      "roles": [
+        "Native_Original"
+      ],
+      "archive_member": "objects/36/36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-to-observed.diff",
+        "sha256": "5098f9bd370e7b9266b959abf442a6a4b6e05f09c43d8519c0f876ee48ba4b38",
+        "size_bytes": 3377
+      },
+      "roles": [
+        "Native_complete_Original_diff"
+      ],
+      "archive_member": "objects/50/5098f9bd370e7b9266b959abf442a6a4b6e05f09c43d8519c0f876ee48ba4b38"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/source-additions.json",
+        "sha256": "9a89f98785f92eeb87e48e8c7894032ea6e8ff754b8dba439e3487b497d72e21",
+        "size_bytes": 2572
+      },
+      "roles": [
+        "Native_literal_source_additions"
+      ],
+      "archive_member": "objects/9a/9a89f98785f92eeb87e48e8c7894032ea6e8ff754b8dba439e3487b497d72e21"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges.json",
+        "sha256": "01dbbb04b94c671e05d55114356b23bb06934d70306e6daff1122c9590207c72",
+        "size_bytes": 6493
+      },
+      "roles": [
+        "Native_Original_ranges"
+      ],
+      "archive_member": "objects/01/01dbbb04b94c671e05d55114356b23bb06934d70306e6daff1122c9590207c72"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/self-check.json",
+        "sha256": "f3f6b8b5b8e174e36e437d99ac9bd0de93eb67870fdb797d6f508f4cac0f6fa6",
+        "size_bytes": 669
+      },
+      "roles": [
+        "Native_self_check"
+      ],
+      "archive_member": "objects/f3/f3f6b8b5b8e174e36e437d99ac9bd0de93eb67870fdb797d6f508f4cac0f6fa6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/surface_consumer_observer.hh",
+        "sha256": "6bc0bb8708b832f2c05bfd5a2150d0437c16e4622e7edfb62c7ebe56f37803f6",
+        "size_bytes": 2179
+      },
+      "roles": [
+        "Native_header"
+      ],
+      "archive_member": "objects/6b/6bc0bb8708b832f2c05bfd5a2150d0437c16e4622e7edfb62c7ebe56f37803f6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/ordinary_radiation_lu_reference.cmake",
+        "sha256": "0c8672c3c9e78afd832438b52e40d66d77efddb2353093dfadf4bc666c81bc1d",
+        "size_bytes": 2497
+      },
+      "roles": [
+        "Native_CMake_recipe"
+      ],
+      "archive_member": "objects/0c/0c8672c3c9e78afd832438b52e40d66d77efddb2353093dfadf4bc666c81bc1d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.cc.57-82.txt",
+        "sha256": "81240064d2a8d1e54fdcbfd13e6413c09ae7157bc814170c05cbba536bfc2508",
+        "size_bytes": 948
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/81/81240064d2a8d1e54fdcbfd13e6413c09ae7157bc814170c05cbba536bfc2508"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.cc.240-272.txt",
+        "sha256": "46162f0d3151d1bf6893944af757ada5d34b51765fe1b02aaa99cb0150904632",
+        "size_bytes": 2163
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/46/46162f0d3151d1bf6893944af757ada5d34b51765fe1b02aaa99cb0150904632"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.cc.646-666.txt",
+        "sha256": "0a497485a18a675c64e2205f42c77a0dd467b35433fb627f46a4aebdfe7bf19d",
+        "size_bytes": 1180
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/0a/0a497485a18a675c64e2205f42c77a0dd467b35433fb627f46a4aebdfe7bf19d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.cc.1806-1903.txt",
+        "sha256": "44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e",
+        "size_bytes": 4819
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/44/44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.cc.1905-2007.txt",
+        "sha256": "2ad02aa85a959c6c771795d0385edbf06480a5e269c94d0f61dcdff01140c4a1",
+        "size_bytes": 4083
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/2a/2ad02aa85a959c6c771795d0385edbf06480a5e269c94d0f61dcdff01140c4a1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/HeatBalanceIntRadExchange.hh.137-159.txt",
+        "sha256": "8eb2e050818530b6920dc4f81b43e4908098b4160cd5a8127e510e83ee0e63d8",
+        "size_bytes": 1286
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/8e/8eb2e050818530b6920dc4f81b43e4908098b4160cd5a8127e510e83ee0e63d8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array2.hh.604-627.txt",
+        "sha256": "e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d",
+        "size_bytes": 448
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/e2/e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array2.hh.852-935.txt",
+        "sha256": "a2a99cd18a758ef7bd7c5a3686903a5605caf6a9de941d98764bbf15077e1735",
+        "size_bytes": 910
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/a2/a2a99cd18a758ef7bd7c5a3686903a5605caf6a9de941d98764bbf15077e1735"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array2D.hh.1-33.txt",
+        "sha256": "e568d1a779d4025271bd8586c6cfd2717a62204166506a6e54561f326b201347",
+        "size_bytes": 786
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/e5/e568d1a779d4025271bd8586c6cfd2717a62204166506a6e54561f326b201347"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array.hh.707-723.txt",
+        "sha256": "54e66e7a5bb4328688c133f3abb0b98356a5c8d845e41921361c1497aa54eb9b",
+        "size_bytes": 335
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/54/54e66e7a5bb4328688c133f3abb0b98356a5c8d845e41921361c1497aa54eb9b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array.hh.742-753.txt",
+        "sha256": "624dbd1cf7d2da99170c9238dd15e4d96dd3ef858883b7af77aa8b8977142bc5",
+        "size_bytes": 136
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/62/624dbd1cf7d2da99170c9238dd15e4d96dd3ef858883b7af77aa8b8977142bc5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-prep-01/Original-ranges/Array.hh.908-920.txt",
+        "sha256": "d174de9fd43983888c1d8865db07d16e4a2524ca2f5e212ff1f2f9adade1c9f4",
+        "size_bytes": 117
+      },
+      "roles": [
+        "Native_literal_Original_range"
+      ],
+      "archive_member": "objects/d1/d174de9fd43983888c1d8865db07d16e4a2524ca2f5e212ff1f2f9adade1c9f4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/manifest.json",
+        "sha256": "ad6957ccd0b147342f84c340f856074e23d153f93966b9e2f6a7f5ca2dfeb71b",
+        "size_bytes": 3805
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_manifest"
+      ],
+      "archive_member": "objects/ad/ad6957ccd0b147342f84c340f856074e23d153f93966b9e2f6a7f5ca2dfeb71b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/prepare_build.py",
+        "sha256": "873a6c1b6678b9aee2e0a5de179f915ab753b42aa8eca8ff91c095a23aff6fbc",
+        "size_bytes": 10728
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_Source_author"
+      ],
+      "archive_member": "objects/87/873a6c1b6678b9aee2e0a5de179f915ab753b42aa8eca8ff91c095a23aff6fbc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/build.py",
+        "sha256": "e96c637490ed64b7a35c7be31fb493f4c20552cf218f2e942059b7b5e97ab052",
+        "size_bytes": 16763
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_launcher_Source"
+      ],
+      "archive_member": "objects/e9/e96c637490ed64b7a35c7be31fb493f4c20552cf218f2e942059b7b5e97ab052"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/README.md",
+        "sha256": "adfee79c635c4d0bece6350a5f47b3d719de9f3500c9a029aaf7330db411d04f",
+        "size_bytes": 4394
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_README"
+      ],
+      "archive_member": "objects/ad/adfee79c635c4d0bece6350a5f47b3d719de9f3500c9a029aaf7330db411d04f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/additive-reference.cmake",
+        "sha256": "4773acb66d255830b983fef522b2ced47990064c70055bd835b2ae2f318bad0c",
+        "size_bytes": 320
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_additive_include"
+      ],
+      "archive_member": "objects/47/4773acb66d255830b983fef522b2ced47990064c70055bd835b2ae2f318bad0c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-build-prep-01/complete-parent.diff",
+        "sha256": "d2c685db02e371cd4fbf792a05f09ec2dc0d261ddb02c28432f136487c625172",
+        "size_bytes": 13476
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-build-prep-01_complete_parent_diff"
+      ],
+      "archive_member": "objects/d2/d2c685db02e371cd4fbf792a05f09ec2dc0d261ddb02c28432f136487c625172"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-environment-01/manifest.json",
+        "sha256": "ee2c3f5db23a10c9e82e351ffef8a4ab2185aa6c69549c55ca2bc78df5f2b843",
+        "size_bytes": 1875
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-environment-01_manifest"
+      ],
+      "archive_member": "objects/ee/ee2c3f5db23a10c9e82e351ffef8a4ab2185aa6c69549c55ca2bc78df5f2b843"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-environment-01/prepare.py",
+        "sha256": "0bc90dba367d67c9fe82fe7e313b065e9d960d179085f7bf89da0ef5514d1437",
+        "size_bytes": 6686
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-environment-01_Source"
+      ],
+      "archive_member": "objects/0b/0bc90dba367d67c9fe82fe7e313b065e9d960d179085f7bf89da0ef5514d1437"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-prep-01/manifest.json",
+        "sha256": "adf17c0e65cc0edffc038b42546e4444a135ec65fc96e0d6badb29986ea72602",
+        "size_bytes": 2769
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-capture-prep-01_manifest"
+      ],
+      "archive_member": "objects/ad/adf17c0e65cc0edffc038b42546e4444a135ec65fc96e0d6badb29986ea72602"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-prep-01/prepare_capture.py",
+        "sha256": "66c8589903be719d5ed3811170ad4c6a2927352c3bf21e4aea8525fd136cde32",
+        "size_bytes": 6145
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-capture-prep-01_Source_author"
+      ],
+      "archive_member": "objects/66/66c8589903be719d5ed3811170ad4c6a2927352c3bf21e4aea8525fd136cde32"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-prep-01/capture.py",
+        "sha256": "f996ba814312735e6dd43eb0f09274a807844ef9dfa84e419cc7f4db3dabeb66",
+        "size_bytes": 11904
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-capture-prep-01_launcher_Source"
+      ],
+      "archive_member": "objects/f9/f996ba814312735e6dd43eb0f09274a807844ef9dfa84e419cc7f4db3dabeb66"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-prep-01/README.md",
+        "sha256": "3e37c91a95a69ffd309e89b97b38c0880127649d0fe43b39c95157361cc5a822",
+        "size_bytes": 2750
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-capture-prep-01_README"
+      ],
+      "archive_member": "objects/3e/3e37c91a95a69ffd309e89b97b38c0880127649d0fe43b39c95157361cc5a822"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-native-capture-prep-01/complete-parent.diff",
+        "sha256": "391453a96c455c93b8941583b656b8f73e354016f51b56de026cca502ad8bd84",
+        "size_bytes": 7386
+      },
+      "roles": [
+        "ordinary-radiation-lu-native-capture-prep-01_complete_parent_diff"
+      ],
+      "archive_member": "objects/39/391453a96c455c93b8941583b656b8f73e354016f51b56de026cca502ad8bd84"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-factual-prep-01/manifest.json",
+        "sha256": "8a466d3fd8072ca90124ceb6148502f2a9ba4a62c8273a0a7fcd02a4d6b44617",
+        "size_bytes": 3024
+      },
+      "roles": [
+        "ordinary-radiation-lu-factual-prep-01_manifest"
+      ],
+      "archive_member": "objects/8a/8a466d3fd8072ca90124ceb6148502f2a9ba4a62c8273a0a7fcd02a4d6b44617"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-factual-prep-01/prepare.py",
+        "sha256": "8721c1cc6f9c183131e53a502b2b8a7f5f91c1d51328b17fce5885ac04651e6a",
+        "size_bytes": 4273
+      },
+      "roles": [
+        "ordinary-radiation-lu-factual-prep-01_Source_author"
+      ],
+      "archive_member": "objects/87/8721c1cc6f9c183131e53a502b2b8a7f5f91c1d51328b17fce5885ac04651e6a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-factual-prep-01/verify_native.py",
+        "sha256": "3dc8ed752f338050102fae0554fd2d3bbfcf9617cf42d07f5e5810640579d9c1",
+        "size_bytes": 28473
+      },
+      "roles": [
+        "ordinary-radiation-lu-factual-prep-01_checker_Source",
+        "executed_full_stream_checker_Source"
+      ],
+      "archive_member": "objects/3d/3dc8ed752f338050102fae0554fd2d3bbfcf9617cf42d07f5e5810640579d9c1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-factual-prep-01/README.md",
+        "sha256": "ecc6f12657d327a791946bf20ee9dafc3d9728c41280924d8689e97da080ff4b",
+        "size_bytes": 4481
+      },
+      "roles": [
+        "ordinary-radiation-lu-factual-prep-01_README"
+      ],
+      "archive_member": "objects/ec/ecc6f12657d327a791946bf20ee9dafc3d9728c41280924d8689e97da080ff4b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+        "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+        "size_bytes": 2385
+      },
+      "roles": [
+        "ordinary-radiation-lu-factual-prep-01_accepted_stream_parser"
+      ],
+      "archive_member": "objects/8e/8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/base/radiation.rs",
+        "sha256": "dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c",
+        "size_bytes": 27520
+      },
+      "roles": [
+        "Rust_preparation_base"
+      ],
+      "archive_member": "objects/de/dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/proposed/radiation.rs",
+        "sha256": "44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3",
+        "size_bytes": 27776
+      },
+      "roles": [
+        "Rust_preparation_proposal"
+      ],
+      "archive_member": "objects/44/44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/direct.diff",
+        "sha256": "60d60d9b95232b4743c7d66a3ccc0e06a97d36301788be5f32c15a97ac35431c",
+        "size_bytes": 5254
+      },
+      "roles": [
+        "Rust_preparation_direct_diff"
+      ],
+      "archive_member": "objects/60/60d60d9b95232b4743c7d66a3ccc0e06a97d36301788be5f32c15a97ac35431c"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3",
+        "size_bytes": 27776
+      },
+      "roles": [
+        "current_Rust_Source_or_fixture",
+        "current_formatted_Rust_Source"
+      ],
+      "archive_member": "objects/44/44778daaa8287c1cef0d1af677f86fda7c1c0a9388acd500fc36c2aa0cc454b3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/Original/HeatBalanceIntRadExchange.cc.1806-1903.txt",
+        "sha256": "44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e",
+        "size_bytes": 4819
+      },
+      "roles": [
+        "Rust_preparation_literal_Original_range",
+        "Rust_replay_preparation_literal_Original_range"
+      ],
+      "archive_member": "objects/44/44c2e7d42617cf83f58beda2927f3552e8d94e956f192b5e359d4f198a2fa80e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/Original/HeatBalanceIntRadExchange.cc.1905-2007.txt",
+        "sha256": "2ad02aa85a959c6c771795d0385edbf06480a5e269c94d0f61dcdff01140c4a1",
+        "size_bytes": 4083
+      },
+      "roles": [
+        "Rust_preparation_literal_Original_range",
+        "Rust_replay_preparation_literal_Original_range"
+      ],
+      "archive_member": "objects/2a/2ad02aa85a959c6c771795d0385edbf06480a5e269c94d0f61dcdff01140c4a1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/Original/Array2.hh.604-627.txt",
+        "sha256": "e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d",
+        "size_bytes": 448
+      },
+      "roles": [
+        "Rust_preparation_literal_Original_range",
+        "Rust_replay_preparation_literal_Original_range"
+      ],
+      "archive_member": "objects/e2/e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/Original/Array2D.hh.1-33.txt",
+        "sha256": "e568d1a779d4025271bd8586c6cfd2717a62204166506a6e54561f326b201347",
+        "size_bytes": 786
+      },
+      "roles": [
+        "Rust_preparation_literal_Original_range",
+        "Rust_replay_preparation_literal_Original_range"
+      ],
+      "archive_member": "objects/e5/e568d1a779d4025271bd8586c6cfd2717a62204166506a6e54561f326b201347"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/prepare.py",
+        "sha256": "21dc32749fe0ec9888639eb3a68648b518e47e8b9fd95218350405576113a6be",
+        "size_bytes": 8835
+      },
+      "roles": [
+        "Rust_preparation_author_Source"
+      ],
+      "archive_member": "objects/21/21dc32749fe0ec9888639eb3a68648b518e47e8b9fd95218350405576113a6be"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-prep-01/README.md",
+        "sha256": "1b52ec289a8136d0b13ba87ee22b74ba18f209924277267e97871f00bcc545f1",
+        "size_bytes": 2976
+      },
+      "roles": [
+        "Rust_preparation_README"
+      ],
+      "archive_member": "objects/1b/1b52ec289a8136d0b13ba87ee22b74ba18f209924277267e97871f00bcc545f1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/base.rs",
+        "sha256": "67f45fd2d00ce02e06c2c51392819760c86afe71653efdfc90797a3532d1966c",
+        "size_bytes": 7420
+      },
+      "roles": [
+        "Rust_replay_preparation_base"
+      ],
+      "archive_member": "objects/67/67f45fd2d00ce02e06c2c51392819760c86afe71653efdfc90797a3532d1966c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/proposed.rs",
+        "sha256": "86883b96e28c2d79b36b47b26bbb65a3c8199a96712d4ee1000c38b57939dc73",
+        "size_bytes": 12146
+      },
+      "roles": [
+        "Rust_replay_preparation_proposal"
+      ],
+      "archive_member": "objects/86/86883b96e28c2d79b36b47b26bbb65a3c8199a96712d4ee1000c38b57939dc73"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/direct.diff",
+        "sha256": "e1c9746c1ab32ede07ad07bd3fd3ebc81933e5ddccafe0e119b9e47ee9835c90",
+        "size_bytes": 5077
+      },
+      "roles": [
+        "Rust_replay_preparation_direct_diff"
+      ],
+      "archive_member": "objects/e1/e1c9746c1ab32ede07ad07bd3fd3ebc81933e5ddccafe0e119b9e47ee9835c90"
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+        "sha256": "86930fa581da1a2510f598154abc8154bb2365ecc3d96f3fa1b6d04dc3e8dcf3",
+        "size_bytes": 12254
+      },
+      "roles": [
+        "current_Rust_Source_or_fixture",
+        "current_formatted_Rust_Source"
+      ],
+      "archive_member": "objects/86/86930fa581da1a2510f598154abc8154bb2365ecc3d96f3fa1b6d04dc3e8dcf3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/ordinary_radiation_lu_native_cases.json",
+        "sha256": "048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174",
+        "size_bytes": 147067
+      },
+      "roles": [
+        "Rust_replay_preparation_proposal"
+      ],
+      "archive_member": "objects/04/048e9120cfce46bdd616cff7b2696a15ce9e9a080de64111ccffe3c856d9a174"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-ordinary-radiation-lu-replay-01.py",
+        "sha256": "b50ea447ff1003db91edb417d1aafc41616b73761fbd626b17ba1359f1f35182",
+        "size_bytes": 9367
+      },
+      "roles": [
+        "Rust_replay_preparation_Source_author"
+      ],
+      "archive_member": "objects/b5/b50ea447ff1003db91edb417d1aafc41616b73761fbd626b17ba1359f1f35182"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-draft-01.rs",
+        "sha256": "966654a623ce12ce547d6205b72824c31508bdb8097a177a6a602e27997a2007",
+        "size_bytes": 4863
+      },
+      "roles": [
+        "Rust_replay_preparation_reviewed_draft"
+      ],
+      "archive_member": "objects/96/966654a623ce12ce547d6205b72824c31508bdb8097a177a6a602e27997a2007"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-prep-01/draft-to-actual-counts.diff",
+        "sha256": "7f75f070050792fb37702b594a6bdc655217c78f8f0443114037b1cfdabe147b",
+        "size_bytes": 1140
+      },
+      "roles": [
+        "Rust_replay_preparation_draft_to_actual_counts_diff"
+      ],
+      "archive_member": "objects/7f/7f75f070050792fb37702b594a6bdc655217c78f8f0443114037b1cfdabe147b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-application-01/Root-Source-acceptance.json",
+        "sha256": "a61ef682bad826f98ba7e93144eaa11154a5da51a9442d0937af95ea669e1503",
+        "size_bytes": 2066
+      },
+      "roles": [
+        "Rust_application_Root_Source_acceptance"
+      ],
+      "archive_member": "objects/a6/a61ef682bad826f98ba7e93144eaa11154a5da51a9442d0937af95ea669e1503"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-replay-application-01/Root-Source-acceptance.json",
+        "sha256": "b1237e4497c8fdb6fe9d92b9173b5a03989f7590280ca4a75e45b8faf56acd6a",
+        "size_bytes": 1258
+      },
+      "roles": [
+        "Rust_replay_application_Root_Source_acceptance"
+      ],
+      "archive_member": "objects/b1/b1237e4497c8fdb6fe9d92b9173b5a03989f7590280ca4a75e45b8faf56acd6a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-application-formatter-review-01/radiation.formatter.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "complete_actual_formatter_diff"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-application-formatter-review-01/radiation_approximate_view_factor_tests.formatter.diff",
+        "sha256": "774c6955ab7240cfe9f64c4ec140689a1e913fe85230ff61f4713cfd3988ebba",
+        "size_bytes": 1965
+      },
+      "roles": [
+        "complete_actual_formatter_diff"
+      ],
+      "archive_member": "objects/77/774c6955ab7240cfe9f64c4ec140689a1e913fe85230ff61f4713cfd3988ebba"
+    },
+    {
+      "original": {
+        "path": ".gitattributes",
+        "sha256": "a39ca0b959436c323591af79e736a4f2581854c132afb5d4023f01c45c9e3e27",
+        "size_bytes": 611
+      },
+      "roles": [
+        "actual_fixture_byte_preservation_attributes"
+      ],
+      "archive_member": "objects/a3/a39ca0b959436c323591af79e736a4f2581854c132afb5d4023f01c45c9e3e27"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/before.json",
+        "sha256": "b03c0a25eed0204da94ff7d529ad697be7b3f3534e1cf71e224ed41555c50004",
+        "size_bytes": 16901
+      },
+      "roles": [
+        "actual_Native_before"
+      ],
+      "archive_member": "objects/b0/b03c0a25eed0204da94ff7d529ad697be7b3f3534e1cf71e224ed41555c50004"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-provider-review-01/review.json",
+        "sha256": "6e4902f9c5f5b01c978c9780c407116bd1ded112b5bebc841b7eb8bcb77a1571",
+        "size_bytes": 2287
+      },
+      "roles": [
+        "actual_Native_provider_review"
+      ],
+      "archive_member": "objects/6e/6e4902f9c5f5b01c978c9780c407116bd1ded112b5bebc841b7eb8bcb77a1571"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-provider-review-01/runtime-closure.json",
+        "sha256": "fbab4add82fe2ff34726d7b2045451aa7143e6d763cc976b72232f430f91ed22",
+        "size_bytes": 3004
+      },
+      "roles": [
+        "actual_Native_runtime_closure"
+      ],
+      "archive_member": "objects/fb/fbab4add82fe2ff34726d7b2045451aa7143e6d763cc976b72232f430f91ed22"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/native-stdout.log",
+        "sha256": "2442f0b57c4c01cdbd4c2e4c81b7213683aefce6281e77b2f855b5f3ce75a59b",
+        "size_bytes": 974
+      },
+      "roles": [
+        "actual_Native_native_stdout"
+      ],
+      "archive_member": "objects/24/2442f0b57c4c01cdbd4c2e4c81b7213683aefce6281e77b2f855b5f3ce75a59b"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/native-stderr.log",
+        "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+        "size_bytes": 36
+      },
+      "roles": [
+        "actual_Native_native_stderr"
+      ],
+      "archive_member": "objects/ce/ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.audit",
+        "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+        "size_bytes": 1569
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/6e/6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.bnd",
+        "sha256": "6c915c53cc9ee62da62ec1c26bfa6bf857557a1b5e39cf426a7c81961de05c50",
+        "size_bytes": 6365
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/6c/6c915c53cc9ee62da62ec1c26bfa6bf857557a1b5e39cf426a7c81961de05c50"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.dxf",
+        "sha256": "501cc3df89504e76e23b09b2fede43d09d4039d8a880251834ecf286c00750a6",
+        "size_bytes": 6096
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/50/501cc3df89504e76e23b09b2fede43d09d4039d8a880251834ecf286c00750a6"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.eio",
+        "sha256": "80fd5da9e4e49f2a7583272e324490a185cbc364b5b4b87734cc1edb1476487a",
+        "size_bytes": 15376
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/80/80fd5da9e4e49f2a7583272e324490a185cbc364b5b4b87734cc1edb1476487a"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.end",
+        "sha256": "d85d1b985544652bfb3cfe238a6ed1cb07465ec45a7ceec320674099db1d729d",
+        "size_bytes": 98
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/d8/d85d1b985544652bfb3cfe238a6ed1cb07465ec45a7ceec320674099db1d729d"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.err",
+        "sha256": "55cf95c7f435d985adf49e314c892d2ed5cd93c8500c37e589d7f225dba1ec3a",
+        "size_bytes": 897
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/55/55cf95c7f435d985adf49e314c892d2ed5cd93c8500c37e589d7f225dba1ec3a"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.eso",
+        "sha256": "a5bee51690f21cbed68e21c16e8b8050a7ba4e9e1c94589962d5ac70acaac3f3",
+        "size_bytes": 112213
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/a5/a5bee51690f21cbed68e21c16e8b8050a7ba4e9e1c94589962d5ac70acaac3f3"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.mdd",
+        "sha256": "a452490b4a01f51a0ed0447feef8f648825f25f05e925eed394cdbbcfab4a209",
+        "size_bytes": 3851
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/a4/a452490b4a01f51a0ed0447feef8f648825f25f05e925eed394cdbbcfab4a209"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.mtd",
+        "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+        "size_bytes": 7539
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/c2/c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.mtr",
+        "sha256": "ab6a7b0fc13e591591a8fa0b4cef499ee34cdc192dde8834d9529a9500ea5441",
+        "size_bytes": 2490
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/ab/ab6a7b0fc13e591591a8fa0b4cef499ee34cdc192dde8834d9529a9500ea5441"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.rdd",
+        "sha256": "1262560e67b8a74dff498a4c7c507c46f1798e7c01cea67c3e3f33e44ebae4a3",
+        "size_bytes": 30562
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/12/1262560e67b8a74dff498a4c7c507c46f1798e7c01cea67c3e3f33e44ebae4a3"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplusout.shd",
+        "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+        "size_bytes": 1557
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/f6/f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplustbl.csv",
+        "sha256": "4132961f91165abc2e5c0d20f34ab41290f7dbd8217a7cf1ee05ff71c170d952",
+        "size_bytes": 84703
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/41/4132961f91165abc2e5c0d20f34ab41290f7dbd8217a7cf1ee05ff71c170d952"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplustbl.htm",
+        "sha256": "7ea4d41b9767e83ac842d22e2ac2f13084fcd3e4368fd1a3937437438367a3d6",
+        "size_bytes": 354322
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/7e/7ea4d41b9767e83ac842d22e2ac2f13084fcd3e4368fd1a3937437438367a3d6"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplustbl.tab",
+        "sha256": "52213a39c09327c838008af6f71d6a8f9ea7983d0165beb267756c99e28627b4",
+        "size_bytes": 84700
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/52/52213a39c09327c838008af6f71d6a8f9ea7983d0165beb267756c99e28627b4"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplustbl.txt",
+        "sha256": "5e3eb42a137afbb9964b14c05a5ede129f11d97b98dadee0a9fedfd4627793e3",
+        "size_bytes": 163344
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/5e/5e3eb42a137afbb9964b14c05a5ede129f11d97b98dadee0a9fedfd4627793e3"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-radiation-lu-native-capture-01/A-24H/eplustbl.xml",
+        "sha256": "8d69989b98702c6686634fe21f08e5e47da4d6526fec08203588611399b0b5df",
+        "size_bytes": 226145
+      },
+      "roles": [
+        "actual_normal_Native_output"
+      ],
+      "archive_member": "objects/8d/8d69989b98702c6686634fe21f08e5e47da4d6526fec08203588611399b0b5df"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/review.json",
+        "sha256": "43123acb4408307166a8cd1e7c20d7f7ee4375255f960f8357269d431aba62b9",
+        "size_bytes": 6269
+      },
+      "roles": [
+        "independent_actual_Native_provider_review"
+      ],
+      "archive_member": "objects/43/43123acb4408307166a8cd1e7c20d7f7ee4375255f960f8357269d431aba62b9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-provider-review-01/pe.json",
+        "sha256": "acd62ead94b21a2bc684a2dd34dff61e4cb6337838e2004d373f9195217a63f6",
+        "size_bytes": 15579
+      },
+      "roles": [
+        "Root_actual_full_PE_metadata"
+      ],
+      "archive_member": "objects/ac/acd62ead94b21a2bc684a2dd34dff61e4cb6337838e2004d373f9195217a63f6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/actual-address-bound-providers.json",
+        "sha256": "fd76c02400520341f7f2680479c342637094606421d2eadbc66645d2c1f76aa1",
+        "size_bytes": 19730
+      },
+      "roles": [
+        "actual_address_bound_Native_providers"
+      ],
+      "archive_member": "objects/fd/fd76c02400520341f7f2680479c342637094606421d2eadbc66645d2c1f76aa1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/addr2line-command-01/receipt.json",
+        "sha256": "4e151314eec7610d4d186ce29aa3a4b8898f7eb0d0aabefb1093e627fc12555b",
+        "size_bytes": 3202
+      },
+      "roles": [
+        "actual_Native_addr2line"
+      ],
+      "archive_member": "objects/4e/4e151314eec7610d4d186ce29aa3a4b8898f7eb0d0aabefb1093e627fc12555b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/addr2line-command-01/stdout.log",
+        "sha256": "3acbc94338080b9968fe2213cf1fa919d6012704ea437554082e221d5c1f7fb3",
+        "size_bytes": 2596
+      },
+      "roles": [
+        "actual_Native_addr2line_stdout"
+      ],
+      "archive_member": "objects/3a/3acbc94338080b9968fe2213cf1fa919d6012704ea437554082e221d5c1f7fb3"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/addr2line-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "roles": [
+        "actual_Native_addr2line_stderr"
+      ],
+      "archive_member": "objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-provider-review-01/actual-PE.json",
+        "sha256": "751958e00e618cbdca2d03eab1b43f8a619b16f62d951be66a618680dd0d9d22",
+        "size_bytes": 16047
+      },
+      "roles": [
+        "independent_actual_full_PE_metadata"
+      ],
+      "archive_member": "objects/75/751958e00e618cbdca2d03eab1b43f8a619b16f62d951be66a618680dd0d9d22"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/close-radiation-lu-provider-Root-01.py",
+        "sha256": "856e9f41639ba9ccacbf4d52f46ee33ae1226722598162d011aa405e991f9181",
+        "size_bytes": 8319
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/85/856e9f41639ba9ccacbf4d52f46ee33ae1226722598162d011aa405e991f9181"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/close-radiation-lu-provider-Root-01.diff",
+        "sha256": "7f1a53b68076bb59787eff3c7958d25e5b7a2a899fe075308a0017e493c3afa9",
+        "size_bytes": 4804
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/7f/7f1a53b68076bb59787eff3c7958d25e5b7a2a899fe075308a0017e493c3afa9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/review-ordinary-radiation-lu-providers-Header-01.py",
+        "sha256": "f0c9362bc66110a289b13eba1127f118c49052c86ab8f904297712a757ea74a2",
+        "size_bytes": 12009
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/f0/f0c9362bc66110a289b13eba1127f118c49052c86ab8f904297712a757ea74a2"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/review-ordinary-radiation-lu-providers-Header-01.diff",
+        "sha256": "a8bddda817227183d7a63ec1c8527bff6f1f64a3bdda623d402337080d03f8b6",
+        "size_bytes": 13890
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/a8/a8bddda817227183d7a63ec1c8527bff6f1f64a3bdda623d402337080d03f8b6"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-Source-review-01/review.json",
+        "sha256": "8027a2f700ef8123d25c22f0e7f59b05ef881d4c71ac2934cb9dd5514a8b1f62",
+        "size_bytes": 1415
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/80/8027a2f700ef8123d25c22f0e7f59b05ef881d4c71ac2934cb9dd5514a8b1f62"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-Native-Source-review-01/review.json",
+        "sha256": "c016c1d715694a81be93d5fd718796aae308e32ebf345b17e7588d6aa95eee77",
+        "size_bytes": 1784
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/c0/c016c1d715694a81be93d5fd718796aae308e32ebf345b17e7588d6aa95eee77"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-build-Source-review-01/review.json",
+        "sha256": "22865034c873866bdd5460fde42532f8f94bf24222d2b5665be670abd24879e4",
+        "size_bytes": 2078
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/22/22865034c873866bdd5460fde42532f8f94bf24222d2b5665be670abd24879e4"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-environment-review-01/review.json",
+        "sha256": "e1e8ef91984b777725684f8dd648783d0753b3c33cda1809daa265c6c24df852",
+        "size_bytes": 2945
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/e1/e1e8ef91984b777725684f8dd648783d0753b3c33cda1809daa265c6c24df852"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-environment-review-01/review.json",
+        "sha256": "3102a6114150997bcd2abd3748224e8fe1d19d3ff5ace431b8f2c13e4d0b7b0c",
+        "size_bytes": 1243
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/31/3102a6114150997bcd2abd3748224e8fe1d19d3ff5ace431b8f2c13e4d0b7b0c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-capture-Source-review-01/review.json",
+        "sha256": "44287f26c60d1ff43ca46d75044a1145f91e9967c5d446fcfbda837e5d472d67",
+        "size_bytes": 1443
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/44/44287f26c60d1ff43ca46d75044a1145f91e9967c5d446fcfbda837e5d472d67"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-capture-Source-review-01/review.json",
+        "sha256": "921bf8cd205e6aa9f15284e52496783992051075615b53f8ab9111afb6329946",
+        "size_bytes": 1949
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/92/921bf8cd205e6aa9f15284e52496783992051075615b53f8ab9111afb6329946"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-factual-Source-review-01/review.json",
+        "sha256": "97cec91615fd7ebbe38f05f971b5c85e8126d80c43fb58ad192febba5445402b",
+        "size_bytes": 1559
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/97/97cec91615fd7ebbe38f05f971b5c85e8126d80c43fb58ad192febba5445402b"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-factual-Source-review-01/review.json",
+        "sha256": "e82a6ad12c80d65c796d937dcb3e18cb42b5a37cc3fca9b8cfe310e1e99eae39",
+        "size_bytes": 2473
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/e8/e82a6ad12c80d65c796d937dcb3e18cb42b5a37cc3fca9b8cfe310e1e99eae39"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-provider-Source-review-01/review.json",
+        "sha256": "1c90756599735847275a2fd6cd49e7e31965503bed3e2f66194aeb73f820235e",
+        "size_bytes": 1140
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/1c/1c90756599735847275a2fd6cd49e7e31965503bed3e2f66194aeb73f820235e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-author-radiation-lu-provider-utility-Source-review-01/review.json",
+        "sha256": "104eba2cfa91d8fffb39c31d34db02d1ffbbc53a8d474edc62be179044f0470a",
+        "size_bytes": 2782
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/10/104eba2cfa91d8fffb39c31d34db02d1ffbbc53a8d474edc62be179044f0470a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-author-radiation-lu-Root-closure-Source-review-01/review.json",
+        "sha256": "c62b5bd47dc055d04d70f51268dfdf2e01bffeb5aff4ba8e0222bd793021f79d",
+        "size_bytes": 2577
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/c6/c62b5bd47dc055d04d70f51268dfdf2e01bffeb5aff4ba8e0222bd793021f79d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-author-radiation-lu-applicator-Source-review-01/review.json",
+        "sha256": "51c52d295128b830f6722f710bdde529d2d65f07ec51a73b6daf3c50d0929452",
+        "size_bytes": 2813
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/51/51c52d295128b830f6722f710bdde529d2d65f07ec51a73b6daf3c50d0929452"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-author-radiation-lu-actual-factual-review-01/review.json",
+        "sha256": "89a10581722008f6a561a1b78d2a12a698c4b095d9c821d2fa6f23894df5340f",
+        "size_bytes": 22712
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/89/89a10581722008f6a561a1b78d2a12a698c4b095d9c821d2fa6f23894df5340f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-author-radiation-lu-actual-factual-review-01/review_closed_outputs.py",
+        "sha256": "35aa9dd26b4ad5c8930df5c1b4c88022892c04549b66df4459cb1d95751eca51",
+        "size_bytes": 13542
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/35/35aa9dd26b4ad5c8930df5c1b4c88022892c04549b66df4459cb1d95751eca51"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-Rust-Source-review-01/review.json",
+        "sha256": "ec201bd57e857ac06f54e2c8526bd3ee46a23411be9e05943e1073a0c736aa3e",
+        "size_bytes": 2047
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/ec/ec201bd57e857ac06f54e2c8526bd3ee46a23411be9e05943e1073a0c736aa3e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-radiation-lu-Root-01.py",
+        "sha256": "cfe272488d6d8aae0d6c6dc5eaf264cb4de0c2358239949f7aa585f897cf738a",
+        "size_bytes": 5650
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/cf/cfe272488d6d8aae0d6c6dc5eaf264cb4de0c2358239949f7aa585f897cf738a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-radiation-lu-replay-Root-01.py",
+        "sha256": "76186c1274f9cdfafff2232469e313e3edaf699b2ff810effda14c142a6c58aa",
+        "size_bytes": 3903
+      },
+      "roles": [
+        "finite_LU_approval_or_application_Source"
+      ],
+      "archive_member": "objects/76/76186c1274f9cdfafff2232469e313e3edaf699b2ff810effda14c142a6c58aa"
+    },
+    {
+      "original": {
+        "path": "tools/porting/record_command.py",
+        "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "size_bytes": 8453
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/test.ps1",
+        "sha256": "03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095",
+        "size_bytes": 2410
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/03/03bedbbe17eba1c4abfe15dfb1cd7dac86015bb8cd87f1dfb214b9f6fd5ef095"
+    },
+    {
+      "original": {
+        "path": "scripts/lib/common.ps1",
+        "sha256": "bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97",
+        "size_bytes": 1052
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/bd/bda0a2189f27cd93451c61da8843b24726e9259cdcf1e0467325537d55167e97"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/source-quality-gate.ps1",
+        "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+        "size_bytes": 3432
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/73/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/docs-check.ps1",
+        "sha256": "98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3",
+        "size_bytes": 10863
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/98/98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3"
+    },
+    {
+      "original": {
+        "path": "scripts/quality/capability-registry-check.ps1",
+        "sha256": "de2250adaa094aaff4389bf7fbfcacca622d957aa69202e87d44beadf13be042",
+        "size_bytes": 1141
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/de/de2250adaa094aaff4389bf7fbfcacca622d957aa69202e87d44beadf13be042"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275
+      },
+      "roles": [
+        "actual_wrapper_Source_or_model_input"
+      ],
+      "archive_member": "objects/db/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-ordinary-radiation-lu-publication-Source-review-01/review.json",
+        "sha256": "efbd25811ea6d4bf6ce74187569b8b6973114e445b0172c00214031f27f64e5d",
+        "size_bytes": 1339
+      },
+      "roles": [
+        "explicit_actual_Root_publication_Source_review"
+      ],
+      "archive_member": "objects/ef/efbd25811ea6d4bf6ce74187569b8b6973114e445b0172c00214031f27f64e5d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Header-ordinary-radiation-lu-publication-Source-review-01/review.json",
+        "sha256": "809b8a9b2cbf9dd7218575620cedd0bb10730e636565f44c7f321f5609e8c71d",
+        "size_bytes": 2535
+      },
+      "roles": [
+        "explicit_actual_Header_publication_Source_review"
+      ],
+      "archive_member": "objects/80/809b8a9b2cbf9dd7218575620cedd0bb10730e636565f44c7f321f5609e8c71d"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-affected-size-Root-01.json",
+        "sha256": "6073033dd82965c5939c3bf92c6b912d154b7870a37127844b0a0f018219eb45",
+        "size_bytes": 506
+      },
+      "roles": [
+        "explicit_actual_affected_size"
+      ],
+      "archive_member": "objects/60/6073033dd82965c5939c3bf92c6b912d154b7870a37127844b0a0f018219eb45"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/collect.py",
+        "sha256": "9a56ae432f3bfb7daf5195a093a45f6266c0b9e1b3d03b5bf45e8c4a79d642f8",
+        "size_bytes": 12470
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/9a/9a56ae432f3bfb7daf5195a093a45f6266c0b9e1b3d03b5bf45e8c4a79d642f8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/publish.py",
+        "sha256": "4d869b02ec53ece5a90f95a2501f351e0664e47a2b5ad3dca5e03b2425242fa5",
+        "size_bytes": 9906
+      },
+      "roles": [
+        "publication_Source_or_preparation",
+        "publication_Source"
+      ],
+      "archive_member": "objects/4d/4d869b02ec53ece5a90f95a2501f351e0664e47a2b5ad3dca5e03b2425242fa5"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/README.md",
+        "sha256": "c0212243d8a61f1c70b70da1a7299e729c9319a4b36d482fc417be3ba146d52a",
+        "size_bytes": 4487
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/c0/c0212243d8a61f1c70b70da1a7299e729c9319a4b36d482fc417be3ba146d52a"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/manifest.json",
+        "sha256": "6c2ca4b5dfe2a88b4c44ba69bf70ea617e467f5bb1d7a32e46c07a7472642e35",
+        "size_bytes": 3724
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/6c/6c2ca4b5dfe2a88b4c44ba69bf70ea617e467f5bb1d7a32e46c07a7472642e35"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/collect.diff",
+        "sha256": "96822f33fb48b4dc26bd2498878261a8ecaae319a367f740c01fdd486e32f2a9",
+        "size_bytes": 19491
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/96/96822f33fb48b4dc26bd2498878261a8ecaae319a367f740c01fdd486e32f2a9"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/publish.diff",
+        "sha256": "a725ae414bd09f0616a6a26b5cf8c52f9466ca41ae6920a5108bcf6a9506e525",
+        "size_bytes": 15516
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/a7/a725ae414bd09f0616a6a26b5cf8c52f9466ca41ae6920a5108bcf6a9506e525"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/before/collect.py",
+        "sha256": "8cc5741e036370e010aad99163853acc671f61849a82f242769841b31d8a8f8f",
+        "size_bytes": 9750
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/8c/8cc5741e036370e010aad99163853acc671f61849a82f242769841b31d8a8f8f"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-prep-01/before/publish.py",
+        "sha256": "7a83342665e76159f0511b1cbd4d5f689dc802fee3a86ad8ffc37a7cc5c5f272",
+        "size_bytes": 7722
+      },
+      "roles": [
+        "publication_Source_or_preparation"
+      ],
+      "archive_member": "objects/7a/7a83342665e76159f0511b1cbd4d5f689dc802fee3a86ad8ffc37a7cc5c5f272"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-radiation-lu-publication-inputs-01.json",
+        "sha256": "c800578cf2b7198206fcd821b9b8c68868bd1a4f65535d65844423b14c841772",
+        "size_bytes": 61303
+      },
+      "roles": [
+        "publication_inputs"
+      ],
+      "archive_member": "objects/c8/c800578cf2b7198206fcd821b9b8c68868bd1a4f65535d65844423b14c841772"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/77/779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+        "sha256": "779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4",
+        "size_bytes": 1640176
+      },
+      "roles": [
+        "current_Source_metadata_only"
+      ],
+      "archive_member": "objects/77/779fc20679fcc6ff4ebc03cb6d88e5398086e16b67e68a57cef194782d375ca4"
+    }
+  ],
+  "large_Native_binaries_maps_objects_core_and_provider_binaries": "Identity/provenance metadata only; no transitive replay claim."
+}
