@@ -1,0 +1,56 @@
+{
+  "schema": "src05-weather-cold-publication-Source-review.v1",
+  "accepted": true,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-05/publish-weather-cold-01.py",
+    "sha256": "fc4b4cfa2f23272b73d1564b24daf7c019efa3123c3454c3e93ba4b058c50c11",
+    "size_bytes": 22764
+  },
+  "FULL_Source_read": true,
+  "prior_FULL_read_Source_sha256": "87e969e146fe44eec7e9f644232c31b4e8860568081fe2d53e9a4645a46f9256",
+  "three_final_edits_FULL_read_and_inverse_exact_prior_bytes": true,
+  "AST_parsed_without_import": true,
+  "actual_metadata_field_names_independently_checked": [
+    "actual_application",
+    "actual_compile_correction",
+    "actual_cleanup",
+    "actual_producer_extension",
+    "Native_baseline_acceptance",
+    "Native_provider_acceptance"
+  ],
+  "finite_packet_exact_key_set_and_contained_full_SHA_size_checks": true,
+  "selected_raw_seventeen_weather_observer_union_current_API_sources": true,
+  "Source_maps_metadata_only_no_whole_snapshot_payload_copy": true,
+  "actual_first_and_final_report_and_all_four_complete_gzip_ledgers_retained": true,
+  "first_comparison_literal_FAIL_0266f0aa_preserved": true,
+  "historical_first_comparison_receipt_required_null_and_program_exit_unknown": true,
+  "final_comparison_requires_real_closed_receipt_status_exit_and_stdout_report_join": true,
+  "Rust_capture_driver_outer_and_factual_checker_commands_correctly_distinguished": true,
+  "two_actual_facts_recorder_stdout_review_joins_independently_checked": [
+    {
+      "path": ".runtime/porting/SRC-05/Root-cold-guard-Rust-factual-review-command-02/receipt.json",
+      "sha256": "c298c3af166dfe320523b91057b946c124b26362d7e7f77f118e84d0a7e81656",
+      "size_bytes": 4873
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-cold-guard-Rust-factual-review-command-02/receipt.json",
+      "sha256": "880e2549af033f27f242f4913f5c8f27f031076380d2681780ff29c4fe1b6004",
+      "size_bytes": 4953
+    }
+  ],
+  "genuine_quality_build_capture_receipts_and_review_source_links_required": true,
+  "Native_target_executable_map_object_payloads_provenance_only_and_availability_not_claimed": true,
+  "no_recursive_ancestry_or_transitive_replay_claim": true,
+  "output_requires_fresh_directory_and_complete_raw_copy_SHA_size_checks": true,
+  "all_selected_seen_bytes_rechecked_before_and_after_copy": true,
+  "publication_success_not_scientific_PASS_and_remaining_SRC05_scope_explicit": true,
+  "review_scope": "Held publisher Source and actual field/receipt joins only. The future concrete final comparison packet and actual publication output require separate factual review.",
+  "publisher_imported_or_executed": false,
+  "canonical_files_modified": false,
+  "Cargo_or_target_calls_performed": false,
+  "actual_new_comparison_result_read": false,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "no_defects_found": true
+}

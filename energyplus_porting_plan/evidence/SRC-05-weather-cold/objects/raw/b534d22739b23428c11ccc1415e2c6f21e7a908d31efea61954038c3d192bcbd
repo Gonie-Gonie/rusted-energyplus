@@ -1,0 +1,113 @@
+{
+  "schema": "src05-weather-cold-writer-Source-preparation.v1",
+  "parent_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-03.py",
+    "sha256": "8c3a4063376398b8ab580b6b2959f401a2a54e4792a57af71b44d50777e46007",
+    "size_bytes": 42540
+  },
+  "parent_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-03/manifest.json",
+    "sha256": "94cd6a1041d80aa41907bb845cf931399ae26cdc5b0920490ba61514716089fa",
+    "size_bytes": 4191
+  },
+  "writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "complete_before": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/before.py",
+    "sha256": "8c3a4063376398b8ab580b6b2959f401a2a54e4792a57af71b44d50777e46007",
+    "size_bytes": 42540
+  },
+  "complete_parent_diff": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/exact-parent.diff",
+    "sha256": "e00ae1b2cc9ab35e672f8c0193605f4b1d1d8280d5f2b17847b219cb8e7fde28",
+    "size_bytes": 15914
+  },
+  "README": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/README.md",
+    "sha256": "bae993df5cab110cedd78ab3f3048e5bb1b0c8a2c62437ac9c09780d3f32724e",
+    "size_bytes": 3006
+  },
+  "actual_producer_extension": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "producer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/manifest.json",
+    "sha256": "048ad25469458f31b50dc566badb8a86f60115a9d371be2847db978a09882e08",
+    "size_bytes": 11725
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "actual_current_Source_file_count": 3949,
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/formatter-command/receipt.json",
+    "sha256": "9bbea64470d52032f12527b5104e504ae1db4d38b4d197318887f9b2a5b593fb",
+    "size_bytes": 4384
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/runtime-source-bindings.json",
+    "sha256": "28d402797c57ac4ceda8c758ece65da3ba9352453dd6c9da9ef8cec18833761b",
+    "size_bytes": 1929
+  },
+  "quality_receipt_refs_supplied_by_later_resumption_acceptance": true,
+  "quality_role_set": [
+    "fmt_check",
+    "clippy",
+    "workspace"
+  ],
+  "focused_quality_run_added": false,
+  "new_Cargo_build_argv": [
+    "cargo",
+    "build",
+    "--locked",
+    "-p",
+    "ep_run",
+    "--example",
+    "src05_surface_cold_guard_main",
+    "--message-format=json-render-diagnostics"
+  ],
+  "apply_phase_refused": true,
+  "execute_cli_seven_option_pairs_unchanged": true,
+  "unchanged_function_ASTs": [
+    "need",
+    "ref",
+    "bind",
+    "operand",
+    "load",
+    "same",
+    "write",
+    "dump",
+    "module",
+    "diff",
+    "delta",
+    "members",
+    "held_rows",
+    "receipt",
+    "native_release",
+    "recorded",
+    "cumulative_application",
+    "cleanup_application"
+  ],
+  "changed_function_ASTs": [
+    "actual_application",
+    "quality_receipts",
+    "main"
+  ],
+  "new_function_ASTs": [
+    "producer_application"
+  ],
+  "historical_records_and_capture_preserved": true,
+  "canonical_files_modified": false,
+  "writer_or_checker_imports_performed": false,
+  "Cargo_or_target_calls_performed": false,
+  "actual_new_Rust_result_read": false,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

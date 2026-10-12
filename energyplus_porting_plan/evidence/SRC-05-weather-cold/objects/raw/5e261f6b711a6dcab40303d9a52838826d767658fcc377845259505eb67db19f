@@ -1,0 +1,61 @@
+--- actual-geometry-before/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
++++ proposed-weather/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
+@@ -1,9 +1,12 @@
+ //! Direct DataSurfaces surface-environment setters, with caller-owned rows.
+ //!
+-//! The ordinary runtime does not yet retain this four-array owner. These setters
+-//! are a direct unit API, not an assertion that its manager handoff is active.
++//! Direct setters and the bounded ordinary A caller share these exact bodies.
++//! Full local-environment/EMS surface-manager branches remain outside this unit.
+ 
+ use ep_model::Terrain;
++pub(crate) mod ordinary;
++pub use ordinary::{SurfaceOutdoorEnvironmentError, SurfaceOutdoorEnvironmentState,
++    check_surface_out_bulb_temperatures};
+ 
+ const EARTH_RADIUS_M: f64 = 6_356_000.0;
+ const ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
+@@ -129,6 +132,14 @@
+     weather: SurfaceOutdoorWeather,
+     rows: &mut [SurfaceOutdoorEnvironmentRow],
+ ) {
++    set_surface_out_bulb_temperature_rows(parameters, weather, rows.iter_mut());
++}
++
++fn set_surface_out_bulb_temperature_rows<'a>(
++    parameters: SurfaceOutdoorEnvironmentParameters,
++    weather: SurfaceOutdoorWeather,
++    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
++) {
+     if parameters.site_temperature_gradient_k_per_m == 0.0 {
+         for row in rows {
+             row.dry_bulb_c = weather.dry_bulb_c;
+@@ -162,6 +173,14 @@
+     wind_speed_m_per_s: f64,
+     rows: &mut [SurfaceOutdoorEnvironmentRow],
+ ) {
++    set_surface_wind_speed_rows(parameters, wind_speed_m_per_s, rows.iter_mut());
++}
++
++fn set_surface_wind_speed_rows<'a>(
++    parameters: SurfaceOutdoorEnvironmentParameters,
++    wind_speed_m_per_s: f64,
++    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
++) {
+     let factor = wind_speed_m_per_s
+         * parameters.weather_file_wind_modifier
+         * parameters
+@@ -190,6 +209,13 @@
+ pub fn set_surface_wind_directions(
+     wind_direction_deg: f64,
+     rows: &mut [SurfaceOutdoorEnvironmentRow],
++) {
++    set_surface_wind_direction_rows(wind_direction_deg, rows.iter_mut());
++}
++
++fn set_surface_wind_direction_rows<'a>(
++    wind_direction_deg: f64,
++    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+ ) {
+     for row in rows {
+         row.wind_direction_deg = wind_direction_deg;

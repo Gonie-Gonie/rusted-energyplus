@@ -1,0 +1,275 @@
+--- .runtime/porting/SRC-05/weather-cold-applied-01/literal/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs
++++ formatted/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs
+@@ -1,9 +1,13 @@
+ //! Actual retained surface rows and the bounded ordinary A manager call.
+ //! No Native guard text comparison or complete surface-manager port is claimed.
+-use super::{SurfaceOutdoorEnvironmentParameters, SurfaceOutdoorEnvironmentRow, SurfaceOutdoorWeather};
++use super::{
++    SurfaceOutdoorEnvironmentParameters, SurfaceOutdoorEnvironmentRow, SurfaceOutdoorWeather,
++};
+ use crate::error::RuntimeError;
+ use crate::heat_balance::ctf_initialization_context::CtfInitializationContext;
+-use crate::heat_balance::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
++use crate::heat_balance::error_backend::{
++    SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop,
++};
+ use crate::heat_balance::state::HeatBalanceState;
+ use crate::weather::{HeatBalanceWeatherContext, day::WeatherDayPhase};
+ use ep_model::{SimulationModel, WindExposure};
+@@ -48,27 +52,50 @@
+             (Self::Unavailable(a), Self::Unavailable(b)) => a == b,
+             (Self::Format(a), Self::Format(b)) => a == b,
+             (Self::Backend(a), Self::Backend(b)) => backend_equal(a, b),
+-            (Self::Fatal(SourceFatalStop::Backend(a)), Self::Fatal(SourceFatalStop::Backend(b))) => backend_equal(a, b),
+-            (Self::Fatal(SourceFatalStop::Fatal(a)), Self::Fatal(SourceFatalStop::Fatal(b))) => a == b,
++            (
++                Self::Fatal(SourceFatalStop::Backend(a)),
++                Self::Fatal(SourceFatalStop::Backend(b)),
++            ) => backend_equal(a, b),
++            (Self::Fatal(SourceFatalStop::Fatal(a)), Self::Fatal(SourceFatalStop::Fatal(b))) => {
++                a == b
++            }
+             _ => false,
+         }
+     }
+ }
+ fn backend_equal(a: &SourceErrorBackendFailure, b: &SourceErrorBackendFailure) -> bool {
+     match (a, b) {
+-        (SourceErrorBackendFailure::Effect { operation: a, source: x },
+-         SourceErrorBackendFailure::Effect { operation: b, source: y }) =>
+-            a == b && x.kind() == y.kind() && x.raw_os_error() == y.raw_os_error() && x.to_string() == y.to_string(),
+-        (SourceErrorBackendFailure::UndefinedCounterIncrement { counter: a },
+-         SourceErrorBackendFailure::UndefinedCounterIncrement { counter: b }) => a == b,
++        (
++            SourceErrorBackendFailure::Effect {
++                operation: a,
++                source: x,
++            },
++            SourceErrorBackendFailure::Effect {
++                operation: b,
++                source: y,
++            },
++        ) => {
++            a == b
++                && x.kind() == y.kind()
++                && x.raw_os_error() == y.raw_os_error()
++                && x.to_string() == y.to_string()
++        }
++        (
++            SourceErrorBackendFailure::UndefinedCounterIncrement { counter: a },
++            SourceErrorBackendFailure::UndefinedCounterIncrement { counter: b },
++        ) => a == b,
+         _ => false,
+     }
+ }
+ impl From<SourceErrorBackendFailure> for SurfaceOutdoorEnvironmentError {
+-    fn from(error: SourceErrorBackendFailure) -> Self { Self::Backend(error) }
++    fn from(error: SourceErrorBackendFailure) -> Self {
++        Self::Backend(error)
++    }
+ }
+ impl From<SurfaceOutdoorEnvironmentError> for RuntimeError {
+-    fn from(error: SurfaceOutdoorEnvironmentError) -> Self { Self::SurfaceOutdoorEnvironment(Box::new(error)) }
++    fn from(error: SurfaceOutdoorEnvironmentError) -> Self {
++        Self::SurfaceOutdoorEnvironment(Box::new(error))
++    }
+ }
+ 
+ /// Four actual allocated owners in the same actual Surface's ID/order carrier.
+@@ -82,21 +109,38 @@
+ }
+ impl SurfaceOutdoorEnvironmentState {
+     pub(crate) fn allocate(centroid_height_m: f64, wind_exposed: bool) -> Self {
+-        Self { row: SurfaceOutdoorEnvironmentRow { centroid_height_m, wind_exposed,
+-            dry_bulb_c: 0.0, wet_bulb_c: 0.0, wind_speed_m_per_s: 0.0, wind_direction_deg: 0.0 },
+-            manager_invoked: false }
++        Self {
++            row: SurfaceOutdoorEnvironmentRow {
++                centroid_height_m,
++                wind_exposed,
++                dry_bulb_c: 0.0,
++                wet_bulb_c: 0.0,
++                wind_speed_m_per_s: 0.0,
++                wind_direction_deg: 0.0,
++            },
++            manager_invoked: false,
++        }
+     }
+     /// A consumer copies the retained values only after the real manager call.
+     pub(crate) fn current(self) -> Option<SurfaceOutdoorWeather> {
+         self.manager_invoked.then_some(SurfaceOutdoorWeather {
+-            dry_bulb_c: self.row.dry_bulb_c, wet_bulb_c: self.row.wet_bulb_c,
+-            wind_speed_m_per_s: self.row.wind_speed_m_per_s, wind_direction_deg: self.row.wind_direction_deg })
++            dry_bulb_c: self.row.dry_bulb_c,
++            wet_bulb_c: self.row.wet_bulb_c,
++            wind_speed_m_per_s: self.row.wind_speed_m_per_s,
++            wind_direction_deg: self.row.wind_direction_deg,
++        })
+     }
+ }
+ 
+ // Literal ObjexxFCL min(double,double,double), including NaNs and tie direction.
+ fn minimum_three(a: f64, b: f64, c: f64) -> f64 {
+-    if a < b { if a < c { a } else { c } } else if b < c { b } else { c }
++    if a < b {
++        if a < c { a } else { c }
++    } else if b < c {
++        b
++    } else {
++        c
++    }
+ }
+ 
+ /// CheckSurfaceOutBulbTempAt, with cumulative min and the actual current name.
+@@ -112,13 +156,21 @@
+             backend.show_severe_error("SetOutBulbTempAt: Surface Outdoor Temperatures < -100 C")?;
+             // Source formats this only after ShowSevereError has returned.
+             let height = crate::heat_balance::source_round_format::round(row.centroid_height_m, 0)
+-                .map_err(|error| SurfaceOutdoorEnvironmentError::Format(format!("surface height .0R unavailable: {error:?}")))?;
+-            backend.show_continue_error(&format!("...check Surface Heights - Maximum Surface Height=[{height}]."))?;
++                .map_err(|error| {
++                    SurfaceOutdoorEnvironmentError::Format(format!(
++                        "surface height .0R unavailable: {error:?}"
++                    ))
++                })?;
++            backend.show_continue_error(&format!(
++                "...check Surface Heights - Maximum Surface Height=[{height}]."
++            ))?;
+             if row.centroid_height_m >= 20000.0 {
+                 backend.show_continue_error("...according to your maximum Z height, your building is somewhere in the Stratosphere.")?;
+                 backend.show_continue_error(&format!("...look at Surface Name= {name}"))?;
+             }
+-            return match backend.show_fatal_error("Program terminates due to preceding condition(s).") {
++            return match backend
++                .show_fatal_error("Program terminates due to preceding condition(s).")
++            {
+                 Ok(never) => match never {},
+                 Err(error) => Err(SurfaceOutdoorEnvironmentError::Fatal(error)),
+             };
+@@ -139,20 +191,45 @@
+     weather: Option<HeatBalanceWeatherContext<'_>>,
+     output: Option<&mut CtfInitializationContext<'_>>,
+ ) -> Result<(), RuntimeError> {
+-    let actual = weather.and_then(|value| value.owned)
++    let actual = weather
++        .and_then(|value| value.owned)
+         .ok_or_else(|| unavailable("surface weather requires actual current production weather"))?;
+-    let clock = actual.ctf_history_clock
++    let clock = actual
++        .ctf_history_clock
+         .ok_or_else(|| unavailable("surface weather requires actual caller WarmupFlag"))?;
+-    let output = output.ok_or_else(|| unavailable("surface weather requires retained actual error backend"))?;
+-    let terrain = model.typed.building.as_ref()
+-        .ok_or_else(|| unavailable("surface weather requires actual compiled Building terrain"))?.terrain;
++    let output = output
++        .ok_or_else(|| unavailable("surface weather requires retained actual error backend"))?;
++    let terrain = model
++        .typed
++        .building
++        .as_ref()
++        .ok_or_else(|| unavailable("surface weather requires actual compiled Building terrain"))?
++        .terrain;
+     if state.surfaces.len() != model.typed.surfaces.len()
+-        || state.surfaces.iter().zip(&model.typed.surfaces).any(|(actual, declared)|
+-            actual.surface_id != declared.id || actual.surface_name != declared.name.0
+-            || actual.outdoor_environment.row.centroid_height_m.to_bits() != actual.geometry.centroid_m.z_m.to_bits()
+-            || actual.outdoor_environment.row.wind_exposed != (declared.wind_exposure == WindExposure::WindExposed))
+-        || state.surfaces.iter().map(|surface| surface.surface_id).collect::<std::collections::BTreeSet<_>>().len() != state.surfaces.len()
+-    { return Err(unavailable("surface weather ID/order/height/exposure owner changed")); }
++        || state
++            .surfaces
++            .iter()
++            .zip(&model.typed.surfaces)
++            .any(|(actual, declared)| {
++                actual.surface_id != declared.id
++                    || actual.surface_name != declared.name.0
++                    || actual.outdoor_environment.row.centroid_height_m.to_bits()
++                        != actual.geometry.centroid_m.z_m.to_bits()
++                    || actual.outdoor_environment.row.wind_exposed
++                        != (declared.wind_exposure == WindExposure::WindExposed)
++            })
++        || state
++            .surfaces
++            .iter()
++            .map(|surface| surface.surface_id)
++            .collect::<std::collections::BTreeSet<_>>()
++            .len()
++            != state.surfaces.len()
++    {
++        return Err(unavailable(
++            "surface weather ID/order/height/exposure owner changed",
++        ));
++    }
+     output.backend.state.warmup_flag = matches!(clock.phase, WeatherDayPhase::Warmup { .. });
+     let parameters = SurfaceOutdoorEnvironmentParameters::default_weather_station(terrain);
+     let weather = SurfaceOutdoorWeather {
+@@ -161,15 +238,41 @@
+         wind_speed_m_per_s: actual.current_weather.wind_speed,
+         wind_direction_deg: actual.current_weather.wind_dir,
+     };
+-    for surface in &mut state.surfaces { surface.outdoor_environment.manager_invoked = true; }
+-    super::set_surface_out_bulb_temperature_rows(parameters, weather,
+-        state.surfaces.iter_mut().map(|surface| &mut surface.outdoor_environment.row));
+-    check_surface_out_bulb_temperatures(state.surfaces.iter().map(|surface|
+-        (&surface.outdoor_environment.row, surface.surface_name.as_str())), &mut output.backend)?;
+-    super::set_surface_wind_speed_rows(parameters, weather.wind_speed_m_per_s,
+-        state.surfaces.iter_mut().map(|surface| &mut surface.outdoor_environment.row));
+-    super::set_surface_wind_direction_rows(weather.wind_direction_deg,
+-        state.surfaces.iter_mut().map(|surface| &mut surface.outdoor_environment.row));
++    for surface in &mut state.surfaces {
++        surface.outdoor_environment.manager_invoked = true;
++    }
++    super::set_surface_out_bulb_temperature_rows(
++        parameters,
++        weather,
++        state
++            .surfaces
++            .iter_mut()
++            .map(|surface| &mut surface.outdoor_environment.row),
++    );
++    check_surface_out_bulb_temperatures(
++        state.surfaces.iter().map(|surface| {
++            (
++                &surface.outdoor_environment.row,
++                surface.surface_name.as_str(),
++            )
++        }),
++        &mut output.backend,
++    )?;
++    super::set_surface_wind_speed_rows(
++        parameters,
++        weather.wind_speed_m_per_s,
++        state
++            .surfaces
++            .iter_mut()
++            .map(|surface| &mut surface.outdoor_environment.row),
++    );
++    super::set_surface_wind_direction_rows(
++        weather.wind_direction_deg,
++        state
++            .surfaces
++            .iter_mut()
++            .map(|surface| &mut surface.outdoor_environment.row),
++    );
+     Ok(())
+ }
+ 
+@@ -179,8 +282,16 @@
+     weather: Option<HeatBalanceWeatherContext<'_>>,
+     output: Option<&mut CtfInitializationContext<'_>>,
+ ) -> Result<(), RuntimeError> {
+-    if state.surfaces.iter().any(|surface| surface.outdoor_environment.manager_invoked) {
+-        if state.surfaces.iter().any(|surface| !surface.outdoor_environment.manager_invoked) {
++    if state
++        .surfaces
++        .iter()
++        .any(|surface| surface.outdoor_environment.manager_invoked)
++    {
++        if state
++            .surfaces
++            .iter()
++            .any(|surface| !surface.outdoor_environment.manager_invoked)
++        {
+             return Err(unavailable("partial ordinary surface weather activation"));
+         }
+         invoke(model, state, weather, output)?;

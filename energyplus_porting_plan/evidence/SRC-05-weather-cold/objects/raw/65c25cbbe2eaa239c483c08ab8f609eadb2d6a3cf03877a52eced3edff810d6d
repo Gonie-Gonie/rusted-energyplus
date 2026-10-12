@@ -1,0 +1,84 @@
+--- actual-geometry-before/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs
++++ proposed-weather/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs
+@@ -6,6 +6,7 @@
+     use crate::heat_balance::error_backend::SourceErrorBackend;
+     for samples in [1,24,48] {
+         let mut typed=ctf_ordinary_output_test_model();
++        typed.building=Some(surface_environment_test_building());
+         typed.timestep.number_of_timesteps_per_hour=4;
+         let model=SimulationModel::from_typed(typed);
+         let weather=ProductionWeatherTimestepSeries::from_bytes(
+@@ -21,6 +22,10 @@
+             crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+                 &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false})?
+         };
++        for surface in &simulation.state.surfaces {
++            assert!(surface.outdoor_environment.manager_invoked);
++            assert_eq!(surface.outdoor_environment.row.centroid_height_m.to_bits(),surface.geometry.centroid_m.z_m.to_bits());
++        }
+         let owner=simulation.state.warmup_convergence.as_ref().ok_or("missing actual ordinary owner")?;
+         let report=owner.report.as_ref().ok_or("missing actual ordinary report allocation")?;
+         assert!(!owner.warmup_flag && !backend_state.warmup_flag);
+@@ -36,3 +41,62 @@
+     }
+     Ok(())
+ }
++
++
++// Explicit authored test inputs; production still requires its compiled owner.
++fn surface_environment_test_building() -> ep_model::Building {
++    ep_model::Building { name: NormalizedName::new("authored surface weather test"),
++        north_axis_deg:0.0, terrain:Terrain::Suburbs,
++        loads_convergence_tolerance_w:1.0, temperature_convergence_tolerance_delta_c:1000.0,
++        solar_distribution:ep_model::SolarDistribution::FullExterior,
++        maximum_number_of_warmup_days:2, minimum_number_of_warmup_days:1 }
++}
++
++#[test]
++fn ordinary_surface_cold_stop_retains_all_bulbs_and_incoming_wind_arrays()
++-> Result<(), Box<dyn std::error::Error>> {
++    use crate::heat_balance::ctf_initialization_context::{CtfInitializationContext,CtfInitializationReports};
++    use crate::heat_balance::convection::surface_environment::{ordinary,SurfaceOutdoorEnvironmentError};
++    use crate::heat_balance::error_backend::{SourceErrorBackend,SourceFatalStop};
++    let mut typed=ctf_ordinary_output_test_model();
++    typed.building=Some(surface_environment_test_building());
++    typed.timestep.number_of_timesteps_per_hour=4;
++    let model=SimulationModel::from_typed(typed);
++    let weather=ProductionWeatherTimestepSeries::from_bytes(DECOY_BYTES.to_vec(),
++        configuration(6,30,7,2,FirstHourInterpolationStartingValues::Hour24)?)?;
++    let driver=HeatBalanceWeatherDriver::Production(&weather);
++    driver.prepare_initial_phase(crate::weather::day::WeatherDayPhase::Warmup{day:1})?;
++    let actual=driver.current_context(0,4,1,FirstHourInterpolationStartingValues::Hour24)?;
++    let (mut reports,mut backend_state,mut eio,mut error,mut console)=(CtfInitializationReports::default(),ctf_ordinary_output_test_state(),Vec::new(),Vec::new(),Vec::new());
++    let mut context=CtfInitializationContext {reports:&mut reports,eio:&mut eio,
++        backend:SourceErrorBackend {state:&mut backend_state,error_stream:Some(&mut error),console:&mut console,
++            out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None}};
++    let mut state=crate::heat_balance::initialize_heat_balance_state_with_initialization_context(&model,23.0,&mut context)?;
++    let timestep=state.timestep_index;
++    // Deliberate pre-call writes to actual retained owners, not Native results
++    // or altered weather. This invokes the real manager/guard on its state.
++    let first=state.surfaces.first_mut().ok_or("missing first actual surface")?;
++    first.geometry.centroid_m.z_m=30000.0;
++    first.outdoor_environment.row.centroid_height_m=30000.0;
++    for (index,surface) in state.surfaces.iter_mut().enumerate() {
++        surface.outdoor_environment.row.wind_speed_m_per_s=f64::from_bits(0x7ff8000000000300+index as u64);
++        surface.outdoor_environment.row.wind_direction_deg=-0.0;
++    }
++    let incoming=state.surfaces.iter().map(|surface|
++        (surface.outdoor_environment.row.wind_speed_m_per_s.to_bits(),
++         surface.outdoor_environment.row.wind_direction_deg.to_bits())).collect::<Vec<_>>();
++    let result=ordinary::invoke(&model,&mut state,Some(actual),Some(&mut context));
++    assert!(matches!(result,Err(RuntimeError::SurfaceOutdoorEnvironment(error))
++        if matches!(*error,SurfaceOutdoorEnvironmentError::Fatal(SourceFatalStop::Fatal(_)))));
++    assert!(state.surfaces[0].outdoor_environment.row.dry_bulb_c < -100.0);
++    for (surface,(wind,direction)) in state.surfaces.iter().zip(incoming) {
++        assert!(surface.outdoor_environment.manager_invoked);
++        assert_ne!(surface.outdoor_environment.row.wet_bulb_c.to_bits(),0.0_f64.to_bits());
++        assert_eq!(surface.outdoor_environment.row.wind_speed_m_per_s.to_bits(),wind);
++        assert_eq!(surface.outdoor_environment.row.wind_direction_deg.to_bits(),direction);
++    }
++    assert_eq!(state.timestep_index,timestep);
++    assert_eq!(context.backend.state.tracking.total_severe_errors,1);
++    assert_eq!(context.backend.state.tracking.total_severe_errors_during_warmup,1);
++    Ok(())
++}

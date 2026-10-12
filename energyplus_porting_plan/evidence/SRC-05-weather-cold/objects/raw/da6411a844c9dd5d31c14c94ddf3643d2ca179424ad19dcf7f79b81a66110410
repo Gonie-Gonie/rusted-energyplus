@@ -1,0 +1,12 @@
+--- .runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs
++++ formatted/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs
+@@ -151,7 +151,8 @@
+ }
+ 
+ #[test]
+-fn real_sink_failure_retains_counter_prefix_and_error_source() -> Result<(), Box<dyn std::error::Error>> {
++fn real_sink_failure_retains_counter_prefix_and_error_source()
++-> Result<(), Box<dyn std::error::Error>> {
+     struct FailingSink(Vec<u8>);
+     impl Write for FailingSink {
+         fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {

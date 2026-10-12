@@ -1,0 +1,165 @@
+--- e1/crates/ep_run/tests/arbitrary_run/exit_codes.rs
++++ d3/crates/ep_run/tests/arbitrary_run/exit_codes.rs
+@@ -0,0 +1,162 @@
++//! Exit-code focused integration tests for the arbitrary-run pipeline.
++
++#![allow(clippy::expect_used, clippy::unwrap_used)]
++
++use ep_run::{
++    PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
++    SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
++};
++
++use super::{read_json, unique_case_dir, write_text};
++
++use super::fixtures::*;
++
++#[test]
++fn invalid_weather_file_returns_runtime_failure() -> Result<(), Box<dyn std::error::Error>> {
++    let case_dir = unique_case_dir("runtime-invalid-weather")?;
++    let input_path = case_dir.join("one-zone.epJSON");
++    let weather_path = case_dir.join("invalid-weather.epw");
++    let output_dir = case_dir.join("out");
++    write_text(&input_path, ONE_ZONE_EPJSON)?;
++    write_text(&weather_path, "LOCATION,Invalid Weather\n")?;
++
++    let outcome = run_arbitrary_idf(&RunConfig {
++        input_path,
++        weather_path: Some(weather_path),
++        output_dir: output_dir.clone(),
++        mode: RunMode::Compatibility,
++        partial_policy: PartialRunPolicy::Deny,
++        output_format: RunOutputFormat::RustNative,
++        overwrite: true,
++        keep_intermediate: true,
++        trace_level: TraceLevel::Normal,
++        trace_selection: TraceSelection::default(),
++        fail_on_warning: false,
++        dry_run: false,
++        oracle_baseline: false,
++        compare_oracle: false,
++        json_stdout: false,
++        oracle_root: None,
++        hours: Some(1),
++    })?;
++
++    assert_eq!(outcome.exit_code, RunExitCode::Runtime);
++    assert_eq!(
++        outcome.support_status,
++        SupportStatus::SupportedCompatibility
++    );
++    assert_eq!(
++        outcome.run_result_state,
++        RunResultState::SupportedCompatibilityRun
++    );
++    assert!(
++        !output_dir
++            .join("results")
++            .join("result-store.json")
++            .exists()
++    );
++
++    let summary = read_json(&output_dir.join("run-summary.json"))?;
++    assert_eq!(summary["status"], "runtime");
++    assert_eq!(summary["exit_code"], 6);
++    assert_eq!(
++        summary["support"]["runtime_class"],
++        "one-zone-heat-balance-compatibility"
++    );
++    assert!(summary["rust_runtime"].is_null());
++
++    let diagnostics = read_json(&output_dir.join("diagnostics.json"))?;
++    let diagnostics = diagnostics["diagnostics"]
++        .as_array()
++        .expect("diagnostics should be an array");
++    assert!(diagnostics.iter().any(|diagnostic| {
++        diagnostic["severity"] == "error"
++            && diagnostic["code"] == "RuntimeConvergenceFailure"
++            && diagnostic["stage"] == "runtime"
++    }));
++    Ok(())
++}
++
++#[test]
++fn output_path_file_returns_output_export_failure() -> Result<(), Box<dyn std::error::Error>> {
++    let case_dir = unique_case_dir("output-export-file")?;
++    let input_path = case_dir.join("one-zone.epJSON");
++    let output_path = case_dir.join("output-is-a-file");
++    write_text(&input_path, ONE_ZONE_EPJSON)?;
++    write_text(&output_path, "not a directory")?;
++
++    let error = run_arbitrary_idf(&RunConfig {
++        input_path,
++        weather_path: None,
++        output_dir: output_path.clone(),
++        mode: RunMode::Compatibility,
++        partial_policy: PartialRunPolicy::Deny,
++        output_format: RunOutputFormat::RustNative,
++        overwrite: true,
++        keep_intermediate: true,
++        trace_level: TraceLevel::Normal,
++        trace_selection: TraceSelection::default(),
++        fail_on_warning: false,
++        dry_run: false,
++        oracle_baseline: false,
++        compare_oracle: false,
++        json_stdout: false,
++        oracle_root: None,
++        hours: Some(1),
++    })
++    .expect_err("output path file should fail before summary export");
++
++    assert_eq!(error.exit_code, RunExitCode::OutputExport);
++    assert!(error.message.contains("failed to remove output directory"));
++    assert!(output_path.is_file());
++    Ok(())
++}
++
++#[test]
++fn full_trace_preserves_nonempty_output_directory_when_overwrite_is_denied()
++-> Result<(), Box<dyn std::error::Error>> {
++    let case_dir = unique_case_dir("full-trace-no-overwrite")?;
++    let input_path = case_dir.join("one-zone.epJSON");
++    let output_dir = case_dir.join("out");
++    write_text(&input_path, ONE_ZONE_EPJSON)?;
++    std::fs::create_dir_all(&output_dir)?;
++    let existing_path = output_dir.join("existing-result.json");
++    let existing_bytes = b"{\"preserve\":true}\n";
++    std::fs::write(&existing_path, existing_bytes)?;
++
++    let error = run_arbitrary_idf(&RunConfig {
++        input_path,
++        weather_path: None,
++        output_dir: output_dir.clone(),
++        mode: RunMode::Compatibility,
++        partial_policy: PartialRunPolicy::Deny,
++        output_format: RunOutputFormat::RustNative,
++        overwrite: false,
++        keep_intermediate: true,
++        trace_level: TraceLevel::Full,
++        trace_selection: TraceSelection::default(),
++        fail_on_warning: false,
++        dry_run: false,
++        oracle_baseline: false,
++        compare_oracle: false,
++        json_stdout: false,
++        oracle_root: None,
++        hours: Some(1),
++    })
++    .expect_err("nonempty output must require explicit overwrite");
++
++    assert_eq!(error.exit_code, RunExitCode::Args);
++    assert!(error.message.contains("output directory is not empty"));
++    assert_eq!(std::fs::read(&existing_path)?, existing_bytes);
++    assert!(!output_dir.join("psychrometrics-calls.json").exists());
++    assert!(!output_dir.join("psy02-calls.json").exists());
++    assert!(!output_dir.join("clock-calls.json").exists());
++    assert!(!output_dir.join("compiled-geometry.json").exists());
++    assert!(!output_dir.join("geometry-consumers.json").exists());
++    assert!(!output_dir.join("geo02-geometry.json").exists());
++    assert!(!output_dir.join("geo02-geometry-operands.json").exists());
++    assert_eq!(std::fs::read_dir(&output_dir)?.count(), 1);
++    std::fs::remove_dir_all(&case_dir)?;
++    Ok(())
++}
++

@@ -1,0 +1,82 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/compare.py",
+    "--Native-baseline",
+    ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json#55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "--Rust-custody",
+    ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/custody.json#a32049dedf74ef17b478ba4252aae4787bf1eb77d4185aa801ca40f379144f51",
+    "--Root-Rust-factual-review",
+    ".runtime/porting/SRC-05/Root-cold-guard-Rust-factual-review-02/review.json#d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "--independent-Rust-factual-review",
+    ".runtime/porting/SRC-05/Header-cold-guard-Rust-factual-review-02/review.json#d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "--output-dir",
+    ".runtime/porting/SRC-05/cold-guard-selected-comparison-02"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-12T02:35:35.595949+00:00",
+  "finished_utc": "2026-10-12T02:36:09.683843+00:00",
+  "elapsed_seconds": 34.088217799999256,
+  "repository_before": {
+    "head": "1fde766a8493ba306d7849462180d4ccaa044003",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/error.rs\u0000 M crates/ep_runtime/src/heat_balance/convection.rs\u0000 M crates/ep_runtime/src/heat_balance/convection/geometry_operands.rs\u0000 M crates/ep_runtime/src/heat_balance/convection/surface_environment.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/run_period.rs\u0000 M crates/ep_runtime/src/heat_balance/run_period/standalone.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_balance.rs\u0000 M crates/ep_runtime/src/heat_balance/warmup.rs\u0000 M crates/ep_runtime/src/runtime.rs\u0000 M crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs\u0000?? crates/ep_run/examples/src05_surface_cold_guard_main.rs\u0000?? crates/ep_runtime/src/heat_balance/convection/surface_environment/\u0000"
+  },
+  "repository_after": {
+    "head": "1fde766a8493ba306d7849462180d4ccaa044003",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/error.rs\u0000 M crates/ep_runtime/src/heat_balance/convection.rs\u0000 M crates/ep_runtime/src/heat_balance/convection/geometry_operands.rs\u0000 M crates/ep_runtime/src/heat_balance/convection/surface_environment.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/run_period.rs\u0000 M crates/ep_runtime/src/heat_balance/run_period/standalone.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_balance.rs\u0000 M crates/ep_runtime/src/heat_balance/warmup.rs\u0000 M crates/ep_runtime/src/runtime.rs\u0000 M crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs\u0000?? crates/ep_run/examples/src05_surface_cold_guard_main.rs\u0000?? crates/ep_runtime/src/heat_balance/convection/surface_environment/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-command-02/stdout.log",
+    "sha256": "7d5225af5085b0c27f654d321b559600058083fad160c97635561263ab22b19a"
+  },
+  "stderr": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-command-02/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-12T02:36:09.683843+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

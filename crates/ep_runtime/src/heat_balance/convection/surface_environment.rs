@@ -1,9 +1,16 @@
 //! Direct DataSurfaces surface-environment setters, with caller-owned rows.
 //!
-//! The ordinary runtime does not yet retain this four-array owner. These setters
-//! are a direct unit API, not an assertion that its manager handoff is active.
+//! Direct setters and the bounded ordinary A caller share these exact bodies.
+//! Full local-environment/EMS surface-manager branches remain outside this unit.
 
 use ep_model::Terrain;
+mod initialization;
+pub use initialization::SurfaceOutdoorInitializationError;
+pub(crate) mod ordinary;
+pub use ordinary::{
+    SurfaceOutdoorEnvironmentError, SurfaceOutdoorEnvironmentState,
+    check_surface_out_bulb_temperatures,
+};
 
 const EARTH_RADIUS_M: f64 = 6_356_000.0;
 const ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
@@ -29,24 +36,9 @@ impl SurfaceOutdoorEnvironmentParameters {
     /// outside the ordinary CON01 scope; the direct API can receive real operands.
     #[must_use]
     pub fn default_weather_station(terrain: Terrain) -> Self {
-        let (site_wind_exponent, site_wind_boundary_layer_height_m) =
-            super::energyplus_site_wind_profile(terrain);
-        let wind_sensor_height_m = 10.0;
-        let wind_exponent = 0.14;
-        let wind_boundary_layer_height_m: f64 = 270.0;
-        let temperature_sensor_height_m =
-            super::ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M;
-        Self {
-            site_temperature_gradient_k_per_m: 0.0065,
-            weather_file_temperature_modifier_c: ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M
-                * EARTH_RADIUS_M
-                * temperature_sensor_height_m
-                / (EARTH_RADIUS_M + temperature_sensor_height_m),
-            site_wind_exponent,
-            site_wind_boundary_layer_height_m,
-            weather_file_wind_modifier: (wind_boundary_layer_height_m / wind_sensor_height_m)
-                .powf(wind_exponent),
-        }
+        let mut parameters = Self::for_building_terrain(terrain);
+        initialization::assign_default_weather_station_coefficients(&mut parameters);
+        parameters
     }
 
     fn temperature_from_base(self, base_temperature_c: f64, height_m: f64) -> f64 {
@@ -129,6 +121,14 @@ pub fn set_surface_out_bulb_temperatures(
     weather: SurfaceOutdoorWeather,
     rows: &mut [SurfaceOutdoorEnvironmentRow],
 ) {
+    set_surface_out_bulb_temperature_rows(parameters, weather, rows.iter_mut());
+}
+
+fn set_surface_out_bulb_temperature_rows<'a>(
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    weather: SurfaceOutdoorWeather,
+    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+) {
     if parameters.site_temperature_gradient_k_per_m == 0.0 {
         for row in rows {
             row.dry_bulb_c = weather.dry_bulb_c;
@@ -162,6 +162,14 @@ pub fn set_surface_wind_speeds(
     wind_speed_m_per_s: f64,
     rows: &mut [SurfaceOutdoorEnvironmentRow],
 ) {
+    set_surface_wind_speed_rows(parameters, wind_speed_m_per_s, rows.iter_mut());
+}
+
+fn set_surface_wind_speed_rows<'a>(
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    wind_speed_m_per_s: f64,
+    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+) {
     let factor = wind_speed_m_per_s
         * parameters.weather_file_wind_modifier
         * parameters
@@ -190,6 +198,13 @@ pub fn set_surface_wind_speeds(
 pub fn set_surface_wind_directions(
     wind_direction_deg: f64,
     rows: &mut [SurfaceOutdoorEnvironmentRow],
+) {
+    set_surface_wind_direction_rows(wind_direction_deg, rows.iter_mut());
+}
+
+fn set_surface_wind_direction_rows<'a>(
+    wind_direction_deg: f64,
+    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
 ) {
     for row in rows {
         row.wind_direction_deg = wind_direction_deg;

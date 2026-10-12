@@ -1,0 +1,47 @@
+--- .runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-04/check_rust.py
++++ .runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/check_rust.py
+@@ -9,7 +9,7 @@
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+ BASE = ROOT / '.runtime/porting/SRC-05'
+-WRITER = dict(path='.runtime/porting/SRC-05/apply-and-validate-weather-cold-03.py', sha256='8c3a4063376398b8ab580b6b2959f401a2a54e4792a57af71b44d50777e46007')
++WRITER = dict(path='.runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py', sha256='db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5')
+ NATIVE_CHECKER = dict(path='.runtime/porting/SRC-05/cold-guard-Native-factual-checker-prep-02/check.py', sha256='61046be32a68c541dd920fdd5d97445c5e1674c7e190d81298803e390ec6fd3b')
+ POLICY_SHA = 'a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52'
+ APIS = dict(bulbs='set_surface_out_bulb_temperatures', check='check_surface_out_bulb_temperatures', wind_speed='set_surface_wind_speeds', wind_direction='set_surface_wind_directions')
+@@ -97,7 +97,7 @@
+     need(value['case_id'] == literal['case_id'] and value['literal_input'] == literal and value['Native_fresh_constructor_state'] == dict(available=False, counted_as_PASS=False) and value['unavailable_families'] == unavailable and value['ordinary_production_handoff_verified'] is False and value['numerical_PASS_claimed'] is False, 'actual input/case/scope differs')
+     streams = literal['initial']['streams']; prepared = value['prepared_state']; snapshot(prepared, streams)
+     producer = value['actual_Rust_default_producer']; keys(producer, 'api terrain actual_return', 'actual default producer')
+-    need(producer['api'] == 'SurfaceOutdoorEnvironmentParameters::default_weather_station' and producer['terrain'] == 'Suburbs', 'actual default producer identity differs'); keys(producer['actual_return'], ' '.join(N.ENV[:5]), 'actual default return')
++    need(producer['api'] == 'SurfaceOutdoorEnvironmentParameters::initialize_absent_weather_station' and producer['terrain'] == 'Suburbs', 'actual default producer identity differs'); keys(producer['actual_return'], ' '.join(N.ENV[:5]), 'actual default return')
+     expected = copy.deepcopy(producer['actual_return']); p = literal['initial']['site_parameters']; owner = prepared['owner']
+     for name in ('SiteWindExp', 'SiteWindBLHeight'): N.input_bits(owner['environment'][name], p[name]); expected[name] = owner['environment'][name]
+     for name in ('SiteTempGradient', 'WeatherFileTempModCoeff', 'WeatherFileWindModCoeff'):
+@@ -110,7 +110,7 @@
+     for name, item in initial['backend_state'].items(): need(owner['backend'][name] == item, 'literal backend seed differs')
+     for name, item in initial['backend_flags'].items(): need((owner['backend_flags'] if name in owner['backend_flags'] else owner['backend'])[name] == item, 'literal phase seed differs')
+     need(prepared['callbacks'] == [] and prepared['actual_callback_count'] == prepared['actual_error_stream_bytes_after_seed'] == prepared['actual_Rust_error_stream_write_attempts'] == 0 and prepared['actual_Rust_error_sink_failed'] is False, 'literal stream/callback seed differs')
+-    for name in ('error_stream', 'eio', 'console'): need(prepared[name + '_bytes'] == (None if name == 'error_stream' and not streams['error_present'] else list(streams['error_seed' if name == 'error_stream' else name + '_seed'].encode())), 'complete literal stream seed differs')
++    for name in ('error_stream', 'console'): need(prepared[name + '_bytes'] == (None if name == 'error_stream' and not streams['error_present'] else list(streams['error_seed' if name == 'error_stream' else name + '_seed'].encode())), 'complete literal stream seed differs')
+     calls, boundaries = value['actual_calls'], value['declared_weather_boundaries']; index = boundary_index = 0; previous = prepared; stopped = False; unreached = []; causes = []
+     for op in literal['operations']:
+         if stopped: unreached.append(op); continue
+@@ -124,7 +124,7 @@
+             need(index < len(calls), 'actual selected call missing'); call = calls[index]; index += 1
+             keys(call, 'operation_id actual_call_ordinal stage api actual_source_invoked actual_source_return_observed source_exception before after', 'Rust call')
+             need(call['operation_id'] == op['operation_id'] and call['actual_call_ordinal'] == index and call['stage'] == stage and call['api'] == APIS[stage] and call['actual_source_invoked'] is True and type(call['actual_source_return_observed']) is bool and call['before'] == previous, 'actual call identity/order/preowner differs')
+-            snapshot(call['after'], streams); continuity(call['before'], call['after']); stopped = not call['actual_source_return_observed']; cause = call['source_exception']
++            snapshot(call['after'], streams); continuity(call['before'], call['after']); need(call['after']['eio_bytes'] == prepared['eio_bytes'] and call['after']['eio'] == prepared['eio'], 'selected calls must retain exact real producer EIO'); stopped = not call['actual_source_return_observed']; cause = call['source_exception']
+             if not stopped: need(cause is None, 'returned Source call has cause')
+             else:
+                 need(stage == 'check' and isinstance(cause, dict), 'actual stopped guard cause required'); kind = cause['kind']; causes.append(kind)
+@@ -146,7 +146,7 @@
+     need(build['schema'] == 'src05-weather-cold-actual-quality-and-artifact.v1' and approval['accepted'] is True and approval['Root_FULL_PE_and_Cargo_artifact_accepted'] is True and approval['gates_updated'] is False, 'actual quality/artifact and Root acceptance required')
+     for k in ('actual_application', 'actual_formatter_review', 'Source_snapshot', 'runtime_source_bindings', 'Native_baseline_acceptance', 'actual_Source_acceptance'): same(build[k], custody[k])
+     same(approval['actual_build_record'], custody['actual_build_record']); same(approval['Source_snapshot'], source); same(build['actual_writer_Source'], WRITER)
+-    quality, totals = W.quality_receipts(source, fmt); need(build['quality_executions'] == quality and build['actual_test_totals'] == totals, 'exact three reused quality receipts and dynamic actual workspace totals required')
++    quality, totals = W.quality_receipts(source, fmt, custody['actual_formatter_review']); need(build['quality_executions'] == quality and build['actual_test_totals'] == totals, 'exact three reused quality receipts and dynamic actual workspace totals required')
+     artifact = build['actual_Cargo_artifact']; argv = ['cargo', 'build'] + W.CONFIGS + ['--locked', '-p', 'ep_run', '--example', W.EXAMPLE, '--message-format=json-render-diagnostics']; actual_build = W.receipt(artifact['actual_build_execution'], source, argv)
+     need(all(load(v)['finished_utc'] <= actual_build['started_utc'] for v in build['quality_executions'].values()), 'build chronology differs'); same(artifact['actual_full_Cargo_JSON'], actual_build['stdout'])
+     messages = [json.loads(v) for v in bind(actual_build['stdout']).read_text(encoding='utf8').splitlines() if v]; need([v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')] == [artifact['cargo_message']] and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'sole genuine Cargo artifact required')

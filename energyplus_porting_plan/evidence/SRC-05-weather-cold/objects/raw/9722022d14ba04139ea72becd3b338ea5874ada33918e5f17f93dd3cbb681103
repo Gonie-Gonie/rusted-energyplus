@@ -1,0 +1,54 @@
+"""Hold a serializer-only successor removing a denied expect; never build or execute Rust."""
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SRC-05/cold-guard-Rust-observer-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-05/cold-guard-Rust-observer-prep-02'
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+assert ref(OLD / 'manifest.json')['sha256'] == 'c9f28a40deb65ccb4acfc64bc06f75548b03d7b662477bfc1a550abbabbc1546'
+assert not OUT.exists(); OUT.mkdir()
+m = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+canonical = m['application_sources'][0]['canonical_path']
+old = (ROOT / m['application_sources'][0]['proposal']['path']).read_text(encoding='utf8')
+before = '''fn parameter_snapshot(p: SurfaceOutdoorEnvironmentParameters) -> Value {
+    json!({"SiteTempGradient":scalar(p.site_temperature_gradient_k_per_m),"WeatherFileTempModCoeff":scalar(p.weather_file_temperature_modifier_c),
+        "SiteWindExp":scalar(p.site_wind_exponent),"SiteWindBLHeight":scalar(p.site_wind_boundary_layer_height_m),"WeatherFileWindModCoeff":scalar(p.weather_file_wind_modifier)})
+}
+fn environment_snapshot(p: SurfaceOutdoorEnvironmentParameters, w: SurfaceOutdoorWeather) -> Value {
+    let mut value = parameter_snapshot(p);
+    let map = value.as_object_mut().expect("parameter snapshot is an object");'''
+after = '''fn parameter_snapshot(p: SurfaceOutdoorEnvironmentParameters) -> serde_json::Map<String, Value> {
+    serde_json::Map::from_iter([
+        ("SiteTempGradient".into(),scalar(p.site_temperature_gradient_k_per_m)),
+        ("WeatherFileTempModCoeff".into(),scalar(p.weather_file_temperature_modifier_c)),
+        ("SiteWindExp".into(),scalar(p.site_wind_exponent)),
+        ("SiteWindBLHeight".into(),scalar(p.site_wind_boundary_layer_height_m)),
+        ("WeatherFileWindModCoeff".into(),scalar(p.weather_file_wind_modifier)),
+    ])
+}
+fn environment_snapshot(p: SurfaceOutdoorEnvironmentParameters, w: SurfaceOutdoorWeather) -> Value {
+    let mut map = parameter_snapshot(p);'''
+assert old.count(before) == 1
+new = old.replace(before, after, 1).replace('    value\n}\nfn backend_failure', '    Value::Object(map)\n}\nfn backend_failure', 1)
+assert new.replace(after,before,1).replace('    Value::Object(map)\n}\nfn backend_failure','    value\n}\nfn backend_failure',1) == old
+assert '.expect(' not in new and '.unwrap(' not in new
+proposal = OUT / 'proposed' / canonical; proposal.parent.mkdir(parents=True); proposal.write_text(new,encoding='utf8',newline='\n')
+readme = OUT / 'README.md'; readme.write_text((OLD / 'README.md').read_text(encoding='utf8')+'\nSuccessor02 changes only the read-only parameter/environment JSON copier to a typed Map, removing an internally constructed-object expect forbidden by workspace lints. All literal inputs, calls, owners, policy and unavailable scope remain unchanged. No Rust target has been invoked.\n',encoding='utf8',newline='\n')
+def delta(name,a,b,left,right):
+    path=OUT/name;path.write_text(''.join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile=left,tofile=right)),encoding='utf8',newline='\n');return ref(path)
+empty=OUT/'before.rs';empty.write_bytes(b'')
+cum=delta('src05_surface_cold_guard_main.rs.diff','',new,'/dev/null',canonical)
+narrow=delta('serializer-only.diff',old,new,m['application_sources'][0]['proposal']['path'],ref(proposal)['path'])
+rd=delta('README.md.diff',(OLD/'README.md').read_text(encoding='utf8'),readme.read_text(encoding='utf8'),ref(OLD/'README.md')['path'],ref(readme)['path'])
+m.update(parent_Source_preparation=ref(OLD/'manifest.json'),successor_scope='Two read-only serializer functions use typed Map instead of expect; no fallback/science/input/policy change.',
+    own_sources=[ref(proposal),m['own_sources'][1],ref(readme),ref(Path(__file__).resolve())],
+    source_correspondence=[dict(before=m['application_sources'][0]['proposal'],proposal=ref(proposal),exact_diff=narrow),dict(before=ref(OLD/'README.md'),proposal=ref(readme),exact_diff=rd)])
+m['application_sources']=[dict(canonical_path=canonical,new_destination_absent=True,actual_before=None,before_archive=ref(empty),proposal=ref(proposal),exact_diff=cum)]
+with (OUT/'manifest.json').open('x',encoding='utf8',newline='\n') as stream:json.dump(m,stream,indent=2,ensure_ascii=False);stream.write('\n')
+print(json.dumps(ref(OUT/'manifest.json')))

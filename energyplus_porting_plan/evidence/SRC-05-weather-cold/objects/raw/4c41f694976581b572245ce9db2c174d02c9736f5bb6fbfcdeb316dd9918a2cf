@@ -1,0 +1,17 @@
+{
+  "schema": "src05-weather-cold-publication-Source-review.v1",
+  "accepted": true,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-05/publish-weather-cold-01.py",
+    "sha256": "fc4b4cfa2f23272b73d1564b24daf7c019efa3123c3454c3e93ba4b058c50c11",
+    "size_bytes": 22764
+  },
+  "full_Source_read": true,
+  "finite_explicit_actual_artifact_roots_and_eight_gzip_selection_reviewed": true,
+  "whole_Source_maps_metadata_only_and_selected_Rust_sources_reviewed": true,
+  "first_direct_comparison_receipt_null_and_program_exit_unknown_retained": true,
+  "reviewer_execution_and_capture_driver_receipts_distinguished": true,
+  "all_large_binary_map_object_payloads_provenance_only": true,
+  "publisher_STORAGE_never_scientific_PASS": true,
+  "gates_updated": false
+}

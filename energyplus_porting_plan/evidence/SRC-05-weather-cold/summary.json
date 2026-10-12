@@ -1,0 +1,183 @@
+{
+  "schema": "src05-weather-cold-evidence.v1",
+  "status": "NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS",
+  "actual_packet": {
+    "path": ".runtime/porting/SRC-05/weather-cold-publication-inputs-01/packet.json",
+    "sha256": "ad9a826c1c6afd55d4a0624203fa9018aa0d393bf7f28188736342f0936c6e74"
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "selected_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-05-weather-cold/manifest.json",
+    "sha256": "427d9972fb71fff4338825feb238ee5429553574366b9bb718a2855f49dbf571",
+    "size_bytes": 384934
+  },
+  "preserved_first_failure": {
+    "status": "MISMATCH_OR_REQUIRED_UNAVAILABLE",
+    "paired_row_counts": {
+      "inputs": 12030,
+      "prestates": 9703,
+      "endpoints": 0,
+      "unavailable": 63
+    },
+    "mismatch_counts": {
+      "inputs": 29,
+      "prestates": 38,
+      "endpoints": 0
+    },
+    "required_unavailable": 38,
+    "nonfinite_observations_excluded_from_numerical_PASS": 6,
+    "full_pair_and_unavailable_logs": {
+      "inputs": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/inputs.jsonl.gz",
+        "sha256": "9059e6739b3133112c4c61fa6d95d99cdb7f9e6373ff7e8cb6c523d3cea56d56",
+        "size_bytes": 109865
+      },
+      "prestates": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/prestates.jsonl.gz",
+        "sha256": "67db62807fd18869ecfec88dd4538600dc60dff486b1f91625891d18eb4bc447",
+        "size_bytes": 88488
+      },
+      "endpoints": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/endpoints.jsonl.gz",
+        "sha256": "fb5c5433ab4e6d5e4ff3774f3d78aaee099c1813cb666b4ee7c747d7bbe5ce54",
+        "size_bytes": 36
+      },
+      "unavailable": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/unavailable.jsonl.gz",
+        "sha256": "1c9c683bfd0c4bf9eb34b70d2c86dfd6a012c46c5bcd245ebb557bd4fc4448aa",
+        "size_bytes": 9422
+      }
+    }
+  },
+  "first_comparison_execution": null,
+  "first_comparison_execution_provenance": "historical direct tool execution; no recorder receipt retained",
+  "first_comparison_actual_program_exit_code": null,
+  "actual_final_comparison": {
+    "status": "NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS",
+    "paired_row_counts": {
+      "inputs": 28879,
+      "prestates": 31781,
+      "endpoints": 41767,
+      "unavailable": 33
+    },
+    "mismatch_counts": {
+      "inputs": 0,
+      "prestates": 0,
+      "endpoints": 0
+    },
+    "required_unavailable": 0,
+    "nonfinite_observations_excluded_from_numerical_PASS": 14,
+    "full_pair_and_unavailable_logs": {
+      "inputs": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/inputs.jsonl.gz",
+        "sha256": "0f05540d4e81e88802ebb7a2bd296c4ebfca50891ec00bd641740e1c7e124d90",
+        "size_bytes": 197867
+      },
+      "prestates": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/prestates.jsonl.gz",
+        "sha256": "18cc34f7841f2ea76fa3a34d16d64f37c2f07c43c18c9c903d4d0f7d9a7eda94",
+        "size_bytes": 202323
+      },
+      "endpoints": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/endpoints.jsonl.gz",
+        "sha256": "85557ec5544027be2728f6da7be77d43e2a1b200ace76c54542b57323b4ec090",
+        "size_bytes": 253170
+      },
+      "unavailable": {
+        "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/unavailable.jsonl.gz",
+        "sha256": "82d0d6d8d4ed9dea5b883e98b0eb66ea71320ca2194ea3dfbabbf0895a1befc1",
+        "size_bytes": 1041
+      }
+    }
+  },
+  "actual_test_totals": {
+    "workspace": {
+      "groups": 18,
+      "passed": 4964,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "provenance_only": [
+    {
+      "artifact": {
+        "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\cold-guard-native-build-01\\bin\\src05_surface_cold_guard_helper.exe",
+        "sha256": "8a708d88ce1909a46584f8ab3e77ca96e1888a783464ef5292be5db7a2565532",
+        "size_bytes": 1296398272
+      },
+      "reason": "accepted Native provider custody; large payload deliberately not republished",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    },
+    {
+      "artifact": {
+        "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\cold-guard-native-build-01\\bin\\src05_surface_cold_guard_helper.map",
+        "sha256": "9b5769c92bfc50fc00db3d7e895e0c829744d38fe1719d8cb67605e66c9525aa",
+        "size_bytes": 304101827
+      },
+      "reason": "accepted Native provider custody; large payload deliberately not republished",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    },
+    {
+      "artifact": {
+        "path": ".runtime/ep261-gcc13-o0/CMakeFiles/src05_surface_cold_guard_helper.dir/2508633295114b12d361658185e088df/porting/SRC-05/native-surface-cold-guard-prep-01/surface_cold_guard_helper.cpp.obj",
+        "sha256": "10b7dc61f0a039615073465117ea68156f2f474838a197dd2a7612884c04ccb7",
+        "size_bytes": 15516515
+      },
+      "reason": "accepted Native provider custody; large payload deliberately not republished",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    },
+    {
+      "artifact": {
+        "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+        "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+        "size_bytes": 30397586
+      },
+      "reason": "accepted immutable Rust build/capture hash; executable payload not republished",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-03/actual-Cargo-emitted-observer.exe",
+        "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+        "size_bytes": 30397586
+      },
+      "reason": "accepted immutable Rust build/capture hash; executable payload not republished",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    },
+    {
+      "artifact": {
+        "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+        "sha256": "854ff3127893dddfe9cced07f55adb49e794f3766b9d2762dd728487f8991de3",
+        "size_bytes": 30390112
+      },
+      "reason": "first-FAIL historical immutable executable identity only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false,
+      "payload_availability": "metadata-only-no-current-payload-claim"
+    }
+  ],
+  "selected_closure_transitively_replayable": false,
+  "scientific_outcome_copied_from_actual_comparer": true,
+  "publisher_storage_success_is_not_scientific_PASS": true,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "pending_SRC05": [
+    "complete ordinary weather/inside arrays and cold-guard reachability",
+    "persistent ordinary air/surface owners and correction cadence",
+    "SRC07/08 consumer handoff and successful complete ordinary comparison"
+  ],
+  "gates_updated": false
+}

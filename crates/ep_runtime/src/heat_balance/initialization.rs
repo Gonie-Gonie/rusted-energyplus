@@ -224,6 +224,8 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 azimuth_deg,
                 tilt_deg,
                 geometry,
+                outdoor_environment: super::convection::surface_environment::SurfaceOutdoorEnvironmentState::allocate(
+                    geometry.centroid_m.z_m, surface.wind_exposure == ep_model::WindExposure::WindExposed),
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,

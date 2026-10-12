@@ -12,6 +12,9 @@ pub(crate) fn energyplus_stored_surface_outside_wind_speed_m_per_s(
     terrain: Terrain,
     weather_file_wind_speed_m_per_s: f64,
 ) -> f64 {
+    if let Some(actual) = state.outdoor_environment.current() {
+        return actual.wind_speed_m_per_s;
+    }
     if surface.wind_exposure != WindExposure::WindExposed {
         return 0.0;
     }
@@ -34,6 +37,9 @@ pub(crate) fn energyplus_stored_surface_outdoor_air_temperature_c(
     state: &SurfaceHeatBalanceState,
     weather_file_temperature_c: f64,
 ) -> f64 {
+    if let Some(actual) = state.outdoor_environment.current() {
+        return actual.dry_bulb_c;
+    }
     let centroid = state.geometry.centroid_m;
     let height_m = centroid.z_m;
     production_trace::record(
@@ -46,6 +52,18 @@ pub(crate) fn energyplus_stored_surface_outdoor_air_temperature_c(
         },
     );
     energyplus_air_temperature_at_height_c(weather_file_temperature_c, height_m)
+}
+
+/// Wet-bulb reads its distinct actual array rather than the dry-bulb owner.
+pub(crate) fn energyplus_stored_surface_outdoor_wet_bulb_temperature_c(
+    state: &SurfaceHeatBalanceState,
+    weather_file_temperature_c: f64,
+) -> f64 {
+    if let Some(actual) = state.outdoor_environment.current() {
+        actual.wet_bulb_c
+    } else {
+        energyplus_stored_surface_outdoor_air_temperature_c(state, weather_file_temperature_c)
+    }
 }
 
 pub(crate) fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {

@@ -182,6 +182,12 @@ where
                     substep,
                     seconds_per_timestep,
                 )?;
+                super::convection::surface_environment::ordinary::invoke_if_active(
+                    simulation_model,
+                    state,
+                    weather_context,
+                    output.as_deref_mut(),
+                )?;
                 advance_timestep(
                     model,
                     state,

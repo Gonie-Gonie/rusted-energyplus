@@ -1,0 +1,30 @@
+        if (specs_.type == 'R') { // matches RoundSigDigits() behavior
+            // push the value up a tad to get the same rounding behavior as Objexx
+            const auto fixed_output = should_be_fixed_output(val);
+
+            if (fixed_output) {
+                specs_.type = 'F';
+
+                if (val > 100000.0) {
+                    const auto digits10 = static_cast<int>(std::log10(val));
+                    // we cannot represent this val to the required precision, truncate the floating
+                    // point portion
+                    if (digits10 + specs_.precision >= std::numeric_limits<decltype(val)>::max_digits10) {
+                        specs_.precision = 0;
+                        spec_builder();
+                        // add '.' to match old RoundSigDigits
+                        buffer.push_back('.');
+                        std::string_view fmt_buffer(buffer.data(), buffer.size());
+                        return fmt::format_to(ctx.out(), fmt::runtime(fmt_buffer), val);
+                    }
+                    return fmt::format_to(ctx.out(), fmt::runtime(spec_builder()), val);
+                }
+                if (val == 0.0 || val == -0.0) {
+                    return fmt::format_to(ctx.out(), fmt::runtime(spec_builder()), 0.0);
+                } // nudge up to next rounded val
+                return fmt::format_to(ctx.out(), fmt::runtime(spec_builder()), next_float(next_float(next_float(val))));
+            }
+            specs_.type = 'E';
+            auto str = fmt::format(fmt::runtime(spec_builder()), next_float(val));
+            return fmt::format_to(ctx.out(), "{}", zero_pad_exponent(str));
+        }

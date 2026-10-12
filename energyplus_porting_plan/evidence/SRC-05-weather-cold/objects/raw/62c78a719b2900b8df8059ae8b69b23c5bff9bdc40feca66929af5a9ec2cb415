@@ -1,0 +1,52 @@
+
+    Ok(PreparedRuntimeInputs {
+        sample_count,
+        time_axis,
+        schedule_cache,
+        zone_timestep_schedule_cache,
+        weather_series,
+        ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+        {
+            Some(crate::warmup_report_controls::resolve(raw_model)?)
+        } else {
+            None
+        },
+    })
+}
+
+fn execute_rust_runtime(
+    simulation_model: Option<&SimulationModel>,
+    runtime_class: RuntimeClass,
+    source_order_gate: SourceOrderGateSummary,
+    runtime_inputs: &PreparedRuntimeInputs,
+    capture_geometry: bool,
+    ctf_outputs: &mut CtfRunOutputs,
+) -> Result<RustRuntimeResult, String> {
+    let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
+    let sample_count = runtime_inputs.sample_count;
+    let schedule_cache_sample_count = runtime_inputs.schedule_cache.sample_count();
+    let schedule_cache_profile = runtime_inputs.schedule_cache.profile();
+    match runtime_class {
+        RuntimeClass::OneZoneHeatBalanceCompatibility
+        | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
+            let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
+                "weather records are required for heat-balance runtime".to_string()
+            })?;
+            let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
+            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
+            let options = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+                HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(model, sample_count)
+            } else {
+                HeatBalanceSimulationOptions::hourly_samples(sample_count)
+            };
+            let mut initialization = ctf_outputs.context();
+            let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {
+                ep_runtime::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+                    model, weather_series, options, &mut initialization, reporting,
+                )
+            } else {
+                simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
+                    model, weather_series, options, &mut initialization,
+                )
+            }.map_err(|error| error.to_string())?;
+            Ok(RustRuntimeResult {

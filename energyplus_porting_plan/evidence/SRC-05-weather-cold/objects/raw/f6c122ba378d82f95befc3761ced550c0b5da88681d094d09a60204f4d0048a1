@@ -1,0 +1,36 @@
+# Held absent-site/station producer and observer Source
+
+This is a four-file proposal only. The unsealed three-file parent draft is preserved
+byte-exact; only the fourth observer file is newly adapted. No canonical file is
+written, Rust source imported/executed, build/capture run, or numerical PASS claimed.
+Root must first close and retain the genuine comparison failure under the current
+seed-only factual checker. This proposal must not be applied before that closure.
+
+The observer starts with constructor parameters and literal incoming site wind
+owners, then uses one actual seeded EIO Vec. Site and station producers run in
+Original order. `actual_return` is the parameter snapshot immediately after station
+completion, before the three unchanged literal optional overrides. Its existing
+`api` field identifies the final producer, `initialize_absent_weather_station`.
+No case/stop/schema expansion or per-timestep manager changes are proposed.
+
+The shared pure factory retains its final operands/equations. The genuine station
+producer computes wind then temperature coefficients before EIO writes. Site
+initialization retains incoming wind operands and assigns only its gradient.
+Constructor coefficients 1.5863/0.0 are distinct from computed station results.
+Headers and .3R/.6R operations come from the archived Original ranges and existing
+Source R formatter. No Native result file or Native observed answer is used by
+the preparation or proposed code.
+
+The existing five held tests cover ordered seeded append, first-site-write failure
+with station unreached, partial site row after completed header, station coefficient
+assignment before its header failure, and unavailable formatting without fallback.
+They remain unexecuted. Future focused selection is:
+`cargo test -p ep_runtime --lib heat_balance::convection::surface_environment`.
+It also selects four existing setter tests; the custody observer remains ignored.
+
+After genuine first-failure preservation, a separately reviewed factual successor
+needs only the final-producer identity and actual EIO seed-prefix/unchanged-EIO
+checks across selected calls. The current comparer keeps its strict full EIO and
+actual-default/preowner joins unchanged. Native constructor/input-processor owner
+boundaries remain unavailable; the selected producer port does not establish
+ordinary lifecycle, optional backend, or full manager compatibility.

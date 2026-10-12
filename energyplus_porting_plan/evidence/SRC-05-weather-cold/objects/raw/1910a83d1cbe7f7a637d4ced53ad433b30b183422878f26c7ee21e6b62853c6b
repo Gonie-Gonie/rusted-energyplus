@@ -1,0 +1,29 @@
+void DisplayString(EnergyPlusData &state, std::string const &String) // String to be displayed
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   Version 1.0
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine provides a call to display strings during program execution.
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // na
+    if (state.dataGlobal->fMessagePtr != nullptr) {
+        state.dataGlobal->fMessagePtr(String);
+    }
+    if (state.dataGlobal->messageCallback) {
+        state.dataGlobal->messageCallback(String.c_str());
+    }
+
+    if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) {
+        return;
+    }
+    if (!state.dataGlobal->printConsoleOutput) {
+        return;
+    }
+    std::cout << String << std::endl;
+}

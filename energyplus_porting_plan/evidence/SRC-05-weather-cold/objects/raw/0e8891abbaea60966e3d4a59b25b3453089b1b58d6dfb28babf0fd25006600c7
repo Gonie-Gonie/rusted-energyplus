@@ -1,0 +1,8 @@
+// min( double, double, double )
+inline
+double
+min( double const a, double const b, double const c )
+{
+	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+}
+

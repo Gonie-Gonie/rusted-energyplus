@@ -1,0 +1,74 @@
+{
+  "schema": "src05-cold-guard-Root-provider-acceptance.v1",
+  "accepted": true,
+  "all_twelve_Original_providers_accepted": true,
+  "full_PE_and_core_proof_accepted": true,
+  "dry_and_actual_compile_link_commands_byte_exact": true,
+  "provider_inventory": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Native-providers-01/linked-provider-and-PE-inventory.json",
+    "sha256": "18d476567e16e27dd609142c7a4d3d1e4c4ee2dd346813a5daa598e6d1146574",
+    "size_bytes": 2156879
+  },
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/native-surface-cold-guard-prep-01/manifest.json",
+    "sha256": "3159324c0c78b2c84bc595262616f67f22dd7c09bed526775ad5409c3f0a1425",
+    "size_bytes": 16459
+  },
+  "actual_Native_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\cold-guard-native-build-01\\bin\\src05_surface_cold_guard_helper.exe",
+    "sha256": "8a708d88ce1909a46584f8ab3e77ca96e1888a783464ef5292be5db7a2565532",
+    "size_bytes": 1296398272
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\cold-guard-native-build-01\\bin\\src05_surface_cold_guard_helper.map",
+    "sha256": "9b5769c92bfc50fc00db3d7e895e0c829744d38fe1719d8cb67605e66c9525aa",
+    "size_bytes": 304101827
+  },
+  "actual_helper_object": {
+    "path": ".runtime/ep261-gcc13-o0/CMakeFiles/src05_surface_cold_guard_helper.dir/2508633295114b12d361658185e088df/porting/SRC-05/native-surface-cold-guard-prep-01/surface_cold_guard_helper.cpp.obj",
+    "sha256": "10b7dc61f0a039615073465117ea68156f2f474838a197dd2a7612884c04ccb7",
+    "size_bytes": 15516515
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-05/cold-guard-native-build-command-01/receipt.json",
+    "sha256": "754d0921c9667b1faa6eb2d6794092fa379a3b04d171bbb32a39a7689ce6e037",
+    "size_bytes": 2874
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "provider_collection_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Native-transport-prep-01/manifest.json",
+    "sha256": "421b0b426c1703aedbaedb1b7d5aefeb921ab59df1fe755c8734504ffeda13e5",
+    "size_bytes": 15582
+  },
+  "actual_evidence_collector": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Native-transport-prep-01/collect_providers.py",
+    "sha256": "daa08027b1d2ae136d2d6b166549b6da06fd9af886837ae2f8a30fbfead27fde",
+    "size_bytes": 21217
+  },
+  "reviewed_execution_driver": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Native-transport-prep-01/run_execution.py",
+    "sha256": "d5fbf5211dd3278207aa76c3f3ddf422ef0b5d0c280328eabe8a56224c7c6949",
+    "size_bytes": 23509
+  },
+  "Root_actual_FULL_review": {
+    "path": ".runtime/porting/SRC-05/Root-cold-provider-factual-review-01/review.json",
+    "sha256": "407a0bbeb74808e887a3284674fc0e79fc477a6ba230bac7c04917ab7faded7f",
+    "size_bytes": 6915
+  },
+  "independent_actual_FULL_review": {
+    "path": ".runtime/porting/SRC-05/Header-cold-provider-factual-review-01/review.json",
+    "sha256": "70c1840833abae5530bde2e9c56cd8b72c9a6f8261bbd060444e9d7cd3232b29",
+    "size_bytes": 6917
+  },
+  "Root_provider_checker_Source_review": {
+    "path": ".runtime/porting/SRC-05/Root-cold-provider-factual-checker-Source-review-02/review.json",
+    "sha256": "387cfd4dbb8b076657a8e2bad2da7c4c35199b392ba6e95961f67ca4142020a7",
+    "size_bytes": 593
+  },
+  "helper_executed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,117 @@
+{
+  "schema": "src05-weather-cold-actual-compile-correction.v1",
+  "parent_actual_application": {
+    "path": ".runtime/porting/SRC-05/weather-cold-applied-01/record.json",
+    "sha256": "e2f3bd5975c1f36512163e0e72425362447a9bc5173fe6bef9645c0fbe64dda9",
+    "size_bytes": 44869
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/7e/7e9e6adf99b546955743799a09c6e76a64ad93b0f9de18f27261b98c4467773a",
+    "sha256": "7e9e6adf99b546955743799a09c6e76a64ad93b0f9de18f27261b98c4467773a"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/28/2880af3d95c661ebbb3bff33f0b622c638c2dabf374b28f05a4185250d39e37b",
+    "sha256": "2880af3d95c661ebbb3bff33f0b622c638c2dabf374b28f05a4185250d39e37b"
+  },
+  "actual_failed_build": {
+    "path": ".runtime/porting/SRC-05/weather-cold-built-01/failed-build.json",
+    "sha256": "dfc57f50f2e7c306766ee4f3a303e989ce58102b83d234125bbb2f893c25c623",
+    "size_bytes": 2529
+  },
+  "actual_failed_outer_execution": {
+    "path": ".runtime/porting/SRC-05/weather-cold-build-command-01/receipt.json",
+    "sha256": "6f631f75b82179ac4b62a770aa8aeb5ceca37365c0d6804fca288b63e1bf010d",
+    "size_bytes": 5193
+  },
+  "corrections": [
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/before/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+        "sha256": "f969689484c26e7b3921aa5e181fc34299f31fb7e157cf59e070dec537a55f3c",
+        "size_bytes": 7151
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+        "sha256": "9a5c9bc10fa196bd2a515653a865c9be34164aa870d544d6222c75004b228245",
+        "size_bytes": 7152
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/diffs/0.diff",
+        "sha256": "39bd6ef0fe96d44b8f2b07cb48483faf07358d69c0e9d53e440ea1970d0de538",
+        "size_bytes": 790
+      },
+      "literal_edits": [
+        {
+          "before": "wind_direction_deg=-0.0;",
+          "after": "wind_direction_deg= -0.0;"
+        }
+      ]
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+        "sha256": "eeb889766354fbf31a598651c4b4f133f93d65540242bd47fc7a2fcfb3563e1a",
+        "size_bytes": 6889
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+        "sha256": "8ba14d71ef3c3356df9fafca52d723236129ae9130257a783c6bd076dcacc3c8",
+        "size_bytes": 6886
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/diffs/1.diff",
+        "sha256": "e48108f284d9222f940422c579f3b11b1ac7fe30ca28a73c93392c33152ec8b3",
+        "size_bytes": 1294
+      },
+      "literal_edits": [
+        {
+          "before": "fn real_sink_failure_retains_counter_prefix_and_error_source() {",
+          "after": "fn real_sink_failure_retains_counter_prefix_and_error_source() -> Result<(), Box<dyn std::error::Error>> {"
+        },
+        {
+          "before": "    let error = match result {\n        Err(error) => error,\n        Ok(()) => panic!(\"cold guard returned\"),\n    };",
+          "after": "    let error = result.err().ok_or(\"cold guard returned\")?;"
+        },
+        {
+          "before": "        Some(io::ErrorKind::BrokenPipe)\n    );\n}",
+          "after": "        Some(io::ErrorKind::BrokenPipe)\n    );\n    Ok(())\n}"
+        }
+      ]
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/before/crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+        "sha256": "a3e5eb91a6d1487425662230e2ee33e8da2a973c664eecda21ce16e3acb6ac4b",
+        "size_bytes": 26790
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+        "sha256": "b3b340b0007464639e735e7e79162d0197096a19e476ea3ff2751d7afd134de0",
+        "size_bytes": 26805
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/diffs/2.diff",
+        "sha256": "b42d04772b7781e3188428283eea8cd280c380dec64374d39ae74bdd9a2f26fe",
+        "size_bytes": 514
+      },
+      "literal_edits": [
+        {
+          "before": "            actual_defaults,\n        ))",
+          "after": "            Value::Object(actual_defaults),\n        ))"
+        }
+      ]
+    }
+  ],
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-01/runtime-source-bindings.json",
+    "sha256": "53e698ffbeec2e92fe6005cf744aaa3e7b4a4c05ae9ab16af4de83d0603b3335",
+    "size_bytes": 1706
+  },
+  "formatter_executed": false,
+  "changes_are_compile_or_test_harness_corrections": true,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

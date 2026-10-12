@@ -1,0 +1,12 @@
+--- e1/crates/ep_run/src/pipeline.rs
++++ d3/crates/ep_run/src/pipeline.rs
+@@ -7835,6 +7835,9 @@
+ }
+ 
+ #[cfg(test)]
++mod serializer_source_tests;
++
++#[cfg(test)]
+ mod tests {
+     use std::path::Path;
+ 

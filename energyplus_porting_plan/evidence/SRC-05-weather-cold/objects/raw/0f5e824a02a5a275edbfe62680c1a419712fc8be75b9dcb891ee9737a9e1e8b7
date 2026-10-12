@@ -1,0 +1,321 @@
+{
+  "actual_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "actual_Source_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-writer-Source-acceptance-04/acceptance.json",
+    "sha256": "982a3a6f9fdcb71b72d2ae68a3dd6caf648b073ac7ae9282e58e70c35d8bed10",
+    "size_bytes": 1868
+  },
+  "weather_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-surface-environment-prep-03/manifest.json",
+    "sha256": "071677b63df5d343932f0f30c621a246381def10968072a40d5f9ab5eb96016b",
+    "size_bytes": 74433
+  },
+  "observer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-observer-prep-02/manifest.json",
+    "sha256": "3bad175a73b4537e57b2d7b978eefe954f14c52f1fdd25cc96a46ac937e01b75",
+    "size_bytes": 20423
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json",
+    "sha256": "55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "size_bytes": 2427
+  },
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-producer-resumption-acceptance-01/acceptance.json",
+    "sha256": "86c53acff789f85bad8c249730512be2ffc543963585d2b48381f4f4f9d1108e",
+    "size_bytes": 2548
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/runtime-source-bindings.json",
+    "sha256": "28d402797c57ac4ceda8c758ece65da3ba9352453dd6c9da9ef8cec18833761b",
+    "size_bytes": 1929
+  },
+  "schema": "src05-weather-cold-actual-quality-and-artifact.v1",
+  "quality_executions": {
+    "fmt_check": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/fmt-check/receipt.json",
+      "sha256": "d3a92c7517f3188513e0370b491724d7633c7d7d2fb830a3d8205646264dfc56",
+      "size_bytes": 4376
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/clippy/receipt.json",
+      "sha256": "092e6d3f46b251dcadb915c740c332a7a815edd6e94191345475747d6602c78d",
+      "size_bytes": 4427
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/workspace/receipt.json",
+      "sha256": "74e84db2e5db1129ddbe08d21da6db6d64376e7ab5ceca994a575cc2db0b651e",
+      "size_bytes": 4386
+    }
+  },
+  "actual_test_totals": {
+    "workspace": {
+      "groups": 18,
+      "passed": 4964,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "actual_Cargo_artifact": {
+    "actual_build_execution": {
+      "path": ".runtime/porting/SRC-05/weather-cold-built-03/observer_build-command/receipt.json",
+      "sha256": "1673bfa13f37c8d7c8f276aa42809b42e91c1aef2ff7fdfd268c21e132f15ea9",
+      "size_bytes": 6057
+    },
+    "actual_full_Cargo_JSON": {
+      "path": ".runtime/porting/SRC-05/weather-cold-built-03/observer_build-command/stdout.log",
+      "sha256": "d0104b4ce7e872ca216fbeaf922cb07e46ccc8f8cd86319fbe8f33fce30f24e7"
+    },
+    "cargo_message": {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+      "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+      "target": {
+        "kind": [
+          "example"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "src05_surface_cold_guard_main",
+        "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\src05_surface_cold_guard_main.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": false
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\src05_surface_cold_guard_main.exe"
+      ],
+      "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\src05_surface_cold_guard_main.exe",
+      "fresh": false
+    },
+    "executable": {
+      "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+      "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+      "size_bytes": 30397586
+    },
+    "PE_inspection": {
+      "actual_binary": {
+        "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+        "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+        "size_bytes": 30397586
+      },
+      "actual_PE_header_bytes": {
+        "path": ".runtime/porting/SRC-05/weather-cold-built-03/PE-headers/cold.bin",
+        "sha256": "11362766880842c187d433a59261b79e5e6c1f4891736bbccb550721adc29c62",
+        "size_bytes": 728
+      },
+      "PE_header_file_offset": 128,
+      "machine": 34404,
+      "COFF_characteristics": 550,
+      "entry_point_RVA": 5104,
+      "subsystem": 3,
+      "DLL_characteristics": 352,
+      "stack_reserve_bytes": 8388608,
+      "stack_commit_bytes": 4096,
+      "data_directories": [
+        {
+          "index": 0,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 1,
+          "address": 20152320,
+          "size": 7348
+        },
+        {
+          "index": 2,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 3,
+          "address": 18636800,
+          "size": 635736
+        },
+        {
+          "index": 4,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 5,
+          "address": 20168704,
+          "size": 42944
+        },
+        {
+          "index": 6,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 7,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 8,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 9,
+          "address": 18635296,
+          "size": 40
+        },
+        {
+          "index": 10,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 11,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 12,
+          "address": 20154032,
+          "size": 1552
+        },
+        {
+          "index": 13,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 14,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 15,
+          "address": 0,
+          "size": 0
+        }
+      ],
+      "sections": [
+        {
+          "name_bytes_hex": "2e74657874000000",
+          "virtual_size": 16759120,
+          "virtual_address": 4096,
+          "raw_size": 16759296,
+          "raw_offset": 1024,
+          "characteristics": 1610612768
+        },
+        {
+          "name_bytes_hex": "2e64617461000000",
+          "virtual_size": 3744,
+          "virtual_address": 16764928,
+          "raw_size": 4096,
+          "raw_offset": 16760320,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e72646174610000",
+          "virtual_size": 1867544,
+          "virtual_address": 16769024,
+          "raw_size": 1867776,
+          "raw_offset": 16764416,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e70646174610000",
+          "virtual_size": 635736,
+          "virtual_address": 18636800,
+          "raw_size": 635904,
+          "raw_offset": 18632192,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e78646174610000",
+          "virtual_size": 872200,
+          "virtual_address": 19275776,
+          "raw_size": 872448,
+          "raw_offset": 19268096,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e62737300000000",
+          "virtual_size": 576,
+          "virtual_address": 20148224,
+          "raw_size": 0,
+          "raw_offset": 0,
+          "characteristics": 3221225600
+        },
+        {
+          "name_bytes_hex": "2e69646174610000",
+          "virtual_size": 7348,
+          "virtual_address": 20152320,
+          "raw_size": 7680,
+          "raw_offset": 20140544,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e43525400000000",
+          "virtual_size": 104,
+          "virtual_address": 20160512,
+          "raw_size": 512,
+          "raw_offset": 20148224,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e746c7300000000",
+          "virtual_size": 16,
+          "virtual_address": 20164608,
+          "raw_size": 512,
+          "raw_offset": 20148736,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e72656c6f630000",
+          "virtual_size": 42944,
+          "virtual_address": 20168704,
+          "raw_size": 43008,
+          "raw_offset": 20149248,
+          "characteristics": 1107296320
+        }
+      ],
+      "loader_or_security_equivalence_claimed": false,
+      "Root_full_PE_acceptance_required_before_target_execution": true
+    }
+  },
+  "pair_policy": {
+    "path": ".runtime/porting/SRC-05/native-surface-cold-guard-prep-01/pairing-policy.proposed.json",
+    "sha256": "a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52",
+    "size_bytes": 2786,
+    "line_count": 57
+  },
+  "frozen_pair_policy": {
+    "path": ".runtime/porting/SRC-05/weather-cold-built-03/frozen-pair-policy.json",
+    "sha256": "a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52",
+    "size_bytes": 2786
+  },
+  "target_execution_performed": false
+}

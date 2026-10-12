@@ -1,0 +1,105 @@
+{
+  "schema": "src05-weather-cold-development-test-cleanup-Source-review.v1",
+  "accepted": true,
+  "actual_cleanup_delta": {
+    "path": ".runtime/porting/SRC-05/weather-cold-development-test-cleanup-01/record.json",
+    "sha256": "4448026eb3fedc0ba32d14f3534fa77dc31a0e25967d5c43cd527ecd35572c2c",
+    "size_bytes": 76866
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/6c/6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "sha256": "6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "size_bytes": 1638665
+  },
+  "historical_compile_corrected_Source": {
+    "path": ".runtime/porting/source-objects/e1/e1d711e9e6180d2c1ab3d19205c8acb7c01f2be0a3bbf097fc7acb32b2ea1737",
+    "sha256": "e1d711e9e6180d2c1ab3d19205c8acb7c01f2be0a3bbf097fc7acb32b2ea1737",
+    "size_bytes": 1637973
+  },
+  "cleanup_literal_Source": {
+    "path": ".runtime/porting/source-objects/d3/d3cba085549bb127c128ce4eb55dca27989f71b0420edca772e81c1bef640838",
+    "sha256": "d3cba085549bb127c128ce4eb55dca27989f71b0420edca772e81c1bef640838",
+    "size_bytes": 1638665
+  },
+  "historical_actual_application": {
+    "path": ".runtime/porting/SRC-05/weather-cold-applied-01/record.json",
+    "sha256": "e2f3bd5975c1f36512163e0e72425362447a9bc5173fe6bef9645c0fbe64dda9",
+    "size_bytes": 44869
+  },
+  "historical_actual_compile_correction": {
+    "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-02/record.json",
+    "sha256": "46760e81801c1666de1db896a9a076c984360c0047fac68d61bd714f4d9e3fc6",
+    "size_bytes": 8811
+  },
+  "complete_snapshot_archives_verified": [
+    3945,
+    3947,
+    3947
+  ],
+  "complete_current_Source_membership_and_bytes_verified": 3947,
+  "unique_artifacts_authenticated": 4074,
+  "complete_two_stage_change_diffs_regenerated": 39,
+  "formatter_change_bodies_full_read": 4,
+  "cleanup_added_paths": 5,
+  "cleanup_removed_paths": 3,
+  "unchanged_member_descriptors": 3911,
+  "original_fifteen_weather_and_observer_paths_byte_exact": true,
+  "ordered_two_observer_and_six_API_bindings_byte_exact": true,
+  "all_nineteen_removed_source_size_topology_test_diffs_full_read": true,
+  "Cargo_profile_change_full_read": true,
+  "prior_full_Raw_cleanup_review_authenticated_and_joined_to_e1_before_d3_after": {
+    "path": ".runtime/porting/test-cleanup/outside-runtime-01/correspondence.json",
+    "sha256": "42dd2af831013e6b2ee6b62aa602281cef4bb5c1eb6bb980cc4cd84a1a3709fd",
+    "size_bytes": 13763
+  },
+  "prior_Raw_before_files_joined": 14,
+  "prior_Raw_after_files_joined": 16,
+  "all_actual_quality_receipt_argv_and_Source_guards_and_chronology_verified": {
+    "fmt_check": {
+      "path": ".runtime/porting/development-test-cleanup/fmt-check-01/receipt.json",
+      "sha256": "f16f9042a4183072fb8afc5961c4de01ba90896af00bd361fec5c9a105ab7c2b",
+      "size_bytes": 25900
+    },
+    "clippy": {
+      "path": ".runtime/porting/development-test-cleanup/clippy-01/receipt.json",
+      "sha256": "9c05d378fe095929fc8da7ae38bc307093fc01678be481b329fb99a40e25cab2",
+      "size_bytes": 25951
+    },
+    "workspace": {
+      "path": ".runtime/porting/development-test-cleanup/workspace-test-01/receipt.json",
+      "sha256": "e78f875b0d4cb909d87efb45f9562142432b732163a4bda99c1cd667faeb6d81",
+      "size_bytes": 25964
+    }
+  },
+  "actual_test_totals": {
+    "workspace": {
+      "groups": 18,
+      "passed": 4959,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "workspace_outer_argv_preserved": [
+    "cmd.exe",
+    "/d",
+    "/c",
+    "scripts\\dev.cmd",
+    "test"
+  ],
+  "workspace_runner_current_default_expansion_reviewed": [
+    "cargo",
+    "test",
+    "--locked",
+    "--workspace"
+  ],
+  "review_time_runner_archives_verified_as_current_not_launch_time_custody": true,
+  "historical_e1_source_authenticated_as_archives_only": true,
+  "fake_app2_created_or_claimed": false,
+  "focused_test_repeated_or_receipt_claimed": false,
+  "reviewed_writer_or_checker_imported_or_executed": false,
+  "Cargo_or_targets_executed": false,
+  "canonical_changes": false,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

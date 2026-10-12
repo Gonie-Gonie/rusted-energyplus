@@ -1,0 +1,28 @@
+{
+  "schema": "src05-weather-cold-cleanup-source-review.v1",
+  "accepted": true,
+  "actual_cleanup_delta": {
+    "path": ".runtime/porting/SRC-05/weather-cold-development-test-cleanup-01/record.json",
+    "sha256": "4448026eb3fedc0ba32d14f3534fa77dc31a0e25967d5c43cd527ecd35572c2c",
+    "size_bytes": 76866
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/6c/6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "sha256": "6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "size_bytes": 1638665
+  },
+  "complete_cleanup_stage_maps_and_diffs_verified": true,
+  "all_fifteen_weather_and_observer_paths_byte_exact": true,
+  "workspace_runner_default_expansion_review_accepted": true,
+  "actual_quality_roles": [
+    "fmt_check",
+    "clippy",
+    "workspace"
+  ],
+  "actual_workspace_passed": 4959,
+  "actual_workspace_failed": 0,
+  "actual_workspace_ignored": 2,
+  "historical_application_and_corrections_preserved": true,
+  "target_execution_performed": false,
+  "gates_updated": false
+}

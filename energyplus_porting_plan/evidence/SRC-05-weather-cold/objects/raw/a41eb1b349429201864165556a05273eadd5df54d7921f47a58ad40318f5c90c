@@ -1,0 +1,31 @@
+{
+  "schema": "src05-weather-cold-producer-Source-acceptance.v1",
+  "accepted": true,
+  "producer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/manifest.json",
+    "sha256": "048ad25469458f31b50dc566badb8a86f60115a9d371be2847db978a09882e08",
+    "size_bytes": 11725
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/6c/6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "sha256": "6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "size_bytes": 1638665
+  },
+  "prior_strict_comparison": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/report.json",
+    "sha256": "0266f0aa1175e72c1d9e7681bf301872b55860736d5c3761b9bc976635a8aa21",
+    "size_bytes": 11578
+  },
+  "Root_FULL_Source_review_accepted": true,
+  "independent_FULL_Source_review_accepted": true,
+  "independent_review": {
+    "path": ".runtime/porting/SRC-05/Header-absent-site-station-EIO-producer-Source-review-02/review.json",
+    "sha256": "3d73e00171900789c60a29fe6881b58b50aa33f616e0986d5e82c991c37fb435",
+    "size_bytes": 3901
+  },
+  "Root_review_scope": "Both full existing-file diffs, both full new modules including five tests, all nine Original ranges; literal wind and real seeded EIO site/station/snapshot/override order. Unchanged existing setter and observer paths remain bound to reviewed bases.",
+  "first_actual_FAIL_preserved": true,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

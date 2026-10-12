@@ -1,0 +1,369 @@
+{
+  "schema": "src05-cold-guard-actual-selected-comparison.v1",
+  "status": "NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS",
+  "actual_Native_baseline": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json",
+    "sha256": "55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "size_bytes": 2427
+  },
+  "actual_Rust_custody": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/custody.json",
+    "sha256": "a32049dedf74ef17b478ba4252aae4787bf1eb77d4185aa801ca40f379144f51",
+    "size_bytes": 4210
+  },
+  "Root_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Rust-factual-review-02/review.json",
+    "sha256": "d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "size_bytes": 13827
+  },
+  "independent_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-05/Header-cold-guard-Rust-factual-review-02/review.json",
+    "sha256": "d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "size_bytes": 13827
+  },
+  "actual_Native_result": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Native-capture-01/command/stdout.log",
+    "sha256": "5ef8f5dd75285de976872270f20be1f5d73da02edbb80d4eb886819af40f80d3",
+    "size_bytes": 1625443
+  },
+  "actual_Rust_result": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/capture-command/stdout.log",
+    "sha256": "d1f2d32036ab4b09170a040fb1bd1866416b03eec4e05b8c931dde4d83ae3d19"
+  },
+  "historical_Native_Source": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "size_bytes": 1636859
+  },
+  "actual_Rust_Source": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "frozen_pair_policy": {
+    "path": ".runtime/porting/SRC-05/native-surface-cold-guard-prep-01/pairing-policy.proposed.json",
+    "sha256": "a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52",
+    "size_bytes": 2786
+  },
+  "input_case_count": 29,
+  "input_operation_count": 31,
+  "input_bit_cells": 433,
+  "input_and_preowners_accepted_before_endpoint_pairing": true,
+  "actual_selected_public_call_pairs": 38,
+  "actual_public_call_joins": [
+    {
+      "case_id": "threshold-exact",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "dry-next-down",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "dry-next-up",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "wet-next-down",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "wet-next-up",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "both-cold-ordered",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "stratosphere-below",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "stratosphere-equal",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "stratosphere-above",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "negative-zero-height",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "wet-nan-masks-dry",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "dry-nan-cold-wet",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "nan-then-cold-next-row",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "signed-zero-bulbs",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "empty-array",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "repeated-noncold-check",
+      "operation_id": "first",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "repeated-noncold-check",
+      "operation_id": "second",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "manager-copy-then-stop",
+      "operation_id": "cold-manager",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "manager-copy-then-stop",
+      "operation_id": "cold-manager",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "manager-raw-nan-route",
+      "operation_id": "raw-nan",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "manager-raw-nan-route",
+      "operation_id": "raw-nan",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "manager-raw-nan-route",
+      "operation_id": "raw-nan",
+      "stage": "wind_speed",
+      "Native_actual_call_ordinal": 5,
+      "Rust_actual_call_ordinal": 3
+    },
+    {
+      "case_id": "manager-raw-nan-route",
+      "operation_id": "raw-nan",
+      "stage": "wind_direction",
+      "Native_actual_call_ordinal": 6,
+      "Rust_actual_call_ordinal": 4
+    },
+    {
+      "case_id": "manager-real-default-profile",
+      "operation_id": "default-profile",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "manager-real-default-profile",
+      "operation_id": "default-profile",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "sizing-severity",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "kickoff-console",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "kickoff-developer",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "abort-severity",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "input-console",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "no-console-no-header",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "absent-error-stream",
+      "operation_id": "literal-check",
+      "stage": "check",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "error-byte-budget-0",
+      "operation_id": "budget-manager",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "error-byte-budget-0",
+      "operation_id": "budget-manager",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "error-byte-budget-5",
+      "operation_id": "budget-manager",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "error-byte-budget-5",
+      "operation_id": "budget-manager",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    },
+    {
+      "case_id": "error-byte-budget-128",
+      "operation_id": "budget-manager",
+      "stage": "bulbs",
+      "Native_actual_call_ordinal": 3,
+      "Rust_actual_call_ordinal": 1
+    },
+    {
+      "case_id": "error-byte-budget-128",
+      "operation_id": "budget-manager",
+      "stage": "check",
+      "Native_actual_call_ordinal": 4,
+      "Rust_actual_call_ordinal": 2
+    }
+  ],
+  "paired_row_counts": {
+    "inputs": 28879,
+    "prestates": 31781,
+    "endpoints": 41767,
+    "unavailable": 33
+  },
+  "mismatch_counts": {
+    "inputs": 0,
+    "prestates": 0,
+    "endpoints": 0
+  },
+  "required_unavailable": 0,
+  "nonfinite_observations_excluded_from_numerical_PASS": 14,
+  "all_available_selected_pairs_match": true,
+  "full_pair_and_unavailable_logs": {
+    "inputs": {
+      "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/inputs.jsonl.gz",
+      "sha256": "0f05540d4e81e88802ebb7a2bd296c4ebfca50891ec00bd641740e1c7e124d90",
+      "size_bytes": 197867
+    },
+    "prestates": {
+      "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/prestates.jsonl.gz",
+      "sha256": "18cc34f7841f2ea76fa3a34d16d64f37c2f07c43c18c9c903d4d0f7d9a7eda94",
+      "size_bytes": 202323
+    },
+    "endpoints": {
+      "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/endpoints.jsonl.gz",
+      "sha256": "85557ec5544027be2728f6da7be77d43e2a1b200ace76c54542b57323b4ec090",
+      "size_bytes": 253170
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/unavailable.jsonl.gz",
+      "sha256": "82d0d6d8d4ed9dea5b883e98b0eb66ea71320ca2194ea3dfbabbf0895a1befc1",
+      "size_bytes": 1041
+    }
+  },
+  "equations_recomputed": false,
+  "inner_Native_invocation_trace_claimed": false,
+  "allocation_implementation_equality_claimed": false,
+  "generated_nonfinite_arithmetic_counted_as_PASS": false,
+  "historical_102_unavailable_claimed_covered": false,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "comparer_Source": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/compare.py",
+    "sha256": "9de835d8896447e7893e4c03d1b8c86169176a480a6e673dd19749d65bc226d2",
+    "size_bytes": 15320
+  }
+}

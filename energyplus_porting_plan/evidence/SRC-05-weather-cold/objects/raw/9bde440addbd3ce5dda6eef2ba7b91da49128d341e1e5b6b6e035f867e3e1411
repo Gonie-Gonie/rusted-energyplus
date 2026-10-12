@@ -1,0 +1,185 @@
+"""Read-only factual QA of the closed genuine Rust cold-guard capture; no equations."""
+import argparse
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import re
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/SRC-05'
+WRITER = dict(path='.runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py', sha256='db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5')
+NATIVE_CHECKER = dict(path='.runtime/porting/SRC-05/cold-guard-Native-factual-checker-prep-02/check.py', sha256='61046be32a68c541dd920fdd5d97445c5e1674c7e190d81298803e390ec6fd3b')
+POLICY_SHA = 'a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52'
+APIS = dict(bulbs='set_surface_out_bulb_temperatures', check='check_surface_out_bulb_temperatures', wind_speed='set_surface_wind_speeds', wind_direction='set_surface_wind_directions')
+
+
+def module(name, row):
+    import hashlib
+    path = (ROOT / row['path']).resolve()
+    with path.open('rb') as stream: actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+    if actual != row['sha256']: raise ValueError('reviewed dependency Source differs')
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); sys.modules[name] = value; spec.loader.exec_module(value)
+    return value
+
+
+N = module('cold_native_readonly_factual_helpers', NATIVE_CHECKER)
+W = module('cold_readonly_application_helpers', WRITER)
+W.R = W.module('cold_readonly_recorder_helpers', W.RECORDER)
+V = W.module('cold_readonly_PE_helpers', W.VALIDATOR)
+need, keys, bind, load, same, operand, full = N.need, N.keys, N.bind, N.load, N.same, N.operand, N.full
+
+
+def byte_array(value):
+    need(isinstance(value, list) and all(type(v) is int and 0 <= v <= 255 for v in value), 'complete actual byte array required')
+    return bytes(value)
+
+
+def bit_cells(value):
+    if isinstance(value, dict): return int(set(value) == {'bits'}) + sum(bit_cells(v) for v in value.values())
+    if isinstance(value, list): return sum(bit_cells(v) for v in value)
+    return 0
+
+
+def snapshot(value, streams):
+    keys(value, 'owner error_stream error_stream_present error_stream_bytes declared_error_stream_budget actual_Rust_error_stream_write_attempts actual_error_stream_bytes_after_seed actual_Rust_error_sink_failed stream_text_projection eio console eio_bytes console_bytes callbacks actual_callback_count', 'Rust snapshot')
+    need(value['error_stream_present'] is streams['error_present'] and value['declared_error_stream_budget'] == streams['error_byte_budget_after_seed'] and type(value['actual_Rust_error_sink_failed']) is bool, 'actual stream availability/budget required')
+    for name in ('actual_Rust_error_stream_write_attempts', 'actual_error_stream_bytes_after_seed', 'actual_callback_count'): N.integer(value[name])
+    need(value['stream_text_projection'] == 'UTF-8 lossy diagnostic view; complete raw byte arrays authoritative', 'actual diagnostic projection identity required')
+    for name in ('error_stream', 'eio', 'console'):
+        raw = value[name + '_bytes']
+        if name == 'error_stream' and not streams['error_present']:
+            need(raw is None and value[name] is None, 'absent error stream must remain absent'); continue
+        raw = byte_array(raw)
+        need(value[name] == raw.decode('utf8', errors='replace') and raw.startswith(streams['error_seed' if name == 'error_stream' else name + '_seed'].encode()), 'complete stream bytes/text/seed differ')
+        if name == 'error_stream': need(len(raw) - len(streams['error_seed'].encode()) == value['actual_error_stream_bytes_after_seed'], 'actual appended byte owner differs')
+    budget = streams['error_byte_budget_after_seed']
+    need(budget is None or value['actual_error_stream_bytes_after_seed'] <= budget, 'declared budget exceeded')
+    callbacks = value['callbacks']; need(isinstance(callbacks, list) and len(callbacks) == value['actual_callback_count'], 'complete actual callbacks required')
+    for i, row in enumerate(callbacks, 1):
+        keys(row, 'actual_ordinal kind level message', 'callback')
+        need(row['actual_ordinal'] == i and row['kind'] in ('errorCallback', 'messageCallback') and isinstance(row['message'], str) and (type(row['level']) is int if row['kind'] == 'errorCallback' else row['level'] is None), 'actual callback order/type differs')
+    owner = value['owner']; keys(owner, 'TotSurfaces Surface SurfOutDryBulbTemp SurfOutWetBulbTemp SurfOutWindSpeed SurfOutWindDir environment weather_operands_assigned backend backend_flags', 'Rust owner')
+    N.integer(owner['TotSurfaces']); need(type(owner['weather_operands_assigned']) is bool, 'actual weather-assignment marker required')
+    surface = owner['Surface']; keys(surface, 'allocated size rows', 'Rust surface vector')
+    need(surface['allocated'] is True and surface['size'] == owner['TotSurfaces'] and len(surface['rows']) == surface['size'], 'complete actual surface vector required')
+    for i, row in enumerate(surface['rows'], 1):
+        keys(row, 'actual_surface_index Name Centroid_z ExtWind', 'surface row')
+        need(row['actual_surface_index'] == i and isinstance(row['Name'], str) and type(row['ExtWind']) is bool, 'actual surface identity required'); keys(row['Centroid_z'], 'value value_bits value_class', 'centroid')
+    for name in N.ARRAYS:
+        array = owner[name]; keys(array, 'container allocated size rows', 'Rust selected array')
+        need(array['container'] == 'Vec<SurfaceOutdoorEnvironmentRow>' and array['allocated'] is True and array['size'] == owner['TotSurfaces'] and len(array['rows']) == array['size'], 'complete actual Rust array required')
+        for i, row in enumerate(array['rows'], 1):
+            keys(row, 'actual_array_index value', 'Rust array row'); need(row['actual_array_index'] == i, 'actual row index differs'); keys(row['value'], 'value value_bits value_class', 'array scalar')
+    keys(owner['environment'], ' '.join(N.ENV), 'Rust environment')
+    for v in owner['environment'].values(): keys(v, 'value value_bits value_class', 'environment scalar')
+    backend = owner['backend']; keys(backend, ' '.join(N.COUNTERS + N.BACKEND_BOOLS + [k for k in N.BACKEND_TEXT if k != 'CurrentDateTime'] + ['MatchCounts']), 'Rust backend')
+    for k in N.COUNTERS: N.integer(backend[k])
+    for k in N.BACKEND_BOOLS: need(type(backend[k]) is bool, 'actual backend boolean required')
+    for k in N.BACKEND_TEXT:
+        if k != 'CurrentDateTime': need(isinstance(backend[k], str), 'actual backend text required')
+    need(isinstance(backend['MatchCounts'], list) and len(backend['MatchCounts']) == 20, 'complete twenty actual match counters required')
+    for v in backend['MatchCounts']: N.integer(v)
+    keys(owner['backend_flags'], 'WarmupFlag DoingSizing KickOffSimulation', 'Rust phase flags'); need(all(type(v) is bool for v in owner['backend_flags'].values()), 'actual phase booleans required')
+
+
+def continuity(before, after):
+    need(after['callbacks'][:len(before['callbacks'])] == before['callbacks'], 'actual callback prefix differs')
+    for name in ('error_stream', 'eio', 'console'):
+        if before[name + '_bytes'] is not None: need(byte_array(after[name + '_bytes']).startswith(byte_array(before[name + '_bytes'])), 'actual stream byte prefix differs')
+    for name in ('actual_Rust_error_stream_write_attempts', 'actual_error_stream_bytes_after_seed'): need(after[name] >= before[name], 'actual stream counter decreased')
+
+
+def case_facts(value, literal, unavailable):
+    keys(value, 'case_id literal_input Native_fresh_constructor_state actual_Rust_default_producer prepared_state declared_weather_boundaries actual_calls unreached_operations_or_stages final actual_source_call_count actual_source_stopped unavailable_families ordinary_production_handoff_verified numerical_PASS_claimed', 'Rust case')
+    need(value['case_id'] == literal['case_id'] and value['literal_input'] == literal and value['Native_fresh_constructor_state'] == dict(available=False, counted_as_PASS=False) and value['unavailable_families'] == unavailable and value['ordinary_production_handoff_verified'] is False and value['numerical_PASS_claimed'] is False, 'actual input/case/scope differs')
+    streams = literal['initial']['streams']; prepared = value['prepared_state']; snapshot(prepared, streams)
+    producer = value['actual_Rust_default_producer']; keys(producer, 'api terrain actual_return', 'actual default producer')
+    need(producer['api'] == 'SurfaceOutdoorEnvironmentParameters::initialize_absent_weather_station' and producer['terrain'] == 'Suburbs', 'actual default producer identity differs'); keys(producer['actual_return'], ' '.join(N.ENV[:5]), 'actual default return')
+    expected = copy.deepcopy(producer['actual_return']); p = literal['initial']['site_parameters']; owner = prepared['owner']
+    for name in ('SiteWindExp', 'SiteWindBLHeight'): N.input_bits(owner['environment'][name], p[name]); expected[name] = owner['environment'][name]
+    for name in ('SiteTempGradient', 'WeatherFileTempModCoeff', 'WeatherFileWindModCoeff'):
+        if p[name + '_override'] is not None: N.input_bits(owner['environment'][name], p[name + '_override']); expected[name] = owner['environment'][name]
+    need({k:owner['environment'][k] for k in N.ENV[:5]} == expected and owner['weather_operands_assigned'] is False, 'actual default/override transport differs')
+    initial = literal['initial']; need(owner['TotSurfaces'] == len(initial['surfaces']), 'literal surface width differs')
+    for i, row in enumerate(initial['surfaces']):
+        observed = owner['Surface']['rows'][i]; need(all(observed[k] == row[k] for k in ('actual_surface_index', 'Name', 'ExtWind')), 'literal identity differs'); N.input_bits(observed['Centroid_z'], row['Centroid_z'])
+        for name in N.ARRAYS: N.input_bits(owner[name]['rows'][i]['value'], row[name])
+    for name, item in initial['backend_state'].items(): need(owner['backend'][name] == item, 'literal backend seed differs')
+    for name, item in initial['backend_flags'].items(): need((owner['backend_flags'] if name in owner['backend_flags'] else owner['backend'])[name] == item, 'literal phase seed differs')
+    need(prepared['callbacks'] == [] and prepared['actual_callback_count'] == prepared['actual_error_stream_bytes_after_seed'] == prepared['actual_Rust_error_stream_write_attempts'] == 0 and prepared['actual_Rust_error_sink_failed'] is False, 'literal stream/callback seed differs')
+    for name in ('error_stream', 'console'): need(prepared[name + '_bytes'] == (None if name == 'error_stream' and not streams['error_present'] else list(streams['error_seed' if name == 'error_stream' else name + '_seed'].encode())), 'complete literal stream seed differs')
+    calls, boundaries = value['actual_calls'], value['declared_weather_boundaries']; index = boundary_index = 0; previous = prepared; stopped = False; unreached = []; causes = []
+    for op in literal['operations']:
+        if stopped: unreached.append(op); continue
+        need(boundary_index < len(boundaries), 'actual weather boundary missing'); boundary = boundaries[boundary_index]; boundary_index += 1
+        keys(boundary, 'literal_operation before_declared_weather_writes after_declared_weather_writes', 'Rust weather boundary'); need(boundary['literal_operation'] == op and boundary['before_declared_weather_writes'] == previous, 'actual operation input/prefix differs')
+        after = boundary['after_declared_weather_writes']; snapshot(after, streams); expected = copy.deepcopy(previous)
+        for name, item in op['weather'].items(): N.input_bits(after['owner']['environment'][name], item); expected['owner']['environment'][name] = after['owner']['environment'][name]
+        expected['owner']['weather_operands_assigned'] = True; need(after == expected, 'declared weather writes changed other owners'); previous = after
+        for stage in op['sequence']:
+            if stopped: unreached.append(dict(operation_id=op['operation_id'], unreached_stage=stage)); continue
+            need(index < len(calls), 'actual selected call missing'); call = calls[index]; index += 1
+            keys(call, 'operation_id actual_call_ordinal stage api actual_source_invoked actual_source_return_observed source_exception before after', 'Rust call')
+            need(call['operation_id'] == op['operation_id'] and call['actual_call_ordinal'] == index and call['stage'] == stage and call['api'] == APIS[stage] and call['actual_source_invoked'] is True and type(call['actual_source_return_observed']) is bool and call['before'] == previous, 'actual call identity/order/preowner differs')
+            snapshot(call['after'], streams); continuity(call['before'], call['after']); need(call['after']['eio_bytes'] == prepared['eio_bytes'] and call['after']['eio'] == prepared['eio'], 'selected calls must retain exact real producer EIO'); stopped = not call['actual_source_return_observed']; cause = call['source_exception']
+            if not stopped: need(cause is None, 'returned Source call has cause')
+            else:
+                need(stage == 'check' and isinstance(cause, dict), 'actual stopped guard cause required'); kind = cause['kind']; causes.append(kind)
+                if kind == 'Rust_backend_IO_error':
+                    keys(cause, 'kind operation io_kind raw_os_error message', 'typed IO cause'); need(streams['error_byte_budget_after_seed'] is not None and call['after']['actual_Rust_error_sink_failed'] is True and all(isinstance(cause[k], str) for k in ('operation', 'io_kind', 'message')) and (cause['raw_os_error'] is None or type(cause['raw_os_error']) is int), 'actual bounded IO cause required')
+                elif kind == 'undefined_counter_increment': keys(cause, 'kind counter', 'counter stop'); need(isinstance(cause['counter'], str), 'actual counter identity required')
+                else:
+                    need(kind in ('Rust_source_fatal', 'selected_format_unavailable', 'selected_prerequisite_unavailable'), 'actual declared typed stop required'); keys(cause, 'kind message', 'typed guard cause'); need(isinstance(cause['message'], str), 'actual cause text required')
+            previous = call['after']
+    need(index == len(calls) and boundary_index == len(boundaries) and value['unreached_operations_or_stages'] == unreached and value['final'] == previous and value['actual_source_call_count'] == len(calls) and value['actual_source_stopped'] is stopped, 'complete reached/unreached/final ledger differs')
+    return dict(case_id=value['case_id'], actual_calls=len(calls), actual_returned_calls=sum(v['actual_source_return_observed'] for v in calls), actual_stopped=stopped, stop_kinds=causes, actual_callbacks=previous['actual_callback_count'], actual_error_bytes_after_seed=previous['actual_error_stream_bytes_after_seed'], reached_operations=boundary_index, unreached_records=len(unreached))
+
+
+def review_capture(custody_ref, outer_ref, output):
+    custody = load(custody_ref); need(custody['schema'] == 'src05-weather-cold-actual-Rust-capture-custody.v1' and custody['target_execution_performed'] is True and all(custody[k] is False for k in ('comparison_performed', 'scientific_PASS_claimed', 'whole_surface_environment_or_ordinary_PASS_claimed', 'gates_updated')), 'closed actual Rust capture required')
+    same(custody['actual_writer_Source'], WRITER); rows, observer = W.held_rows(); native_ref = custody['Native_baseline_acceptance']; W.native_release(native_ref, observer)
+    app, fmt = W.actual_application(custody['actual_application'], custody['actual_formatter_review'], native_ref, rows); source = app['source_final']; same(custody['Source_snapshot'], source); same(custody['runtime_source_bindings'], app['runtime_source_bindings'])
+    build = load(custody['actual_build_record']); approval = load(custody['actual_Root_artifact_acceptance'])
+    need(build['schema'] == 'src05-weather-cold-actual-quality-and-artifact.v1' and approval['accepted'] is True and approval['Root_FULL_PE_and_Cargo_artifact_accepted'] is True and approval['gates_updated'] is False, 'actual quality/artifact and Root acceptance required')
+    for k in ('actual_application', 'actual_formatter_review', 'Source_snapshot', 'runtime_source_bindings', 'Native_baseline_acceptance', 'actual_Source_acceptance'): same(build[k], custody[k])
+    same(approval['actual_build_record'], custody['actual_build_record']); same(approval['Source_snapshot'], source); same(build['actual_writer_Source'], WRITER)
+    quality, totals = W.quality_receipts(source, fmt, custody['actual_formatter_review']); need(build['quality_executions'] == quality and build['actual_test_totals'] == totals, 'exact three reused quality receipts and dynamic actual workspace totals required')
+    artifact = build['actual_Cargo_artifact']; argv = ['cargo', 'build'] + W.CONFIGS + ['--locked', '-p', 'ep_run', '--example', W.EXAMPLE, '--message-format=json-render-diagnostics']; actual_build = W.receipt(artifact['actual_build_execution'], source, argv)
+    need(all(load(v)['finished_utc'] <= actual_build['started_utc'] for v in build['quality_executions'].values()), 'build chronology differs'); same(artifact['actual_full_Cargo_JSON'], actual_build['stdout'])
+    messages = [json.loads(v) for v in bind(actual_build['stdout']).read_text(encoding='utf8').splitlines() if v]; need([v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')] == [artifact['cargo_message']] and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'sole genuine Cargo artifact required')
+    binary = bind(artifact['executable']); need(Path(artifact['cargo_message']['executable']).resolve() == binary and artifact['cargo_message']['target']['name'] == W.EXAMPLE, 'actual executable identity differs'); same(approval['actual_executable'], artifact['executable']); same(custody['actual_executable_after'], artifact['executable'])
+    captured = actual_build['cargo_compiler_artifacts_capture']; need(captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == artifact['cargo_message'] and captured['rows'][0]['executable'] == dict(historical_path=artifact['executable']['path'], sha256=artifact['executable']['sha256']), 'actual immediate Cargo artifact differs')
+    actual_pe = V.pe_header(W, binary, output, 'actual-Rust-cold'); stored_pe = artifact['PE_inspection']; need({k:v for k,v in actual_pe.items() if k != 'actual_PE_header_bytes'} == {k:v for k,v in stored_pe.items() if k != 'actual_PE_header_bytes'} and bind(actual_pe['actual_PE_header_bytes']).read_bytes() == bind(stored_pe['actual_PE_header_bytes']).read_bytes(), 'complete actual PE headers differ')
+    same(custody['actual_input'], observer['input_only_request']); same(custody['actual_pair_policy'], observer['prospective_pairing_policy']); need(custody['actual_pair_policy']['sha256'] == POLICY_SHA and bind(build['pair_policy']).read_bytes() == bind(build['frozen_pair_policy']).read_bytes() == bind(custody['actual_pair_policy']).read_bytes(), 'frozen policy differs')
+    command = [str(binary), str(bind(custody['actual_input']))]; inner = W.receipt(custody['actual_execution'], source, command); need(custody['actual_exit_code'] == inner['exit_code'] == 0 and actual_build['finished_utc'] <= inner['started_utc'], 'complete successful observer transport required; typed guard stops are retained in JSON')
+    for name in ('stdout', 'stderr'): same(custody['actual_complete_' + name], inner[name])
+    outer = N.recorded(outer_ref, source); need(bind(inner['stderr']).stat().st_size == bind(outer['stderr']).stat().st_size == 0 and outer['started_utc'] <= inner['started_utc'] <= inner['finished_utc'] <= outer['finished_utc'], 'closed complete stderr/chronology required')
+    argv = outer['command']; need(len(argv) == 20 and argv[1:4] == ['-X', 'utf8', '-B'] and argv[5] == 'execute' and (ROOT / argv[4]).resolve() == bind(WRITER), 'actual writer execute command differs'); options = dict(zip(argv[6::2], argv[7::2])); need(len(options) == 7 and set(options) == {'--Source-acceptance', '--Native-baseline', '--output-dir', '--application', '--formatter-review', '--build-record', '--artifact-review'}, 'exact actual writer operands required')
+    for flag, field in [('--Source-acceptance', 'actual_Source_acceptance'), ('--Native-baseline', 'Native_baseline_acceptance'), ('--application', 'actual_application'), ('--formatter-review', 'actual_formatter_review'), ('--build-record', 'actual_build_record'), ('--artifact-review', 'actual_Root_artifact_acceptance')]: same(operand(options[flag]), custody[field])
+    capture = bind(custody_ref).parent; need((ROOT / options['--output-dir']).resolve() == capture and capture.is_relative_to(BASE), 'actual contained capture directory differs'); before = json.loads((capture / 'before.json').read_bytes()); need(before == {**{k:v for k,v in custody.items() if k not in ('schema', 'actual_execution', 'actual_exit_code', 'actual_complete_stdout', 'actual_complete_stderr', 'actual_executable_after', 'comparison_performed')}, 'prospective_command':command, 'target_execution_performed':False}, 'complete capture-before/custody correspondence differs')
+    need({p.relative_to(capture).as_posix() for p in capture.rglob('*') if p.is_file()} == {'before.json', 'custody.json', 'capture-command/receipt.json', 'capture-command/stdout.log', 'capture-command/stderr.log'}, 'complete actual capture file set differs'); produced = [full(p) for p in sorted(capture.rglob('*')) if p.is_file()]
+    for row in produced: bind(row)
+    transport = bind(outer['stdout']).read_bytes(); echoed = b''.join(bind(inner[k]).read_bytes()[-8000:].decode('utf8', errors='replace').encode() for k in ('stdout', 'stderr')); prefixes = [v for v in {echoed, echoed.replace(b'\n', b'\r\n')} if transport.startswith(v)]; need(len(prefixes) == 1, 'complete recorder tail echo differs'); lines = transport[len(prefixes[0]):].splitlines(); need(len(lines) == 2, 'complete two-record driver transport required'); recorder, summary = [json.loads(v) for v in lines]
+    keys(recorder, 'receipt exit_code source_bytes_match_before_and_after', 'inner recorder transport'); same(recorder['receipt'], custody['actual_execution']); need(recorder['exit_code'] == 0 and recorder['source_bytes_match_before_and_after'] is True, 'actual recorder transport differs'); keys(summary, 'custody', 'writer transport'); same(summary['custody'], custody_ref)
+    request = load(custody['actual_input']); need(len(request['cases']) == 29 and sum(len(c['operations']) for c in request['cases']) == 31 and bit_cells(request) == 433, 'whole fixed29/31/433 input required')
+    result = load(inner['stdout']); keys(result, 'schema input cases requested_case_count recorded_case_count expected_values_supplied scientific_PASS_claimed whole_SRC05_or_ordinary_PASS_claimed gates_updated', 'Rust result'); need(result['schema'] == observer['runtime_interfaces']['output_schema'] and result['input'] == dict(sha256=custody['actual_input']['sha256'], size_bytes=custody['actual_input']['size_bytes']) and result['requested_case_count'] == result['recorded_case_count'] == len(result['cases']) == 29 and all(result[k] is False for k in ('expected_values_supplied', 'scientific_PASS_claimed', 'whole_SRC05_or_ordinary_PASS_claimed', 'gates_updated')), 'complete actual Rust result required')
+    source_text = bind(observer['application_sources'][0]['proposal']).read_text(encoding='utf8'); block = source_text.split('const UNAVAILABLE: [&str; 9] = [', 1)[1].split('];', 1)[0]; unavailable = [json.loads('"' + v + '"') for v in re.findall(r'^\s*"(.*)",$', block, re.M)]; need(len(unavailable) == 9, 'literal observer unavailable declarations required')
+    N.scalar_tree(result); facts = [case_facts(v, literal, unavailable) for v,literal in zip(result['cases'], request['cases'])]; need(W.R.snapshot_still_matches(source), 'full current Source membership/bytes differ')
+    need(all(full(p) == row for p,row in N.SEEN.items()), 'factual review input changed while being read')
+    return custody, source, result, facts, totals, produced
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('custody', 'outer-execution', 'output-dir'): parser.add_argument('--' + name, required=True)
+    args = parser.parse_args(); custody_ref, outer_ref = operand(args.custody), operand(args.outer_execution); output = (ROOT / args.output_dir).resolve(); capture = bind(custody_ref).parent
+    need(output.is_relative_to(BASE) and output != BASE and not output.is_relative_to(capture) and not output.exists(), 'fresh ignored review output outside capture required'); output.mkdir(parents=True)
+    custody, source, result, facts, totals, produced = review_capture(custody_ref, outer_ref, output)
+    review = dict(schema='src05-cold-guard-Rust-factual-review.v1', accepted=True, complete_input_owner_prefix_and_custody_review_accepted=True, actual_custody=custody_ref, actual_before=full(capture / 'before.json'), actual_produced_capture_files_full_SHA_inventory=produced, actual_outer_execution=outer_ref, actual_execution=custody['actual_execution'], actual_authoritative_result=custody['actual_complete_stdout'], actual_application=custody['actual_application'], actual_build_record=custody['actual_build_record'], Native_baseline_acceptance=custody['Native_baseline_acceptance'], Source_snapshot=source, actual_Source_file_count=len(W.load(source)['files']), input_case_count=29, input_operation_count=31, input_bit_cells=433, actual_source_calls=sum(v['actual_calls'] for v in facts), actual_returned_calls=sum(v['actual_returned_calls'] for v in facts), actual_stopped_cases=sum(v['actual_stopped'] for v in facts), actual_case_facts=facts, actual_test_totals=totals, scalar_DTO_classes=N.CLASSES, all_full_SHA_and_complete_current_Source_accepted=True, historical_Native_Source_authenticated_as_archives_only=True, complete_raw_stream_bytes_prefixes_callbacks_and_stopped_suffixes_accepted=True, full_actual_Cargo_and_PE_accepted=True, equations_recomputed=False, Native_or_Rust_values_compared=False, scientific_PASS_claimed=False, whole_surface_environment_or_ordinary_PASS_claimed=False, gates_updated=False, factual_checker_source=full(Path(__file__)))
+    row = W.dump(output / 'review.json', review); print(json.dumps(dict(review=row, scientific_PASS_claimed=False))); return 0
+
+
+if __name__ == '__main__': sys.exit(main())

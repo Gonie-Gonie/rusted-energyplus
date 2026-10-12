@@ -1,0 +1,64 @@
+--- e1/crates/ep_run/tests/arbitrary_run.rs
++++ d3/crates/ep_run/tests/arbitrary_run.rs
+@@ -3,13 +3,22 @@
+ #![allow(clippy::expect_used, clippy::unwrap_used)]
+ 
+ use std::path::{Path, PathBuf};
+-use std::time::{SystemTime, UNIX_EPOCH};
+ 
+ use ep_run::{
+     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
+     SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
+ };
+-use serde_json::Value;
++
++#[path = "arbitrary_run/common.rs"]
++mod common;
++use common::{read_json, unique_case_dir, write_text};
++
++#[path = "arbitrary_run/direct_zone_coupled.rs"]
++mod direct_zone_coupled;
++#[path = "arbitrary_run/exit_codes.rs"]
++mod exit_codes;
++#[path = "arbitrary_run/ideal_loads.rs"]
++mod ideal_loads;
+ 
+ #[allow(dead_code)]
+ #[path = "arbitrary_run/fixtures.rs"]
+@@ -934,24 +943,6 @@
+     Ok(())
+ }
+ 
+-fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
+-    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
+-    let path = std::env::temp_dir().join(format!(
+-        "rusted-energyplus-ep-run-{name}-{}-{timestamp}",
+-        std::process::id()
+-    ));
+-    if path.exists() {
+-        std::fs::remove_dir_all(&path)?;
+-    }
+-    std::fs::create_dir_all(&path)?;
+-    Ok(path)
+-}
+-
+-fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
+-    std::fs::write(path, contents)?;
+-    Ok(())
+-}
+-
+ fn assert_unsupported_fixture_blocks_before_runtime(
+     name: &str,
+     fixture: &str,
+@@ -1003,11 +994,6 @@
+     let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
+     assert!(support_report.contains(report_phrase));
+     Ok(())
+-}
+-
+-fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
+-    let contents = std::fs::read_to_string(path)?;
+-    Ok(serde_json::from_str(&contents)?)
+ }
+ 
+ fn assert_output_layout(

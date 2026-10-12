@@ -1,0 +1,188 @@
+{
+  "schema": "src05-weather-cold-publication-inputs.v1",
+  "writer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/manifest.json",
+    "sha256": "b534d22739b23428c11ccc1415e2c6f21e7a908d31efea61954038c3d192bcbd",
+    "size_bytes": 3882
+  },
+  "facts_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/manifest.json",
+    "sha256": "97ace0058b1f2f098db78af0636c14523d9c3ef84ecab0161559812b5110e8ab",
+    "size_bytes": 4141
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/weather-cold-applied-01/record.json",
+    "sha256": "e2f3bd5975c1f36512163e0e72425362447a9bc5173fe6bef9645c0fbe64dda9",
+    "size_bytes": 44869
+  },
+  "actual_compile_correction": {
+    "path": ".runtime/porting/SRC-05/weather-cold-compile-corrections-02/record.json",
+    "sha256": "46760e81801c1666de1db896a9a076c984360c0047fac68d61bd714f4d9e3fc6",
+    "size_bytes": 8811
+  },
+  "actual_cleanup": {
+    "path": ".runtime/porting/SRC-05/weather-cold-development-test-cleanup-01/record.json",
+    "sha256": "4448026eb3fedc0ba32d14f3534fa77dc31a0e25967d5c43cd527ecd35572c2c",
+    "size_bytes": 76866
+  },
+  "actual_producer_extension": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-05/weather-cold-built-03/record.json",
+    "sha256": "0f5e824a02a5a275edbfe62680c1a419712fc8be75b9dcb891ee9737a9e1e8b7",
+    "size_bytes": 10427
+  },
+  "actual_Root_artifact_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-03/acceptance.json",
+    "sha256": "b23a5140c2f96bb55281172b38e855cb9a22b4b2e5bb04ff155d02c1f8110a3b",
+    "size_bytes": 1636
+  },
+  "actual_Rust_custody": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/custody.json",
+    "sha256": "a32049dedf74ef17b478ba4252aae4787bf1eb77d4185aa801ca40f379144f51",
+    "size_bytes": 4210
+  },
+  "Root_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Rust-factual-review-02/review.json",
+    "sha256": "d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "size_bytes": 13827
+  },
+  "independent_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-05/Header-cold-guard-Rust-factual-review-02/review.json",
+    "sha256": "d64b7bd73f535577887b3815c511ce742e3bf01545915568f985240af39131ad",
+    "size_bytes": 13827
+  },
+  "actual_Root_facts_execution": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Rust-factual-review-command-02/receipt.json",
+    "sha256": "c298c3af166dfe320523b91057b946c124b26362d7e7f77f118e84d0a7e81656",
+    "size_bytes": 4873
+  },
+  "actual_independent_facts_execution": {
+    "path": ".runtime/porting/SRC-05/Header-cold-guard-Rust-factual-review-command-02/receipt.json",
+    "sha256": "880e2549af033f27f242f4913f5c8f27f031076380d2681780ff29c4fe1b6004",
+    "size_bytes": 4953
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json",
+    "sha256": "55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "size_bytes": 2427
+  },
+  "Native_provider_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-provider-acceptance-01/acceptance.json",
+    "sha256": "9d2eab5488e7db900536baeca15f8ee056d88282cc754b9d7674304ed5dc7f09",
+    "size_bytes": 3652
+  },
+  "first_comparison": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-01/report.json",
+    "sha256": "0266f0aa1175e72c1d9e7681bf301872b55860736d5c3761b9bc976635a8aa21",
+    "size_bytes": 11578
+  },
+  "first_comparison_execution": null,
+  "actual_comparison": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-02/report.json",
+    "sha256": "eeccfa054a41ab3bd7680207bc7f956e654396e2e49f4486d3e6ac31455d54b5",
+    "size_bytes": 11564
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/SRC-05/cold-guard-selected-comparison-command-02/receipt.json",
+    "sha256": "814f91b78c880b9dea3d08e16e28b942486fd23a06a4ebca81cef3d03cf57093",
+    "size_bytes": 5245
+  },
+  "Root_comparison_factual_review": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-selected-comparison-review-02/review.json",
+    "sha256": "dbe244155c593fccffae3a1c9f7bf8d3852528b083a4399c11b61d8285750c25",
+    "size_bytes": 1356
+  },
+  "independent_comparison_factual_review": {
+    "path": ".runtime/porting/SRC-05/Header-cold-guard-selected-comparison-factual-review-02/review.json",
+    "sha256": "3adef0161e93173e5269baf4a833ae4942800a0a8b2f6145821dafb9d85521a8",
+    "size_bytes": 2686
+  },
+  "Source_acceptances": [
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-writer-Source-acceptance-01/acceptance.json",
+      "sha256": "a19a854a433860218a60f930a83c0453df3110a5dd611fe35391d762d44cbb2c",
+      "size_bytes": 1379
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-absent-site-station-EIO-producer-Source-acceptance-02/acceptance.json",
+      "sha256": "a41eb1b349429201864165556a05273eadd5df54d7921f47a58ad40318f5c90c",
+      "size_bytes": 1583
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-compile-correction-review-01/review.json",
+      "sha256": "a33f78db90741f83e72d29ae8403ec3d8e768f3207da14c0da95a583edac99e2",
+      "size_bytes": 1330
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-weather-cold-compile-correction-review-01/review.json",
+      "sha256": "3b469a2208f5c2153099c9f7792193302ff969d728f683105ec3883476625fa7",
+      "size_bytes": 6828
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-development-test-cleanup-review-01/review.json",
+      "sha256": "b351c6fefb7e765e6af3a4a326d823b753dd5a027c32496ed6f426c3748d3e3e",
+      "size_bytes": 1078
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-weather-cold-development-test-cleanup-review-01/review.json",
+      "sha256": "e2850ad29f0b25d76d37971c7c15bd1a8e5e25201a4873cf22b5b5cf6fa9f7f8",
+      "size_bytes": 4270
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-producer-formatter-review-01/review.json",
+      "sha256": "a47f0f6168b23c52e50c2182ac31eddaa4462b5cb7582e6a59c7fe1ad7c1cf4e",
+      "size_bytes": 1047
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-weather-cold-site-station-formatter-review-01/review.json",
+      "sha256": "d9c35d8443852afc6b364eb47ef8c1e51c87741cb5658545ff7002ff8005fd53",
+      "size_bytes": 2801
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-producer-resumption-acceptance-01/acceptance.json",
+      "sha256": "86c53acff789f85bad8c249730512be2ffc543963585d2b48381f4f4f9d1108e",
+      "size_bytes": 2548
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-writer-Source-acceptance-04/acceptance.json",
+      "sha256": "982a3a6f9fdcb71b72d2ae68a3dd6caf648b073ac7ae9282e58e70c35d8bed10",
+      "size_bytes": 1868
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-successor-Source-review-04/review.json",
+      "sha256": "ec74dc4926ddcb96f9dfd93887eb412e2e86fba4f0e3fce9dfaea7c2afe9d13f",
+      "size_bytes": 1290
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-weather-cold-successor-Source-review-04/review.json",
+      "sha256": "ea85ad93639b52f4c5e1c6d4651051e43f947d7ce7576c8e5ab7b808969509ea",
+      "size_bytes": 6757
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-02/acceptance.json",
+      "sha256": "8623543bbba3c4a5f9d95345ad39ffaf671f5dfaf6d490839c918dc4369cea59",
+      "size_bytes": 5614
+    }
+  ],
+  "retained_closed_failures": [
+    {
+      "path": ".runtime/porting/SRC-05/weather-cold-build-command-01/receipt.json",
+      "sha256": "6f631f75b82179ac4b62a770aa8aeb5ceca37365c0d6804fca288b63e1bf010d",
+      "size_bytes": 5193
+    }
+  ],
+  "Root_publication_Source_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-publication-Source-review-01/review.json",
+    "sha256": "4c41f694976581b572245ce9db2c174d02c9736f5bb6fbfcdeb316dd9918a2cf",
+    "size_bytes": 771
+  },
+  "independent_publication_Source_review": {
+    "path": ".runtime/porting/SRC-05/Header-weather-cold-publication-Source-review-01/review.json",
+    "sha256": "717dad55709d6fcc7e9169856590b82c23474f384c9ed407c3dc82573a5d98a1",
+    "size_bytes": 2914
+  }
+}

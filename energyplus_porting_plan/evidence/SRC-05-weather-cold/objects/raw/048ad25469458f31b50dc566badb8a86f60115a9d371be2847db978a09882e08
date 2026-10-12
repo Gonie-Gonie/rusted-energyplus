@@ -1,0 +1,257 @@
+{
+  "schema": "src05-absent-site-station-EIO-producer-Source-preparation.v1",
+  "status": "HELD-Source-only-first-genuine-comparison-FAIL-required-before-application",
+  "cleanup_commit": "1fde766a8493ba306d7849462180d4ccaa044003",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/6c/6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "sha256": "6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "size_bytes": 1638665
+  },
+  "current_Source_members_verified_before_and_after": 3947,
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_proposals": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "b024df5bad2ac3af1eb6d2d399255fff8982780f62c8a3493ecba92c84e567f3",
+        "size_bytes": 12487
+      },
+      "proposed": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "ea04180ea8d05a2d3cc58b89699758df5a4c3c8eb2ad3c0c524fdbecaa289efb",
+        "size_bytes": 11831
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/diffs/00.diff",
+        "sha256": "09345cc528244489d468afedda8077b6ea1040354cadc197c8ddf23492c6c58e",
+        "size_bytes": 1845
+      },
+      "unsealed_parent_draft": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "ea04180ea8d05a2d3cc58b89699758df5a4c3c8eb2ad3c0c524fdbecaa289efb",
+        "size_bytes": 11831
+      },
+      "byte_exact_parent_draft": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization.rs",
+      "new_destination_absent": true,
+      "actual_before": null,
+      "proposed": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization.rs",
+        "sha256": "ab14047438248ab6ec132263d99cdbbce1156fcdc133b84ccc78dbedfc060c45",
+        "size_bytes": 5609
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/diffs/01.diff",
+        "sha256": "2a6588c62fd57218bcc69fbd0be235a9df1d7f8e9e3db9d0bb02f2b28764a3da",
+        "size_bytes": 5847
+      },
+      "unsealed_parent_draft": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization.rs",
+        "sha256": "ab14047438248ab6ec132263d99cdbbce1156fcdc133b84ccc78dbedfc060c45",
+        "size_bytes": 5609
+      },
+      "byte_exact_parent_draft": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization_tests.rs",
+      "new_destination_absent": true,
+      "actual_before": null,
+      "proposed": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization_tests.rs",
+        "sha256": "699acd4e2f87a00e351cddbfdd410af7eb97f8cf5f23470437361da8edc08795",
+        "size_bytes": 5385
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/diffs/02.diff",
+        "sha256": "d868c21f50984372a31dbc8a213d7d01bdc0688a7736e38c319745c4c9e4c209",
+        "size_bytes": 5597
+      },
+      "unsealed_parent_draft": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization_tests.rs",
+        "sha256": "699acd4e2f87a00e351cddbfdd410af7eb97f8cf5f23470437361da8edc08795",
+        "size_bytes": 5385
+      },
+      "byte_exact_parent_draft": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/before/crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+        "sha256": "b3b340b0007464639e735e7e79162d0197096a19e476ea3ff2751d7afd134de0",
+        "size_bytes": 26805
+      },
+      "proposed": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/proposed/crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+        "sha256": "0bd359279057a3e290c54a0926f089e58d7f33d28b627f483d45cf0dbbd68df3",
+        "size_bytes": 27126
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/diffs/03.diff",
+        "sha256": "5848b12089f4b74a3cd724afce75a264faf2efa6ed034f8c8abc6d46378f2c46",
+        "size_bytes": 4360
+      }
+    }
+  ],
+  "Original_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103
+      },
+      "first_line": 566,
+      "last_line": 585,
+      "purpose": "Existing Building terrain wind handoff",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/HeatBalanceManager.cc-566-585.literal",
+        "sha256": "110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "size_bytes": 1106
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103
+      },
+      "first_line": 1252,
+      "last_line": 1318,
+      "purpose": "Full real GetSiteAtmosphereData, selected absent branch and EIO",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/HeatBalanceManager.cc-1252-1318.literal",
+        "sha256": "40c643b51cf6b2879e1100a52b9211a535bc5dc4ecd534b7eb59b347e60d1397",
+        "size_bytes": 3544
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+        "size_bytes": 490422
+      },
+      "first_line": 7233,
+      "last_line": 7301,
+      "purpose": "Full real GetWeatherStation, absent operands, coefficient assignment order and EIO",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/WeatherManager.cc-7233-7301.literal",
+        "sha256": "ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "size_bytes": 3695
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "size_bytes": 16816
+      },
+      "first_line": 79,
+      "last_line": 80,
+      "purpose": "EarthRadius and AtmosphericTempGradient constants",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/DataEnvironment.hh-79-80.literal",
+        "sha256": "fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "size_bytes": 190
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "size_bytes": 16816
+      },
+      "first_line": 192,
+      "last_line": 196,
+      "purpose": "Distinct constructor site/station owner defaults",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/DataEnvironment.hh-192-196.literal",
+        "sha256": "d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "size_bytes": 654
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "size_bytes": 32371
+      },
+      "first_line": 117,
+      "last_line": 120,
+      "purpose": "Source R fixed/exponential threshold",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/IOFiles.hh-117-120.literal",
+        "sha256": "55c688f05290edd606969cab7bf0785080b80895cbc089b469b34ab09f1d145a",
+        "size_bytes": 200
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "size_bytes": 32371
+      },
+      "first_line": 130,
+      "last_line": 140,
+      "purpose": "Source R exponent padding",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/IOFiles.hh-130-140.literal",
+        "sha256": "1e68610b3c7fd804d9a7cc5f0c91066e97b818a5e4ee6b0ab96f1591596309f8",
+        "size_bytes": 382
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "size_bytes": 32371
+      },
+      "first_line": 249,
+      "last_line": 260,
+      "purpose": "Source R next_float direction",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/IOFiles.hh-249-260.literal",
+        "sha256": "b07fab2c614de51c6cc850f2b772743b0a8bdaee22295ce747795e4ba6407fc2",
+        "size_bytes": 467
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "size_bytes": 32371
+      },
+      "first_line": 277,
+      "last_line": 306,
+      "purpose": "Complete Source R formatting branch for .3R/.6R",
+      "full_literal_range": {
+        "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/Original-ranges/IOFiles.hh-277-306.literal",
+        "sha256": "d0492bd2041aa63639ee246c8d169d86adc2ee986597d70c0a2295f6eb37bd90",
+        "size_bytes": 1670
+      }
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/README.md",
+    "sha256": "f6c122ba378d82f95befc3761ced550c0b5da88681d094d09a60204f4d0048a1",
+    "size_bytes": 2404
+  },
+  "author": {
+    "path": ".runtime/porting/SRC-05/prepare-absent-site-station-02.py",
+    "sha256": "57c0cf5d3bdbf1e0c494e1e7f86d9bc8d79631b3f6447a220944e492f5c8f5fc",
+    "size_bytes": 11316
+  },
+  "canonical_mutation": false,
+  "facts_or_comparer_changed": false,
+  "build_performed": false,
+  "capture_performed": false,
+  "tests_executed": false,
+  "Native_results_read_by_preparation": false,
+  "future_actual_hashes_supplied": false,
+  "gates_updated": false,
+  "numerical_PASS_claimed": false
+}

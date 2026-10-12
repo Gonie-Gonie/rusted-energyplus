@@ -1,0 +1,137 @@
+"""Exact available selected cold-guard comparison after complete genuine factual reviews."""
+import argparse
+import copy
+import gzip
+import importlib.util
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+CHECKER = dict(path='.runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-04/check_rust.py', sha256='719752d055685a9b661225239a84fa77538b07c9838e77c03f36bca2c713fe34')
+
+
+def helpers():
+    import hashlib
+    path = ROOT / CHECKER['path']; raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != CHECKER['sha256']: raise ValueError('reviewed factual checker Source differs')
+    spec = importlib.util.spec_from_file_location('cold_exact_rust_factual_helpers', path)
+    module = importlib.util.module_from_spec(spec); sys.modules[spec.name] = module; spec.loader.exec_module(module)
+    return module
+
+
+R = helpers()
+N, W = R.N, R.W
+need, bind, load, same, operand, full = R.need, R.bind, R.load, R.same, R.operand, R.full
+
+
+def selected_snapshot(value, engine, weather=True):
+    owner = value['owner']; backend = copy.deepcopy(owner['backend'])
+    if engine == 'Native':
+        backend.pop('CurrentDateTime'); backend['MatchCounts'] = [v['value'] for v in backend['MatchCounts']['rows']]
+    environment = owner['environment'] if weather else {k:owner['environment'][k] for k in N.ENV[:5]}
+    result = dict(owner=dict(TotSurfaces=owner['TotSurfaces'], Surface=dict(size=owner['Surface']['size'], rows=owner['Surface']['rows']), environment=environment, backend=backend, backend_flags=owner['backend_flags']), callbacks=value['callbacks'], actual_callback_count=value['actual_callback_count'], error_stream_present=value['error_stream_present'], declared_error_stream_budget=value['declared_error_stream_budget'])
+    for name in N.ARRAYS: result['owner'][name] = dict(size=owner[name]['size'], rows=owner[name]['rows'])
+    for name in ('error_stream', 'eio', 'console'):
+        result[name + '_bytes'] = value[name + '_bytes'] if engine == 'Rust' else (None if value[name] is None else list(value[name].encode('utf8')))
+    return result
+
+
+def selected_call(call, engine):
+    cause = call['source_exception']; family = 'returned'; fatal = None
+    if cause is not None:
+        if cause['kind'] in ('OriginalFatalError', 'Rust_source_fatal'): family = 'fatal'; fatal = cause['message']
+        elif cause['kind'] in ('Original_stream_ios_failure', 'Rust_backend_IO_error'): family = 'backend_IO'
+        else: family = 'unavailable'
+    return dict(actual_source_return_observed=call['actual_source_return_observed'], actual_stop_family=family, actual_fatal_message=fatal, after=selected_snapshot(call['after'], engine))
+
+
+class Rows:
+    def __init__(self, output):
+        self.output = output; self.streams = {name:gzip.GzipFile(filename=str(output / (name + '.jsonl.gz')), mode='xb', mtime=0) for name in ('inputs', 'prestates', 'endpoints', 'unavailable')}
+        self.counts = {name:0 for name in self.streams}; self.mismatches = {name:0 for name in ('inputs', 'prestates', 'endpoints')}; self.required_unavailable = 0; self.nonfinite_excluded = 0
+
+    def emit(self, phase, row):
+        self.streams[phase].write((json.dumps(row, ensure_ascii=False, allow_nan=False, separators=(',', ':')) + '\n').encode()); self.counts[phase] += 1
+
+    def unavailable(self, role, path, native, rust, required=False):
+        self.emit('unavailable', dict(role=role, path=path, Native=native, Rust=rust, required=required, counted_as_PASS=False)); self.required_unavailable += required
+
+    def pair(self, phase, path, native, rust, generated=False):
+        if isinstance(native, dict) and isinstance(rust, dict) and set(native) == set(rust) == {'value', 'value_bits', 'value_class'}:
+            nonfinite = any(v['value_class'] in ('nan', 'negative_infinity', 'positive_infinity') for v in (native, rust))
+            derived_bulb = generated and any('/' + name + '/' in path for name in ('SurfOutDryBulbTemp', 'SurfOutWetBulbTemp'))
+            if nonfinite and (derived_bulb or any(v['value_class'] in ('negative_infinity', 'positive_infinity') for v in (native, rust))):
+                self.nonfinite_excluded += 1; self.unavailable('post_bulb_or_infinite_nonfinite_observation_origin_untraced_not_numerical_PASS', path, native, rust); return
+            matched = native['value_bits'] == rust['value_bits'] and native['value_class'] == rust['value_class']
+        elif isinstance(native, dict) and isinstance(rust, dict):
+            self.pair(phase, path + '/actual_field_membership', sorted(native), sorted(rust), generated)
+            for key in sorted(set(native) & set(rust)): self.pair(phase, path + '/' + key, native[key], rust[key], generated)
+            return
+        elif isinstance(native, list) and isinstance(rust, list):
+            self.pair(phase, path + '/actual_length', len(native), len(rust), generated)
+            for i, (a,b) in enumerate(zip(native, rust)): self.pair(phase, path + '/' + str(i), a,b, generated)
+            return
+        else: matched = type(native) is type(rust) and native == rust
+        self.emit(phase, dict(path=path, Native=native, Rust=rust, matched=matched, absolute_tolerance=0, relative_tolerance=0)); self.mismatches[phase] += not matched
+
+    def close(self):
+        for stream in self.streams.values(): stream.close()
+        return {name:full(self.output / (name + '.jsonl.gz')) for name in self.streams}
+
+
+def native_capture(native_ref, request):
+    native = load(native_ref); observer = W.load(W.OBSERVER); W.native_release(native_ref, observer)
+    need(native['Source_snapshot']['sha256'] == W.SOURCE_BEFORE, 'historical Native Source47 required'); historical = W.members(native['Source_snapshot']); need(len(historical) == 3942, 'complete historical Native archive membership required')
+    custody = load(native['actual_custody']); before = load(native['actual_before']); same(before['actual_input'], observer['input_only_request']); same(custody['actual_command_receipt'], native['actual_Native_execution'])
+    for row in before['frozen_artifacts']:
+        if row['path'] not in historical: bind(row)
+    for field in ('actual_binary', 'actual_link_map', 'actual_helper_object', 'provider_inventory', 'Root_provider_acceptance'): bind(before[field])
+    result = load(native['actual_authoritative_result']); need(result['schema'] == 'src05-surface-cold-guard-direct-results.v1' and len(result['cases']) == result['requested_case_count'] == result['recorded_case_count'] == 29, 'complete actual Native results required'); N.scalar_tree(result)
+    facts = [N.case_facts(v,literal) for v,literal in zip(result['cases'], request['cases'])]
+    for field in ('Root_factual_review', 'independent_FULL_factual_review'):
+        review = load(native[field]); need(review['schema'] == 'src05-cold-guard-Native-factual-review.v1' and review['accepted'] is True and review['baseline_releasable'] is True and review['complete_input_owner_prefix_and_custody_review_accepted'] is True and review['actual_case_facts'] == facts and review['gates_updated'] is False, 'both complete genuine Native input/owner/prefix/custody reviews required'); same(review['actual_authoritative_result'], native['actual_authoritative_result']); same(review['actual_custody'], native['actual_custody']); same(review['Source_snapshot'], native['Source_snapshot'])
+    produced = custody['produced_capture_files_full_SHA_inventory']; capture = bind(native['actual_before']).parent; need({bind(v) for v in produced} == {p.resolve() for p in capture.rglob('*') if p.is_file()} - {bind(native['actual_custody'])}, 'complete preserved Native capture inventory differs')
+    return native, result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('Native-baseline', 'Rust-custody', 'Root-Rust-factual-review', 'independent-Rust-factual-review', 'output-dir'): parser.add_argument('--' + name, required=True)
+    args = parser.parse_args(); native_ref, rust_ref, root_ref, peer_ref = [operand(v) for v in (args.Native_baseline, args.Rust_custody, args.Root_Rust_factual_review, args.independent_Rust_factual_review)]
+    need(bind(root_ref) != bind(peer_ref), 'distinct actual Rust factual reviews required'); root_review, peer_review = load(root_ref), load(peer_ref)
+    for review in (root_review, peer_review):
+        need(review['schema'] == 'src05-cold-guard-Rust-factual-review.v1' and review['accepted'] is True and review['complete_input_owner_prefix_and_custody_review_accepted'] is True and review['gates_updated'] is False, 'both complete actual Rust factual reviews required'); same(review['actual_custody'], rust_ref); same(review['factual_checker_source'], CHECKER); same(review['Native_baseline_acceptance'], native_ref)
+    custody = load(rust_ref); same(custody['Native_baseline_acceptance'], native_ref); observer = W.load(W.OBSERVER); request = load(custody['actual_input']); policy = load(custody['actual_pair_policy']); need(custody['actual_pair_policy']['sha256'] == R.POLICY_SHA and policy['expected_values_supplied'] is False and policy['finite_arithmetic']['absolute_tolerance'] == policy['finite_arithmetic']['relative_tolerance'] == 0 and policy['generated_nonfinite_arithmetic_counted_as_PASS'] is False and policy['unavailable_or_missing_never_PASS'] is True, 'exact frozen prospective policy required')
+    output = (ROOT / args.output_dir).resolve(); native_capture_dir = bind(load(native_ref)['actual_before']).parent; rust_capture_dir = bind(rust_ref).parent; need(output.is_relative_to(R.BASE) and output != R.BASE and not output.is_relative_to(native_capture_dir) and not output.is_relative_to(rust_capture_dir) and not output.exists(), 'fresh ignored comparison output outside both immutable captures required'); output.mkdir(parents=True)
+    custody, source, rust, rust_facts, totals, produced = R.review_capture(rust_ref, root_review['actual_outer_execution'], output / 'revalidated-Rust')
+    for review in (root_review, peer_review):
+        same(review['Source_snapshot'], source); same(review['actual_authoritative_result'], custody['actual_complete_stdout']); need(review['actual_case_facts'] == rust_facts and review['actual_test_totals'] == totals and review['actual_produced_capture_files_full_SHA_inventory'] == produced, 'complete actual Rust review facts differ')
+    native, native_result = native_capture(native_ref, request); rows = Rows(output); joined = []; candidate_endpoints = []
+    for a,b,literal in zip(native_result['cases'], rust['cases'], request['cases']):
+        case = literal['case_id']; rows.pair('inputs', case + '/literal_input', a['literal_input'], b['literal_input'])
+        rows.pair('inputs', case + '/prepared_selected_owner', selected_snapshot(a['prepared_state'], 'Native', False), selected_snapshot(b['prepared_state'], 'Rust', False))
+        rows.pair('inputs', case + '/actual_default_return', {k:a['actual_calls'][1]['after']['owner']['environment'][k] for k in N.ENV[:5]}, b['actual_Rust_default_producer']['actual_return'])
+        native_calls = a['actual_calls'][2:]; rust_calls = b['actual_calls']; rows.pair('prestates', case + '/selected_call_count', len(native_calls), len(rust_calls)); rows.pair('prestates', case + '/unreached_suffix', a['unreached_operations_or_stages'], b['unreached_operations_or_stages'])
+        derived = False
+        for i,(left,right) in enumerate(zip(native_calls, rust_calls)):
+            reverse = {v:k for k,v in N.APIS.items()}; stage = reverse[left['api']]; path = case + '/' + str(i+1) + '/' + left['operation_id'] + '/' + stage
+            identity = dict(operation_id=left['operation_id'], stage=stage); rows.pair('prestates', path + '/selected_call_identity', identity, dict(operation_id=right['operation_id'], stage=right['stage']))
+            rows.pair('prestates', path + '/before', selected_snapshot(left['before'], 'Native'), selected_snapshot(right['before'], 'Rust'), derived)
+            joined.append(dict(case_id=case, operation_id=left['operation_id'], stage=stage, Native_actual_call_ordinal=left['actual_call_ordinal'], Rust_actual_call_ordinal=right['actual_call_ordinal']))
+            derived = derived or stage == 'bulbs'; candidate_endpoints.append((path, selected_call(left, 'Native'), selected_call(right, 'Rust'), derived))
+            if right['source_exception'] is not None and right['source_exception']['kind'] not in ('Rust_source_fatal', 'Rust_backend_IO_error'): rows.unavailable('required_Rust_guard_implementation_unavailable', path, left['source_exception'], right['source_exception'], True)
+        if len(native_calls) != len(rust_calls): rows.unavailable('required_selected_call_boundary_missing', case, native_calls[len(rust_calls):], rust_calls[len(native_calls):], True)
+    prestate_accepted = rows.mismatches['inputs'] == rows.mismatches['prestates'] == 0 and rows.required_unavailable == 0
+    for path,left,right,derived in candidate_endpoints:
+        if prestate_accepted: rows.pair('endpoints', path, left,right,derived)
+        else: rows.unavailable('endpoints_not_paired_after_input_or_preowner_difference', path,left,right,True)
+    for family in policy['explicit_unavailable_families']: rows.unavailable('frozen_policy_unavailable_family', family, None,None)
+    for family in rust['cases'][0]['unavailable_families']: rows.unavailable('observer_unpaired_family', family, None,None)
+    logs = rows.close(); W.members(source, current=True); need(all(full(p) == row for p,row in N.SEEN.items()), 'comparison input changed while being read')
+    observed = prestate_accepted and rows.mismatches['endpoints'] == 0 and rows.counts['endpoints'] > 0
+    report = dict(schema='src05-cold-guard-actual-selected-comparison.v1', status='NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS' if observed else 'MISMATCH_OR_REQUIRED_UNAVAILABLE', actual_Native_baseline=native_ref, actual_Rust_custody=rust_ref, Root_Rust_factual_review=root_ref, independent_Rust_factual_review=peer_ref, actual_Native_result=native['actual_authoritative_result'], actual_Rust_result=custody['actual_complete_stdout'], historical_Native_Source=native['Source_snapshot'], actual_Rust_Source=source, frozen_pair_policy=custody['actual_pair_policy'], input_case_count=29, input_operation_count=31, input_bit_cells=433, input_and_preowners_accepted_before_endpoint_pairing=prestate_accepted, actual_selected_public_call_pairs=len(joined), actual_public_call_joins=joined, paired_row_counts=rows.counts, mismatch_counts=rows.mismatches, required_unavailable=rows.required_unavailable, nonfinite_observations_excluded_from_numerical_PASS=rows.nonfinite_excluded, all_available_selected_pairs_match=observed, full_pair_and_unavailable_logs=logs, equations_recomputed=False, inner_Native_invocation_trace_claimed=False, allocation_implementation_equality_claimed=False, generated_nonfinite_arithmetic_counted_as_PASS=False, historical_102_unavailable_claimed_covered=False, scientific_PASS_claimed=False, whole_surface_environment_or_ordinary_PASS_claimed=False, gates_updated=False, comparer_Source=full(Path(__file__)))
+    row = W.dump(output / 'report.json', report); print(json.dumps(dict(report=row, status=report['status'], scientific_PASS_claimed=False))); return 0 if observed else 2
+
+
+if __name__ == '__main__': sys.exit(main())

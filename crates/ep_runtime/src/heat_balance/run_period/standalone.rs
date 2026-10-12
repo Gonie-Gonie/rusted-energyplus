@@ -40,6 +40,12 @@ pub(crate) fn sample_heat_balance_run_period(
         seconds_per_timestep,
         first_hour_interpolation_starting_values,
         |state, input, weather_context, _hour_index, _substep| {
+            crate::heat_balance::convection::surface_environment::ordinary::invoke_if_active(
+                model,
+                state,
+                weather_context,
+                output.as_deref_mut(),
+            )?;
             advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
                 &model.typed,
                 schedule_cache,

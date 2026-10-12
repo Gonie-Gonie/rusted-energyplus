@@ -449,6 +449,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     &mut schedule_cache_profile,
                 )?
             };
+            if reporting.is_some() {
+                crate::heat_balance::convection::surface_environment::ordinary::invoke(
+                    model,
+                    &mut state,
+                    initial_weather_context,
+                    initialization.as_deref_mut(),
+                )?;
+            }
             seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
                 initial_weather_context,

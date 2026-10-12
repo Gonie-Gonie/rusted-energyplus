@@ -1,0 +1,35 @@
+--- e1/crates/ep_runtime/src/ideal_loads/calc/heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry/tests.rs
++++ d3/crates/ep_runtime/src/ideal_loads/calc/heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry/tests.rs
+@@ -267,32 +267,6 @@
+     }
+ }
+ 
+-#[test]
+-fn cp442_subtree_is_twelve_files_and_every_file_is_bounded() {
+-    let files = [
+-        include_str!(
+-            "../heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry.rs"
+-        ),
+-        include_str!("release.rs"),
+-        include_str!("state.rs"),
+-        include_str!("tests.rs"),
+-        include_str!("transition.rs"),
+-        include_str!("release/error.rs"),
+-        include_str!("release/prefix.rs"),
+-        include_str!("release/runtime_validation.rs"),
+-        include_str!("release/snapshot_validation.rs"),
+-        include_str!("tests/schema_prefix.rs"),
+-        include_str!("transition/accounting.rs"),
+-        include_str!("transition/snapshot.rs"),
+-    ];
+-    assert_eq!(files.len(), 12);
+-    assert!(
+-        files
+-            .into_iter()
+-            .all(|source| source.lines().count() <= 500)
+-    );
+-}
+-
+ #[allow(dead_code)]
+ pub(in crate::ideal_loads::calc) fn cp442_all_snapshots_for_successor_tests()
+ -> Vec<super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardElseBranchEntrySnapshot>

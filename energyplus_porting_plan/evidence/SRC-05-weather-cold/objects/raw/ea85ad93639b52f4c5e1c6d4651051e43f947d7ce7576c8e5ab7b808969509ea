@@ -1,0 +1,163 @@
+{
+  "schema": "src05-weather-cold-successor-Source-review.v1",
+  "accepted": true,
+  "actual_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/manifest.json",
+    "sha256": "b534d22739b23428c11ccc1415e2c6f21e7a908d31efea61954038c3d192bcbd",
+    "size_bytes": 3882
+  },
+  "Rust_facts_and_comparison_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/manifest.json",
+    "sha256": "97ace0058b1f2f098db78af0636c14523d9c3ef84ecab0161559812b5110e8ab",
+    "size_bytes": 4141
+  },
+  "factual_checker_Source": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/check_rust.py",
+    "sha256": "9bde440addbd3ce5dda6eef2ba7b91da49128d341e1e5b6b6e035f867e3e1411",
+    "size_bytes": 26485
+  },
+  "same_input_comparer_Source": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/compare.py",
+    "sha256": "9de835d8896447e7893e4c03d1b8c86169176a480a6e673dd19749d65bc226d2",
+    "size_bytes": 15320
+  },
+  "actual_producer_extension": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "independent_FULL_actual_producer_and_formatter_review": {
+    "path": ".runtime/porting/SRC-05/Header-weather-cold-site-station-formatter-review-01/review.json",
+    "sha256": "d9c35d8443852afc6b364eb47ef8c1e51c87741cb5658545ff7002ff8005fd53",
+    "size_bytes": 2801
+  },
+  "historical_parent_writer_Source_review": {
+    "path": ".runtime/porting/SRC-05/Header-weather-cold-writer-Source-review-03/review.json",
+    "sha256": "f0ed0673b886f45868b418154d18cec22faa13a3d8054cdd025efe2d49bfd9c1",
+    "size_bytes": 4048
+  },
+  "historical_parent_facts_and_comparison_Source_review": {
+    "path": ".runtime/porting/SRC-05/Header-cold-guard-Rust-facts-and-comparison-Source-review-04/review.json",
+    "sha256": "1e207e18432f568ffa50bb17ea217ce90a60974d8662258c068e64784254a317",
+    "size_bytes": 2842
+  },
+  "complete_writer_parent_diff_regenerated_and_FULL_read": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/exact-parent.diff",
+    "sha256": "e00ae1b2cc9ab35e672f8c0193605f4b1d1d8280d5f2b17847b219cb8e7fde28",
+    "size_bytes": 15914
+  },
+  "complete_facts_parent_diffs_regenerated_and_FULL_read": [
+    {
+      "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/diffs/check_rust.py.diff",
+      "sha256": "7d81d9fb77108bd1520633ec3c958304314aaf73c0d5665ddb408b57dc694d3a",
+      "size_bytes": 7371
+    },
+    {
+      "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/diffs/compare.py.diff",
+      "sha256": "686fb602601762f52cfbbb260209f9a2ccfb6dd21c0a1c50445f31cfd8489683",
+      "size_bytes": 626
+    },
+    {
+      "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/diffs/README.md.diff",
+      "sha256": "9b4532cfe0801527f1295278821b6f96afa0c45f2f31aca10b62723f4e3c9a35",
+      "size_bytes": 7313
+    }
+  ],
+  "final_READMEs_and_manifests_FULL_read": true,
+  "direct_manifest_refs_SHA_and_size_verified": {
+    "writer": 11,
+    "facts_and_comparison": 13
+  },
+  "writer_parent_before_bytes_exact_Source03": true,
+  "writer_unchanged_function_ASTs": [
+    "bind",
+    "cleanup_application",
+    "cumulative_application",
+    "delta",
+    "diff",
+    "dump",
+    "held_rows",
+    "load",
+    "members",
+    "module",
+    "native_release",
+    "need",
+    "operand",
+    "receipt",
+    "recorded",
+    "ref",
+    "same",
+    "write"
+  ],
+  "writer_changed_functions_FULL_read": [
+    "actual_application",
+    "quality_receipts",
+    "main"
+  ],
+  "writer_new_function_FULL_read": "producer_application",
+  "writer_CLI_declarations_exact_Source03": true,
+  "producer_application_checks": {
+    "genuine_proposal_and_literal_application": true,
+    "distinct_Root_and_independent_actual_reviews": true,
+    "four_paths_two_additions_and_3945_unrelated_descriptors": true,
+    "all_four_semantic_and_formatter_diffs_regenerated": true,
+    "current_Source_d70_only_guard": true,
+    "ordered_two_observer_seven_API_bindings": true,
+    "historical_app1_correction02_cleanup_Native_Source47_and_first_FAIL_preserved": true
+  },
+  "quality_contract": {
+    "three_current_actual_receipts_from_resumption_acceptance": true,
+    "exact_roles": [
+      "fmt_check",
+      "clippy",
+      "workspace"
+    ],
+    "actual_outer_workspace_argv_preserved": true,
+    "runner_archives_claim_review_time_only": true,
+    "dynamic_workspace_summary_totals": true,
+    "no_baked_future_receipts_or_totals": true,
+    "no_focused_repeat": true
+  },
+  "build_only_observer_example": true,
+  "apply_refused_before_canonical_actions": true,
+  "facts_checker_parent_before_bytes_exact_Source04": true,
+  "facts_checker_five_explicit_substitutions_inverse_full_bytes_exact": true,
+  "facts_checker_changed_functions": [
+    "case_facts",
+    "review_capture"
+  ],
+  "facts_checker_unchanged_function_ASTs": [
+    "module",
+    "byte_array",
+    "bit_cells",
+    "snapshot",
+    "continuity",
+    "main"
+  ],
+  "prepared_EIO_literal_prefix_and_complete_raw_text_projection_checked": true,
+  "selected_call_after_EIO_exact_prepared_and_all_boundaries_carry_invariant": true,
+  "actual_producer_identity_and_literal_optional_overrides_retained": true,
+  "comparer_all_function_ASTs_and_inverse_full_bytes_exact_Source04": true,
+  "strict_complete_EIO_input_preowner_comparison_and_endpoint_blockers_unchanged": true,
+  "frozen_policy_zero_tolerance_and_nonfinite_origin_exclusions_unchanged": true,
+  "original_argc2_and_fixed29case31operation433bit_inputs_retained": true,
+  "review_scope": "Source changes and direct pins only; accepted actual formatter/current3949 proof is joined without repeating its member scan. No fresh QA/capture/result has been certified by this Source review.",
+  "reviewed_python_imported_or_executed": false,
+  "canonical_changes": false,
+  "Cargo_or_targets_executed": false,
+  "current_Source_member_scan_repeated": false,
+  "new_actual_cold_target_result_read": false,
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "no_defects_found": true
+}

@@ -1,0 +1,15 @@
+--- .runtime/porting/SRC-05/weather-cold-applied-01/literal/crates/ep_runtime/src/runtime.rs
++++ formatted/crates/ep_runtime/src/runtime.rs
+@@ -451,7 +451,11 @@
+             };
+             if reporting.is_some() {
+                 crate::heat_balance::convection::surface_environment::ordinary::invoke(
+-                    model, &mut state, initial_weather_context, initialization.as_deref_mut())?;
++                    model,
++                    &mut state,
++                    initial_weather_context,
++                    initialization.as_deref_mut(),
++                )?;
+             }
+             seed_zone_air_humidity_ratios_from_weather_context(
+                 &mut state,

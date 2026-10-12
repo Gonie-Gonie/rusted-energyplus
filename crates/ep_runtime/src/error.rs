@@ -13,6 +13,10 @@ pub enum RuntimeError {
     CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
     /// Reached ordinary warmup output or backend stop with the original cause.
     WarmupOutput(Box<WarmupOutputError>),
+    /// Actual surface outdoor-temperature guard or its retained backend failure.
+    SurfaceOutdoorEnvironment(
+        Box<crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentError>,
+    ),
     /// No zones were available to simulate.
     NoZones,
     /// Actual warmup demand/topology/daily owner is outside this bounded Source route.
@@ -122,6 +126,7 @@ impl Display for RuntimeError {
         match self {
             Self::CtfInitialization(error) => Display::fmt(error, formatter),
             Self::WarmupOutput(error) => Display::fmt(error, formatter),
+            Self::SurfaceOutdoorEnvironment(error) => Display::fmt(error, formatter),
             Self::CtfSurfaceLifecycle(error) => write!(
                 formatter,
                 "selected public CTF/history lifecycle unavailable: {error:?}"
@@ -234,6 +239,7 @@ impl std::error::Error for RuntimeError {
         match self {
             Self::CtfInitialization(error) => Some(error.as_ref()),
             Self::WarmupOutput(error) => Some(error.as_ref()),
+            Self::SurfaceOutdoorEnvironment(error) => Some(error.as_ref()),
             _ => None,
         }
     }

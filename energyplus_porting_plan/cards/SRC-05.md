@@ -138,3 +138,14 @@ PE, process and independent factual reviews are retained in the
 The cold guard/error backend, retained ordinary four-array setter/check sequence,
 SRC-07/08 handoff and successful complete ordinary comparison remain pending. No card gate
 or A/B completion count changes.
+
+
+## Actual bounded weather handoff Source and selected cold-guard comparison
+
+Seventeen reviewed weather/observer Source paths are applied, including retained ordinary weather arrays, manager setter/check ordering and the absent-site/station EIO producers. The actual selected Native/Rust main comparison covers 29 literal cases, 31 declared operations and 38 paired public-call boundaries. Its status is `NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS`: 28,879 input rows, 31,781 prestate rows and 41,767 endpoint rows, with zero mismatches and zero required unavailable. All 33 unavailable observations remain excluded from PASS: 14 nonfinite observations, 10 frozen-policy families and nine observer-only families. This selected comparison does not certify complete ordinary-run reachability or consumer handoff.
+
+The first genuine comparison remains preserved: input mismatches 29, prestate mismatches 38, paired endpoints zero and required unavailable 38. It ran directly through the tool; no recorder receipt was retained and its actual program exit code is unknown. The later strict comparison has its genuine closed recorder receipt. Both reports and all four complete gzip logs for each comparison are retained. No tolerance or pairing policy was relaxed.
+
+The final Source `d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914` passed fmt and Clippy; the consolidated workspace run passed 4,964 tests, with zero failures and the same two intentionally ignored observers. Actual application, formatter, Cargo/PE, capture and independent factual reviews are retained in [the bounded weather/cold evidence](../evidence/SRC-05-weather-cold/summary.json). Full Source payloads and large binary/map/object payloads remain outside the finite archive's replayability claim.
+
+Complete ordinary weather/inside-array reachability, persistent air/surface owner and correction cadence, SRC-07/08 handoff and successful complete ordinary comparison remain pending. All four SRC-05 gates stay unchecked; A14/54 and B14/64 remain unchanged.

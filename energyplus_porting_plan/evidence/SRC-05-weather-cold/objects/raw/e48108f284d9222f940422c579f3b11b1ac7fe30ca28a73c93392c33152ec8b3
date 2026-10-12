@@ -1,0 +1,29 @@
+--- .runtime/porting/SRC-05/weather-cold-compile-corrections-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs
++++ .runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs
+@@ -151,7 +151,7 @@
+ }
+ 
+ #[test]
+-fn real_sink_failure_retains_counter_prefix_and_error_source() {
++fn real_sink_failure_retains_counter_prefix_and_error_source() -> Result<(), Box<dyn std::error::Error>> {
+     struct FailingSink(Vec<u8>);
+     impl Write for FailingSink {
+         fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+@@ -175,10 +175,7 @@
+         rows.iter().map(|row| (row, "sink")),
+         &mut backend(&mut state, &mut sink, &mut console),
+     );
+-    let error = match result {
+-        Err(error) => error,
+-        Ok(()) => panic!("cold guard returned"),
+-    };
++    let error = result.err().ok_or("cold guard returned")?;
+     assert!(matches!(error, SurfaceOutdoorEnvironmentError::Backend(_)));
+     assert_eq!(state.tracking.total_severe_errors, 8);
+     assert_eq!(state.tracking.last_severe_error, "incoming severe");
+@@ -196,4 +193,5 @@
+         actual_io.map(io::Error::kind),
+         Some(io::ErrorKind::BrokenPipe)
+     );
++    Ok(())
+ }

@@ -1,0 +1,51 @@
+            wind_direction_deg: number(required(w, "WindDir")?, false)?,
+        };
+        weather = Some(current);
+        let after_writes = snapshot(p, weather, &rows, rows.capacity(), &ids);
+        let mut calls = Vec::new();
+        for stage in ["bulbs", "check", "wind_speed", "wind_direction"] {
+            let call_before = snapshot(p, weather, &rows, rows.capacity(), &ids);
+            let invoked = match stage {
+                "bulbs" => {
+                    set_surface_out_bulb_temperatures(p, current, &mut rows);
+                    true
+                }
+                "wind_speed" => {
+                    set_surface_wind_speeds(p, current.wind_speed_m_per_s, &mut rows);
+                    true
+                }
+                "wind_direction" => {
+                    set_surface_wind_directions(current.wind_direction_deg, &mut rows);
+                    true
+                }
+                "check" => false,
+                _ => return Err("unknown selected stage".into()),
+            };
+            if invoked {
+                call_count += 1;
+            }
+            // Independent actual point-method probes; no setter or expected arithmetic.
+            let point_helpers: Vec<Value> = rows.iter().enumerate().filter_map(|(i,row)| match stage {
+                "bulbs"=>{point_call_count+=2;Some(json!({"Rust_row_index":i,
+                    "temperature_at_height_dry":scalar(p.temperature_at_height(current.dry_bulb_c,row.centroid_height_m)),
+                    "temperature_at_height_wet":scalar(p.temperature_at_height(current.wet_bulb_c,row.centroid_height_m))}))},
+                "wind_speed"=>{point_call_count+=1;Some(json!({"Rust_row_index":i,
+                    "wind_speed_at_height":scalar(p.wind_speed_at_height(current.wind_speed_m_per_s,row.centroid_height_m))}))},
+                _=>None,
+            }).collect();
+            calls.push(json!({"stage":stage,"actual_point_helper_returns":point_helpers,"actual_selected_method_invoked":invoked,"actual_selected_method_return_observed":invoked,
+                "actual_selected_call_ordinal":if invoked {Some(call_count)} else {None},
+                "status":if invoked {"actual-selected-setter-returned"} else {"unavailable-no-Rust-cold-check-backend"},
+                "before":call_before,"after":snapshot(p,weather,&rows,rows.capacity(),&ids),"counted_as_PASS":false}));
+        }
+        operations.push(json!({"operation_id":id,"literal_operation":op,"before_declared_weather_writes":before,
+            "after_declared_weather_writes":after_writes,"calls":calls,"independent_setter_probes_not_ordinary_manager":true}));
+    }
+    Ok(
+        json!({"case_id":required(case,"case_id")?,"literal_input":case,"actual_default_station_constructor_invoked":true,
+        "actual_default_station_parameters":default_parameters,"prepared_state":prepared,"operations":operations,
+        "final":snapshot(p,weather,&rows,rows.capacity(),&ids),"actual_selected_method_call_count":call_count,
+        "actual_point_helper_call_count":point_call_count,"cold_check_or_backend_invoked":false,"ordinary_production_handoff_verified":false,"numerical_PASS_claimed":false}),
+    )
+}
+fn observe() -> Result<(), String> {

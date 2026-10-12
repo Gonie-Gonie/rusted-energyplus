@@ -1,0 +1,11 @@
+--- .runtime/porting/SRC-05/weather-cold-compile-corrections-01/before/crates/ep_run/examples/src05_surface_cold_guard_main.rs
++++ .runtime/porting/SRC-05/weather-cold-compile-corrections-01/after/crates/ep_run/examples/src05_surface_cold_guard_main.rs
+@@ -355,7 +355,7 @@
+                 callbacks: Rc::new(RefCell::new(Vec::new())),
+                 stopped: false,
+             },
+-            actual_defaults,
++            Value::Object(actual_defaults),
+         ))
+     }
+     fn snapshot(&self) -> Value {

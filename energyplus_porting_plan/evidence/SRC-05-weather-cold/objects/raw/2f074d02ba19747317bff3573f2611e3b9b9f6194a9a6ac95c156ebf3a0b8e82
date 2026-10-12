@@ -1,0 +1,94 @@
+{
+  "schema": "src05-weather-cold-actual-producer-literal-application.v1",
+  "producer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/absent-site-station-EIO-producer-prep-02/manifest.json",
+    "sha256": "048ad25469458f31b50dc566badb8a86f60115a9d371be2847db978a09882e08",
+    "size_bytes": 11725
+  },
+  "actual_producer_Source_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-absent-site-station-EIO-producer-Source-acceptance-02/acceptance.json",
+    "sha256": "a41eb1b349429201864165556a05273eadd5df54d7921f47a58ad40318f5c90c",
+    "size_bytes": 1583
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/6c/6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "sha256": "6c051015b13eda5e267551f268e637394889822fda59187bb9ba719f88ca0e3d",
+    "size_bytes": 1638665
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/a5/a50c50533052cb0737c198faa3c3445c106e820012e130a69c5f3c3498e058e1",
+    "sha256": "a50c50533052cb0737c198faa3c3445c106e820012e130a69c5f3c3498e058e1"
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+      "new_destination_absent": false,
+      "actual_before_archive": {
+        "path": ".runtime/porting/source-objects/b0/b024df5bad2ac3af1eb6d2d399255fff8982780f62c8a3493ecba92c84e567f3",
+        "sha256": "b024df5bad2ac3af1eb6d2d399255fff8982780f62c8a3493ecba92c84e567f3"
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/source-objects/ea/ea04180ea8d05a2d3cc58b89699758df5a4c3c8eb2ad3c0c524fdbecaa289efb",
+        "sha256": "ea04180ea8d05a2d3cc58b89699758df5a4c3c8eb2ad3c0c524fdbecaa289efb"
+      },
+      "actual_semantic_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/diffs/00-semantic.diff",
+        "sha256": "09345cc528244489d468afedda8077b6ea1040354cadc197c8ddf23492c6c58e",
+        "size_bytes": 1845
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization.rs",
+      "new_destination_absent": true,
+      "actual_before_archive": {
+        "path": ".runtime/porting/source-objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/source-objects/ab/ab14047438248ab6ec132263d99cdbbce1156fcdc133b84ccc78dbedfc060c45",
+        "sha256": "ab14047438248ab6ec132263d99cdbbce1156fcdc133b84ccc78dbedfc060c45"
+      },
+      "actual_semantic_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/diffs/01-semantic.diff",
+        "sha256": "2a6588c62fd57218bcc69fbd0be235a9df1d7f8e9e3db9d0bb02f2b28764a3da",
+        "size_bytes": 5847
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/initialization_tests.rs",
+      "new_destination_absent": true,
+      "actual_before_archive": {
+        "path": ".runtime/porting/source-objects/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/source-objects/69/699acd4e2f87a00e351cddbfdd410af7eb97f8cf5f23470437361da8edc08795",
+        "sha256": "699acd4e2f87a00e351cddbfdd410af7eb97f8cf5f23470437361da8edc08795"
+      },
+      "actual_semantic_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/diffs/02-semantic.diff",
+        "sha256": "d868c21f50984372a31dbc8a213d7d01bdc0688a7736e38c319745c4c9e4c209",
+        "size_bytes": 5597
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+      "new_destination_absent": false,
+      "actual_before_archive": {
+        "path": ".runtime/porting/source-objects/b3/b3b340b0007464639e735e7e79162d0197096a19e476ea3ff2751d7afd134de0",
+        "sha256": "b3b340b0007464639e735e7e79162d0197096a19e476ea3ff2751d7afd134de0"
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/source-objects/0b/0bd359279057a3e290c54a0926f089e58d7f33d28b627f483d45cf0dbbd68df3",
+        "sha256": "0bd359279057a3e290c54a0926f089e58d7f33d28b627f483d45cf0dbbd68df3"
+      },
+      "actual_semantic_diff": {
+        "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/diffs/03-semantic.diff",
+        "sha256": "5848b12089f4b74a3cd724afce75a264faf2efa6ed034f8c8abc6d46378f2c46",
+        "size_bytes": 4360
+      }
+    }
+  ],
+  "target_execution_performed": false,
+  "gates_updated": false
+}

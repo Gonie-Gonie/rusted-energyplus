@@ -1,0 +1,11 @@
+    static std::string &zero_pad_exponent(std::string &str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (std::isdigit(str[str.size() - 3]) == 0) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
+            }
+        }
+        return str;
+    }

@@ -1,0 +1,47 @@
+{
+  "schema": "src05-weather-cold-runtime-source-bindings.v1",
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+      "sha256": "a3e5eb91a6d1487425662230e2ee33e8da2a973c664eecda21ce16e3acb6ac4b",
+      "size_bytes": 26790
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+      "sha256": "b024df5bad2ac3af1eb6d2d399255fff8982780f62c8a3493ecba92c84e567f3",
+      "size_bytes": 12487
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "576190619787c358c45ae13477a3b8e072ab7f29430a994afc72a67b721c8ade",
+      "size_bytes": 11594
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection.rs",
+      "sha256": "69777ce150745b5093a42774776713c3444c7031c873556b2d94e8bdb82cb437",
+      "size_bytes": 11242
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "d9806884275aead705154e0f9cbe5fd14300246cd424a78276dcb77775aad908",
+      "size_bytes": 16927
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_round_format.rs",
+      "sha256": "fd508c48c5ca298b1d5d9105dccf29f5c7d577f4a49a7a0ac22554545080e289",
+      "size_bytes": 3572
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621
+    }
+  ]
+}

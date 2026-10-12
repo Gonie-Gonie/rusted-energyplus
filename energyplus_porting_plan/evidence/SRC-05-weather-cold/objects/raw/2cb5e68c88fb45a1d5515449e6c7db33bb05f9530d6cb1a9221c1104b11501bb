@@ -1,0 +1,15 @@
+--- .runtime/porting/SRC-05/weather-cold-applied-01/literal/crates/ep_runtime/src/heat_balance/run_period/standalone.rs
++++ formatted/crates/ep_runtime/src/heat_balance/run_period/standalone.rs
+@@ -41,7 +41,11 @@
+         first_hour_interpolation_starting_values,
+         |state, input, weather_context, _hour_index, _substep| {
+             crate::heat_balance::convection::surface_environment::ordinary::invoke_if_active(
+-                model, state, weather_context, output.as_deref_mut())?;
++                model,
++                state,
++                weather_context,
++                output.as_deref_mut(),
++            )?;
+             advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
+                 &model.typed,
+                 schedule_cache,

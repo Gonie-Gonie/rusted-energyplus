@@ -1,0 +1,15 @@
+--- .runtime/porting/SRC-05/weather-cold-applied-01/literal/crates/ep_runtime/src/heat_balance/warmup.rs
++++ formatted/crates/ep_runtime/src/heat_balance/warmup.rs
+@@ -183,7 +183,11 @@
+                     seconds_per_timestep,
+                 )?;
+                 super::convection::surface_environment::ordinary::invoke_if_active(
+-                    simulation_model, state, weather_context, output.as_deref_mut())?;
++                    simulation_model,
++                    state,
++                    weather_context,
++                    output.as_deref_mut(),
++                )?;
+                 advance_timestep(
+                     model,
+                     state,

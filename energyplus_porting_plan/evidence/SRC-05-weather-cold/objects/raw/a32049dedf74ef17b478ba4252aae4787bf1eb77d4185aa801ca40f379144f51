@@ -1,0 +1,91 @@
+{
+  "actual_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "actual_Source_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-writer-Source-acceptance-04/acceptance.json",
+    "sha256": "982a3a6f9fdcb71b72d2ae68a3dd6caf648b073ac7ae9282e58e70c35d8bed10",
+    "size_bytes": 1868
+  },
+  "weather_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-surface-environment-prep-03/manifest.json",
+    "sha256": "071677b63df5d343932f0f30c621a246381def10968072a40d5f9ab5eb96016b",
+    "size_bytes": 74433
+  },
+  "observer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-observer-prep-02/manifest.json",
+    "sha256": "3bad175a73b4537e57b2d7b978eefe954f14c52f1fdd25cc96a46ac937e01b75",
+    "size_bytes": 20423
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json",
+    "sha256": "55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "size_bytes": 2427
+  },
+  "scientific_PASS_claimed": false,
+  "whole_surface_environment_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-producer-resumption-acceptance-01/acceptance.json",
+    "sha256": "86c53acff789f85bad8c249730512be2ffc543963585d2b48381f4f4f9d1108e",
+    "size_bytes": 2548
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/runtime-source-bindings.json",
+    "sha256": "28d402797c57ac4ceda8c758ece65da3ba9352453dd6c9da9ef8cec18833761b",
+    "size_bytes": 1929
+  },
+  "schema": "src05-weather-cold-actual-Rust-capture-custody.v1",
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-05/weather-cold-built-03/record.json",
+    "sha256": "0f5e824a02a5a275edbfe62680c1a419712fc8be75b9dcb891ee9737a9e1e8b7",
+    "size_bytes": 10427
+  },
+  "actual_Root_artifact_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-03/acceptance.json",
+    "sha256": "b23a5140c2f96bb55281172b38e855cb9a22b4b2e5bb04ff155d02c1f8110a3b",
+    "size_bytes": 1636
+  },
+  "actual_input": {
+    "path": ".runtime/porting/SRC-05/native-surface-cold-guard-prep-01/input-only-cases.proposed.json",
+    "sha256": "0d1264f8802347055e90635a4ae5e754280c7fcfa8fef35595f1db6589511734",
+    "size_bytes": 102723
+  },
+  "actual_pair_policy": {
+    "path": ".runtime/porting/SRC-05/native-surface-cold-guard-prep-01/pairing-policy.proposed.json",
+    "sha256": "a8db114cd5ec9c4594944f4c0023937889aaf37b17d9f00f2dc95ac7db516f52",
+    "size_bytes": 2786
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/capture-command/receipt.json",
+    "sha256": "231a4e7f32799b2a2c7c73281fd3fb0c16c397e3c40b5c0dd809c1eb3a355ba9",
+    "size_bytes": 4607
+  },
+  "actual_exit_code": 0,
+  "actual_complete_stdout": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/capture-command/stdout.log",
+    "sha256": "d1f2d32036ab4b09170a040fb1bd1866416b03eec4e05b8c931dde4d83ae3d19"
+  },
+  "actual_complete_stderr": {
+    "path": ".runtime/porting/SRC-05/weather-cold-Rust-capture-02/capture-command/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_executable_after": {
+    "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+    "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+    "size_bytes": 30397586
+  },
+  "target_execution_performed": true,
+  "comparison_performed": false
+}

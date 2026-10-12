@@ -1,0 +1,2 @@
+    Real64 constexpr EarthRadius(6356000.0);          // Radius of the Earth (m)
+    Real64 constexpr AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)

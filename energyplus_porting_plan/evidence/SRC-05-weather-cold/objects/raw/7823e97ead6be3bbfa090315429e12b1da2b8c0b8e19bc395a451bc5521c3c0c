@@ -1,0 +1,15 @@
+--- .runtime/porting/SRC-05/weather-cold-applied-01/literal/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
++++ formatted/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
+@@ -5,8 +5,10 @@
+ 
+ use ep_model::Terrain;
+ pub(crate) mod ordinary;
+-pub use ordinary::{SurfaceOutdoorEnvironmentError, SurfaceOutdoorEnvironmentState,
+-    check_surface_out_bulb_temperatures};
++pub use ordinary::{
++    SurfaceOutdoorEnvironmentError, SurfaceOutdoorEnvironmentState,
++    check_surface_out_bulb_temperatures,
++};
+ 
+ const EARTH_RADIUS_M: f64 = 6_356_000.0;
+ const ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;

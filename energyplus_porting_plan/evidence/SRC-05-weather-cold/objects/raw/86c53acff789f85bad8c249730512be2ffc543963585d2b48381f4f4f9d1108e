@@ -1,0 +1,62 @@
+{
+  "schema": "src05-weather-cold-producer-resumption-acceptance.v1",
+  "accepted": true,
+  "Root_FULL_producer_application_and_formatter_review_accepted": true,
+  "independent_FULL_producer_application_and_formatter_review_accepted": true,
+  "actual_producer_extension": {
+    "path": ".runtime/porting/SRC-05/weather-cold-site-station-application-01/record.json",
+    "sha256": "b3c0701bd6a466112239a731385f72b5a5c6443537a054ae2c08d348bdc8f2f9",
+    "size_bytes": 10144
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "actual_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-05/Root-cold-guard-Native-baseline-acceptance-01/acceptance.json",
+    "sha256": "55cbcd2957e309719d428adbf738d615d70cfbab8a6b7db08e18b7edad939a42",
+    "size_bytes": 2427
+  },
+  "Root_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-producer-formatter-review-01/review.json",
+    "sha256": "a47f0f6168b23c52e50c2182ac31eddaa4462b5cb7582e6a59c7fe1ad7c1cf4e",
+    "size_bytes": 1047
+  },
+  "independent_review": {
+    "path": ".runtime/porting/SRC-05/Header-weather-cold-site-station-formatter-review-01/review.json",
+    "sha256": "d9c35d8443852afc6b364eb47ef8c1e51c87741cb5658545ff7002ff8005fd53",
+    "size_bytes": 2801
+  },
+  "quality_executions": {
+    "fmt_check": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/fmt-check/receipt.json",
+      "sha256": "d3a92c7517f3188513e0370b491724d7633c7d7d2fb830a3d8205646264dfc56",
+      "size_bytes": 4376
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/clippy/receipt.json",
+      "sha256": "092e6d3f46b251dcadb915c740c332a7a815edd6e94191345475747d6602c78d",
+      "size_bytes": 4427
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-05/weather-cold-producer-quality-01/workspace/receipt.json",
+      "sha256": "74e84db2e5db1129ddbe08d21da6db6d64376e7ab5ceca994a575cc2db0b651e",
+      "size_bytes": 4386
+    }
+  },
+  "actual_test_totals": {
+    "workspace": {
+      "groups": 18,
+      "passed": 4964,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

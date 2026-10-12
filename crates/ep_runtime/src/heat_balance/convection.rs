@@ -13,6 +13,7 @@ use ep_model::{
 use geometry_operands::surface_centroid_z_m;
 pub(crate) use geometry_operands::{
     energyplus_stored_surface_outdoor_air_temperature_c,
+    energyplus_stored_surface_outdoor_wet_bulb_temperature_c,
     energyplus_stored_surface_outside_wind_speed_m_per_s,
 };
 pub(crate) use tarp_inside::{

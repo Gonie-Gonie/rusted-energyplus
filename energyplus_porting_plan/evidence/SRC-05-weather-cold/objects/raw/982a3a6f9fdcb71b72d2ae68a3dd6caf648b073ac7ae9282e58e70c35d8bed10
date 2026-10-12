@@ -1,0 +1,43 @@
+{
+  "schema": "src05-weather-cold-writer-Source-acceptance.v1",
+  "accepted": true,
+  "Root_FULL_Source_review_accepted": true,
+  "independent_FULL_Source_review_accepted": true,
+  "actual_writer_Source": {
+    "path": ".runtime/porting/SRC-05/apply-and-validate-weather-cold-04.py",
+    "sha256": "db6def81460bdfce42577c5a9fc2d271710635d2d384abb7a689ce461a86f2c5",
+    "size_bytes": 50368
+  },
+  "weather_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-surface-environment-prep-03/manifest.json",
+    "sha256": "071677b63df5d343932f0f30c621a246381def10968072a40d5f9ab5eb96016b",
+    "size_bytes": 74433
+  },
+  "observer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-observer-prep-02/manifest.json",
+    "sha256": "3bad175a73b4537e57b2d7b978eefe954f14c52f1fdd25cc96a46ac937e01b75",
+    "size_bytes": 20423
+  },
+  "writer_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/weather-cold-writer-prep-04/manifest.json",
+    "sha256": "b534d22739b23428c11ccc1415e2c6f21e7a908d31efea61954038c3d192bcbd",
+    "size_bytes": 3882
+  },
+  "Rust_facts_and_comparison_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/cold-guard-Rust-facts-and-comparison-prep-05/manifest.json",
+    "sha256": "97ace0058b1f2f098db78af0636c14523d9c3ef84ecab0161559812b5110e8ab",
+    "size_bytes": 4141
+  },
+  "Root_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-successor-Source-review-04/review.json",
+    "sha256": "ec74dc4926ddcb96f9dfd93887eb412e2e86fba4f0e3fce9dfaea7c2afe9d13f",
+    "size_bytes": 1290
+  },
+  "independent_review": {
+    "path": ".runtime/porting/SRC-05/Header-weather-cold-successor-Source-review-04/review.json",
+    "sha256": "ea85ad93639b52f4c5e1c6d4651051e43f947d7ce7576c8e5ab7b808969509ea",
+    "size_bytes": 6757
+  },
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

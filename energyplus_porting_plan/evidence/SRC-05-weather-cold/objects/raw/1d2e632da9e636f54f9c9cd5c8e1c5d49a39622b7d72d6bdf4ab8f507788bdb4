@@ -1,0 +1,87 @@
+--- e1/crates/ep_cli/src/main.rs
++++ d3/crates/ep_cli/src/main.rs
+@@ -20411,69 +20411,21 @@
+     }
+ 
+     #[test]
+-    fn missing_model_inspect_path_fails() {
+-        let args = vec!["model".to_string(), "inspect".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_model_compile_path_fails() {
+-        let args = vec!["model".to_string(), "compile".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_model_plan_path_fails() {
+-        let args = vec!["model".to_string(), "plan".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_model_geometry_path_fails() {
+-        let args = vec!["model".to_string(), "geometry".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_compare_geometry_path_fails() {
+-        let args = vec!["compare".to_string(), "geometry".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_compare_surface_geometry_path_fails() {
+-        let args = vec!["compare".to_string(), "surface-geometry".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_compare_internal_gains_path_fails() {
+-        let args = vec!["compare".to_string(), "internal-gains".to_string()];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_compare_internal_convective_gain_path_fails() {
+-        let args = vec![
+-            "compare".to_string(),
+-            "internal-convective-gain".to_string(),
+-        ];
+-
+-        assert_eq!(run(&args), 2);
+-    }
+-
+-    #[test]
+-    fn missing_conformance_diagnostic_report_path_fails() {
+-        let args = vec!["conformance".to_string(), "diagnostic-report".to_string()];
+-
+-        assert_eq!(run(&args), 2);
++    fn missing_command_paths_fail() {
++        for (command, subcommand) in [
++            ("model", "inspect"),
++            ("model", "compile"),
++            ("model", "plan"),
++            ("model", "geometry"),
++            ("compare", "geometry"),
++            ("compare", "surface-geometry"),
++            ("compare", "internal-gains"),
++            ("compare", "internal-convective-gain"),
++            ("conformance", "diagnostic-report"),
++        ] {
++            let args = vec![command.to_string(), subcommand.to_string()];
++            assert_eq!(run(&args), 2, "{command} {subcommand}");
++        }
+     }
+ 
+     #[test]

@@ -1,0 +1,42 @@
+void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   December 1997
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine displays the error messages on the indicated
+    // file unit numbers, in addition to the "standard error output" unit.
+
+    // METHODOLOGY EMPLOYED:
+    // If arguments OutUnit1 and/or OutUnit2 are present the
+    // error message is written to these as well and the standard one.
+
+    auto *err_stream = state.files.err_stream.get();
+
+    if (state.dataUtilityRoutines->outputErrorHeader && (err_stream != nullptr)) {
+        *err_stream << "Program Version," << state.dataStrGlobals->VerStringVar << ',' << state.dataStrGlobals->IDDVerString << '\n';
+        state.dataUtilityRoutines->outputErrorHeader = false;
+    }
+
+    if (!state.dataGlobal->DoingInputProcessing) {
+        if (err_stream != nullptr) {
+            *err_stream << "  " << ErrorMessage << '\n';
+        }
+    } else {
+        // CacheIPErrorFile is never opened or closed
+        // so this output would just go to stdout
+        // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+        if (state.dataGlobal->printConsoleOutput) {
+            std::cout << ErrorMessage << '\n';
+        }
+    }
+    if (OutUnit1) {
+        print(OutUnit1.value(), "  {}", ErrorMessage);
+    }
+    if (OutUnit2) {
+        print(OutUnit2.value(), "  {}", ErrorMessage);
+    }
+    // std::string tmp = "  " + ErrorMessage + '\n';
+    // if (errorCallback) DataGlobals::errorCallback(tmp.c_str());

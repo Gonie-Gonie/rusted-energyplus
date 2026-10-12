@@ -1,0 +1,35 @@
+{
+  "schema": "src05-weather-cold-Root-artifact-acceptance.v1",
+  "accepted": true,
+  "Root_FULL_PE_and_Cargo_artifact_accepted": true,
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-05/weather-cold-built-03/record.json",
+    "sha256": "0f5e824a02a5a275edbfe62680c1a419712fc8be75b9dcb891ee9737a9e1e8b7",
+    "size_bytes": 10427
+  },
+  "actual_executable": {
+    "path": "target/debug/examples/src05_surface_cold_guard_main.exe",
+    "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+    "size_bytes": 30397586
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+    "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+  },
+  "actual_full_PE_review": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-03/actual-PE-inspection.json",
+    "sha256": "c262ebf0a22d3c2e761f1530ae10adba873f27dfeb1de3231edffa5ca6bf0aec",
+    "size_bytes": 4071
+  },
+  "immutable_binary_archive": {
+    "path": ".runtime/porting/SRC-05/Root-weather-cold-artifact-acceptance-03/actual-Cargo-emitted-observer.exe",
+    "sha256": "50de36c71ccbe727e61c03476425a17a500d09f741169ebd07f7bc2ebd62f068",
+    "size_bytes": 30397586
+  },
+  "sole_Cargo_emitted_example_and_immediate_capture_accepted": true,
+  "all_PE_fields_sections_and_data_directories_FULL_read": true,
+  "independent_raw_PE_parser_matches_all_build_fields_and_header_bytes": true,
+  "all_three_actual_quality_receipts_reused_without_engine_repeat": true,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

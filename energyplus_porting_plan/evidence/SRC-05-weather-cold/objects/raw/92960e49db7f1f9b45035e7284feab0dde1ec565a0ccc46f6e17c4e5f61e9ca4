@@ -1,0 +1,42 @@
+{"receipt": {"path": ".runtime/porting/SRC-05/weather-cold-built-01/fmt_check-command/receipt.json", "sha256": "97996653c32e49838b7d981d042994790653557d5f5901e35e67d795b9cc2914"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: this looks like you are trying to use `.. -= ..`, but you really are doing `.. = (- ..)`
+  --> crates\ep_runtime\src\runtime\tests/warmup_ordinary_reports.rs:83:59
+   |
+83 |         surface.outdoor_environment.row.wind_direction_deg=-0.0;
+   |                                                           ^^
+   |
+   = note: to remove this lint, use either `-=` or `= -`
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#suspicious_assignment_formatting
+   = note: `-D clippy::suspicious-assignment-formatting` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::suspicious_assignment_formatting)]`
+
+error: `panic` should not be present in production code
+   --> crates\ep_runtime\src\heat_balance\convection\surface_environment\ordinary_tests.rs:180:19
+    |
+180 |         Ok(()) => panic!("cold guard returned"),
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#panic
+    = note: requested on the command line with `-D clippy::panic`
+
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error[E0308]: mismatched types
+   --> crates\ep_run\examples\src05_surface_cold_guard_main.rs:358:13
+    |
+358 |             actual_defaults,
+    |             ^^^^^^^^^^^^^^^ expected `Value`, found `Map<String, Value>`
+    |
+    = note: expected enum `serde_json::Value`
+             found struct `serde_json::Map<std::string::String, serde_json::Value>`
+help: try wrapping the expression in `serde_json::Value::Object`
+    |
+358 |             serde_json::Value::Object(actual_defaults),
+    |             ++++++++++++++++++++++++++               +
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `ep_run` (example "src05_surface_cold_guard_main") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ep_runtime` (lib test) due to 2 previous errors
+{"receipt": {"path": ".runtime/porting/SRC-05/weather-cold-built-01/clippy-command/receipt.json", "sha256": "9106a663c64501be968eedac389b9e25c13b6d0a8385f89ad150f8b9443f8a6d"}, "exit_code": 101, "source_bytes_match_before_and_after": true}

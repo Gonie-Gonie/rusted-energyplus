@@ -5,6 +5,7 @@ use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::convection::{
     ExteriorConvectionTerms, energyplus_building_terrain, energyplus_exterior_convection_terms,
     energyplus_stored_surface_outdoor_air_temperature_c,
+    energyplus_stored_surface_outdoor_wet_bulb_temperature_c,
     energyplus_surface_outdoor_air_temperature_c, heat_balance_uses_doe2_outside_convection,
 };
 use crate::heat_balance::ctf::{
@@ -158,15 +159,17 @@ fn exterior_surface_boundary_balance_with_origin(
     let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
     let weather_file_wind_speed_m_per_s =
         energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
-    let wind_direction_deg =
-        energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
+    let wind_direction_deg = surface_state.outdoor_environment.current().map_or_else(
+        || energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg),
+        |actual| actual.wind_direction_deg,
+    );
     let horizontal_infrared_radiation_w_per_m2 = energyplus_weather_horizontal_infrared_for_context(
         context,
         record.horizontal_infrared_radiation_wh_per_m2,
     );
     let surface_outdoor_dry_bulb_c =
         energyplus_stored_surface_outdoor_air_temperature_c(surface_state, outdoor_dry_bulb_c);
-    let wet_reference_temperature_c = energyplus_stored_surface_outdoor_air_temperature_c(
+    let wet_reference_temperature_c = energyplus_stored_surface_outdoor_wet_bulb_temperature_c(
         surface_state,
         energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
     );
@@ -317,17 +320,26 @@ pub(crate) fn surface_exterior_report_terms(
     let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
     let weather_file_wind_speed_m_per_s =
         energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
-    let wind_direction_deg =
-        energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
+    let wind_direction_deg = surface_state.outdoor_environment.current().map_or_else(
+        || energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg),
+        |actual| actual.wind_direction_deg,
+    );
     let horizontal_infrared_radiation_w_per_m2 = energyplus_weather_horizontal_infrared_for_context(
         context,
         record.horizontal_infrared_radiation_wh_per_m2,
     );
-    let surface_outdoor_dry_bulb_c =
-        energyplus_surface_outdoor_air_temperature_c(typed_surface, outdoor_dry_bulb_c);
-    let wet_reference_temperature_c = energyplus_surface_outdoor_air_temperature_c(
-        typed_surface,
-        energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
+    let surface_outdoor_dry_bulb_c = surface_state.outdoor_environment.current().map_or_else(
+        || energyplus_surface_outdoor_air_temperature_c(typed_surface, outdoor_dry_bulb_c),
+        |actual| actual.dry_bulb_c,
+    );
+    let wet_reference_temperature_c = surface_state.outdoor_environment.current().map_or_else(
+        || {
+            energyplus_surface_outdoor_air_temperature_c(
+                typed_surface,
+                energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
+            )
+        },
+        |actual| actual.wet_bulb_c,
     );
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,

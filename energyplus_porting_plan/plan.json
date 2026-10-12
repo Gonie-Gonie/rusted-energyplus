@@ -12461,6 +12461,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
         "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
         "size_bytes": 441884
+      },
+      "actual_bounded_weather_and_cold_guard": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-weather-cold/summary.json",
+        "sha256": "7e96a269e925b554d34d1148d692726464d8cdbaf2ed55980392c533a5525f42",
+        "size_bytes": 7674
       }
     },
     {
