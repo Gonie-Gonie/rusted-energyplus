@@ -355,5 +355,63 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
         .map_err(|error| error.to_string())?;
     assert_eq!(context.reports.scan, reached);
     assert_eq!(context.backend.state.tracking.total_warning_errors, 0);
+
+    // The actual input owner takes the same production context branch; the
+    // legacy checks above keep exercising the independent public entry point.
+    use crate::heat_balance::selected_input_processor::{
+        SelectedInputProcessor, SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
+    };
+    let source = SelectedInputProcessor::from_admitted_input(
+        vec![SourceObjectDefinition {
+            object_type: "Output:Constructions".into(),
+            alpha_fields: 2,
+            numeric_fields: 0,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        }],
+        std::collections::BTreeMap::from([(
+            "Output:Constructions".into(),
+            SourceInputFamily::Objects(vec![SourceObjectShape {
+                object_name: "authored report input".into(),
+                field_sizes: std::collections::BTreeMap::new(),
+            }]),
+        )]),
+    )
+    .map_err(|error| error.to_string())?;
+    context
+        .reports
+        .initialize_input_processor(source)
+        .map_err(|error| error.to_string())?;
+    context.reports.scan = crate::heat_balance::report_scan::ReportScanState::default();
+    context
+        .prepare_report_input_cache(&input)
+        .map_err(|error| error.to_string())?;
+    assert!(context.reports.scan.constructions);
+    assert!(!context.reports.scan.get_report_input);
+    assert_eq!(
+        context
+            .reports
+            .input_processor_shortcut
+            .current_module_object,
+        "Output:EnergyManagementSystem"
+    );
+    assert!(
+        context
+            .reports
+            .selected_input_processor
+            .as_ref()
+            .is_some_and(
+                |source| !source.is_object_unused("Output:Constructions", "authored report input")
+            )
+    );
+    let retained_input = context.reports.selected_input_processor.clone();
+    let retained_shortcut = context.reports.input_processor_shortcut.clone();
+    context
+        .prepare_report_input_cache(&ReportInputs::default())
+        .map_err(|error| error.to_string())?;
+    assert_eq!(context.reports.selected_input_processor, retained_input);
+    assert_eq!(context.reports.input_processor_shortcut, retained_shortcut);
+    assert_eq!(context.backend.state.tracking.total_warning_errors, 0);
     Ok(())
 }

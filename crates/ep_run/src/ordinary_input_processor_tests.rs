@@ -27,6 +27,10 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         return Err("actual diagnostic family shapes missing".into());
     };
     assert_eq!(shapes[0].field_sizes["diagnostics"], 5);
+    assert_eq!(shapes[0].object_name, "d");
+    assert!(input.has_object("Output:Diagnostics", "d"));
+    assert!(input.is_object_unused("Output:Diagnostics", "d"));
+    assert!(!input.has_object("Output:Diagnostics", "D"));
     let initial_counts = SourceArgumentCounts {
         alphas: 5,
         numerics: 9,

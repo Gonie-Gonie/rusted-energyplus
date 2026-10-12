@@ -24,8 +24,9 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedInputProcessor, String> 
         .iter()
         .map(|(family, objects)| {
             let shapes = objects
-                .values()
-                .map(|object| SourceObjectShape {
+                .iter()
+                .map(|(name, object)| SourceObjectShape {
+                    object_name: name.0.clone(),
                     field_sizes: object
                         .fields
                         .iter()

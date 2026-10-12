@@ -174,29 +174,52 @@ impl CtfInitializationContext<'_> {
     /// Run the first report-cache query reached by ordinary no-EMS init_state.
     /// A genuinely already-scanned cache is retained without replaying its query
     /// or diagnostics; it is not relabelled as a newly reached preparation.
+    /// With the admitted input owner, real reached getter writes use its sole
+    /// complete shortcut; legacy callers without that owner keep their API.
     pub fn prepare_report_input_cache(
         &mut self,
         input: &ep_model::ReportInputs,
     ) -> Result<(), CtfInitializationError> {
-        use super::report_scan::{ReportScanDiagnostic, ReportScanFailure, try_scan_for_reports};
+        use super::report_scan::{
+            ReportScanDiagnostic, ReportScanFailure, SourceReportScanInput, try_scan_for_reports,
+            try_scan_for_reports_with_input,
+        };
         if !self.reports.scan.get_report_input {
             return Ok(());
         }
-        let requested = try_scan_for_reports(
-            input,
-            &mut self.reports.scan,
-            "EnergyManagementSystem",
-            None,
-            None,
-            None,
-            |diagnostic| match diagnostic {
-                ReportScanDiagnostic::Warning(message) => self.backend.show_warning_error(&message),
-                ReportScanDiagnostic::Continue(message) => {
-                    self.backend.show_continue_error(&message)
-                }
-            },
-        )
-        .map_err(|error| {
+        let mut diagnostic = |diagnostic| match diagnostic {
+            ReportScanDiagnostic::Warning(message) => self.backend.show_warning_error(&message),
+            ReportScanDiagnostic::Continue(message) => self.backend.show_continue_error(&message),
+        };
+        let result = if let Some(actual_input) = self.reports.selected_input_processor.as_mut() {
+            let mut source = SourceReportScanInput::new(
+                actual_input,
+                &mut self.reports.input_processor_shortcut,
+                input,
+            )
+            .map_err(|value| CtfInitializationError::Postlude(CtfInitPostludeError::Scan(value)))?;
+            try_scan_for_reports_with_input(
+                input,
+                &mut self.reports.scan,
+                "EnergyManagementSystem",
+                None,
+                None,
+                None,
+                &mut source,
+                &mut diagnostic,
+            )
+        } else {
+            try_scan_for_reports(
+                input,
+                &mut self.reports.scan,
+                "EnergyManagementSystem",
+                None,
+                None,
+                None,
+                &mut diagnostic,
+            )
+        };
+        let requested = result.map_err(|error| {
             CtfInitializationError::Postlude(match error {
                 ReportScanFailure::Unavailable(value) => CtfInitPostludeError::Scan(value),
                 ReportScanFailure::Diagnostic(value) => CtfInitPostludeError::Backend(value),

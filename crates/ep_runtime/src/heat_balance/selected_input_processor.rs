@@ -1,7 +1,7 @@
 //! Selected real InputProcessor queries and its sole shared shortcut allocation.
 //! Schema metadata is projected from the pinned IDD after ordinary raw admission.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Literal legacy_idd field counts; not an object-admission allowlist.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -23,6 +23,8 @@ pub struct SourceObjectDefinition {
 /// Actual JSON .size() values of the input fields, before schema queries mutate presence.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SourceObjectShape {
+    /// Exact original epJSON object-map key, including case and blank spelling.
+    pub object_name: String,
     /// Actual input field names and their JSON .size() values.
     pub field_sizes: BTreeMap<String, usize>,
 }
@@ -41,6 +43,8 @@ pub enum SourceInputFamily {
 pub struct SelectedInputProcessor {
     definitions: BTreeMap<String, SourceObjectDefinition>,
     families: BTreeMap<String, SourceInputFamily>,
+    // Source initializeMaps/ObjectInfo lexicographic exact-case identity owner.
+    unused_inputs: BTreeSet<(String, String)>,
 }
 
 /// Independent Original alpha/numeric argument counts.
@@ -84,7 +88,7 @@ impl SelectedInputProcessor {
     /// Retain complete actual family presence/shapes and the finite real schema closure.
     ///
     /// # Errors
-    /// Rejects duplicate/empty schema identities or an unrepresented present family.
+    /// Rejects duplicate schema/object identities or an unrepresented present family.
     pub fn from_admitted_input(
         definitions: Vec<SourceObjectDefinition>,
         families: BTreeMap<String, SourceInputFamily>,
@@ -105,9 +109,20 @@ impl SelectedInputProcessor {
                 return Err(SelectedInputUnavailable::Definition(name.clone()));
             }
         }
+        let mut unused_inputs = BTreeSet::new();
+        for (object_type, family) in &families {
+            if let SourceInputFamily::Objects(objects) = family {
+                for object in objects {
+                    if !unused_inputs.insert((object_type.clone(), object.object_name.clone())) {
+                        return Err(SelectedInputUnavailable::Association);
+                    }
+                }
+            }
+        }
         Ok(Self {
             definitions: by_name,
             families,
+            unused_inputs,
         })
     }
 
@@ -125,6 +140,48 @@ impl SelectedInputProcessor {
             Some(SourceInputFamily::Objects(objects)) => objects.len(),
             Some(SourceInputFamily::Null) | None => 0,
         }
+    }
+
+    /// Return the actual exact-case section size, or -1 for an absent section.
+    /// Unlike object counts this does not canonicalize or insert a family.
+    ///
+    /// # Errors
+    /// Returns Size when a present section count exceeds the Original signed int.
+    pub fn get_num_sections_found(
+        &self,
+        section_word: &str,
+    ) -> Result<i32, SelectedInputUnavailable> {
+        match self.families.get(section_word) {
+            None => Ok(-1),
+            Some(SourceInputFamily::Null) => Ok(0),
+            Some(SourceInputFamily::Objects(objects)) => {
+                i32::try_from(objects.len()).map_err(|_| SelectedInputUnavailable::Size)
+            }
+        }
+    }
+
+    /// Inspect permanent exact-case raw identity, including an already used object.
+    /// This does not consult or mutate the distinct unusedInputs owner.
+    pub fn has_object(&self, object_type: &str, object_name: &str) -> bool {
+        match self.families.get(object_type) {
+            Some(SourceInputFamily::Objects(objects)) => objects
+                .iter()
+                .any(|object| object.object_name == object_name),
+            Some(SourceInputFamily::Null) | None => false,
+        }
+    }
+
+    /// Actual markObjectAsUsed exact-case erase; absent/already-used is a no-op.
+    pub fn mark_object_as_used(&mut self, object_type: &str, object_name: &str) {
+        self.unused_inputs
+            .remove(&(object_type.into(), object_name.into()));
+    }
+
+    /// Inspect the actual remaining exact-case unused object identity.
+    /// False for an absent or already-consumed object, not a readiness decision.
+    pub fn is_object_unused(&self, object_type: &str, object_name: &str) -> bool {
+        self.unused_inputs
+            .contains(&(object_type.into(), object_name.into()))
     }
 
     /// Actual presence, including null insertion, is observable by subsequent getters.
