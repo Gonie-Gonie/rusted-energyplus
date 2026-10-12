@@ -12541,6 +12541,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/summary.json",
         "sha256": "f7e63f6bb3fb17c369ee01eb131f62e699a98157158a9126a35e3965ee90b34b",
         "size_bytes": 13417
+      },
+      "actual_selected_ordinary_solar_initialization": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-solar-initialization/summary.json",
+        "sha256": "4c0291b8d261bff16962781ea19f986e67b3601d26eccc5685f03b85933b46cf",
+        "size_bytes": 5767
       }
     },
     {

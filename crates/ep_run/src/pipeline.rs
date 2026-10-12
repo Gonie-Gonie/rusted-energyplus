@@ -3583,7 +3583,12 @@ fn prepare_runtime_inputs(
         ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
         {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
-            input.equipment_input = Some(crate::ordinary_equipment_input::resolve(raw_model)?);
+            let (equipment, radiation) = crate::ordinary_equipment_input::resolve_with_radiation(
+                raw_model,
+                input.advanced_report_variables,
+            )?;
+            input.equipment_input = Some(equipment);
+            input.radiation_input = Some(radiation);
             Some(input)
         } else {
             None

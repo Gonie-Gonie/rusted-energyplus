@@ -1,0 +1,126 @@
+{
+  "schema": "src06-actual-consumed-solar-initialization.v1",
+  "status": "Source integrated and Rust regressions verified; new Solar owner/EIO Native parity remains pending.",
+  "current_Source": {
+    "path": ".runtime/porting/source-objects/90/90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+    "sha256": "90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+    "size_bytes": 1642317
+  },
+  "owner_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-owner-application-Root-01/application-literal.json",
+    "sha256": "160adf03b258dd10acf8c16a9dc94a8f9e0fac3146f65096d172175963c007e2",
+    "size_bytes": 22662
+  },
+  "test_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-tests-application-Root-01.json",
+    "sha256": "813009f33cc9309ac60892e321426e9a48787ec18b186ae1fdd4638ecd9bb60a",
+    "size_bytes": 3963
+  },
+  "formatter": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-owner-fmt-01/receipt.json",
+    "sha256": "e0e6f420e49f96a4c2449bc882763396a0c57cf3bcd6cc16ef8bc8cae2f6cb85",
+    "size_bytes": 4726
+  },
+  "independent_reviews": [
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-solar-Source-review-03/review.json",
+      "sha256": "ca9375a4cd66feddd922f62c6e85a4c77ba9e040c975aa5b7473b0a617d7a469",
+      "size_bytes": 3220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-solar-owner-Source-review-03/review.json",
+      "sha256": "f5e5b43ec745566483d2613a6da97663050f2be720d70545251f0391ed60219c",
+      "size_bytes": 2352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-solar-tests-Source-review-02/review.json",
+      "sha256": "057334a39ccd10e9fbeed4c48d3447868b05451299cae41f9f8d444a9dcc5090",
+      "size_bytes": 1346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-solar-formatter-review-01/review.json",
+      "sha256": "a65b13049ba9b998d4dba425c6452526f0e0163c10444a76ca5d7ba2c395eac1",
+      "size_bytes": 2473
+    }
+  ],
+  "QA": {
+    "fmt": {
+      "path": ".runtime/porting/SRC-06/ordinary-solar-owner-fmt-check-01/receipt.json",
+      "sha256": "a96ac4d718ae6a28d93ad94f685dab09aaa9fe40eb8d8b3c7dbfdc289f21ced4",
+      "size_bytes": 4753
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-06/ordinary-solar-owner-clippy-01/receipt.json",
+      "sha256": "ce196bb9945b282b6f88c7c96818a953e6d68ca425e567aa4911055af3cc4ecf",
+      "size_bytes": 4814
+    },
+    "source_quality": {
+      "path": ".runtime/porting/SRC-06/ordinary-solar-owner-source-quality-01/receipt.json",
+      "sha256": "6f61ca251713dc3ca1b4243b541f333a2bbb74e54ea6486a63a3ed88921ec7bd",
+      "size_bytes": 4815
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-06/ordinary-solar-owner-workspace-01/receipt.json",
+      "sha256": "4663ed752112895c6cf7e0443effa92a67baa0bd2e909c6b7e08c307fc67efed",
+      "size_bytes": 4790
+    }
+  },
+  "workspace_tests": {
+    "groups": 18,
+    "passed": 4974,
+    "failed": 0,
+    "ignored": 2
+  },
+  "affected_Source_files": 18,
+  "existing_test_count_changed": false,
+  "new_test_binary_or_framework_added": false,
+  "existing_Native_primitive_cases": 5,
+  "existing_Native_output_bits_retained": 204,
+  "additional_actual_Fix_diagnostic_bits": 4,
+  "additional_actual_Fix_iteration_count": true,
+  "Native_primitive_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_producer_native_cases.json",
+    "sha256": "7ddc9d8d623f9e693913def6780aee465a7a8a782be37a4540aed67361e94405",
+    "size_bytes": 219335
+  },
+  "prior_primitive_evidence": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-producer/summary.json",
+    "sha256": "f7e63f6bb3fb17c369ee01eb131f62e699a98157158a9126a35e3965ee90b34b",
+    "size_bytes": 13417
+  },
+  "Source_contract": [
+    "Actual inside construction solar absorptance retained independently of outside absorptance.",
+    "Actual InitSolar after construction/surface returns and before present convective/radiant gain consumers.",
+    "Shared report/EIO/backend and actual partial Solar owner retained on error; owner moved into State on success.",
+    "None route retained; warning-buffer output rejected before F commit; N1 literal skip retained."
+  ],
+  "authored_Rust_regression_cases": [
+    "N1 success: inside0.25/outside0.75, storage/associations/move and9W+3W after Solar.",
+    "Four actual parallel Walls: NumericDomain retains allocated+0F/associations, initializedfalse and zero gain lookups."
+  ],
+  "limits": [
+    "New Solar owner/EIO/initialization lifecycle numerical Native parity is not claimed.",
+    "Full Original GetInternalHeatGainsInput, ordinary radiant enclosure/ScriptF cache/callers and activation remain incomplete.",
+    "Actual kickoff visits two DesignDays; missing DesignDay producer and complete selected InitSurface suffix remain next dependencies.",
+    "Archived Source metadata does not imply all historical refs or build/executable payloads are archived or replayed."
+  ],
+  "SRC06_gates_preserved": {
+    "scope_review": "미확인",
+    "unit_gate": "미확인",
+    "integration_gate": "미확인",
+    "production_gate": "미확인"
+  },
+  "gates_updated": false,
+  "ordinary_interior_radiation_activation_claimed": false,
+  "scientific_whole_port_PASS_claimed": false,
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-solar-initialization/manifest.json",
+    "sha256": "95125798cd00ee6e204ed18ab039eff5bb9109e5a7e1085c96b730717cb35876",
+    "size_bytes": 59961
+  },
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-solar-initialization/evidence.zip",
+    "sha256": "871f210559b2fb7d636b08acebc26db02774ae4049b0bd1263cec945f18be82d",
+    "size_bytes": 1020317
+  }
+}

@@ -55,6 +55,9 @@ pub struct HeatBalanceState {
     pub warmup_convergence: Option<HeatBalanceWarmupConvergenceState>,
     /// Retained actual geometry GetZoneEquipment owner for explicit ordinary input.
     pub(crate) ordinary_equipment: Option<super::ordinary_equipment::OrdinaryEquipment>,
+    /// Actual initialized solar prefix, moved from the caller context.
+    /// None preserves the legacy initializer without admitted raw facts.
+    pub ordinary_solar_radiation: Option<super::radiation::ordinary::OrdinarySolarRadiation>,
     /// Present only for the explicitly admitted ordinary A temperature route.
     pub(crate) ordinary_inside_temperatures:
         Option<super::ordinary_inside_temperatures::OrdinaryInsideTemperatures>,
@@ -439,6 +442,8 @@ pub struct SurfaceHeatBalanceState {
     pub inside_thermal_absorptance: f64,
     /// Outside layer solar absorptance used by exterior diagnostic forcing.
     pub solar_absorptance: f64,
+    /// Construct.InsideAbsorpSolar from the actual inside material, not outside solar.
+    pub inside_solar_absorptance: f64,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
     /// Current inside convection coefficient in W/m2-K.
@@ -1110,6 +1115,10 @@ impl HeatBalanceSimulationOptions {
 pub struct HeatBalanceOrdinaryWarmupReportInputs {
     /// Actual selected first Output:Diagnostics detailed warmup key.
     pub detailed: bool,
+    /// Actual first Output:Diagnostics DisplayAdvancedReportVariables key.
+    pub advanced_report_variables: bool,
+    /// Radiation counts from the same successful complete ordinary raw admission.
+    pub radiation_input: Option<super::radiation::ordinary::OrdinaryRadiationInput>,
     /// Actual selected project control result; the weather A admission requires false.
     pub do_pure_load_calc: bool,
     /// Actual ZoneAirHeatBalanceAlgorithm sizing space-control input.

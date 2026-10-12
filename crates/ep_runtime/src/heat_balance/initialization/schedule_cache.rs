@@ -39,7 +39,7 @@ pub fn initialize_heat_balance_state_with_initialization_context(
         &schedule_cache,
         None,
         Some(context),
-        None,
+        super::OrdinaryInitializationInputs::default(),
     )
 }
 
@@ -76,7 +76,7 @@ pub(crate) fn initialize_heat_balance_state_with_ctf_coefficients_and_schedule_c
         schedule_cache,
         None,
         None,
-        None,
+        super::OrdinaryInitializationInputs::default(),
     )
 }
 
@@ -94,7 +94,7 @@ pub(crate) fn initialize_heat_balance_state_with_ctf_coefficients_and_schedule_c
         schedule_cache,
         Some(&mut profile.initialization),
         None,
-        None,
+        super::OrdinaryInitializationInputs::default(),
     )
 }
 
@@ -113,7 +113,7 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_profiled
         schedule_cache,
         profile,
         context,
-        None,
+        super::OrdinaryInitializationInputs::default(),
     )
 }
 
@@ -124,7 +124,7 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_and_equi
     schedule_cache: &ScheduleSeriesCache,
     profile: &mut HeatBalanceInternalGainScheduleOperationProfile,
     context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
-    equipment_input: Option<super::super::ordinary_equipment::OrdinaryEquipmentInput>,
+    inputs: super::OrdinaryInitializationInputs,
 ) -> Result<HeatBalanceState, RuntimeError> {
     initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         model,
@@ -133,7 +133,7 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_and_equi
         schedule_cache,
         Some(&mut profile.initialization),
         Some(context),
-        equipment_input,
+        inputs,
     )
 }
 

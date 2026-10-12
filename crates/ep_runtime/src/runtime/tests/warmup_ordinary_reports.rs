@@ -20,7 +20,7 @@ fn ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day(
                 backend:SourceErrorBackend {state:&mut backend_state,error_stream:Some(&mut error),console:&mut console,
                 out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None}};
             crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
-                &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false,do_space_heat_balance_for_sizing:false,do_space_heat_balance_for_simulation:false,
+                &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,advanced_report_variables:false,radiation_input:None,do_pure_load_calc:false,do_space_heat_balance_for_sizing:false,do_space_heat_balance_for_simulation:false,
                     no_user_convection_input:crate::heat_balance::inside_convection_dispatcher::NoUserConvectionInput::new([0;6])?,
                     low_hconv_limit_w_per_m2_k:0.375,
                     equipment_input:Some(crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_family_inventory([],4)?)})?

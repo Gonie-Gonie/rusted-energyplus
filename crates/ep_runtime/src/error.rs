@@ -19,6 +19,8 @@ pub enum RuntimeError {
     ),
     /// Reached selected probe requires unsupported radiation operands or owners.
     InteriorRadiation(crate::heat_balance::radiation::InteriorRadiationUnavailable),
+    /// Real retained ordinary radiation owner/output stop.
+    OrdinaryRadiation(Box<crate::heat_balance::radiation::ordinary::OrdinaryRadiationError>),
     /// No zones were available to simulate.
     NoZones,
     /// Actual warmup demand/topology/daily owner is outside this bounded Source route.
@@ -127,6 +129,7 @@ impl Display for RuntimeError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InteriorRadiation(error) => Display::fmt(error, formatter),
+            Self::OrdinaryRadiation(error) => Display::fmt(error, formatter),
             Self::CtfInitialization(error) => Display::fmt(error, formatter),
             Self::WarmupOutput(error) => Display::fmt(error, formatter),
             Self::SurfaceOutdoorEnvironment(error) => Display::fmt(error, formatter),
@@ -241,6 +244,7 @@ impl std::error::Error for RuntimeError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::InteriorRadiation(error) => Some(error),
+            Self::OrdinaryRadiation(error) => Some(error.as_ref()),
             Self::CtfInitialization(error) => Some(error.as_ref()),
             Self::WarmupOutput(error) => Some(error.as_ref()),
             Self::SurfaceOutdoorEnvironment(error) => Some(error.as_ref()),

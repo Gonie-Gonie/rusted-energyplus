@@ -27,6 +27,8 @@ pub struct CtfInitializationReports {
     pub scan: ReportScanState,
     /// Reached ordinary postlude writes and return boundaries.
     pub progress: CtfInitPostludeProgress,
+    /// Actual reached InitSolar prefix on failure; moved into State on success.
+    pub ordinary_solar_radiation: Option<super::radiation::ordinary::OrdinarySolarRadiation>,
 }
 
 /// Distinct actual initialization failures, retaining the original backend errors.

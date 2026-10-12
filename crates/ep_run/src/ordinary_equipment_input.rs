@@ -287,6 +287,26 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
     .map_err(|error| error.to_string())
 }
 
+/// Reuse the one existing complete positive-family/field admission once, then
+/// retain actual radiation query counts and selected project diagnostic input.
+pub(crate) fn resolve_with_radiation(
+    raw: &RawModel,
+    advanced_report_variables: bool,
+) -> Result<
+    (
+        OrdinaryEquipmentInput,
+        ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput,
+    ),
+    String,
+> {
+    let equipment = resolve(raw)?;
+    let radiation = ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
+        raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len())),
+        advanced_report_variables,
+    ).map_err(|error| error.to_string())?;
+    Ok((equipment, radiation))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

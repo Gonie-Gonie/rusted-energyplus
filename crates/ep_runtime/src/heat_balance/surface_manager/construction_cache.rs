@@ -566,6 +566,9 @@ fn construction_thermal_data(
         inside_thermal_absorptance: inside_opaque_material
             .surface_properties()
             .thermal_absorptance,
+        inside_solar_absorptance: inside_opaque_material
+            .surface_properties()
+            .solar_absorptance,
         solar_absorptance: outside_opaque_material
             .surface_properties()
             .solar_absorptance,

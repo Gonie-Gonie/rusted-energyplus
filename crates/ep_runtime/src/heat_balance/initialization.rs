@@ -40,6 +40,13 @@ use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache}
 use ep_model::SimulationModel;
 use state_shell::finish_heat_balance_state;
 
+/// Actual optional raw-admission projections for the one existing initializer.
+#[derive(Default)]
+pub(crate) struct OrdinaryInitializationInputs {
+    pub(crate) equipment: Option<super::ordinary_equipment::OrdinaryEquipmentInput>,
+    pub(crate) radiation: Option<super::radiation::ordinary::OrdinaryRadiationInput>,
+}
+
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     model: &SimulationModel,
@@ -50,8 +57,18 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     mut initialization: Option<
         &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
     >,
-    equipment_input: Option<super::ordinary_equipment::OrdinaryEquipmentInput>,
+    inputs: OrdinaryInitializationInputs,
 ) -> Result<HeatBalanceState, RuntimeError> {
+    let OrdinaryInitializationInputs {
+        equipment: equipment_input,
+        radiation: radiation_input,
+    } = inputs;
+    if radiation_input.is_some() && initialization.is_none() {
+        return Err(super::radiation::ordinary::OrdinaryRadiationError::from(
+            super::radiation::ordinary::OrdinaryRadiationUnavailable::MissingInitializationContext,
+        )
+        .into());
+    }
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
     }
@@ -132,13 +149,19 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
             )
             .unwrap_or(0.0),
-            convective_internal_gain_w:
+            // On the admitted solar route, defer the actual physical gain
+            // consumer until construction/surface returns and InitSolar.
+            // The legacy None route retains its existing call order.
+            convective_internal_gain_w: if radiation_input.is_some() {
+                0.0
+            } else {
                 schedule_cache::convective_internal_gain_w_for_initialization(
                     &model.typed,
                     schedule_cache,
                     zone.id,
                     operations.as_deref_mut(),
-                ),
+                )
+            },
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
             opaque_surface_outside_conduction_w: 0.0,
@@ -169,7 +192,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
             .collect::<Result<Vec<_>, _>>()?
     };
-    let mut construction_thermal_data = if let Some(actual) = initialization {
+    let mut construction_thermal_data = if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_registry(&model.typed)?;
         crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
             &model.typed,
@@ -281,6 +304,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 thermal_absorptance: thermal.thermal_absorptance,
                 inside_thermal_absorptance: thermal.inside_thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
+                inside_solar_absorptance: thermal.inside_solar_absorptance,
                 conductance_w_per_k,
                 inside_convection_coefficient_w_per_m2_k:
                     ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K,
@@ -302,6 +326,35 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
+    if let Some(input) = radiation_input {
+        let actual = initialization.as_deref_mut().ok_or_else(|| {
+            RuntimeError::from(super::radiation::ordinary::OrdinaryRadiationError::from(
+                super::radiation::ordinary::OrdinaryRadiationUnavailable::MissingInitializationContext,
+            ))
+        })?;
+        let mut owner =
+            super::radiation::ordinary::OrdinarySolarRadiation::for_initialized_geometry(
+                &model.typed,
+                &surfaces,
+                input,
+            )?;
+        // Restore the real reached prefix before propagating any output/domain
+        // failure, so the caller's reports/EIO/backend retain the partial owner.
+        let result = owner.initialize_solar_at_input_boundary(&model.typed, &surfaces, actual);
+        actual.reports.ordinary_solar_radiation = Some(owner);
+        result?;
+        // These are the present typed-model consumers, not a claim that the
+        // full Original ManageInternalHeatGains/GetInternalHeatGainsInput is ported.
+        for zone in &mut zones {
+            zone.convective_internal_gain_w =
+                schedule_cache::convective_internal_gain_w_for_initialization(
+                    &model.typed,
+                    schedule_cache,
+                    zone.zone_id,
+                    operations.as_deref_mut(),
+                );
+        }
+    }
     schedule_cache::initialize_surface_radiant_internal_gains(
         &model.typed,
         schedule_cache,
@@ -355,5 +408,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         ctf_surface_lifecycle,
     );
     state.ordinary_equipment = equipment;
+    if radiation_input.is_some() {
+        state.ordinary_solar_radiation =
+            initialization.and_then(|actual| actual.reports.ordinary_solar_radiation.take());
+    }
     Ok(state)
 }

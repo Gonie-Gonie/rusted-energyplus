@@ -5,6 +5,8 @@ use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{SurfaceId, SurfaceType, ZoneId};
 use std::collections::BTreeMap;
 
+pub mod ordinary;
+
 /// Current longwave/solar source-order owner for outside-face inputs.
 pub const EXTERIOR_RADIATION_OWNER_STAGE: &str = "CalcHeatBalanceOutsideSurf";
 
@@ -572,10 +574,28 @@ fn energyplus_surface_sees_surface(
 
 /// Selected warning-free balanced N>3 numeric branch of Original FixViewFactors.
 /// Diagnostic and persistent-owner branches are explicitly unavailable here.
+#[derive(Clone, Debug, PartialEq)]
+struct FixedViewFactors {
+    view_factors: Vec<f64>,
+    original_check: f64,
+    fixed_check: f64,
+    final_check: f64,
+    iterations: usize,
+    row_sum: f64,
+}
+
 pub(crate) fn fix_energyplus_approximate_view_factors(
     areas: &[f64],
     view_factors: &[f64],
 ) -> Option<Vec<f64>> {
+    fix_energyplus_approximate_view_factors_with_outcome(areas, view_factors)
+        .map(|outcome| outcome.view_factors)
+}
+
+fn fix_energyplus_approximate_view_factors_with_outcome(
+    areas: &[f64],
+    view_factors: &[f64],
+) -> Option<FixedViewFactors> {
     let surface_count = areas.len();
     let extent = surface_count.checked_mul(surface_count)?;
     if surface_count <= 3
@@ -644,10 +664,22 @@ pub(crate) fn fix_energyplus_approximate_view_factors(
             return None;
         }
         if converged {
-            if convergence_new < original_check
-                || (fixed_factors.iter().sum::<f64>() - surface_count as f64).abs() < 0.001
-            {
-                return Some(fixed_factors);
+            // RowSum is initialized to +0 and assigned only in Original's
+            // final fallback branch; retain it instead of recomputing a report.
+            let row_sum = if convergence_new < original_check {
+                0.0
+            } else {
+                fixed_factors.iter().sum::<f64>()
+            };
+            if convergence_new < original_check || (row_sum - surface_count as f64).abs() < 0.001 {
+                return Some(FixedViewFactors {
+                    view_factors: fixed_factors,
+                    original_check,
+                    fixed_check: convergence_new,
+                    final_check: convergence_new,
+                    iterations,
+                    row_sum,
+                });
             }
             // Original emits a completeness warning for the remaining branch.
             return None;

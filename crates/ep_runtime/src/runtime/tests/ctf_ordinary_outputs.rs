@@ -43,6 +43,102 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
     assert_eq!(entries[0].object_name,"Wall");
     assert_eq!(entries[0].char_entry,"R1");
     assert!(error.is_empty());assert!(eio.is_empty());
+    // Authored typed input: exercise the real optional Solar initializer,
+    // not an observed Native owner endpoint or another weather simulation.
+    for (surface_count, success) in [(1_usize, true), (4, false)] {
+        let mut typed = ctf_ordinary_output_test_model();
+        typed.zones[0].ceiling_height = AutoOrNumber::Value(1.0);
+        typed.zones[0].floor_area = AutoOrNumber::Value(1.0);
+        let wall = typed.surfaces.iter().find(|surface| surface.surface_type == SurfaceType::Wall)
+            .cloned().ok_or("missing authored Wall fixture")?;
+        typed.surfaces = (0..surface_count).map(|index| {
+            let mut surface = wall.clone();
+            surface.id = SurfaceId(u32::try_from(index)?);
+            surface.name = NormalizedName::new(&format!("authored parallel wall {index}"));
+            Ok::<_, Box<dyn std::error::Error>>(surface)
+        }).collect::<Result<Vec<_>, _>>()?;
+        let mut inside = typed.materials[0].clone();
+        inside.id = MaterialId(1);
+        inside.name = NormalizedName::new("authored inside layer");
+        let ep_model::MaterialDefinition::NoMass(material) = &mut inside.definition else {
+            return Err("expected authored opaque inside material".into());
+        };
+        material.surface.solar_absorptance = 0.25;
+        typed.materials.push(inside);
+        typed.ctf_report_names.materials.push((MaterialId(1), "authored inside layer".into()));
+        typed.constructions[0].layers.push(MaterialId(1));
+        typed.other_equipment[0].fraction_radiant = 0.25;
+        let model = SimulationModel::from_typed(typed);
+        let (schedule_cache, mut profile) =
+            crate::schedules::precompute_hour_only_internal_gain_schedule_cache_profiled(&model.typed)?;
+        assert_eq!(profile.cache_entry_count, 1);
+        let (mut reports, mut state, mut error, mut console, mut eio) =
+            (CtfInitializationReports::default(), ctf_ordinary_output_test_state(),
+             Vec::new(), Vec::new(), Vec::new());
+        let result = {
+            let mut context = CtfInitializationContext { reports: &mut reports, eio: &mut eio,
+                backend: SourceErrorBackend { state: &mut state, error_stream: Some(&mut error),
+                    console: &mut console, out_unit1: None, out_unit2: None, f_message: None,
+                    message_callback: None, error_callback: None, sqlite: None } };
+            crate::heat_balance::initialization::initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+                &model, 23.0, &[], &schedule_cache, &mut profile, &mut context,
+                crate::heat_balance::initialization::OrdinaryInitializationInputs {
+                    equipment: None,
+                    radiation: Some(crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory([], true)?),
+                },
+            )
+        };
+        assert!(reports.progress.postlude_returned);
+        let owner = if success {
+            let output = result?;
+            assert!(reports.ordinary_solar_radiation.is_none(), "successful owner must move into State");
+            let surface = &output.surfaces[0];
+            assert_eq!(surface.inside_solar_absorptance.to_bits(), 0.25_f64.to_bits());
+            assert_eq!(surface.solar_absorptance.to_bits(), 0.75_f64.to_bits());
+            assert_eq!(output.zones[0].convective_internal_gain_w.to_bits(), 9.0_f64.to_bits());
+            assert!((surface.inside_radiant_internal_gain_w_per_m2 - 3.0).abs() < 1.0e-12);
+            assert_eq!(profile.initialization.cached_value_lookup_count, 2,
+                "both actual gain consumers run after successful InitSolar");
+            output.ordinary_solar_radiation.ok_or("missing moved actual Solar owner")?
+        } else {
+            use crate::heat_balance::radiation::ordinary::{OrdinaryRadiationError, OrdinaryRadiationUnavailable};
+            assert!(matches!(result, Err(RuntimeError::OrdinaryRadiation(error))
+                if matches!(*error, OrdinaryRadiationError::Unavailable(OrdinaryRadiationUnavailable::NumericDomain))));
+            assert_eq!(profile.initialization.cached_value_lookup_count, 0,
+                "neither convective nor radiant gain consumer may precede the failed Solar prefix");
+            reports.ordinary_solar_radiation.take().ok_or("missing retained partial Solar owner")?
+        };
+        assert_eq!(owner.is_initialized(), success);
+        assert_eq!(owner.enclosures().len(), 1);
+        let enclosure = &owner.enclosures()[0];
+        assert_eq!(enclosure.id, 1);
+        assert_eq!(enclosure.zone_id, model.typed.zones[0].id);
+        assert_eq!(enclosure.space_ids, [model.typed.spaces[0].id]);
+        assert_eq!(enclosure.surface_ptr,
+            model.typed.surfaces.iter().map(|surface| surface.id).collect::<Vec<_>>());
+        assert_eq!(enclosure.surface_indexes, (0..surface_count).collect::<Vec<_>>());
+        assert_eq!(enclosure.surface_report_nums, (0..surface_count).collect::<Vec<_>>());
+        assert_eq!(owner.back_pointers(), (0..surface_count).map(|index| (1, 1, index + 1)).collect::<Vec<_>>());
+        assert_eq!(enclosure.area, vec![1.0; surface_count]);
+        assert_eq!(enclosure.absorptance, vec![0.25; surface_count]);
+        assert_eq!(enclosure.azimuth.len(), surface_count);
+        assert_eq!(enclosure.tilt.len(), surface_count);
+        assert!(enclosure.azimuth.iter().all(|value| value.to_bits() == enclosure.azimuth[0].to_bits()));
+        assert!(enclosure.tilt.iter().all(|value| value.to_bits() == enclosure.tilt[0].to_bits()));
+        assert_eq!(enclosure.f.len(), surface_count * surface_count);
+        assert!(enclosure.f.iter().all(|value| value.to_bits() == 0.0_f64.to_bits()),
+            "N1 skips numeric work; buffered-warning rejection retains allocated +0 F");
+        let text = std::str::from_utf8(&eio)?;
+        assert_eq!(text.matches("! <Solar View Factor Check Values>").count(), 1);
+        assert_eq!(text.lines().filter(|line| line.starts_with("Solar View Factor Check Values,")).count(), usize::from(success));
+        if success {
+            assert!(text.contains(&format!("Solar View Factor Check Values,{},0,0,0,-1,0,0", model.typed.spaces[0].name.0)));
+        }
+        assert_eq!(state.tracking.total_warning_errors, 0,
+            "buffered approximate warnings are unavailable, not emitted as Original mid-loop effects");
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        assert!(error.is_empty());
+    }
     Ok(())
 }
 

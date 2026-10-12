@@ -50,6 +50,7 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
     // DataSystemVariables constructor false; GetProjectData processes only the
     // first name-ordered instance, retaining every actual selected key in order.
     let mut detailed = false;
+    let mut advanced_report_variables = false;
     if let Some((_, first)) = raw
         .objects
         .get(&ObjectType("Output:Diagnostics".into()))
@@ -71,6 +72,9 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
             };
             if key.eq_ignore_ascii_case("ReportDetailedWarmupConvergence") {
                 detailed = true;
+            }
+            if key.eq_ignore_ascii_case("DisplayAdvancedReportVariables") {
+                advanced_report_variables = true;
             }
         }
     }
@@ -143,6 +147,8 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
     };
     Ok(HeatBalanceOrdinaryWarmupReportInputs {
         detailed,
+        advanced_report_variables,
+        radiation_input: None,
         do_pure_load_calc,
         do_space_heat_balance_for_sizing,
         do_space_heat_balance_for_simulation,
@@ -164,6 +170,8 @@ mod tests {
             resolve(&parse_epjson_str("{}")?)?,
             HeatBalanceOrdinaryWarmupReportInputs {
                 detailed: false,
+                advanced_report_variables: false,
+                radiation_input: None,
                 do_pure_load_calc: false,
                 do_space_heat_balance_for_sizing: false,
                 do_space_heat_balance_for_simulation: false,
@@ -176,6 +184,13 @@ mod tests {
             r#"{"Output:Diagnostics":{"first":{"diagnostics":[{}, {"key":"reportdetailedwarmupconvergence"}]}}}"#,
         )?;
         assert!(resolve(&raw)?.detailed);
+        let raw = parse_epjson_str(
+            r#"{"Output:Diagnostics":{"first":{"diagnostics":[{"key":"displayadvancedreportvariables"}]}}}"#,
+        )?;
+        let actual = resolve(&raw)?;
+        assert!(actual.advanced_report_variables);
+        assert!(!actual.detailed);
+        assert!(actual.radiation_input.is_none());
         Ok(())
     }
 

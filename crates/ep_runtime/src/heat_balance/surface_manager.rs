@@ -38,6 +38,7 @@ pub(crate) struct ConstructionThermalData {
     pub(crate) thermal_absorptance: f64,
     pub(crate) inside_thermal_absorptance: f64,
     pub(crate) solar_absorptance: f64,
+    pub(crate) inside_solar_absorptance: f64,
     pub(crate) ctf_coefficient_source: ConstructionCtfCoefficientSource,
     pub(crate) ctf_coefficients: Vec<ConstructionCtfCoefficientOverride>,
 }

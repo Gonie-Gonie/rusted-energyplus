@@ -402,3 +402,40 @@ Source `690a7374`의 과거 실행이며 최종 Source 검증으로 대신하지
 실제 enclosure/cache/first-call/report/sigma 소유권, ordinary radiation 활성화,
 실제 반복 cadence와 전체 zone 해법·handoff 일치는 아직 미완료다.
 네 SRC-06 gate와 A14/54, B14/64는 그대로 유지한다.
+
+## 실제 태양복사 초기화 경로와 부분 상태 보존
+
+전체 ordinary raw 입력 검증에서 얻은 radiation 입력과 실제 advanced-report
+선택을 초기화 경로에 전달한다. 실제 내부 재료의 solar absorptance를 외부
+재료의 값과 독립적으로 보존하고, construction/surface 준비가 끝난 뒤
+현재 convective/radiant gain 소비자보다 먼저 InitSolar를 호출한다.
+전체 Original GetInternalHeatGainsInput 구현 완료를 주장하지 않는다.
+
+선정된 단일 Zone·implicit Space의 Wall/Floor/Roof enclosure는 실제 순서와
+surface 연결로 배열·F·backpointer를 생성한다. 실제 report scan, EIO와
+error backend를 빌려 쓰며, 중단 시 도달한 부분 owner를 caller reports에
+남긴다. 성공한 owner는 State로 이동한다. 기존 None 경로는 유지한다.
+기존 approximate API가 모아 반환한 경고는 NumericDomain으로 중단하여
+Original의 중간 경고·부분 수치 결과처럼 재생하지 않는다.
+
+기존 초기화 테스트 안의 두 authored 입력으로 N1 성공, 내부0.25/외부0.75
+흡수율 구분, 실제 배열·연결·owner 이동, 성공 후 gain9W+3W를 확인한다.
+평행 Wall 4개 입력에서는 할당된 +0 F·연결·초기화 미완료 상태를 보존하고
+gain 조회 전에 중단함을 확인한다. 이 검사는 Rust 경로 회귀이며 새 Solar
+owner/EIO의 Native 수치 동등성 검증은 아직 아니다. 기존 실제 Native5회와
+204개 비트 검증을 유지하고, 같은 fixture의 실제 Fix diagnostic4개 비트와
+iteration 출력 검사를 추가했다. 테스트 수·binary·framework는 늘리지 않았다.
+
+최종 Source `90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee`에서
+fmt, workspace Clippy(-D warnings), source-quality와 전체 테스트 1회가 통과했다:
+18개 그룹, 4,974 passed, 0 failed, 기존 ignored2개. 개별 테스트의 중복 실행은
+추가하지 않았다. 변경된18개 Source, 전체 direct/formatter diff, Original18개
+구간, 독립 검토와 실제 QA 로그는
+[초기화 검증 요약](../evidence/SRC-06-ordinary-solar-initialization/summary.json),
+[색인](../evidence/SRC-06-ordinary-solar-initialization/manifest.json),
+[119개 member의 ZIP](../evidence/SRC-06-ordinary-solar-initialization/evidence.zip)에 보존한다.
+
+실제 SetupSimulation kickoff는 기준 입력의 DesignDay2개도 방문한다.
+현재 없는 DesignDay 생산자, 실제 InitSurface 전체 suffix, 공유 firstTime,
+radiant enclosure·ScriptF cache·반복 caller와 ordinary 활성화는 계속 포팅한다.
+SRC-06의 네 gate와 A14/54, B14/64는 변경하지 않는다.

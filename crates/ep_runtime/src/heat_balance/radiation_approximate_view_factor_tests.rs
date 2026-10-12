@@ -413,6 +413,7 @@ fn actual_native_fix_and_scriptf_calls_replay_all_dimensionless_output_bits()
     };
     let mut calls = [0_usize; 2];
     let mut compared_values = 0;
+    let mut compared_fix_diagnostics = 0;
     for (call_index, case) in cases.iter().enumerate() {
         // Any excluded call prevents whole-table numeric success; never skip it.
         assert_eq!(case["numerical_admitted"].as_bool(), Some(true));
@@ -436,9 +437,36 @@ fn actual_native_fix_and_scriptf_calls_replay_all_dimensionless_output_bits()
                 let areas = decode(&before["A"], "values", n)?;
                 let input_f = decode(&before["F"], "flat_values", extent)?;
                 let expected_f = decode(&after["F"], "flat_values", extent)?;
-                let actual_f = fix_energyplus_approximate_view_factors(&areas, &input_f)
+                let actual = fix_energyplus_approximate_view_factors_with_outcome(&areas, &input_f)
                     .ok_or("real Rust Fix unavailable for admitted Native input")?;
-                compared_values += compare(&actual_f, &expected_f, call_index, "fixed F");
+                compared_values +=
+                    compare(&actual.view_factors, &expected_f, call_index, "fixed F");
+                for (name, value) in [
+                    ("OriginalCheckValue", actual.original_check),
+                    ("FixedCheckValue", actual.fixed_check),
+                    ("FinalCheckValue", actual.final_check),
+                    ("RowSum", actual.row_sum),
+                ] {
+                    let expected = u64::from_str_radix(
+                        after[name]["value_bits"]
+                            .as_str()
+                            .ok_or("missing actual Fix diagnostic bits")?,
+                        16,
+                    )?;
+                    assert!(f64::from_bits(expected).is_finite());
+                    assert_eq!(
+                        value.to_bits(),
+                        expected,
+                        "actual Fix call {call_index}, {name}"
+                    );
+                    compared_fix_diagnostics += 1;
+                }
+                assert_eq!(
+                    u64::try_from(actual.iterations)?,
+                    after["NumIterations"]
+                        .as_u64()
+                        .ok_or("missing actual Fix iteration output")?
+                );
                 calls[0] += 1;
             }
             Some("calc_scriptf") => {
@@ -464,5 +492,6 @@ fn actual_native_fix_and_scriptf_calls_replay_all_dimensionless_output_bits()
     }
     assert_eq!(calls, [1, 4]);
     assert_eq!(compared_values, 204);
+    assert_eq!(compared_fix_diagnostics, 4);
     Ok(())
 }

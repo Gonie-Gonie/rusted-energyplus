@@ -384,6 +384,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 })
         })
         .transpose()?;
+    let radiation_input = reporting.and_then(|input| input.radiation_input);
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let first_hour_interpolation_starting_values =
@@ -447,7 +448,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     &schedule_cache,
                     &mut schedule_cache_profile,
                     context,
-                    equipment_input,
+                    crate::heat_balance::initialization::OrdinaryInitializationInputs {
+                        equipment: equipment_input,
+                        radiation: radiation_input,
+                    },
                 )?
             } else {
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
