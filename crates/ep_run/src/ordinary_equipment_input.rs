@@ -315,6 +315,28 @@ mod tests {
     #[test]
     fn raw_equipment_admission_preserves_empty_presence_and_rejects_positive_or_field_branches()
     -> Result<(), Box<dyn std::error::Error>> {
+        let converted = r#"{
+            "Version":{"Version 1":{"version_identifier":"26.1"}},
+            "Timestep":{"Timestep 1":{"number_of_timesteps_per_hour":4}},
+            "HeatBalanceAlgorithm":{"HeatBalanceAlgorithm 1":{"algorithm":"ConductionTransferFunction"}},
+            "SimulationControl":{"SimulationControl 1":{"run_simulation_for_weather_file_run_periods":"Yes"}},
+            "Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Zone":{"z":{}}
+        }"#;
+        let mut converted = ep_raw_model::parse_epjson_str_with_idf_order(
+            converted,
+            "Version,26.1;Timestep,4;HeatBalanceAlgorithm,ConductionTransferFunction;SimulationControl,No,No,No,No,Yes;Zone,z;",
+        )?;
+        assert!(resolve(&converted).is_ok());
+        let metadata = converted
+            .objects
+            .get_mut(&ObjectType("Version".into()))
+            .and_then(|rows| rows.get_mut(&ep_raw_model::ObjectName("Version 1".into())))
+            .ok_or("actual Version object missing")?;
+        metadata.fields.insert(
+            FieldName("idf_max_fields".into()),
+            RawValue::Number("-1".into()),
+        );
+        assert!(resolve(&converted).is_err());
         let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
         for (name, addition, accepted) in [
             ("absent queries", "", true),

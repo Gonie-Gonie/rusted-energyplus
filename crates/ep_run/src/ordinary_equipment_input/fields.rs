@@ -7,6 +7,19 @@ use ep_raw_model::{FieldName, RawValue};
 // run. The Source-reviewed branch restrictions below are deliberately narrower.
 pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
     match (family, name) {
+        // Actual parser metadata only, including the existing unnamed reports.
+        (
+            "Version"
+            | "HeatBalanceAlgorithm"
+            | "Timestep"
+            | "SimulationControl"
+            | "Output:VariableDictionary"
+            | "Output:Surfaces:Drawing"
+            | "Output:Constructions",
+            "idf_order" | "idf_max_fields" | "idf_max_extensible_fields",
+        ) => {
+            matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())
+        }
         ("Version", "version_identifier") => blank(value) || matches!(value, RawValue::String(_)),
         ("Timestep", "number_of_timesteps_per_hour") => {
             blank(value)

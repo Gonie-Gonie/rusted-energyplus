@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 15개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 16개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -101,6 +101,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 단일 SurfHConvInt 대여 | [요약](../evidence/SRC-06-ordinary-inside-convection-borrow/summary.json) · [색인](../evidence/SRC-06-ordinary-inside-convection-borrow/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-inside-convection-borrow/evidence.zip) | dispatcher가 실제 SurfaceHB 계수를 직접 대여; 전체 개수·순서 ID를 쓰기 전에 검증. 기존 8개 테스트 통과; 식/cadence 변경·새 Native 수치 비교 없음. |
 | 공통 InputProcessor / shortcut | [요약](../evidence/SRC-06-ordinary-shared-input/summary.json) · [색인](../evidence/SRC-06-ordinary-shared-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-shared-input/evidence.zip) | 입력 존재·JSON 크기, count 비변경·definition null 삽입, 실제 최대값의 여섯 배열·이동/오류 보존. 이 증거 당시 metadata 60종; 전체 parser/startup 증명은 아님. |
 | 공통 보고 입력 getter / unused | [요약](../evidence/SRC-06-ordinary-shared-report-input/summary.json) · [색인](../evidence/SRC-06-ordinary-shared-report-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-shared-report-input/evidence.zip) | 실제 다섯 report family의 여섯 배열 reset→정확 identity erase→alpha/default 쓰기, cache/error-prefix·metadata 87종. fmt·quality·all-target Clippy와 기존 테스트 8/0/0; 전체 workspace 중복 실행·새 Native 비교 없음. |
+| 실제 입력 형식 / IDF 필드 개수 | [요약](../evidence/SRC-06-ordinary-input-origin/summary.json) · [색인](../evidence/SRC-06-ordinary-input-origin/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-input-origin/evidence.zip) | 전체 입력 형식을 family order와 독립 보존; 프로젝트 네 family의 실제 IDF field count, IDF 전용 NumAlpha·빈 필드와 실패 시 원상 보존. 전체 GetProjectData/startup 활성화는 아님. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -122,11 +123,15 @@ DesignDay의 정수·플래그·배열 범위·보고 문자열과 Rust 내부 T
 4. **HVAC / zone solution / handoff:** 독립 Node allocation과 Config getter 이후의 equipment·availability·Manage/Sim tails·EMS readiness를 실제 소유자로 생산해야 한다. 기존 Rust A의 SimplifiedAnalytical과 관측 Native ThirdOrder는 같다고 검증하지 않았다. 전체 ZTAV 평균, 다중 Space·명시 reference flag0, 후속 warmup/run과 최종 handoff 비교도 남아 있다.
 5. **선택 외 분기:** CON-01 제외 범위인 Kiva·window·EMS/override·대표 surface 및 미지원 입력을 성공으로 대체하지 않는다. 실제 TARP/방사 수치 관측 밖의 pivot swap/tie·singular/tiny·경고 domain도 별도 증거가 필요하다. Timestep 객체의 생략 필드는 schema6이지만 객체 자체 부재의 Original/compiler 차이는 지원 불가로 유지한다.
 
-## 최신 보고 입력 단위의 실제 QA
+## 공통 보고 입력 단위의 실제 QA
 
 최종 Source `e181f6ff45f1957ff0299fe7fd414e68c4e59e68935f169bb73dd2e9765339ac`에서 fmt·source-quality·all-target workspace Clippy가 통과했다. 기존 report 관련 6개·raw 1개·CLI 1개 테스트가 통과해 합계 **8 passed / 0 failed / 0 ignored**다. 테스트 본문·binary는 늘리지 않았고 전체 workspace를 중복 실행하지 않았다. 직전 전체 baseline **4,974/0/2**는 과거 Source의 검증으로 유지한다.
 
 Assembly01의 실제 Clippy 실패(exit101)는 보존했다. Assembly02는 중첩된 테스트의 잘못된 module 경로 두 곳만 고쳤으며 최종 QA는 수정본에서 수행했다. plan의 `actual_selected_ordinary_shared_report_input`과 위 실제 요약/색인/ZIP이 이 이력을 고정한다. metadata 87종은 positive-family admission 확대가 아니며 전체 unused-input reporting·parser/InputProcessor ABI·startup/Setup 완료를 주장하지 않는다.
+
+## 실제 입력 형식 단위의 QA
+
+최종 Source `bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa`에서 fmt와 RawModel 전체 16개·compiler report 8개·raw admission 1개 테스트, 합계 **25 passed / 0 failed / 0 ignored**를 확인했다. 새 테스트 본문·binary는 없다. all-target Clippy와 source-quality는 직전 assembly01에서 통과했고, 이후에는 두 테스트 입력 쌍의 누락 객체만 고쳤다. 다섯 파일의 production bytes가 동일함을 검토해 두 정적 검사와 전체 workspace 테스트는 반복하지 않았다. 과거 RawModel 15 passed/1 failed(exit101) 기록은 별도 Source로 보존했다. IDF `Output:VariableDictionary;`의 실제 NumAlpha0과 epJSON의 min_fields1을 구분하며 기본 alpha 값 REGULAR는 둘 다 보존한다. 모든 gate와 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

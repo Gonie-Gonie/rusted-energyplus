@@ -12571,6 +12571,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-shared-report-input/summary.json",
         "sha256": "943ad722d8e7b6abc3b98e88b77feecdcb85f619c88cb9202871981df1bbdac5",
         "size_bytes": 5884
+      },
+      "actual_selected_ordinary_input_origin": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-input-origin/summary.json",
+        "sha256": "f118f12eb9768a62219627afc0d17b202059a2f18b0c457a48caebe6acb43e2e",
+        "size_bytes": 6115
       }
     },
     {

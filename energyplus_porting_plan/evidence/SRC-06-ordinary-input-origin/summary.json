@@ -1,0 +1,145 @@
+{
+  "schema": "src06-input-origin-summary.v1",
+  "status": "Actual loader input format and IDF project field metadata retained; full GetProjectData/startup not activated",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/bc/bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa",
+    "sha256": "bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa"
+  },
+  "prior_QA_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/bf/bf592af16ea077ea523c9086962b543be327b7292a2544373ee604d52eb3f2a7",
+    "sha256": "bf592af16ea077ea523c9086962b543be327b7292a2544373ee604d52eb3f2a7"
+  },
+  "QA": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-02/receipt.json",
+        "sha256": "ca266f79d448dd26cd10c16d24e5e7f4372244d2c5581255a552c8f1a8a8746a",
+        "size_bytes": 3191
+      },
+      "final_Source": true,
+      "qualification": "Final assembly02"
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-02/receipt.json",
+        "sha256": "d9b3a725d6907c79d127739e49eb6591ceb50e388ba016232f7ef67946cef9c5",
+        "size_bytes": 3210
+      },
+      "final_Source": true,
+      "qualification": "Final assembly02"
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-compiler-tests-01/receipt.json",
+        "sha256": "e1c7f9ffbfa371b37af240c8ad9d650d45b400b0977070f2a5b3148c39a8360a",
+        "size_bytes": 3239
+      },
+      "final_Source": true,
+      "qualification": "Final assembly02"
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-admission-tests-01/receipt.json",
+        "sha256": "102616ab0b0088aa38eae0a58dd428be26d476486b444f107e7ea6470b03019a",
+        "size_bytes": 3247
+      },
+      "final_Source": true,
+      "qualification": "Final assembly02"
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-quality-01/receipt.json",
+        "sha256": "f6052f2f3b18627d0f47a9045e14743b06288e0f15b48090382052a04f041995",
+        "size_bytes": 3240
+      },
+      "final_Source": false,
+      "qualification": "Assembly01; assembly02 changes only two test input literals. All five production prefixes and other three complete files are byte-exact."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-clippy-01/receipt.json",
+        "sha256": "16ab06f29f555f67a5981ac7a10870d5c71bfcaf145f525956e5abdfae277ca1",
+        "size_bytes": 3237
+      },
+      "final_Source": false,
+      "qualification": "Assembly01; assembly02 changes only two test input literals. All five production prefixes and other three complete files are byte-exact."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-01/receipt.json",
+        "sha256": "382fdc7c158a46807f7e8e283e15e96a4d864f75da564464dd50f849938dcc1a",
+        "size_bytes": 3191
+      },
+      "final_Source": false,
+      "qualification": "Assembly01; assembly02 changes only two test input literals. All five production prefixes and other three complete files are byte-exact."
+    }
+  ],
+  "tests": {
+    "selections": [
+      {
+        "scope": "raw-tests-02",
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "compiler-tests-01",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "admission-tests-01",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "passed": 25,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "behavior": [
+    "Whole-model input format retained separately from finite per-family declaration order",
+    "Only successful atomic IDF recovery changes mode; failed recovery preserves all model bytes/state",
+    "Four project unnamed family identities and physical field counts recovered from actual staged IDF",
+    "IDF report NumAlphas does not acquire epJSON-only schema min_fields",
+    "Existing missing-IDF-field-metadata compiler stop retained; metadata grammar remains finite"
+  ],
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Native-ordinary-input-origin-review-02/review.json",
+    "sha256": "9cf7c32a5e062790462f6fae40ef91031cc781f3fde03dc79a7eaf147b5812d8",
+    "size_bytes": 2969
+  },
+  "historical_failed_QA": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-01/receipt.json",
+      "sha256": "86d70c490a64758cb04412ab985d4f44697de8f86940751c8d77f5dfa45a88b8",
+      "size_bytes": 3212
+    },
+    "exit_code": 101,
+    "passed": 15,
+    "failed": 1,
+    "qualification": "New strict Version target exposed an inconsistent old BOM test pair. Corrected the converted Version counterpart and the new admission fixture Zone counterpart; production unchanged."
+  },
+  "limitations": [
+    "IDF parser overlay covers finite named/unnamed families; no complete parser/InputProcessor parity claim",
+    "Missing IDF report field metadata remains an explicit compiler boundary",
+    "No full GetProjectData, RunSimulation, Setup or Native numerical comparison activation",
+    "SRC-06 four gates and A14/54 B14/64 unchanged"
+  ],
+  "validation_scope": "Final fmt and focused RawModel package/compiler report/admission tests. Workspace all-target Clippy and source quality passed on assembly01; only two test input literals changed afterward, with full production-byte proof and independent review. These two expensive static checks and whole-workspace tests were not repeated.",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-input-origin/manifest.json",
+    "sha256": "2c3c783447a68606356bf4e9770f4b6787f103efed1b871d10955295c13090ad",
+    "size_bytes": 19588
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-input-origin/evidence.zip",
+    "sha256": "5a9d1513d126385d872f1b240b691f111396c2943c8a2cb60517acec0f1e47d6",
+    "size_bytes": 639928
+  },
+  "gates_updated": false
+}

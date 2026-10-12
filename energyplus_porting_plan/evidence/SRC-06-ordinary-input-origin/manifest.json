@@ -1,0 +1,466 @@
+{
+  "schema": "src06-input-origin-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/bc/bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa",
+    "sha256": "bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa"
+  },
+  "assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/manifest.json",
+    "sha256": "107bb0525b154bcb0a3b421c09942e32fc22884754af6590a713c352c9f1ecc4",
+    "size_bytes": 11693
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/manifest.json",
+      "sha256": "107bb0525b154bcb0a3b421c09942e32fc22884754af6590a713c352c9f1ecc4",
+      "size_bytes": 11693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/manifest.json",
+      "sha256": "aea51862e954312555d4ca6446666c2cf54100406a31cd5a7c5deed25bcd428c",
+      "size_bytes": 9891
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Native-ordinary-input-origin-review-02/review.json",
+      "sha256": "9cf7c32a5e062790462f6fae40ef91031cc781f3fde03dc79a7eaf147b5812d8",
+      "size_bytes": 2969
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "de5ee972be7b3c75bf9100bc0d860626fd172fa636b2202b89c8d395374f764d",
+      "size_bytes": 16989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/00.before",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/00.after",
+      "sha256": "de5ee972be7b3c75bf9100bc0d860626fd172fa636b2202b89c8d395374f764d",
+      "size_bytes": 16989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/00.diff",
+      "sha256": "67a3b462b04e37adfd5a6a180458c1adcb9f7021f7d6a320b57d6933801ee193",
+      "size_bytes": 1261
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "cba8d7eb263395d88459bced4f6c1649cbbc842d8f0a7b62e705ffd052cbb6e6",
+      "size_bytes": 34984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/01.before",
+      "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+      "size_bytes": 32611
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/01.after",
+      "sha256": "cba8d7eb263395d88459bced4f6c1649cbbc842d8f0a7b62e705ffd052cbb6e6",
+      "size_bytes": 34984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/01.diff",
+      "sha256": "1dbe764a1428e770580d891d9a75f95d1ba23f350a9b3caaca8a3d161c50cf08",
+      "size_bytes": 6097
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "sha256": "e2a01ad86748bb0b99042aed475f85a235cf3bb3fda0a979f3f02432bbcbcdc1",
+      "size_bytes": 17624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/02.before",
+      "sha256": "a86f97af46ade8a8588a4074cce6bb0f9b9a87446216d5ebb904873c04163d87",
+      "size_bytes": 15936
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/02.after",
+      "sha256": "e2a01ad86748bb0b99042aed475f85a235cf3bb3fda0a979f3f02432bbcbcdc1",
+      "size_bytes": 17624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/02.diff",
+      "sha256": "06b1c299f5ebd577c179191669092f7a9cfe5e779eb8d994712f05a210854913",
+      "size_bytes": 3213
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input/fields.rs",
+      "sha256": "0297773c97594549b68cf1bd26834a089d547f39a2a46cf410ea9eb9122326da",
+      "size_bytes": 34909
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/03.before",
+      "sha256": "e30a4a3fc489469c20627135e4206658060e4680e59a859aded3244796a726c4",
+      "size_bytes": 34397
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/03.after",
+      "sha256": "0297773c97594549b68cf1bd26834a089d547f39a2a46cf410ea9eb9122326da",
+      "size_bytes": 34909
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/03.diff",
+      "sha256": "d732d9d03d13c0bb9f7d68d8e27e149308ced4e8bda80f9a729c6b123ae905d0",
+      "size_bytes": 1040
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "0977a8fc819c3689f09df18dbad80bdea6b068f02302586b8f0577f4efde3775",
+      "size_bytes": 21190
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/04.before",
+      "sha256": "0ed7022ce182712af8085b4b4e466832ae8c8d496bf1517259d83833b2cc6dd0",
+      "size_bytes": 19987
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/04.after",
+      "sha256": "0977a8fc819c3689f09df18dbad80bdea6b068f02302586b8f0577f4efde3775",
+      "size_bytes": 21190
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/04.diff",
+      "sha256": "4c8e2895a6839978e6ea0e0f1ad3c3499fb8c64e0616b80eaed4c5e99e65ab5a",
+      "size_bytes": 1808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/application.json",
+      "sha256": "07d80835a0be672a9f89ca8d85e38e78f3664056413d4bd5055c1339c43471b7",
+      "size_bytes": 4222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/manifest.json",
+      "sha256": "a367592439d4b77583e086c98b5a223518004ef61a4708e861a7d1cccca66a5d",
+      "size_bytes": 28423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/before/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+      "size_bytes": 32611
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "f31f8d2b8d3ab5370eb16d3988b9dc80413b3bb85dd7c06aaa5237bab9bd85ee",
+      "size_bytes": 33932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/diffs/14.diff",
+      "sha256": "b9d8bbaf420748ce1f78a6096beea231d45f36e1ce5ebbcda8e68e1875f3eb95",
+      "size_bytes": 3444
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/before/crates/ep_run/src/ordinary_equipment_input/fields.rs",
+      "sha256": "e30a4a3fc489469c20627135e4206658060e4680e59a859aded3244796a726c4",
+      "size_bytes": 34397
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_run/src/ordinary_equipment_input/fields.rs",
+      "sha256": "9bd1fd9154f8261b1485e57173189717a27c8390a5a3df3e677aa249ad549c79",
+      "size_bytes": 34826
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/diffs/15.diff",
+      "sha256": "9a30552b11a09febcf1b901bd7d1d4719ada759ae822ca3f1c0665c73817475e",
+      "size_bytes": 949
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/Original-00.literal",
+      "sha256": "ccfcc304a7d4ef85ff6211df4d3fd1f10959a49bc2a677295ea4eefe405286ee",
+      "size_bytes": 1496
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/Original-01.literal",
+      "sha256": "64e144a66b7ef14cd54f1c8815a03faf48f0d6f207d03ebcf459972f6cb5b748",
+      "size_bytes": 2225
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/Original-02.literal",
+      "sha256": "a903750821f6c2baad8ad59043cf75bd5eb3c49ce20257ea4caaa6c8c087ea67",
+      "size_bytes": 1939
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-input-origin-Root-01.py",
+      "sha256": "e1da9e467a2c7bfcbe21309071823fe4daff39f56ad40c9648522c25a586b912",
+      "size_bytes": 8329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-input-origin-Root-01.py",
+      "sha256": "b83c009da83ce45ab4ca4afe3d7b58691c78836ba396f516486ad5340daacf35",
+      "size_bytes": 3569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fix-input-origin-fixtures-Root-01.py",
+      "sha256": "6c85cf7bce1cef5d25b33775d670fa62cf370e1254df5cacf90736d5a0005a1c",
+      "size_bytes": 2020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-input-origin-Root-02.py",
+      "sha256": "039a7c7089212ab9110ecb1d297298288efc8ce9f0cb3d5eb6389cb42c1638d0",
+      "size_bytes": 2986
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fixture-fix-01.json",
+      "sha256": "3223ca979e1cdeff9dde4d90beafea4a9f0b8649b47953d5c0c285ba0ba58ebf",
+      "size_bytes": 1779
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/01.parent.diff",
+      "sha256": "319e92d95a8a3a937d9a3538141fd16829f66208821c162c29f000915691dc60",
+      "size_bytes": 503
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-02/04.parent.diff",
+      "sha256": "722f08fda01e8e83dc2d2e5d46c28058402db23e530282a77b7adf391d070b81",
+      "size_bytes": 592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/00.after",
+      "sha256": "de5ee972be7b3c75bf9100bc0d860626fd172fa636b2202b89c8d395374f764d",
+      "size_bytes": 16989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/00.diff",
+      "sha256": "67a3b462b04e37adfd5a6a180458c1adcb9f7021f7d6a320b57d6933801ee193",
+      "size_bytes": 1261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/01.after",
+      "sha256": "dee901eba4a67d0467a51e5fac3121b3a35e7a52b4afc1cd7125865aeb993d0f",
+      "size_bytes": 34917
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/01.diff",
+      "sha256": "5d41547b7334df6ced27e2f2b510c255df7311b0bfbae745f829efd6991dc9c8",
+      "size_bytes": 5687
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/02.after",
+      "sha256": "e2a01ad86748bb0b99042aed475f85a235cf3bb3fda0a979f3f02432bbcbcdc1",
+      "size_bytes": 17624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/02.diff",
+      "sha256": "06b1c299f5ebd577c179191669092f7a9cfe5e779eb8d994712f05a210854913",
+      "size_bytes": 3213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/03.after",
+      "sha256": "0297773c97594549b68cf1bd26834a089d547f39a2a46cf410ea9eb9122326da",
+      "size_bytes": 34909
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/03.diff",
+      "sha256": "d732d9d03d13c0bb9f7d68d8e27e149308ced4e8bda80f9a729c6b123ae905d0",
+      "size_bytes": 1040
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/04.after",
+      "sha256": "1c34c7d2952a12c73692c4c40ebc66524169e5456f332a02fb39f467e0ffdcba",
+      "size_bytes": 21183
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/04.diff",
+      "sha256": "2ab9e655f58cf58e61f1b4efddcad87b30e9fa3f828fe36583ef36354f290f5c",
+      "size_bytes": 1801
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-02/receipt.json",
+      "sha256": "ca266f79d448dd26cd10c16d24e5e7f4372244d2c5581255a552c8f1a8a8746a",
+      "size_bytes": 3191
+    },
+    {
+      "path": ".runtime/porting/source-objects/bc/bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa",
+      "sha256": "bc9440f54851344b6fd373d9256edb72e5b70bd3ba22b8a0cda847b094d84dfa",
+      "size_bytes": 1647626
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-02/receipt.json",
+      "sha256": "d9b3a725d6907c79d127739e49eb6591ceb50e388ba016232f7ef67946cef9c5",
+      "size_bytes": 3210
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-02/stdout.log",
+      "sha256": "5345ed4679cfd704211b68cfaa6ddd2e471a93face6617572d185d702de32bbb",
+      "size_bytes": 1419
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-02/stderr.log",
+      "sha256": "51dcc7e35b428e8beb77f61d4d2216a06e00548e8ccbd9259a8b678cf6fcdee8",
+      "size_bytes": 259
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-compiler-tests-01/receipt.json",
+      "sha256": "e1c7f9ffbfa371b37af240c8ad9d650d45b400b0977070f2a5b3148c39a8360a",
+      "size_bytes": 3239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-compiler-tests-01/stdout.log",
+      "sha256": "d31d2a8a0120654d8b30f7b5d81a1882c9311d9f5c548ace3d3ad78095f63e34",
+      "size_bytes": 1024
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-compiler-tests-01/stderr.log",
+      "sha256": "1cd4ab8bf19fb2f7ab489ca52ebf381de781877656fc6dc650850d457091c949",
+      "size_bytes": 367
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-admission-tests-01/receipt.json",
+      "sha256": "102616ab0b0088aa38eae0a58dd428be26d476486b444f107e7ea6470b03019a",
+      "size_bytes": 3247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-admission-tests-01/stdout.log",
+      "sha256": "3db6120270e6f1e147921f505e49941bdcdc5d998e35415c8ddefd098cd1fdd5",
+      "size_bytes": 247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-admission-tests-01/stderr.log",
+      "sha256": "cb40e6fab46ce8dc7ffcd13e41613285711c1ba3818b17aaae0f1724a8dd4ce6",
+      "size_bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-quality-01/receipt.json",
+      "sha256": "f6052f2f3b18627d0f47a9045e14743b06288e0f15b48090382052a04f041995",
+      "size_bytes": 3240
+    },
+    {
+      "path": ".runtime/porting/source-objects/bf/bf592af16ea077ea523c9086962b543be327b7292a2544373ee604d52eb3f2a7",
+      "sha256": "bf592af16ea077ea523c9086962b543be327b7292a2544373ee604d52eb3f2a7",
+      "size_bytes": 1647626
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-quality-01/stdout.log",
+      "sha256": "94a3341c159897c56b026718539c687ba9baff761193461f111fd8f1a1489cdc",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-clippy-01/receipt.json",
+      "sha256": "16ab06f29f555f67a5981ac7a10870d5c71bfcaf145f525956e5abdfae277ca1",
+      "size_bytes": 3237
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-clippy-01/stderr.log",
+      "sha256": "d8ac9445ee9462a09cf22c2db4e270c304efd23f96c18bbfc43f45f35ba0f4e0",
+      "size_bytes": 475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-01/receipt.json",
+      "sha256": "382fdc7c158a46807f7e8e283e15e96a4d864f75da564464dd50f849938dcc1a",
+      "size_bytes": 3191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-01/receipt.json",
+      "sha256": "86d70c490a64758cb04412ab985d4f44697de8f86940751c8d77f5dfa45a88b8",
+      "size_bytes": 3212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-01/stdout.log",
+      "sha256": "0a103a43db45bf20b2a585f5aef59f3af51a5cf2121dabb6c0f8cedfabd599f5",
+      "size_bytes": 1791
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-input-origin-raw-tests-01/stderr.log",
+      "sha256": "7f58f97bb5f4db198319710a73766e7aab1043ef3f63652847ca016c591d11c0",
+      "size_bytes": 317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-input-origin-Root-01.py",
+      "sha256": "716b2087980e0149262db1cc5476887d36c4def81fa66414ca42813a34815c50",
+      "size_bytes": 9703
+    }
+  ],
+  "historical_references": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+        "size_bytes": 32611
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/01.before",
+        "sha256": "bcffa8678c09b9370d4208ddcdb837d33489ed455954b6235788b50ace41f8aa",
+        "size_bytes": 32611
+      },
+      "qualification": "Exact pre-integration baseline for the two consumed metadata proposals."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/ordinary_equipment_input/fields.rs",
+        "sha256": "e30a4a3fc489469c20627135e4206658060e4680e59a859aded3244796a726c4",
+        "size_bytes": 34397
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/03.before",
+        "sha256": "e30a4a3fc489469c20627135e4206658060e4680e59a859aded3244796a726c4",
+        "size_bytes": 34397
+      },
+      "qualification": "Exact pre-integration baseline for the two consumed metadata proposals."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "dee901eba4a67d0467a51e5fac3121b3a35e7a52b4afc1cd7125865aeb993d0f",
+        "size_bytes": 34917
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/01.after",
+        "sha256": "dee901eba4a67d0467a51e5fac3121b3a35e7a52b4afc1cd7125865aeb993d0f",
+        "size_bytes": 34917
+      },
+      "qualification": "Assembly01 bytes before two test input pairs were corrected; production unchanged."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "1c34c7d2952a12c73692c4c40ebc66524169e5456f332a02fb39f467e0ffdcba",
+        "size_bytes": 21183
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-input-origin-assembly-01/04.after",
+        "sha256": "1c34c7d2952a12c73692c4c40ebc66524169e5456f332a02fb39f467e0ffdcba",
+        "size_bytes": 21183
+      },
+      "qualification": "Assembly01 bytes before two test input pairs were corrected; production unchanged."
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-input-origin/evidence.zip",
+    "sha256": "5a9d1513d126385d872f1b240b691f111396c2943c8a2cb60517acec0f1e47d6",
+    "size_bytes": 639928
+  },
+  "archive_member_count": 78,
+  "archive_scope": "Five active files, their two consumed metadata proposals, literal ranges, review and actual QA. The referenced full GetProjectData preparation remains HELD; transitive unused proposals are not an archive or activation claim.",
+  "gates_updated": false
+}

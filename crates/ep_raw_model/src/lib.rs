@@ -57,6 +57,13 @@ pub struct RawObject {
     pub source_span: Option<SourceSpan>,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+enum SourceInputFormat {
+    #[default]
+    EpJson,
+    Idf,
+}
+
 /// Raw epJSON model before defaults, validation, typed conversion, or reference resolution.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct RawModel {
@@ -66,6 +73,7 @@ pub struct RawModel {
     pub objects: BTreeMap<ObjectType, BTreeMap<ObjectName, RawObject>>,
     /// Per-type declaration order recovered from staged IDF input.
     idf_declaration_order: BTreeMap<ObjectType, Vec<ObjectName>>,
+    source_input_format: SourceInputFormat,
 }
 
 impl RawModel {
@@ -79,7 +87,15 @@ impl RawModel {
             version,
             objects,
             idf_declaration_order: BTreeMap::new(),
+            source_input_format: SourceInputFormat::EpJson,
         }
+    }
+
+    /// Whether the actual source was epJSON rather than staged IDF.
+    /// Successful IDF recovery retains this independently of per-family targets.
+    #[must_use]
+    pub fn is_epjson(&self) -> bool {
+        self.source_input_format == SourceInputFormat::EpJson
     }
 
     /// Returns the total object instance count.

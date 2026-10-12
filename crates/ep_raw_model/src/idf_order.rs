@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
 
-use crate::{FieldName, RawModel, RawValue};
+use crate::{FieldName, RawModel, RawValue, SourceInputFormat};
 
 /// One IDF object type whose declaration order must survive epJSON conversion.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -9,7 +9,7 @@ pub struct IdfOrderTarget {
     /// Canonical EnergyPlus object type.
     pub object_type: &'static str,
     /// Zero-based data-field index containing the required object name.
-    /// The five Source-defined unnamed report families use IdfParser-generated names.
+    /// Source-defined unnamed report/project families use IdfParser-generated names.
     pub name_field_index: usize,
 }
 
@@ -19,6 +19,23 @@ pub struct IdfOrderTarget {
 /// explicit identity and converter edge-case evidence. Other position-sensitive
 /// families require the same evidence before joining the fail-closed overlay.
 pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
+    // SimulationManager::GetProjectData uses real IDF max-field counts.
+    IdfOrderTarget {
+        object_type: "Version",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "HeatBalanceAlgorithm",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Timestep",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "SimulationControl",
+        name_field_index: 0,
+    },
     // IdfParser.cc277-301 generates these unnamed keys from the per-type count.
     IdfOrderTarget {
         object_type: "Output:Surfaces:List",
@@ -257,7 +274,7 @@ pub fn apply_idf_declaration_order(
                     actual_type.0, actual_name.0
                 )));
             }
-            if unnamed_report_type(target.object_type) {
+            if unnamed_legacy_type(target.object_type) {
                 report_field_counts.push((
                     actual_type.clone(),
                     actual_name.clone(),
@@ -283,6 +300,7 @@ pub fn apply_idf_declaration_order(
         );
     }
     model.idf_declaration_order = overlay;
+    model.source_input_format = SourceInputFormat::Idf;
     Ok(())
 }
 
@@ -417,10 +435,14 @@ fn scan_target_objects(
     Ok(scanned)
 }
 
-fn unnamed_report_type(object_type: &str) -> bool {
+fn unnamed_legacy_type(object_type: &str) -> bool {
     matches!(
         object_type,
-        "Output:Surfaces:List"
+        "Version"
+            | "HeatBalanceAlgorithm"
+            | "Timestep"
+            | "SimulationControl"
+            | "Output:Surfaces:List"
             | "Output:Surfaces:Drawing"
             | "Output:VariableDictionary"
             | "Output:Constructions"
@@ -452,7 +474,7 @@ fn record_object(
     else {
         return Ok(());
     };
-    if unnamed_report_type(target.object_type) {
+    if unnamed_legacy_type(target.object_type) {
         let bucket = scanned.get_mut(target.object_type).ok_or_else(|| {
             IdfOrderError::new(format!(
                 "internal IDF order recovery error: missing target bucket for {}",
@@ -739,6 +761,7 @@ mod tests {
     fn scanner_handles_bom_comments_multiple_objects_and_literal_quotes()
     -> Result<(), Box<dyn std::error::Error>> {
         let epjson = r#"{
+            "Version":{"Version 1":{"version_identifier":"26.1"}},
             "RunPeriodControl:SpecialDays": {
                 "\"Zulu Definition\"": {"start_date": "6/15"},
                 "Alpha Definition": {"start_date": "6/15"}
@@ -874,7 +897,10 @@ mod tests {
 
 #[cfg(test)]
 mod unnamed_report_order_tests {
-    use crate::{FieldName, RawValue, parse_epjson_str_with_idf_order};
+    use crate::{
+        FieldName, IDF_ORDER_TARGETS, RawModel, RawValue, apply_idf_declaration_order,
+        parse_epjson_str, parse_epjson_str_with_idf_order,
+    };
 
     #[test]
     fn twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts()
@@ -887,7 +913,18 @@ mod unnamed_report_order_tests {
             .join(",");
         let epjson = format!("{{\"Output:Constructions\":{{{objects}}}}}");
         let idf = "Output:Constructions, Materials;".repeat(12);
-        let raw = parse_epjson_str_with_idf_order(&epjson, &idf)?;
+        assert!(RawModel::default().is_epjson());
+        assert!(RawModel::new(None, Default::default()).is_epjson());
+        let mut plain = parse_epjson_str(&epjson)?;
+        assert!(plain.is_epjson());
+        let before_failure = plain.clone();
+        assert!(apply_idf_declaration_order(&mut plain, "", IDF_ORDER_TARGETS).is_err());
+        assert_eq!(plain, before_failure);
+        let mut raw = parse_epjson_str_with_idf_order(&epjson, &idf)?;
+        assert!(!raw.is_epjson());
+        let before_failure = raw.clone();
+        assert!(apply_idf_declaration_order(&mut raw, "", IDF_ORDER_TARGETS).is_err());
+        assert_eq!(raw, before_failure);
         let rows = raw.ordered_instances("Output:Constructions")?;
         assert_eq!(rows.len(), 12);
         for (index, (name, object)) in rows.iter().enumerate() {
@@ -895,6 +932,28 @@ mod unnamed_report_order_tests {
             assert_eq!(
                 object.fields.get(&FieldName("idf_max_fields".to_string())),
                 Some(&RawValue::Number("1".to_string()))
+            );
+        }
+        // The same unnamed Source parser counts blank positional fields too.
+        for (family, fields, expected) in [
+            ("Version", "26.1", 1),
+            (
+                "HeatBalanceAlgorithm",
+                "ConductionTransferFunction,200,0.1,1000",
+                4,
+            ),
+            ("Timestep", "4", 1),
+            ("SimulationControl", "No,No,No,No,Yes,,1", 7),
+        ] {
+            let epjson = format!("{{\"{family}\":{{\"{family} 1\":{{}}}}}}");
+            let raw = parse_epjson_str_with_idf_order(&epjson, &format!("{family},{fields};"))?;
+            assert!(!raw.is_epjson());
+            let rows = raw.ordered_instances(family)?;
+            assert_eq!(rows.len(), 1);
+            assert_eq!(rows[0].0.0, format!("{family} 1"));
+            assert_eq!(
+                rows[0].1.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(expected.to_string()))
             );
         }
         Ok(())

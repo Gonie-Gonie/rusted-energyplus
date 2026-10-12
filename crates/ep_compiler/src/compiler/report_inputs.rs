@@ -123,7 +123,7 @@ impl Compiler<'_> {
         };
         for (kind, fields, min_fields) in families {
             let object_type = kind.source_name();
-            let is_epjson = !self.raw_model.has_idf_declaration_order(object_type);
+            let is_epjson = self.raw_model.is_epjson();
             for (name, object) in self.objects(object_type) {
                 let mut alphas: [String; 3] = Default::default();
                 let mut alpha_blank = [true; 3];
@@ -166,9 +166,7 @@ impl Compiler<'_> {
                 if !is_epjson {
                     match field_value(&object, "idf_max_fields") {
                         Some(RawValue::Number(value)) => match value.parse::<u8>() {
-                            Ok(value) if usize::from(value) <= fields.len() => {
-                                max_fields = value.max(min_fields)
-                            }
+                            Ok(value) if usize::from(value) <= fields.len() => max_fields = value,
                             _ => {
                                 self.error(
                                     "InvalidIdfReportFieldCount",
@@ -346,6 +344,47 @@ mod tests {
         assert!(!rows[0].is_epjson);
         assert_eq!(rows[0].alphas[1], "");
         assert!(rows[0].alpha_blank[1]);
+
+        // Source findMaxFields applies schema min_fields only to epJSON.
+        let empty_idf = parse_epjson_str_with_idf_order(
+            r#"{"Output:VariableDictionary":{"Output:VariableDictionary 1":{}}}"#,
+            "Output:VariableDictionary;",
+        )?;
+        let empty_idf_model = compile_raw_model(&empty_idf)
+            .model
+            .ok_or("IDF report unavailable")?;
+        assert_eq!(empty_idf_model.report_inputs.objects[0].num_alphas, 0);
+        assert_eq!(
+            empty_idf_model.report_inputs.objects[0].alphas[0],
+            "REGULAR"
+        );
+        assert!(!empty_idf_model.report_inputs.objects[0].is_epjson);
+        let mut empty_json = parse_epjson_str(
+            r#"{"Output:VariableDictionary":{"Output:VariableDictionary 1":{}}}"#,
+        )?;
+        let empty_json_model = compile_raw_model(&empty_json)
+            .model
+            .ok_or("epJSON report unavailable")?;
+        assert_eq!(empty_json_model.report_inputs.objects[0].num_alphas, 1);
+        assert!(empty_json_model.report_inputs.objects[0].is_epjson);
+        // A real IDF source with no per-family overlay is still IDF; missing
+        // physical field metadata keeps the existing explicit compiler stop.
+        ep_raw_model::apply_idf_declaration_order(
+            &mut empty_json,
+            "Output:VariableDictionary;",
+            &[],
+        )?;
+        assert!(!empty_json.has_idf_declaration_order("Output:VariableDictionary"));
+        assert!(!empty_json.is_epjson());
+        let missing = compile_raw_model(&empty_json);
+        assert!(missing.has_errors());
+        assert!(
+            missing
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "MissingIdfReportFieldCount")
+        );
         Ok(())
     }
 }
