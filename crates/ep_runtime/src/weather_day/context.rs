@@ -162,6 +162,14 @@ pub struct WeatherEnvironmentState {
     pub latitude: f64,
     /// Selected site longitude.
     pub longitude: f64,
+    /// Actual standard time-zone meridian from ResolveLocationInformation.
+    pub time_zone_meridian: f64,
+    /// Actual stored sine and cosine of site latitude.
+    pub sin_latitude: f64,
+    /// Actual stored cosine of site latitude.
+    pub cos_latitude: f64,
+    /// Actual TS1TimeOffset constructor default for hourly solar.
+    pub one_step_solar_time_offset: f64,
     /// Selected site elevation.
     pub elevation: f64,
     /// Source standard barometric pressure; constructor is sea-level 101325.0.
@@ -203,6 +211,10 @@ impl Default for WeatherEnvironmentState {
             equation_of_time: 0.0,
             latitude: 0.0,
             longitude: 0.0,
+            time_zone_meridian: 0.0,
+            sin_latitude: 0.0,
+            cos_latitude: 0.0,
+            one_step_solar_time_offset: -0.5,
             elevation: 0.0,
             std_baro_press: 101325.0,
             environment_name: String::new(),
@@ -293,6 +305,22 @@ pub struct WeatherOwnerState {
     pub next_hour: i32,
     /// Source rain report indicator.
     pub rpt_is_rain: i32,
+    /// Actual RptIsSnow report indicator.
+    pub rpt_is_snow: i32,
+    /// Actual DetermineSunUpDown HrAngle in degrees.
+    pub hour_angle: f64,
+    /// Actual SolarAltitudeAngle in degrees.
+    pub solar_altitude_angle: f64,
+    /// Actual SolarAzimuthAngle in degrees.
+    pub solar_azimuth_angle: f64,
+    /// Actual HorizIRSky copied from the selected Today slot.
+    pub horizontal_infrared_sky: f64,
+    /// Actual default GroundReflectances allocation, independently retained.
+    pub ground_reflectances: [f64; 12],
+    /// Actual SnowGndRefModifier constructor default.
+    pub snow_ground_reflectance_modifier: f64,
+    /// Actual SnowGndRefModifierForDayltg constructor default.
+    pub snow_ground_reflectance_for_daylighting_modifier: f64,
     /// Selected environment's rain-indicator control.
     pub use_rain_values: bool,
     /// Selected environment's snow-indicator control.
@@ -333,6 +361,14 @@ impl Default for WeatherOwnerState {
             solar_interpolation: None,
             next_hour: 1,
             rpt_is_rain: 0,
+            rpt_is_snow: 0,
+            hour_angle: 0.0,
+            solar_altitude_angle: 0.0,
+            solar_azimuth_angle: 0.0,
+            horizontal_infrared_sky: 0.0,
+            ground_reflectances: [0.2; 12],
+            snow_ground_reflectance_modifier: 1.0,
+            snow_ground_reflectance_for_daylighting_modifier: 1.0,
             use_rain_values: true,
             use_snow_values: true,
         }

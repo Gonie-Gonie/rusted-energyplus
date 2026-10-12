@@ -12546,6 +12546,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-solar-initialization/summary.json",
         "sha256": "4c0291b8d261bff16962781ea19f986e67b3601d26eccc5685f03b85933b46cf",
         "size_bytes": 5767
+      },
+      "actual_selected_ordinary_current_solar": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-current-solar/summary.json",
+        "sha256": "9a8a063c1f9fcd9dffaa7dd604cb9e6d270363f503a51de19eda2211d734fd14",
+        "size_bytes": 7489
       }
     },
     {

@@ -81,6 +81,16 @@ impl WeatherSession {
         state.environment.latitude = configuration.site.latitude_deg;
         state.environment.longitude = configuration.site.longitude_deg;
         state.environment.elevation = configuration.site.elevation_m;
+        // Literal ResolveLocationInformation4570-4576, after admitted site input.
+        state.environment.time_zone_meridian = if configuration.site.time_zone_hours <= 12.0 {
+            configuration.site.time_zone_hours * 15.0
+        } else {
+            configuration.site.time_zone_hours * 15.0 - 360.0
+        };
+        state.environment.sin_latitude =
+            (std::f64::consts::PI / 180.0 * state.environment.latitude).sin();
+        state.environment.cos_latitude =
+            (std::f64::consts::PI / 180.0 * state.environment.latitude).cos();
         state.environment.day_of_week = weekday_index(
             configuration
                 .day_point(1)

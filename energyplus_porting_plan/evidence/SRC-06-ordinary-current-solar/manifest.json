@@ -1,0 +1,519 @@
+{
+  "schema": "src06-current-solar-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/af/af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18",
+    "sha256": "af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18"
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/publish-current-solar-Root-01.py",
+      "sha256": "425f69c32faa50a5addaa8496338897e5d0d3bb953f9ccefc2fd477349b5d329",
+      "size_bytes": 7310
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/manifest.json",
+      "sha256": "1534143cd25f8e7dc5f2ee3dff58310d70624c485f9d071d867076263fceb58b",
+      "size_bytes": 12640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/base/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3",
+      "size_bytes": 8803
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/proposed/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "69b81bc1d9911dc494f94cada9625557a8a6e4850a2b19edf2073ba8f2e5feb6",
+      "size_bytes": 14889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/diffs/01.diff",
+      "sha256": "35a702b1a631619bea09cc91f189fa2a074bfd009aad01cbb2249b93f64d453b",
+      "size_bytes": 8509
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/parent-diffs/01.diff",
+      "sha256": "d0abc5b0e833768bddf1fab8d1c5af395d434c75aff596ac1038613f3be1afea",
+      "size_bytes": 1906
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/base/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057",
+      "size_bytes": 12459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "07cd947f07be2d8f094e742c25afde67888fa197f04db3abe7235c8c75f39cc6",
+      "size_bytes": 14072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/diffs/02.diff",
+      "sha256": "80b9c6fa9139de6cef00c0822d846d22cd124021b6f15bb358699715e1a2d82d",
+      "size_bytes": 2675
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/parent-diffs/02.diff",
+      "sha256": "2466ebbb78e0876f0497e9a7e850db68a8e893365b62d3d03fadc19e53aab7b1",
+      "size_bytes": 662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/base/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+      "size_bytes": 21564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "03b10af1c198e09f42799f19d7877c8f195c4712bf1192d1a203395017cd42c9",
+      "size_bytes": 22106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/diffs/03.diff",
+      "sha256": "2c5216fff6a22321407e12b3ab37cefe680770de2785fbd3d9e4670aabad96dc",
+      "size_bytes": 1000
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/parent-diffs/03.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/base/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "eb273be8652e1783f6b404ea3715d7220e8cfb442a9f6eba9197aeac84a066c5",
+      "size_bytes": 16644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/proposed/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "d1222d48afb659125663dd72549073a20bd0d0205e681bc7dbe46799454587b6",
+      "size_bytes": 17837
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/diffs/04.diff",
+      "sha256": "ea8a3ebda21c6f1b4bc715ffb818a7db4a602b6b9ab4741c77eff88926ce9e70",
+      "size_bytes": 2070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/parent-diffs/04.diff",
+      "sha256": "f8c210bd5c6cd59233f481b1b7afa7aa0547b381ab6652e12658ef0a18ec804d",
+      "size_bytes": 401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/base/crates/ep_runtime/src/weather_day/current_tests.rs",
+      "sha256": "c6e7dfba3a3d9ff1f71358411f338b8144f96089d168cab335b033be1d0100d5",
+      "size_bytes": 4091
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/proposed/crates/ep_runtime/src/weather_day/current_tests.rs",
+      "sha256": "fdd428bdd5dacbaffef7525c9006b7d7a0fc6102d51555363e2fd5b406919c12",
+      "size_bytes": 8118
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/diffs/05.diff",
+      "sha256": "602babe1312bb1d9490aeee8dc42ce3437322225f42758a730f5965b0dfbd9a6",
+      "size_bytes": 4420
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/parent-diffs/05.diff",
+      "sha256": "644e8644184fd5d96e14946d0884bf5767d97403dccab5a4574b8def6b847960",
+      "size_bytes": 1326
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+      "size_bytes": 490422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/WeatherManager.cc-2036-2273.txt",
+      "sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206",
+      "size_bytes": 13709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/WeatherManager.cc-4275-4335.txt",
+      "sha256": "9fc98db0fb59828d625984533dc044b40bbb5ac5f29a72762a12c4896444b687",
+      "size_bytes": 3246
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/WeatherManager.cc-4570-4576.txt",
+      "sha256": "f1234509c0a7310b291e6a6abe106dbe5a50c00936cc5979b56036c4b8712788",
+      "size_bytes": 461
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc",
+      "size_bytes": 53352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/WeatherManager.hh-794-802.txt",
+      "sha256": "63695d98beb605153209f58f9fe6738149147680a3a6b53455dfa7fbb7a28d4b",
+      "size_bytes": 747
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/WeatherManager.hh-849-852.txt",
+      "sha256": "f04bacb88a8ed0a6c025f373b6dc498790983ab8b79f2700963aec130b922f01",
+      "size_bytes": 293
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "size_bytes": 16816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/DataEnvironment.hh-81-81.txt",
+      "sha256": "8500a5062b75dabcedd0f7fee47ade669c24ea975f18e77829c2039c1269540a",
+      "size_bytes": 122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/DataEnvironment.hh-109-159.txt",
+      "sha256": "1b584996770131f4a98f6963368901e441f9b6061b6c12914763a51e573553cc",
+      "size_bytes": 4895
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/Original/DataEnvironment.hh-172-191.txt",
+      "sha256": "5cb87c9251fb07fe5abadbc37da8d508e9c7057fe5d010dda6ce5994423cace8",
+      "size_bytes": 2191
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "size_bytes": 27600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/Original/Fmath.hh-88-96.txt",
+      "sha256": "1b79e90995478fc80680db8d944c55418e5f2d646e79262dc7aaea8e53cb3e01",
+      "size_bytes": 111
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/Original/Fmath.hh-337-343.txt",
+      "sha256": "87136c075a12342a20889402c2a829de3567b5d26fe0822c03bce7bfc52f6417",
+      "size_bytes": 107
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494",
+      "size_bytes": 7439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-03/Original/EnergyPlus.hh-160-168.txt",
+      "sha256": "432df973777d73931a73a04f103890b1d4215add56b5e2ec34ca835859401ab5",
+      "size_bytes": 222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/manifest.json",
+      "sha256": "e84149893efb155a1076e42c8ae63f0473de2b536c03b7d33e27ea1e9d843d01",
+      "size_bytes": 9632
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-Source-review-03/review.json",
+      "sha256": "02780432608a3c6d22a4f1e45f0adbc7c0d3c3bd74fadc2c953409b4df1441bd",
+      "size_bytes": 1313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/review.json",
+      "sha256": "fb251f68b922b45450c7779d5399183998f299efbbcaa8b69204a5d263475aa2",
+      "size_bytes": 5685
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-application-Root-01/application-literal.json",
+      "sha256": "cb2f70cc55e2a9f7ed2fd7eaf004b480c588271aeec7f1c663afe9893b677d9d",
+      "size_bytes": 6603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-01/receipt.json",
+      "sha256": "e5f42d340f4acd7ed5bb0190cb8c9bcf3f35d145f80e14f252de3cecd94f9cfe",
+      "size_bytes": 3199
+    },
+    {
+      "path": ".runtime/porting/source-objects/af/af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18",
+      "sha256": "af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18",
+      "size_bytes": 1642318
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "3021cea19e030728bec4f13bc457179d1decedcbe299d4f93125485e6b7243bd",
+      "size_bytes": 15140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/00-formatter.diff",
+      "sha256": "174b758ce3d4c9ee8c406dfba67338e8160f8d0d7632af88a70e2dbe90476d7a",
+      "size_bytes": 4613
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "07cd947f07be2d8f094e742c25afde67888fa197f04db3abe7235c8c75f39cc6",
+      "size_bytes": 14072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/01-formatter.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "c74e9a42cbf083cf237c1c881015a745fd5360d30aafe4dbf3129723040edf86",
+      "size_bytes": 22126
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/02-formatter.diff",
+      "sha256": "aec01febc26d67f7f8a782844c04a0cc9251776759431c212037b155c19d4706",
+      "size_bytes": 721
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "d1222d48afb659125663dd72549073a20bd0d0205e681bc7dbe46799454587b6",
+      "size_bytes": 17837
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/03-formatter.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current_tests.rs",
+      "sha256": "41837705b8c15f9bb08e8db0b6c7bf9c78d941f44040e6bb5c6bd9324d5cb01e",
+      "size_bytes": 8433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-current-solar-formatter-review-01/04-formatter.diff",
+      "sha256": "655ed1bb0778e4635bee413ebcfe84299c7887ac40ca376332a090fee16bf81e",
+      "size_bytes": 5246
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-current-solar-Root-01.py",
+      "sha256": "cd3da84229157362f151d9d0728d0bcdab4880debe401668f037847121e2524d",
+      "size_bytes": 2073
+    },
+    {
+      "path": ".runtime/porting/source-objects/90/90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+      "sha256": "90b489e38f4b41d61ff6cd726ea22e03f823179163db04777f5e1107f068d2ee",
+      "size_bytes": 1642317
+    },
+    {
+      "path": ".runtime/porting/source-objects/34/34ca299fcc89ec51560c9e12101a8ed64d959f39fd65e8a06258aa99ed4774c3",
+      "sha256": "34ca299fcc89ec51560c9e12101a8ed64d959f39fd65e8a06258aa99ed4774c3",
+      "size_bytes": 1642318
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-check-01/receipt.json",
+      "sha256": "039ac364495ef241d85a2c8988814daafbd95a45ee359e179a818e6ffe1f0bb3",
+      "size_bytes": 3235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-check-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-fmt-check-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-source-quality-01/receipt.json",
+      "sha256": "72b8afcf8bc231ef1c38584442071267290ccbc813be272bfc8a6331a3a008f2",
+      "size_bytes": 3287
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-source-quality-01/stdout.log",
+      "sha256": "6b502a38833c59ba15059901a9032e3a318599589831ca82c22a19d4bfbb2cb2",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-source-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-clippy-01/receipt.json",
+      "sha256": "97be4d48fa58086482fd02c0aebc9112ce4d75a95756f26826a7a989d3e1329c",
+      "size_bytes": 3270
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-clippy-01/stderr.log",
+      "sha256": "b2cdf287d5b5afdc8e80a2c9acb1d54dfc2e1d58f4d3ba800ea25fe4e7d3e298",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-workspace-01/receipt.json",
+      "sha256": "ec02aef2eacc43a9c0a165a02b3700e8f59a20ce9b17d9f78a78d35f5caedf01",
+      "size_bytes": 3218
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-workspace-01/stdout.log",
+      "sha256": "0c0d659ba5fd95266f558c4b7fe1593e6982e90c8d7c7c8bb698a4ca309b0864",
+      "size_bytes": 760892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-workspace-01/stderr.log",
+      "sha256": "9fe919c0f0b9a95d642bd2ae2465b57acc5c68cc9195d796843ca656c1945197",
+      "size_bytes": 1420
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-current-solar-Root-01.py",
+      "sha256": "765f75ce89f8102d7d0b82b8075742e7e038f2d53e8bd4f1345241d72b628fcd",
+      "size_bytes": 12711
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-current-solar-Root-02.py",
+      "sha256": "4080abd9cda2201f7f7ed5b631627c62b1fecc886855ce5c687a26f7750838a7",
+      "size_bytes": 7548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-current-solar-Root-03.py",
+      "sha256": "86ace8bda883571a825e9a4a94eea57b610ceca7a106ea33b184385869ce8130",
+      "size_bytes": 4799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/manifest.json",
+      "sha256": "87e6fd92c817d5860f9323b7aed307d2fd638fe4cbacca4a28dc801f1baeda88",
+      "size_bytes": 7532
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/base/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3",
+      "size_bytes": 8803
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/proposed/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "cbf673c01a66c7e0a5fb053f93c61eb84b670874e0e75be1ab885c23327fe931",
+      "size_bytes": 14816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/diffs/01.diff",
+      "sha256": "537f1832a6679601a5d87ad136d53acb75522221c9b00928926b2e763c72cafc",
+      "size_bytes": 8281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/base/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057",
+      "size_bytes": 12459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "12e48428e15a4c28e5ad74a6b80a52bc8ae3966d089da694b9d0f3c6db84c048",
+      "size_bytes": 13975
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/diffs/02.diff",
+      "sha256": "cb25af25eda7e0a952bfd07450394b24300497b00a221928b4a2e8cf2f080d83",
+      "size_bytes": 2575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/base/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+      "size_bytes": 21564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "03b10af1c198e09f42799f19d7877c8f195c4712bf1192d1a203395017cd42c9",
+      "size_bytes": 22106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-01/diffs/03.diff",
+      "sha256": "2c5216fff6a22321407e12b3ab37cefe680770de2785fbd3d9e4670aabad96dc",
+      "size_bytes": 1000
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/base/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3",
+      "size_bytes": 8803
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/proposed/crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "cbf673c01a66c7e0a5fb053f93c61eb84b670874e0e75be1ab885c23327fe931",
+      "size_bytes": 14816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/diffs/01.diff",
+      "sha256": "537f1832a6679601a5d87ad136d53acb75522221c9b00928926b2e763c72cafc",
+      "size_bytes": 8281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/base/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057",
+      "size_bytes": 12459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "12e48428e15a4c28e5ad74a6b80a52bc8ae3966d089da694b9d0f3c6db84c048",
+      "size_bytes": 13975
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/diffs/02.diff",
+      "sha256": "cb25af25eda7e0a952bfd07450394b24300497b00a221928b4a2e8cf2f080d83",
+      "size_bytes": 2575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/base/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+      "size_bytes": 21564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "03b10af1c198e09f42799f19d7877c8f195c4712bf1192d1a203395017cd42c9",
+      "size_bytes": 22106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/diffs/03.diff",
+      "sha256": "2c5216fff6a22321407e12b3ab37cefe680770de2785fbd3d9e4670aabad96dc",
+      "size_bytes": 1000
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/base/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "eb273be8652e1783f6b404ea3715d7220e8cfb442a9f6eba9197aeac84a066c5",
+      "size_bytes": 16644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/proposed/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "10b608ca88f3e260ffb51195add0106d10ecc9431f965e7a6426b61b8a78f878",
+      "size_bytes": 17807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/diffs/04.diff",
+      "sha256": "3f7849b88bd8f5deb67475a533da3b8b92fc84136e39c87ab42840dba1d08d0b",
+      "size_bytes": 2039
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/base/crates/ep_runtime/src/weather_day/current_tests.rs",
+      "sha256": "c6e7dfba3a3d9ff1f71358411f338b8144f96089d168cab335b033be1d0100d5",
+      "size_bytes": 4091
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/proposed/crates/ep_runtime/src/weather_day/current_tests.rs",
+      "sha256": "b0b14aad1f712d4550a4b81ec61751d84555a2db48a289f506d619c2a7595b90",
+      "size_bytes": 7872
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-current-solar-prep-02/diffs/05.diff",
+      "sha256": "c903078a7a1368f252d85a3c946a3bf62f376869183da27045e905cabcb18643",
+      "size_bytes": 4170
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-current-solar/evidence.zip",
+    "sha256": "6e157a112a31e928164ac53929ce7defa98b751dbed88b119ac99b55cd5b0344",
+    "size_bytes": 1053436
+  },
+  "archive_member_count": 100,
+  "reference_scope": "Finite listed bytes only; Source-index rows are metadata, not a transitive whole-workspace payload archive",
+  "large_Native_payloads_read": false,
+  "Native_execution_performed": false,
+  "gates_updated": false
+}

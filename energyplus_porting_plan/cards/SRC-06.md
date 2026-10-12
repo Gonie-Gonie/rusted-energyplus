@@ -439,3 +439,33 @@ fmt, workspace Clippy(-D warnings), source-quality와 전체 테스트 1회가 �
 현재 없는 DesignDay 생산자, 실제 InitSurface 전체 suffix, 공유 firstTime,
 radiant enclosure·ScriptF cache·반복 caller와 ordinary 활성화는 계속 포팅한다.
 SRC-06의 네 gate와 A14/54, B14/64는 변경하지 않는다.
+
+
+## 실제 현재 기상 태양 상태 생산자
+
+SetCurrentWeather에서 실제 TodayVariables와 한 번 초기화된 위치 상태를 사용해
+DetermineSunUpDown을 실행한다. SunIsUp, 이전 timestep의 SunIsUp, SOLCOS,
+시간각·태양 고도·방위각을 독립된 원래 소유자에 보존한다. sky·IR·cloud·snow도
+실제 Today slot에서 복사한다. 월별 지면 반사율을 매번 복원한 뒤 두 적설 계수를
+각각 적용하고, 지면 일사량을 계산한 다음 야간의 현재 Beam/Dif/Gnd만 0으로 만든다.
+Today의 원래 일사 값은 변경하지 않는다. 같은 시각의 실제 반복 호출도 이전 태양
+상태를 갱신한다. hourly 태양 시각의 -0.5 offset과 ObjexxFCL min/max 인수 순서의
+NaN 동작을 그대로 유지한다.
+
+기존 두 테스트 파일의 사례만 확장했다. 실제 session에서 정오·야간·동일 시각 반복·
+적설·월별 반사율 복원·hourly offset을 검증하고, 전체 일일 handoff canary에 새
+소유자를 추가했다. 테스트 수와 binary는 늘리지 않았다. 최종 Source
+`af6f53c88091a2350ba0545ddc4ed1ee200e75c734e6823e979e20b096f9fa18`에서
+fmt, source-quality, workspace Clippy(-D warnings), 전체 테스트 1회가 통과했다:
+18개 그룹, 4,974 passed, 0 failed, 기존 ignored 2개. 별도 focused 중복 실행은 없다.
+
+[현재 기상 생산자 검증 요약](../evidence/SRC-06-ordinary-current-solar/summary.json),
+[실제 파일·검증 기록](../evidence/SRC-06-ordinary-current-solar/manifest.json),
+[전체 기록 ZIP](../evidence/SRC-06-ordinary-current-solar/evidence.zip)에 실제 수정,
+Original 구간, 독립 검토 및 QA 로그를 보존한다. 새 Native 수치 동등성을 주장하지 않는다.
+선택된 no-EMS·기본 지면 반사율 경로이며, 선택 외 ground/water 모델과 daylight
+illuminance는 이 단위의 구현 범위가 아니다. DesignDay의 site schedule 진단 초기화는
+실제 DesignDay configuration을 연결할 때 함께 적용한다.
+
+실제 SetupSimulation, 첫 DesignDay에서의 지연 초기화, InitSurface 전체 suffix와
+ordinary 반복 호출 연결은 계속 포팅한다. 모든 SRC-06 gate 및 A14/54, B14/64는 유지한다.
