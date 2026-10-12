@@ -12531,6 +12531,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-radiation-lu/summary.json",
         "sha256": "e001786af82a08fcd8a6c15afb672ea770d41d7432b4522369602f8d87d92187",
         "size_bytes": 4650
+      },
+      "actual_selected_ordinary_geometry_equipment": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-geometry-equipment/summary.json",
+        "sha256": "5304f1babb24867f09414f68a04ce09db59d80e46e7fa6f815576db7b11422c8",
+        "size_bytes": 8094
       }
     },
     {

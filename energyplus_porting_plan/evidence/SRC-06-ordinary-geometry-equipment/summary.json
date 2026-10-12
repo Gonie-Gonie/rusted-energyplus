@@ -1,0 +1,203 @@
+{
+  "schema": "src06-actual-bounded-geometry-equipment-and-borrowed-Config.v1",
+  "status": "bounded getter retained in actual geometry caller; selected whole released-Rust dispatcher regression identical",
+  "publication_inputs": {
+    "path": ".runtime/porting/SRC-06/ordinary-equipment-publication-inputs-Root-01.json",
+    "sha256": "7eda228957c6e25403f3b055bbbf8a9121d1710b105c376b3703b707ade10f13",
+    "size_bytes": 8228
+  },
+  "current_Source": {
+    "path": ".runtime/porting/source-objects/eb/eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+    "sha256": "eb2d06b7ae9b3a85fe058ffb77dcd5dbb38bc8cff68ce8c7767e71a326b2f3ae",
+    "size_bytes": 1641591
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-equipment-Root-apply-01/report.json",
+    "sha256": "b90174cad4e86f5f27693c45cd0e45faf847aaf8dfe86756b0015616b6c7ddf6",
+    "size_bytes": 5346
+  },
+  "owner_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-equipment-integration-prep-01/manifest.json",
+    "sha256": "cb98a9e40825b0619886f83faa6df7ead44dc0a0fe616508619813f06dd8dedf",
+    "size_bytes": 70275
+  },
+  "borrow_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-zone-equipment-borrow-prep-02/manifest.json",
+    "sha256": "05c1927c25325baba5480b0d078726c5988ef18ca686043c7ca8fc9ac47baf4d",
+    "size_bytes": 9236
+  },
+  "changed_current_paths": [
+    "crates/ep_run/src/lib.rs",
+    "crates/ep_run/src/ordinary_equipment_input/fields.rs",
+    "crates/ep_run/src/ordinary_equipment_input.rs",
+    "crates/ep_run/src/pipeline.rs",
+    "crates/ep_run/src/warmup_report_controls.rs",
+    "crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+    "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment_tests.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+    "crates/ep_runtime/src/runtime.rs",
+    "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+    "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+    "crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+    "crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs"
+  ],
+  "explicit_current_recorder_Source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+    "size_bytes": 8557
+  },
+  "owner_literal_Original_ranges": 85,
+  "borrow_literal_Original_ranges": 3,
+  "historical_Native_facts": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/review.json",
+    "sha256": "0c485eff914c0def87199b8a31e6a090d81c2af2c22b440fd8c77926964572ba",
+    "size_bytes": 34995
+  },
+  "historical_full_fixture_identity_only": {
+    "path": ".runtime/porting/SRC-06/ordinary-readiness-native-factual-01/selected-cases.json",
+    "sha256": "b5d13ffe85c1695d805ba2492537b5f4443c3461313806e91187f64a577310dd",
+    "size_bytes": 3384982
+  },
+  "eight_whole_Native_objects": {
+    "path": ".runtime/porting/SRC-06/ordinary-equipment-integration-prep-01/proposed/crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+    "sha256": "8fc26d9728a3d186d858f03ce3a75468610f837fefdcfadd4ca294d6eb824a2c",
+    "size_bytes": 85227
+  },
+  "selected_source_indices": [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    13
+  ],
+  "actual_test_totals": {
+    "focused-0": {
+      "groups": 2,
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused-1": {
+      "groups": 1,
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "actual_QA_commands": {
+    "fmt_check": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "source_quality": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/source-quality-gate.ps1"
+    ],
+    "focused-0": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/test.ps1",
+      "-Package",
+      "ep_run,ep_runtime",
+      "-Lib",
+      "-Filter",
+      "ordinary_"
+    ],
+    "focused-1": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/quality/test.ps1",
+      "-Package",
+      "ep_runtime",
+      "-Lib",
+      "-Filter",
+      "inside_convection_dispatcher"
+    ]
+  },
+  "checkpoint_validation_scope": "Actual fmt check, source quality and affected tests only. No Owner-checkpoint Clippy/workspace run is claimed; consolidated QA is shared with the following radiation integration.",
+  "optional_later_consolidated_quality": {},
+  "actual_whole_Rust_regression": {
+    "path": ".runtime/porting/SRC-06/ordinary-borrowed-equipment-parity-01/comparison.json",
+    "sha256": "a13df3fd6e1ba382b2130a35e4ae056f55a1d92eb5060922d4fdb37679543768",
+    "size_bytes": 2771
+  },
+  "whole_JSON_comparison_counts": {
+    "objects": 16398,
+    "arrays": 3067,
+    "exact_leaves": 57930
+  },
+  "actual_selected_Rust_cases": 8,
+  "actual_selected_Rust_calls": 20,
+  "whole_regression_differences": 0,
+  "authenticated_execution_metadata_leaves": 53,
+  "historical_optional_Native_unpaired_excluded": 264,
+  "preserved_prior_executions": [
+    {
+      "role": "powershell-policy-blocked",
+      "artifact": {
+        "path": ".runtime/porting/SRC-06/ordinary-equipment-focused-tests-01/receipt.json",
+        "sha256": "6bc00b79e2ccf9d1c6544b6f6840df51b840061a68310adf2e71e53ed2365f95",
+        "size_bytes": 5151
+      },
+      "reason": "PowerShell policy blocked script before Cargo; rerun uses process-scoped Bypass."
+    },
+    {
+      "role": "Cargo-success-before-artifact-classifier-correction",
+      "artifact": {
+        "path": ".runtime/porting/SRC-06/ordinary-borrowed-equipment-build-01/build-command/receipt.json",
+        "sha256": "e72e0986bd5e4afee85ff1203e156ba47555b45da355e6bfee2700501525c676",
+        "size_bytes": 5345
+      },
+      "reason": "Cargo built successfully; original recorder failed to capture absolute-Cargo artifact. Driver stopped before target execution."
+    }
+  ],
+  "scope": "Finite 29-family/field raw admission, surface validation then actual bounded GetZoneEquipment then volume, retained independent Node allocation and sole Config active-element borrow. One actual getter pair and seven count/find objects are test authority; full InputProcessor prepresence is unclaimed.",
+  "limitations": [
+    "full InputProcessor prepresence/scratch state",
+    "full GetSurfaceData diagnostic and global failure-prefix retention",
+    "gain registration/equations and full Config/Node ABI",
+    "availability-manager/HVAC Manage/Sim tails",
+    "AnyEMS host-global readiness",
+    "ordinary dispatcher activation/cadence",
+    "interior radiation or zone solution parity",
+    "full port science/report PASS",
+    "No new direct Native engine comparison or full InputProcessor ABI.",
+    "Earlier absent-or-null family equivalence is limited to the reached admitted lookups.",
+    "Large historical capture, full138 fixture, Native executable/map/provider/core and transitive Source payloads are identity/provenance only."
+  ],
+  "SRC06_all_four_gates_pending": true,
+  "A_completed": 14,
+  "A_total": 54,
+  "B_completed": 14,
+  "B_total": 64,
+  "new_direct_Native_comparison_claimed": false,
+  "whole_ordinary_handoff_PASS_claimed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-geometry-equipment/evidence.zip",
+    "sha256": "5bbf885099723a44375eb0b6aab1eaa3e794f7c57d0d448864e00678a79b55c5",
+    "size_bytes": 932922
+  }
+}
