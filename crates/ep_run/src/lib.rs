@@ -21,6 +21,7 @@ mod geometry_trace;
 mod oracle;
 mod ordinary_design_day_input;
 mod ordinary_equipment_input;
+mod ordinary_input_processor;
 mod outputs;
 mod pipeline;
 mod porting_scope;

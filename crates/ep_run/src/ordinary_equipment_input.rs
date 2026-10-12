@@ -466,6 +466,7 @@ mod tests {
             "no inferred timing or geometry defaults"
         );
         super::design_day_projection::verify_admitted_design_day_projection()?;
+        crate::ordinary_input_processor::tests::verify_shared_input_boundary()?;
         Ok(())
     }
 }

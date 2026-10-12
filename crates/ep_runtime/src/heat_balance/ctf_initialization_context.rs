@@ -24,6 +24,11 @@ pub struct CtfInitializationReports {
     /// True only after the selected Setup caller reached SetPredefinedTables215.
     /// Legacy callers still register normally; this is not inferred from size.
     pub setup_simulation_registry_prepared: bool,
+    /// Sole actual raw/schema input owner, retained across runtime success and failure.
+    /// Legacy callers that supply no raw projection retain None.
+    pub selected_input_processor: Option<super::selected_input_processor::SelectedInputProcessor>,
+    /// Sole shared input arrays allocated before the ordinary runtime getters.
+    pub input_processor_shortcut: super::selected_input_processor::SourceInputProcessorShortCut,
     /// Full allocated predefined string-entry owner.
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.
@@ -32,6 +37,26 @@ pub struct CtfInitializationReports {
     pub progress: CtfInitPostludeProgress,
     /// Actual reached InitSolar prefix on failure; moved into State on success.
     pub ordinary_solar_radiation: Option<super::radiation::ordinary::OrdinarySolarRadiation>,
+}
+
+impl CtfInitializationReports {
+    /// Move the actual admitted input owner and allocate its shared arrays.
+    /// This is the selected InputProcessor.cc315-320 boundary, before runtime.
+    /// Later definition queries retain their presence mutations without reallocating.
+    ///
+    /// # Errors
+    /// Retains the moved input and previous arrays if schema/count lookup fails.
+    pub fn initialize_input_processor(
+        &mut self,
+        input: super::selected_input_processor::SelectedInputProcessor,
+    ) -> Result<(), super::selected_input_processor::SelectedInputUnavailable> {
+        self.selected_input_processor = Some(input);
+        let input = self
+            .selected_input_processor
+            .as_ref()
+            .ok_or(super::selected_input_processor::SelectedInputUnavailable::Association)?;
+        self.input_processor_shortcut.allocate_from_input(input)
+    }
 }
 
 /// Distinct actual initialization failures, retaining the original backend errors.

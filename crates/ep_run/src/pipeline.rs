@@ -840,6 +840,8 @@ struct PreparedRuntimeInputs {
     zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
     weather_series: Option<ProductionWeatherTimestepSeries>,
     ordinary_warmup_reporting: Option<ep_runtime::HeatBalanceOrdinaryWarmupReportInputs>,
+    selected_input_processor:
+        Option<ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -1388,7 +1390,7 @@ fn run_with_optional_porting_scope_impl(
             }
         };
         let runtime_setup_start = Instant::now();
-        let runtime_inputs = match ep_runtime::psychrometrics::production_trace::in_phase(
+        let mut runtime_inputs = match ep_runtime::psychrometrics::production_trace::in_phase(
             "rust_runtime_setup",
             || {
                 prepare_runtime_inputs(
@@ -1439,7 +1441,7 @@ fn run_with_optional_porting_scope_impl(
                             simulation_model.as_ref(),
                             assessment.runtime_class,
                             source_order_gate,
-                            &runtime_inputs,
+                            &mut runtime_inputs,
                             config.trace_level == TraceLevel::Full,
                             &mut ctf_outputs,
                         )
@@ -3584,6 +3586,12 @@ fn prepare_runtime_inputs(
         schedule_cache,
         zone_timestep_schedule_cache,
         weather_series,
+        selected_input_processor: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+        {
+            Some(crate::ordinary_input_processor::resolve(raw_model)?)
+        } else {
+            None
+        },
         ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
         {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
@@ -3604,7 +3612,7 @@ fn execute_rust_runtime(
     simulation_model: Option<&SimulationModel>,
     runtime_class: RuntimeClass,
     source_order_gate: SourceOrderGateSummary,
-    runtime_inputs: &PreparedRuntimeInputs,
+    runtime_inputs: &mut PreparedRuntimeInputs,
     capture_geometry: bool,
     ctf_outputs: &mut CtfRunOutputs,
 ) -> Result<RustRuntimeResult, String> {
@@ -3626,6 +3634,12 @@ fn execute_rust_runtime(
                 HeatBalanceSimulationOptions::hourly_samples(sample_count)
             };
             let mut initialization = ctf_outputs.context();
+            if let Some(input) = runtime_inputs.selected_input_processor.take() {
+                initialization
+                    .reports
+                    .initialize_input_processor(input)
+                    .map_err(|error| error.to_string())?;
+            }
             let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {
                 ep_runtime::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
                     model, weather_series, options, &mut initialization, reporting,

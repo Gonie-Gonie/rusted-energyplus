@@ -12561,6 +12561,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-inside-convection-borrow/summary.json",
         "sha256": "7605c8e5510a7d40edd4ca73339446153676b6d18e0cf2d6882d950930e0e0f1",
         "size_bytes": 2968
+      },
+      "actual_selected_ordinary_shared_input": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-shared-input/summary.json",
+        "sha256": "3394960db785295f34d8414ec06b009ec4f570a5d7714191766f122538b8c97f",
+        "size_bytes": 3341
       }
     },
     {

@@ -532,3 +532,28 @@ fmt, source-quality, all-target workspace Clippy(-D warnings), 관련 8개 테�
 실제 변경과 Original 구간, 독립 Source 검토 및 QA를 보존한다. 전체 InitSurface/
 Setup 호출 연결과 ordinary dispatcher 활성화는 계속 구현 중이다. SRC-06 네 gate와
 A14/54, B14/64는 유지한다.
+
+## 공통 입력 저장소의 실제 실행 연결
+
+ordinary 입력 준비 단계에서 실제 raw family 존재와 JSON 필드 크기를 보존하고,
+실행 직전에 `Option::take`로 단일 입력 owner를 보고 저장소에 옮긴다. 원본
+InputProcessor315–320 순서로 공통 alpha/numeric 배열 여섯 개를 실제 스키마
+최대값으로 할당한다. 문자열은 빈 값, 숫자는 +0.0, blank flag는 false로 시작한다.
+개수 조회는 입력 존재를 바꾸지 않고, 정의 조회는 알려진 미존재 family를 null로
+삽입한다. 이후 null 삽입이 이미 할당한 공통 배열을 다시 늘리지는 않는다.
+
+기존 raw admission 회귀 한 본문을 확장해 대소문자 조회, 확장 필드 크기,
+empty/absent/null 구분, 공통 배열 초기값과 크기 실패 후 owner 보존을 검증했다.
+테스트 본문과 바이너리 수는 그대로다. 최종 Source `0b215d65ee43520a829a45318c7e4b317540cae70a23a21393c3281a080395af`에서
+fmt, source-quality, workspace 전체 target Clippy(-D warnings), 전체 테스트 한 번이
+통과했다: 18개 그룹, 4,974 passed/0 failed/기존 ignored 2개. 해당 회귀를 별도로
+중복 실행하지 않았다.
+
+[공통 입력 검증 요약](../evidence/SRC-06-ordinary-shared-input/summary.json),
+[실제 파일 색인](../evidence/SRC-06-ordinary-shared-input/manifest.json),
+[전체 검증 기록](../evidence/SRC-06-ordinary-shared-input/evidence.zip)에 변경 전체와
+원본 구간, 독립 Source 검토 및 실제 QA를 보존했다. 선택한 60개 스키마 정의는
+조회 metadata이며 positive 입력 허용 범위를 넓히지 않는다. 아직 지원하지 않는
+존재 family는 명시적으로 중단한다. 스케줄·사이징·전체 RunSimulation/Setup은
+후속 연결 대상이며 전체 parser 또는 Native 수치 동등성을 주장하지 않는다.
+SRC-06 gate와 A14/54, B14/64 상태는 유지한다.
