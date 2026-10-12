@@ -53,6 +53,9 @@ pub struct HeatBalanceState {
     /// Actual admitted uncontrolled warmup demand/daily convergence owners.
     /// None means no warmup owner has been invoked; it supplies no zero loads.
     pub warmup_convergence: Option<HeatBalanceWarmupConvergenceState>,
+    /// Present only for the explicitly admitted ordinary A temperature route.
+    pub(crate) ordinary_inside_temperatures:
+        Option<super::ordinary_inside_temperatures::OrdinaryInsideTemperatures>,
     /// Persistent selected global BeginEnvrn guard shared by all zone owners.
     pub zone_air_environment_guard: ZoneAirEnvironmentGuard,
     /// Per-surface heat-balance state.
@@ -1107,4 +1110,12 @@ pub struct HeatBalanceOrdinaryWarmupReportInputs {
     pub detailed: bool,
     /// Actual selected project control result; the weather A admission requires false.
     pub do_pure_load_calc: bool,
+    /// Actual ZoneAirHeatBalanceAlgorithm sizing space-control input.
+    pub do_space_heat_balance_for_sizing: bool,
+    /// Actual ZoneAirHeatBalanceAlgorithm simulation space-control input.
+    pub do_space_heat_balance_for_simulation: bool,
+    /// Actual six-family getter counts, admitted by the existing no-user type.
+    pub no_user_convection_input: super::inside_convection_dispatcher::NoUserConvectionInput,
+    /// Actual HeatBalanceAlgorithm N2 or retained Source constructor default.
+    pub low_hconv_limit_w_per_m2_k: f64,
 }

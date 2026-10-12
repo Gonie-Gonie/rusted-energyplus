@@ -8,6 +8,7 @@ config/local.toml
 *.log
 *.tmp
 *.zip
+!energyplus_porting_plan/evidence/**/evidence.zip
 *.7z
 *.tar.gz
 __pycache__/

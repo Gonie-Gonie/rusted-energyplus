@@ -136,6 +136,8 @@ pub enum CtfSurfaceLifecycleUnavailable {
     MissingPublicOwner,
     /// A mutable legacy consumer view no longer matches its real public owner.
     ConsumerView,
+    /// Explicit ordinary temperature owner/configuration is unavailable.
+    OrdinaryTemperatureOwner,
 }
 
 impl From<CtfSurfaceBindingUnavailable> for CtfSurfaceLifecycleUnavailable {
@@ -474,6 +476,10 @@ impl CtfSurfaceLifecycle {
         surfaces: &mut [SurfaceHeatBalanceState],
         clock: ProductionCtfHistoryClock,
         outdoor: f64,
+        zones: &mut [super::state::ZoneHeatBalanceState],
+        ordinary_temperatures: Option<
+            &mut super::ordinary_inside_temperatures::OrdinaryInsideTemperatures,
+        >,
     ) -> Result<(), CtfSurfaceLifecycleUnavailable> {
         if let Some(error) = self.failure {
             return Err(error);
@@ -493,6 +499,9 @@ impl CtfSurfaceLifecycle {
         }
         let inputs = self.inputs(model, public, surfaces, outdoor)?;
         if clock.begin_environment {
+            if let Some(owner) = ordinary_temperatures {
+                owner.begin_environment(zones)?;
+            }
             // Borrow disjoint fields explicitly; the accepted arithmetic is unchanged.
             let aggregate = public.aggregate_after_returned_calls;
             let context = CtfThermalHistoryContext {
@@ -659,7 +668,15 @@ pub(crate) fn begin_step(
         (Some(public), Some(clock))
             if clock.time_step_zone_seconds.to_bits() == timestep_seconds.to_bits() =>
         {
-            lifecycle.begin_step(model, public, &mut state.surfaces, clock, outdoor)
+            lifecycle.begin_step(
+                model,
+                public,
+                &mut state.surfaces,
+                clock,
+                outdoor,
+                &mut state.zones,
+                state.ordinary_inside_temperatures.as_mut(),
+            )
         }
         (Some(_), Some(_)) => Err(CtfSurfaceLifecycleUnavailable::TimeStepAssociation),
         (None, _) => Err(CtfSurfaceLifecycleUnavailable::MissingPublicOwner),

@@ -1,0 +1,1779 @@
+{
+  "schema": "src06-finite-temperature-owner-publication.v1",
+  "actual_inputs": {
+    "path": ".runtime/porting/SRC-06/temperature-owner-publication-inputs-01/actual-inputs.json",
+    "sha256": "98dc791bbe8e3e6dc94bff920f2f27373298ff8e73ecc2e650d356984b78c660"
+  },
+  "summary": {
+    "path": "summary.json",
+    "sha256": "22b8c678136e8d70b79b333c8add1f718db044088fa3e23fb77aab7ce4602835",
+    "size_bytes": 12312
+  },
+  "evidence_zip": {
+    "path": "evidence.zip",
+    "sha256": "f34700e29c9bbf5f3dce2d5219febe8f00dbef8344942a3172abb48301699368",
+    "size_bytes": 3768729
+  },
+  "members": [
+    {
+      "member_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src\\EnergyPlus\\CommandLineInterface.cc",
+      "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+      "size_bytes": 46621
+    },
+    {
+      "member_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src\\EnergyPlus\\HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+      "size_bytes": 198904
+    },
+    {
+      "member_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src\\EnergyPlus\\HeatBalanceSurfaceManager.cc",
+      "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+      "size_bytes": 698972
+    },
+    {
+      "member_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src\\EnergyPlus\\ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705
+    },
+    {
+      "member_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src\\EnergyPlus\\api\\EnergyPlusPgm.cc",
+      "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+      "size_bytes": 24694
+    },
+    {
+      "member_path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-10\\surface-consumer05-original-data-review-prep-01\\stream_events.py",
+      "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+      "size_bytes": 2385
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-Source-review-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-Source-review-02\\review.json",
+      "sha256": "cf94ad0e20c06885d22acf5aafcb71ee810b38a30fca37c05f9beac63d2b2a24",
+      "size_bytes": 3706
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/00-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\00-formatter.diff",
+      "sha256": "03acc9558466b2e3c1bc93692ce83a2dbb966c9ba7da89a4fd6b72ccec110f14",
+      "size_bytes": 9126
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/01-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\01-formatter.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/02-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\02-formatter.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/03-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\03-formatter.diff",
+      "sha256": "96ba58709497e38e739d4fd69332c15d13a70d722eaabc0948660033b3903057",
+      "size_bytes": 1169
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/04-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\04-formatter.diff",
+      "sha256": "473bd0e59bfd33e1d230c9e1a8baa7176d994a59a15a5626bd45a85273aefe2a",
+      "size_bytes": 1837
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/05-formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\05-formatter.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/formatter-diff-index.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\formatter-diff-index.json",
+      "sha256": "bd0ab33841f2ec747bba1d9058cfcd2bf17b4187277c36c835e59e983247b87d",
+      "size_bytes": 3232
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-convection-input-application-review-02\\review.json",
+      "sha256": "1ca1c760d5eab0b7dcd65f0c3ce4aa91be1293f89906c2ab7c4cd3fae7a182f1",
+      "size_bytes": 7211
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-Native-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-Native-Source-review-01\\review.json",
+      "sha256": "ef8e7693084acc7d33739de34e0333940ca29d0d7ce01c1cac7e549ee7a6bd43",
+      "size_bytes": 3750
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-Native-checker-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-Native-checker-Source-review-01\\review.json",
+      "sha256": "63c739556862813bc230131cc01fb7b3a2b4e5cfa9d087738ffc8d90d7b0fb12",
+      "size_bytes": 2793
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-Native-checker-Source-review-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-Native-checker-Source-review-02\\review.json",
+      "sha256": "1152e1e2e04ea093168e8b17ab6b9d2cd3ca25e65ed9ca5e2ad88a9fc0791c0c",
+      "size_bytes": 2447
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-comparison-policy-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-comparison-policy-review-01\\review.json",
+      "sha256": "8cdd087bfd54664bcd17532be46d3149d55b41ef6bcbc341332632343cd31fd1",
+      "size_bytes": 3554
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-custody-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-custody-review-01\\review.json",
+      "sha256": "f43b167de9cdada5a9da7698748b3eeb3836a43daf12cd05e928ecf3a2d48490",
+      "size_bytes": 13945
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-facts-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-facts-02\\review.json",
+      "sha256": "4c98858241956574055ae902ce2b61b350c020d35603d3b0a80e89417b720729",
+      "size_bytes": 5564
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-facts-02/selected-cases.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-facts-02\\selected-cases.json",
+      "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+      "size_bytes": 268293
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-factual-command-02/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-factual-command-02\\receipt.json",
+      "sha256": "89cbe3bc05c046bcfd2dc2856aea9821e9850dacad75cf640fc6c51008538a17",
+      "size_bytes": 3081
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-factual-command-02/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-factual-command-02\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-factual-command-02/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-factual-command-02\\stdout.log",
+      "sha256": "a8e6c670cac7e8c80cf39bf8cfe67afe3389d4b487bf929440834a4666728475",
+      "size_bytes": 478
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-factual-release-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-native-factual-release-02\\review.json",
+      "sha256": "5438cf3a63abdb6e7756468e72f6bc42e8b4a434c5253f28311a8400a5275d6b",
+      "size_bytes": 8603
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-Source-review-04/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-Source-review-04\\review.json",
+      "sha256": "24362bc802a13ab3ed7519ddc00afcb56d5a09884b2a0d2d8954c1ee54c5c3b3",
+      "size_bytes": 2275
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/00.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\00.formatter.diff",
+      "sha256": "5b91d1ec5148539c476f2ac9f6b142acc78f04c728b532880f41beba1ae91b38",
+      "size_bytes": 3309
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/01.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\01.formatter.diff",
+      "sha256": "bd2301597d48f45a661e527585eefef86c72b005774640c3deb1e1ba06ca527b",
+      "size_bytes": 1485
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/02.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\02.formatter.diff",
+      "sha256": "71e33a5cb8073ee573e6fb208b826e01287a68c928b9b912a3a4c91adbcb62f9",
+      "size_bytes": 385
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/03.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\03.formatter.diff",
+      "sha256": "4bef36d1645b4e6490d5bd0874aba534b67ac54de187c0a8cb59bc198c11caf0",
+      "size_bytes": 5124
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/04.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\04.formatter.diff",
+      "sha256": "f9c2d147a1b0f460988a4889060dc19cbea801c9071e2f41b5d142b17bc0119e",
+      "size_bytes": 30879
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/05.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\05.formatter.diff",
+      "sha256": "44ffc18c28c6c508f79d5e6abc018999ed0bf105c312b27f19a62a039b531b46",
+      "size_bytes": 807
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/06.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\06.formatter.diff",
+      "sha256": "55ff9f00958d0b3c980cdee054e45f43422f8bada051c8c406b7c06c64b27b15",
+      "size_bytes": 3756
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/07.formatter.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\07.formatter.diff",
+      "sha256": "4bf6ea49a964a98f13ae6136410aa0b59e449987297a0e8ec24330074017ae55",
+      "size_bytes": 924
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/formatter-diff-index.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\formatter-diff-index.json",
+      "sha256": "d4f0a52742978ddd3b5dc92704cf803177757357b4dbf3f4e67c28a69a666253",
+      "size_bytes": 1879
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-owner-application-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-owner-application-review-01\\review.json",
+      "sha256": "991cde658010891ff7ac557d75091ed23987df7c4b64e0d37975bcfc48abc5f6",
+      "size_bytes": 5345
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/actual-PE.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\actual-PE.json",
+      "sha256": "7ace0d3bc7dff3219dfcb2fe5a1e62354e92d8a4e6631f4ec3b4d351a81a1b93",
+      "size_bytes": 16047
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/actual-address-bound-providers.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\actual-address-bound-providers.json",
+      "sha256": "b40e8bea2a6894ac100d6c2b8551df2fbee43b3fcfd68f47c73af3f7ff53cc53",
+      "size_bytes": 48344
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/addr2line-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\addr2line-command-01\\receipt.json",
+      "sha256": "266d33871ac9afd5e00cf7421b2ba60e008df58e7cd02316b19f2a15509dc694",
+      "size_bytes": 3542
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/addr2line-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\addr2line-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/addr2line-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\addr2line-command-01\\stdout.log",
+      "sha256": "3263b782254e0e69c82eb12f1d475eb7d82de67a1766fb8ab1322a158e5b4b94",
+      "size_bytes": 6420
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-ordinary-temperature-provider-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-ordinary-temperature-provider-review-01\\review.json",
+      "sha256": "c8117d0ea3f0ceefd876c8abea356fb4c1fd526489c80f17359232eae69c0f5a",
+      "size_bytes": 6251
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-reference-branch-inventory-01/inventory.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-reference-branch-inventory-01\\inventory.json",
+      "sha256": "f8e81d23090b2b87292f0036420e2c57cd43bffebe99d0321a8b1a52a2017aa2",
+      "size_bytes": 5833
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-reference-branch-inventory-01/inventory.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-reference-branch-inventory-01\\inventory.py",
+      "sha256": "3162dd83e3974e88f6ed4f68044aecab48d44f534b57ecc802b28abf8c6ded41",
+      "size_bytes": 3252
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-reference-branch-inventory-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-reference-branch-inventory-command-01\\receipt.json",
+      "sha256": "2c4676a01454601e25b9c6bcdcc5f8beca1eb64b92542c2ee31efb4bbcc2d806",
+      "size_bytes": 2739
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-reference-branch-inventory-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-reference-branch-inventory-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Header-reference-branch-inventory-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Header-reference-branch-inventory-command-01\\stdout.log",
+      "sha256": "b65b3c4208911754d7fb9ba24edb52cb6639c85a56cc73af817e405bfa3ea67b",
+      "size_bytes": 2314
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Native-author-ordinary-temperature-replay-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Native-author-ordinary-temperature-replay-Source-review-01\\review.json",
+      "sha256": "f707831a83a443a8f6c767d946060203cb3b9893e7960d5d08ebae5931c4108e",
+      "size_bytes": 5503
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Native-author-temperature-factual-checker-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Native-author-temperature-factual-checker-Source-review-01\\review.json",
+      "sha256": "f0fe2e57d188cca736f24a68f4ca8fb9cefa7790c9b39cfa8d7aa48974c5e8aa",
+      "size_bytes": 3842
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/00.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\00.diff",
+      "sha256": "0a81516b14b9bafda7e98852b09f1bd1569fb5befc6850e2ffd27916ad12a0d8",
+      "size_bytes": 9175
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/01.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/02.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\02.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/03.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\03.diff",
+      "sha256": "37c59948ac0ae735d349675f31733b2678395d14868b257f75db42f3d35a0791",
+      "size_bytes": 1218
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/04.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\04.diff",
+      "sha256": "102794a460437940c166d75f1dced4fb7c9c3f460f4052a503f83ab695de16fe",
+      "size_bytes": 1886
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/05.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\05.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-convection-input-formatter-review-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-convection-input-formatter-review-02\\review.json",
+      "sha256": "989c6ee4600a076825c430b000e9404dfaf61682be44219335833579fef3d80d",
+      "size_bytes": 2596
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-Native-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-Native-Source-review-01\\review.json",
+      "sha256": "4d8d1d66129e8a6eb8a9e3ffa30e65d3aac6a12a36985f46c5e00c5f8e5ea97f",
+      "size_bytes": 2436
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-build-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-build-Source-review-01\\review.json",
+      "sha256": "bfd8427cebb31a316d2856450ebb760ab52111d09698741c9155458a48e51a84",
+      "size_bytes": 1247
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-capture-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-capture-Source-review-01\\review.json",
+      "sha256": "e8b738fa609ed517b67f0a9754b7a166d28e97df4071b53a6892665f1883eb40",
+      "size_bytes": 1041
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-factual-checker-Source-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-factual-checker-Source-review-01\\review.json",
+      "sha256": "89b0c43e3d50a661722c1131e7d5a832c1ba2748e5ae290eb35a7dad0a5c98a5",
+      "size_bytes": 1803
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-provider-review-01/pe.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-provider-review-01\\pe.json",
+      "sha256": "7ace0d3bc7dff3219dfcb2fe5a1e62354e92d8a4e6631f4ec3b4d351a81a1b93",
+      "size_bytes": 16047
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-provider-review-01/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-provider-review-01\\review.json",
+      "sha256": "d6ecae24425f97571b34a248744c1b9f1737d23e6c565b0e3f59a23a3c33e207",
+      "size_bytes": 2284
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/Root-ordinary-temperature-provider-review-01/runtime-closure.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\Root-ordinary-temperature-provider-review-01\\runtime-closure.json",
+      "sha256": "4a5abaad9117e3f979f40be5c0fd7f5b238dcaf49421708e8afd68881f1be956",
+      "size_bytes": 2872
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/apply-convection-inputs-Root-02.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\apply-convection-inputs-Root-02.py",
+      "sha256": "f613f48fe742a6b891202b9fa1beda824639ee7cb6054037b1f9dceedbe303ac",
+      "size_bytes": 3911
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/apply-temperature-owners-Root-01.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\apply-temperature-owners-Root-01.py",
+      "sha256": "c7206b244ddfa54d9e602cedf88c4e7a7ed3f1459402de06c7a521db8519b8be",
+      "size_bytes": 8519
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/close-temperature-provider-Root-01.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\close-temperature-provider-Root-01.py",
+      "sha256": "345fdae235c5eb29ff35798773d67da9b5ae48468bd2ddb17d70a75045bc2662",
+      "size_bytes": 6676
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-application-02/Root-Source-acceptance.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-application-02\\Root-Source-acceptance.json",
+      "sha256": "0749651b4ddd87823087c6ae65d6f886968d53e81374755a91bc3259ae21f5ee",
+      "size_bytes": 1392
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-application-02/application.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-application-02\\application.json",
+      "sha256": "d5e604aad4e3c7daaafd62653699e8c8bbb7015134f34da98e61657b49c4b428",
+      "size_bytes": 2603
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-format-command-02/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-format-command-02\\receipt.json",
+      "sha256": "7ef4225202ef8907283b24f03c73e7e3e2c79be1f05f3e6767ec577496e95ddd",
+      "size_bytes": 4252
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-format-command-02/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-format-command-02\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-format-command-02/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-format-command-02\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/00-ConvectionCoefficients.cc-764-767.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\00-ConvectionCoefficients.cc-764-767.txt",
+      "sha256": "b2a72429ae104671d98458774c70af2542e1769731806c7c513efdce93d7a3b2",
+      "size_bytes": 343
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/01-ConvectionCoefficients.cc-856-859.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\01-ConvectionCoefficients.cc-856-859.txt",
+      "sha256": "c70a3bf6d73ca71d009451e3e7a8494adfe030612d20ff25a03f8a80d0c4a620",
+      "size_bytes": 271
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/02-ConvectionCoefficients.cc-939-943.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\02-ConvectionCoefficients.cc-939-943.txt",
+      "sha256": "b48b12d3b1a39d4eeba3efe56307e53318775be2829e55b9e414a32c52d178e8",
+      "size_bytes": 337
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/03-ConvectionCoefficients.cc-977-980.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\03-ConvectionCoefficients.cc-977-980.txt",
+      "sha256": "8133a877efb5fe9b1cb12c8010307266f04c76b2de2ea50a4fa7c773e705ebf8",
+      "size_bytes": 225
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/04-ConvectionCoefficients.cc-1591-1595.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\04-ConvectionCoefficients.cc-1591-1595.txt",
+      "sha256": "7351210044aea5926b57dd77075b85307a4ee00d1c9a44ef51d47badaa37f4ef",
+      "size_bytes": 282
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/05-ConvectionCoefficients.cc-1628-1631.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\05-ConvectionCoefficients.cc-1628-1631.txt",
+      "sha256": "2dfd0b92653686b3ea6ecae77d43c3534e33392f95abb37ad53f7dc5bf5bbd26",
+      "size_bytes": 214
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/06-DataHeatBalance.hh-1788-1792.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\06-DataHeatBalance.hh-1788-1792.txt",
+      "sha256": "6ddb08b81831fb9cb91a5d4b9cc4ce6d81cc0526058a933c8bfbd7d6e20b4607",
+      "size_bytes": 247
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/07-HeatBalanceManager.cc-800-818.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\07-HeatBalanceManager.cc-800-818.txt",
+      "sha256": "9563ad176427acc405a5bd091e18a2be5ef2ab1e07934120a39eb081b944bccb",
+      "size_bytes": 1465
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/08-HeatBalanceManager.cc-879-898.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\08-HeatBalanceManager.cc-879-898.txt",
+      "sha256": "17b7363281827c5fa223079483b8b20db3c122bfe1df8cc22b1c7a675975ba2b",
+      "size_bytes": 1058
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-01/Original-ranges/09-Energy+.idd.in-723-749.txt",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-01\\Original-ranges\\09-Energy+.idd.in-723-749.txt",
+      "sha256": "c4e518d97b06776a2321be4530342ed2770544b7d753601d10c446a1f9128f45",
+      "size_bytes": 1047
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/00.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\00.diff",
+      "sha256": "33864909163c81e4ae942266fb2015a44260255e5b77e3b28a9cbf62f16e24fd",
+      "size_bytes": 6650
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/01.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\01.diff",
+      "sha256": "53f09c2b67802ffefad5e3b40f7a92a23a50de3cf9e80aacfaa3af844ccbf0ed",
+      "size_bytes": 604
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/02.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\02.diff",
+      "sha256": "e7b658db544f71f024d985d5492c74f2a599d80f850041b72f7a8929d7941fff",
+      "size_bytes": 502
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/03.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\03.diff",
+      "sha256": "24c8881ad0b4c1e55711e01f75c939a2fdd83f881684693545f1e345d7d73465",
+      "size_bytes": 3794
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/04.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\04.diff",
+      "sha256": "bfdb081e557b4cdb2beb975dc20509774db6dcc3b0331718259727ec80abaf38",
+      "size_bytes": 1647
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/05.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\05.diff",
+      "sha256": "f48c8f4a9da2c060f2fc3d4d35a16c585d6888139b020bd319cd51e9dc435bf6",
+      "size_bytes": 3173
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/README.md",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\README.md",
+      "sha256": "1ad9b19d42c073dce1d0697d48c5ec904c8089de2d1b8acd5b6eb9bd80c6d081",
+      "size_bytes": 1385
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_run/src/warmup_report_controls.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_run\\src\\warmup_report_controls.rs",
+      "sha256": "302b277e10d56e3a22166c97e46f0128fb9da8627cd6b18ff9f56413b222f4ed",
+      "size_bytes": 7282
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures.rs",
+      "sha256": "af8923d031b9d944cd53563199422bd27749c12dc5363a6275cfd37eadef7f5b",
+      "size_bytes": 8760
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures_tests.rs",
+      "sha256": "b1b792251d44129e1f8a8a842badeb465e8ca8460b8524c8a33a0bce48a5c532",
+      "size_bytes": 20496
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_runtime/src/heat_balance/state.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_runtime\\src\\heat_balance\\state.rs",
+      "sha256": "f3db099bcd92622f1d6f114405d28ef7bc3da6b169f7488f899d0855d07f85e4",
+      "size_bytes": 52891
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_runtime/src/runtime.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_runtime\\src\\runtime.rs",
+      "sha256": "84411b2bd0b36ee89e26c04db2f3953cf3c11828dab4f369561d87b1860c1db7",
+      "size_bytes": 28624
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/actual-bases/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\actual-bases\\crates\\ep_runtime\\src\\runtime\\tests\\warmup_ordinary_reports.rs",
+      "sha256": "9be1ce45a705af5747ef8f0a9a75d03482f52be5bb2357c9cbf8390018d1a74e",
+      "size_bytes": 13287
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\manifest.json",
+      "sha256": "5177d499aad7287fcfd8972583519230d6aa27ffabe3fa85a7b20ae0ba9f087f",
+      "size_bytes": 14064
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_run/src/warmup_report_controls.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_run\\src\\warmup_report_controls.rs",
+      "sha256": "d609f7b0b751d8536b834a449fafdcda8e8ef4f043d5ee217cc7eade28c1a782",
+      "size_bytes": 12648
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures.rs",
+      "sha256": "215c3a7bb4cf01796f2d8042ccb4294a1988cbacafbe1fb47ebd07edc741e210",
+      "size_bytes": 9873
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures_tests.rs",
+      "sha256": "ffc21cdb40e8b6ddff979b33f8389b7ee91030cb80ba79b5ef9b8fb9e36330a1",
+      "size_bytes": 20630
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_runtime\\src\\heat_balance\\state.rs",
+      "sha256": "73ff4d98c2ec6755690a3ccfc505ed856b661333dc59d253c5bfa385c1b910fc",
+      "size_bytes": 53185
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_runtime/src/runtime.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_runtime\\src\\runtime.rs",
+      "sha256": "a0b34496e6bb543bfa4fc4adeffc9c9768f78fa0a59387d85f2dc4ac85ca0901",
+      "size_bytes": 28714
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/proposed/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-convection-input-prep-02\\proposed\\crates\\ep_runtime\\src\\runtime\\tests\\warmup_ordinary_reports.rs",
+      "sha256": "e7223b9e337f76a35e1e2bc693d289b6fa78b6a39f1097f669a5b70fec95832d",
+      "size_bytes": 14467
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-01/policy.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-01\\policy.json",
+      "sha256": "8567b4707d8de8dbecd53e0c1a55b4f93dbfa34e42bc19daaafa59e2b0812989",
+      "size_bytes": 2023
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-01/verify_native.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-01\\verify_native.py",
+      "sha256": "4de7130bdecea236bee66494e1e5098228ee0b126ca188ab21057368938522e3",
+      "size_bytes": 20687
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/DataSurfaces.cc.199-266.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\DataSurfaces.cc.199-266.literal",
+      "sha256": "50e6c51debd526f5028d69cc5d5db70b7c0e43921f49ca5f84c61836fbfd9b0c",
+      "size_bytes": 3303
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/DataSurfaces.hh.277-284.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\DataSurfaces.hh.277-284.literal",
+      "sha256": "0d9e1c4c2e428e5efa5ff0a80ea51277f2f7ac2e7852cbb0c763944db9db67bc",
+      "size_bytes": 383
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/SurfaceGeometry.cc.905-928.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\SurfaceGeometry.cc.905-928.literal",
+      "sha256": "b5d0d45fb95512b41849ee2887f15ffdd357115fa1c04412aa3c5c07071ac3c1",
+      "size_bytes": 1654
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\manifest.json",
+      "sha256": "b13af4f39661bfe71cb78b7cd043dd80f4c41a07b8909464fd025eca20470959",
+      "size_bytes": 4222
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/ordinary-native-owner-replay-test.draft.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\ordinary-native-owner-replay-test.draft.rs",
+      "sha256": "2be29c49036e2321c12e37eca073c20df45a47e77e948589977c98e7b370dd38",
+      "size_bytes": 13425
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/policy.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\policy.json",
+      "sha256": "b2205b8eae98a8a518f0f26caa23326921209748f4fbac989503e952ac7a41b8",
+      "size_bytes": 2203
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/policy.json.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\policy.json.diff",
+      "sha256": "ee691dbd882555ab4b6450bde1e4ae8b5764b4d623a53bc1eb00cd0b59b17e05",
+      "size_bytes": 2018
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/verify_native.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\verify_native.py",
+      "sha256": "b7cc84be7abcb973a9066cc13df929e1b8172f72881e107b27159a34894b208d",
+      "size_bytes": 20703
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-comparison-prep-02/verify_native.py.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-comparison-prep-02\\verify_native.py.diff",
+      "sha256": "1327ef9761c5b29dbe585c06f91e5a32be34bdecf5e1c3bbe9d8a8ad9f12f372",
+      "size_bytes": 1759
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-format-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-format-command-01\\receipt.json",
+      "sha256": "e4a0a189f899866ee6cbdd9c4c21021de5ded9c15bb58a069c0a0a21f83632aa",
+      "size_bytes": 4243
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-format-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-format-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-format-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-format-command-01\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-clippy-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-clippy-command-01\\receipt.json",
+      "sha256": "fcae96466f5ec099dd9f375aecbf96c4530011413c6942beb30df5334ace55fe",
+      "size_bytes": 4346
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-clippy-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-clippy-command-01\\stderr.log",
+      "sha256": "bdc763fe367d2ae9e2794542dc1ec0bd9ed677a4fe033a180027f13cbb99a4bd",
+      "size_bytes": 363
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-clippy-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-clippy-command-01\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-fmt-check-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-fmt-check-command-01\\receipt.json",
+      "sha256": "73a04c07a6399c1aa09dfd3cf6de1a6472961e1ca44f2a16e0ac0fa9d328565a",
+      "size_bytes": 4295
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-fmt-check-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-fmt-check-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-fmt-check-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-fmt-check-command-01\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-workspace-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-workspace-command-01\\receipt.json",
+      "sha256": "3e12901137203b9feb7c8a3e3ca8094fa88e6e8bcb3c72afd5e04b2d502c580f",
+      "size_bytes": 4318
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-workspace-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-workspace-command-01\\stderr.log",
+      "sha256": "80906fc70c6fe5aa9e9f4f288650ba76d2a3d378019c0ebacb5fd6298a2e1ef6",
+      "size_bytes": 1420
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-workspace-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-integrated-workspace-command-01\\stdout.log",
+      "sha256": "9cc0a6c0a06ffa0337557b8a0a79b022a7d9831030d69731485d53cda24a72b5",
+      "size_bytes": 765343
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-archive-01/A-24H.observation.json.gz",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-archive-01\\A-24H.observation.json.gz",
+      "sha256": "ae9ebfda3417dc78d35506498a78a0bdee3602ca72dbb0c7e56b6914b30dcab4",
+      "size_bytes": 4180859
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-archive-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-archive-01\\receipt.json",
+      "sha256": "81dfe9f574dd2fa7b474db6707cde81929c76ad7f4f06404662fbca0df6faa7e",
+      "size_bytes": 1678
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/cache-before.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\cache-before.json",
+      "sha256": "1ef653458531c606253c61c428ecb1f4dd2a7bd940b095c60af8dc0900ed2fe5",
+      "size_bytes": 38761
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/compile-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\compile-command-01\\receipt.json",
+      "sha256": "acb55c7844132c5559fa4d8840f307a1ad2c64d3c73a61cc0d4d82e616cd6ce2",
+      "size_bytes": 2994
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/compile-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\compile-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/compile-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\compile-command-01\\stdout.log",
+      "sha256": "6ab6761dbe16d0de395760fcfbb99ceca44a4bde7377dceb88e37fd609573aa4",
+      "size_bytes": 47062
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/compile-commands-before.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\compile-commands-before.json",
+      "sha256": "aba63f42a729d5970c99b7e3c3a968e7519fe605b645a432ce6badea75f27061",
+      "size_bytes": 3990116
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/configure-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\configure-command-01\\receipt.json",
+      "sha256": "ab2eb4599d767ac167ae31f14aac28678e8fe2c6ec4e5bc74dfcd87867955b3c",
+      "size_bytes": 3482
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/configure-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\configure-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/configure-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\configure-command-01\\stdout.log",
+      "sha256": "2c062a35d0a2895ea46ff32ec61cbf9dea05a95189e3cb6de5f95da56fc479f9",
+      "size_bytes": 743
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/dry-run-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\dry-run-command-01\\receipt.json",
+      "sha256": "4a3045362a11e8f90316ffc562e58c1a1bace491310967a5a6c7f29f535acfca",
+      "size_bytes": 2919
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/dry-run-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\dry-run-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/dry-run-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\dry-run-command-01\\stdout.log",
+      "sha256": "824742be597cec2cd58dcb586818c9fb50ae26270397f60bd75338137bb1e081",
+      "size_bytes": 46908
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/native-build.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\native-build.json",
+      "sha256": "3137526b5c860c6662cfb6f80339e963f1e2c462580ea05715cd6cf718dec8f2",
+      "size_bytes": 52602
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/protected-before.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-01\\protected-before.json",
+      "sha256": "b48d4c5cf934d577f831efac92a846a6de7fb90d554fecbc22f24b4ada34da49",
+      "size_bytes": 75007
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-command-01\\receipt.json",
+      "sha256": "f55e62803cdf57fb7d22eda122f4966dc0d29ac40806147f06ced1b8cd61844e",
+      "size_bytes": 2924
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-command-01\\stdout.log",
+      "sha256": "0645541d6ec7bb75f62413a2d8a77c78e5a758e30da540e9a6ff84098925b8e0",
+      "size_bytes": 17748
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-prep-01/additive-reference.cmake",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-prep-01\\additive-reference.cmake",
+      "sha256": "b1d3cb81b904efc4bcbd00c784211533a7f17c29e36ea6474876de336c71683c",
+      "size_bytes": 315
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-prep-01/build.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-prep-01\\build.py",
+      "sha256": "bd3ae34b940e48fdfa9bd4450f1270dabc9de75509d36d06f845f7ead4fc0360",
+      "size_bytes": 11158
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-prep-01/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-build-prep-01\\manifest.json",
+      "sha256": "76f45ef78bbdbf229d91cc64ac8706dc7c099191c432bb508a58f4b21d8f1929",
+      "size_bytes": 1367
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-command-01\\receipt.json",
+      "sha256": "66c26eaa694d0b478cdd2779bb4c00ae641dea25b98f3ce1b0aaa7e634087129",
+      "size_bytes": 3108
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-command-01\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-command-01\\stdout.log",
+      "sha256": "9debf2decd5fcf311d802c6732769985d04e7786cad4623852c551a80df6900e",
+      "size_bytes": 257
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-prep-01/README.md",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-prep-01\\README.md",
+      "sha256": "9589b26fead90c395e4c1200ca103b68a40a9129599316883d3bf23e97106359",
+      "size_bytes": 2787
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-prep-01/capture.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-prep-01\\capture.py",
+      "sha256": "5672b0968fbced0816a19eac409415607bbaaf5a7d99f9809a1cf0b55c8c4da6",
+      "size_bytes": 9212
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-capture-prep-01/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-capture-prep-01\\manifest.json",
+      "sha256": "dffd46c2b482cd57de4a54c6e5a868b7fd1b80a451d9a1d958c58c5a1f8ce628",
+      "size_bytes": 1585
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-Root-02/review.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-Root-02\\review.json",
+      "sha256": "3948120e6c098142b35f01c35186cdc9e9ebc5489909a26dd9a117c5d62bf227",
+      "size_bytes": 5564
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-Root-02/selected-cases.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-Root-02\\selected-cases.json",
+      "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+      "size_bytes": 268293
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-01\\receipt.json",
+      "sha256": "330caaf378e92d081f1fa2e9eddedbd81c4b08a4d68ed2a3118bcbaf2e8e7b44",
+      "size_bytes": 3077
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-01\\stderr.log",
+      "sha256": "6818b95b39a89aaa1ed518bf38e3ff9ea688661a6c1e2bfc647b427cac5bc038",
+      "size_bytes": 1454
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-01\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-02/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-02\\receipt.json",
+      "sha256": "4042e2bdbacedefa7f52c7d576c41c9952b8ae4aaedbe72b092d5aa917d3d1c2",
+      "size_bytes": 3077
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-02/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-02\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-02/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-factual-command-Root-02\\stdout.log",
+      "sha256": "ed29daad230d49737d70eda1901d067a64e37315d399a48a2d08b2853e53383e",
+      "size_bytes": 478
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/HVACManager.surface_consumer.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\HVACManager.surface_consumer.cc",
+      "sha256": "5bfe574d140c77cb045839397462ea31ffd80a0de0e991ce61ec217e91000172",
+      "size_bytes": 199492
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "f05779c91b59c73d0a45efef1f153d1ca97a3a861d60df8ae4ae0316caf7d7d0",
+      "size_bytes": 704735
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/README.md",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\README.md",
+      "sha256": "7efea0e4ceb7ab69c98cad581c8f963c12291e17344751f786c752e85378acb8",
+      "size_bytes": 6097
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/ZoneTempPredictorCorrector.surface_consumer.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\ZoneTempPredictorCorrector.surface_consumer.cc",
+      "sha256": "87587e37149dc72ee3486725b7356cb2797c5434e695a8448ec7de97b2fe4995",
+      "size_bytes": 407893
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/boundary-contract.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\boundary-contract.json",
+      "sha256": "a444a0e6b19d9cac6217b0c4950a9eb745072553a02673163901461d78bf4df3",
+      "size_bytes": 8929
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/diffs/HVACManager.cc.Original.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\diffs\\HVACManager.cc.Original.diff",
+      "sha256": "9a87549c74a494d984039e5291ea51811d1f8d764b1c9b8c4c1a6aac39063ba9",
+      "size_bytes": 1119
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/diffs/HeatBalanceSurfaceManager.cc.Original.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\diffs\\HeatBalanceSurfaceManager.cc.Original.diff",
+      "sha256": "0ce21ef0acdd4a026d69b7a4093f57ef4bead6d160408fd22c2e645cee74c0e8",
+      "size_bytes": 9416
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/diffs/ZoneTempPredictorCorrector.cc.Original.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\diffs\\ZoneTempPredictorCorrector.cc.Original.diff",
+      "sha256": "db41f4abaa87ed7d42d8830361336f68e7eb8ef6a73a516803a10a90a80d50fa",
+      "size_bytes": 6357
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/diffs/surface_consumer_observer.cc.Native06.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\diffs\\surface_consumer_observer.cc.Native06.diff",
+      "sha256": "b78c58fad9e4b54a64dc8f2ac40cdaa1ca61f4106812d782505e6e70dd8bbd93",
+      "size_bytes": 42105
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/diffs/surface_consumer_observer.hh.Native06.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\diffs\\surface_consumer_observer.hh.Native06.diff",
+      "sha256": "dd06bfaa6e96982304e400d239ffeb45f76940e6748ca368f55ac4efcce086d9",
+      "size_bytes": 3586
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\manifest.json",
+      "sha256": "d74663fe849903dbb6a6c4f648ef2c2e6e422ced08e8bd49fb25fff809b51660",
+      "size_bytes": 8618
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/ordinary_temperature_reference.cmake",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\ordinary_temperature_reference.cmake",
+      "sha256": "43afe9d9c6f2a7b4ab3ef67273ed5eb62070910392b1ae32722628a835ba62b2",
+      "size_bytes": 2705
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/prepare_sources.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\prepare_sources.py",
+      "sha256": "3db06ba1bb8ab0efb893db4e72aafa0e1d545bfefca9294f0af588ece1fbc3b9",
+      "size_bytes": 9500
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/source-additions.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\source-additions.json",
+      "sha256": "41fcebcc2348efc3807699a9c1b46926da0d5d8f7aa94aedd3109d944f573ce4",
+      "size_bytes": 14656
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/surface_consumer_main.cpp",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\surface_consumer_main.cpp",
+      "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+      "size_bytes": 2216
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/surface_consumer_observer.cc",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\surface_consumer_observer.cc",
+      "sha256": "35293bd629bd8d4294093de17a5699159fd3ba1a10a18cc928e2f71d0955cfbb",
+      "size_bytes": 16019
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-native-prep-01/surface_consumer_observer.hh",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-native-prep-01\\surface_consumer_observer.hh",
+      "sha256": "5dd689dc6f2ffb04f97c154191f0bf5a356193f6bf86988166cd6561400a0f45",
+      "size_bytes": 2587
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-application-01/Root-Source-and-Native-acceptance.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-application-01\\Root-Source-and-Native-acceptance.json",
+      "sha256": "8aa55670920dc1a143cbdef0755bd5e678df3b1a45ec590a9f33adf8dc4d23f3",
+      "size_bytes": 2777
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-application-01/application.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-application-01\\application.json",
+      "sha256": "eaa7e43968f82dc5b6a2539bdb9edad423bfcafae8c71743d3bae1ab655dfa39",
+      "size_bytes": 11121
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/DataHeatBalance.hh.1831-1839.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\DataHeatBalance.hh.1831-1839.literal",
+      "sha256": "cde6f3d98f56ac70d4dc43d78251005859d60044bf3bbfa959de2fc0b715feee",
+      "size_bytes": 878
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/HeatBalanceManager.cc.914-975.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\HeatBalanceManager.cc.914-975.literal",
+      "sha256": "b482df2b54aa946cc23f66ace562089228cbe024a6c8f9a772e796367f623dce",
+      "size_bytes": 4348
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/HeatBalanceSurfaceManager.cc.1427-1445.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\HeatBalanceSurfaceManager.cc.1427-1445.literal",
+      "sha256": "ae81c79025e0cc692b815af396485cf89891158234e6accf3b93093c6a013cd2",
+      "size_bytes": 1436
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/HeatBalanceSurfaceManager.cc.2231-2261.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\HeatBalanceSurfaceManager.cc.2231-2261.literal",
+      "sha256": "155333e29ca4325f8ef87d391234e0b73e08dc5c8f8928e7e71b6d54a5180fe5",
+      "size_bytes": 2300
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/HeatBalanceSurfaceManager.cc.8805-8826.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\HeatBalanceSurfaceManager.cc.8805-8826.literal",
+      "sha256": "cb75f8253b3b747493f4e8042baf90e8c921dd5a9ba603510379784677f97e3f",
+      "size_bytes": 1628
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/ZoneTempPredictorCorrector.cc.3806-3849.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\ZoneTempPredictorCorrector.cc.3806-3849.literal",
+      "sha256": "78626508cc1252c5e43be3c5e814fa73e74106a8fa4d79544f1e52c1c85afe89",
+      "size_bytes": 2731
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/ZoneTempPredictorCorrector.cc.4060-4083.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\ZoneTempPredictorCorrector.cc.4060-4083.literal",
+      "sha256": "ed6ccd7d526013fdc481c65d2bddc80458b7951efc076fd20e08b70a762c1900",
+      "size_bytes": 1244
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-01/ranges/ZoneTempPredictorCorrector.hh.101-113.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-01\\ranges\\ZoneTempPredictorCorrector.hh.101-113.literal",
+      "sha256": "4d0ffd13b2268960bbb7cfd057a1d95f84ce467be06019707ff56a31f0d3a3e6",
+      "size_bytes": 1068
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/README.md",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\README.md",
+      "sha256": "9be581d523b099b1fcb98d9375ff3c5978e5cb0d450ba4c8b8e0f7c45ead960d",
+      "size_bytes": 2487
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_run/src/warmup_report_controls.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_run\\src\\warmup_report_controls.rs",
+      "sha256": "541751ce02af55c696f1e83bf291d832abf2640b757f97a1fc434741212181c3",
+      "size_bytes": 5108
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\ctf_surface_lifecycle.rs",
+      "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+      "size_bytes": 29848
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\initialization\\state_shell.rs",
+      "sha256": "f2d435813974b26a70e05b4f6cdd7bc0aadb6d58ecedd7c8517584749c2c6ac3",
+      "size_bytes": 3070
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/mod.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\mod.rs",
+      "sha256": "4cf7f90761914657ced2c71856c727f88be4d400fd6bb80c383fe54a0ce107af",
+      "size_bytes": 2294
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/state.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\state.rs",
+      "sha256": "c6914cf39faf127dd1c0187d0869af63642500f762f8e77abbd3b2beb76b502b",
+      "size_bytes": 52440
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\surface_loop.rs",
+      "sha256": "098dd593cc2986cb4f3eb8e7f079282c02b291088805c6daa83bfabc07f8ca10",
+      "size_bytes": 20263
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/heat_balance/timestep.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\heat_balance\\timestep.rs",
+      "sha256": "c839fa3fa3ef0b719fc94ecfd2507a391d803857dba60db92469309d75061ba0",
+      "size_bytes": 42545
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/runtime.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\runtime.rs",
+      "sha256": "7bff051de5aec85ae23df13ed486f807cde36742eea3f28db7e9a4928cc0f338",
+      "size_bytes": 28146
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/runtime/tests/part04.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\runtime\\tests\\part04.rs",
+      "sha256": "a7604fe5d9f99e761db26da060529da9c33a8daabcfd3a40df636ed55eb0a8e1",
+      "size_bytes": 33031
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/before/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\before\\crates\\ep_runtime\\src\\runtime\\tests\\warmup_ordinary_reports.rs",
+      "sha256": "9a5c9bc10fa196bd2a515653a865c9be34164aa870d544d6222c75004b228245",
+      "size_bytes": 7152
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/00.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\00.diff",
+      "sha256": "6027db27c6f9677bd4b5fb07a70cfa176e5897a8224de32ceb8e6937b307fe98",
+      "size_bytes": 1153
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/01.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\01.diff",
+      "sha256": "ad646454584809178e0e04a6e2ab177b8670374014f1317b1d1fa85d4c108afa",
+      "size_bytes": 385
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/02.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\02.diff",
+      "sha256": "0dfd899299fb28336823253f5f4376ce8b3f491b34bc142b0196b8e22504578d",
+      "size_bytes": 315
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/03.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\03.diff",
+      "sha256": "0f15ad2d0f02b5b010d49c2e433a6647bb8d063e99f71eb397750a27becb9f39",
+      "size_bytes": 771
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/04.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\04.diff",
+      "sha256": "eab552bb2f65226bed399addf2522f1e1522f6e8b18e0c03a66e471706b3237c",
+      "size_bytes": 1960
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/05.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\05.diff",
+      "sha256": "e85802c24f842b79febb0243071a4e44c7b93be0f37fc535e20993725289f95b",
+      "size_bytes": 4814
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/06.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\06.diff",
+      "sha256": "b66775f8c01313ae0f53216a844257e795c6491d8a91565feb58debb435db9e7",
+      "size_bytes": 2741
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/07.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\07.diff",
+      "sha256": "9c18f3790362cff303f59848118d81936ce6f9fe3da50d47d145bd417c6213a7",
+      "size_bytes": 8430
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/08.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\08.diff",
+      "sha256": "11b87427d3f8af1ffcea2ea41b1463875d2310539b42f65949cfafe0d9a27c14",
+      "size_bytes": 8587
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/09.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\09.diff",
+      "sha256": "c6f7a5b7327882d98967c14424d659f641379aad147c5ec523c1deaa68ac2811",
+      "size_bytes": 4159
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/10.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\10.diff",
+      "sha256": "d7b95d9465192315b5a839bca29e238ed117d19c818e4042122be04c4525e688",
+      "size_bytes": 3241
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/diffs/11.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\diffs\\11.diff",
+      "sha256": "cb224e1b30cf5029b4de577c116ae23ceb7ddd7a05f708b945cd2bf42bd22a4a",
+      "size_bytes": 471
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/00.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\00.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/01.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/02.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\02.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/03.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\03.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/04.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\04.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/05.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\05.diff",
+      "sha256": "814704df990d5880f7fc42aa330539e17d66540fb06e22ec7b43d894adbf4719",
+      "size_bytes": 2472
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/06.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\06.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/07.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\07.diff",
+      "sha256": "61727674b7f6911986788683b6e326ff01e1caaab52d2fb26f8ac93de0e1f5b5",
+      "size_bytes": 5268
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/08.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\08.diff",
+      "sha256": "d27784eea32035c2044f89878b498b48339799a37e9d1a12e43fa7a943398564",
+      "size_bytes": 4001
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/from-parent03-diffs/09.diff",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\from-parent03-diffs\\09.diff",
+      "sha256": "d8ead845ae0130f24e3bd5101978c50329555aa48205f9e8be6bf4d89c3346cd",
+      "size_bytes": 2000
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/manifest.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\manifest.json",
+      "sha256": "1a218751703dc734a13802ee8c49c2706183fba53531f81aabcd48eab0789f82",
+      "size_bytes": 30059
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/ordinary-native-owner-replay-test.draft.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\ordinary-native-owner-replay-test.draft.rs",
+      "sha256": "7984f6191692f123dda292e7fbbbfb0caa6b56dca0faf31e443f0e42233375bb",
+      "size_bytes": 13373
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_run/src/warmup_report_controls.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_run\\src\\warmup_report_controls.rs",
+      "sha256": "fef0530275b51b004fea2bbf27bf0746f339d6a177238a2944b22ae1fc585383",
+      "size_bytes": 7054
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\ctf_surface_lifecycle.rs",
+      "sha256": "b8d89d6b31197cfd242909415178d0472a578a6babf5d216fac0afbc4abf6a33",
+      "size_bytes": 30318
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\initialization\\state_shell.rs",
+      "sha256": "27a0fb22727543127d05a17a03a3bff3d0b0abfb704c26d36bf946bb2d178759",
+      "size_bytes": 3114
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\mod.rs",
+      "sha256": "6b579d71dbd5e28ce71b44ab88358b85c313af7774467cfb1ce0ca7ba3f2df80",
+      "size_bytes": 2339
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures.rs",
+      "sha256": "e1c084865e488fe9dff28b782b4d44a8c029e12cd42d888fc5a1ef8f45f8a647",
+      "size_bytes": 8275
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures_tests.rs",
+      "sha256": "ba281cd32642c36ff5aa14ad39f2db7ec63ec085950bccce3dc803ef8c4752b9",
+      "size_bytes": 3965
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\state.rs",
+      "sha256": "6cb80514448d3c44beb74f354d7be90ebdb82be4ad2c3aec5147fb1971588f81",
+      "size_bytes": 52883
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\surface_loop.rs",
+      "sha256": "f10dfdec56b688fcf263d9355838cb113af90c23d5c3eb1701aa74d018ff29a2",
+      "size_bytes": 20637
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/heat_balance/timestep.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\heat_balance\\timestep.rs",
+      "sha256": "1c7309f618a892ce64225d018fc7ad4413129ce13a90298afcb4e7349a458ec0",
+      "size_bytes": 43759
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/runtime.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\runtime.rs",
+      "sha256": "7adf96c8c3b8570f6bf797917fbdf3867498af03d8d0bffd5949cb0f3ba012e1",
+      "size_bytes": 28567
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/runtime/tests/part04.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\runtime\\tests\\part04.rs",
+      "sha256": "853443be8e43973901482cdc1611743a881d8f699e157c552203768a91eb67a3",
+      "size_bytes": 33067
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/proposed/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\proposed\\crates\\ep_runtime\\src\\runtime\\tests\\warmup_ordinary_reports.rs",
+      "sha256": "9be1ce45a705af5747ef8f0a9a75d03482f52be5bb2357c9cbf8390018d1a74e",
+      "size_bytes": 13287
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/ranges/DataHeatBalance.hh.429-432.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\ranges\\DataHeatBalance.hh.429-432.literal",
+      "sha256": "46fd4ca62d02296b00c3ca63ac91c7e45588daf6c750f604675a70efb641c4d8",
+      "size_bytes": 316
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/ranges/DataSurfaces.cc.199-266.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\ranges\\DataSurfaces.cc.199-266.literal",
+      "sha256": "50e6c51debd526f5028d69cc5d5db70b7c0e43921f49ca5f84c61836fbfd9b0c",
+      "size_bytes": 3303
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/ranges/HeatBalanceSurfaceManager.cc.8704-8742.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\ranges\\HeatBalanceSurfaceManager.cc.8704-8742.literal",
+      "sha256": "e6f6d84eebf46e15a5079e458cfc0ea8bf08bc5b838cb4ba4b8d8ebb072ba90e",
+      "size_bytes": 2668
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-04/ranges/ZoneTempPredictorCorrector.cc.4112-4165.literal",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-owner-prep-04\\ranges\\ZoneTempPredictorCorrector.cc.4112-4165.literal",
+      "sha256": "d2ea2dc3e3a2df740cc1da979bd7dddfd28d3c0a0ee24baa5b08f28365c6bc7a",
+      "size_bytes": 2430
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-run-affected-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-run-affected-command-01\\receipt.json",
+      "sha256": "fef7fcd7ace226d535522a45c7475ccb9178d902a9118463075735c992d0fa07",
+      "size_bytes": 4388
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-run-affected-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-run-affected-command-01\\stderr.log",
+      "sha256": "06c963117a610f28da1e8271f474de88bd0db05b90ea0469a758f96d7cdaca43",
+      "size_bytes": 348
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-run-affected-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-run-affected-command-01\\stdout.log",
+      "sha256": "c8128b13c465b0c11cbc61ba26e5e04413b1d19057a447210463e0d05a58694a",
+      "size_bytes": 426
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-runtime-affected-command-01/receipt.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-runtime-affected-command-01\\receipt.json",
+      "sha256": "12420856c055cdfde290c38b69dfe7b25820f4921e096fd3657fe9f3645fd312",
+      "size_bytes": 4386
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-runtime-affected-command-01/stderr.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-runtime-affected-command-01\\stderr.log",
+      "sha256": "a982ba4c6067e6ec00e23128b33b02e6ff6b2c1620e282c017d968b3e77f6543",
+      "size_bytes": 254
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/ordinary-temperature-runtime-affected-command-01/stdout.log",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-temperature-runtime-affected-command-01\\stdout.log",
+      "sha256": "9f2f84b8a240f677f878d2056767cad9617d29789df3dd47bfabb90737df31fa",
+      "size_bytes": 4616
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/prepare-ordinary-convection-input-02.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\prepare-ordinary-convection-input-02.py",
+      "sha256": "72d18f26d28fb4bd843dc72f10282d363c2cb6b3869ec6e1d8090805a4dfbc6c",
+      "size_bytes": 12301
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/prepare-ordinary-temperature-owner-04.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\prepare-ordinary-temperature-owner-04.py",
+      "sha256": "2325a3d86d569302ddcd04c134623c664cb5fa89aa96f9007ca40943708c4211",
+      "size_bytes": 24381
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/prepare-temperature-publication-inputs-Root-01.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\prepare-temperature-publication-inputs-Root-01.py",
+      "sha256": "1f1267c508c086a8548a9fe3b4bd3a8e40f35d80787b4140e3062fe8a00e372c",
+      "size_bytes": 10636
+    },
+    {
+      "member_path": ".runtime/porting/SRC-06/review-ordinary-temperature-providers-Header-01.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\review-ordinary-temperature-providers-Header-01.py",
+      "sha256": "24ed69d8bfd38016b239382a93dd6a2346799b91e8abfaae25cedb081c43f985",
+      "size_bytes": 11181
+    },
+    {
+      "member_path": "crates/ep_run/src/warmup_report_controls.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\src\\warmup_report_controls.rs",
+      "sha256": "d41679d1e4ede174d89f7370f368ce19b6c26814b4237ad143d9dba8b0ab46b6",
+      "size_bytes": 13780
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\ctf_surface_lifecycle.rs",
+      "sha256": "55f91904e6d1ec79ca44f0d469e8a5a89617e796fec13e062f73bfcaba170fc1",
+      "size_bytes": 30452
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\fixtures\\ordinary_temperature_selected_cases.json",
+      "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+      "size_bytes": 268293
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\initialization\\state_shell.rs",
+      "sha256": "27a0fb22727543127d05a17a03a3bff3d0b0abfb704c26d36bf946bb2d178759",
+      "size_bytes": 3114
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\inside_convection_dispatcher.rs",
+      "sha256": "eab0fb8c85754fa3eac412c1c91f951b5158eea4f9e7e5a0e7a94a3c3ed35b96",
+      "size_bytes": 30096
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\mod.rs",
+      "sha256": "8baec0096d78ef08807ff10b3f46b53fcf1a8b29f68a27c99abfc723691a591b",
+      "size_bytes": 2339
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures.rs",
+      "sha256": "39a4978c67d5a81f45ac9a7be04120f0ab1d93696ad9df0be56c7e85157e6b45",
+      "size_bytes": 9912
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\ordinary_inside_temperatures_tests.rs",
+      "sha256": "3d9f3a73fb81ebc4e9c906895047f3407e6977c56fbd5139d53885b4c60f47bc",
+      "size_bytes": 20668
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\state.rs",
+      "sha256": "73ff4d98c2ec6755690a3ccfc505ed856b661333dc59d253c5bfa385c1b910fc",
+      "size_bytes": 53185
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\surface_loop.rs",
+      "sha256": "f10dfdec56b688fcf263d9355838cb113af90c23d5c3eb1701aa74d018ff29a2",
+      "size_bytes": 20637
+    },
+    {
+      "member_path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\heat_balance\\timestep.rs",
+      "sha256": "d73774ba7dd213188a459fe58f218df17cd4ba2426c384f3430069891d1d5445",
+      "size_bytes": 44073
+    },
+    {
+      "member_path": "crates/ep_runtime/src/runtime.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\runtime.rs",
+      "sha256": "a0b34496e6bb543bfa4fc4adeffc9c9768f78fa0a59387d85f2dc4ac85ca0901",
+      "size_bytes": 28714
+    },
+    {
+      "member_path": "crates/ep_runtime/src/runtime/tests/part04.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\runtime\\tests\\part04.rs",
+      "sha256": "853443be8e43973901482cdc1611743a881d8f699e157c552203768a91eb67a3",
+      "size_bytes": 33067
+    },
+    {
+      "member_path": "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_runtime\\src\\runtime\\tests\\warmup_ordinary_reports.rs",
+      "sha256": "e7223b9e337f76a35e1e2bc693d289b6fa78b6a39f1097f669a5b70fec95832d",
+      "size_bytes": 14467
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.audit",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "size_bytes": 1569
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.bnd",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.bnd",
+      "sha256": "37d10e36c7ec78962054ceb5b7da25775c66342eef60581b5f3c15c370dce421",
+      "size_bytes": 6365
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.dxf",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.dxf",
+      "sha256": "403907e88cce289476f482b2716b87b74f51b7d47c40eb77b23ae4b06d4889ae",
+      "size_bytes": 6096
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.eio",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.eio",
+      "sha256": "b747b9ebef1f12bb54fa19604fabb8a6082bb6119a6506c4fb3e78573e929a82",
+      "size_bytes": 15376
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.end",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.end",
+      "sha256": "4d9bcc67b829ec4d64b156c2a8d919816f8270e0b9290036403ce5db2255f95a",
+      "size_bytes": 98
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.err",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.err",
+      "sha256": "9640403e0a3b905414a5d2c1a249961e9a252b3f736ffb33a426e81214f7a7d4",
+      "size_bytes": 897
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.eso",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.eso",
+      "sha256": "bf5469ab7fc4da91f1d89dbc37d0078b3906033d50a1a370dd662e4b3bb09130",
+      "size_bytes": 112213
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.mdd",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.mdd",
+      "sha256": "107b4b0eecbf7ac5835cdc56c8198fdd31c701851d916561104d99a091b95224",
+      "size_bytes": 3851
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.mtd",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.mtd",
+      "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+      "size_bytes": 7539
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.mtr",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.mtr",
+      "sha256": "8d8faf7bd84fba2d267230a04cdc679d6efb80c88c6eceb9f0d4785d0de0984a",
+      "size_bytes": 2490
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.rdd",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.rdd",
+      "sha256": "c074ff43abb3fea787db17323af99acf33d4b4b5330ed1fe763a6b0972769534",
+      "size_bytes": 30562
+    },
+    {
+      "member_path": "native-capture/A-24H/eplusout.shd",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplusout.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "size_bytes": 1557
+    },
+    {
+      "member_path": "native-capture/A-24H/eplustbl.csv",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplustbl.csv",
+      "sha256": "745da6f92680c8897317a7138a840e2a7cdfa20e5348a650c32d6833902fb33d",
+      "size_bytes": 84703
+    },
+    {
+      "member_path": "native-capture/A-24H/eplustbl.htm",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplustbl.htm",
+      "sha256": "81c32ad0f65e2890fd5b2f778fd1d36694b598d15595575e1411c2a7d1de9e10",
+      "size_bytes": 354322
+    },
+    {
+      "member_path": "native-capture/A-24H/eplustbl.tab",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplustbl.tab",
+      "sha256": "8dc0b3589768fb795721cc7c0338b6412242000802ca06462b845064f8485b2f",
+      "size_bytes": 84700
+    },
+    {
+      "member_path": "native-capture/A-24H/eplustbl.txt",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplustbl.txt",
+      "sha256": "3678d266b34f70b6854e30e39700347eed661e4ea4a232ba9ffea808a82a856d",
+      "size_bytes": 163344
+    },
+    {
+      "member_path": "native-capture/A-24H/eplustbl.xml",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\A-24H\\eplustbl.xml",
+      "sha256": "18f33b0d2ff77d85957ec857a4432c32c86e9d2f1e44f5a05172bf2d48e45b88",
+      "size_bytes": 226145
+    },
+    {
+      "member_path": "native-capture/before.json",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\before.json",
+      "sha256": "34c94f7539e2b577461dc0c409147896452e1f841707ec219b651e8d4e2437a0",
+      "size_bytes": 13165
+    },
+    {
+      "member_path": "native-capture/custody.json",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\custody.json",
+      "sha256": "30ff05ba2d3ca4d909af9ccee82dcedeaec41cc74ff320df2b075036c1ba04ae",
+      "size_bytes": 13749
+    },
+    {
+      "member_path": "native-capture/native-stderr.log",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\native-stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "size_bytes": 36
+    },
+    {
+      "member_path": "native-capture/native-stdout.log",
+      "source_path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\ordinary-temperature-native-capture-01\\native-stdout.log",
+      "sha256": "451fcb81763c46c15503f1c1e2eb4c906d4389eb365aa4d5ef4e7bae6832deff",
+      "size_bytes": 974
+    },
+    {
+      "member_path": "publication/README.md",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\temperature-owner-publication-prep-01\\README.md",
+      "sha256": "9ceea5d2c13ed2fb25c6be59bfe7003bdb8dd401cc1cd0a5c28fcd4e6613f786",
+      "size_bytes": 3036
+    },
+    {
+      "member_path": "publication/actual-inputs.json",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\temperature-owner-publication-inputs-01\\actual-inputs.json",
+      "sha256": "98dc791bbe8e3e6dc94bff920f2f27373298ff8e73ecc2e650d356984b78c660",
+      "size_bytes": 12407
+    },
+    {
+      "member_path": "publication/package.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\temperature-owner-publication-prep-01\\package.py",
+      "sha256": "fa32ccc7c5f5bbee26e4a56e653fe94888f2673e197c497d218629f2192ddf2f",
+      "size_bytes": 12001
+    },
+    {
+      "member_path": "tools/porting/native_pe.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217
+    },
+    {
+      "member_path": "tools/porting/record_command.py",
+      "source_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453
+    }
+  ],
+  "selected_current_Source_descriptor": {
+    "path": ".runtime/porting/source-objects/fb/fb798c3be74235ff22c0f0a75e7ce3222e22bd08e27b4691e910b00311225789",
+    "sha256": "fb798c3be74235ff22c0f0a75e7ce3222e22bd08e27b4691e910b00311225789"
+  },
+  "provenance_only": [
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-temperature-native-build-01/bin/ordinary_temperature_owner_helper.exe",
+      "sha256": "a272b50e2c7ba7ccf2553a173daee62582b9c80219f04d3ba7c84bf12d8de97f",
+      "size_bytes": 1304886561
+    },
+    {
+      "path": ".runtime/porting/source-objects/d7/d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914",
+      "sha256": "d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-06/manifest.json",
+      "sha256": "96f2cfd23045889e0164a9b007af796b64c0f59dea3bb35d131fbc2fa8252fc3",
+      "size_bytes": 33571,
+      "line_count": 804
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-temperature-owner-prep-03/manifest.json",
+      "sha256": "8628027002d006c75c50c5248608246a44e74e853c465adddbc2b9e6098e00d0",
+      "size_bytes": 30633
+    }
+  ],
+  "outbound_reference_policy": "Only indexed ZIP members and the two adjacent JSON files are bundled. Unindexed historical parents, binaries, maps, objects, core/toolchain and Source maps are provenance-only; no transitive replay/closure claim.",
+  "complete_compressed_native_capture_included_once": true,
+  "full_Rust_Source_payload_archived": false,
+  "engine_tests_or_compilers_executed": false,
+  "whole_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

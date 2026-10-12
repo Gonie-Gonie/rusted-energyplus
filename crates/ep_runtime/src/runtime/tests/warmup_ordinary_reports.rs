@@ -15,16 +15,27 @@ fn ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day(
         options.warmup=HeatBalanceWarmupOptions {enabled:true,minimum_days:1,maximum_days:2,
             temperature_convergence_tolerance_delta_c:1000.0,loads_convergence_tolerance_w:1.0};
         let (mut reports,mut backend_state,mut eio,mut error,mut console)=(CtfInitializationReports::default(),ctf_ordinary_output_test_state(),Vec::new(),Vec::new(),Vec::new());
-        let simulation={
+        let mut simulation={
             let mut context=CtfInitializationContext {reports:&mut reports,eio:&mut eio,
                 backend:SourceErrorBackend {state:&mut backend_state,error_stream:Some(&mut error),console:&mut console,
                 out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None}};
             crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
-                &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false})?
+                &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false,do_space_heat_balance_for_sizing:false,do_space_heat_balance_for_simulation:false,
+                    no_user_convection_input:crate::heat_balance::inside_convection_dispatcher::NoUserConvectionInput::new([0;6])?,
+                    low_hconv_limit_w_per_m2_k:0.375})?
         };
         for surface in &simulation.state.surfaces {
             assert!(surface.outdoor_environment.manager_invoked);
             assert_eq!(surface.outdoor_environment.row.centroid_height_m.to_bits(),surface.geometry.centroid_m.z_m.to_bits());
+        }
+        let temperatures=simulation.state.ordinary_inside_temperatures.as_ref().ok_or("missing ordinary temperature owner")?;
+        assert_eq!(temperatures.inside_old.len(),simulation.state.surfaces.len());
+        assert_eq!(temperatures.no_user_convection_input.counts(),[0;6]);
+        assert_eq!(temperatures.low_hconv_limit_w_per_m2_k.to_bits(),0.375_f64.to_bits());
+        for space in temperatures.space_air.rows() {
+            assert_eq!(space.mat.to_bits(),simulation.state.zones[0].mean_air_temperature_c.to_bits());
+            assert_eq!(space.zt.to_bits(),space.mat.to_bits());
+            assert_eq!(space.ztav.to_bits(),23.0_f64.to_bits());
         }
         let owner=simulation.state.warmup_convergence.as_ref().ok_or("missing actual ordinary owner")?;
         let report=owner.report.as_ref().ok_or("missing actual ordinary report allocation")?;
@@ -38,6 +49,7 @@ fn ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day(
         let text=std::str::from_utf8(&eio)?;
         assert_eq!(text.matches(crate::heat_balance::warmup::report::DETAILED_HEADER).count(),1);
         assert_eq!(text.matches(crate::heat_balance::warmup::report::SUMMARY_HEADER).count(),usize::from(samples>=24));
+        assert_selected_temperature_resets_and_prefix(&model.typed, &mut simulation.state)?;
     }
     Ok(())
 }
@@ -98,5 +110,107 @@ fn ordinary_surface_cold_stop_retains_all_bulbs_and_incoming_wind_arrays()
     assert_eq!(state.timestep_index,timestep);
     assert_eq!(context.backend.state.tracking.total_severe_errors,1);
     assert_eq!(context.backend.state.tracking.total_severe_errors_during_warmup,1);
+    Ok(())
+}
+
+// These authored owner checks run only after the actual A production route above.
+// They retain distinct current ZT, MAT, ZTAV and Old inputs, including signed zero.
+fn assert_selected_temperature_resets_and_prefix(
+    model: &TypedModel,
+    state: &mut crate::heat_balance::state::HeatBalanceState,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let owner = state.ordinary_inside_temperatures.as_mut().ok_or("missing owner")?;
+    let original_low_limit = owner.low_hconv_limit_w_per_m2_k;
+    let input_prefix = owner.clone();
+    let surface_prefix = state.surfaces.iter().map(|surface|
+        (surface.inside_face_temperature_c.to_bits(), surface.inside_reference_air_temperature_c.to_bits()))
+        .collect::<Vec<_>>();
+    for invalid in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        owner.low_hconv_limit_w_per_m2_k = invalid;
+        assert!(owner.prepare_inside_entry(model, &state.zones, &mut state.surfaces).is_err());
+        assert_eq!(state.surfaces.iter().map(|surface|
+            (surface.inside_face_temperature_c.to_bits(), surface.inside_reference_air_temperature_c.to_bits()))
+            .collect::<Vec<_>>(), surface_prefix);
+    }
+    owner.low_hconv_limit_w_per_m2_k = original_low_limit;
+    assert_eq!(*owner, input_prefix);
+    let original_id = state.surfaces.first().ok_or("missing actual surface")?.surface_id;
+    let stale_id = ep_model::SurfaceId(original_id.0.wrapping_add(1));
+    state.surfaces[0].surface_id = stale_id;
+    owner.inside_old[0].0 = stale_id;
+    let old_before_validation = owner.inside_old.iter()
+        .map(|&(id, value)| (id, value.to_bits())).collect::<Vec<_>>();
+    let surfaces_before_validation = state.surfaces.iter().map(|surface|
+        (surface.surface_id, surface.inside_face_temperature_c.to_bits(),
+         surface.inside_reference_air_temperature_c.to_bits())).collect::<Vec<_>>();
+    assert!(owner.prepare_inside_entry(model, &state.zones, &mut state.surfaces).is_err());
+    assert_eq!(owner.inside_old.iter().map(|&(id, value)| (id, value.to_bits()))
+        .collect::<Vec<_>>(), old_before_validation);
+    assert_eq!(state.surfaces.iter().map(|surface|
+        (surface.surface_id, surface.inside_face_temperature_c.to_bits(),
+         surface.inside_reference_air_temperature_c.to_bits())).collect::<Vec<_>>(), surfaces_before_validation);
+    state.surfaces[0].surface_id = original_id;
+    owner.inside_old[0].0 = original_id;
+    let last_surface = state.surfaces.pop().ok_or("missing surface prefix")?;
+    let last_old = owner.inside_old.pop().ok_or("missing Old prefix")?;
+    let old_prefix = owner.inside_old.iter().map(|&(id, value)| (id, value.to_bits())).collect::<Vec<_>>();
+    let ref_air_prefix = state.surfaces.iter().map(|surface|
+        surface.inside_reference_air_temperature_c.to_bits()).collect::<Vec<_>>();
+    assert!(owner.prepare_inside_entry(model, &state.zones, &mut state.surfaces).is_err());
+    assert_eq!(owner.inside_old.iter().map(|&(id, value)| (id, value.to_bits()))
+        .collect::<Vec<_>>(), old_prefix);
+    assert_eq!(state.surfaces.iter().map(|surface| surface.inside_reference_air_temperature_c.to_bits())
+        .collect::<Vec<_>>(), ref_air_prefix);
+    state.surfaces.push(last_surface);
+    owner.inside_old.push(last_old);
+    let zone = state.zones.first_mut().ok_or("missing actual zone")?;
+    let surface = state.surfaces.first_mut().ok_or("missing actual surface")?;
+    let id = surface.surface_id;
+    let old_before = owner.inside_old.clone();
+    surface.surface_id = ep_model::SurfaceId(id.0.wrapping_add(1));
+    assert!(owner.capture_inside_entry(&state.surfaces).is_err());
+    assert_eq!(owner.inside_old, old_before);
+    state.surfaces[0].surface_id = id;
+    state.surfaces[0].inside_face_temperature_c = -0.0;
+    owner.capture_inside_entry(&state.surfaces).map_err(|_| "inside capture unavailable")?;
+    assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
+    state.surfaces[0].inside_face_temperature_c = 39.0;
+    assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
+
+    let zone_id = zone.zone_id;
+    zone.mean_air_temperature_c = 41.0;
+    zone.zone_timestep_average_air_temperature_c = 15.0;
+    owner.retain_solution(zone_id, -0.0).map_err(|_| "solution unavailable")?;
+    let spaces_before_commit = owner.space_air.clone();
+    owner.commit_zone_mat(&mut state.zones).map_err(|_| "MAT commit unavailable")?;
+    assert_eq!(owner.space_air, spaces_before_commit);
+    assert_eq!(state.zones[0].mean_air_temperature_c.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(state.zones[0].zone_timestep_average_air_temperature_c, 15.0);
+    owner.after_full_correction(&state.zones).map_err(|_| "correction unavailable")?;
+    assert_eq!(state.zones[0].mean_air_temperature_c.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(state.zones[0].zone_timestep_average_air_temperature_c, 15.0);
+    for space in owner.space_air.rows() {
+        assert_eq!(space.mat.to_bits(), (-0.0_f64).to_bits());
+        assert_eq!(space.zt.to_bits(), (-0.0_f64).to_bits());
+        assert_eq!(space.ztav.to_bits(), 23.0_f64.to_bits());
+    }
+    let old_id = state.zones[0].zone_id;
+    state.zones[0].zone_id = ep_model::ZoneId(old_id.0.wrapping_add(1));
+    assert!(owner.begin_environment(&mut state.zones).is_err());
+    assert_eq!(state.zones[0].mean_air_temperature_c.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(state.zones[0].zone_timestep_average_air_temperature_c, 15.0);
+    state.zones[0].zone_id = old_id;
+    owner.begin_environment(&mut state.zones).map_err(|_| "reset unavailable")?;
+    assert_eq!(state.zones[0].mean_air_temperature_c, 23.0);
+    assert_eq!(state.zones[0].zone_timestep_average_air_temperature_c, 23.0);
+    assert_eq!(owner.inside_old[0].1.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(state.surfaces[0].inside_face_temperature_c, 39.0);
+    for space in owner.space_air.rows() {
+        assert_eq!((space.mat, space.zt, space.ztav), (23.0, 23.0, 23.0));
+    }
+    state.zones[0].mean_air_temperature_c = 25.0;
+    owner.commit_zone_mat(&mut state.zones).map_err(|_| "reset ZT unavailable")?;
+    owner.after_full_correction(&state.zones).map_err(|_| "reset space copy unavailable")?;
+    assert_eq!(state.zones[0].mean_air_temperature_c, 23.0);
     Ok(())
 }

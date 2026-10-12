@@ -1,0 +1,273 @@
+{
+  "schema": "src06-actual-selected-ordinary-temperature-owners.v1",
+  "status": "pass-selected-retained-temperature-operations-and-input-prerequisites-only",
+  "Original": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "implementation_parent": "8213151ead2e3d10fbae0248c8fd44f8d260f1c8",
+  "final_Rust_Source": {
+    "path": ".runtime/porting/source-objects/fb/fb798c3be74235ff22c0f0a75e7ce3222e22bd08e27b4691e910b00311225789",
+    "sha256": "fb798c3be74235ff22c0f0a75e7ce3222e22bd08e27b4691e910b00311225789"
+  },
+  "Source_members": 3951,
+  "selected_current_sources": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "73ff4d98c2ec6755690a3ccfc505ed856b661333dc59d253c5bfa385c1b910fc",
+      "size_bytes": 53185
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "27a0fb22727543127d05a17a03a3bff3d0b0abfb704c26d36bf946bb2d178759",
+      "size_bytes": 3114
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "8baec0096d78ef08807ff10b3f46b53fcf1a8b29f68a27c99abfc723691a591b",
+      "size_bytes": 2339
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "sha256": "a0b34496e6bb543bfa4fc4adeffc9c9768f78fa0a59387d85f2dc4ac85ca0901",
+      "size_bytes": 28714
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "55f91904e6d1ec79ca44f0d469e8a5a89617e796fec13e062f73bfcaba170fc1",
+      "size_bytes": 30452
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "d73774ba7dd213188a459fe58f218df17cd4ba2426c384f3430069891d1d5445",
+      "size_bytes": 44073
+    },
+    {
+      "path": "crates/ep_run/src/warmup_report_controls.rs",
+      "sha256": "d41679d1e4ede174d89f7370f368ce19b6c26814b4237ad143d9dba8b0ab46b6",
+      "size_bytes": 13780
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs",
+      "sha256": "e7223b9e337f76a35e1e2bc693d289b6fa78b6a39f1097f669a5b70fec95832d",
+      "size_bytes": 14467
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures.rs",
+      "sha256": "39a4978c67d5a81f45ac9a7be04120f0ab1d93696ad9df0be56c7e85157e6b45",
+      "size_bytes": 9912
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_inside_temperatures_tests.rs",
+      "sha256": "3d9f3a73fb81ebc4e9c906895047f3407e6977c56fbd5139d53885b4c60f47bc",
+      "size_bytes": 20668
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "sha256": "f10dfdec56b688fcf263d9355838cb113af90c23d5c3eb1701aa74d018ff29a2",
+      "size_bytes": 20637
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part04.rs",
+      "sha256": "853443be8e43973901482cdc1611743a881d8f699e157c552203768a91eb67a3",
+      "size_bytes": 33067
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json",
+      "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+      "size_bytes": 268293
+    }
+  ],
+  "implemented": [
+    "Persistent independent current Zone ZT, existing Space MAT/ZT/ZTAV owners and complete SurfTempInsOld array.",
+    "Begin-environment air reset, actual existing solver-return retention, MAT commit before sensible/humidity reporting and disabled-space MAT/ZT copy after correction; ZTAV retained independently.",
+    "Complete associated SpaceMAT map supplies inside reference air; complete Old <- In copy occurs before the existing radiation stage.",
+    "Exact complete typed associations/cardinality checked before writes; stale IDs, missing prefix and invalid retained input reject explicitly.",
+    "Actual six raw user-convection family counts and HeatBalanceAlgorithm N2/default0.1 retained through the ordinary A caller; no convection consumer activation."
+  ],
+  "actual_Native": {
+    "one_engine_child_exit_code": 0,
+    "Source_build": {
+      "path": ".runtime/porting/SRC-06/ordinary-temperature-native-build-01/native-build.json",
+      "sha256": "3137526b5c860c6662cfb6f80339e963f1e2c462580ea05715cd6cf718dec8f2",
+      "size_bytes": 52602
+    },
+    "helper_provenance_only": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-temperature-native-build-01/bin/ordinary_temperature_owner_helper.exe",
+      "sha256": "a272b50e2c7ba7ccf2553a173daee62582b9c80219f04d3ba7c84bf12d8de97f",
+      "size_bytes": 1304886561
+    },
+    "provider_review": {
+      "path": ".runtime/porting/SRC-06/Root-ordinary-temperature-provider-review-01/review.json",
+      "sha256": "d6ecae24425f97571b34a248744c1b9f1737d23e6c565b0e3f59a23a3c33e207",
+      "size_bytes": 2284
+    },
+    "complete_capture": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-temperature-native-capture-01/A-24H.observation.json",
+      "sha256": "cedd5f677b02aa683e62d44c1a08f6a96c175b9b72968da246ef659d0583a19c",
+      "size_bytes": 212283495
+    },
+    "complete_capture_gzip": {
+      "path": ".runtime/porting/SRC-06/ordinary-temperature-native-archive-01/A-24H.observation.json.gz",
+      "sha256": "ae9ebfda3417dc78d35506498a78a0bdee3602ca72dbb0c7e56b6914b30dcab4",
+      "size_bytes": 4180859
+    },
+    "Root_facts": {
+      "path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-Root-02/review.json",
+      "sha256": "3948120e6c098142b35f01c35186cdc9e9ebc5489909a26dd9a117c5d62bf227",
+      "size_bytes": 5564
+    },
+    "independent_facts": {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-temperature-native-facts-02/review.json",
+      "sha256": "4c98858241956574055ae902ce2b61b350c020d35603d3b0a80e89417b720729",
+      "size_bytes": 5564
+    },
+    "observed_events": 58039,
+    "validated_pairs": {
+      "temperature_air_reset_before": 4,
+      "temperature_reference_returned": 12150,
+      "temperature_old_copy_before": 12447,
+      "temperature_mat_commit_before": 2209,
+      "temperature_space_copy_before": 2209
+    },
+    "mismatches": 0,
+    "observed_reference_flag": -1,
+    "explicit_reference_flag0_observations": 0,
+    "actual_algorithm": "ThirdOrder (0)",
+    "actual_zones_spaces_surfaces": [
+      1,
+      1,
+      6
+    ],
+    "engine_rerun_for_checker_repair": false
+  },
+  "actual_Rust_replay": {
+    "test": "actual_native_before_owners_replay_selected_retained_temperature_operations",
+    "fixture": {
+      "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json",
+      "sha256": "b70b45958198a374e8cfb37e42a8b1dc6287e99e46529aaeb8b8bcfde468caf8",
+      "size_bytes": 268293
+    },
+    "genuine_cases": 19,
+    "scalar_bits_classes_in_fixture": 661,
+    "selection": "Allocation1, reset2, reference4, Old4, MAT4, disabled-space-group4; actual kickoff/warmup/run phases where observed.",
+    "production_Native_answers_used": false,
+    "scope": "Test-local actual BEFORE owners drive genuine private assignment/map methods; every selected AFTER scalar is compared by binary64 bits/class."
+  },
+  "raw_input_prerequisite": {
+    "preparation": {
+      "path": ".runtime/porting/SRC-06/ordinary-convection-input-prep-02/manifest.json",
+      "sha256": "5177d499aad7287fcfd8972583519230d6aa27ffabe3fa85a7b20ae0ba9f087f",
+      "size_bytes": 14064
+    },
+    "application": {
+      "path": ".runtime/porting/SRC-06/ordinary-convection-input-application-02/application.json",
+      "sha256": "d5e604aad4e3c7daaafd62653699e8c8bbb7015134f34da98e61657b49c4b428",
+      "size_bytes": 2603
+    },
+    "independent_Source_review": {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-Source-review-02/review.json",
+      "sha256": "cf94ad0e20c06885d22acf5aafcb71ee810b38a30fca37c05f9beac63d2b2a24",
+      "size_bytes": 3706
+    },
+    "independent_applied_review": {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-convection-input-application-review-02/review.json",
+      "sha256": "1ca1c760d5eab0b7dcd65f0c3ce4aa91be1293f89906c2ab7c4cd3fae7a182f1",
+      "size_bytes": 7211
+    },
+    "rules": "Six actual zero family counts; unique HeatBalanceAlgorithm; absent/null/blank N2 retains Original constructor0.1; explicit finite positive number retained. Unsupported inputs and invalid retained values stop before inside-entry writes.",
+    "tests": "One28-case raw-input table plus existing production-route retention/prefix regression;0.375 verifies retention only."
+  },
+  "actual_quality": {
+    "fmt_check": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-fmt-check-command-01/receipt.json",
+        "sha256": "73a04c07a6399c1aa09dfd3cf6de1a6472961e1ca44f2a16e0ac0fa9d328565a",
+        "size_bytes": 4295
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "source_stable": true
+    },
+    "workspace_clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-clippy-command-01/receipt.json",
+        "sha256": "fcae96466f5ec099dd9f375aecbf96c4530011413c6942beb30df5334ace55fe",
+        "size_bytes": 4346
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source_stable": true
+    },
+    "workspace_test": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-temperature-integrated-workspace-command-01/receipt.json",
+        "sha256": "3e12901137203b9feb7c8a3e3ca8094fa88e6e8bcb3c72afd5e04b2d502c580f",
+        "size_bytes": 4318
+      },
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/test.ps1"
+      ],
+      "exit_code": 0,
+      "source_stable": true
+    }
+  },
+  "workspace_test_totals": {
+    "passed": 4969,
+    "failed": 0,
+    "ignored": 2
+  },
+  "iteration_quality_history": {
+    "runtime_ordinary_passed": 36,
+    "run_controls_passed": 2,
+    "scope": "Earlier owner-only focused tests; final workspace validates the later raw input delta too."
+  },
+  "retained_failure": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-temperature-native-factual-command-Root-01/receipt.json",
+      "sha256": "330caaf378e92d081f1fa2e9eddedbd81c4b08a4d68ed2a3118bcbaf2e8e7b44",
+      "size_bytes": 3077
+    },
+    "cause": "First checker admitted only explicit ZoneMeanAirTemp0 but actual Original constructor flag was Invalid-1. Full Original getter default branch returns the same actual SpaceMAT.",
+    "repair": "Reviewed successor admits only -1/0 for selected SpaceMAT branch; same immutable raw capture reused, no numerical rule, endpoint or target run changed."
+  },
+  "remaining": [
+    "Rust production uses its existing SimplifiedAnalytical diagnostic solver; actual Native capture uses ThirdOrder. No solver or whole ordinary call-order equivalence follows from assignment replay.",
+    "One shared SpaceAir owner with dispatcher, independent SurfTempInTmp allocation/reset/solve production, actual no-equipment/readiness/Node allocation producers and real ordinary dispatcher activation.",
+    "Actual radiation enclosure/cache lifecycle, post-radiation positive completed-iteration30 refresh, immediate CTF term rebuild and original inside convergence loop.",
+    "True zone algorithm/HVAC handoff, full ZTAV averaging, multiple-space actual coverage and explicit reference flag0 actual coverage.",
+    "Whole Native stream validates all observed assignment pairs; bounded Rust replay selects19 cases and first reference surface per phase, not every Native invocation."
+  ],
+  "full_card_gates_changed": false,
+  "completed_cards": {
+    "A": {
+      "passed": 14,
+      "total": 54
+    },
+    "B": {
+      "passed": 14,
+      "total": 64
+    }
+  },
+  "archive_policy": "Three adjacent files: summary.json, manifest.json, evidence.zip. Only indexed finite bytes are bundled. Large binaries/maps/core/toolchain, whole Rust Source maps/payloads and unindexed historical parents are provenance-only; no transitive replay claim."
+}

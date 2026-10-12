@@ -264,6 +264,13 @@ where
     PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
     Error: From<super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>,
 {
+    super::ordinary_inside_temperatures::validate_step(
+        model,
+        state,
+        runtime_config,
+        surface_iteration_count,
+    )
+    .map_err(Error::from)?;
     let history_clock = match weather_context.and_then(|context| context.owned) {
         // Production keeps its genuine owner authoritative, even if unavailable.
         Some(context) => context.ctf_history_clock,
@@ -457,7 +464,7 @@ where
                                 };
 
                                 zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
-                                zone.mean_air_temperature_c = match runtime_config.zone_air_update {
+                                let solved_temperature_c = match runtime_config.zone_air_update {
                                     HeatBalanceZoneAirUpdate::SimplifiedAnalytical => {
                                         step_zone_air_temperature(
                                             previous_temperature_c,
@@ -523,6 +530,12 @@ where
                 )
                                     }
                                 };
+                                if let Some(owner) = &mut state.ordinary_inside_temperatures {
+                                    owner
+                                        .retain_solution(zone.zone_id, solved_temperature_c)
+                                        .map_err(Error::from)?;
+                                }
+                                zone.mean_air_temperature_c = solved_temperature_c;
                             }
                             predictor_hook(state)
                         })
@@ -578,6 +591,16 @@ where
     let commit_inside_ctf_outside_temperature_to_history =
         runtime_config.commit_inside_ctf_outside_temperature_to_history;
 
+    let ordinary_reference_air_temperatures =
+        if let Some(owner) = &mut state.ordinary_inside_temperatures {
+            Some(
+                owner
+                    .prepare_inside_entry(model, &state.zones, &mut state.surfaces)
+                    .map_err(Error::from)?,
+            )
+        } else {
+            None
+        };
     let interleaved_surface_zone_balance_result =
         surface_manager::calc_heat_balance_inside_surf_source_order_path(|| {
             if runtime_config.timestep.interleave_zone_air_surface_passes {
@@ -647,6 +670,7 @@ where
                     None,
                     None,
                     false,
+                    ordinary_reference_air_temperatures.as_ref(),
                 );
 
                 if runtime_config
@@ -701,6 +725,7 @@ where
                         None,
                         None,
                         false,
+                        None,
                     );
                 }
                 None
@@ -811,7 +836,7 @@ where
     zone_predictor_corrector::manage_zone_air_updates_compat(
         zone_predictor_corrector::PredictorCorrectorCtrl::CorrectStep,
         || {
-            zone_predictor_corrector::correct_zone_air_temps_compat(|| {
+            zone_predictor_corrector::correct_zone_air_temps_compat(|| -> Result<(), Error> {
                 correct_zone_air_temperatures_from_current_surfaces(
                     &state.surfaces,
                     &state.surface_indexes,
@@ -824,6 +849,11 @@ where
                     runtime_config.use_third_order_zone_air_correction,
                     use_inside_ctf_outside_temperature_for_conduction_report,
                 );
+                if let Some(owner) = &state.ordinary_inside_temperatures {
+                    owner
+                        .commit_zone_mat(&mut state.zones)
+                        .map_err(Error::from)?;
+                }
                 // Native uncontrolled MAT -> sensible demand report -> humidity.
                 // No report is invented when the admitted warmup owner is absent.
                 super::warmup::report_uncontrolled_sensible_loads(state);
@@ -833,6 +863,11 @@ where
                     weather_context,
                     runtime_config.use_third_order_zone_air_correction,
                 );
+                if let Some(owner) = &mut state.ordinary_inside_temperatures {
+                    owner
+                        .after_full_correction(&state.zones)
+                        .map_err(Error::from)?;
+                }
                 if use_energyplus_adaptive_system_timestep_zone_air_correction {
                     apply_energyplus_adaptive_system_timestep_zone_air_correction(
                         &state.surfaces,
@@ -856,9 +891,10 @@ where
                         zone.system_timestep_average_air_storage_report_w = None;
                     }
                 }
-            });
+                Ok(())
+            })
         },
-    );
+    )?;
     if state.ctf_surface_lifecycle.is_some() {
         finish_surface_histories(state)?;
     }

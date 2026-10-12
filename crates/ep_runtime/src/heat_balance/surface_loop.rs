@@ -177,6 +177,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
             frozen_outside_boundary_balances.as_ref(),
             frozen_inside_ctf_outside_temperatures.as_ref(),
             use_inside_ctf_outside_temperature_for_conduction_report,
+            None,
         );
         if freeze_outside_balance_for_surface_iterations
             && frozen_outside_boundary_balances.is_none()
@@ -280,6 +281,8 @@ pub(crate) fn run_surface_balance_passes(
     outside_boundary_balance_snapshots: Option<&BTreeMap<SurfaceId, SurfaceBoundaryBalanceResult>>,
     inside_ctf_outside_temperature_snapshots: Option<&BTreeMap<SurfaceId, f64>>,
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
+    // Some is a complete caller-validated surface -> actual SpaceMAT snapshot.
+    ordinary_reference_air_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         let temperature_overrides = if surface_iteration_index == 0 {
@@ -324,14 +327,18 @@ pub(crate) fn run_surface_balance_passes(
                 .get(&surface.zone_id)
                 .copied()
                 .unwrap_or(surface.inside_face_temperature_c);
-            surface.inside_reference_air_temperature_c = zone_temperature_c;
+            let reference_air_temperature_c = match ordinary_reference_air_temperatures {
+                Some(temperatures) => temperatures[&surface.surface_id],
+                None => zone_temperature_c,
+            };
+            surface.inside_reference_air_temperature_c = reference_air_temperature_c;
             let inside_convection_coefficient_w_per_m2_k = inside_convection_coefficient_overrides
                 .and_then(|coefficients| coefficients.get(&surface.surface_id).copied())
                 .unwrap_or_else(|| {
                     energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
                         surface,
                         previous_inside_face_temperature_c,
-                        zone_temperature_c,
+                        reference_air_temperature_c,
                     )
                 });
             surface.inside_convection_coefficient_w_per_m2_k =
@@ -340,7 +347,7 @@ pub(crate) fn run_surface_balance_passes(
                 .and_then(|inputs| inputs.get(&surface.surface_id).copied())
                 .unwrap_or(InsideConvectionCoefficientInputState {
                     inside_face_temperature_c: previous_inside_face_temperature_c,
-                    reference_air_temperature_c: zone_temperature_c,
+                    reference_air_temperature_c,
                 });
             surface.inside_convection_input_inside_face_temperature_c =
                 inside_convection_input.inside_face_temperature_c;
@@ -406,7 +413,7 @@ pub(crate) fn run_surface_balance_passes(
                 energyplus_ctf_inside_face_temperature_c_with_outside_temperature(
                     surface,
                     CtfInsideFaceBalanceInput {
-                        reference_air_temperature_c: zone_temperature_c,
+                        reference_air_temperature_c,
                         inside_convection_coefficient_w_per_m2_k,
                         previous_inside_face_temperature_c,
                         zone_timestep_seconds: input.timestep_seconds,

@@ -183,3 +183,54 @@ The actual comparison status is `pass-available-selected-ordinary-geometry-only`
 Source47ebf61d passed fmt, Clippy with warnings denied, focused354/0/2 and workspace4988/0/2. The same two ignored observers remain unchanged. Earlier Native compile failure, generated-metadata restoration, input-metadata admission preflight, the two factual-checker transport/Scan-shape failures, and the first comparison, which stopped before any pairs on a recorder-descriptor error, are retained along with the first evidence-publication metadata-shape failure. These transport repairs use the same closed Native/Rust captures without target reruns. The three uncapped ledgers were fully decoded and checked independently; the finite archive stores its selected bytes exactly, while large executable/map/object and whole Source payloads remain provenance references rather than a transitive replay claim.
 
 [Actual bounded geometry evidence](../evidence/SRC-06-ordinary-geometry/summary.json). Whole SetupZoneGeometry, nonopaque corrections, ordinary persistent MAT/reset/correction, independent SurfTempInTmp/SurfTempIn/SurfTempInsOld, radiation-before-positive-completed-iteration30 refresh and immediate cached term rebuild remain separate work. The ordinary dispatcher is not activated by this geometry prerequisite. Weather03 and its absent-site/station producer extension are now applied; the [actual bounded weather/cold comparison](../evidence/SRC-05-weather-cold/summary.json) records the available selected results. Complete ordinary reachability and handoff remain pending. All four SRC-06 gates and A14/54/B14/64 stay unchanged.
+
+## Actual bounded ordinary temperature owners and convection inputs
+
+The existing ordinary A caller now retains independent current Zone ZT,
+Space MAT/ZT/ZTAV and the complete SurfTempInsOld array. Air owners reset at
+BeginEnvrn; the existing solver return is retained, MAT commits before reporting
+and humidity, and disabled-space MAT/ZT copies after correction without changing
+ZTAV. The complete associated SpaceMAT map supplies inside reference air, and
+Old copies In before the existing radiation stage. Exact complete associations,
+cardinality and retained input validity are checked before writes.
+
+One genuine A-24H Native engine run captured all 58,039 selected events. Root
+and an independent reviewer validated every observed selected assignment pair:
+4 resets, 12,150 reference-air pairs, 12,447 Old copies, 2,209 MAT commits and
+2,209 disabled-space copies, with zero mismatches. The genuine 19-case fixture
+then exercised the Rust private owner operations using actual BEFORE states and
+exact AFTER binary64 bits/classes. It covers allocation and observed kickoff,
+warmup and run phases. The first checker failure is retained: Original's
+constructor reference flag is Invalid(-1), whose default getter branch returns
+SpaceMAT. The reviewed successor admits -1/0 for this selected branch and reuses
+the same capture; no Native rerun or numerical rule change occurred.
+
+Actual raw counts for the six user-convection object families and the unique
+HeatBalanceAlgorithm N2/default0.1 now flow through the ordinary caller into
+retained owners. Unsupported counts/types and invalid retained values stop
+explicitly. One 28-case input table and the existing production regression cover
+these rules; nondefault0.375 proves retention only. Final Source `fb798c3b`
+passed fmt, workspace Clippy with warnings denied and one workspace test run:
+4,969 passed, 0 failed, 2 existing ignored. Earlier owner-only focused checks
+passed36 and2; they were not repeated after the final workspace suite.
+
+Plan/view, documentation, spec, source-quality and false-conformance guards also
+passed. The global file-size guard failed on 19 existing files, all byte-exact
+with parent commit8213151e. No file in this temperature/input change exceeds its
+hard limit; the existing structural debt is not reported as a successful gate.
+
+[Bounded temperature owner evidence](../evidence/SRC-06-ordinary-temperature-owners/summary.json)
+uses three files: summary, indexed manifest and finite evidence ZIP. The complete
+compressed Native capture and failure history are retained. Large binaries,
+maps, cores and whole Source payloads remain provenance references, with no
+transitive replay claim.
+
+This proof does not compare zone solvers: actual Native uses ThirdOrder while
+the existing Rust A admission remains SimplifiedAnalytical. Native observes one
+Space and reference flag-1 only; multiple-space and explicit0 actual coverage,
+full ZTAV averaging and every Native invocation's Rust replay are not claimed.
+Shared SpaceAir identity with the dispatcher, independent SurfTempInTmp,
+genuine equipment/Node readiness, actual radiation/cache lifecycle, positive
+completed-iteration30 refresh and immediate CTF term rebuild remain unfinished.
+The ordinary dispatcher is still inactive. All four full-card gates and
+A14/54/B14/64 remain unchanged.

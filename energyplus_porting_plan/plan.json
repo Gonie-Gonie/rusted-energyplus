@@ -12511,6 +12511,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-geometry/summary.json",
         "sha256": "e30c4c0345eb05d4db121491f55a54d69d94ca84658e9774cc6cc76407277b1f",
         "size_bytes": 4530810
+      },
+      "actual_selected_ordinary_temperature_owners": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-temperature-owners/summary.json",
+        "sha256": "22b8c678136e8d70b79b333c8add1f718db044088fa3e23fb77aab7ce4602835",
+        "size_bytes": 12312
       }
     },
     {

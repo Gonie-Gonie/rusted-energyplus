@@ -488,6 +488,19 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     reason: "missing explicit ordinary output context".into(),
                 })?,
         )?;
+        crate::heat_balance::ordinary_inside_temperatures::prepare(
+            &model.typed,
+            &mut state,
+            heat_balance_runtime_config,
+            options.surface_iteration_count,
+            input.do_space_heat_balance_for_sizing,
+            input.do_space_heat_balance_for_simulation,
+            input.no_user_convection_input,
+            input.low_hconv_limit_w_per_m2_k,
+        )
+        .map_err(|reason| RuntimeError::WarmupUnavailable {
+            reason: format!("ordinary temperature owner unavailable: {reason:?}"),
+        })?;
     }
     let mut warmup_day_end_zone_air_states = Vec::new();
     let warmup = run_heat_balance_run_period_warmup_with_reporting(

@@ -226,6 +226,7 @@
             Some(&outside_snapshots),
             None,
             false,
+            None,
         );
 
         let surface = &state.surfaces[0];
@@ -304,6 +305,7 @@
             None,
             Some(&inside_ctf_outside_temperature_snapshots),
             false,
+            None,
         );
 
         let surface = &state.surfaces[0];
