@@ -130,6 +130,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             calendar_year_chr: "calendar-canary".into(),
         },
         environment: WeatherEnvironmentState {
+            force_begin_env_reset_suppress: true,
             previous_sol_rad_positive: true,
             current_weather: super::CurrentWeatherState {
                 out_dry_bulb_temp: -0.0,

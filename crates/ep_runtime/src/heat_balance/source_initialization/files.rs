@@ -1,0 +1,175 @@
+//! Actual retained filesystem streams for OpenOutputFiles and Schedule input.
+use std::fs::{File, OpenOptions};
+use std::io::{self, Write};
+use std::path::{Path, PathBuf};
+
+/// Explicit selected output paths; no Native path is inferred from a fixture.
+#[derive(Debug)]
+pub struct SourceInitializationFilePaths {
+    /// Actual ESO output path.
+    pub eso: PathBuf,
+    /// Actual EIO output path, reused by later HB initialization.
+    pub eio: PathBuf,
+    /// Actual meter output path.
+    pub mtr: PathBuf,
+    /// Actual branch/node output path.
+    pub bnd: PathBuf,
+    /// Actual Audit path, opened only at ProcessScheduleInput718.
+    pub audit: PathBuf,
+}
+
+#[derive(Debug)]
+struct SourceOutputStream {
+    path: PathBuf,
+    file: Option<File>,
+    failed: bool,
+}
+impl SourceOutputStream {
+    fn new(path: PathBuf) -> Self {
+        Self {
+            path,
+            file: None,
+            failed: false,
+        }
+    }
+    fn ensure_open(&mut self) -> io::Result<&mut Self> {
+        if self.file.is_none() || self.failed {
+            // IOFiles.cc278-294: read/write/create/truncate; default controls
+            // are true because the sole ordinary admission excludes Output:Files.
+            match OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(&self.path)
+            {
+                Ok(file) => {
+                    self.file = Some(file);
+                    self.failed = false;
+                }
+                Err(error) => {
+                    self.file = None;
+                    self.failed = true;
+                    return Err(error);
+                }
+            }
+        }
+        Ok(self)
+    }
+}
+impl Write for SourceOutputStream {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        let result = self
+            .file
+            .as_mut()
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::NotConnected, "actual output is not open")
+            })?
+            .write(bytes);
+        if result.is_err() || matches!(result,Ok(0) if !bytes.is_empty()) {
+            self.failed = true;
+        }
+        result
+    }
+    fn write_all(&mut self, bytes: &[u8]) -> io::Result<()> {
+        let result = self
+            .file
+            .as_mut()
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::NotConnected, "actual output is not open")
+            })?
+            .write_all(bytes);
+        if result.is_err() {
+            self.failed = true;
+        }
+        result
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        let result = self
+            .file
+            .as_mut()
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::NotConnected, "actual output is not open")
+            })?
+            .flush();
+        if result.is_err() {
+            self.failed = true;
+        }
+        result
+    }
+}
+
+/// Actual audit capability; a concrete real stream must outlive returned errors.
+pub(crate) trait ScheduleAuditFileHost {
+    fn audit_path(&self) -> &Path;
+    fn ensure_audit_open(&mut self) -> io::Result<&mut dyn Write>;
+}
+
+/// Non-Clone retained source output files, independent of Runtime Result.
+#[derive(Debug)]
+pub struct SourceInitializationFiles {
+    outputs: [SourceOutputStream; 4],
+    audit: SourceOutputStream,
+}
+impl SourceInitializationFiles {
+    /// Retain genuine caller-selected paths without opening any stream early.
+    #[must_use]
+    pub fn new(paths: SourceInitializationFilePaths) -> Self {
+        Self {
+            outputs: [
+                SourceOutputStream::new(paths.eso),
+                SourceOutputStream::new(paths.eio),
+                SourceOutputStream::new(paths.mtr),
+                SourceOutputStream::new(paths.bnd),
+            ],
+            audit: SourceOutputStream::new(paths.audit),
+        }
+    }
+    pub(super) fn output_path(&self, index: usize) -> &Path {
+        &self.outputs[index].path
+    }
+    pub(super) fn ensure_output_open(&mut self, index: usize) -> io::Result<&mut dyn Write> {
+        Ok(self.outputs[index].ensure_open()?)
+    }
+    /// Borrow the already-open actual EIO for subsequent reached producers.
+    ///
+    /// # Errors
+    /// Fails if OpenOutputFiles has not opened EIO; this method never opens it.
+    pub fn eio_writer(&mut self) -> io::Result<&mut dyn Write> {
+        if self.outputs[1].file.is_none() {
+            return Err(io::Error::new(
+                io::ErrorKind::NotConnected,
+                "actual EIO is not open",
+            ));
+        }
+        Ok(&mut self.outputs[1])
+    }
+    /// Borrow the retained EIO stream without opening it or substituting a sink.
+    /// Writes to an unreached stream return the real not-connected error.
+    pub fn eio_stream(&mut self) -> &mut dyn Write {
+        &mut self.outputs[1]
+    }
+    /// Flush every actually opened stream without opening an unreached output.
+    ///
+    /// # Errors
+    /// Retains and returns the first actual OS failure; later streams are not flushed.
+    pub fn flush_reached(&mut self) -> io::Result<()> {
+        for stream in &mut self.outputs {
+            if stream.file.is_some() {
+                stream.flush()?;
+            }
+        }
+        if self.audit.file.is_some() {
+            self.audit.flush()?;
+        }
+        Ok(())
+    }
+}
+impl ScheduleAuditFileHost for SourceInitializationFiles {
+    fn audit_path(&self) -> &Path {
+        &self.audit.path
+    }
+    fn ensure_audit_open(&mut self) -> io::Result<&mut dyn Write> {
+        Ok(self.audit.ensure_open()?)
+    }
+}

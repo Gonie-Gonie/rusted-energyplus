@@ -1,0 +1,4281 @@
+{
+  "schema": "src06-source-initialization-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/29/29be17da9f5e9cbaf9ac8cbc47913ddebfac121226093acefe385c984515f4b8",
+    "sha256": "29be17da9f5e9cbaf9ac8cbc47913ddebfac121226093acefe385c984515f4b8"
+  },
+  "assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/manifest.json",
+    "sha256": "9b67f879a5812159134f010b398050b4142355b52ea855e6148f76c84bc721af",
+    "size_bytes": 47016
+  },
+  "independent_reviews": [
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/review.json",
+      "sha256": "ef874efef1a0f7db065133f106ae35daaca2a52a484f7400d44444f189152b57",
+      "size_bytes": 8004
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-01/review.json",
+      "sha256": "60ad5466a5b074fab141cd6f1e0f68262c5bb7712e5b8b4671fbf4b3c0a01098",
+      "size_bytes": 2853
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-02/review.json",
+      "sha256": "fbc0245d28407077ee9a6ef68f7c74a929207af784c90c25f78ec1344db9d5dc",
+      "size_bytes": 2572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-03/review.json",
+      "sha256": "b734493f2606b9e43da40aca238caf57cc281bb963ebd8485e24bfde42ccfc8a",
+      "size_bytes": 4122
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/manifest.json",
+      "sha256": "2144578b9ecd2666a8d89d31abe45c82d86e02a54cd2af01ace867658b021adc",
+      "size_bytes": 44712
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/00.after",
+      "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+      "size_bytes": 20646
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/00.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/00.after",
+      "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+      "size_bytes": 20646
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/00.diff",
+      "sha256": "2cf2ca0f79619a82bc842e0f9c470179f4f68a6b3b4aa519b10b68236bdf3899",
+      "size_bytes": 21265
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/00.held.diff",
+      "sha256": "21ad84d213876c7e2f0998e39f0d0c5263551e719a3d4daa6e1e0fe05bac89f2",
+      "size_bytes": 27539
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "c6deeb5fd21022e5986182d62576bc3a4c2bca36f5856abc90fd4ee89defdf41",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/01.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/01.after",
+      "sha256": "c6deeb5fd21022e5986182d62576bc3a4c2bca36f5856abc90fd4ee89defdf41",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/01.diff",
+      "sha256": "4ec94e9dc2a9c2f3ebb6cefb07c33e7aeddf26c9f7281025d4be6b1ae248e2d0",
+      "size_bytes": 5969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/01.held.diff",
+      "sha256": "7c0b4f486dd51d43c0acb40cfbefdd5abd1714474f2e5547cb0381c0d1ee3b9e",
+      "size_bytes": 7961
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "8fac48acce15f7dd9c90951aceeadc19b4038da3b4159aea75fd5319c0e41b41",
+      "size_bytes": 9305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/02.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/02.after",
+      "sha256": "8fac48acce15f7dd9c90951aceeadc19b4038da3b4159aea75fd5319c0e41b41",
+      "size_bytes": 9305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/02.diff",
+      "sha256": "eea3f28886cdb8cdd27891d036367ffee5e824e771de7b32952cf831ea7a9bbc",
+      "size_bytes": 9670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/02.held.diff",
+      "sha256": "68e0e5b14af3a60a073ce845eef46781db0eac3fbb75e3ee29c96905923d1ccd",
+      "size_bytes": 13509
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/03.after",
+      "sha256": "70298de9d5b711eb3db6c079b229480b5ead62d5db1f0407889b7c2056d628dd",
+      "size_bytes": 4135
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/03.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/03.diff",
+      "sha256": "a814430ec428af9193dc31f0310cd0f66c7e6fcb89e173ba0a0fa99ca611dcff",
+      "size_bytes": 4391
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/03.held.diff",
+      "sha256": "6528204a0003356b073e227470769963afec7258382e253e7e77aed5d6be5c75",
+      "size_bytes": 5995
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "sha256": "a398a294cf82913d013244c2fabbeb65e3f7faeece18a068e5acace44e464494",
+      "size_bytes": 8535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/04.before",
+      "sha256": "7c275e0496cea92cf01f5e8a2b374629ee085891444a88cfd9485d86dae07525",
+      "size_bytes": 8318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/04.after",
+      "sha256": "a398a294cf82913d013244c2fabbeb65e3f7faeece18a068e5acace44e464494",
+      "size_bytes": 8535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/04.diff",
+      "sha256": "607c324b91a96266cc9f7b71719a4eaff06b9da82563da138530dd4867ec59c6",
+      "size_bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/04.held.diff",
+      "sha256": "1ef5b2684415123df5e751c6deadc71d63c216f3aa9e9d39e096500a0bb9c7e0",
+      "size_bytes": 599
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "aa9e390657e8b6b05fbc9da72ac63018353973c8ce53cc3c65d33705a570f854",
+      "size_bytes": 54268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/05.before",
+      "sha256": "774a0e3740c40d07c10dbdbe0a1d03cb715179cdc5f300223249913747e3269b",
+      "size_bytes": 54259
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/05.after",
+      "sha256": "aa9e390657e8b6b05fbc9da72ac63018353973c8ce53cc3c65d33705a570f854",
+      "size_bytes": 54268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/05.diff",
+      "sha256": "676c7a1bebd154180a57b9652ebdba87822ca05e7578045431eaf3ee844b679d",
+      "size_bytes": 487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/05.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/06.before",
+      "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+      "size_bytes": 19614
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/06.after",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/06.diff",
+      "sha256": "f8767f0fb94b2266de2004158a87fb26ae6f8d8a81b136d44bd02e277d9c709f",
+      "size_bytes": 672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/06.held.diff",
+      "sha256": "740d3694eb5253495d42c952ffccb528e5c51f3f51ff35c0026ba27aa1eb3e35",
+      "size_bytes": 595
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/07.before",
+      "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+      "size_bytes": 42191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/07.after",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/07.diff",
+      "sha256": "6462ff842964e47e2ca6030e8c5f9e435ebd65c1ced55b82ba95b2a16ecaf33e",
+      "size_bytes": 573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/07.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs",
+      "sha256": "9a7f5d710a44812a9f16e928df34cc0ac3aff6b3efd878a711021d2b205489b8",
+      "size_bytes": 7871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/08.before",
+      "sha256": "352e0972d142d3d19ca4ceb9923d7d2b547c0c54709bc07e68badf94e0b620ea",
+      "size_bytes": 6645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/08.after",
+      "sha256": "9a7f5d710a44812a9f16e928df34cc0ac3aff6b3efd878a711021d2b205489b8",
+      "size_bytes": 7871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/08.diff",
+      "sha256": "11b3efb0102b666978339e90c509b1ae327c5bba5bc30e6fced399737905f4e5",
+      "size_bytes": 1521
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/08.held.diff",
+      "sha256": "a72531d8e7fa5ef003e2fb531df033825ec5544581ddecb016a7339b00e85642",
+      "size_bytes": 2146
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "11af1180c7ba27e247bd973dfe086c666517d881db46f82f78830eb49c12e4c9",
+      "size_bytes": 17515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/09.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/09.after",
+      "sha256": "11af1180c7ba27e247bd973dfe086c666517d881db46f82f78830eb49c12e4c9",
+      "size_bytes": 17515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/09.diff",
+      "sha256": "f009e04ee84b18caa98077fbdff5d587c73bdd53ddad99b036cbcf98c027a18b",
+      "size_bytes": 18116
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/09.held.diff",
+      "sha256": "bcf2575245681ceeda2402ac8b85e63047b1fc5ac4a467a60ce86602e8617697",
+      "size_bytes": 19806
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_schedule_input.rs",
+      "sha256": "e0109071d40bcd64a8b0e26fa337016b15c5929f60b98d5ae20cf8f56da50691",
+      "size_bytes": 3654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/10.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/10.after",
+      "sha256": "e0109071d40bcd64a8b0e26fa337016b15c5929f60b98d5ae20cf8f56da50691",
+      "size_bytes": 3654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/10.diff",
+      "sha256": "7f3a1565de2262de09c0cacd0f7f80cda2715db62e2f34297328c2a8edf4c1a6",
+      "size_bytes": 3855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/10.held.diff",
+      "sha256": "5e9afa968df24dd16c0d55f3eaf6ec71917e56047d2d4af3a216cabd0aed8958",
+      "size_bytes": 2534
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "ef62b70551446784b7ed1b561757b14e6fd39939e607d2a4dd04cc99b9c3a962",
+      "size_bytes": 15059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/11.before",
+      "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+      "size_bytes": 14880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/11.after",
+      "sha256": "ef62b70551446784b7ed1b561757b14e6fd39939e607d2a4dd04cc99b9c3a962",
+      "size_bytes": 15059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/11.diff",
+      "sha256": "e37b26d4e3eb8afa7e519ae6e605e511949842f7bfb4f279b3ea7c50181b970d",
+      "size_bytes": 922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/11.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "c4d68db2582f8083d542806566ca750e790c3b40f46d2fbffa1110bd5972eef3",
+      "size_bytes": 18157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/12.before",
+      "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+      "size_bytes": 18107
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/12.after",
+      "sha256": "c4d68db2582f8083d542806566ca750e790c3b40f46d2fbffa1110bd5972eef3",
+      "size_bytes": 18157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/12.diff",
+      "sha256": "8bb468676cc32bf9ba22c823ca49763dbeb6332078cfd220f89ccf56cb880b54",
+      "size_bytes": 435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/12.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "39b3b0286b357292b00e480a5f96dc093131f4249c589a3b61e2610e24813587",
+      "size_bytes": 23928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/13.before",
+      "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+      "size_bytes": 22959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/13.after",
+      "sha256": "39b3b0286b357292b00e480a5f96dc093131f4249c589a3b61e2610e24813587",
+      "size_bytes": 23928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/13.diff",
+      "sha256": "01eca5628f228695215c339d30a31076d2fa162fe2b757c9c6f485b227d7eab0",
+      "size_bytes": 3268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/13.held.diff",
+      "sha256": "0c319a351de589ce48f8b36ca9014a3781b385ffdcb2eb2fb00cf41f6b75452a",
+      "size_bytes": 3088
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "8ee59f5bd835a15343437a424059a07c3aa1fdc97db409bcdac8f6307c0e7a0d",
+      "size_bytes": 21705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/14.before",
+      "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+      "size_bytes": 21027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/14.after",
+      "sha256": "8ee59f5bd835a15343437a424059a07c3aa1fdc97db409bcdac8f6307c0e7a0d",
+      "size_bytes": 21705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/14.diff",
+      "sha256": "c36d6f879fcdf4045b8ddcea56a0b46d703e6236eba84b04018c85c84022a045",
+      "size_bytes": 1597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/14.held.diff",
+      "sha256": "ac601b8f13ab6ef5d0fba6035ddadf041c2c8ce1075856cd9e2e75cf25ad44fb",
+      "size_bytes": 1679
+    },
+    {
+      "path": "crates/ep_runtime/src/time_axis.rs",
+      "sha256": "8f498ca583e4ad4c05a88b9dc9b46af6624ee78dbf676acd4fb39196ffcf4e0e",
+      "size_bytes": 44273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/15.before",
+      "sha256": "433c570ad19bc14a245c6e72601898dfec053d6a7f0622924be460ec5001ab8b",
+      "size_bytes": 44262
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/15.after",
+      "sha256": "8f498ca583e4ad4c05a88b9dc9b46af6624ee78dbf676acd4fb39196ffcf4e0e",
+      "size_bytes": 44273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/15.diff",
+      "sha256": "89dc08b153d4e817a3d163c5236260dcf1275d9cb95f8d080f7b4eeb06a99500",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/15.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "sha256": "c8a60aad15164d9b1528f1f13992a77b3841857e63591106b6520572b6f8769c",
+      "size_bytes": 29739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/16.before",
+      "sha256": "e792f4b6a0c7099f8e4f8f0e9c473a82d36b74ad45aff724b112e41f3342ec02",
+      "size_bytes": 29602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/16.after",
+      "sha256": "c8a60aad15164d9b1528f1f13992a77b3841857e63591106b6520572b6f8769c",
+      "size_bytes": 29739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/16.diff",
+      "sha256": "b98008da3647bb0f0b0976151ad6c75ea7539a02f17cfa2edb5061447fd4ebaf",
+      "size_bytes": 743
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/16.held.diff",
+      "sha256": "23b086995cea370d26aba61ef68769e1df4ea277287fcf97c6fefc882718ef21",
+      "size_bytes": 728
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "ea7678e101b596a9f92d7c3e6d20873f0dd611495f497a941ca7740df69de3a4",
+      "size_bytes": 18034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/17.before",
+      "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+      "size_bytes": 16257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/17.after",
+      "sha256": "ea7678e101b596a9f92d7c3e6d20873f0dd611495f497a941ca7740df69de3a4",
+      "size_bytes": 18034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/17.diff",
+      "sha256": "83cbecfaecf531da1b6fcacd8a6627e450856f0d04fe0fd92a7a6b59fd508c0b",
+      "size_bytes": 2334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/17.held.diff",
+      "sha256": "7d8759a2e3c67da1233f8e61e36ace22c879513aad4d739a24898a8e2fad5fee",
+      "size_bytes": 2467
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "a4b5882a7fcdb6c838e182eff01f9cd3a1d88316e3b7a04553568d2059428803",
+      "size_bytes": 2693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/18.before",
+      "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+      "size_bytes": 2432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/18.after",
+      "sha256": "a4b5882a7fcdb6c838e182eff01f9cd3a1d88316e3b7a04553568d2059428803",
+      "size_bytes": 2693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/18.diff",
+      "sha256": "4777e9f5e48b92165b8a00e43b85dc940813778c8bf37ab306bd247bfc0cda39",
+      "size_bytes": 588
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/18.held.diff",
+      "sha256": "0290f4ad66ed274a5bc914862cbec7737d33bb51caabe8cfd688a77759d81992",
+      "size_bytes": 640
+    },
+    {
+      "path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "7b6443065b9376dfd64adc2408fdefe0b9011a8edbf47c412189c86f1c5e80d8",
+      "size_bytes": 15572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/19.before",
+      "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+      "size_bytes": 6212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/19.after",
+      "sha256": "7b6443065b9376dfd64adc2408fdefe0b9011a8edbf47c412189c86f1c5e80d8",
+      "size_bytes": 15572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/19.diff",
+      "sha256": "1b0d2f5baa06764c2c580e7a9c3881bc530493261b14b20c0455b78f8b511c03",
+      "size_bytes": 11213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/19.held.diff",
+      "sha256": "9455e71866dcb3e571d0732bdfb3d9ad6957cac1f870372dee4dc5270c6c75b5",
+      "size_bytes": 16615
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "c9fa9e5b40a997237be44a082a7942e4530cfdc58e6847e06b2e3d971bd6e7b2",
+      "size_bytes": 828926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/20.before",
+      "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+      "size_bytes": 825011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/20.after",
+      "sha256": "c9fa9e5b40a997237be44a082a7942e4530cfdc58e6847e06b2e3d971bd6e7b2",
+      "size_bytes": 828926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/20.diff",
+      "sha256": "b046b09a510eb47ad69ae5c1ce13e7f5b0a132bba5d364f1bbcb250a6c4d0416",
+      "size_bytes": 12019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/20.held.diff",
+      "sha256": "4a26b6d239c28b7a9f2a5ec43fb1d2f531e26f06f095eb53939bcb30bfc5b3ce",
+      "size_bytes": 12985
+    },
+    {
+      "path": "crates/ep_run/src/lib.rs",
+      "sha256": "9269b5cee70ac24be8a20992bc4f051a64b53ff0ffb20e1709962a572c88f699",
+      "size_bytes": 1196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/21.before",
+      "sha256": "35992c0395c3cf0a5cd2666896073aced2217c82f1b53bb60ad7289b2f6481c3",
+      "size_bytes": 1140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/21.after",
+      "sha256": "9269b5cee70ac24be8a20992bc4f051a64b53ff0ffb20e1709962a572c88f699",
+      "size_bytes": 1196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/21.diff",
+      "sha256": "d174116dc085a83c09e35a4f465a3e880e243c89a59cbb061aae7cdb3a95ef6d",
+      "size_bytes": 282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/21.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_project_data.rs",
+      "sha256": "cc908286228060a50e07de22d20966c0725843647c7f942dfc0d7c2688b89707",
+      "size_bytes": 6123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/22.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/22.after",
+      "sha256": "cc908286228060a50e07de22d20966c0725843647c7f942dfc0d7c2688b89707",
+      "size_bytes": 6123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/22.diff",
+      "sha256": "06484543d6a62f162c04b10fa8b804f3996493e8af463c09ba6338d36791b388",
+      "size_bytes": 6433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/22.held.diff",
+      "sha256": "ef95cdcb900c9d8d63a80a8591aab5d169273c1485d323dbd2731540817f27ea",
+      "size_bytes": 4449
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_project_data/input.rs",
+      "sha256": "af8b3fd08fef3c728b037e88d80b13c54f116d44740d94beced17e93ba3bb420",
+      "size_bytes": 7928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/23.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/23.after",
+      "sha256": "af8b3fd08fef3c728b037e88d80b13c54f116d44740d94beced17e93ba3bb420",
+      "size_bytes": 7928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/23.diff",
+      "sha256": "386b27e6f3f68470c71f41cb18d9b9f598dcb1952a6b60c4b5dcd9eb7701fd07",
+      "size_bytes": 8288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/23.held.diff",
+      "sha256": "c916a8be0f204e4ad6d4dd158564e8c33bfd46b54bf2a74ac6eefcc043a63ea9",
+      "size_bytes": 8881
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_project_data/input/schema.rs",
+      "sha256": "b825ea567a16f22cb44e77de7f7b82adfbd472cd15328748ba8257eeadb84677",
+      "size_bytes": 3080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/24.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/24.after",
+      "sha256": "b825ea567a16f22cb44e77de7f7b82adfbd472cd15328748ba8257eeadb84677",
+      "size_bytes": 3080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/24.diff",
+      "sha256": "8b323bb82ff71b9d23c7709c90fe1747d06572f142451aa50712641d62355afb",
+      "size_bytes": 3349
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/24.held.diff",
+      "sha256": "ca6290d1e5631051b9070ca354cfcc1b82e927ded5be5f58332b1ded158afb78",
+      "size_bytes": 5378
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_project_data/getter.rs",
+      "sha256": "a7d19b7d53b7ea8ce1824f91bcc04a1035a6e14b036309b85bba31091eec6167",
+      "size_bytes": 19959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/25.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/25.after",
+      "sha256": "a7d19b7d53b7ea8ce1824f91bcc04a1035a6e14b036309b85bba31091eec6167",
+      "size_bytes": 19959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/25.diff",
+      "sha256": "0f0c898aa166501840e0cd9da27ead0fada7c56c6a8c5819e0c3696e31a0e3d7",
+      "size_bytes": 20523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/25.held.diff",
+      "sha256": "c831cb69614d73ee53fbfb4b87ca529c4321690c0c36e161d11345cf54d44c27",
+      "size_bytes": 22810
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_project_data/environment.rs",
+      "sha256": "d47923318690676382f3522eebae66e6a1ff294e4fac3aadd6b8a01cbd9eeb22",
+      "size_bytes": 3567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/26.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/26.after",
+      "sha256": "d47923318690676382f3522eebae66e6a1ff294e4fac3aadd6b8a01cbd9eeb22",
+      "size_bytes": 3567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/26.diff",
+      "sha256": "714b99995892badc7de8a2d89befaadaebc3fb941b3577314c61128c0dd492ea",
+      "size_bytes": 3835
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/26.held.diff",
+      "sha256": "e71ee107313b3ba9000c6dc1a56a0b2b0710ab63f9d54583240ff39711f9a16a",
+      "size_bytes": 4745
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_project_data.rs",
+      "sha256": "6c891d0ee89bb885341c9ad08a4f3721e6a390e1cb2a721a3095262e98840abe",
+      "size_bytes": 5232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/27.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/27.after",
+      "sha256": "6c891d0ee89bb885341c9ad08a4f3721e6a390e1cb2a721a3095262e98840abe",
+      "size_bytes": 5232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/27.diff",
+      "sha256": "adfd6e13e7021ec3c8edb4c0a638a0a1b068fa78dc2e1e11a21b662ee1a98a47",
+      "size_bytes": 5470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/27.held.diff",
+      "sha256": "00a7b4785e7cf737e377c682edc396a6b87f62ff0027669fb1ba66016f78f422",
+      "size_bytes": 6675
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_globals.rs",
+      "sha256": "f6a830603986609cb2423415c2e2f3446b602f4a1751288bcdd10bba75cc07e8",
+      "size_bytes": 2470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/28.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/28.after",
+      "sha256": "f6a830603986609cb2423415c2e2f3446b602f4a1751288bcdd10bba75cc07e8",
+      "size_bytes": 2470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/28.diff",
+      "sha256": "162459b121a366c944042881fe4fc5a2efdb641e21fd853b1d2d5283087f9d55",
+      "size_bytes": 2683
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/28.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties/owners.rs",
+      "sha256": "595daa3ce11a04f2f5da902ab53b94bae248b03d844927d486dbe716ce6d9ece",
+      "size_bytes": 6913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/29.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/29.after",
+      "sha256": "595daa3ce11a04f2f5da902ab53b94bae248b03d844927d486dbe716ce6d9ece",
+      "size_bytes": 6913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/29.diff",
+      "sha256": "fc02e9194ea4ece9346dd7d3104f59269e072bfe9337e563de786637e0a56f8c",
+      "size_bytes": 7261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/29.held.diff",
+      "sha256": "2057e0253573ee5269d56aa0d885d7d2fe3562b60d5b722dc9b3cd552d401be8",
+      "size_bytes": 3034
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties/limits.rs",
+      "sha256": "de6c85d68f2a4e25d3651e0c26b6ee2862011dae6241bf4d0da216eb05d67cd8",
+      "size_bytes": 5843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/30.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/30.after",
+      "sha256": "de6c85d68f2a4e25d3651e0c26b6ee2862011dae6241bf4d0da216eb05d67cd8",
+      "size_bytes": 5843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/30.diff",
+      "sha256": "f57104e053ecbef59e2a9b4884024b82cbdf9e826b30599f198d84a61d9d6f3e",
+      "size_bytes": 6173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/30.held.diff",
+      "sha256": "0853cf9a7eeb71ff638e229693a213f4442194cc1c770b37d299563fd74b6398",
+      "size_bytes": 8953
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties.rs",
+      "sha256": "9c1d34ef23f08cbfa3ea1716f9fef1360343b39b0309b376373a3d2650528361",
+      "size_bytes": 12467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/31.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/31.after",
+      "sha256": "9c1d34ef23f08cbfa3ea1716f9fef1360343b39b0309b376373a3d2650528361",
+      "size_bytes": 12467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/31.diff",
+      "sha256": "9438d9e7dff5a3dc6c8cc2a1375e0a9a1fd896cb0a13a306e11870d868ea1e4e",
+      "size_bytes": 12921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/31.held.diff",
+      "sha256": "2f1d926b44415454313fcf79df73f1960828896b6ede1f65319593161f0c59ce",
+      "size_bytes": 15999
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/32.after",
+      "sha256": "726b4352bbab21d4d71f09571086b01d7a52e9c8fc113435db8195d61903691b",
+      "size_bytes": 26027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/32.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/32.diff",
+      "sha256": "f7d8319de9270b750f0879f5c24c65b38f2ee4d40c2f330f73f2fd5636c6944e",
+      "size_bytes": 26726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/32.held.diff",
+      "sha256": "ab2fae38a32e2df74b3ba72a13accf31a3e4b454a2d1f4dc6602a2faed4d3269",
+      "size_bytes": 47041
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties/water_steam_data.rs",
+      "sha256": "fc13801f1646020f8232240ee957c2e8e9188c5ae345d9085c7397ae8f958f3c",
+      "size_bytes": 12260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/33.before",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/33.after",
+      "sha256": "fc13801f1646020f8232240ee957c2e8e9188c5ae345d9085c7397ae8f958f3c",
+      "size_bytes": 12260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/33.diff",
+      "sha256": "35e2afbf572bffb0b7ff826319910f3dc54d75f12676ba7732b60b1996c95407",
+      "size_bytes": 12625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/33.held.diff",
+      "sha256": "c8a73360d8153bf7e7a1576450f30e0ab48435368466e16f0c65314962310897",
+      "size_bytes": 24774
+    },
+    {
+      "path": "crates/ep_run/tests/arbitrary_run.rs",
+      "sha256": "5989b87eecd682aa90b3caf43ad0c8c5e8364a1710dee4b9ac15df1eae22cfa7",
+      "size_bytes": 36648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/34.before",
+      "sha256": "5f4f06169ff36d980935f87ff946370faf18c650a6708669dae05fc154f850b6",
+      "size_bytes": 36110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/34.after",
+      "sha256": "5989b87eecd682aa90b3caf43ad0c8c5e8364a1710dee4b9ac15df1eae22cfa7",
+      "size_bytes": 36648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/34.diff",
+      "sha256": "741128cfc3972d12e63577b8aa1eee599f514b9255683c3916f0a84d85b425bf",
+      "size_bytes": 1248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/34.held.diff",
+      "sha256": "cede53818d42608215aacb04023a18fadb2d3177cf82ff2d8618050843f6c59b",
+      "size_bytes": 1435
+    },
+    {
+      "path": "crates/ep_run/tests/arbitrary_run/output_manifest.rs",
+      "sha256": "5771d3e2dd695e86bcf49a470959510c61adde490458fba2cd9154070c5b6069",
+      "size_bytes": 3644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/35.before",
+      "sha256": "2c90e6517ac7060082c3588c86747ab1789272535033c2a3a9e0a551999b66a5",
+      "size_bytes": 3147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/35.after",
+      "sha256": "5771d3e2dd695e86bcf49a470959510c61adde490458fba2cd9154070c5b6069",
+      "size_bytes": 3644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/35.diff",
+      "sha256": "d0d6d3c4e2d54a781e8fb010003fd84be1bc582d960e4f2d85c81e85d0854116",
+      "size_bytes": 857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/35.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/apply.json",
+      "sha256": "789089bd813276f937d11e0c32663a814ab585a222b811775ed7d6efa2ce4d22",
+      "size_bytes": 12784
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/manifest.json",
+      "sha256": "d43a19500b3341b7b7719343f21d505d3f07935e8d627eb9446e0f2d5a807a5d",
+      "size_bytes": 36869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/review.json",
+      "sha256": "ef874efef1a0f7db065133f106ae35daaca2a52a484f7400d44444f189152b57",
+      "size_bytes": 8004
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-six-handler-Root-01.py",
+      "sha256": "604686e7bfd52b0b031846cfe9b1dd49ba669d20a1b88201da731a515b9b156b",
+      "size_bytes": 2778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/manifest.json",
+      "sha256": "b053528733b6d172f0ee8c44d9aa0be37ab4653c5706127bc41eca4a2a5164c1",
+      "size_bytes": 44923
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/00.diff",
+      "sha256": "2cf2ca0f79619a82bc842e0f9c470179f4f68a6b3b4aa519b10b68236bdf3899",
+      "size_bytes": 21265
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/00.held.diff",
+      "sha256": "21ad84d213876c7e2f0998e39f0d0c5263551e719a3d4daa6e1e0fe05bac89f2",
+      "size_bytes": 27539
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/01.after",
+      "sha256": "c6deeb5fd21022e5986182d62576bc3a4c2bca36f5856abc90fd4ee89defdf41",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/01.diff",
+      "sha256": "4ec94e9dc2a9c2f3ebb6cefb07c33e7aeddf26c9f7281025d4be6b1ae248e2d0",
+      "size_bytes": 5969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/01.held.diff",
+      "sha256": "7c0b4f486dd51d43c0acb40cfbefdd5abd1714474f2e5547cb0381c0d1ee3b9e",
+      "size_bytes": 7961
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/02.after",
+      "sha256": "8fac48acce15f7dd9c90951aceeadc19b4038da3b4159aea75fd5319c0e41b41",
+      "size_bytes": 9305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/02.diff",
+      "sha256": "eea3f28886cdb8cdd27891d036367ffee5e824e771de7b32952cf831ea7a9bbc",
+      "size_bytes": 9670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/02.held.diff",
+      "sha256": "68e0e5b14af3a60a073ce845eef46781db0eac3fbb75e3ee29c96905923d1ccd",
+      "size_bytes": 13509
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/setup_postludes.rs",
+      "sha256": "b1ecb0f5432d28913c53ed55c1ec7200e81d3711d9c24a7533dd1466f6c0086f",
+      "size_bytes": 3963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/03.after",
+      "sha256": "b1ecb0f5432d28913c53ed55c1ec7200e81d3711d9c24a7533dd1466f6c0086f",
+      "size_bytes": 3963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/03.diff",
+      "sha256": "0cf2a5bc437c6414ceb670c7b84e12d848dcce13f651449e2eb243e3b383d921",
+      "size_bytes": 4211
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/03.held.diff",
+      "sha256": "7ab2620d8963ea1656c0aa3c3e97b2cadc46abb3426882310f3e5be01b15136c",
+      "size_bytes": 5889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/04.after",
+      "sha256": "a398a294cf82913d013244c2fabbeb65e3f7faeece18a068e5acace44e464494",
+      "size_bytes": 8535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/04.diff",
+      "sha256": "607c324b91a96266cc9f7b71719a4eaff06b9da82563da138530dd4867ec59c6",
+      "size_bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/04.held.diff",
+      "sha256": "1ef5b2684415123df5e751c6deadc71d63c216f3aa9e9d39e096500a0bb9c7e0",
+      "size_bytes": 599
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/05.after",
+      "sha256": "aa9e390657e8b6b05fbc9da72ac63018353973c8ce53cc3c65d33705a570f854",
+      "size_bytes": 54268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/05.diff",
+      "sha256": "676c7a1bebd154180a57b9652ebdba87822ca05e7578045431eaf3ee844b679d",
+      "size_bytes": 487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/05.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/06.after",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/06.diff",
+      "sha256": "f8767f0fb94b2266de2004158a87fb26ae6f8d8a81b136d44bd02e277d9c709f",
+      "size_bytes": 672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/06.held.diff",
+      "sha256": "740d3694eb5253495d42c952ffccb528e5c51f3f51ff35c0026ba27aa1eb3e35",
+      "size_bytes": 595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/07.after",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/07.diff",
+      "sha256": "6462ff842964e47e2ca6030e8c5f9e435ebd65c1ced55b82ba95b2a16ecaf33e",
+      "size_bytes": 573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/07.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/08.after",
+      "sha256": "9a7f5d710a44812a9f16e928df34cc0ac3aff6b3efd878a711021d2b205489b8",
+      "size_bytes": 7871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/08.diff",
+      "sha256": "11b3efb0102b666978339e90c509b1ae327c5bba5bc30e6fced399737905f4e5",
+      "size_bytes": 1521
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/08.held.diff",
+      "sha256": "a72531d8e7fa5ef003e2fb531df033825ec5544581ddecb016a7339b00e85642",
+      "size_bytes": 2146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/09.after",
+      "sha256": "11af1180c7ba27e247bd973dfe086c666517d881db46f82f78830eb49c12e4c9",
+      "size_bytes": 17515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/09.diff",
+      "sha256": "f009e04ee84b18caa98077fbdff5d587c73bdd53ddad99b036cbcf98c027a18b",
+      "size_bytes": 18116
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/09.held.diff",
+      "sha256": "bcf2575245681ceeda2402ac8b85e63047b1fc5ac4a467a60ce86602e8617697",
+      "size_bytes": 19806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/10.after",
+      "sha256": "e0109071d40bcd64a8b0e26fa337016b15c5929f60b98d5ae20cf8f56da50691",
+      "size_bytes": 3654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/10.diff",
+      "sha256": "7f3a1565de2262de09c0cacd0f7f80cda2715db62e2f34297328c2a8edf4c1a6",
+      "size_bytes": 3855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/10.held.diff",
+      "sha256": "5e9afa968df24dd16c0d55f3eaf6ec71917e56047d2d4af3a216cabd0aed8958",
+      "size_bytes": 2534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/11.after",
+      "sha256": "ef62b70551446784b7ed1b561757b14e6fd39939e607d2a4dd04cc99b9c3a962",
+      "size_bytes": 15059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/11.diff",
+      "sha256": "e37b26d4e3eb8afa7e519ae6e605e511949842f7bfb4f279b3ea7c50181b970d",
+      "size_bytes": 922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/11.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/12.after",
+      "sha256": "c4d68db2582f8083d542806566ca750e790c3b40f46d2fbffa1110bd5972eef3",
+      "size_bytes": 18157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/12.diff",
+      "sha256": "8bb468676cc32bf9ba22c823ca49763dbeb6332078cfd220f89ccf56cb880b54",
+      "size_bytes": 435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/12.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/13.after",
+      "sha256": "39b3b0286b357292b00e480a5f96dc093131f4249c589a3b61e2610e24813587",
+      "size_bytes": 23928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/13.diff",
+      "sha256": "01eca5628f228695215c339d30a31076d2fa162fe2b757c9c6f485b227d7eab0",
+      "size_bytes": 3268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/13.held.diff",
+      "sha256": "0c319a351de589ce48f8b36ca9014a3781b385ffdcb2eb2fb00cf41f6b75452a",
+      "size_bytes": 3088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/14.after",
+      "sha256": "8ee59f5bd835a15343437a424059a07c3aa1fdc97db409bcdac8f6307c0e7a0d",
+      "size_bytes": 21705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/14.diff",
+      "sha256": "c36d6f879fcdf4045b8ddcea56a0b46d703e6236eba84b04018c85c84022a045",
+      "size_bytes": 1597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/14.held.diff",
+      "sha256": "ac601b8f13ab6ef5d0fba6035ddadf041c2c8ce1075856cd9e2e75cf25ad44fb",
+      "size_bytes": 1679
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/15.after",
+      "sha256": "8f498ca583e4ad4c05a88b9dc9b46af6624ee78dbf676acd4fb39196ffcf4e0e",
+      "size_bytes": 44273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/15.diff",
+      "sha256": "89dc08b153d4e817a3d163c5236260dcf1275d9cb95f8d080f7b4eeb06a99500",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/15.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/16.after",
+      "sha256": "c8a60aad15164d9b1528f1f13992a77b3841857e63591106b6520572b6f8769c",
+      "size_bytes": 29739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/16.diff",
+      "sha256": "b98008da3647bb0f0b0976151ad6c75ea7539a02f17cfa2edb5061447fd4ebaf",
+      "size_bytes": 743
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/16.held.diff",
+      "sha256": "23b086995cea370d26aba61ef68769e1df4ea277287fcf97c6fefc882718ef21",
+      "size_bytes": 728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/17.after",
+      "sha256": "ea7678e101b596a9f92d7c3e6d20873f0dd611495f497a941ca7740df69de3a4",
+      "size_bytes": 18034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/17.diff",
+      "sha256": "83cbecfaecf531da1b6fcacd8a6627e450856f0d04fe0fd92a7a6b59fd508c0b",
+      "size_bytes": 2334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/17.held.diff",
+      "sha256": "7d8759a2e3c67da1233f8e61e36ace22c879513aad4d739a24898a8e2fad5fee",
+      "size_bytes": 2467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/18.after",
+      "sha256": "a4b5882a7fcdb6c838e182eff01f9cd3a1d88316e3b7a04553568d2059428803",
+      "size_bytes": 2693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/18.diff",
+      "sha256": "4777e9f5e48b92165b8a00e43b85dc940813778c8bf37ab306bd247bfc0cda39",
+      "size_bytes": 588
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/18.held.diff",
+      "sha256": "0290f4ad66ed274a5bc914862cbec7737d33bb51caabe8cfd688a77759d81992",
+      "size_bytes": 640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/19.after",
+      "sha256": "7b6443065b9376dfd64adc2408fdefe0b9011a8edbf47c412189c86f1c5e80d8",
+      "size_bytes": 15572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/19.diff",
+      "sha256": "1b0d2f5baa06764c2c580e7a9c3881bc530493261b14b20c0455b78f8b511c03",
+      "size_bytes": 11213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/19.held.diff",
+      "sha256": "9455e71866dcb3e571d0732bdfb3d9ad6957cac1f870372dee4dc5270c6c75b5",
+      "size_bytes": 16615
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/20.after",
+      "sha256": "c9fa9e5b40a997237be44a082a7942e4530cfdc58e6847e06b2e3d971bd6e7b2",
+      "size_bytes": 828926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/20.diff",
+      "sha256": "b046b09a510eb47ad69ae5c1ce13e7f5b0a132bba5d364f1bbcb250a6c4d0416",
+      "size_bytes": 12019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/20.held.diff",
+      "sha256": "4a26b6d239c28b7a9f2a5ec43fb1d2f531e26f06f095eb53939bcb30bfc5b3ce",
+      "size_bytes": 12985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/21.after",
+      "sha256": "9269b5cee70ac24be8a20992bc4f051a64b53ff0ffb20e1709962a572c88f699",
+      "size_bytes": 1196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/21.diff",
+      "sha256": "d174116dc085a83c09e35a4f465a3e880e243c89a59cbb061aae7cdb3a95ef6d",
+      "size_bytes": 282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/21.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/22.after",
+      "sha256": "cc908286228060a50e07de22d20966c0725843647c7f942dfc0d7c2688b89707",
+      "size_bytes": 6123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/22.diff",
+      "sha256": "06484543d6a62f162c04b10fa8b804f3996493e8af463c09ba6338d36791b388",
+      "size_bytes": 6433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/22.held.diff",
+      "sha256": "ef95cdcb900c9d8d63a80a8591aab5d169273c1485d323dbd2731540817f27ea",
+      "size_bytes": 4449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/23.after",
+      "sha256": "af8b3fd08fef3c728b037e88d80b13c54f116d44740d94beced17e93ba3bb420",
+      "size_bytes": 7928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/23.diff",
+      "sha256": "386b27e6f3f68470c71f41cb18d9b9f598dcb1952a6b60c4b5dcd9eb7701fd07",
+      "size_bytes": 8288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/23.held.diff",
+      "sha256": "c916a8be0f204e4ad6d4dd158564e8c33bfd46b54bf2a74ac6eefcc043a63ea9",
+      "size_bytes": 8881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/24.after",
+      "sha256": "b825ea567a16f22cb44e77de7f7b82adfbd472cd15328748ba8257eeadb84677",
+      "size_bytes": 3080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/24.diff",
+      "sha256": "8b323bb82ff71b9d23c7709c90fe1747d06572f142451aa50712641d62355afb",
+      "size_bytes": 3349
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/24.held.diff",
+      "sha256": "ca6290d1e5631051b9070ca354cfcc1b82e927ded5be5f58332b1ded158afb78",
+      "size_bytes": 5378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/25.after",
+      "sha256": "a7d19b7d53b7ea8ce1824f91bcc04a1035a6e14b036309b85bba31091eec6167",
+      "size_bytes": 19959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/25.diff",
+      "sha256": "0f0c898aa166501840e0cd9da27ead0fada7c56c6a8c5819e0c3696e31a0e3d7",
+      "size_bytes": 20523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/25.held.diff",
+      "sha256": "c831cb69614d73ee53fbfb4b87ca529c4321690c0c36e161d11345cf54d44c27",
+      "size_bytes": 22810
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/26.after",
+      "sha256": "d47923318690676382f3522eebae66e6a1ff294e4fac3aadd6b8a01cbd9eeb22",
+      "size_bytes": 3567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/26.diff",
+      "sha256": "714b99995892badc7de8a2d89befaadaebc3fb941b3577314c61128c0dd492ea",
+      "size_bytes": 3835
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/26.held.diff",
+      "sha256": "e71ee107313b3ba9000c6dc1a56a0b2b0710ab63f9d54583240ff39711f9a16a",
+      "size_bytes": 4745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/27.after",
+      "sha256": "6c891d0ee89bb885341c9ad08a4f3721e6a390e1cb2a721a3095262e98840abe",
+      "size_bytes": 5232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/27.diff",
+      "sha256": "adfd6e13e7021ec3c8edb4c0a638a0a1b068fa78dc2e1e11a21b662ee1a98a47",
+      "size_bytes": 5470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/27.held.diff",
+      "sha256": "00a7b4785e7cf737e377c682edc396a6b87f62ff0027669fb1ba66016f78f422",
+      "size_bytes": 6675
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/28.after",
+      "sha256": "f6a830603986609cb2423415c2e2f3446b602f4a1751288bcdd10bba75cc07e8",
+      "size_bytes": 2470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/28.diff",
+      "sha256": "162459b121a366c944042881fe4fc5a2efdb641e21fd853b1d2d5283087f9d55",
+      "size_bytes": 2683
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/28.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/29.after",
+      "sha256": "595daa3ce11a04f2f5da902ab53b94bae248b03d844927d486dbe716ce6d9ece",
+      "size_bytes": 6913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/29.diff",
+      "sha256": "fc02e9194ea4ece9346dd7d3104f59269e072bfe9337e563de786637e0a56f8c",
+      "size_bytes": 7261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/29.held.diff",
+      "sha256": "2057e0253573ee5269d56aa0d885d7d2fe3562b60d5b722dc9b3cd552d401be8",
+      "size_bytes": 3034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/30.after",
+      "sha256": "de6c85d68f2a4e25d3651e0c26b6ee2862011dae6241bf4d0da216eb05d67cd8",
+      "size_bytes": 5843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/30.diff",
+      "sha256": "f57104e053ecbef59e2a9b4884024b82cbdf9e826b30599f198d84a61d9d6f3e",
+      "size_bytes": 6173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/30.held.diff",
+      "sha256": "0853cf9a7eeb71ff638e229693a213f4442194cc1c770b37d299563fd74b6398",
+      "size_bytes": 8953
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/31.after",
+      "sha256": "9c1d34ef23f08cbfa3ea1716f9fef1360343b39b0309b376373a3d2650528361",
+      "size_bytes": 12467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/31.diff",
+      "sha256": "9438d9e7dff5a3dc6c8cc2a1375e0a9a1fd896cb0a13a306e11870d868ea1e4e",
+      "size_bytes": 12921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/31.held.diff",
+      "sha256": "2f1d926b44415454313fcf79df73f1960828896b6ede1f65319593161f0c59ce",
+      "size_bytes": 15999
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties/glycol_data.rs",
+      "sha256": "1f4063957bb21276f9776798d2e6d8f3d7e8697be4b79be139f65cabcdec3a68",
+      "size_bytes": 26146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/32.after",
+      "sha256": "1f4063957bb21276f9776798d2e6d8f3d7e8697be4b79be139f65cabcdec3a68",
+      "size_bytes": 26146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/32.diff",
+      "sha256": "75d2854bd2ab11c16341bdd29cff80fee57b6375686df33ac9ca1f061abbd1a5",
+      "size_bytes": 26847
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/32.held.diff",
+      "sha256": "974cc405d27799ab7b08dee693700080a35030c8e7ccabe123833fbf9cc08feb",
+      "size_bytes": 47162
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/33.after",
+      "sha256": "fc13801f1646020f8232240ee957c2e8e9188c5ae345d9085c7397ae8f958f3c",
+      "size_bytes": 12260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/33.diff",
+      "sha256": "35e2afbf572bffb0b7ff826319910f3dc54d75f12676ba7732b60b1996c95407",
+      "size_bytes": 12625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/33.held.diff",
+      "sha256": "c8a73360d8153bf7e7a1576450f30e0ab48435368466e16f0c65314962310897",
+      "size_bytes": 24774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/34.after",
+      "sha256": "5989b87eecd682aa90b3caf43ad0c8c5e8364a1710dee4b9ac15df1eae22cfa7",
+      "size_bytes": 36648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/34.diff",
+      "sha256": "741128cfc3972d12e63577b8aa1eee599f514b9255683c3916f0a84d85b425bf",
+      "size_bytes": 1248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/34.held.diff",
+      "sha256": "cede53818d42608215aacb04023a18fadb2d3177cf82ff2d8618050843f6c59b",
+      "size_bytes": 1435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/35.after",
+      "sha256": "5771d3e2dd695e86bcf49a470959510c61adde490458fba2cd9154070c5b6069",
+      "size_bytes": 3644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/35.diff",
+      "sha256": "d0d6d3c4e2d54a781e8fb010003fd84be1bc582d960e4f2d85c81e85d0854116",
+      "size_bytes": 857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/35.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/manifest.json",
+      "sha256": "9b67f879a5812159134f010b398050b4142355b52ea855e6148f76c84bc721af",
+      "size_bytes": 47016
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization.rs",
+      "sha256": "03c5666a935a565c14bdbfd412e8211147f08080d1f278b5e88b2888890bb2a9",
+      "size_bytes": 21185
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/00.after",
+      "sha256": "03c5666a935a565c14bdbfd412e8211147f08080d1f278b5e88b2888890bb2a9",
+      "size_bytes": 21185
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/00.diff",
+      "sha256": "1eb0892bd3d51d3321eb11e029719fe89d027764f82adf6569adb3e761822efb",
+      "size_bytes": 21815
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/00.held.diff",
+      "sha256": "289b9803c1d2c6c7997cf32d55f469e20c924044d6d55e24bca1faee3a132228",
+      "size_bytes": 28089
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/01.after",
+      "sha256": "c6deeb5fd21022e5986182d62576bc3a4c2bca36f5856abc90fd4ee89defdf41",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/01.diff",
+      "sha256": "4ec94e9dc2a9c2f3ebb6cefb07c33e7aeddf26c9f7281025d4be6b1ae248e2d0",
+      "size_bytes": 5969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/01.held.diff",
+      "sha256": "7c0b4f486dd51d43c0acb40cfbefdd5abd1714474f2e5547cb0381c0d1ee3b9e",
+      "size_bytes": 7961
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/02.after",
+      "sha256": "8fac48acce15f7dd9c90951aceeadc19b4038da3b4159aea75fd5319c0e41b41",
+      "size_bytes": 9305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/02.diff",
+      "sha256": "eea3f28886cdb8cdd27891d036367ffee5e824e771de7b32952cf831ea7a9bbc",
+      "size_bytes": 9670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/02.held.diff",
+      "sha256": "68e0e5b14af3a60a073ce845eef46781db0eac3fbb75e3ee29c96905923d1ccd",
+      "size_bytes": 13509
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/03.after",
+      "sha256": "b1ecb0f5432d28913c53ed55c1ec7200e81d3711d9c24a7533dd1466f6c0086f",
+      "size_bytes": 3963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/03.diff",
+      "sha256": "0cf2a5bc437c6414ceb670c7b84e12d848dcce13f651449e2eb243e3b383d921",
+      "size_bytes": 4211
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/03.held.diff",
+      "sha256": "7ab2620d8963ea1656c0aa3c3e97b2cadc46abb3426882310f3e5be01b15136c",
+      "size_bytes": 5889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/04.after",
+      "sha256": "a398a294cf82913d013244c2fabbeb65e3f7faeece18a068e5acace44e464494",
+      "size_bytes": 8535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/04.diff",
+      "sha256": "607c324b91a96266cc9f7b71719a4eaff06b9da82563da138530dd4867ec59c6",
+      "size_bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/04.held.diff",
+      "sha256": "1ef5b2684415123df5e751c6deadc71d63c216f3aa9e9d39e096500a0bb9c7e0",
+      "size_bytes": 599
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/05.after",
+      "sha256": "aa9e390657e8b6b05fbc9da72ac63018353973c8ce53cc3c65d33705a570f854",
+      "size_bytes": 54268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/05.diff",
+      "sha256": "676c7a1bebd154180a57b9652ebdba87822ca05e7578045431eaf3ee844b679d",
+      "size_bytes": 487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/05.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/06.after",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/06.diff",
+      "sha256": "f8767f0fb94b2266de2004158a87fb26ae6f8d8a81b136d44bd02e277d9c709f",
+      "size_bytes": 672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/06.held.diff",
+      "sha256": "740d3694eb5253495d42c952ffccb528e5c51f3f51ff35c0026ba27aa1eb3e35",
+      "size_bytes": 595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/07.after",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/07.diff",
+      "sha256": "6462ff842964e47e2ca6030e8c5f9e435ebd65c1ced55b82ba95b2a16ecaf33e",
+      "size_bytes": 573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/07.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/08.after",
+      "sha256": "9a7f5d710a44812a9f16e928df34cc0ac3aff6b3efd878a711021d2b205489b8",
+      "size_bytes": 7871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/08.diff",
+      "sha256": "11b3efb0102b666978339e90c509b1ae327c5bba5bc30e6fced399737905f4e5",
+      "size_bytes": 1521
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/08.held.diff",
+      "sha256": "a72531d8e7fa5ef003e2fb531df033825ec5544581ddecb016a7339b00e85642",
+      "size_bytes": 2146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/09.after",
+      "sha256": "11af1180c7ba27e247bd973dfe086c666517d881db46f82f78830eb49c12e4c9",
+      "size_bytes": 17515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/09.diff",
+      "sha256": "f009e04ee84b18caa98077fbdff5d587c73bdd53ddad99b036cbcf98c027a18b",
+      "size_bytes": 18116
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/09.held.diff",
+      "sha256": "bcf2575245681ceeda2402ac8b85e63047b1fc5ac4a467a60ce86602e8617697",
+      "size_bytes": 19806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/10.after",
+      "sha256": "e0109071d40bcd64a8b0e26fa337016b15c5929f60b98d5ae20cf8f56da50691",
+      "size_bytes": 3654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/10.diff",
+      "sha256": "7f3a1565de2262de09c0cacd0f7f80cda2715db62e2f34297328c2a8edf4c1a6",
+      "size_bytes": 3855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/10.held.diff",
+      "sha256": "5e9afa968df24dd16c0d55f3eaf6ec71917e56047d2d4af3a216cabd0aed8958",
+      "size_bytes": 2534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/11.after",
+      "sha256": "ef62b70551446784b7ed1b561757b14e6fd39939e607d2a4dd04cc99b9c3a962",
+      "size_bytes": 15059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/11.diff",
+      "sha256": "e37b26d4e3eb8afa7e519ae6e605e511949842f7bfb4f279b3ea7c50181b970d",
+      "size_bytes": 922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/11.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/12.after",
+      "sha256": "c4d68db2582f8083d542806566ca750e790c3b40f46d2fbffa1110bd5972eef3",
+      "size_bytes": 18157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/12.diff",
+      "sha256": "8bb468676cc32bf9ba22c823ca49763dbeb6332078cfd220f89ccf56cb880b54",
+      "size_bytes": 435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/12.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/13.after",
+      "sha256": "39b3b0286b357292b00e480a5f96dc093131f4249c589a3b61e2610e24813587",
+      "size_bytes": 23928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/13.diff",
+      "sha256": "01eca5628f228695215c339d30a31076d2fa162fe2b757c9c6f485b227d7eab0",
+      "size_bytes": 3268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/13.held.diff",
+      "sha256": "0c319a351de589ce48f8b36ca9014a3781b385ffdcb2eb2fb00cf41f6b75452a",
+      "size_bytes": 3088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/14.after",
+      "sha256": "8ee59f5bd835a15343437a424059a07c3aa1fdc97db409bcdac8f6307c0e7a0d",
+      "size_bytes": 21705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/14.diff",
+      "sha256": "c36d6f879fcdf4045b8ddcea56a0b46d703e6236eba84b04018c85c84022a045",
+      "size_bytes": 1597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/14.held.diff",
+      "sha256": "ac601b8f13ab6ef5d0fba6035ddadf041c2c8ce1075856cd9e2e75cf25ad44fb",
+      "size_bytes": 1679
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/15.after",
+      "sha256": "8f498ca583e4ad4c05a88b9dc9b46af6624ee78dbf676acd4fb39196ffcf4e0e",
+      "size_bytes": 44273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/15.diff",
+      "sha256": "89dc08b153d4e817a3d163c5236260dcf1275d9cb95f8d080f7b4eeb06a99500",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/15.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/16.after",
+      "sha256": "c8a60aad15164d9b1528f1f13992a77b3841857e63591106b6520572b6f8769c",
+      "size_bytes": 29739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/16.diff",
+      "sha256": "b98008da3647bb0f0b0976151ad6c75ea7539a02f17cfa2edb5061447fd4ebaf",
+      "size_bytes": 743
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/16.held.diff",
+      "sha256": "23b086995cea370d26aba61ef68769e1df4ea277287fcf97c6fefc882718ef21",
+      "size_bytes": 728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/17.after",
+      "sha256": "ea7678e101b596a9f92d7c3e6d20873f0dd611495f497a941ca7740df69de3a4",
+      "size_bytes": 18034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/17.diff",
+      "sha256": "83cbecfaecf531da1b6fcacd8a6627e450856f0d04fe0fd92a7a6b59fd508c0b",
+      "size_bytes": 2334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/17.held.diff",
+      "sha256": "7d8759a2e3c67da1233f8e61e36ace22c879513aad4d739a24898a8e2fad5fee",
+      "size_bytes": 2467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/18.after",
+      "sha256": "a4b5882a7fcdb6c838e182eff01f9cd3a1d88316e3b7a04553568d2059428803",
+      "size_bytes": 2693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/18.diff",
+      "sha256": "4777e9f5e48b92165b8a00e43b85dc940813778c8bf37ab306bd247bfc0cda39",
+      "size_bytes": 588
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/18.held.diff",
+      "sha256": "0290f4ad66ed274a5bc914862cbec7737d33bb51caabe8cfd688a77759d81992",
+      "size_bytes": 640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/19.after",
+      "sha256": "7b6443065b9376dfd64adc2408fdefe0b9011a8edbf47c412189c86f1c5e80d8",
+      "size_bytes": 15572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/19.diff",
+      "sha256": "1b0d2f5baa06764c2c580e7a9c3881bc530493261b14b20c0455b78f8b511c03",
+      "size_bytes": 11213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/19.held.diff",
+      "sha256": "9455e71866dcb3e571d0732bdfb3d9ad6957cac1f870372dee4dc5270c6c75b5",
+      "size_bytes": 16615
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/20.after",
+      "sha256": "c9fa9e5b40a997237be44a082a7942e4530cfdc58e6847e06b2e3d971bd6e7b2",
+      "size_bytes": 828926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/20.diff",
+      "sha256": "b046b09a510eb47ad69ae5c1ce13e7f5b0a132bba5d364f1bbcb250a6c4d0416",
+      "size_bytes": 12019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/20.held.diff",
+      "sha256": "4a26b6d239c28b7a9f2a5ec43fb1d2f531e26f06f095eb53939bcb30bfc5b3ce",
+      "size_bytes": 12985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/21.after",
+      "sha256": "9269b5cee70ac24be8a20992bc4f051a64b53ff0ffb20e1709962a572c88f699",
+      "size_bytes": 1196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/21.diff",
+      "sha256": "d174116dc085a83c09e35a4f465a3e880e243c89a59cbb061aae7cdb3a95ef6d",
+      "size_bytes": 282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/21.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/22.after",
+      "sha256": "cc908286228060a50e07de22d20966c0725843647c7f942dfc0d7c2688b89707",
+      "size_bytes": 6123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/22.diff",
+      "sha256": "06484543d6a62f162c04b10fa8b804f3996493e8af463c09ba6338d36791b388",
+      "size_bytes": 6433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/22.held.diff",
+      "sha256": "ef95cdcb900c9d8d63a80a8591aab5d169273c1485d323dbd2731540817f27ea",
+      "size_bytes": 4449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/23.after",
+      "sha256": "af8b3fd08fef3c728b037e88d80b13c54f116d44740d94beced17e93ba3bb420",
+      "size_bytes": 7928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/23.diff",
+      "sha256": "386b27e6f3f68470c71f41cb18d9b9f598dcb1952a6b60c4b5dcd9eb7701fd07",
+      "size_bytes": 8288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/23.held.diff",
+      "sha256": "c916a8be0f204e4ad6d4dd158564e8c33bfd46b54bf2a74ac6eefcc043a63ea9",
+      "size_bytes": 8881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/24.after",
+      "sha256": "b825ea567a16f22cb44e77de7f7b82adfbd472cd15328748ba8257eeadb84677",
+      "size_bytes": 3080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/24.diff",
+      "sha256": "8b323bb82ff71b9d23c7709c90fe1747d06572f142451aa50712641d62355afb",
+      "size_bytes": 3349
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/24.held.diff",
+      "sha256": "ca6290d1e5631051b9070ca354cfcc1b82e927ded5be5f58332b1ded158afb78",
+      "size_bytes": 5378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/25.after",
+      "sha256": "a7d19b7d53b7ea8ce1824f91bcc04a1035a6e14b036309b85bba31091eec6167",
+      "size_bytes": 19959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/25.diff",
+      "sha256": "0f0c898aa166501840e0cd9da27ead0fada7c56c6a8c5819e0c3696e31a0e3d7",
+      "size_bytes": 20523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/25.held.diff",
+      "sha256": "c831cb69614d73ee53fbfb4b87ca529c4321690c0c36e161d11345cf54d44c27",
+      "size_bytes": 22810
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/26.after",
+      "sha256": "d47923318690676382f3522eebae66e6a1ff294e4fac3aadd6b8a01cbd9eeb22",
+      "size_bytes": 3567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/26.diff",
+      "sha256": "714b99995892badc7de8a2d89befaadaebc3fb941b3577314c61128c0dd492ea",
+      "size_bytes": 3835
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/26.held.diff",
+      "sha256": "e71ee107313b3ba9000c6dc1a56a0b2b0710ab63f9d54583240ff39711f9a16a",
+      "size_bytes": 4745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/27.after",
+      "sha256": "6c891d0ee89bb885341c9ad08a4f3721e6a390e1cb2a721a3095262e98840abe",
+      "size_bytes": 5232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/27.diff",
+      "sha256": "adfd6e13e7021ec3c8edb4c0a638a0a1b068fa78dc2e1e11a21b662ee1a98a47",
+      "size_bytes": 5470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/27.held.diff",
+      "sha256": "00a7b4785e7cf737e377c682edc396a6b87f62ff0027669fb1ba66016f78f422",
+      "size_bytes": 6675
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/28.after",
+      "sha256": "f6a830603986609cb2423415c2e2f3446b602f4a1751288bcdd10bba75cc07e8",
+      "size_bytes": 2470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/28.diff",
+      "sha256": "162459b121a366c944042881fe4fc5a2efdb641e21fd853b1d2d5283087f9d55",
+      "size_bytes": 2683
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/28.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/29.after",
+      "sha256": "595daa3ce11a04f2f5da902ab53b94bae248b03d844927d486dbe716ce6d9ece",
+      "size_bytes": 6913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/29.diff",
+      "sha256": "fc02e9194ea4ece9346dd7d3104f59269e072bfe9337e563de786637e0a56f8c",
+      "size_bytes": 7261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/29.held.diff",
+      "sha256": "2057e0253573ee5269d56aa0d885d7d2fe3562b60d5b722dc9b3cd552d401be8",
+      "size_bytes": 3034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/30.after",
+      "sha256": "de6c85d68f2a4e25d3651e0c26b6ee2862011dae6241bf4d0da216eb05d67cd8",
+      "size_bytes": 5843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/30.diff",
+      "sha256": "f57104e053ecbef59e2a9b4884024b82cbdf9e826b30599f198d84a61d9d6f3e",
+      "size_bytes": 6173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/30.held.diff",
+      "sha256": "0853cf9a7eeb71ff638e229693a213f4442194cc1c770b37d299563fd74b6398",
+      "size_bytes": 8953
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/31.after",
+      "sha256": "9c1d34ef23f08cbfa3ea1716f9fef1360343b39b0309b376373a3d2650528361",
+      "size_bytes": 12467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/31.diff",
+      "sha256": "9438d9e7dff5a3dc6c8cc2a1375e0a9a1fd896cb0a13a306e11870d868ea1e4e",
+      "size_bytes": 12921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/31.held.diff",
+      "sha256": "2f1d926b44415454313fcf79df73f1960828896b6ede1f65319593161f0c59ce",
+      "size_bytes": 15999
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/32.after",
+      "sha256": "1f4063957bb21276f9776798d2e6d8f3d7e8697be4b79be139f65cabcdec3a68",
+      "size_bytes": 26146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/32.diff",
+      "sha256": "75d2854bd2ab11c16341bdd29cff80fee57b6375686df33ac9ca1f061abbd1a5",
+      "size_bytes": 26847
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/32.held.diff",
+      "sha256": "974cc405d27799ab7b08dee693700080a35030c8e7ccabe123833fbf9cc08feb",
+      "size_bytes": 47162
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/33.after",
+      "sha256": "fc13801f1646020f8232240ee957c2e8e9188c5ae345d9085c7397ae8f958f3c",
+      "size_bytes": 12260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/33.diff",
+      "sha256": "35e2afbf572bffb0b7ff826319910f3dc54d75f12676ba7732b60b1996c95407",
+      "size_bytes": 12625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/33.held.diff",
+      "sha256": "c8a73360d8153bf7e7a1576450f30e0ab48435368466e16f0c65314962310897",
+      "size_bytes": 24774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/34.after",
+      "sha256": "5989b87eecd682aa90b3caf43ad0c8c5e8364a1710dee4b9ac15df1eae22cfa7",
+      "size_bytes": 36648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/34.diff",
+      "sha256": "741128cfc3972d12e63577b8aa1eee599f514b9255683c3916f0a84d85b425bf",
+      "size_bytes": 1248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/34.held.diff",
+      "sha256": "cede53818d42608215aacb04023a18fadb2d3177cf82ff2d8618050843f6c59b",
+      "size_bytes": 1435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/35.after",
+      "sha256": "5771d3e2dd695e86bcf49a470959510c61adde490458fba2cd9154070c5b6069",
+      "size_bytes": 3644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/35.diff",
+      "sha256": "d0d6d3c4e2d54a781e8fb010003fd84be1bc582d960e4f2d85c81e85d0854116",
+      "size_bytes": 857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/35.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "dc9b0a2e69f8296de601f7cde43faf3cd7b584bb844d935cb895d3a77d654fe4",
+      "size_bytes": 22591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/36.before",
+      "sha256": "50505b69d5690f396b1f8deba1500a0990a0f4b50d81ef6350f79dc2d7a0e392",
+      "size_bytes": 22143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/36.after",
+      "sha256": "dc9b0a2e69f8296de601f7cde43faf3cd7b584bb844d935cb895d3a77d654fe4",
+      "size_bytes": 22591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/36.diff",
+      "sha256": "08b5f49dbc0d3d3128160297fc12eac23618079ce1a7c41c871cdd92e30a9449",
+      "size_bytes": 839
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/36.held.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/apply.json",
+      "sha256": "64955bf8844a8014b7ee1eb9c557ddcf7c4da5d3336bfc8c222ae78ccaa33b27",
+      "size_bytes": 32469
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-six-handler-Root-02.py",
+      "sha256": "a2f1384824ef7776ad780d60edfe7850eb5c56d0f7eed704e1ef8a48659bb718",
+      "size_bytes": 3512
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.cc",
+      "sha256": "fa4a784f847e9d85a19b9f871c4c23a78b8de630a7300546a4a2551db0d257cd",
+      "size_bytes": 428353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/ZoneEquipmentManager.cc-174-192.source",
+      "sha256": "e8b86dd273c54407d244fa62f7ed2857b30b9d8da2a0baa518b2b5195cadca36",
+      "size_bytes": 955
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_initialization.rs",
+      "sha256": "bcf2267c28d19eb75417aaaf99324d9dd05cbb9c09b3c7a74a67985a3a3525b6",
+      "size_bytes": 18353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/source_initialization.rs.diff",
+      "sha256": "d0b188a1d5efb43db10c8007bbc39d533148c8f52985ee95d3e7338442f5e6f5",
+      "size_bytes": 18797
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "3cb250a0154e17760795da879688730db59e89743148a1a18c6cce71b3aa8aad",
+      "size_bytes": 4696
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/source_initialization/files.rs.diff",
+      "sha256": "6ce7fc99b6812c86efcb51e12466f20ece22c22a400b638d3df948173513e153",
+      "size_bytes": 4967
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "6d123b98eaf5795b326d8748fcbc7322eae4f14f1cb2423e2786fa79dfaff3e5",
+      "size_bytes": 21457
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "6d123b98eaf5795b326d8748fcbc7322eae4f14f1cb2423e2786fa79dfaff3e5",
+      "size_bytes": 21457
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "9321a69350be93979f7d58b0adc23107ebe2696a28e7a4fcbbfeb3481e6478f6",
+      "size_bytes": 8356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs.diff",
+      "sha256": "c46f32d922538b2fef9aa3119c0402dd2514ea80389077d53ecaa0f82d12986b",
+      "size_bytes": 16898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/setup_postludes.rs",
+      "sha256": "14aa590cabc3220b45bb7a8c889a7ff7c7634381fb12d63c3e9a14fc55b69b4a",
+      "size_bytes": 9158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/proposed/crates/ep_runtime/src/heat_balance/setup_postludes.rs",
+      "sha256": "14aa590cabc3220b45bb7a8c889a7ff7c7634381fb12d63c3e9a14fc55b69b4a",
+      "size_bytes": 9158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/setup_postludes.rs",
+      "sha256": "c527dbb1c5e891128aa73e47c71d6c4443e6da08762f336f25f061a399f9afc9",
+      "size_bytes": 3815
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/setup_postludes.rs.diff",
+      "sha256": "e693b1fe0d98dcfac8174dcaae948886cc7ee4398d6d1d34260a87a2b0608054",
+      "size_bytes": 7368
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "sha256": "7c275e0496cea92cf01f5e8a2b374629ee085891444a88cfd9485d86dae07525",
+      "size_bytes": 8318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "sha256": "1487f6d623e0429232e11f14b4c022dea88797503a77b16f03de542f94c198f1",
+      "size_bytes": 8531
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs.diff",
+      "sha256": "d7d07ef023695eb8d684e0ebefc2515f54591fe0f94cb0caca12c582f612322d",
+      "size_bytes": 561
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "774a0e3740c40d07c10dbdbe0a1d03cb715179cdc5f300223249913747e3269b",
+      "size_bytes": 54259
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "aa9e390657e8b6b05fbc9da72ac63018353973c8ce53cc3c65d33705a570f854",
+      "size_bytes": 54268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/state.rs.diff",
+      "sha256": "c1aac16e7eecff51b0941f80ec73a87f3592a34d2250629fbc3d29ca6a6daa75",
+      "size_bytes": 486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+      "size_bytes": 19614
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "9300a1744e71c1367c72d3c3c7f4e74090300292ec0909e5cfce0a54b2aa900a",
+      "size_bytes": 19905
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/psychrometrics/psy02_state.rs.diff",
+      "sha256": "7d5c5b990382d1139d1272f0ea19785217edf2adea1c6557faafa6b95415d0d4",
+      "size_bytes": 649
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+      "size_bytes": 42191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/psychrometrics.rs.diff",
+      "sha256": "5da6b9615b98feeb79d9e09a3997949559044edbd123ba7d6206c737c43853e5",
+      "size_bytes": 572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs",
+      "sha256": "352e0972d142d3d19ca4ceb9923d7d2b547c0c54709bc07e68badf94e0b620ea",
+      "size_bytes": 6645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs",
+      "sha256": "170e4efd1d17682fc14c062c42ece042a3873abd4f9b150308a06a8f214ace6e",
+      "size_bytes": 7703
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs.diff",
+      "sha256": "72cf6a463f4eef28f4bb8056d075ca11c4452bb1935b42903fd4a4ca330208de",
+      "size_bytes": 1327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "4176ac740138eaff74efe1eee651e3ed263f06f694c8177b0e62ecb3de82a76a",
+      "size_bytes": 14020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-02/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "520d5ea2a34e26c907965875437408cc9778079f5306540b133e6a7ff043375d",
+      "size_bytes": 14303
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "029205b06474784dab8c7432bd169bc88f7494c55dde5f524bd43577daf1ab08",
+      "size_bytes": 15525
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs.diff",
+      "sha256": "85f75689f017df0f3622801236be5803914759750ed55bd5bd857debf1aa9ea8",
+      "size_bytes": 4469
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/ordinary_schedule_input.rs",
+      "sha256": "28993d947db6e4cb351c18a9b11d604644ca0ac11e1e1440691e26144a258844",
+      "size_bytes": 3407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-02/proposed/crates/ep_run/src/ordinary_schedule_input.rs",
+      "sha256": "28993d947db6e4cb351c18a9b11d604644ca0ac11e1e1440691e26144a258844",
+      "size_bytes": 3407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_run/src/ordinary_schedule_input.rs",
+      "sha256": "9f1b161c612d674449b5edf48fa8b88627ddcaec9626339e620b9d6a06ee9608",
+      "size_bytes": 3498
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_run/src/ordinary_schedule_input.rs.diff",
+      "sha256": "ce74b89458e387fab5a61e5f14e6514b0dc78c0ce58ce230c5a8573083f8becc",
+      "size_bytes": 1417
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+      "size_bytes": 14880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "ef62b70551446784b7ed1b561757b14e6fd39939e607d2a4dd04cc99b9c3a962",
+      "size_bytes": 15059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/weather_day/context.rs.diff",
+      "sha256": "c5270e3c1ecca2561b5a3b19cf34a83f0f0ad9268b3c6522eb30be97491e77be",
+      "size_bytes": 921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+      "size_bytes": 18107
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "c4d68db2582f8083d542806566ca750e790c3b40f46d2fbffa1110bd5972eef3",
+      "size_bytes": 18157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/weather_day/tests.rs.diff",
+      "sha256": "a0227e27e5396942631e80081ddb8d43dde5713db58f0d90ecc2d1258bf57cf9",
+      "size_bytes": 434
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+      "size_bytes": 22959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "ff4a5378ce003afda78ea18d193ce156cc01cc7baf41f22734a50f8019ced47a",
+      "size_bytes": 23764
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/weather_day/lifecycle.rs.diff",
+      "sha256": "fae3e1ae42990a1ec0532cabb1d81bc800724fc29e3df5b5ff5ea95189d1b90a",
+      "size_bytes": 3090
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+      "size_bytes": 21027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "07f3570a17a869ed9dd7200c799ecc93286987460ef3c19330ecbce327595c45",
+      "size_bytes": 21586
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/weather_day/production.rs.diff",
+      "sha256": "92a7cd40275d36d02a92b0c72c4eb659e67acea168399d5011a2a650481bc7f5",
+      "size_bytes": 1467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/time_axis.rs",
+      "sha256": "433c570ad19bc14a245c6e72601898dfec053d6a7f0622924be460ec5001ab8b",
+      "size_bytes": 44262
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/time_axis.rs",
+      "sha256": "8f498ca583e4ad4c05a88b9dc9b46af6624ee78dbf676acd4fb39196ffcf4e0e",
+      "size_bytes": 44273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/time_axis.rs.diff",
+      "sha256": "e7e40ea3ac4094946450ea8d9c23aef569d5718a482de4e3eb6f9b12888fb199",
+      "size_bytes": 362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "e792f4b6a0c7099f8e4f8f0e9c473a82d36b74ad45aff724b112e41f3342ec02",
+      "size_bytes": 29602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "245e03128d44bba392e5def2d36694546148ad85c5d70ff7802ae4da7d6299df",
+      "size_bytes": 29735
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/runtime.rs.diff",
+      "sha256": "974ecb53dceb57b8e57668b1eef36461857ba93875055b3a560a68d94614a2ce",
+      "size_bytes": 738
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+      "size_bytes": 16257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "4e798c06c2dbbbba9436265a2dcc9d09626bd544f46a28b18eb203f7a6128f95",
+      "size_bytes": 17994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs.diff",
+      "sha256": "e97915ac91039897a1ee6b03b361fe782bbdd043c265d520b60c26b95c0fafbe",
+      "size_bytes": 2288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+      "size_bytes": 2432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "21f35161f6a186d59642fab380101cd34c88269cf46ab04f41a971c2b1b85ba6",
+      "size_bytes": 2693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_runtime/src/heat_balance/mod.rs.diff",
+      "sha256": "c78717cdf37f4be0848adaa1cd68622042f0c72b2637a74366d3dcf75bd0d136",
+      "size_bytes": 549
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+      "size_bytes": 6212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "967c60fd8f2958f0478bd0ccd955c3b51626bf14b1f69cd28337cf7db8fc4e4d",
+      "size_bytes": 13975
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_run/src/ctf_initialization_outputs.rs.diff",
+      "sha256": "a946c184b92e22ad5d35272efa9231d9b441acdb680e572150e56087c82f08a5",
+      "size_bytes": 9526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/pipeline.rs",
+      "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+      "size_bytes": 825011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "f83add915f29841c70bd734e5dc1f9b8ea6c159703168e75906219ee11203799",
+      "size_bytes": 828192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_run/src/pipeline.rs.diff",
+      "sha256": "05b0af70bbef640a0fa809afde0e8623ad8923396227626560afdbcdc7a3d0c1",
+      "size_bytes": 10986
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/lib.rs",
+      "sha256": "35992c0395c3cf0a5cd2666896073aced2217c82f1b53bb60ad7289b2f6481c3",
+      "size_bytes": 1140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/proposed/crates/ep_run/src/lib.rs",
+      "sha256": "9269b5cee70ac24be8a20992bc4f051a64b53ff0ffb20e1709962a572c88f699",
+      "size_bytes": 1196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/diffs/crates/ep_run/src/lib.rs.diff",
+      "sha256": "8288bc65ed422eae5d6dd673061f85a83ae4b242f3340a211486996272bf7bec",
+      "size_bytes": 281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-02/proposed/crates/ep_runtime/src/heat_balance/selected_project_data.rs",
+      "sha256": "be4b8c07f2895445c75af2d37b71c43cead8441bc78d1237c0bd867ae8422f88",
+      "size_bytes": 5814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-02/manifest.json",
+      "sha256": "1d49fbb9339ba75efa81b2020b6ff206a8e303dcbeb699cc76cc75c8e073bca6",
+      "size_bytes": 31156
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_project_data/input.rs",
+      "sha256": "753f84ac7a29a1dc08fe3e269ca02e533a70dcd1b25a0f5ce2c9920f7044555f",
+      "size_bytes": 6842
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_project_data/input/schema.rs",
+      "sha256": "80dec3f13073a7752de3421013eba2dfedc13e59db16dae85ea45a6667fa48c3",
+      "size_bytes": 2653
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-02/proposed/crates/ep_runtime/src/heat_balance/selected_project_data/getter.rs",
+      "sha256": "3f6ec3a8ce2450fd0b9b6bb1de3129b4e65d14a3d6c499b9b0c5044ea52de540",
+      "size_bytes": 18083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_project_data/environment.rs",
+      "sha256": "04e684e4f785f6d903bb6080236cbd4eed9d2884a5d025df3ad57c44151ffc54",
+      "size_bytes": 3157
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_globals.rs",
+      "sha256": "f6a830603986609cb2423415c2e2f3446b602f4a1751288bcdd10bba75cc07e8",
+      "size_bytes": 2470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/proposed/crates/ep_run/src/ordinary_project_data.rs",
+      "sha256": "e067bc01d0422e02773f9790397c22452c62a16157dd2d7aca32dfc2fb30c320",
+      "size_bytes": 4442
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_fluid_properties.rs",
+      "sha256": "c2b845d7b3c78fe39923f30e934f11017a0e8840f02890e3b5994d73599d23c8",
+      "size_bytes": 10808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/manifest.json",
+      "sha256": "ca779e0c66fca7c23092914126c87e5cfd4dc2fc83fc8d70f2edb6f602808428",
+      "size_bytes": 27435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_fluid_properties/owners.rs",
+      "sha256": "5068170b0c776176fa0ec105dd6e123b43b9b58d447a1cf72f6e40ed1e0552ec",
+      "size_bytes": 6645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_fluid_properties/limits.rs",
+      "sha256": "ccca80dbd228b2cb94d14d90a1857358a772c1b711ab8ed8c09a0e0c3250be40",
+      "size_bytes": 5093
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_fluid_properties/glycol_data.rs",
+      "sha256": "e0d382ee5e979733d4a5e7f46b5d92e00bff998ecf77b25817b4df9e7c41fa2d",
+      "size_bytes": 25276
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_fluid_properties/water_steam_data.rs",
+      "sha256": "cb12b931886a070d33ad1ce1568fe23a92c84ea767d51f47cefb3e71317990b3",
+      "size_bytes": 12252
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-02/manifest.json",
+      "sha256": "d5f44a2d9e761cf19bf88c473682f8d1a7429f806892cf3e1dfe4d64a7ef0368",
+      "size_bytes": 26804
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-02/manifest.json",
+      "sha256": "5179d27573e7d4f01477c4e6114b710d2eca6b71c3526cb63f0ef34bc83b909b",
+      "size_bytes": 14616
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-02/manifest.json",
+      "sha256": "6f009ae60a4f4ff53a26e71bc35ff9d1731f3ba5199a7530a5f01e03018ce214",
+      "size_bytes": 10082
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/manifest.json",
+      "sha256": "b33d4b74754916e9ceacdc90653c5e3e56720fb15b5a8f49d999a02c05893266",
+      "size_bytes": 16827
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/README.md",
+      "sha256": "017658e065ef91f91ca5363af1b3d0c90bbba499296fd01f58de8a7cca2c22cd",
+      "size_bytes": 6203
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/review.json",
+      "sha256": "9c6f42681835dd9c2e4c8b74e4ab6c8af5a717cec101fa5f44a4e03df0981921",
+      "size_bytes": 11580
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-six-handler-assembly-Header-01.py",
+      "sha256": "59031722f8e7f64457dd5ca9cfd2e3903ab8d22ee8a7d521ed5e5915ec7ebf89",
+      "size_bytes": 49552
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/Data__EnergyPlusData.cc-579-594.txt",
+      "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+      "size_bytes": 607
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/Data__EnergyPlusData.cc-840-859.txt",
+      "sha256": "5b2636e61f60df0ab00b9c9fe300c6f42e77a22c5f0fc5f951dbc8c404f21879",
+      "size_bytes": 870
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/SimulationManager.cc-174-244.txt",
+      "sha256": "3f75e93a2aac241bac398e8a9de4913769d5a4ad80d3e4cb88de1dfb214d8871",
+      "size_bytes": 3713
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/SimulationManager.cc-1734-1768.txt",
+      "sha256": "f26ff864c20b166ff4ca09c06830d1d62102ece2b50e4235675689007bd4fa1d",
+      "size_bytes": 1474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/api__EnergyPlusPgm.cc-280-300.txt",
+      "sha256": "23424350c3435c33b5b51de2cb48d5f53c548445bae55ee86fd7583af165afb0",
+      "size_bytes": 760
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/Psychrometrics.cc-110-138.txt",
+      "sha256": "79b6035b85002e026cd108c7c3dfa055c5064098344eacdbd0ed4324aeee841d",
+      "size_bytes": 917
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/IOFiles.cc-259-314.txt",
+      "sha256": "d5ed1571b68d31608c20b99db98aee88858463296e6622a710d0210a26cdb991",
+      "size_bytes": 1552
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-Source-review-01/ScheduleManager.cc-312-327.txt",
+      "sha256": "58571bab1e7f1ffa8110b2ae1ff087f021794ff51952ae608ff67f3ba5584462",
+      "size_bytes": 727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-01/review.json",
+      "sha256": "60ad5466a5b074fab141cd6f1e0f68262c5bb7712e5b8b4671fbf4b3c0a01098",
+      "size_bytes": 2853
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/cli-test-extension.json",
+      "sha256": "ba11808248096847520c755e29f566af7387045cde72adf07052d06b864c1667",
+      "size_bytes": 1548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-01/receipt.json",
+      "sha256": "3d8257130248aadb00f247eb76b99558f60962353336aee651163da147e6933b",
+      "size_bytes": 6165
+    },
+    {
+      "path": ".runtime/porting/source-objects/20/207a1a09e99cfdc4527968c9abe024ac01708ccf4eb7ed3570b1bd65350e9b5c",
+      "sha256": "207a1a09e99cfdc4527968c9abe024ac01708ccf4eb7ed3570b1bd65350e9b5c",
+      "size_bytes": 1654884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-02/review.json",
+      "sha256": "fbc0245d28407077ee9a6ef68f7c74a929207af784c90c25f78ec1344db9d5dc",
+      "size_bytes": 2572
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-lint-fix-01.json",
+      "sha256": "4ebe79fa6ea7381554f007b2657753088e840ed8f774907b8d1aa4abf325aef5",
+      "size_bytes": 1532
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-01/receipt.json",
+      "sha256": "4c45ae11419c918a26bf446d98629dbea15999d8e2200bd176986a1f33fd31f1",
+      "size_bytes": 6214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-six-handler-application-review-03/review.json",
+      "sha256": "b734493f2606b9e43da40aca238caf57cc281bb963ebd8485e24bfde42ccfc8a",
+      "size_bytes": 4122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-01/receipt.json",
+      "sha256": "3b2e49ac0290fbd1080933d37b01c617597862e331f7d6121d8cf4c7f37558d7",
+      "size_bytes": 6254
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-01/stdout.log",
+      "sha256": "ba160dbb444668ca0f6fe5021e36636afbb01374ecaaaa6c985ac867104faf05",
+      "size_bytes": 662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-01/stderr.log",
+      "sha256": "535d80760dcfe41e0fce2d9b5c741e82bce15b051cfa4864ecd24b8c37105879",
+      "size_bytes": 699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/diagnostics.json",
+      "sha256": "6dc6eae9389658a9b2b03349608c6939c22bf01c8d2466b2602c7ba1bd81ad6f",
+      "size_bytes": 810
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/34.cli-proposed",
+      "sha256": "c514556d69ec0898df8a265dafe991d1838ac82759643b116afd88a1860b9e5d",
+      "size_bytes": 36612
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/35.cli-proposed",
+      "sha256": "5771d3e2dd695e86bcf49a470959510c61adde490458fba2cd9154070c5b6069",
+      "size_bytes": 3644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-six-handler-Root-01.py",
+      "sha256": "2c3f38d7c4f2aa451e7256d0731d9b21094c7b604cff300fef4310b70e0cdfde",
+      "size_bytes": 4724
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/36.equipment-proposed",
+      "sha256": "dc9b0a2e69f8296de601f7cde43faf3cd7b584bb844d935cb895d3a77d654fe4",
+      "size_bytes": 22591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/one-zone.epJSON",
+      "sha256": "2ba2d1107c2f6596afe7ee4aa00cd03dbedc9f9b1a817333f838ee4d72468e3f",
+      "size_bytes": 1297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.audit",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.bnd",
+      "sha256": "28b18821a42c76161c0fc92059e9805e1846a0a81e0949e6821a3fef6f73d888",
+      "size_bytes": 40
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.ctf.err",
+      "sha256": "75e239b4d0cde1024055f6e1f759e461ff4015a6c30a5df790d650b96a2b1ddf",
+      "size_bytes": 268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.ctf.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.eio",
+      "sha256": "7a0f3b501f9bc330ac5cf868c6472e8c28f0ce1755474d7ffd2abf18d295ba24",
+      "size_bytes": 1100
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.err",
+      "sha256": "08fffe0a0febb189f5075c606227c2cdb26ef403aca34506511e5df25d05c8ac",
+      "size_bytes": 584
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.eso",
+      "sha256": "28b18821a42c76161c0fc92059e9805e1846a0a81e0949e6821a3fef6f73d888",
+      "size_bytes": 40
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/eplusrs.mtr",
+      "sha256": "28b18821a42c76161c0fc92059e9805e1846a0a81e0949e6821a3fef6f73d888",
+      "size_bytes": 40
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/input/converted.epJSON",
+      "sha256": "2ba2d1107c2f6596afe7ee4aa00cd03dbedc9f9b1a817333f838ee4d72468e3f",
+      "size_bytes": 1297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/input/input-hashes.json",
+      "sha256": "192ffb5117d8a924b940b4aa44b910e3ec2276f99d9992282de33fc79482094b",
+      "size_bytes": 737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/input/original.epJSON",
+      "sha256": "2ba2d1107c2f6596afe7ee4aa00cd03dbedc9f9b1a817333f838ee4d72468e3f",
+      "size_bytes": 1297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/model/execution-plan.json",
+      "sha256": "ad5153c3c42b7156bbaf740d3404d8e1e41552ede521c61de5856b8d8e4bf235",
+      "size_bytes": 20169
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/model/graph-summary.json",
+      "sha256": "0ce31704cf1db1bafceb0a08a1b06374aa8cb7564de980c59e815ab4cc41344a",
+      "size_bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/model/raw-model-summary.json",
+      "sha256": "63fce4f07b03f61e7a17d08ccd3ec336a35b4bbeb9efc267367d49eec0c7ef59",
+      "size_bytes": 362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/model/typed-model-summary.json",
+      "sha256": "cc043c15c6eb1958d9667442aa8b29d56e0e5ddf5447c87528b5facee2ef71d4",
+      "size_bytes": 2440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/reports/run-report.md",
+      "sha256": "976508129a53f4639c9924c212b27c7ad99e565d82a29456f581c3b8c0e03f11",
+      "size_bytes": 547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/run-summary.json",
+      "sha256": "c99b95990b5f6e34b027a49dad352f7cd5d3411ad95f3752e35ab2cb40c4b8f0",
+      "size_bytes": 9942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/support-assessment.json",
+      "sha256": "c7aacc376c88efb7109153585947edc40c7d975aaf32538c8a6ea5e127892f36",
+      "size_bytes": 4279
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/out/support-report.md",
+      "sha256": "4863224906d78ecfe5647a81467b963125f75695f2ff750b888b82e2695a814f",
+      "size_bytes": 1080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-03/failed-ci-case/weather.epw",
+      "sha256": "565ad5fd6e780055591ee27d28aa10024c98096fe0f768f81f0506be1d6745cd",
+      "size_bytes": 2923
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fix-six-handler-equipment-clock-Root-01.py",
+      "sha256": "4afadb375e0ba16b49e832864dca207af4ec09561ca6e636de31b41a4afb4940",
+      "size_bytes": 4403
+    },
+    {
+      "path": ".runtime/porting/SRC-06/extend-six-handler-cli-tests-Root-01.py",
+      "sha256": "76457a7367d8fb93c11f5301a59974d8832244ae04dff5c8388d0dae77e0f405",
+      "size_bytes": 4267
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fix-six-handler-lints-Root-01.py",
+      "sha256": "387481f9ab0b9f212f99dd8ed9104a387c349a9239b492112c561882d1fd8487",
+      "size_bytes": 3055
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "size_bytes": 168527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.cc-195-241.txt",
+      "sha256": "b939d36ba405f8d2197d361ee6f21747f94d002311a2c055642324f61244c601",
+      "size_bytes": 2512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.cc-820-886.txt",
+      "sha256": "a7b53332763fa02bf7ae6e2e44c606b701cc6e5aa063d659185869d60b4e38bd",
+      "size_bytes": 4556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.cc-1106-1192.txt",
+      "sha256": "357516e035e84e011d491f1ac05a7161b3eaaee4934f5b2a4cf38489bcd0cd0a",
+      "size_bytes": 5490
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.cc-1541-1705.txt",
+      "sha256": "c9744bbf6ea3b7b51d60d3809ea46db2e75152fc09f1b86f4e9dd0ae641e196e",
+      "size_bytes": 10335
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.cc-2801-2818.txt",
+      "sha256": "ef0b59eb990c049f3d5bc1b494490c5c83657bb013a6bf694f6bf3b1ff4bdd8d",
+      "size_bytes": 1172
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.hh",
+      "sha256": "3bae57633d9a906b51f68de345008daf96125d8af1c22ea9c0ca9f73a67a463e",
+      "size_bytes": 5752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SimulationManager.hh-100-113.txt",
+      "sha256": "a4ef23f5755b8d67f6ac75139457c74e50208fb72e466fcf7ca4e47d13109d66",
+      "size_bytes": 347
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+      "size_bytes": 60978
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Data_EnergyPlusData.cc-579-595.txt",
+      "sha256": "4791a94d500e6995e61b686dadb0b4ba7c88ba1effab55b12551ec073bc629a4",
+      "size_bytes": 658
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Data_EnergyPlusData.cc-840-1099.txt",
+      "sha256": "75d87beedc7b895914225ff38af27d7009337d8be7b6352027cf0877647e8d08",
+      "size_bytes": 12639
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21",
+      "size_bytes": 28491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Data_EnergyPlusData.hh-600-612.txt",
+      "sha256": "7d114abbd4b955ad10cb50681fa643998fddd0fbe9fda4ffb5be575795e208d9",
+      "size_bytes": 542
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EMSManager.cc",
+      "sha256": "b5626bf87617a9cf4d9aa523dc4975fc4a148b2d69fe2daad17d00c07f9649b4",
+      "size_bytes": 128968
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/EMSManager.cc-124-245.txt",
+      "sha256": "2cd26258d3b120d662229a7f9098198e3b26cd83e970b0f2c57d3428fb5b4e5a",
+      "size_bytes": 7798
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EMSManager.hh",
+      "sha256": "93c71e31ef957d3b65062834c2ab7626245507e919be5ff791b0b9b31b9c0f28",
+      "size_bytes": 9962
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/EMSManager.hh-202-213.txt",
+      "sha256": "64c7b9eb850ac75110881dcdf5ea5a79611e7b1e4e5b73848ef38dfb66b632dc",
+      "size_bytes": 317
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRuntimeLanguage.hh",
+      "sha256": "23956875a5223d1302fed2f0006b92b5ffd82ef5391de339f898d6ddf3839316",
+      "size_bytes": 43065
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataRuntimeLanguage.hh-749-782.txt",
+      "sha256": "c398171384237bc60977e170e27746a8a066de4d023e6a35b43b9145531aef44",
+      "size_bytes": 3113
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+      "size_bytes": 23158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/ScheduleManager.hh-506-524.txt",
+      "sha256": "02d8251f11101e03296fbcc5b01eece717e51b4cd66a224b86db7f4a82cad6e3",
+      "size_bytes": 558
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "size_bytes": 108928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Psychrometrics.hh-1710-1725.txt",
+      "sha256": "5283c2d6bfa7512ad40af0ccc1b4d994dc90ea1667785937ec0052d2cd95f7f5",
+      "size_bytes": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FluidProperties.hh",
+      "sha256": "45651603d5fcc6e590f0298131989bd118935b5da7a2ece50d5ac2fb00e9b04f",
+      "size_bytes": 35759
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/FluidProperties.hh-602-612.txt",
+      "sha256": "120759f97ef45957214cd143cda270d99f4989044cf584d32971e5468beda134",
+      "size_bytes": 217
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CurveManager.hh",
+      "sha256": "1faa93d1b1b9629a4848cf889290cb5eb5b61f24b62d0f3751848e9755d95b36",
+      "size_bytes": 25681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/CurveManager.hh-455-468.txt",
+      "sha256": "0dc8474ab3a1d475efd0182f97c179e8a16b28165f65231a8e354e5c90ff71dc",
+      "size_bytes": 316
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+      "size_bytes": 13547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataGlobals.hh-117-186.txt",
+      "sha256": "eed5f6beba20b2faa366128c384f186c22a9152e0abfe26fd3008cecd605b630",
+      "size_bytes": 6411
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "size_bytes": 24717
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataHVACGlobals.hh-491-501.txt",
+      "sha256": "c23748049376634baa1e41b1dfe239c4f4a4fd99d9349e893d730716090c6710",
+      "size_bytes": 875
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataHVACGlobals.hh-538-550.txt",
+      "sha256": "62d98a1d02502d209169e9486504e6b083d22d72218c6b9c1315b0d9a9a3f446",
+      "size_bytes": 301
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+      "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+      "size_bytes": 225982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/OutputProcessor.cc-253-280.txt",
+      "sha256": "4ce4601c246a370cf6bf4cdb80d93df5fb97de0a76913d92157abe17724ed9bf",
+      "size_bytes": 1269
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+      "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+      "size_bytes": 55700
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/OutputProcessor.hh-182-197.txt",
+      "sha256": "2925f189e688a892fbaba0c6062e4fd5b7ecb57e6bc1c52306e81a4f71739f2e",
+      "size_bytes": 456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/OutputProcessor.hh-421-426.txt",
+      "sha256": "18b8671c75befe1a756a81a716d168b0dabe063fee887d1b743feaeefbb9bd75",
+      "size_bytes": 220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/OutputProcessor.hh-970-980.txt",
+      "sha256": "49ec48bed40602f7deb0e82b7de59ef8ad06f4f2ecfba0bc3679e1f9fb9e6745",
+      "size_bytes": 212
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "size_bytes": 122929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/InputProcessing_InputProcessor.cc-305-324.txt",
+      "sha256": "c6af0e866a50ca6822423dd3183f0dc2c087e5a9b04195a5224256bd3ce2f23e",
+      "size_bytes": 601
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/InputProcessing_InputProcessor.cc-487-504.txt",
+      "sha256": "4e38996175fc14dd472f3f1e3e338b93efaa8049398852207df02a16853f4727",
+      "size_bytes": 686
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/InputProcessing_InputProcessor.cc-797-893.txt",
+      "sha256": "a2f627baa6979fd2bc4d6bf35edc0dac6ed712c81013b0c90bd2daf14ab6682b",
+      "size_bytes": 4062
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/InputProcessing_InputProcessor.cc-932-1082.txt",
+      "sha256": "a74f570214930a677bba915b703ce8a7f12d527b039c1e4137f8f858d670bbc8",
+      "size_bytes": 6408
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658",
+      "size_bytes": 66243
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/General.cc-1130-1469.txt",
+      "sha256": "dd854e449424fb4d1b1bf1ddc719712ae631b1042b3cc081a6eb66401897b021",
+      "size_bytes": 18398
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/HeatBalanceManager.cc-446-491.txt",
+      "sha256": "494dff49e226bec56dfef6ce975d258eca02b99481a3f452070196527a95857a",
+      "size_bytes": 3046
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataHeatBalance.hh-1780-1792.txt",
+      "sha256": "401966264dcb109372a3919aa29767c78e4646bc023bf8e4cd58322ec0395c03",
+      "size_bytes": 465
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Plant/PlantManager.cc",
+      "sha256": "0c9ccc31f07dc40d6b5841ff6785dbe3afe6a400d525456d9cc8e1fec032adeb",
+      "size_bytes": 287255
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Plant_PlantManager.cc-4562-4594.txt",
+      "sha256": "0cd5c6bc63c88040c6d45cc749279dd0ba727d0d22183aa71c5f91770ecbc58c",
+      "size_bytes": 1164
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Plant/DataPlant.hh",
+      "sha256": "245704d15481a9c6c399e09d725db548edbff520039af3d051eacce77830b0a5",
+      "size_bytes": 22215
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/Plant_DataPlant.hh-411-425.txt",
+      "sha256": "3adcbf8977d8427758456fe51c164d49648a157395747a19a9069bce410f1045",
+      "size_bytes": 986
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PlantPipingSystemsManager.cc",
+      "sha256": "6ab951aff094499ac0befb5b0c90b18699fd1c89b1582d259e046b61c1dff58f",
+      "size_bytes": 317614
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/PlantPipingSystemsManager.cc-124-145.txt",
+      "sha256": "720fb2cd118053b9fd84ea4ddefb015fb39699efdc2a7879284265ae43e6d892",
+      "size_bytes": 908
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SetPointManager.cc",
+      "sha256": "bf8343f8e5136adfd1b036ea737ec1d0526f409e6329826ed6ee2d9ad73ebde9",
+      "size_bytes": 250708
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/SetPointManager.cc-4543-4559.txt",
+      "sha256": "50c5e94100cc85b4f1c2ff30dddae80e26871cf22f55c233bc6493940d85317f",
+      "size_bytes": 696
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FileSystem.cc",
+      "sha256": "d63d42179e8d96a90fd1651f20c0f87f720322ed04b45941397f38d421213c9d",
+      "size_bytes": 17648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/FileSystem.cc-289-292.txt",
+      "sha256": "ad1a26a34538a0e1485e833c551c3b5b5048d1ea3eda88a5dbf10f2bc7a5ea1e",
+      "size_bytes": 126
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+      "size_bytes": 198904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/HVACManager.cc-190-211.txt",
+      "sha256": "f364f6bd8d1c695bb6fc5d96d4fb9908dedaa041b3684dd7684b9ef28460b5b3",
+      "size_bytes": 956
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PluginManager.cc",
+      "sha256": "4df126820bd132fa4c75ebc8479106632916aa886a3229c06f0c8f53beb1fc48",
+      "size_bytes": 79253
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/PluginManager.cc-134-147.txt",
+      "sha256": "531fb3ccbd45ab6760d731bff58de03742d3029c09735bdbdcc1af33c267f68b",
+      "size_bytes": 461
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "size_bytes": 16816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-simulation-startup-checks-prep-01/Original/DataEnvironment.hh-215-228.txt",
+      "sha256": "63b9aec7e79c8b857cbc821c55fcfe0e215949890ba7d1747afc38d40b5a9dd8",
+      "size_bytes": 374
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/00-SimulationManager.cc-622-1510.txt",
+      "sha256": "7a95b718433a08ae816d67f64963f2201951b9f01db80cd09973bc2d55790494",
+      "size_bytes": 55812
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/01-SimulationManager.hh-93-119.txt",
+      "sha256": "8c84e8e0837fdad5bbe88bf623aafca935788e90e9819f11ffaf09af923172a9",
+      "size_bytes": 665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/02-InputProcessor.cc-543-582.txt",
+      "sha256": "579206b7537e9ca5587a2685482f590618a17d7ef8a9129b69eae747ca3dc798",
+      "size_bytes": 1513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/03-InputProcessor.cc-726-742.txt",
+      "sha256": "30489490887c41d4a17dbb17312f205ca8a71be0678f8a1732c54721a283fa4a",
+      "size_bytes": 599
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/04-InputProcessor.cc-747-906.txt",
+      "sha256": "8654072b58f60e61b04bfb15108cb137fe7def90418bd9d4cf787db7cb81da28",
+      "size_bytes": 7219
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/05-InputProcessor.cc-932-1083.txt",
+      "sha256": "44c6020e46ff43253b296575ae366088b1c6f166840533987bf23f833159eeb2",
+      "size_bytes": 6514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/06-DataGlobals.hh-106-165.txt",
+      "sha256": "c315a20cbd0e2944bc1e474e7214bf099f8bac88da12594b9647501a3f94e7e7",
+      "size_bytes": 6508
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/07-DataHVACGlobals.hh-474-503.txt",
+      "sha256": "0d921c1763c668499627c4c1404ea4716cf9cf08deae2edf5c0c53f572119d08",
+      "size_bytes": 2457
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/08-DataConvergParams.hh-173-180.txt",
+      "sha256": "e9321764fc2644fb8e65ac5700e7f8ebdbef2f047de04205fd7923b4fd62c7c4",
+      "size_bytes": 534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/09-DataReportingFlags.hh-62-72.txt",
+      "sha256": "f84904cb4fa2a9a2664c0c0d84dbe7eea1505d7a78d1ed4e8de24a509d5700e7",
+      "size_bytes": 709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/10-DataHeatBalance.hh-1803-1842.txt",
+      "sha256": "42acfccaf1503821388edf91cc0171caa325e33a84efd488b95cffb10137f2f1",
+      "size_bytes": 3904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/11-DataEnvironment.hh-196-215.txt",
+      "sha256": "b4f7d8b5e9034b4c8c4537d3c1df88877de777b653ad18d7dcebffac782872bd",
+      "size_bytes": 1490
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/12-DataSystemVariables.hh-96-154.txt",
+      "sha256": "ae29e81e97eff792fc4d9e9c6a8455ecdaa609cb4a6c82c5378e0f3b59202dd4",
+      "size_bytes": 3676
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/13-DataSystemVariables.cc-78-114.txt",
+      "sha256": "f86155f7804c9a6aaec8dc0c82e12bb82295c47599aa95fb35d178d0a39800df",
+      "size_bytes": 2782
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/14-DataSystemVariables.cc-204-359.txt",
+      "sha256": "3b1d8f305a4b1aeaaee51d07b353248c974c71eb720dd4ff67d262d7c4029b70",
+      "size_bytes": 6417
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/15-UtilityRoutines.cc-691-702.txt",
+      "sha256": "4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e",
+      "size_bytes": 369
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/16-DataStringGlobals.in.cc-62-86.txt",
+      "sha256": "94dd11217aed9b53ea16c369e804655e0e81e64a146f590b68391d50e23c1eb9",
+      "size_bytes": 634
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/17-IdfParser.cc-259-303.txt",
+      "sha256": "c9fb5b34ae234dfff8cfe2874b510b7d0081365837f9e204c0b36e85faa7c840",
+      "size_bytes": 2088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/Original/18-Version.cmake-1-3.txt",
+      "sha256": "a0673b924f552fe91265c562dcbb8e9a18b09d2fcdb60aea6f1841512af00a56",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/Energy+.schema.epJSON",
+      "sha256": "60b24d904e6fa553f773b38037a8a09730e6da1538647df552cd77db8d6704a9",
+      "size_bytes": 10568550
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-project-data-prep-01/schema-excerpt.json",
+      "sha256": "b609194b749a68b909461efdcd00800297746f4d3dae80241cc6ecd64bd3b7f2",
+      "size_bytes": 10295
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/01-SimulationManager-199-214.txt",
+      "sha256": "200a8266c21e19d23d17547e0552b3ce6aff7b9cc39b57e266b35ea49720fd49",
+      "size_bytes": 854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/02-EnergyPlusData-579-594.txt",
+      "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+      "size_bytes": 607
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/03-EnergyPlusData-840-857.txt",
+      "sha256": "bc0d31cc194aec2c5080b73957b61b3ebd1f206d96285d8ea100da23bd97c1eb",
+      "size_bytes": 827
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/04-FluidProperties-70-184.txt",
+      "sha256": "275624e73ab5e74783c5661de5cd52f854bcb9ece3a33148144c781e96d76697",
+      "size_bytes": 6149
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/05-FluidProperties-240-357.txt",
+      "sha256": "7eb68ce63b0538d19435d4284562880ea1f18531317384325450b5f5eec59022",
+      "size_bytes": 6333
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/06-FluidProperties-388-393.txt",
+      "sha256": "94064910f2f198af7d94161e80e04ed5bc64ccb97f6d8356089144861adcd2d1",
+      "size_bytes": 112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/07-FluidProperties-577-609.txt",
+      "sha256": "44efa5ebc0f606e4bdf469244452eb4c728557a73dbf92a0d8f5be5920256733",
+      "size_bytes": 1235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/08-FluidProperties-105-508.txt",
+      "sha256": "b9cd1f2d5ad5df91e30ae9b3ee69350903e8150f92b55e299b5d87423ba19d55",
+      "size_bytes": 43695
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/09-FluidProperties-509-675.txt",
+      "sha256": "9c4d43a230fe6ddfc35d1461cad382cdeadbce0d51cb384f167ee1969e2b8609",
+      "size_bytes": 8199
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/10-FluidProperties-677-840.txt",
+      "sha256": "12e4aa10cd23a9f721d6ac359a41f8faf7d0ac8eede8970f7334911c1242986e",
+      "size_bytes": 8915
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/11-FluidProperties-1013-1081.txt",
+      "sha256": "bb129eb8b437a357234f242c05badaa5a33434ecd40877c4f31b07700b73c699",
+      "size_bytes": 3319
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/12-FluidProperties-1243-1394.txt",
+      "sha256": "30d4ebfb125a63ce38ecd587b08319d493ea08ba35bea18c489dc17798ebf9ef",
+      "size_bytes": 7660
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/13-FluidProperties-1525-1571.txt",
+      "sha256": "591fa885321ded39bf959d93ded2febf90a6391c881a5d72763ff1263c395227",
+      "size_bytes": 2681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/14-FluidProperties-1683-1690.txt",
+      "sha256": "3586ee28cc49689a7be48918fddce737d7733976bb954f19151ab8f8e8a81fe6",
+      "size_bytes": 488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/15-FluidProperties-1847-1879.txt",
+      "sha256": "480ebe252941c23182ee88c6198929477ef3bbbdecdaf30b68ca54479210d56a",
+      "size_bytes": 1255
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/16-FluidProperties-1979-2246.txt",
+      "sha256": "f3261c3f472e8550377d7e200d242e637ba14e8912911d81010c29f3072d8ebd",
+      "size_bytes": 11218
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/17-FluidProperties-4706-4764.txt",
+      "sha256": "da1c09d06d7c303bca5b30292e616370a70f09ad92d825420722f312d2d36c84",
+      "size_bytes": 2159
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/18-FluidProperties-5064-5071.txt",
+      "sha256": "db1515e760783ce401a597c51060bfca2b0c5c9d817c3bea5b48ec8386af5fba",
+      "size_bytes": 645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/19-FluidProperties-6169-6175.txt",
+      "sha256": "4d7a5c302a0cce5315be2b73340778c2b48e13006632551cdcd8228f8dc004d0",
+      "size_bytes": 757
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/20-FluidProperties-7019-7022.txt",
+      "sha256": "0b2ea9adef3ea638632cf114cb4316daf64e6d5b078a364f8a9a50f25b99a18a",
+      "size_bytes": 305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/21-UtilityRoutines-268-272.txt",
+      "sha256": "0f8f36bec0e607deeccbf977766741bc7d1d768ad8ea6796cd1a4278cdcd2707",
+      "size_bytes": 66
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/22-InputProcessor-487-533.txt",
+      "sha256": "0eefeccf3d56cb1f81d8c9dc95e4a0dafabf6e7ff5c7a1a3b6f453d1a16c5aeb",
+      "size_bytes": 1808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/23-Array1D-164-177.txt",
+      "sha256": "f863aaeea24dfe9e8258d31bc64cbca660aab34ee78f157427712586025681c8",
+      "size_bytes": 261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/24-Array1-147-158.txt",
+      "sha256": "409fef3a66fdb2b468b48d17ada5d5fa9efdaecb904a5daf34ee202338d02da1",
+      "size_bytes": 263
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/25-Array-191-211.txt",
+      "sha256": "3fd4c4affc5cba380277d7d1fbb0f0292af39f97cc1df3defd0219b5985dd27f",
+      "size_bytes": 574
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/26-Array1D-952-968.txt",
+      "sha256": "83c32025f875fdc53cc0f933330f542e7ca08202837ed70ffcba31281f5d36d7",
+      "size_bytes": 263
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/27-Array1D-1380-1391.txt",
+      "sha256": "6e30ed5292d168e282dda65b82d1ac0b02ffe32892383dd87ee0d4c5f79ef623",
+      "size_bytes": 294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/28-Array1D-1441-1449.txt",
+      "sha256": "c0a18e02648c3e46036b128de753c6cc46d837b5ae07169ce255e2141f1628ba",
+      "size_bytes": 179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/29-Array-1990-1998.txt",
+      "sha256": "c90974b018e21be843976453989bc308f513ed962a40b594bf3643be0f9abe54",
+      "size_bytes": 268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/30-Array2D-155-168.txt",
+      "sha256": "70f98316203abe5ec2e6193ebc72a89fd38045ae89e68ed40b4f744ee9e5189e",
+      "size_bytes": 296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/31-Array2-147-164.txt",
+      "sha256": "61fe2b7dd78de29d697542e14de0e8cd72c675351955dbb57c43f2ee0ef5ee85",
+      "size_bytes": 410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/32-Array2D-611-648.txt",
+      "sha256": "f0815d9414f369f0164eef117f71c58dffdd7d82ace03bc7a17b64368bce9b1f",
+      "size_bytes": 742
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/33-TypeTraits-633-666.txt",
+      "sha256": "e65ddef97d3bc9fab1110d9139930ccdc70e8b7ed9434345bd194b0e74cda2ed",
+      "size_bytes": 661
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/34-AlignedAllocator-55-66.txt",
+      "sha256": "b680f9b0b50844ed82687181b5003288f79a84fdcbf2db708cb12d8e242d5a2a",
+      "size_bytes": 355
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-audit-01/Original/35-CompilerFlags-1-3.txt",
+      "sha256": "f050c301bd1336aee78fc8da16fea8d46ea43282327039f06cdccc471f124617",
+      "size_bytes": 293
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-fluid-properties-prep-01/Original/FluidProperties-1174-1184.txt",
+      "sha256": "2f1927a2255a541fe9ca021bed63a319ad39c946ff5e71b7fccb3190b0584191",
+      "size_bytes": 450
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+      "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+      "size_bytes": 187792
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-241-258.txt",
+      "sha256": "f67a48e463644ee4bb21d949a2affc0e3de3bd020ff32a8d27cdfa50f59bd5cb",
+      "size_bytes": 799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-278-295.txt",
+      "sha256": "cca87fccc62b9087e55376b61ab86066a1f2c4b973ada446aafee15ed7396872",
+      "size_bytes": 716
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-312-328.txt",
+      "sha256": "153a419dbe8dda9482dfd5ce6fde7026ed1fb6fee83e0488175054a38218dbaa",
+      "size_bytes": 745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-410-525.txt",
+      "sha256": "64034f4118c33533d932c7f17f7b12247eba39ec9e787e4a78d6c021cfc211c2",
+      "size_bytes": 6214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-553-556.txt",
+      "sha256": "3ae0db6f871a470d14ce6c7c663be753e6fa92e2f577ebe950548fdd62fc898c",
+      "size_bytes": 178
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-718-798.txt",
+      "sha256": "dc7ccb6061be2244291c39b4abc8d960dd3fd5028d6aecf17b16c99b04c6e938",
+      "size_bytes": 3527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-1961-2003.txt",
+      "sha256": "39e8e8d754f8a0d53a21502c9fccb0c2f705cd141198a729aa69d0741e1a785c",
+      "size_bytes": 2289
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-2198-2264.txt",
+      "sha256": "586993218e85bf72da53f50ce2b87a20b96e1245d12956a60417f096c2498a3b",
+      "size_bytes": 3272
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-2549-2553.txt",
+      "sha256": "a2e58f7139244408e3722587f87e89d0e2e1d8e45e209b25100d16704fe60b09",
+      "size_bytes": 144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.cc-2670-2677.txt",
+      "sha256": "5e3772c7bb1e2f38e0029dc97ecef0f2084ce7e3e96c01710f73ff2695fbd2bd",
+      "size_bytes": 230
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.hh-68-74.txt",
+      "sha256": "22b3a7eb4c26088c5486ae5ff9e5b37e1678bf482665d462248f66455707bb68",
+      "size_bytes": 183
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.hh-136-250.txt",
+      "sha256": "7c0a5ae0ff5aed18b1d2755e23e0846bbbd9f0eea78f44ce15606618394aa39e",
+      "size_bytes": 4042
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.hh-281-295.txt",
+      "sha256": "d95b60545c3697e253a811cbca5e252859c4883f5b49562fbdf8dbb566eb5e2b",
+      "size_bytes": 557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-ScheduleManager.hh-491-525.txt",
+      "sha256": "6e772601a56073e6574ec18c34c79f065c855de77f16e559bce8a0cd5a05fb52",
+      "size_bytes": 1260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-EnergyPlusData.cc-579-594.txt",
+      "sha256": "e873037cebdd1facf95225759c42413810abff269393609d3d25d87e6eb43130",
+      "size_bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-EnergyPlusData.cc-840-858.txt",
+      "sha256": "dd6712e7b7866aeecf7367a72dddea1ba595bec62f6d24ec10ba5e980ead7f2d",
+      "size_bytes": 847
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-01/Original-SimulationManager.cc-195-224.txt",
+      "sha256": "ad44835728dc428d55fa1bda26b91e1c2326525486303c10216a75f963886f1b",
+      "size_bytes": 1677
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-02/Original-ScheduleManager.cc-3388-3412.txt",
+      "sha256": "b362dc723bd3324511494278f50463da4d9933aaca887319bc4bad1d43ad0a23",
+      "size_bytes": 1269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-schedule-manager-prep-02/Original-ScheduleManager.hh-249-264.txt",
+      "sha256": "043cdd66fc4fe8bdd57ea5d3e23b3d74b03e7db6fb2612c5264311501c6ba821",
+      "size_bytes": 472
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/IOFiles-212-234.txt",
+      "sha256": "a2c7198df331e77386c65215d250cd73e2cbeee2fb3099409341e11c2ccd500d",
+      "size_bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/IOFiles-277-294.txt",
+      "sha256": "9b00558a7ea746bb6b71ae2530270aa08b77d22a1acd44537b826051684a67b5",
+      "size_bytes": 590
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/IOFiles-468-495.txt",
+      "sha256": "f875d3146e611584d9d3691f91b58460a4ebeeb43dfd4fdd1e3e78977a0af726",
+      "size_bytes": 942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/IOFiles-549-595.txt",
+      "sha256": "6bd755b840813e34688bc2b5074462a5efc1434fb5ecf19f2889d7908e9b6150",
+      "size_bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/ScheduleManager-710-723.txt",
+      "sha256": "bd658dc0869c772d44051ad530ee4a8df9746aab4b5b3fd77e7febf2c2a54ddf",
+      "size_bytes": 563
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/ScheduleManager-2258-2268.txt",
+      "sha256": "593ec83dcfa728aafad49c016b50bb7d5893e6299519099d3dd33d6bcd67e233",
+      "size_bytes": 355
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/SimulationManager-1734-1762.txt",
+      "sha256": "bcc90634852a725dbf33e19b69b460b5515ef35b17a8b9d6fb815263fd306425",
+      "size_bytes": 1338
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/CommandLineInterface-484-497.txt",
+      "sha256": "d1b068f1f07a5fcbad9a2ee96b2e2a14fa96a5d92fe85e2c1f983cfe06ad860d",
+      "size_bytes": 719
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-audit-file-host-prep-01/Original/IOFiles-758-777.txt",
+      "sha256": "6c909307463a44a5d41d17a3cee49e1da6d1d7c9eef92fd01ea024eb0cd3c6d3",
+      "size_bytes": 839
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-93-134.txt",
+      "sha256": "637f9ca37277c04cc5c86edf153b868c58622536191c64728cd274ff432996db",
+      "size_bytes": 1560
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-994-1095.txt",
+      "sha256": "10b6b4ea69b3b8569953b22d79252fdf586350e6303c13da58ce2fdce9075479",
+      "size_bytes": 5249
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1285-1411.txt",
+      "sha256": "28cdc7497e4c34fb2d269344495da05f25b1bf9ccc54ae0b5f95f604e1220736",
+      "size_bytes": 7318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1459-1489.txt",
+      "sha256": "0b08e73fed515caf2188db7ff7ed1d02bc637b7b28ca5d844d24b728206998f4",
+      "size_bytes": 1709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1525-1555.txt",
+      "sha256": "7803d865d5cc2187be7f55de09e039f7d5afde498abe7b10180da7907436b374",
+      "size_bytes": 1381
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1697-1797.txt",
+      "sha256": "12b320fffcd65c458281f7be43a76bd1301185f40c77f5ab0c935a1ac76d768b",
+      "size_bytes": 5197
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1915-1953.txt",
+      "sha256": "ff988f8b127a9a7fd61e4088dfd7a62370f8315e9d018cac255f9d152e151c66",
+      "size_bytes": 2682
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-1956-2067.txt",
+      "sha256": "fad26f0fdabd8ca4d9b11919692bf6fe142824e3da09847bcdca891abe00f451",
+      "size_bytes": 5665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-2167-2207.txt",
+      "sha256": "78763abf7486b8f61414561079cd630f1a357df2eff36755822d8ab27df12a82",
+      "size_bytes": 2790
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.cc-2459-2544.txt",
+      "sha256": "f5eb7f158efa867f6faf4a8eaf7529d65c026b2211fba431da9a1362b11e6a2a",
+      "size_bytes": 4691
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/BranchInputManager.hh-306-312.txt",
+      "sha256": "67f0eeff148c57cce6ce8f753258f314eeab4fddd66bc5838bc6825a4bcdfe86",
+      "size_bytes": 456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/PluginManager.cc-490-496.txt",
+      "sha256": "eb7f3ac2e2ad350b4eaf91f00faafbc7714062000d59f7d231c1f14eb6ac3223",
+      "size_bytes": 428
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/PluginManager.hh-172-212.txt",
+      "sha256": "aeebac3622058fdaacbef2af4b4d7442862e04ba03ba3fcd039233e87fef2dea",
+      "size_bytes": 2356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/ReportCoilSelection.cc-76-79.txt",
+      "sha256": "c251e30728ee30263aacb2d6ac584da01d2701d27f73122aacdad34175bab107",
+      "size_bytes": 159
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/ReportCoilSelection.hh-222-231.txt",
+      "sha256": "54c8f35217f58d8c37bee27b6315ce8effd824253bd678e57e36a36e74d441c2",
+      "size_bytes": 192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/ReportCoilSelection.hh-438-457.txt",
+      "sha256": "d02df105b89029730777e21e41f58a3fe184824ee478372c000b942f3a35d35f",
+      "size_bytes": 737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CostEstimateManager.cc-110-175.txt",
+      "sha256": "c4d16854140a7c33ff1404e35c16d433f3dda81d76de43f437ad1c8422c523b7",
+      "size_bytes": 2264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CostEstimateManager.hh-164-190.txt",
+      "sha256": "6df27fac23d655e3b04cdf5226c1602c50ec5c7490d71c99258341d282a3ffae",
+      "size_bytes": 1500
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/FaultsManager.cc-125-141.txt",
+      "sha256": "993e80c0ef0086fbd220bc600c05583dc4e5b184a8750bfe3875724e9c623b7a",
+      "size_bytes": 1245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/FaultsManager.cc-203-299.txt",
+      "sha256": "63e89774d6feccd6646af99892549cd60aec8e8651a03e61abfb4883d492dbef",
+      "size_bytes": 4957
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/FaultsManager.hh-385-435.txt",
+      "sha256": "7d2f992807989f0135f44b7a165adb840ba39bb13d805489b9b443567c13ab63",
+      "size_bytes": 2863
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-650-754.txt",
+      "sha256": "8de1c76fb6653f6ccf81a625bbcb14db70a4c90264632fcc6b89a906820a1604",
+      "size_bytes": 7480
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-755-2370.txt",
+      "sha256": "6c236ba519c9c3b0015aaf6933ab9ffa7c04c511c80cfb9630453a270d3d55f6",
+      "size_bytes": 92524
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-2371-2392.txt",
+      "sha256": "f2e56f9fb553cae66c014d4fc0faf25cb4a9262c9358fd37be766fd0d1effe40",
+      "size_bytes": 1558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-2393-2722.txt",
+      "sha256": "68a895453638ffdd4307722f3b17620565d096e49b116a66937120664685fa66",
+      "size_bytes": 19472
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-2842-2925.txt",
+      "sha256": "4c2625e989650723f17c718f4e9bd8edb1bef73e7b200f750eb30489d263ae53",
+      "size_bytes": 4452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.cc-3414-3498.txt",
+      "sha256": "0eca117cd6264bb468e2256a29641db1362419b644f9be7e1b4da28bcd7cd5ac",
+      "size_bytes": 4267
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.hh-223-255.txt",
+      "sha256": "5c49334e7fc694cbe66bfb816bae50501fcf5bb90c2262ed0142e02be401b591",
+      "size_bytes": 1512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/CurveManager.hh-447-468.txt",
+      "sha256": "e6ac88be36be8734d2648d5978a8b78e1992bd33e5482aad48ee1d600c050c84",
+      "size_bytes": 573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/SimulationManager.cc-199-281.txt",
+      "sha256": "f295d8bc1b8fdade4d79e17687c22e15c71e0ac76f2d8cc25a014fbfed660c75",
+      "size_bytes": 4179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/Data__EnergyPlusData.cc-579-594.txt",
+      "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+      "size_bytes": 607
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-services-prep-01/Original/Data__EnergyPlusData.cc-840-858.txt",
+      "sha256": "352b94df50c5db498a226082f3160705208f3a087cccb4b8d6bd9fd93e0bbc60",
+      "size_bytes": 828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/source-index.json",
+      "sha256": "ef6bc5553179eac819dd42187eab5f21559e3dd80f554376dd4c289307ae86fc",
+      "size_bytes": 966971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/README.md",
+      "sha256": "6e8d96481c77bd8755b2ef2741bf11e6eedcd578bcfb4653f5b63c8c818f3392",
+      "size_bytes": 2275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-BaseData.hh-55-61.txt",
+      "sha256": "4d58c5a6cf2c8f24bbd6ba3a18d8c324557cc0fb4fb80914ca63c48469ec7ecd",
+      "size_bytes": 261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-EnergyPlusData.hh-603-614.txt",
+      "sha256": "d4b7cffec1ac9bbeaf1a2043e6aaed69f7e6cf792e9f38dbd48ccd01539e9cbc",
+      "size_bytes": 396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-EnergyPlusData.cc-311-316.txt",
+      "sha256": "119af8cedf042b6264307bc41e8bddba42b2d325628857a6da6dffd7083b7213",
+      "size_bytes": 182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-SimulationManager.cc-203-216.txt",
+      "sha256": "782b1936b9dc1835fc8d4b50988bb2f165b65e1ba3e37b9a3ac741cd915a399f",
+      "size_bytes": 880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-Psychrometrics.cc-110-134.txt",
+      "sha256": "d5f82af56c939670da609d314846f42be482d6c52eef7262693d98b92027e114",
+      "size_bytes": 790
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-PsychCacheData.hh-75-154.txt",
+      "sha256": "51a5bdaff4b75dca812072882c2328c09ae6217121737e7a7fc340c92bcda6f8",
+      "size_bytes": 1704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-Psychrometrics.hh-72-82.txt",
+      "sha256": "571750df0c21a5fde33149692e1ceb2113e9264cce51fdd0081d053b7c3d7df1",
+      "size_bytes": 318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-init-guard-audit-Header-02/Original/supplement-ScheduleManager.cc-312-327.txt",
+      "sha256": "58571bab1e7f1ffa8110b2ae1ff087f021794ff51952ae608ff67f3ba5584462",
+      "size_bytes": 727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-project-data-Source-review-02/review.json",
+      "sha256": "29298a3eea9817b105f132a5599cfa8e6dd7ed8828effbcf51a1b3057699ee97",
+      "size_bytes": 1652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-fluid-properties-Source-review-01/review.json",
+      "sha256": "b53f1867520fd710a8cfd179a707d10df23cea38a6ee12af27fe060a2bf3d878",
+      "size_bytes": 3284
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-run-services-Source-review-01/review.json",
+      "sha256": "e6da7bf556e9a1272838a624685f63c302ba3b13913452064035b8859bcbe084",
+      "size_bytes": 3406
+    },
+    {
+      "path": ".runtime/porting/SRC-06/audit-init-guards-Header-02.py",
+      "sha256": "b6c5907da0d0a29aef96f775025d5a56075f8ecd22db3cf0af0b31d72d755263",
+      "size_bytes": 11237
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-init-guard-audit-Header-02.py",
+      "sha256": "7b773c0ef9647472b15ce86dc420a6f60cc95f8d2456defc2952f813d8965123",
+      "size_bytes": 11335
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/templates/source_initialization.rs",
+      "sha256": "32abf225fa62298ca9c001700f01971d2030fb1ae448662de17b54ea77a400ac",
+      "size_bytes": 18193
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/templates/files.rs",
+      "sha256": "3cb250a0154e17760795da879688730db59e89743148a1a18c6cce71b3aa8aad",
+      "size_bytes": 4696
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-03/receipt.json",
+      "sha256": "2d6af58ee6b8c8f505c6673e37c2fa5c788b3e2014c48a59442c0380a702167b",
+      "size_bytes": 6295
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-03/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-03/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/29/29be17da9f5e9cbaf9ac8cbc47913ddebfac121226093acefe385c984515f4b8",
+      "sha256": "29be17da9f5e9cbaf9ac8cbc47913ddebfac121226093acefe385c984515f4b8",
+      "size_bytes": 1654884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-03/receipt.json",
+      "sha256": "975e31dde146bfca887248b6815f1c5e59da5c93764fc253440081628c5f49c6",
+      "size_bytes": 6342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-03/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-03/stderr.log",
+      "sha256": "dd46b8a16500a8754b9447bd7c9e45308bb957267967a3ddbb77d595dceb5e98",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-03/receipt.json",
+      "sha256": "eb74f90828de18d2a9f9036e759d862833c074fc03472277bb21872c4085d809",
+      "size_bytes": 6344
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-03/stdout.log",
+      "sha256": "1bfcada3813c48488bbb33568157984c0c811ecce1dd52b432b7da772405692b",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-03/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-runtime-tests-01/receipt.json",
+      "sha256": "6f9349f79b812fe01eddfc5c308f8e0d77b19bb7b5874e607de4408b8780c01b",
+      "size_bytes": 6305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-runtime-tests-01/stdout.log",
+      "sha256": "df3bb03751cfab7f6a27baad5d95e7999abc7af50e57ecc2005a636e4f6e777c",
+      "size_bytes": 1852
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-runtime-tests-01/stderr.log",
+      "sha256": "fe80fd86a8cb995436f30eb26c0f4ddc2115101c74246cd4d2016998b06fcfa9",
+      "size_bytes": 308
+    },
+    {
+      "path": ".runtime/porting/source-objects/59/59192f3a1eb35f4e718c43e9203d9f1471431f3774447f8a3ac03c2d4075ba27",
+      "sha256": "59192f3a1eb35f4e718c43e9203d9f1471431f3774447f8a3ac03c2d4075ba27",
+      "size_bytes": 1654884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-02/receipt.json",
+      "sha256": "a59b8e8b04c48f027cc915aeb0c6df66a638a7cdcaebf530b340d1e0978193a4",
+      "size_bytes": 6431
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-02/stdout.log",
+      "sha256": "295eb11ccd2585038c0191bf9cd859421a86519664e883c3e8752a518cbaadac",
+      "size_bytes": 352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-02/stderr.log",
+      "sha256": "64bb3ea978891603a230bc2dd06a01aae57d87633c4e2b70d587461765cbf9e7",
+      "size_bytes": 402
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-02/receipt.json",
+      "sha256": "432664245ac184a596c3fad08e2ca3f38bcbb83215eb4e5d9dbeda9e4648c1dd",
+      "size_bytes": 6382
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-02/stdout.log",
+      "sha256": "2e2ca109fbebbf476f5cf6d2c5dd8c3b5051152ba37dfec53d8b2de15e6bdf3b",
+      "size_bytes": 170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-02/stderr.log",
+      "sha256": "ed0c2f3859ea22fbdc8a6bc9450ac3e62c5b096ef92c2b689e91b04a04980e37",
+      "size_bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-02/receipt.json",
+      "sha256": "78339174d8ec9a555b9d9060d4ed71794a8b59979f2eaf53fb06b03ae827014d",
+      "size_bytes": 6384
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-02/stdout.log",
+      "sha256": "9caaa37f76d120c4cff69bd75d400f58060e149efb6e1e9826204110920b8942",
+      "size_bytes": 258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-ci-timestep-tests-02/stderr.log",
+      "sha256": "516a4babc44a0f4cfb8829c24b8211c21e84c9d98f840824907b8d3895a413b1",
+      "size_bytes": 152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-01/stderr.log",
+      "sha256": "8d1e107310b8a0b59c79d13ae546557c42406378ef0e0ee3b4233bcc4f0b52c2",
+      "size_bytes": 2482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-01/receipt.json",
+      "sha256": "189c3c5ef2ce89f08adac15a14a48582d6c2de21f5ec26a76e07e5f283ae32ca",
+      "size_bytes": 6214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-01/stdout.log",
+      "sha256": "1bfcada3813c48488bbb33568157984c0c811ecce1dd52b432b7da772405692b",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-02/receipt.json",
+      "sha256": "3f80a1548815db145a6295c43b2b17ac256ae28955f9d61ee04ef28277c865e0",
+      "size_bytes": 6165
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-fmt-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-02/receipt.json",
+      "sha256": "593f8d456501ab97a7d1e07ba89ec5fbfe3d584bba7b02f07050c9453a2f507c",
+      "size_bytes": 6212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-clippy-02/stderr.log",
+      "sha256": "6ff5f936f1bc3bdc61ab429f8c63a49386aa54583892bdd2c908bab15d1df10e",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-01/receipt.json",
+      "sha256": "265bb60424bbe035e8def4e104585e3ebf391146e2d522823e27061f185f486a",
+      "size_bytes": 6299
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-01/stdout.log",
+      "sha256": "ec1be9563de629b7e99004d126f7d3808e32cc9e0ecd0df5ee3d8abd2c31b81d",
+      "size_bytes": 352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-input-output-tests-01/stderr.log",
+      "sha256": "7da51e39d434ca45dceda52d5c9b9d95161a7b3bf5dc8142f5cda96751670219",
+      "size_bytes": 348
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-01/receipt.json",
+      "sha256": "77b319b260ad0586432e9c3e992879fd97f3d6096a158d1bd3e079d4521cf476",
+      "size_bytes": 6252
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-01/stdout.log",
+      "sha256": "b1db5f10d1b988abc166a89a07283dc4a41e2fcb36ef37b2884930470c694fdf",
+      "size_bytes": 170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-six-handler-cli-tests-01/stderr.log",
+      "sha256": "c43998e60335d5a46b9c9ab904103a5b235f242e74f75ba044af18c970dc7eef",
+      "size_bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-six-handler-Root-01.py",
+      "sha256": "db69c4cc661b18ba13ccf045ff5fd861f70ef931f99ad5cb9bb4d569315c0903",
+      "size_bytes": 15731
+    }
+  ],
+  "historical_references": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/source_initialization.rs",
+        "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+        "size_bytes": 20646
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/00.after",
+        "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+        "size_bytes": 20646
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/setup_postludes.rs",
+        "sha256": "70298de9d5b711eb3db6c079b229480b5ead62d5db1f0407889b7c2056d628dd",
+        "size_bytes": 4135
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/03.after",
+        "sha256": "70298de9d5b711eb3db6c079b229480b5ead62d5db1f0407889b7c2056d628dd",
+        "size_bytes": 4135
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_fluid_properties/glycol_data.rs",
+        "sha256": "726b4352bbab21d4d71f09571086b01d7a52e9c8fc113435db8195d61903691b",
+        "size_bytes": 26027
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-01/32.after",
+        "sha256": "726b4352bbab21d4d71f09571086b01d7a52e9c8fc113435db8195d61903691b",
+        "size_bytes": 26027
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/source_initialization.rs",
+        "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+        "size_bytes": 20646
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-02/00.after",
+        "sha256": "c42e629a013c801e6f4600550d615cb4613c094d44ae14767dc4bbce1486c477",
+        "size_bytes": 20646
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "sha256": "7c275e0496cea92cf01f5e8a2b374629ee085891444a88cfd9485d86dae07525",
+        "size_bytes": 8318
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "sha256": "7c275e0496cea92cf01f5e8a2b374629ee085891444a88cfd9485d86dae07525",
+        "size_bytes": 8318
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "774a0e3740c40d07c10dbdbe0a1d03cb715179cdc5f300223249913747e3269b",
+        "size_bytes": 54259
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "774a0e3740c40d07c10dbdbe0a1d03cb715179cdc5f300223249913747e3269b",
+        "size_bytes": 54259
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/psychrometrics.rs",
+        "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "size_bytes": 42191
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics.rs",
+        "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "size_bytes": 42191
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs",
+        "sha256": "352e0972d142d3d19ca4ceb9923d7d2b547c0c54709bc07e68badf94e0b620ea",
+        "size_bytes": 6645
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/psychrometrics/psy02_state/tests.rs",
+        "sha256": "352e0972d142d3d19ca4ceb9923d7d2b547c0c54709bc07e68badf94e0b620ea",
+        "size_bytes": 6645
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+        "size_bytes": 14880
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "73b0d8aeb38fc4abd5306fa6bf00422ac48f971895fe93a8a44e9e74b38383cf",
+        "size_bytes": 14880
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+        "size_bytes": 18107
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "4348f6dd28543c3945fbd94d6424538fba3f84b79d1428d2e368e4af37efd02b",
+        "size_bytes": 18107
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+        "size_bytes": 22959
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "ce0979ee2e62f123aebd3ebd4c58abd05d045a46073c6302079a286abd83a938",
+        "size_bytes": 22959
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+        "size_bytes": 21027
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "46b3bfeaace1571038ffb2fa83fcc405c46412b22778557d50909818deb92c85",
+        "size_bytes": 21027
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/time_axis.rs",
+        "sha256": "433c570ad19bc14a245c6e72601898dfec053d6a7f0622924be460ec5001ab8b",
+        "size_bytes": 44262
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/time_axis.rs",
+        "sha256": "433c570ad19bc14a245c6e72601898dfec053d6a7f0622924be460ec5001ab8b",
+        "size_bytes": 44262
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "e792f4b6a0c7099f8e4f8f0e9c473a82d36b74ad45aff724b112e41f3342ec02",
+        "size_bytes": 29602
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/runtime.rs",
+        "sha256": "e792f4b6a0c7099f8e4f8f0e9c473a82d36b74ad45aff724b112e41f3342ec02",
+        "size_bytes": 29602
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+        "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+        "size_bytes": 16257
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+        "sha256": "7ac101a228e7fe8e0eed8bd47bf38f04c384bda302780d4cc161d5b1cbe3de96",
+        "size_bytes": 16257
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+        "size_bytes": 2432
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "a1b99a5e540ca68c98774db82f07f12adc15fcdcca158d2d07175a71d603d08f",
+        "size_bytes": 2432
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+        "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+        "size_bytes": 6212
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/ctf_initialization_outputs.rs",
+        "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+        "size_bytes": 6212
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+        "size_bytes": 825011
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/pipeline.rs",
+        "sha256": "a8572191dd5301d9d5123c2a152d8f674d128d7c5d6d08a2c3d2d62f09ba4441",
+        "size_bytes": 825011
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/lib.rs",
+        "sha256": "35992c0395c3cf0a5cd2666896073aced2217c82f1b53bb60ad7289b2f6481c3",
+        "size_bytes": 1140
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-six-handler-assembly-prep-01/before/crates/ep_run/src/lib.rs",
+        "sha256": "35992c0395c3cf0a5cd2666896073aced2217c82f1b53bb60ad7289b2f6481c3",
+        "size_bytes": 1140
+      },
+      "qualification": "Historical canonical reference resolved to the immutable full assembly/held bytes with the identical SHA."
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-source-initialization/evidence.zip",
+    "sha256": "af1a777b2ff6b0f26f5e1dacc6215d30d7775924b22eee1a111310ee9ecd7bf4",
+    "size_bytes": 4103705
+  },
+  "archive_member_count": 795,
+  "archive_scope": "37 active before/after/full diffs, finite dependency Source literals/schema, guard audit metadata, independent reviews, actual QA receipts/logs/Source snapshot indexes and24 complete failed CI case files. Other historical dependency Rust proposals and249 complete guard-closure files remain referenced provenance; not a transitive whole-workspace/Native replay bundle.",
+  "gates_updated": false
+}

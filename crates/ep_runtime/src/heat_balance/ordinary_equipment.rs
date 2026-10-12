@@ -32,6 +32,16 @@ pub struct OrdinaryEquipmentInput {
     timesteps_per_hour: usize,
 }
 impl OrdinaryEquipmentInput {
+    /// GetZoneEquipment uses the effective DataGlobal clock after GetProjectData.
+    /// This updates only that operand; the admitted family inventory is unchanged.
+    pub(crate) fn apply_source_timestep(&mut self, steps: usize) -> Result<(), Unavailable> {
+        if steps == 0 || steps > 60 || 60 % steps != 0 {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        self.timesteps_per_hour = steps;
+        Ok(())
+    }
+
     /// Five count-query families, NodeList, then three actual .find families.
     pub const FAMILIES: [&'static str; 9] = [
         "ZoneHVAC:EquipmentConnections",

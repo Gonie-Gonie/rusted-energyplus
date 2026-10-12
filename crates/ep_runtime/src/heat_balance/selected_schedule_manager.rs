@@ -1,0 +1,442 @@
+//! Actual constant-only ScheduleManager initialization, separate from derived caches.
+use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnavailable};
+use super::source_initialization::ScheduleAuditFileHost;
+use ep_model::ScheduleUnitType;
+use std::collections::BTreeMap;
+
+/// Actual source-ordered ScheduleTypeLimits getter values after raw admission.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SourceScheduleTypeInput {
+    /// Exact original object-map identity used by InputProcessor unused tracking.
+    pub object_name: String,
+    /// Getter uppercase name.
+    pub name: String,
+    /// Number field presence, preserving the constructor value when blank.
+    pub lower: Option<f64>,
+    /// Number field presence, preserving the constructor value when blank.
+    pub upper: Option<f64>,
+    /// Entered uppercase numeric-type key; used only when both bounds are present.
+    pub numeric_type: Option<String>,
+    /// Entered nonblank unit, otherwise the actual retained Invalid constructor state.
+    pub unit: ScheduleUnitType,
+}
+
+/// Actual source-ordered Schedule:Constant getter values after raw admission.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SourceConstantScheduleInput {
+    /// Exact original object-map identity used by InputProcessor unused tracking.
+    pub object_name: String,
+    /// Getter uppercase name, separate from built-in schedule names/indices.
+    pub name: String,
+    /// Getter uppercase type name, absent/blank retained for explicit selected stop.
+    pub type_name: Option<String>,
+    /// Actual number or schema default +0.0.
+    pub value: f64,
+}
+
+/// Sole admitted source projection; no precomputed schedule-result table.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct SelectedScheduleInput {
+    /// Actual type declaration order.
+    pub types: Vec<SourceScheduleTypeInput>,
+    /// Actual constant declaration order.
+    pub constants: Vec<SourceConstantScheduleInput>,
+}
+
+/// Native ScheduleManager index, never a typed user ScheduleId alias.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct SourceScheduleIndex(pub(crate) usize);
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedScheduleType {
+    pub(crate) name: String,
+    pub(crate) number: usize,
+    pub(crate) is_limited: bool,
+    pub(crate) min_value: f64,
+    pub(crate) max_value: f64,
+    pub(crate) is_real: bool,
+    pub(crate) limit_units: ScheduleUnitType,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedConstantSchedule {
+    pub(crate) name: String,
+    pub(crate) number: SourceScheduleIndex,
+    pub(crate) is_used: bool,
+    pub(crate) min_value: f64,
+    pub(crate) max_value: f64,
+    pub(crate) is_min_max_set: bool,
+    pub(crate) schedule_type_number: Option<usize>,
+    pub(crate) ems_actuated_on: bool,
+    pub(crate) ems_value: f64,
+    pub(crate) current_value: f64,
+    pub(crate) timestep_values: Vec<f64>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedMissingDaySchedule {
+    pub(crate) name: String,
+    pub(crate) number: usize,
+    pub(crate) is_used: bool,
+    pub(crate) min_value: f64,
+    pub(crate) max_value: f64,
+    pub(crate) is_min_max_set: bool,
+    pub(crate) schedule_type_number: Option<usize>,
+    pub(crate) interpolation: i32,
+    pub(crate) timestep_values: Vec<f64>,
+    pub(crate) sum_timestep_values: f64,
+}
+
+/// One retained real manager, including actual built-ins and selected user objects.
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedScheduleManager {
+    pub(crate) check_min_max_run_once_only: bool,
+    pub(crate) do_schedule_reporting_setup: bool,
+    pub(crate) schedule_input_processed: bool,
+    pub(crate) schedule_file_shading_processed: bool,
+    pub(crate) schedule_types: Vec<SelectedScheduleType>,
+    pub(crate) schedules: Vec<SelectedConstantSchedule>,
+    pub(crate) day_schedules: Vec<SelectedMissingDaySchedule>,
+    pub(crate) schedule_type_map: BTreeMap<String, usize>,
+    pub(crate) schedule_map: BTreeMap<String, SourceScheduleIndex>,
+    pub(crate) day_schedule_map: BTreeMap<String, usize>,
+}
+impl Default for SelectedScheduleManager {
+    fn default() -> Self {
+        Self {
+            check_min_max_run_once_only: true,
+            do_schedule_reporting_setup: true,
+            schedule_input_processed: false,
+            schedule_file_shading_processed: false,
+            schedule_types: Vec::new(),
+            schedules: Vec::new(),
+            day_schedules: Vec::new(),
+            schedule_type_map: BTreeMap::new(),
+            schedule_map: BTreeMap::new(),
+            day_schedule_map: BTreeMap::new(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) enum SelectedScheduleError {
+    Input(SelectedInputUnavailable),
+    Unavailable(&'static str),
+    Audit(std::io::Error),
+    AuditOpen {
+        path: std::path::PathBuf,
+        source: std::io::Error,
+    },
+}
+impl From<SelectedInputUnavailable> for SelectedScheduleError {
+    fn from(value: SelectedInputUnavailable) -> Self {
+        Self::Input(value)
+    }
+}
+impl From<std::io::Error> for SelectedScheduleError {
+    fn from(value: std::io::Error) -> Self {
+        Self::Audit(value)
+    }
+}
+impl std::fmt::Display for SelectedScheduleError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Input(e) => std::fmt::Display::fmt(e, f),
+            Self::Audit(e) => std::fmt::Display::fmt(e, f),
+            Self::AuditOpen { path, .. } => write!(
+                f,
+                "ProcessScheduleInput: Could not open file {} for output (write).",
+                path.display()
+            ),
+            Self::Unavailable(e) => write!(f, "selected ScheduleManager unavailable: {e}"),
+        }
+    }
+}
+impl std::error::Error for SelectedScheduleError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Input(e) => Some(e),
+            Self::Audit(e) => Some(e),
+            Self::AuditOpen { source, .. } => Some(source),
+            Self::Unavailable(_) => None,
+        }
+    }
+}
+
+impl SelectedScheduleManager {
+    fn add_constant(&mut self, name: &str, value: f64, slots: usize) -> SourceScheduleIndex {
+        let number = SourceScheduleIndex(self.schedules.len());
+        self.schedules.push(SelectedConstantSchedule {
+            name: name.into(),
+            number,
+            is_used: false,
+            min_value: 0.0,
+            max_value: 0.0,
+            is_min_max_set: false,
+            schedule_type_number: None,
+            ems_actuated_on: false,
+            ems_value: 0.0,
+            current_value: value,
+            timestep_values: vec![value; slots],
+        });
+        self.schedule_map.insert(name.to_ascii_uppercase(), number);
+        number
+    }
+
+    /// EnergyPlusData's real init_constant_state guard remains caller-owned.
+    /// The actual constructor timestep operand may be zero, as in Original.
+    pub(crate) fn init_constant_state(
+        &mut self,
+        time_steps_in_hour: usize,
+    ) -> Result<(), SelectedScheduleError> {
+        if !self.schedules.is_empty() || !self.day_schedules.is_empty() {
+            return Err(SelectedScheduleError::Unavailable(
+                "repeated init_constant_state outside caller guard",
+            ));
+        }
+        let slots = 24usize
+            .checked_mul(time_steps_in_hour.max(1))
+            .ok_or(SelectedScheduleError::Unavailable("timestep storage size"))?;
+        let off = self.add_constant("Constant-0.0", 0.0, slots);
+        self.schedules[off.0].is_used = true;
+        let on = self.add_constant("Constant-1.0", 1.0, slots);
+        self.schedules[on.0].is_used = true;
+        self.day_schedules.push(SelectedMissingDaySchedule {
+            name: "MissingDaySchedule-0.0".into(),
+            number: 0,
+            is_used: true,
+            min_value: 0.0,
+            max_value: 0.0,
+            is_min_max_set: false,
+            schedule_type_number: None,
+            interpolation: 0,
+            timestep_values: vec![0.0; slots],
+            sum_timestep_values: 0.0,
+        });
+        self.day_schedule_map
+            .insert("MISSINGDAYSCHEDULE-0.0".into(), 0);
+        Ok(())
+    }
+
+    /// The actual getter does not trigger ProcessScheduleInput.
+    pub(crate) fn always_on(&self) -> Result<SourceScheduleIndex, SelectedScheduleError> {
+        self.schedules
+            .get(1)
+            .filter(|s| s.name == "Constant-1.0")
+            .map(|s| s.number)
+            .ok_or(SelectedScheduleError::Unavailable(
+                "init_constant_state prerequisite",
+            ))
+    }
+
+    pub(crate) fn process_schedule_input(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+    ) -> Result<(), SelectedScheduleError> {
+        if self.schedule_input_processed {
+            return Ok(());
+        }
+        self.schedule_input_processed = true;
+        self.always_on()?;
+        let mut max_numbers = 1;
+        let mut max_alphas = 0;
+        for (family, extra_alpha) in [
+            ("ScheduleTypeLimits", 0),
+            ("Schedule:Day:Hourly", 0),
+            ("Schedule:Day:Interval", 0),
+            ("Schedule:Day:List", 0),
+            ("Schedule:Week:Daily", 0),
+            ("Schedule:Week:Compact", 0),
+            ("Schedule:Year", 0),
+            ("Schedule:Compact", 1),
+            ("Schedule:File", 0),
+            ("Schedule:Constant", 0),
+            ("ExternalInterface:Schedule", 1),
+            (
+                "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+                1,
+            ),
+            (
+                "ExternalInterface:FunctionalMockupUnitExport:To:Schedule",
+                1,
+            ),
+        ] {
+            let count = input.get_num_objects_found(family);
+            if count > 0 {
+                let args = input.get_object_def_max_args(family)?;
+                max_numbers = max_numbers.max(args.numerics);
+                max_alphas = max_alphas.max(
+                    args.alphas
+                        .checked_add(extra_alpha)
+                        .ok_or(SelectedScheduleError::Unavailable("local alpha size"))?,
+                );
+                if !matches!(family, "ScheduleTypeLimits" | "Schedule:Constant") {
+                    return Err(SelectedScheduleError::Unavailable(
+                        "nonconstant schedule input",
+                    ));
+                }
+            }
+        }
+        let args = input.get_object_def_max_args("Output:Schedules")?;
+        max_numbers = max_numbers.max(args.numerics);
+        max_alphas = max_alphas.max(args.alphas);
+        // Real getter-local arrays, distinct from dataIPShortCut and its false blanks.
+        let mut locals = (
+            vec![String::new(); max_alphas],
+            vec![String::new(); max_alphas],
+            vec![String::new(); max_numbers],
+            vec![0.0; max_numbers],
+            vec![true; max_alphas],
+            vec![true; max_numbers],
+        );
+        if input.get_num_objects_found("Schedule:File:Shading") > 0 {
+            return Err(SelectedScheduleError::Unavailable("file shading"));
+        }
+        if declarations.types.len() != input.get_num_objects_found("ScheduleTypeLimits")
+            || declarations.constants.len() != input.get_num_objects_found("Schedule:Constant")
+        {
+            return Err(SelectedScheduleError::Unavailable(
+                "raw declaration association",
+            ));
+        }
+        for (family, names) in [
+            (
+                "ScheduleTypeLimits",
+                declarations
+                    .types
+                    .iter()
+                    .map(|row| row.object_name.as_str())
+                    .collect::<Vec<_>>(),
+            ),
+            (
+                "Schedule:Constant",
+                declarations
+                    .constants
+                    .iter()
+                    .map(|row| row.object_name.as_str())
+                    .collect::<Vec<_>>(),
+            ),
+        ] {
+            for (index, name) in names.iter().enumerate() {
+                if !input.has_object(family, name) || names[..index].contains(name) {
+                    return Err(SelectedScheduleError::Unavailable(
+                        "raw object identity association",
+                    ));
+                }
+            }
+        }
+        let audit_path = audit_files.audit_path().to_path_buf();
+        let audit =
+            audit_files
+                .ensure_audit_open()
+                .map_err(|source| SelectedScheduleError::AuditOpen {
+                    path: audit_path,
+                    source,
+                })?;
+        writeln!(audit, "  Processing Schedule Input -- Start")?;
+        for row in &declarations.types {
+            // getObjectItem resets all six getter-local arrays before unused erase.
+            locals.0.fill(String::new());
+            locals.1.fill(String::new());
+            locals.2.fill(String::new());
+            locals.3.fill(0.0);
+            locals.4.fill(true);
+            locals.5.fill(true);
+            input.mark_object_as_used("ScheduleTypeLimits", &row.object_name);
+            if self.schedule_type_map.contains_key(&row.name) {
+                return Err(SelectedScheduleError::Unavailable(
+                    "duplicate type diagnostic",
+                ));
+            }
+            let number = self.schedule_types.len();
+            self.schedule_types.push(SelectedScheduleType {
+                name: row.name.clone(),
+                number,
+                is_limited: row.lower.is_some() && row.upper.is_some(),
+                min_value: row.lower.unwrap_or(0.0),
+                max_value: row.upper.unwrap_or(0.0),
+                is_real: true,
+                limit_units: ScheduleUnitType::Invalid,
+            });
+            self.schedule_type_map.insert(row.name.clone(), number);
+            let retained = &mut self.schedule_types[number];
+            if retained.is_limited {
+                retained.is_real = match row.numeric_type.as_deref() {
+                    Some("DISCRETE" | "INTEGER") => false,
+                    Some("CONTINUOUS" | "REAL") => true,
+                    _ => {
+                        return Err(SelectedScheduleError::Unavailable(
+                            "numeric type diagnostic",
+                        ));
+                    }
+                };
+            }
+            retained.limit_units = row.unit;
+            if retained.is_limited && retained.min_value > retained.max_value {
+                return Err(SelectedScheduleError::Unavailable(
+                    "reversed bounds diagnostic",
+                ));
+            }
+        }
+        let slots = 24usize
+            .checked_mul(time_steps_in_hour)
+            .ok_or(SelectedScheduleError::Unavailable("timestep storage size"))?;
+        for row in &declarations.constants {
+            // getObjectItem resets all six getter-local arrays before unused erase.
+            locals.0.fill(String::new());
+            locals.1.fill(String::new());
+            locals.2.fill(String::new());
+            locals.3.fill(0.0);
+            locals.4.fill(true);
+            locals.5.fill(true);
+            input.mark_object_as_used("Schedule:Constant", &row.object_name);
+            if self.schedule_map.contains_key(&row.name) {
+                return Err(SelectedScheduleError::Unavailable(
+                    "duplicate schedule diagnostic",
+                ));
+            }
+            let number = self.add_constant(&row.name, row.value, slots);
+            let type_number = row
+                .type_name
+                .as_ref()
+                .and_then(|name| self.schedule_type_map.get(name))
+                .copied()
+                .ok_or(SelectedScheduleError::Unavailable(
+                    "blank or unknown type warning",
+                ))?;
+            self.schedules[number.0].schedule_type_number = Some(type_number);
+        }
+        self.schedules[0].timestep_values = vec![0.0; slots];
+        self.schedules[1].timestep_values = vec![1.0; slots];
+        for schedule in &mut self.schedules {
+            let Some(type_number) = schedule.schedule_type_number else {
+                continue;
+            };
+            let limits = &self.schedule_types[type_number];
+            if !limits.is_limited {
+                continue;
+            }
+            // ScheduleConstant::setMinMaxVals: no reduction or epsilon substitute.
+            schedule.min_value = schedule.current_value;
+            schedule.max_value = schedule.current_value;
+            schedule.is_min_max_set = true;
+            // Original ScheduleBase::checkMinMaxVals, inclusive subtraction first.
+            let min_ok = f64::from(f32::EPSILON) >= limits.min_value - schedule.min_value;
+            let max_ok = schedule.max_value - limits.max_value <= f64::from(f32::EPSILON);
+            if !(min_ok && max_ok) {
+                return Err(SelectedScheduleError::Unavailable(
+                    "schedule bounds severe/fatal",
+                ));
+            }
+        }
+        if input.get_num_objects_found("Output:Schedules") > 0 {
+            return Err(SelectedScheduleError::Unavailable("schedule report output"));
+        }
+        drop(locals);
+        writeln!(audit, "  Processing Schedule Input -- Complete")?;
+        Ok(())
+    }
+}

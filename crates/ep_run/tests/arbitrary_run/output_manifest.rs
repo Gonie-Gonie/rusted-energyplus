@@ -77,6 +77,17 @@ pub(crate) fn assert_output_manifest(
     Ok(())
 }
 
+// The ordinary caller reaches real OpenOutputFiles and Schedule audit.
+// Diagnostic/IdealLoads callers retain their existing explicit output contract.
+pub(crate) fn assert_ordinary_output_manifest(
+    output_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut expected = SUPPORTED_RUNTIME_MANIFEST.to_vec();
+    expected.extend(["eplusrs.audit", "eplusrs.bnd", "eplusrs.eso", "eplusrs.mtr"]);
+    expected.sort_unstable();
+    assert_output_manifest(output_dir, &expected)
+}
+
 fn output_file_manifest(output_dir: &Path) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let mut files = Vec::new();
     collect_output_files(output_dir, output_dir, &mut files)?;

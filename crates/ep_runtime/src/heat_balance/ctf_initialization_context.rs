@@ -35,6 +35,33 @@ pub struct CtfInitializationReports {
     pub output_prescan: super::source_output_prescan::SourceOutputPreScan,
     /// Actual SimulationManager PreP_Fatal constructor member, initially false.
     pub simulation_preprocessor_fatal: bool,
+    /// Actual parent guards, set before each member sequence.
+    pub source_initialization_guards: super::source_initialization::SourceInitializationGuards,
+    /// Real raw operands retained even if initialization stops.
+    pub source_initialization_input:
+        Option<super::source_initialization::SourceInitializationInput>,
+    /// Sole pre-weather owner, moved into the real session after successful allocation.
+    pub(crate) source_initialization_weather: Option<crate::weather::day::WeatherDayState>,
+    /// Actual StdOutputRecordCount reset at OpenOutputFiles1747.
+    pub source_standard_output_record_count: i32,
+    /// Same DataGlobal owner later moved into the first genuine HeatBalanceState.
+    pub(crate) selected_heat_balance_globals:
+        Option<super::selected_heat_balance_globals::SelectedHeatBalanceGlobals>,
+    /// Sole startup/HVAC/RuntimeLanguage owner.
+    pub(crate) selected_simulation_startup:
+        Option<super::selected_simulation_startup::SelectedSimulationStartup>,
+    /// Sole retained GetProjectData owner.
+    pub(crate) selected_project_data: Option<super::selected_project_data::SelectedProjectData>,
+    /// Sole Fluid constructor/constant/input owner.
+    pub(crate) selected_fluid_properties:
+        Option<super::selected_fluid_properties::SelectedFluidProperties>,
+    /// Sole real built-in and selected constant schedules.
+    pub(crate) selected_schedule_manager:
+        Option<super::selected_schedule_manager::SelectedScheduleManager>,
+    /// Sole selected CurveManager retained collections.
+    pub(crate) selected_curves: Option<super::setup_postludes::SelectedCurves>,
+    /// Distinct HeatBalanceManager getter module carrier, not dataIPShortCut.
+    pub(crate) heat_balance_current_module_object: String,
     /// Full allocated predefined string-entry owner.
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.

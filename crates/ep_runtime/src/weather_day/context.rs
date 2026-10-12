@@ -110,6 +110,8 @@ impl Default for WeatherGlobalState {
 /// Selected current and tomorrow environment fields from DataEnvironment.hh.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WeatherEnvironmentState {
+    /// Actual DataEnvironment constructor false; GetProjectData may override it.
+    pub force_begin_env_reset_suppress: bool,
     /// Selected mutable environment after SetCurrentWeather.
     pub current_weather: CurrentWeatherState,
     /// Actual InitSolarHeatGains environment owner (DataEnvironment.hh148).
@@ -193,6 +195,7 @@ pub struct WeatherEnvironmentState {
 impl Default for WeatherEnvironmentState {
     fn default() -> Self {
         Self {
+            force_begin_env_reset_suppress: false,
             current_weather: CurrentWeatherState::default(),
             previous_sol_rad_positive: false,
             display_weather_missing_data_warnings: false,

@@ -21,6 +21,37 @@ fn cold_zero_tag_hits_preserve_source_sentinels_without_running_raw_helpers() {
         state.final_caches(),
         EnergyPlusPsychrometricFinalCaches::default()
     );
+    // Reached InitializePsychRoutines must reset arrays, not constructor-reset
+    // scalar saved pressures/controls that real property routes already changed.
+    state
+        .evaluate(
+            EnergyPlusPsychrometricFunction::Twb,
+            &[30.0, 0.008, 101325.0],
+        )
+        .unwrap();
+    state
+        .evaluate(
+            EnergyPlusPsychrometricFunction::TsatHPb,
+            &[50000.0, 101325.0],
+        )
+        .unwrap();
+    state.set_controls(Some(true), Some(0.0002));
+    let retained_scalars = state.snapshot();
+    let populated = state.final_caches();
+    assert!(!populated.twb.is_empty() && !populated.psat.is_empty());
+    assert!(!populated.tsat_pb.is_empty() && !populated.tsat_h_pb.is_empty());
+    state.initialize_source_caches();
+    assert_eq!(state.snapshot(), retained_scalars);
+    assert_eq!(
+        state.final_caches(),
+        EnergyPlusPsychrometricFinalCaches::default()
+    );
+    assert!(
+        matches!(default_slot(1,17),EnergyPlusPsychrometricCacheSlot::Psat { i_tdb:-1000,value,.. } if value.to_bits()==0)
+    );
+    assert!(
+        matches!(default_slot(2,17),EnergyPlusPsychrometricCacheSlot::TsatPb { i_h:0,i_pb:0,value,.. } if value.to_bits()==0)
+    );
 }
 
 #[test]

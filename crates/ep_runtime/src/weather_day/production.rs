@@ -148,8 +148,31 @@ impl ProductionWeatherTimestepSeries {
         bytes: Vec<u8>,
         configuration: WeatherEnvironmentConfiguration,
     ) -> Result<Self, WeatherDayError> {
-        Ok(Self {
-            session: RefCell::new(WeatherSession::new(bytes, configuration)?),
+        Ok(Self::from_session(WeatherSession::new(
+            bytes,
+            configuration,
+        )?))
+    }
+
+    /// Consume the actual Project-initialized owner only after successful allocation.
+    ///
+    /// # Errors
+    /// Retains partial preparation in the supplied owner on failure.
+    pub fn from_initialized_project_state(
+        bytes: Vec<u8>,
+        configuration: WeatherEnvironmentConfiguration,
+        state: &mut super::WeatherDayState,
+    ) -> Result<Self, WeatherDayError> {
+        Ok(Self::from_session(WeatherSession::new_from_project_state(
+            bytes,
+            configuration,
+            state,
+        )?))
+    }
+
+    fn from_session(session: WeatherSession) -> Self {
+        Self {
+            session: RefCell::new(session),
             setup_started: Cell::new(false),
             setup_completed: Cell::new(false),
             setup_design_day_reports_registered: Cell::new(false),
@@ -158,7 +181,7 @@ impl ProductionWeatherTimestepSeries {
             last_consumed: RefCell::new(None),
             current_step: RefCell::new(None),
             current_step_stamp: RefCell::new(None),
-        })
+        }
     }
 
     /// Prepares actual Today before humidity and CTF seeds. The first day hook

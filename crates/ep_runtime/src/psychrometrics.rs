@@ -18,6 +18,11 @@ pub use cp_cache::{EnergyPlusCpAirCache, EnergyPlusCpAirCacheState};
 /// Opt-in observations of actual production psychrometric calls.
 pub mod production_trace;
 
+/// The genuine default-build InitializePsychRoutines cache-only operation.
+pub(crate) fn initialize_source_psychrometric_caches() {
+    psy02_state::with_state(EnergyPlusPsychrometricsState::initialize_source_caches);
+}
+
 /// Synchronizes the weather caller control without replacing the cache owner.
 pub(crate) fn set_psychrometric_warmup(warmup: bool) {
     psy02_state::with_state(|state| state.set_controls(Some(warmup), None));

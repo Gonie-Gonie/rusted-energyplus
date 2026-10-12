@@ -1109,7 +1109,7 @@ impl HeatBalanceSimulationOptions {
     }
 }
 
-/// Input-only selected GetProjectData facts for the explicit ordinary A caller.
+/// Selected GetProjectData facts; the actual startup replaces effective report controls.
 /// Sizing/controlled/generic callers cannot infer these from absent report owners.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceOrdinaryWarmupReportInputs {

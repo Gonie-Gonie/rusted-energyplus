@@ -833,12 +833,20 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardElseBranchEntryLifecycleSummary>,
 }
 
+struct PendingOrdinaryWeather {
+    bytes: Vec<u8>,
+    configuration: WeatherEnvironmentConfiguration,
+}
+
 struct PreparedRuntimeInputs {
     sample_count: usize,
     time_axis: TimeAxis,
-    schedule_cache: ScheduleSeriesCache,
+    schedule_cache: Option<ScheduleSeriesCache>,
     zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
     weather_series: Option<ProductionWeatherTimestepSeries>,
+    pending_ordinary_weather: Option<PendingOrdinaryWeather>,
+    source_initialization_input:
+        Option<ep_runtime::heat_balance::source_initialization::SourceInitializationInput>,
     ordinary_warmup_reporting: Option<ep_runtime::HeatBalanceOrdinaryWarmupReportInputs>,
     selected_input_processor:
         Option<ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor>,
@@ -1440,12 +1448,13 @@ fn run_with_optional_porting_scope_impl(
                 .and_then(|()| {
                     ep_runtime::psychrometrics::production_trace::in_phase("rust_runtime", || {
                         execute_rust_runtime(
-                            simulation_model.as_ref(),
+                            simulation_model.as_mut(),
                             assessment.runtime_class,
                             source_order_gate,
                             &mut runtime_inputs,
                             config.trace_level == TraceLevel::Full,
                             &mut ctf_outputs,
+                            &config.output_dir,
                         )
                     })
                 });
@@ -3454,6 +3463,7 @@ fn prepare_runtime_inputs(
     raw_model: &RawModel,
 ) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
+    let mut pending_ordinary_weather = None;
     let (time_axis, weather_series, zone_timestep_schedule_cache) =
         if runtime_class_requires_weather(runtime_class) {
             let weather_path = config
@@ -3525,11 +3535,19 @@ fn prepare_runtime_inputs(
                 let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
                 crate::ordinary_design_day_input::project(raw_model, &mut configuration, reverse)?;
             }
-            let weather_series = ProductionWeatherTimestepSeries::from_bytes(
-                std::fs::read(weather_path).map_err(|error| error.to_string())?,
-                configuration,
-            )
-            .map_err(|error| format!("failed to open live EPW owner: {error}"))?;
+            let bytes = std::fs::read(weather_path).map_err(|error| error.to_string())?;
+            let weather_series = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+                pending_ordinary_weather = Some(PendingOrdinaryWeather {
+                    bytes,
+                    configuration,
+                });
+                None
+            } else {
+                Some(
+                    ProductionWeatherTimestepSeries::from_bytes(bytes, configuration)
+                        .map_err(|error| format!("failed to open live EPW owner: {error}"))?,
+                )
+            };
             let zone_timestep_schedule_cache = if runtime_class
                 == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
             {
@@ -3558,11 +3576,7 @@ fn prepare_runtime_inputs(
             } else {
                 None
             };
-            (
-                time_axis,
-                Some(weather_series),
-                zone_timestep_schedule_cache,
-            )
+            (time_axis, weather_series, zone_timestep_schedule_cache)
         } else {
             (
                 build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?,
@@ -3575,25 +3589,59 @@ fn prepare_runtime_inputs(
         &time_axis,
         runtime_class_requires_weather(runtime_class),
     )?;
-    let schedule_cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
-    ep_runtime::schedules::production_trace::record_cache(
-        ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,
-        &schedule_cache,
-    );
-    ep_runtime::psychrometrics::production_trace::register_time_axis(&time_axis);
+    let schedule_cache = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+        // No disposable cache or trace is produced from the pre-Project timestep.
+        None
+    } else {
+        let cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
+        ep_runtime::schedules::production_trace::record_cache(
+            ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,
+            &cache,
+        );
+        ep_runtime::psychrometrics::production_trace::register_time_axis(&time_axis);
+        Some(cache)
+    };
 
+    let selected_input_processor = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+    {
+        Some(crate::ordinary_input_processor::resolve(raw_model)?)
+    } else {
+        None
+    };
+    let source_initialization_input =
+        if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+            // Pure raw projection only; actual counts/getters still use the moved IP.
+            Some(
+                ep_runtime::heat_balance::source_initialization::SourceInitializationInput {
+                    project: crate::ordinary_project_data::resolve(
+                        raw_model,
+                        raw_model.is_epjson(),
+                        selected_input_processor
+                            .as_ref()
+                            .ok_or("missing real IP projection")?,
+                    )?,
+                    schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
+                    cli_dd_only: false,
+                    cli_annual: false,
+                    reverse_design_days: pending_ordinary_weather
+                        .as_ref()
+                        .ok_or("missing actual pending weather")?
+                        .configuration
+                        .reverse_design_days,
+                },
+            )
+        } else {
+            None
+        };
     Ok(PreparedRuntimeInputs {
+        pending_ordinary_weather,
+        source_initialization_input,
         sample_count,
         time_axis,
         schedule_cache,
         zone_timestep_schedule_cache,
         weather_series,
-        selected_input_processor: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
-        {
-            Some(crate::ordinary_input_processor::resolve(raw_model)?)
-        } else {
-            None
-        },
+        selected_input_processor,
         reporting_prescan_input: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
             Some(crate::ordinary_input_processor::resolve_reporting_prescan(
                 raw_model,
@@ -3618,30 +3666,23 @@ fn prepare_runtime_inputs(
 }
 
 fn execute_rust_runtime(
-    simulation_model: Option<&SimulationModel>,
+    simulation_model: Option<&mut SimulationModel>,
     runtime_class: RuntimeClass,
     source_order_gate: SourceOrderGateSummary,
     runtime_inputs: &mut PreparedRuntimeInputs,
     capture_geometry: bool,
     ctf_outputs: &mut CtfRunOutputs,
+    output_dir: &Path,
 ) -> Result<RustRuntimeResult, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_inputs.sample_count;
-    let schedule_cache_sample_count = runtime_inputs.schedule_cache.sample_count();
-    let schedule_cache_profile = runtime_inputs.schedule_cache.profile();
-    match runtime_class {
-        RuntimeClass::OneZoneHeatBalanceCompatibility
-        | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
-            let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
-                "weather records are required for heat-balance runtime".to_string()
-            })?;
-            let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
-            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
-            let options = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
-                HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(model, sample_count)
-            } else {
-                HeatBalanceSimulationOptions::hourly_samples(sample_count)
-            };
+    if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+        let input = runtime_inputs
+            .source_initialization_input
+            .take()
+            .ok_or("actual source initialization input missing")?;
+        ctf_outputs.prepare_source_environment(output_dir, input)?;
+        {
             let mut initialization = ctf_outputs.context();
             if let Some(input) = runtime_inputs.selected_input_processor.take() {
                 initialization
@@ -3655,6 +3696,53 @@ fn execute_rust_runtime(
                     .post_input_processing()
                     .map_err(|error| error.to_string())?;
             }
+        }
+        {
+            ctf_outputs.initialize_source_state(&model.typed.report_inputs)?;
+            let pending = runtime_inputs
+                .pending_ordinary_weather
+                .take()
+                .ok_or("missing delayed weather input")?;
+            let steps = ctf_outputs.source_zone_timesteps_per_hour()?;
+            model.typed.timestep.number_of_timesteps_per_hour = steps;
+            let profile = ep_runtime::time_axis::time_axis_timestep_profile(&model.typed);
+            runtime_inputs.time_axis.zone_timestep = profile.zone_timestep;
+            runtime_inputs.time_axis.system_timestep = profile.system_timestep;
+            if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting.as_mut() {
+                ctf_outputs.apply_source_reporting_controls(reporting)?;
+            }
+            let weather =
+                ctf_outputs.initialize_source_weather(pending.bytes, pending.configuration)?;
+            let cache =
+                precompute_schedule_cache_for_time_axis(&model.typed, &runtime_inputs.time_axis);
+            ep_runtime::schedules::production_trace::record_cache(
+                    ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,&cache);
+            ep_runtime::psychrometrics::production_trace::register_time_axis(
+                &runtime_inputs.time_axis,
+            );
+            runtime_inputs.schedule_cache = Some(cache);
+            runtime_inputs.weather_series = Some(weather);
+        }
+    }
+    let cache = runtime_inputs
+        .schedule_cache
+        .as_ref()
+        .ok_or("actual runtime schedule cache missing")?;
+    let schedule_cache_sample_count = cache.sample_count();
+    let schedule_cache_profile = cache.profile();
+    match runtime_class {
+        RuntimeClass::OneZoneHeatBalanceCompatibility
+        | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
+            let weather_series = runtime_inputs
+                .weather_series
+                .as_ref()
+                .ok_or("missing actual weather series")?;
+            let options = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+                HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(model, sample_count)
+            } else {
+                HeatBalanceSimulationOptions::hourly_samples(sample_count)
+            };
+            let mut initialization = ctf_outputs.context();
             let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {
                 ep_runtime::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
                     model, weather_series, options, &mut initialization, reporting,

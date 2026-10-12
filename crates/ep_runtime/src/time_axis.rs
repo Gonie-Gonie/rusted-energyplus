@@ -883,7 +883,7 @@ fn build_hourly_time_axis_for_run_period_internal(
     })
 }
 
-fn time_axis_timestep_profile_for_zone_timesteps(
+pub(crate) fn time_axis_timestep_profile_for_zone_timesteps(
     zone_timesteps_per_hour: u32,
 ) -> TimeAxisTimestepProfile {
     let zone_timesteps_per_hour = zone_timesteps_per_hour.max(1);

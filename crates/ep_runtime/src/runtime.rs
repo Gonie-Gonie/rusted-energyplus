@@ -385,7 +385,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         })
         .transpose()?;
     let radiation_input = reporting.and_then(|input| input.radiation_input);
-    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    let zone_steps_per_hour = match weather_driver {
+        Some(HeatBalanceWeatherDriver::Production(weather)) => weather.zone_steps_per_hour(),
+        _ => model.typed.timestep.number_of_timesteps_per_hour.max(1),
+    };
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let first_hour_interpolation_starting_values =
         run_period_first_hour_interpolation_starting_values(&model.typed);

@@ -141,6 +141,14 @@ impl Default for EnergyPlusPsychrometricsState {
 }
 
 impl EnergyPlusPsychrometricsState {
+    /// InitializePsychRoutines fills the four cache arrays without resetting scalars.
+    /// Empty sparse storage denotes every exact default slot, including Psat -1000.
+    pub(crate) fn initialize_source_caches(&mut self) {
+        for slots in &mut self.slots {
+            slots.clear();
+        }
+    }
+
     /// Current scalar state; warning recurrence is deliberately not fabricated.
     pub fn snapshot(&self) -> EnergyPlusPsychrometricStateSnapshot {
         self.state

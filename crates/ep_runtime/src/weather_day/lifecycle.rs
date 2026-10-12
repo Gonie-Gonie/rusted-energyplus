@@ -46,6 +46,29 @@ impl WeatherSession {
         bytes: Vec<u8>,
         configuration: WeatherEnvironmentConfiguration,
     ) -> Result<Self, WeatherDayError> {
+        let mut state = WeatherDayState::default();
+        Self::new_from_state(bytes, configuration, &mut state, false)
+    }
+
+    pub(super) fn new_from_project_state(
+        bytes: Vec<u8>,
+        configuration: WeatherEnvironmentConfiguration,
+        state: &mut WeatherDayState,
+    ) -> Result<Self, WeatherDayError> {
+        Self::new_from_state(bytes, configuration, state, true)
+    }
+
+    fn new_from_state(
+        bytes: Vec<u8>,
+        configuration: WeatherEnvironmentConfiguration,
+        state: &mut WeatherDayState,
+        preserve_project: bool,
+    ) -> Result<Self, WeatherDayError> {
+        if preserve_project && state.global.time_steps_in_hour != configuration.steps() as i32 {
+            return Err(WeatherDayError::admission(
+                "Project/weather timestep association",
+            ));
+        }
         let mut cursor = RawEpwCursorOwner::open_from_bytes(
             bytes,
             RawEpwHeaderState::default(),
@@ -53,19 +76,24 @@ impl WeatherSession {
                 run_period_control_special_days: configuration.input_special_day_count,
             },
         )?;
-        let mut state = WeatherDayState::default();
-        configuration
-            .solar_controls
-            .apply_to(&mut state.environment);
+        if !preserve_project {
+            configuration
+                .solar_controls
+                .apply_to(&mut state.environment);
+        }
         state.today_values = WeatherDayValues::allocated(configuration.steps() as usize)?;
         state.tomorrow_values = WeatherDayValues::allocated(configuration.steps() as usize)?;
-        state.global.time_steps_in_hour = configuration.steps() as i32;
-        state.global.time_step_zone = 1.0 / f64::from(configuration.steps());
-        state.global.time_step_zone_sec = state.global.time_step_zone * 3600.0;
-        state.global.minutes_in_time_step = 60 / configuration.steps() as i32;
+        if !preserve_project {
+            state.global.time_steps_in_hour = configuration.steps() as i32;
+            state.global.time_step_zone = 1.0 / f64::from(configuration.steps());
+            state.global.time_step_zone_sec = state.global.time_step_zone * 3600.0;
+            state.global.minutes_in_time_step = 60 / configuration.steps() as i32;
+        }
         // Genuine prepared caller order: SetupInterpolationValues, then fraction.
         state.setup_interpolation_values()?;
-        state.global.do_weath_sim = true;
+        if !preserve_project {
+            state.global.do_weath_sim = true;
+        }
         state.weather.time_step_fraction = state.global.time_step_zone;
         state.weather.weather_file_exists = true;
         state.weather.get_branch_input_one_time_flag = false;
@@ -104,7 +132,7 @@ impl WeatherSession {
         cursor.close();
         let errors_found = cursor.header_errors();
         Ok(Self {
-            state,
+            state: std::mem::take(state),
             configuration,
             cursor,
             available: false,

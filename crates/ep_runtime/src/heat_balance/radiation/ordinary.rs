@@ -21,6 +21,11 @@ pub struct OrdinaryRadiationInput {
 }
 
 impl OrdinaryRadiationInput {
+    /// Actual GetProjectData/environment flag, applied before the first Solar owner.
+    pub(crate) fn apply_source_advanced_reporting(&mut self, value: bool) {
+        self.advanced_report_variables = value;
+    }
+
     /// Retain actual query counts after the existing positive-family/field
     /// admission has succeeded. This projection is not another allowlist.
     ///

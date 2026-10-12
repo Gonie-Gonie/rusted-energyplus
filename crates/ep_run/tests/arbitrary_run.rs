@@ -31,7 +31,8 @@ use fixtures::*;
 mod output_manifest;
 
 use output_manifest::{
-    BLOCKED_AFTER_SUPPORT_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest,
+    BLOCKED_AFTER_SUPPORT_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_ordinary_output_manifest,
+    assert_output_manifest,
 };
 
 #[test]
@@ -74,7 +75,19 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     );
 
     assert_output_layout(&output_dir, true)?;
-    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
+    assert_ordinary_output_manifest(&output_dir)?;
+    let eio = std::fs::read_to_string(output_dir.join("eplusrs.eio"))?;
+    assert!(eio.starts_with("Program Version,"));
+    assert_eq!(
+        std::fs::read(output_dir.join("eplusrs.audit"))?,
+        b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+    );
+    if std::env::var("CI_FORCE_TIME_STEP").as_deref() == Ok("Y") {
+        assert!(
+            eio.contains(" Timesteps per Hour,  2, 30"),
+            "the actual CLI must reach the forced Project timestep"
+        );
+    }
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(summary["status"], "success");
     assert_eq!(
