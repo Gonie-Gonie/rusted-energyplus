@@ -299,6 +299,7 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
             is_epjson: true,
         }],
         legacy_variable_dictionary_sections: -1,
+        output_variables: Vec::new(),
     };
     let mut reports = CtfInitializationReports::default();
     let mut state = SourceErrorState {
@@ -413,5 +414,125 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
     assert_eq!(context.reports.selected_input_processor, retained_input);
     assert_eq!(context.reports.input_processor_shortcut, retained_shortcut);
     assert_eq!(context.backend.state.tracking.total_warning_errors, 0);
+
+    use crate::heat_balance::source_output_prescan::SourceOutputPreScan;
+    use crate::heat_balance::source_output_registration::{
+        SourceOutputFileHost, SourceOutputRegistration, SourceOutputStoreType, SourceOutputUnits,
+        SourceRealOutputDeclaration, SourceReportVariableInput,
+    };
+    struct AuthoredMtd {
+        opens: usize,
+    }
+    impl SourceOutputFileHost for AuthoredMtd {
+        fn ensure_mtd_open(&mut self) -> std::io::Result<()> {
+            self.opens += 1;
+            Ok(())
+        }
+    }
+    for (minimum, regex, expected_requests, used) in [
+        ("", false, 2, true),
+        ("", true, 1, true),
+        ("Daily", false, 0, false),
+    ] {
+        let input = ReportInputs {
+            output_variables: [
+                (
+                    "first",
+                    if regex { "bad.regex" } else { "*" },
+                    "BRACKET \t [W]",
+                ),
+                ("second", "MiXeD", "NO BRACKET \t "),
+            ]
+            .into_iter()
+            .map(
+                |(identity, key, name)| ep_model::SourceOutputVariableInput {
+                    object_name: identity.into(),
+                    key: key.into(),
+                    variable_name: name.into(),
+                    reporting_frequency: "Hourly".into(),
+                    schedule_name: String::new(),
+                    alpha_blank: [false, false, true, true],
+                    default_applied: [false, false, true, false],
+                    num_alphas: 2,
+                    is_epjson: true,
+                },
+            )
+            .collect(),
+            ..ReportInputs::default()
+        };
+        let mut source = SelectedInputProcessor::from_admitted_input(
+            vec![SourceObjectDefinition {
+                object_type: "Output:Variable".into(),
+                alpha_fields: 4,
+                numeric_fields: 0,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            }],
+            std::collections::BTreeMap::from([(
+                "Output:Variable".into(),
+                SourceInputFamily::Objects(
+                    input
+                        .output_variables
+                        .iter()
+                        .map(|row| SourceObjectShape {
+                            object_name: row.object_name.clone(),
+                            field_sizes: std::collections::BTreeMap::new(),
+                        })
+                        .collect(),
+                ),
+            )]),
+        )
+        .map_err(|error| error.to_string())?;
+        let scratch = context.reports.input_processor_shortcut.clone();
+        let mut output = SourceOutputRegistration::default();
+        let mut host = AuthoredMtd { opens: 0 };
+        let mut eio = Vec::new();
+        let mut operands = SourceReportVariableInput::new(&input, &mut source, minimum);
+        let result = output.setup_unmetered_zone_real(
+            &mut operands,
+            &SourceOutputPreScan::default(),
+            SourceRealOutputDeclaration {
+                name: "UNMATCHED AUTHORED VARIABLE",
+                key: "ZONE",
+                units: SourceOutputUnits::C,
+                store_type: SourceOutputStoreType::Average,
+            },
+            15,
+            &mut host,
+            &mut eio,
+        );
+        assert_eq!(result.is_ok(), minimum.is_empty() && !regex);
+        assert_eq!(host.opens, 1);
+        assert!(output.output_initialized);
+        assert!(!output.get_output_input);
+        assert_eq!(output.time_step_zone_sec.to_bits(), 900.0_f64.to_bits());
+        assert_eq!(output.requested_variables.len(), expected_requests);
+        assert_eq!(source.is_object_unused("Output:Variable", "first"), !used);
+        assert_eq!(
+            source.is_object_unused("Output:Variable", "second"),
+            regex || !used
+        );
+        assert_eq!(
+            context.reports.input_processor_shortcut, scratch,
+            "the real Output getter uses only local 4A/1N argument arrays"
+        );
+        assert!(eio.is_empty());
+        if minimum.is_empty() && !regex {
+            assert_eq!(output.requested_variables[0].name, "BRACKET");
+            assert_eq!(output.requested_variables[1].name, "NO BRACKET \t ");
+            assert!(output.requested_variables[0].key.is_empty());
+            assert_eq!(output.requested_variables[1].key, "MiXeD");
+            assert_eq!(output.num_real_variables_setup, 1);
+            assert_eq!(output.num_total_real_variables, 1);
+        } else {
+            assert!(output.dictionary_variables.is_empty());
+            assert_eq!(output.num_real_variables_setup, 0);
+            if regex {
+                assert_eq!(output.requested_variables[0].key, "bad.regex");
+                assert!(output.requested_variables[0].name.is_empty());
+            }
+        }
+    }
     Ok(())
 }

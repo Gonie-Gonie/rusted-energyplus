@@ -79,6 +79,21 @@ pub struct CtfInitializationReports {
         super::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls,
     /// Sole selected CurveManager retained collections.
     pub(crate) selected_curves: Option<super::setup_postludes::SelectedCurves>,
+    /// Raw HB getter operands from the same admitted source model.
+    pub heat_balance_input: Option<super::selected_heat_balance_input::SelectedHeatBalanceInput>,
+    /// Sole actual ProjectControl/Construction flags and argument state.
+    pub(crate) heat_balance_input_state:
+        super::selected_heat_balance_input::SelectedHeatBalanceInputState,
+    pub(crate) heat_balance_input_errors_found: bool,
+    /// Raw Material operands, retaining original loader format/order.
+    pub selected_material_input: Option<super::selected_material_data::SelectedMaterialInput>,
+    pub(crate) selected_material_data: super::selected_material_data::SelectedMaterialData,
+    /// Actual partial Zone/Space arrays, moved only after initializer success.
+    pub(crate) selected_zone_input:
+        Option<super::selected_heat_balance_input::zone::SelectedZoneInputOwners>,
+    /// Sole reached GetShadowingInput result; later Solar must consume this owner.
+    pub(crate) shadowing_input:
+        Option<super::selected_heat_balance_input::shadowing::SourceShadowingInput>,
     /// Distinct HeatBalanceManager getter module carrier, not dataIPShortCut.
     pub(crate) heat_balance_current_module_object: String,
     /// Full allocated predefined string-entry owner.
@@ -401,4 +416,172 @@ pub(crate) fn original_loader_name<'a, I: Copy + Eq>(
         return Err(CtfReportUnavailable::Association);
     }
     Ok(name)
+}
+
+impl CtfInitializationContext<'_> {
+    pub(crate) fn get_selected_project_control_data(
+        &mut self,
+        environment: &mut crate::weather::day::WeatherEnvironmentState,
+    ) -> Result<(), crate::error::RuntimeError> {
+        use super::selected_heat_balance_input::{
+            HeatBalanceInputError as E, HeatBalanceInputOwners,
+        };
+        let reports = &mut *self.reports;
+        let raw = reports
+            .heat_balance_input
+            .as_ref()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing genuine HB raw operands")))?;
+        let input = reports
+            .selected_input_processor
+            .as_mut()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing sole actual IP")))?;
+        reports.heat_balance_input_errors_found = false;
+        let mut owners = HeatBalanceInputOwners {
+            input,
+            shortcut: &mut reports.input_processor_shortcut,
+            project: reports
+                .selected_project_data
+                .as_mut()
+                .ok_or_else(|| hb_input_error(E::Unavailable("missing sole project owner")))?,
+            space_controls: &mut reports.heat_balance_space_controls,
+            environment,
+            current_module_object: &mut reports.heat_balance_current_module_object,
+        };
+        reports
+            .heat_balance_input_state
+            .get_project_control_data(
+                raw,
+                &mut owners,
+                &mut self.backend,
+                self.eio,
+                &mut reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)
+    }
+    pub(crate) fn read_selected_construction_arguments(
+        &mut self,
+        model: &TypedModel,
+    ) -> Result<(), crate::error::RuntimeError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let reports = &mut *self.reports;
+        let raw = reports.heat_balance_input.as_ref().ok_or_else(|| {
+            hb_input_error(E::Unavailable("missing genuine Construction raw operands"))
+        })?;
+        let input = reports
+            .selected_input_processor
+            .as_mut()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing sole actual IP")))?;
+        reports
+            .heat_balance_input_state
+            .read_regular_construction_arguments(
+                raw,
+                model,
+                input,
+                &mut reports.input_processor_shortcut,
+                &mut reports.heat_balance_current_module_object,
+                &mut self.backend,
+            )
+            .map_err(hb_input_error)
+    }
+}
+fn hb_input_error(
+    error: super::selected_heat_balance_input::HeatBalanceInputError,
+) -> crate::error::RuntimeError {
+    use super::selected_heat_balance_input::HeatBalanceInputError as E;
+    use crate::error::{RuntimeError, WarmupOutputError};
+    let output = match error {
+        E::Backend(e) => WarmupOutputError::Backend(e),
+        E::Io(e) => WarmupOutputError::Io(e),
+        E::Output(e) => return e.into(),
+        E::Unavailable(e) => WarmupOutputError::Unavailable(format!("GetHeatBalanceInput: {e}")),
+        E::Format(e) => WarmupOutputError::Format(e),
+    };
+    RuntimeError::WarmupOutput(Box::new(output))
+}
+
+impl CtfInitializationContext<'_> {
+    pub(crate) fn get_selected_zone_data(
+        &mut self,
+        model: &TypedModel,
+        minutes_in_time_step: i32,
+        host: &mut dyn super::source_output_registration::SourceOutputFileHost,
+    ) -> Result<(), crate::error::RuntimeError> {
+        use super::selected_heat_balance_input::{
+            HeatBalanceInputError as E,
+            zone::{SelectedZoneInputOwners, ZoneGetterOwners},
+        };
+        let reports = &mut *self.reports;
+        let raw = reports
+            .heat_balance_input
+            .as_ref()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing genuine Zone raw operands")))?;
+        let input = reports
+            .selected_input_processor
+            .as_mut()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing sole Zone IP")))?;
+        let globals = reports
+            .selected_heat_balance_globals
+            .as_mut()
+            .ok_or_else(|| hb_input_error(E::Unavailable("missing sole early globals")))?;
+        let zone = reports
+            .selected_zone_input
+            .get_or_insert_with(SelectedZoneInputOwners::default);
+        let mut owners = ZoneGetterOwners {
+            input,
+            shortcut: &mut reports.input_processor_shortcut,
+            globals,
+            output: &mut reports.output_registration,
+            prescan: &reports.output_prescan,
+            report_input: &model.report_inputs,
+            minimum_report_frequency: &reports
+                .selected_project_data
+                .as_ref()
+                .ok_or_else(|| hb_input_error(E::Unavailable("missing sole system variables")))?
+                .system
+                .minimum_report_frequency,
+            minutes_in_time_step,
+            host,
+            eio: self.eio,
+        };
+        zone.get_zone_data(raw, &reports.heat_balance_input_state, model, &mut owners)
+            .map_err(hb_input_error)
+    }
+    pub(crate) fn mark_selected_surface_construction_used(
+        &mut self,
+        id: ep_model::ConstructionId,
+    ) -> Result<(), crate::error::RuntimeError> {
+        self.reports
+            .heat_balance_input_state
+            .mark_opaque_surface_construction_used(id)
+            .map_err(hb_input_error)
+    }
+    pub(crate) fn mark_selected_surface_ctf_construction_used(
+        &mut self,
+        id: ep_model::ConstructionId,
+    ) -> Result<(), crate::error::RuntimeError> {
+        self.reports
+            .heat_balance_input_state
+            .mark_surface_ctf_construction_used(id)
+            .map_err(hb_input_error)
+    }
+}
+
+impl CtfInitializationContext<'_> {
+    pub(crate) fn initialize_selected_heat_balance_input(
+        &mut self,
+        model: &TypedModel,
+        environment: &mut crate::weather::day::WeatherEnvironmentState,
+        minutes: i32,
+        host: &mut dyn super::source_output_registration::SourceOutputFileHost,
+    ) -> Result<(), crate::RuntimeError> {
+        self.get_selected_project_control_data(environment)?;
+        self.initialize_source_site_atmosphere(environment)?;
+        self.get_selected_material_data(model)?;
+        self.read_selected_construction_arguments(model)?;
+        let mut owner = super::selected_heat_balance_input::shadowing::SourceShadowingInput::new();
+        let result = owner.get_at_building_boundary(self);
+        self.reports.shadowing_input = Some(owner);
+        result?;
+        self.get_selected_zone_data(model, minutes, host)
+    }
 }

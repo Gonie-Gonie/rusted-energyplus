@@ -9,13 +9,22 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
     match (family, name) {
         // Actual parser metadata only, including the existing unnamed reports.
         (
-            "Version"
+            "Zone"
+            | "Material"
+            | "Material:NoMass"
+            | "Version"
             | "HeatBalanceAlgorithm"
             | "Timestep"
             | "SimulationControl"
+            | "Building"
+            | "Construction"
+            | "SurfaceConvectionAlgorithm:Inside"
+            | "SurfaceConvectionAlgorithm:Outside"
+            | "ZoneAirHeatBalanceAlgorithm"
             | "Output:VariableDictionary"
             | "Output:Surfaces:Drawing"
-            | "Output:Constructions",
+            | "Output:Constructions"
+            | "Output:Variable",
             "idf_order" | "idf_max_fields" | "idf_max_extensible_fields",
         ) => {
             matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())

@@ -51,6 +51,7 @@ fn report_inputs() -> ReportInputs {
             is_epjson: true,
         }],
         legacy_variable_dictionary_sections: -1,
+        output_variables: Vec::new(),
     }
 }
 

@@ -130,6 +130,15 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             calendar_year_chr: "calendar-canary".into(),
         },
         environment: WeatherEnvironmentState {
+            outdoor_environment_parameters: crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters {
+                site_temperature_gradient_k_per_m: real(311, 0),
+                weather_file_temperature_modifier_c: -0.0,
+                site_wind_exponent: real(311, 1),
+                site_wind_boundary_layer_height_m: real(311, 2),
+                weather_file_wind_modifier: real(311, 3),
+            },
+            source_weather_station_initialized: true,
+            source_site_atmosphere_initialized: true,
             force_begin_env_reset_suppress: true,
             previous_sol_rad_positive: true,
             current_weather: super::CurrentWeatherState {
@@ -416,6 +425,20 @@ fn source_constructor_defaults_and_allocation_are_distinct() {
     assert_eq!(
         state.today_values.hour(1),
         Err(WeatherDayValuesError::Unallocated)
+    );
+    assert!(!state.environment.source_weather_station_initialized);
+    assert!(!state.environment.source_site_atmosphere_initialized);
+    let parameters = state.environment.outdoor_environment_parameters;
+    assert_eq!(
+        [
+            parameters.site_temperature_gradient_k_per_m,
+            parameters.weather_file_temperature_modifier_c,
+            parameters.site_wind_exponent,
+            parameters.site_wind_boundary_layer_height_m,
+            parameters.weather_file_wind_modifier,
+        ]
+        .map(f64::to_bits),
+        [0.0065_f64, 0.0, 0.22, 370.0, 1.5863].map(f64::to_bits)
     );
     assert_eq!(state.global.kind_of_sim, -1);
     assert_eq!(state.global.day_of_sim_chr, "0");

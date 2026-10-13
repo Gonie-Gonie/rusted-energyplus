@@ -83,7 +83,13 @@ pub(crate) fn assert_ordinary_output_manifest(
     output_dir: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut expected = SUPPORTED_RUNTIME_MANIFEST.to_vec();
-    expected.extend(["eplusrs.audit", "eplusrs.bnd", "eplusrs.eso", "eplusrs.mtr"]);
+    expected.extend([
+        "eplusrs.audit",
+        "eplusrs.bnd",
+        "eplusrs.eso",
+        "eplusrs.mtr",
+        "eplusrs.mtd",
+    ]);
     expected.sort_unstable();
     assert_output_manifest(output_dir, &expected)
 }

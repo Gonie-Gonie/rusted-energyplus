@@ -84,6 +84,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
                 &model, 23.0, &[], &schedule_cache, &mut profile, &mut context,
                 crate::heat_balance::initialization::OrdinaryInitializationInputs {
                     equipment: None,
+                    source: None,
                     radiation: Some(crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory([], true)?),
                 },
             )

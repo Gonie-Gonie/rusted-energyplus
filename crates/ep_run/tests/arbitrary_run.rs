@@ -78,6 +78,23 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     assert_ordinary_output_manifest(&output_dir)?;
     let eio = std::fs::read_to_string(output_dir.join("eplusrs.eio"))?;
     assert!(eio.starts_with("Program Version,"));
+    let sections = [
+        "! <Environment:Weather Station>",
+        "! <Building Information>",
+        "! <Environment:Site Atmospheric Variation>",
+        "! <Shadowing/Sun Position Calculations Annual Simulations>",
+    ];
+    let mut offset = 0;
+    for section in sections {
+        let relative = eio[offset..]
+            .find(section)
+            .ok_or_else(|| format!("missing reached EIO section {section}"))?;
+        offset += relative + section.len();
+    }
+    assert!(
+        std::fs::read(output_dir.join("eplusrs.mtd"))?.is_empty(),
+        "actual InitializeOutput opens MTD without fabricated unmatched-variable records"
+    );
     assert_eq!(
         std::fs::read(output_dir.join("eplusrs.audit"))?,
         b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"

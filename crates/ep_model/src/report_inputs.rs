@@ -67,6 +67,8 @@ pub struct ReportInputs {
     pub objects: Vec<ReportInputObject>,
     /// Actual getNumSectionsFound result for the legacy dictionary section; -1 absent.
     pub legacy_variable_dictionary_sections: i32,
+    /// Actual ordered local Output:Variable getter operands.
+    pub output_variables: Vec<SourceOutputVariableInput>,
 }
 
 impl Default for ReportInputs {
@@ -74,6 +76,7 @@ impl Default for ReportInputs {
         Self {
             objects: Vec::new(),
             legacy_variable_dictionary_sections: -1,
+            output_variables: Vec::new(),
         }
     }
 }
@@ -124,4 +127,27 @@ impl PredefinedTableSizing {
         }
         (do_zone_sizing, do_system_sizing)
     }
+}
+
+/// Input-only getObjectItem projection for OutputProcessor's real first getter.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceOutputVariableInput {
+    /// Actual parser identity; records keep the producer's object order.
+    pub object_name: String,
+    /// Key retains case, with the literal IDD default * applied to blanks.
+    pub key: String,
+    /// Uppercase source alpha; units stripping occurs in the real getter.
+    pub variable_name: String,
+    /// Uppercase/default-applied reporting frequency; not a cached decision.
+    pub reporting_frequency: String,
+    /// Uppercase schedule input, empty when the actual alpha is blank.
+    pub schedule_name: String,
+    /// Actual alpha blank and default-substitution facts, independently retained.
+    pub alpha_blank: [bool; 4],
+    /// Which actual Output:Variable alpha defaults were substituted.
+    pub default_applied: [bool; 4],
+    /// Actual supplied physical alpha count; defaults do not extend it.
+    pub num_alphas: u8,
+    /// Actual loader origin, used for the procedure-local field-name array.
+    pub is_epjson: bool,
 }

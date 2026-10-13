@@ -742,6 +742,7 @@ mod tests {
     fn last_ordered_options_and_ems_assignments_replace_earlier_values() {
         let input = ReportInputs {
             legacy_variable_dictionary_sections: 1,
+            output_variables: Vec::new(),
             objects: vec![
                 row(Kind::VariableDictionary, ["IDF", "NAME", ""], 2),
                 row(Kind::VariableDictionary, ["REGULAR", "UNSORTED", ""], 2),

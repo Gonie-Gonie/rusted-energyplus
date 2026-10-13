@@ -14,6 +14,8 @@ pub(super) fn finish_heat_balance_state(
     ctf_surface_lifecycle: Option<super::super::ctf_surface_lifecycle::CtfSurfaceLifecycle>,
 ) -> HeatBalanceState {
     HeatBalanceState {
+        selected_heat_balance_globals: None,
+        selected_zone_input: None,
         timestep_index: 0,
         zones,
         initialized_geometry,

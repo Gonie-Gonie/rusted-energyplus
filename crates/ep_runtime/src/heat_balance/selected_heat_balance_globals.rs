@@ -5,6 +5,10 @@
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedHeatBalanceGlobals {
+    /// Actual GetZoneData/GetSpaceData counts, independently initialized zero.
+    pub(crate) num_of_zones: i32,
+    pub(crate) num_spaces: i32,
+    pub(crate) num_space_types: i32,
     /// Actual DataGlobals GetProjectData/diagnostics owners; all ctor false/0.
     pub(crate) do_zone_sizing: bool,
     pub(crate) do_system_sizing: bool,

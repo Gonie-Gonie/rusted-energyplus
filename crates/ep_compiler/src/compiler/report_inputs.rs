@@ -61,8 +61,110 @@ impl Compiler<'_> {
         }
     }
 
+    fn parse_output_variable_inputs(&mut self, model: &mut TypedModel) {
+        const OBJECT: &str = "Output:Variable";
+        model.report_inputs.output_variables.clear();
+        let is_epjson = self.raw_model.is_epjson();
+        for (name, object) in self.objects(OBJECT) {
+            let mut alphas: [String; 4] = Default::default();
+            let mut num_alphas = 0_u8;
+            let mut alpha_blank = [true; 4];
+            let mut default_applied = [false; 4];
+            let mut valid = true;
+            for (index, (field, default)) in [
+                ("key_value", Some("*")),
+                ("variable_name", None),
+                ("reporting_frequency", Some("Hourly")),
+                ("schedule_name", None),
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                if object.fields.contains_key(&FieldName(field.into())) {
+                    num_alphas = (index + 1) as u8;
+                }
+                let supplied = match field_value(&object, field) {
+                    None => "",
+                    Some(RawValue::String(text)) => text,
+                    Some(_) => {
+                        self.invalid_field_type(OBJECT, &name, field, "string");
+                        valid = false;
+                        ""
+                    }
+                };
+                alpha_blank[index] = supplied.is_empty();
+                let actual = if supplied.is_empty() {
+                    if let Some(default) = default {
+                        self.record_default(OBJECT, &name, field, default);
+                        default_applied[index] = true;
+                        default
+                    } else {
+                        ""
+                    }
+                } else {
+                    supplied
+                };
+                alphas[index] = if index == 0 {
+                    actual.into()
+                } else {
+                    actual.to_ascii_uppercase()
+                };
+            }
+            if !is_epjson {
+                match field_value(&object, "idf_max_fields") {
+                    Some(RawValue::Number(value)) => match value.parse::<u8>() {
+                        Ok(value) if value <= 4 => num_alphas = value,
+                        _ => {
+                            self.error(
+                                "InvalidIdfReportFieldCount",
+                                OBJECT,
+                                Some(&name),
+                                None,
+                                "actual Output:Variable physical field count exceeds four".into(),
+                            );
+                            valid = false;
+                        }
+                    },
+                    _ => {
+                        self.error("MissingIdfReportFieldCount", OBJECT, Some(&name), None,
+                            "validated Output:Variable IDF order must retain its physical field count".into());
+                        valid = false;
+                    }
+                }
+            }
+            if alphas[1].is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT,
+                    Some(&name),
+                    Some("variable_name"),
+                    "Output:Variable requires its actual variable name".into(),
+                );
+                valid = false;
+            }
+            if valid {
+                let [key, variable_name, reporting_frequency, schedule_name] = alphas;
+                model
+                    .report_inputs
+                    .output_variables
+                    .push(ep_model::SourceOutputVariableInput {
+                        object_name: name,
+                        key,
+                        variable_name,
+                        reporting_frequency,
+                        schedule_name,
+                        alpha_blank,
+                        default_applied,
+                        num_alphas,
+                        is_epjson,
+                    });
+            }
+        }
+    }
+
     pub(super) fn parse_report_inputs(&mut self, model: &mut TypedModel) {
         self.parse_predefined_table_sizing(model);
+        self.parse_output_variable_inputs(model);
         let families: [ReportFamily; 5] = [
             (
                 Kind::SurfacesList,
@@ -312,7 +414,7 @@ mod tests {
     fn actual_a_report_requests_keep_native_default_and_blank_owners()
     -> Result<(), Box<dyn std::error::Error>> {
         let raw = parse_epjson_str(
-            r#"{"Output:VariableDictionary":{"dictionary":{"key_field":"IDF"}},"Output:Surfaces:Drawing":{"drawing":{"report_type":"dxf:wireframe"}},"Output:Constructions":{"ctf":{"details_type_1":"Constructions"}}}"#,
+            r#"{"Output:VariableDictionary":{"dictionary":{"key_field":"IDF"}},"Output:Surfaces:Drawing":{"drawing":{"report_type":"dxf:wireframe"}},"Output:Constructions":{"ctf":{"details_type_1":"Constructions"}},"Output:Variable":{"a":{"variable_name":"Zone Mean Air Temperature"},"b":{"key_value":"MiXeD","variable_name":"Other Equipment Radiant Heating Rate [W]","reporting_frequency":"Daily","schedule_name":""}}}"#,
         )?;
         let result = compile_raw_model(&raw);
         let model = result.model.ok_or("typed report input unavailable")?;
@@ -324,6 +426,24 @@ mod tests {
         assert_eq!(drawing.num_alphas, 1);
         assert_eq!(model.report_inputs.objects[1].alphas[0], "IDF");
         assert_eq!(model.report_inputs.objects[2].alphas[0], "CONSTRUCTIONS");
+        let variables = &model.report_inputs.output_variables;
+        assert_eq!(variables.len(), 2);
+        assert_eq!(variables[0].key, "*");
+        assert_eq!(variables[0].variable_name, "ZONE MEAN AIR TEMPERATURE");
+        assert_eq!(variables[0].reporting_frequency, "HOURLY");
+        assert_eq!(variables[0].alpha_blank, [true, false, true, true]);
+        assert_eq!(variables[0].default_applied, [true, false, true, false]);
+        assert_eq!(variables[1].key, "MiXeD");
+        assert_eq!(
+            variables[1].variable_name,
+            "OTHER EQUIPMENT RADIANT HEATING RATE [W]"
+        );
+        assert_eq!(variables[1].reporting_frequency, "DAILY");
+        assert_eq!(variables[1].alpha_blank, [false, false, false, true]);
+        assert_eq!(variables[0].num_alphas, 2);
+        assert_eq!(variables[1].num_alphas, 4);
+        assert!(variables.iter().all(|row| row.is_epjson));
+
         Ok(())
     }
 
@@ -392,7 +512,7 @@ mod tests {
 #[cfg(test)]
 mod ctf_report_name_tests {
     use crate::compile_raw_model;
-    use ep_raw_model::parse_epjson_str;
+    use ep_raw_model::{parse_epjson_str, parse_epjson_str_with_idf_order};
 
     #[test]
     fn actual_selected_loaders_keep_distinct_report_name_rules()
@@ -438,6 +558,31 @@ mod ctf_report_name_tests {
             model.constructions[0].id,
             model.ctf_report_names.constructions[0].0
         );
+        // Eleven generated unnamed identities distinguish declaration order
+        // from the JSON map's 1,10,11,2 lexical ordering, without another test.
+        let entries = (1..=11).map(|index| format!(
+            "\"Output:Variable {index}\":{{\"key_value\":\"*\",\"variable_name\":\"Variable {index}\"}}"
+        )).collect::<Vec<_>>().join(",");
+        let idf = (1..=11)
+            .map(|index| format!("Output:Variable,*,Variable {index};"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let raw = parse_epjson_str_with_idf_order(
+            &format!("{{\"Output:Variable\":{{{entries}}}}}"),
+            &idf,
+        )?;
+        let model = compile_raw_model(&raw)
+            .model
+            .ok_or("typed Output:Variable input unavailable")?;
+        for (index, row) in model.report_inputs.output_variables.iter().enumerate() {
+            assert_eq!(row.object_name, format!("Output:Variable {}", index + 1));
+            assert_eq!(row.variable_name, format!("VARIABLE {}", index + 1));
+            assert_eq!(row.num_alphas, 2);
+            assert!(!row.is_epjson);
+            assert_eq!(row.reporting_frequency, "HOURLY");
+            assert_eq!(row.alpha_blank, [false, false, true, true]);
+        }
+        assert_eq!(model.report_inputs.output_variables.len(), 11);
         Ok(())
     }
 }

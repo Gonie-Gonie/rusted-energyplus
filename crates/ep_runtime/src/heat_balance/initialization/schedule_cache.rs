@@ -124,7 +124,7 @@ pub(crate) fn initialize_heat_balance_state_with_initialization_context_and_equi
     schedule_cache: &ScheduleSeriesCache,
     profile: &mut HeatBalanceInternalGainScheduleOperationProfile,
     context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
-    inputs: super::OrdinaryInitializationInputs,
+    inputs: super::OrdinaryInitializationInputs<'_>,
 ) -> Result<HeatBalanceState, RuntimeError> {
     initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         model,

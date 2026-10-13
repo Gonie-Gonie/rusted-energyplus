@@ -31,6 +31,20 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
     assert!(input.has_object("Output:Diagnostics", "d"));
     assert!(input.is_object_unused("Output:Diagnostics", "d"));
     assert!(!input.has_object("Output:Diagnostics", "D"));
+    let hb = crate::ordinary_heat_balance_input::resolve(&raw, &input)?;
+    assert!(hb.source_is_epjson);
+    assert_eq!(hb.objects["Building"][0].object_name, "b");
+    assert_eq!(hb.objects["Zone"][0].object_name, "actual zone");
+    assert_eq!(hb.objects["Building"][0].idf_max_fields, None);
+    assert!(hb.objects["Construction"].is_empty());
+    let material = crate::ordinary_material_input::resolve(&raw, &input)?;
+    assert!(material.source_is_epjson);
+    assert!(material.regular.is_empty() && material.no_mass.is_empty());
+    assert!(
+        input.is_object_unused("Building", "b"),
+        "raw custody must not masquerade as a reached getter"
+    );
+    assert!(input.is_object_unused("Zone", "actual zone"));
     let initial_counts = SourceArgumentCounts {
         alphas: 5,
         numerics: 9,

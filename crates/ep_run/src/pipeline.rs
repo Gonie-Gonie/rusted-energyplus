@@ -852,6 +852,9 @@ struct PreparedRuntimeInputs {
         Option<ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor>,
     reporting_prescan_input:
         Option<ep_runtime::heat_balance::source_output_prescan::SourceReportingPreScanInput>,
+    heat_balance_input:
+        Option<ep_runtime::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInput>,
+    material_input: Option<ep_runtime::heat_balance::selected_material_data::SelectedMaterialInput>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -3638,7 +3641,20 @@ fn prepare_runtime_inputs(
         } else {
             None
         };
+    let (heat_balance_input, material_input) =
+        if let Some(input) = selected_input_processor.as_ref() {
+            (
+                Some(crate::ordinary_heat_balance_input::resolve(
+                    raw_model, input,
+                )?),
+                Some(crate::ordinary_material_input::resolve(raw_model, input)?),
+            )
+        } else {
+            (None, None)
+        };
     Ok(PreparedRuntimeInputs {
+        heat_balance_input,
+        material_input,
         pending_ordinary_weather,
         source_initialization_input,
         sample_count,
@@ -3695,6 +3711,8 @@ fn execute_rust_runtime(
                     .initialize_input_processor(input)
                     .map_err(|error| error.to_string())?;
             }
+            initialization.reports.heat_balance_input = runtime_inputs.heat_balance_input.take();
+            initialization.reports.selected_material_input = runtime_inputs.material_input.take();
             if let Some(raw) = runtime_inputs.reporting_prescan_input.take() {
                 initialization.reports.reporting_prescan_input = Some(raw);
                 initialization
@@ -3748,12 +3766,13 @@ fn execute_rust_runtime(
             } else {
                 HeatBalanceSimulationOptions::hourly_samples(sample_count)
             };
-            let mut initialization = ctf_outputs.context();
             let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {
-                ep_runtime::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
-                    model, weather_series, options, &mut initialization, reporting,
+                let (mut initialization, host) = ctf_outputs.context_with_mtd()?;
+                ep_runtime::simulate_heat_balance_zone_air_temperatures_with_source_heat_balance_input(
+                    model, weather_series, options, &mut initialization, reporting, host,
                 )
             } else {
+                let mut initialization = ctf_outputs.context();
                 simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
                     model, weather_series, options, &mut initialization,
                 )

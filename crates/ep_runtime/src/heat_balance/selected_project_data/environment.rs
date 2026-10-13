@@ -78,6 +78,10 @@ impl SelectedProjectData {
             "IgnoreSolarRadiation",
             &mut environment.ignore_solar_radiation,
         )?;
+        let minimum_report_frequency = get("MINREPORTFREQUENCY")?;
+        if !minimum_report_frequency.is_empty() {
+            self.system.minimum_report_frequency = minimum_report_frequency;
+        }
         update("DeveloperFlag", &mut self.system.developer_flag)?;
         update(
             "IgnoreBeamRadiation",
@@ -87,6 +91,15 @@ impl SelectedProjectData {
             "IgnoreDiffuseRadiation",
             &mut environment.ignore_diffuse_radiation,
         )?;
+        update(
+            "SutherlandHodgman",
+            &mut self.system.shadowing_clipping.sutherland_hodgman,
+        )?;
+        update(
+            "SlaterBarsky",
+            &mut self.system.shadowing_clipping.slater_barsky,
+        )?;
+        update("MinimalShadowing", &mut self.system.minimal_shadowing)?;
         update("TimingFlag", &mut self.system.timing_flag)?;
         update("CI_FORCE_TIME_STEP", &mut self.system.ci_force_time_step)?;
         Ok(())

@@ -1,0 +1,296 @@
+{
+  "schema": "src06-selected-hb-input-summary.v1",
+  "status": "Actual ordinary selected HB inputs and retained weather/output handoff connected; full Setup/GetHeatBalanceInput pending",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/7c/7cef065bae90e71aafb7bc3d64fc788ce8a06d0f1199b3c3474bc72fbbca8ba8",
+    "sha256": "7cef065bae90e71aafb7bc3d64fc788ce8a06d0f1199b3c3474bc72fbbca8ba8"
+  },
+  "behavior": [
+    "The same retained ordinary session supplies actual Station EIO before its existing weather selection. The HB initializer borrows that same weather environment/minutes, EIO, InputProcessor/unused identities and six shared argument arrays.",
+    "ProjectControl, SiteAtmosphere, Spectral/Material/Hysteresis/FrameDivider, regular Construction, Shadowing and Zone/implicit Space getters execute before the existing physical geometry return. Sole early Space controls are borrowed; no duplicate Sizing/Simulation controls are introduced.",
+    "Raw Building/Construction/Zone/NoMass projections preserve loader origin and genuine IDF positional field counts. Material properties and current CTF/LU/Solar mathematics remain the existing numerical producers.",
+    "Reached construction usage and Zone constructor owners are retained, with genuine ordered GrossArea-weighted centroid accumulation and guarded divisions over existing surface geometry. Full SurfaceTmp/final-sort/Space-range/min-max/report lifecycle remains incomplete.",
+    "Output:Variable getter owns local scratch and exact reset/unused erase/partial ReqVar prefixes. The sole prescan/time-binding registry is extended, and four unmatched Zone output setup/dictionary/total operations use the genuine retained MTD file host.",
+    "MINREPORTFREQUENCY and clipping settings are acquired once in actual early SystemVariables order. Report-input failure or later initializer errors retain reached owners, EIO and MTD bytes. Sole globals and Zone owners move to HeatBalanceState only after successful initialization."
+  ],
+  "QA": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-fmt-03/receipt.json",
+        "sha256": "65b0cb090273fa2176893a4d4209de4c9fe013429143c78e9c3ec5282c3aaf08",
+        "size_bytes": 7286
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-quality-03/receipt.json",
+        "sha256": "5e6c2cf63062589134bdf32098f43dbbdd55528b89f3cf1ad8e2ab43a61ea734",
+        "size_bytes": 7335
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-clippy-03/receipt.json",
+        "sha256": "111bd6341aacaa73df78082225f01eb6c0852141c731c87d5c52b4b1330c70cd",
+        "size_bytes": 7333
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-focused-tests-03/receipt.json",
+        "sha256": "31c58ca59d7a3653e7144b2c4fa5641ca0ee26127894cd48fbd4e23a5afae1af",
+        "size_bytes": 7883
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_compiler",
+        "-p",
+        "ep_raw_model",
+        "-p",
+        "ep_run",
+        "--lib",
+        "--",
+        "early_report_scan_is_shared_and_prescanned_owner_is_not_replayed",
+        "ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "source_constructor_defaults_and_allocation_are_distinct",
+        "compiler::report_inputs::",
+        "twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts",
+        "actual_fatal_prefix_survives_runtime_failure_and_summary",
+        "raw_equipment_admission_preserves_empty_presence_and_rejects_positive_or_field_branches"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-cli-tests-03/receipt.json",
+        "sha256": "9a9442ae6f1db53b3b2cc2cee610c3c6546b82df855db62bc4b1fe9ada769a78",
+        "size_bytes": 7370
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-ci-timestep-tests-03/receipt.json",
+        "sha256": "9addaf2dd43ffa8cbcaa903b2378ce44ebab745736888a96e8f0b42eaff243fd",
+        "size_bytes": 7374
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "historical_QA": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-fmt-01/receipt.json",
+        "sha256": "91f273948e8b462b8a8d5e3bfab06b88b04e5d603d4b693090658616480cf335",
+        "size_bytes": 6953
+      },
+      "exit_code": 0,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-quality-01/receipt.json",
+        "sha256": "eb54f4de017bc9acfe7c2c9721799b45e640c88dde86c430ece9e417c0a081c8",
+        "size_bytes": 7003
+      },
+      "exit_code": 0,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-clippy-01/receipt.json",
+        "sha256": "6fc811e925cb922b72a7ea531f69159dcbbf0537abe51e0a880bb49838371369",
+        "size_bytes": 7003
+      },
+      "exit_code": 101,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-focused-tests-01/receipt.json",
+        "sha256": "c2e5dbd47031f8b88c4e44e88a8d60096ffe38a5dec1d25d07a9c2d5c4e93df7",
+        "size_bytes": 7558
+      },
+      "exit_code": 101,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-fmt-02/receipt.json",
+        "sha256": "7bfcb9c17f63c5ff820b87e5c4518e721fd778665ee01193fc4bfee0d2743781",
+        "size_bytes": 7176
+      },
+      "exit_code": 0,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-quality-02/receipt.json",
+        "sha256": "bb1a02cb644e3095eac38bdcf4004fa928fd4309a5faf2f1427576a95eb93e9b",
+        "size_bytes": 7226
+      },
+      "exit_code": 0,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-clippy-02/receipt.json",
+        "sha256": "50f3562fee8bee5c7bcdb810bb7493cceca2501d1467df170d5eb8084b3e38e8",
+        "size_bytes": 7224
+      },
+      "exit_code": 101,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-input-focused-tests-02/receipt.json",
+        "sha256": "40ae65f757e6735864aa775c5e8878b0d43be51f20948fea3e66ba3d800f2ed4",
+        "size_bytes": 7778
+      },
+      "exit_code": 101,
+      "qualification": "Actual historical Source01/02 result, preserved without relabeling as final Source03. Source02 focused failure includes10 partial passes,1 failure,and no runtime3 execution."
+    }
+  ],
+  "tests": {
+    "selections": [
+      {
+        "scope": "focused-tests",
+        "package_group_results": [
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            0
+          ]
+        ],
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "cli-tests",
+        "package_group_results": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "ci-timestep-tests",
+        "package_group_results": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "passed": 16,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "validation_scope": "One four-package filtered lib command runs14 existing tests; normalCLI1 and actual CI_FORCE_TIME_STEP=Y CLI1. One fmt/source-quality/all-target workspace Clippy. No full workspace-test repeat or new Native execution; earlier unit passes are not recounted.",
+  "limitations": [
+    "Selected getter assembly is not a complete GetHeatBalanceInput, SetupSimulation, InitHeatBalance, surface geometry lifecycle, radiation/inside solver or HVAC completion.",
+    "Current eager weather allocation and eager CTF/Solar preparation remain known limitations until genuine Setup/BeginSim orchestration is connected.",
+    "Matched OutVar/report-dictionary writers, RE2 keys, nonblank output schedule and nonempty minimum-report-frequency branches remain explicitly unavailable after their genuine reached prefixes. Positive excluded input families are not widened.",
+    "Three top-comment02 changes preserve01 tokens. Two inherited whole-payload equality annotations apply to01 or02 only after the exact comment inverse, as qualified in independent review; bundled fmath custody is local and not falsely labeled Git-tracked.",
+    "Generic apply01 rejected genuine new-file before=None during prevalidation, without canonical writes; apply02 records the preserved author failure and reverified clean Git base. This was not a Rust/QA failure.",
+    "Actual Source01 Clippy and focused compiler runs failed101 before tests. Source02 fixes six API/import/error-wrapper/legacy-literal/caller sites. Source02 Clippy failed101 on five style issues; focused tests failed101 on an old staged IDF that omitted its converted Building, after10 partial passes and before runtime3. Source03 preserves exact output bytes/ASCII characters, consumes the same borrowed host and fixes that fixture without weakening production validation. All old receipts/custody are retained; final tests are from Source03 only.",
+    "Whole ordinary235456 mismatches/2754 unavailable and DesignDay nine strict failures/eight UNPAIRED remain unchanged. SRC06 four gates remain unverified; A14/54 B14/64 unchanged."
+  ],
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-hb-input-assembly-Source-review-02/review.json",
+    "sha256": "d327e0a192c8e0d235ddced33b43041708f50a2ea7b49a3cacdd7460cedae574",
+    "size_bytes": 4767
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-hb-input-application-review-03/review.json",
+    "sha256": "2345c6f931083460cabb7f5b0bb0eb8cfae52091e4cab91a2d655be56ec3c1c5",
+    "size_bytes": 8977
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-input/manifest.json",
+    "sha256": "597d5d752325f2838bd22e570860f4f32ba71b1f90adca5db54653c2afba9d2a",
+    "size_bytes": 290463
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-input/evidence.zip",
+    "sha256": "48fc08a44ab70a478ddb3f087394f4bfb6cad39bdcb1d487c276022d91a33915",
+    "size_bytes": 3863266
+  },
+  "gates_updated": false
+}

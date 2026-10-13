@@ -19,6 +19,32 @@ pub struct IdfOrderTarget {
 /// explicit identity and converter edge-case evidence. Other position-sensitive
 /// families require the same evidence before joining the fail-closed overlay.
 pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
+    // Same four actual HB getter targets from the frozen adjacent packet.
+    IdfOrderTarget {
+        object_type: "Building",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "SurfaceConvectionAlgorithm:Inside",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "SurfaceConvectionAlgorithm:Outside",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "ZoneAirHeatBalanceAlgorithm",
+        name_field_index: 0,
+    },
+    // Material.cc regular direct JSON and NoMass getter preserve IDF order.
+    IdfOrderTarget {
+        object_type: "Material",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Material:NoMass",
+        name_field_index: 0,
+    },
     // SimulationManager::GetProjectData uses real IDF max-field counts.
     IdfOrderTarget {
         object_type: "Version",
@@ -34,6 +60,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
     },
     IdfOrderTarget {
         object_type: "SimulationControl",
+        name_field_index: 0,
+    },
+    // OutputProcessor's actual getter requires the same unnamed-object order.
+    IdfOrderTarget {
+        object_type: "Output:Variable",
         name_field_index: 0,
     },
     // IdfParser.cc277-301 generates these unnamed keys from the per-type count.
@@ -274,7 +305,12 @@ pub fn apply_idf_declaration_order(
                     actual_type.0, actual_name.0
                 )));
             }
-            if unnamed_legacy_type(target.object_type) {
+            if unnamed_legacy_type(target.object_type)
+                || matches!(
+                    target.object_type,
+                    "Material:NoMass" | "Building" | "Construction" | "Zone"
+                )
+            {
                 report_field_counts.push((
                     actual_type.clone(),
                     actual_name.clone(),
@@ -442,11 +478,15 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
             | "HeatBalanceAlgorithm"
             | "Timestep"
             | "SimulationControl"
+            | "SurfaceConvectionAlgorithm:Inside"
+            | "SurfaceConvectionAlgorithm:Outside"
+            | "ZoneAirHeatBalanceAlgorithm"
             | "Output:Surfaces:List"
             | "Output:Surfaces:Drawing"
             | "Output:VariableDictionary"
             | "Output:Constructions"
             | "Output:EnergyManagementSystem"
+            | "Output:Variable"
     )
 }
 
@@ -935,6 +975,52 @@ mod unnamed_report_order_tests {
             );
         }
         // The same unnamed Source parser counts blank positional fields too.
+        // Named materials use the same strict source overlay, not lexical order.
+        for (family, idf, expected) in [
+            (
+                "Material",
+                "Material,Z,Rough,0.1,1,100,1000;Material,A,Smooth,0.2,1,100,1000;",
+                None,
+            ),
+            (
+                "Material:NoMass",
+                "Material:NoMass,Z,Rough,1;Material:NoMass,A,Smooth,2,,,;",
+                Some([3, 6]),
+            ),
+            (
+                "Zone",
+                "Zone,Z;Zone,A,0,0,0,0,1,1,autocalculate,autocalculate,autocalculate,,,Yes;",
+                Some([1, 13]),
+            ),
+            (
+                "Building",
+                "Building,Z,0,Suburbs,0.04,0.4,MinimalShadowing,25,6;Building,A,0,Suburbs,0.04,0.4,MinimalShadowing,25,6;",
+                Some([8, 8]),
+            ),
+            (
+                "Construction",
+                "Construction,Z,Layer;Construction,A,Layer1,Layer2;",
+                Some([2, 3]),
+            ),
+        ] {
+            let epjson = format!("{{\"{family}\":{{\"A\":{{}},\"Z\":{{}}}}}}");
+            let raw = parse_epjson_str_with_idf_order(&epjson, idf)?;
+            let rows = raw.ordered_instances(family)?;
+            assert_eq!(
+                rows.iter()
+                    .map(|(name, _)| name.0.as_str())
+                    .collect::<Vec<_>>(),
+                ["Z", "A"]
+            );
+            for (index, (_, object)) in rows.iter().enumerate() {
+                let count = object.fields.get(&FieldName("idf_max_fields".into()));
+                if let Some(expected) = expected {
+                    assert_eq!(count, Some(&RawValue::Number(expected[index].to_string())));
+                } else {
+                    assert!(count.is_none());
+                }
+            }
+        }
         for (family, fields, expected) in [
             ("Version", "26.1", 1),
             (
@@ -944,6 +1030,13 @@ mod unnamed_report_order_tests {
             ),
             ("Timestep", "4", 1),
             ("SimulationControl", "No,No,No,No,Yes,,1", 7),
+            ("SurfaceConvectionAlgorithm:Inside", "TARP", 1),
+            ("SurfaceConvectionAlgorithm:Outside", "DOE-2", 1),
+            (
+                "ZoneAirHeatBalanceAlgorithm",
+                "ThirdOrderBackwardDifference,No,No",
+                3,
+            ),
         ] {
             let epjson = format!("{{\"{family}\":{{\"{family} 1\":{{}}}}}}");
             let raw = parse_epjson_str_with_idf_order(&epjson, &format!("{family},{fields};"))?;
@@ -956,6 +1049,18 @@ mod unnamed_report_order_tests {
                 Some(&RawValue::Number(expected.to_string()))
             );
         }
+        // Building is named: preserve its actual source name and eight fields.
+        let raw = parse_epjson_str_with_idf_order(
+            r#"{"Building":{"Actual Building":{"north_axis":0}}}"#,
+            "Building,Actual Building,0,Suburbs,0.04,0.4,MinimalShadowing,25,6;",
+        )?;
+        let rows = raw.ordered_instances("Building")?;
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].0.0, "Actual Building");
+        assert_eq!(
+            rows[0].1.fields.get(&FieldName("idf_max_fields".into())),
+            Some(&RawValue::Number("8".into()))
+        );
         Ok(())
     }
 }

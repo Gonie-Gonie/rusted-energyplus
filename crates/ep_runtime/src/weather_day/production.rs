@@ -12,6 +12,7 @@ use ep_model::FirstHourInterpolationStartingValues;
 use std::cell::{Cell, RefCell};
 
 mod setup;
+mod source_environment;
 pub use setup::{SetupSimulationCall, SetupSimulationControls, SetupSimulationRole};
 
 /// Explicit caller phase; repeated warmup days retain independent call identities.

@@ -207,6 +207,7 @@ pub fn simulate_heat_balance_zone_air_temperatures(
         &[],
         None,
         None,
+        None,
     )
 }
 
@@ -282,6 +283,7 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_c
         ctf_coefficients,
         None,
         None,
+        None,
     )
 }
 
@@ -299,6 +301,7 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather(
         Some(HeatBalanceWeatherDriver::Production(weather_series)),
         options,
         &[],
+        None,
         None,
         None,
     )
@@ -319,6 +322,7 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather_and_i
         options,
         &[],
         Some(context),
+        None,
         None,
     )
 }
@@ -341,6 +345,33 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather_and_w
         &[],
         Some(context),
         Some(reporting),
+        None,
+    )
+}
+
+/// Ordinary source-input path using the actual weather, EIO and MTD owners.
+/// Existing manual/diagnostic entrypoints preserve their initialization behavior.
+///
+/// # Errors
+/// Returns the actual input, output, weather or existing heat-balance failure.
+pub fn simulate_heat_balance_zone_air_temperatures_with_source_heat_balance_input(
+    model: &SimulationModel,
+    weather: &ProductionWeatherTimestepSeries,
+    options: HeatBalanceSimulationOptions,
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    reporting: HeatBalanceOrdinaryWarmupReportInputs,
+    host: &mut crate::heat_balance::source_output_registration::SourceMtdFileHost,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_internal(
+        model,
+        &[],
+        None,
+        Some(HeatBalanceWeatherDriver::Production(weather)),
+        options,
+        &[],
+        Some(context),
+        Some(reporting),
+        Some(host),
     )
 }
 
@@ -359,6 +390,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
     >,
     reporting: Option<HeatBalanceOrdinaryWarmupReportInputs>,
+    source_output_host: Option<
+        &mut crate::heat_balance::source_output_registration::SourceMtdFileHost,
+    >,
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
     let hourly_count =
         weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
@@ -399,7 +433,22 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         } else {
             WeatherDayPhase::Run { day: 1 }
         };
-        driver.prepare_initial_phase(initial_phase)?;
+        match (source_output_host.is_some(), driver) {
+            (true, HeatBalanceWeatherDriver::Production(weather)) => {
+                let actual = initialization.as_deref_mut().ok_or_else(|| {
+                    RuntimeError::WarmupUnavailable {
+                        reason: "source weather input requires actual initialization owners".into(),
+                    }
+                })?;
+                weather.prepare_initial_phase_with_source_context(initial_phase, actual)?;
+            }
+            (true, _) => {
+                return Err(RuntimeError::WarmupUnavailable {
+                    reason: "source HB input requires the actual production weather session".into(),
+                });
+            }
+            (false, _) => driver.prepare_initial_phase(initial_phase)?,
+        }
     }
     let initial_dry_bulb_c = match weather_driver {
         Some(driver) => driver.initial_hourly_dry_bulb_c()?,
@@ -444,18 +493,27 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 &schedule_cache,
             );
             let mut state = if let Some(context) = initialization.as_deref_mut() {
-                initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
-                    model,
-                    options.initial_zone_air_temperature_c,
-                    ctf_coefficients,
-                    &schedule_cache,
-                    &mut schedule_cache_profile,
-                    context,
-                    crate::heat_balance::initialization::OrdinaryInitializationInputs {
-                        equipment: equipment_input,
-                        radiation: radiation_input,
-                    },
-                )?
+                match (source_output_host, weather_driver) {
+                    (Some(host), Some(HeatBalanceWeatherDriver::Production(weather))) =>
+                        weather.with_source_environment_mut(|environment, minutes|
+                            initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+                                model, options.initial_zone_air_temperature_c, ctf_coefficients,
+                                &schedule_cache, &mut schedule_cache_profile, context,
+                                crate::heat_balance::initialization::OrdinaryInitializationInputs {
+                                    equipment: equipment_input, radiation: radiation_input,
+                                    source: Some(crate::heat_balance::initialization::SourceHeatBalanceInputOwners {
+                                        environment, minutes, output_host: host,
+                                    }),
+                                }))?,
+                    (Some(_), _) => return Err(RuntimeError::WarmupUnavailable {
+                        reason: "source HB input requires the actual production weather session".into() }),
+                    (None, _) => initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+                        model, options.initial_zone_air_temperature_c, ctf_coefficients,
+                        &schedule_cache, &mut schedule_cache_profile, context,
+                        crate::heat_balance::initialization::OrdinaryInitializationInputs {
+                            equipment: equipment_input, radiation: radiation_input, source: None,
+                        })?,
+                }
             } else {
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
                     model,

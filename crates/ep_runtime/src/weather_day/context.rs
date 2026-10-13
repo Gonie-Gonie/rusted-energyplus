@@ -110,6 +110,13 @@ impl Default for WeatherGlobalState {
 /// Selected current and tomorrow environment fields from DataEnvironment.hh.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WeatherEnvironmentState {
+    /// Sole DataEnvironment constructor/site/station operands, retained in this session.
+    pub outdoor_environment_parameters:
+        crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters,
+    /// Rust witness assigned only after the real selected station/EIO return.
+    pub(crate) source_weather_station_initialized: bool,
+    /// Rust witness assigned only after the real selected site/EIO return.
+    pub(crate) source_site_atmosphere_initialized: bool,
     /// Actual DataEnvironment constructor false; GetProjectData may override it.
     pub force_begin_env_reset_suppress: bool,
     /// Selected mutable environment after SetCurrentWeather.
@@ -195,6 +202,15 @@ pub struct WeatherEnvironmentState {
 impl Default for WeatherEnvironmentState {
     fn default() -> Self {
         Self {
+            outdoor_environment_parameters: crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters {
+                site_temperature_gradient_k_per_m: 0.0065,
+                weather_file_temperature_modifier_c: 0.0,
+                site_wind_exponent: 0.22,
+                site_wind_boundary_layer_height_m: 370.0,
+                weather_file_wind_modifier: 1.5863,
+            },
+            source_weather_station_initialized: false,
+            source_site_atmosphere_initialized: false,
             force_begin_env_reset_suppress: false,
             current_weather: CurrentWeatherState::default(),
             previous_sol_rad_positive: false,

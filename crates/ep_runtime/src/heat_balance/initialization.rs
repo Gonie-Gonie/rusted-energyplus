@@ -42,9 +42,16 @@ use state_shell::finish_heat_balance_state;
 
 /// Actual optional raw-admission projections for the one existing initializer.
 #[derive(Default)]
-pub(crate) struct OrdinaryInitializationInputs {
+pub(crate) struct OrdinaryInitializationInputs<'a> {
     pub(crate) equipment: Option<super::ordinary_equipment::OrdinaryEquipmentInput>,
+    pub(crate) source: Option<SourceHeatBalanceInputOwners<'a>>,
     pub(crate) radiation: Option<super::radiation::ordinary::OrdinaryRadiationInput>,
+}
+
+pub(crate) struct SourceHeatBalanceInputOwners<'a> {
+    pub(crate) environment: &'a mut crate::weather::day::WeatherEnvironmentState,
+    pub(crate) minutes: i32,
+    pub(crate) output_host: &'a mut super::source_output_registration::SourceMtdFileHost,
 }
 
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
@@ -57,17 +64,33 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     mut initialization: Option<
         &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
     >,
-    inputs: OrdinaryInitializationInputs,
+    inputs: OrdinaryInitializationInputs<'_>,
 ) -> Result<HeatBalanceState, RuntimeError> {
     let OrdinaryInitializationInputs {
         equipment: equipment_input,
         radiation: radiation_input,
+        source,
     } = inputs;
     if radiation_input.is_some() && initialization.is_none() {
         return Err(super::radiation::ordinary::OrdinaryRadiationError::from(
             super::radiation::ordinary::OrdinaryRadiationUnavailable::MissingInitializationContext,
         )
         .into());
+    }
+    let source_input_reached = source.is_some();
+    if let Some(source) = source {
+        let actual =
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "source HB input requires its actual context".into(),
+                })?;
+        actual.initialize_selected_heat_balance_input(
+            &model.typed,
+            source.environment,
+            source.minutes,
+            source.output_host,
+        )?;
     }
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
@@ -92,6 +115,14 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .surfaces
                 .iter()
                 .map(|surface| {
+                    if source_input_reached {
+                        initialization
+                            .as_deref_mut()
+                            .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                                reason: "surface construction requires actual input owner".into(),
+                            })?
+                            .mark_selected_surface_construction_used(surface.construction)?;
+                    }
                     let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
                         .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
                             surface_name: surface.name.0.clone(),
@@ -103,6 +134,32 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .collect::<Result<Vec<_>, _>>()
         })
         .transpose()?;
+    if source_input_reached {
+        let layout =
+            super::inside_convection_layout::InsideConvectionLayout::from_typed_model(&model.typed)
+                .map_err(|_| RuntimeError::WarmupUnavailable {
+                    reason: "actual CTF surface domain".into(),
+                })?;
+        let actual =
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "actual input owner before CTF assignment".into(),
+                })?;
+        for group in layout.groups() {
+            for id in &group.surfaces {
+                let surface = model
+                    .typed
+                    .surfaces
+                    .iter()
+                    .find(|s| s.id == *id)
+                    .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                        reason: "actual CTF surface identity".into(),
+                    })?;
+                actual.mark_selected_surface_ctf_construction_used(surface.construction)?;
+            }
+        }
+    }
     let equipment = equipment_input
         .map(|input| {
             super::ordinary_equipment::OrdinaryEquipment::for_geometry(&model.typed, input).map_err(
@@ -178,6 +235,101 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             system_timestep_average_air_storage_report_w: None,
         });
     }
+
+    let selected_opaque_geometry = if source_input_reached {
+        let data =
+            admitted_surface_data
+                .as_ref()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "source Zone geometry requires actual admitted surface returns".into(),
+                })?;
+        let actual_surface_geometry = model
+            .typed
+            .surfaces
+            .iter()
+            .zip(data)
+            .map(|(surface, (geometry, _))| (surface.id, *geometry))
+            .collect::<Vec<_>>();
+        let geometry = opaque_geometry_owners(&model.typed, &actual_surface_geometry);
+        let actual =
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "Zone geometry commit requires retained caller owner".into(),
+                })?;
+        let zone_owner = actual.reports.selected_zone_input.as_mut().ok_or_else(|| {
+            RuntimeError::WarmupUnavailable {
+                reason: "Zone geometry before real Zone getter".into(),
+            }
+        })?;
+        let rows = zone_owner
+            .zones
+            .as_mut()
+            .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                reason: "Zone geometry before actual allocation".into(),
+            })?;
+        let opaque = geometry
+            .as_ref()
+            .map_err(|error| RuntimeError::WarmupUnavailable {
+                reason: format!("actual Zone centroid unavailable: {error}"),
+            })?;
+        for zone in rows {
+            let id = zone
+                .typed_zone_id
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "raw Zone identity".into(),
+                })?;
+            if !opaque.zones.iter().any(|row| row.zone_id == id) {
+                return Err(RuntimeError::WarmupUnavailable {
+                    reason: "actual Zone geometry association absent".into(),
+                });
+            }
+            let volume = zone_geometry_returns
+                .iter()
+                .find(|row| row.zone_id == id)
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "actual Zone volume return absent".into(),
+                })?;
+            // SurfaceGeometry557-597: reset, then actual Space/opaque-class
+            // traversal using already returned Surface.Centroid/GrossArea.
+            let layout = super::inside_convection_layout::InsideConvectionLayout::from_typed_model(
+                &model.typed,
+            )
+            .map_err(|_| RuntimeError::WarmupUnavailable {
+                reason: "actual Zone centroid traversal".into(),
+            })?;
+            let mut centroid = [0.0; 3];
+            let mut total_surface_area = 0.0;
+            zone.centroid_m = Some(centroid);
+            for group in layout.groups().iter().filter(|group| group.zone_id == id) {
+                for surface_id in &group.surfaces {
+                    let (_, geometry) = actual_surface_geometry
+                        .iter()
+                        .find(|row| row.0 == *surface_id)
+                        .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                            reason: "actual Zone centroid surface return".into(),
+                        })?;
+                    centroid[0] += geometry.centroid_m.x_m * geometry.gross_area_m2;
+                    centroid[1] += geometry.centroid_m.y_m * geometry.gross_area_m2;
+                    centroid[2] += geometry.centroid_m.z_m * geometry.gross_area_m2;
+                    total_surface_area += geometry.gross_area_m2;
+                    zone.centroid_m = Some(centroid);
+                }
+            }
+            if total_surface_area > 0.0 {
+                centroid[0] /= total_surface_area;
+                centroid[1] /= total_surface_area;
+                centroid[2] /= total_surface_area;
+                zone.centroid_m = Some(centroid);
+            }
+            zone.ceiling_height = volume.returned.ceiling_height_m;
+            zone.volume = volume.returned.volume_m3;
+            zone.floor_area = volume.returned.floor_area_m2;
+        }
+        Some(geometry)
+    } else {
+        None
+    };
 
     // Validate actual declared references before selected public generation
     // can reject an unsupported boundary family. Preserve the existing
@@ -371,7 +523,8 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .collect::<Vec<_>>();
     let initialized_geometry = InitializedGeometryOwners {
         zone_returns: zone_geometry_returns,
-        opaque_setup: opaque_geometry_owners(&model.typed, &actual_surface_geometry),
+        opaque_setup: selected_opaque_geometry
+            .unwrap_or_else(|| opaque_geometry_owners(&model.typed, &actual_surface_geometry)),
     };
 
     for zone in &mut zones {
@@ -410,6 +563,24 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         construction_thermal_data,
         ctf_surface_lifecycle,
     );
+    // No fallible initialization work follows the sole-owner move.
+    if source_input_reached {
+        let actual =
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "completed source HB initialization requires retained context".into(),
+                })?;
+        if actual.reports.selected_heat_balance_globals.is_none()
+            || actual.reports.selected_zone_input.is_none()
+        {
+            return Err(RuntimeError::WarmupUnavailable {
+                reason: "missing source owners after geometry".into(),
+            });
+        }
+        state.selected_heat_balance_globals = actual.reports.selected_heat_balance_globals.take();
+        state.selected_zone_input = actual.reports.selected_zone_input.take();
+    }
     state.ordinary_equipment = equipment;
     if radiation_input.is_some() {
         state.ordinary_solar_radiation =

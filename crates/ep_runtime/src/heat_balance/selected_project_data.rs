@@ -71,6 +71,10 @@ fn fatal(backend: &mut SourceErrorBackend<'_>, message: &str) -> Result<(), Proj
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct ProjectSystemVariables {
     pub(crate) ci_force_time_step: bool,
+    pub(crate) minimal_shadowing: bool,
+    pub(crate) minimum_report_frequency: String,
+    pub(crate) shadowing_clipping:
+        super::selected_heat_balance_input::shadowing::ShadowingSystemSettings,
     pub(crate) dd_only: bool,
     pub(crate) full_annual_run: bool,
     pub(crate) report_during_warmup: bool,

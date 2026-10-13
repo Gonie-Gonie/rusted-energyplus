@@ -44,6 +44,10 @@ impl ZoneAirTemperatureCoefficients {
 /// Initial heat-balance state shell for the EnergyPlus porting path.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeatBalanceState {
+    pub(crate) selected_heat_balance_globals:
+        Option<super::selected_heat_balance_globals::SelectedHeatBalanceGlobals>,
+    pub(crate) selected_zone_input:
+        Option<super::selected_heat_balance_input::zone::SelectedZoneInputOwners>,
     /// Current zone timestep index.
     pub timestep_index: usize,
     /// Per-zone heat-balance state.

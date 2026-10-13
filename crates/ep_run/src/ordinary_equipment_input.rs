@@ -324,7 +324,7 @@ mod tests {
         }"#;
         let mut converted = ep_raw_model::parse_epjson_str_with_idf_order(
             converted,
-            "Version,26.1;Timestep,4;HeatBalanceAlgorithm,ConductionTransferFunction;SimulationControl,No,No,No,No,Yes;Zone,z;",
+            "Version,26.1;Timestep,4;HeatBalanceAlgorithm,ConductionTransferFunction;SimulationControl,No,No,No,No,Yes;Building,b,,,,,MinimalShadowing;Zone,z;",
         )?;
         assert!(resolve(&converted).is_ok());
         let metadata = converted

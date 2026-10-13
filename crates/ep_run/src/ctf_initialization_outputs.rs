@@ -22,6 +22,7 @@ pub(crate) struct CtfRunOutputs {
     eio: Vec<u8>,
     reached: bool,
     initialization_files: Option<SourceInitializationFiles>,
+    mtd: Option<ep_runtime::heat_balance::source_output_registration::SourceMtdFileHost>,
 }
 
 impl CtfRunOutputs {
@@ -57,6 +58,7 @@ impl CtfRunOutputs {
             eio: Vec::new(),
             reached: false,
             initialization_files: None,
+            mtd: None,
         }
     }
 
@@ -68,6 +70,11 @@ impl CtfRunOutputs {
         self.reached = true;
         let first_entry = self.initialization_files.is_none();
         if first_entry {
+            self.mtd = Some(
+                ep_runtime::heat_balance::source_output_registration::SourceMtdFileHost::new(
+                    output_dir.join("eplusrs.mtd"),
+                ),
+            );
             self.reports.source_initialization_input = Some(input);
             self.initialization_files = Some(SourceInitializationFiles::new(
                 SourceInitializationFilePaths {
@@ -192,6 +199,43 @@ impl CtfRunOutputs {
         }
     }
 
+    pub(crate) fn context_with_mtd(
+        &mut self,
+    ) -> Result<
+        (
+            CtfInitializationContext<'_>,
+            &mut ep_runtime::heat_balance::source_output_registration::SourceMtdFileHost,
+        ),
+        String,
+    > {
+        self.reached = true;
+        let mtd = self.mtd.as_mut().ok_or("actual MTD host missing")?;
+        Ok((
+            CtfInitializationContext {
+                reports: &mut self.reports,
+                eio: match self.initialization_files.as_mut() {
+                    Some(files) => files.eio_stream(),
+                    None => &mut self.eio,
+                },
+                backend: SourceErrorBackend {
+                    state: &mut self.state,
+                    error_stream: Some(&mut self.error),
+                    console: &mut self.console,
+                    // RunConfig owns no SQLite, callback or optional output-unit adapter.
+                    // The actual buffered console stream is exported separately from
+                    // CLI JSON stdout, rather than silently replacing it with a no-op.
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            },
+            mtd,
+        ))
+    }
+
     pub(crate) fn persist(&mut self, output_dir: &Path) -> Result<(), String> {
         if !self.reached {
             return Ok(());
@@ -211,6 +255,9 @@ impl CtfRunOutputs {
         }
         if let Some(files) = self.initialization_files.as_mut() {
             files.flush_reached().map_err(|e| e.to_string())?;
+        }
+        if let Some(host) = self.mtd.as_mut() {
+            host.flush_reached().map_err(|error| error.to_string())?;
         }
         Ok(())
     }
