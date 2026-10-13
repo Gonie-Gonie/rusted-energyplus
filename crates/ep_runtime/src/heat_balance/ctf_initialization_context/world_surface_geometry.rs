@@ -57,6 +57,13 @@ impl CtfInitializationContext<'_> {
             }
             return Ok(true);
         }
+        // Actual preconstruction owner supplies the unconditional window bound.
+        let max_solid_window_layers = reports
+            .selected_simulation_startup
+            .as_ref()
+            .ok_or_else(|| hb_input_error(E::Unavailable("actual startup construction bounds")))?
+            .construction_bounds
+            .max_solid_window_layers;
         let mut owners = SurfaceGetterOwners {
             model,
             environment,
@@ -126,7 +133,11 @@ impl CtfInitializationContext<'_> {
                 &mut owners,
                 &mut self.backend,
                 &mut reports.heat_balance_input_errors_found,
+                max_solid_window_layers,
             )
+            .map_err(hb_input_error)?;
+        state
+            .set_floor_and_roof_areas(&mut owners, &mut self.backend)
             .map_err(hb_input_error)?;
         state
             .check_final_surface_areas(&mut self.backend)
@@ -135,6 +146,7 @@ impl CtfInitializationContext<'_> {
             .calculate_final_centroids(&mut self.backend, environment)
             .map_err(hb_input_error)?;
         state.bind_typed_surfaces(&owners).map_err(hb_input_error)?;
+        state.bind_outdoor_geometry().map_err(hb_input_error)?;
         // Do not clear SetupGeometry trig arrays here: Original310's caller
         // boundary has not been reached by this bounded numerical-prefix port.
         Ok(true)
@@ -150,5 +162,97 @@ impl CtfInitializationContext<'_> {
             .surface_geometry_input
             .required_properties(id)
             .map_err(hb_input_error)
+    }
+
+    pub(crate) fn take_selected_world_outdoor_rows(
+        &mut self,
+        model: &TypedModel,
+    ) -> Result<
+        Vec<crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentState>,
+        RuntimeError,
+    > {
+        self.reports
+            .surface_geometry_input
+            .take_outdoor_in_model_order(model)
+            .map_err(hb_input_error)
+    }
+
+    pub(crate) fn restore_selected_world_outdoor_rows(
+        &mut self,
+        surfaces: Vec<crate::heat_balance::state::SurfaceHeatBalanceState>,
+    ) {
+        self.reports
+            .surface_geometry_input
+            .restore_outdoor_from_surfaces(surfaces);
+    }
+
+    /// Qualified existing numeric handoff, supplied by genuine retained faces.
+    /// This is not the complete Source SetupZoneGeometry height/volume suffix.
+    pub(crate) fn selected_world_zone_volume(
+        &mut self,
+        id: ep_model::ZoneId,
+    ) -> Result<crate::geometry::ZoneGeometryProperties, RuntimeError> {
+        let reports = &mut *self.reports;
+        let zones = reports
+            .selected_zone_input
+            .as_mut()
+            .and_then(|owner| owner.zones.as_mut())
+            .ok_or_else(|| hb_input_error(E::Unavailable("same selected Zone volume owner")))?;
+        let number = zones
+            .iter()
+            .position(|zone| zone.typed_zone_id == Some(id))
+            .ok_or_else(|| hb_input_error(E::Unavailable("actual selected volume ZoneId")))?;
+        let source_number = i32::try_from(number)
+            .ok()
+            .and_then(|value| value.checked_add(1))
+            .ok_or_else(|| hb_input_error(E::Unavailable("Source signed volume Zone index")))?;
+        let faces = reports
+            .surface_geometry_input
+            .retained_zone_volume_faces(source_number)
+            .map_err(hb_input_error)?;
+        let zone = &mut zones[number];
+        let mut numeric = crate::geometry::ZoneGeometryProperties {
+            volume_m3: zone.volume,
+            ceiling_height_m: zone.ceiling_height,
+            ceiling_height_entered: zone.ceiling_height_entered,
+            floor_area_m2: zone.floor_area,
+            user_entered_floor_area_m2: zone.user_entered_floor_area,
+            ceiling_area_m2: zone.ceiling_area,
+            has_floor: zone.has_floor,
+            has_roof: zone.has_roof,
+            faces,
+            ..Default::default()
+        };
+        // Temporary numeric denominators only. No second persistent Zone owner,
+        // inferred multiplier or Source geometric-area producer is installed.
+        for face in &numeric.faces {
+            match face.surface_type {
+                ep_model::SurfaceType::Floor => {
+                    numeric.geometric_floor_area_m2 += face.gross_area_m2
+                }
+                ep_model::SurfaceType::Roof | ep_model::SurfaceType::Ceiling => {
+                    numeric.geometric_ceiling_area_m2 += face.gross_area_m2
+                }
+                ep_model::SurfaceType::Wall => {}
+            }
+        }
+        let result = (|| {
+            let height = crate::geometry::prepare_zone_height(&mut numeric);
+            // Preserve partial helper writes before either numerical error.
+            zone.ceiling_height = numeric.ceiling_height_m;
+            zone.ceiling_height_entered = numeric.ceiling_height_entered;
+            height?;
+            let volume = crate::geometry::calculate_zone_volume(&mut numeric);
+            zone.volume = numeric.volume_m3;
+            volume?;
+            Ok(numeric)
+        })();
+        crate::geometry::zone_volume_trace::record(id, &zone.name, &result);
+        result.map_err(|error: crate::geometry::ZoneVolumeError| {
+            RuntimeError::UnsupportedZoneVolumeGeometry {
+                zone_name: zone.name.clone(),
+                reason: error.to_string(),
+            }
+        })
     }
 }

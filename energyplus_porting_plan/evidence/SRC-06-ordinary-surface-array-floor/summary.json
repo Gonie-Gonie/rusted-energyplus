@@ -1,0 +1,320 @@
+{
+  "schema": "src06-surface-array-floor-summary.v1",
+  "status": "Selected arrays/floor and retained outdoor owner consumed; bounded Rust QA passed",
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/manifest.json",
+    "sha256": "91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529",
+    "size_bytes": 26304
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-application-review-01/review.json",
+    "sha256": "a84a57ed78d3b76c7c7bf47780587588f5dee9da28845fb7eb1b38451ece4a75",
+    "size_bytes": 20980
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/bd/bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715",
+    "sha256": "bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715"
+  },
+  "behavior": "Source-order final Surface/SurfaceWindow/surfShades/primitive/window arrays allocated. Literal selected floor/roof owner writes survive later initialization. Existing numeric height/volume handoff consumes retained final raw faces/current Zone scalars. Sole outdoor rows move into physical surfaces with checked complete mapping and reverse restoration before selected constructor errors.",
+  "QA": [
+    {
+      "role": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-fmt-01/receipt.json",
+        "sha256": "f4ba879058fc3051e02837b895459099b16bd35736968e705332524faf55e57c",
+        "size_bytes": 4634
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-quality-01/receipt.json",
+        "sha256": "eada3e630e0348267cf1e24bea555fde74e70a15625b7f44443fe1558833c514",
+        "size_bytes": 4682
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-clippy-01/receipt.json",
+        "sha256": "ae947086c749b407ae5d063995d85202dddc73124cb10f502d7f93f045d41fba",
+        "size_bytes": 4689
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "focused-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-focused-tests-01/receipt.json",
+        "sha256": "9d07a9b9332984e7f95bc499a76ca38c9b5a108f767d8e2ece8369651dd13c44",
+        "size_bytes": 4765
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--nocapture"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "cli-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-cli-tests-01/receipt.json",
+        "sha256": "cbc8468feed9f051218c0893a5a914819d37b7b2a88bc4e5d49eaeefb77beb8a",
+        "size_bytes": 4720
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "ci-timestep-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-ci-timestep-tests-01/receipt.json",
+        "sha256": "1d8ece80c12c8afb0869d31e20c0bea46a2b85ff45f5a03ebbcc270dc0ceb2b4",
+        "size_bytes": 4721
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ],
+      "actual_exit_code": 0
+    }
+  ],
+  "tests": {
+    "selections": [
+      {
+        "role": "focused-tests",
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "role": "cli-tests",
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "role": "ci-timestep-tests",
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "QA_scope": "Affected ep_runtime all-target Clippy, one extended existing runtime allocation/custody body, normalCLI1 and actual CI_FORCE_TIME_STEP=Y CLI1. Prior unchanged geometry/volume mathematical tests are not rerun; no full workspace test repeat or new Native run.",
+  "historical_QA": [],
+  "actual_A": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-command-01/receipt.json",
+      "sha256": "eca313b339a8d08e912a8eff05a0b20f6d4e83b1d43d6d4b7069637a3e4046ab",
+      "size_bytes": 5182
+    },
+    "actual_command": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "run",
+      "-p",
+      "ep_cli",
+      "--bin",
+      "eplus-rs",
+      "--",
+      "run",
+      "energyplus_porting_plan/cases/A-24H/input.idf",
+      "--weather",
+      ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output",
+      "--mode",
+      "compatibility",
+      "--partial",
+      "deny",
+      "--porting-scope",
+      "A",
+      "--format",
+      "rust-native",
+      "--hours",
+      "24",
+      "--keep-intermediate",
+      "--trace-level",
+      "summary",
+      "--json"
+    ],
+    "Source_snapshot": {
+      "path": ".runtime/porting/source-objects/bd/bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715",
+      "sha256": "bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715"
+    },
+    "actual_exit_code": 0,
+    "status": "success",
+    "message": "arbitrary run completed",
+    "runtime_samples": 24,
+    "runtime_series": 390,
+    "Surface_Geometry_headers": [
+      "! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System"
+    ],
+    "Surface_Geometry_rows": [
+      " Surface Geometry,UpperLeftCorner,Counterclockwise,WorldCoordinateSystem,RelativeCoordinateSystem,RelativeToZoneOrigin"
+    ],
+    "selected_outputs": {
+      "run-summary.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/run-summary.json",
+        "sha256": "fb71a443bd9bc61f67c6c4727b883a4572e763bc9b38b1f611dd21849db13f19",
+        "size_bytes": 27443
+      },
+      "diagnostics.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/diagnostics.json",
+        "sha256": "d683ba879aeff3d4b53c9f3b30d1223d2f603ab1a71dbd7b0525404554040b4e",
+        "size_bytes": 6151
+      },
+      "eplusrs.err": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/eplusrs.err",
+        "sha256": "e0849b6017cdc9959b2e51bda6687eaad004a98bd3a8b4517a07666e5532acbe",
+        "size_bytes": 2052
+      },
+      "eplusrs.eio": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/eplusrs.eio",
+        "sha256": "786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109",
+        "size_bytes": 7182
+      },
+      "support-assessment.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/support-assessment.json",
+        "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+        "size_bytes": 13937
+      },
+      "support-report.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/support-report.md",
+        "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+        "size_bytes": 3960
+      },
+      "logs/command.log": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/logs/command.log",
+        "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+        "size_bytes": 65
+      },
+      "reports/run-report.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/reports/run-report.md",
+        "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+        "size_bytes": 546
+      },
+      "reports/compatibility-boundary.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/reports/compatibility-boundary.md",
+        "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+        "size_bytes": 690
+      },
+      "input/input-hashes.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/input/input-hashes.json",
+        "sha256": "310e931e9733437a7a2eca7261aa6e48accaa75a03ea9c409d2fb799527d0008",
+        "size_bytes": 564
+      },
+      "input/converted.epJSON": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/input/converted.epJSON",
+        "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+        "size_bytes": 27734
+      }
+    },
+    "oracle_status": "not-requested",
+    "compare_status": "not-requested",
+    "conformance_claim": false,
+    "Rust_output_regression": {
+      "actual": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "prior_World_A": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-world-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "whole_byte_exact": true,
+      "scope": "Only this24-hour Rust result-store is byte-identical to prior World A. No Native/numerical equivalence,96 Source-step or full Setup claim."
+    }
+  },
+  "A_proof_scope": "Actual final-source CLI outcome is retained as observed. On success,24 hourly samples and the unique World EIO row/six raw surfaces identify the bounded selected route. These outputs do not observe array/floor endpoints, prove96 Source steps or certify Native numerical equivalence.",
+  "limitations": [
+    "The one authored Rust regression exercises actual copy/bind/take/reverse APIs/defaults and signed-zero markers. It is not the full selected Solar-constructor rollback endpoint or a Native array observation.",
+    "Height/volume use the existing qualified numerical kernels at current initializer position; complete Original Setup geometry warnings/repair/Space volume and separate later geometry lifecycle remain pending.",
+    "Full GetSurfaceData/SetupZoneGeometry/InitHB/Setup return, positive windows/BSDF/daylighting, later getters/enclosures/reports, constructor-eager timing removal, Ready/firstTime and gate changes are unclaimed.",
+    "Existing ordinary235456 mismatches/2754 unavailable and whole DesignDay strict differences/eightUNPAIRED remain unchanged. Four SRC06 gates remain unverified; A14/54 and B14/64 are unchanged."
+  ],
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-array-floor/manifest.json",
+    "sha256": "fc3ac68bc2cc2a45354fa0bf062c269ef74aeca8dda702b74ee6c03b97b431e0",
+    "size_bytes": 121652
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-array-floor/evidence.zip",
+    "sha256": "9ebbb3fa5d49dcf83f4d9c9579f465f8a0549096e3a9638d485810745adffe6e",
+    "size_bytes": 592183
+  },
+  "gates_updated": false
+}

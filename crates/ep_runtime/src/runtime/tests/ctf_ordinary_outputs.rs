@@ -177,6 +177,143 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(state.tracking.total_severe_errors, 0);
         assert!(error.is_empty());
     }
+
+    // Authored Rust custody fixture: exercise real final-copy allocation and
+    // the same move/reverse APIs used by the selected constructor error path.
+    // This does not observe Native arrays or certify a full getter return.
+    {
+        use crate::heat_balance::selected_heat_balance_input::surface::{
+            SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners, SurfaceTmpInput,
+        };
+        use crate::heat_balance::selected_heat_balance_input::{
+            SelectedHeatBalanceInputState, zone::{SelectedZoneData, SelectedZoneInputOwners},
+        };
+        use crate::heat_balance::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};
+        let model = SimulationModel::from_typed(ctf_ordinary_output_test_model());
+        let total = model.typed.surfaces.len();
+        assert_eq!(total, 6);
+        let (schedule_cache, mut profile) =
+            crate::schedules::precompute_hour_only_internal_gain_schedule_cache_profiled(&model.typed)?;
+        let (mut reports, mut state, mut error, mut console, mut eio) =
+            (CtfInitializationReports::default(), ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new());
+        let mut context = CtfInitializationContext { reports: &mut reports, eio: &mut eio,
+            backend: SourceErrorBackend { state: &mut state, error_stream: Some(&mut error),
+                console: &mut console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None } };
+        let mut physical = crate::heat_balance::initialization::initialize_heat_balance_state_with_initialization_context_and_equipment_profiled(
+            &model, 23.0, &[], &schedule_cache, &mut profile, &mut context, Default::default(),
+        )?;
+        let mut raw = SurfaceGeometryInputState {
+            total_surfaces: i32::try_from(total)?, surfaces_read: total, next_object: total,
+            surface_tmp: Some(model.typed.surfaces.iter().map(|surface| SurfaceTmpInput {
+                name: surface.name.0.clone(), class: match surface.surface_type {
+                    SurfaceType::Wall => SurfaceClass::Wall, SurfaceType::Floor => SurfaceClass::Floor,
+                    SurfaceType::Roof | SurfaceType::Ceiling => SurfaceClass::Roof,
+                }, construction: 1, zone: 1, space: 1, heat_transfer_surface: true,
+                exterior_solar: true, exterior_wind: true, sides: 4,
+                vertex: Some(surface.vertices.iter().map(|p| Some([p.x_m, p.y_m, p.z_m])).collect()),
+                ..Default::default()
+            }).collect()), ..Default::default()
+        };
+        let mut zones = SelectedZoneInputOwners {
+            zones: Some(vec![SelectedZoneData { typed_zone_id: Some(model.typed.zones[0].id),
+                space_indexes: vec![1], num_spaces: 1, ..Default::default() }]),
+            spaces: Some(vec![Default::default()]), ..Default::default()
+        };
+        let space = &mut zones.spaces.as_mut().ok_or("authored actual Space allocation")?[0];
+        space.typed_space_id = Some(model.typed.spaces[0].id);
+        space.zone_num = 1;
+        let mut input = SelectedInputProcessor::from_admitted_input(Vec::new(), std::collections::BTreeMap::new())?;
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        let mut control = SelectedHeatBalanceInputState { construction_order: vec![ConstructionId(0)], ..Default::default() };
+        let globals = crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
+        let environment = crate::weather::day::WeatherEnvironmentState::default();
+        let mut owners = SurfaceGetterOwners { model: &model.typed, input: &mut input,
+            shortcut: &mut shortcut, zones: &mut zones, control: &mut control,
+            globals: &globals, environment: &environment };
+        let mut errors = false;
+        // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
+        raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
+        raw.bind_typed_surfaces(&owners)?;
+        assert!(!errors);
+        assert!(raw.surface_tmp.is_none());
+        let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?
+            .iter().map(|row| row.typed_id.ok_or("missing final physical ID")).collect::<Result<Vec<_>, _>>()?;
+        assert_eq!(source_ids, [SurfaceId(2), SurfaceId(3), SurfaceId(4), SurfaceId(5), SurfaceId(0), SurfaceId(1)]);
+        let arrays = raw.parallel_arrays.as_ref().ok_or("missing real parallel allocation")?;
+        assert_eq!(arrays.surf_penumbra_id, vec![-1; total]);
+        assert_eq!(arrays.surf_t_air_ref, vec![-1; total]);
+        assert_eq!(arrays.x0.len(), total);
+        assert!(arrays.x0.iter().all(|value| value.to_bits() == 0.0_f64.to_bits()));
+        let windows = raw.window_arrays.as_ref().ok_or("missing actual window allocation")?;
+        assert_eq!((windows.rows, windows.equivalent_layer_columns, windows.solid_window_columns), (total, 7, 3));
+        assert_eq!((windows.surf_win_a.len(), windows.surf_win_acf_overlap.len()), (total * 7, total * 3));
+        assert!(windows.surf_win_a.iter().chain(&windows.surf_win_acf_overlap).all(|value| value.to_bits() == 0.0_f64.to_bits()));
+        let derived = raw.surface_windows.as_ref().ok_or("missing real SurfaceWindowCalc allocation")?;
+        assert_eq!(derived.len(), total);
+        assert_eq!(raw.surface_shades.as_ref().ok_or("missing real SurfaceShade allocation")?.len(), total);
+        for row in derived {
+            assert!(row.reference_points.is_none());
+            assert!(row.complex_fenestration.states.is_none());
+            assert_eq!(row.complex_fenestration.current_state, 1);
+            assert_eq!(row.theta_face[0].to_bits(), 296.15_f64.to_bits());
+            assert!(row.theta_face[1..].iter().all(|value| value.to_bits() == 0.0_f64.to_bits()));
+            assert_eq!(row.outside_projection_sunlit_multiplier[0].to_bits(), 1.0_f64.to_bits());
+            assert!(row.outside_projection_sunlit_multiplier[1..].iter().all(|value| value.to_bits() == 0.0_f64.to_bits()));
+        }
+        let outdoor = raw.parallel_arrays.as_mut().and_then(|arrays| arrays.outdoor.as_mut()).ok_or("missing Source outdoor arrays")?;
+        for (index, owner) in outdoor.iter_mut().enumerate() {
+            let marker = f64::from(u32::try_from(index)?);
+            owner.row.dry_bulb_c = 101.0 + marker;
+            owner.row.wet_bulb_c = 201.0 + marker;
+            owner.row.wind_speed_m_per_s = if index == 0 { -0.0 } else { 301.0 + marker };
+            owner.row.wind_direction_deg = 401.0 + marker;
+            owner.manager_invoked = index % 2 == 0;
+        }
+        raw.bind_outdoor_geometry()?;
+        let bits = |owner: &crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentState| {
+            [owner.row.dry_bulb_c, owner.row.wet_bulb_c, owner.row.wind_speed_m_per_s, owner.row.wind_direction_deg].map(f64::to_bits)
+        };
+        let original = raw.parallel_arrays.as_ref().and_then(|arrays| arrays.outdoor.as_ref()).ok_or("missing Source custody")?;
+        let allocation = original.as_ptr();
+        let expected = original.iter().map(bits).collect::<Vec<_>>();
+        assert_eq!(expected[0][2], (-0.0_f64).to_bits());
+        context.reports.surface_geometry_input = raw;
+        // Missing cardinality and duplicate physical IDs must both reject before take.
+        for duplicate in [false, true] {
+            let mut invalid = model.typed.clone();
+            if duplicate { invalid.surfaces[0].id = invalid.surfaces[1].id; } else { invalid.surfaces.pop(); }
+            assert!(context.take_selected_world_outdoor_rows(&invalid).is_err());
+            let arrays = context.reports.surface_geometry_input.parallel_arrays.as_ref().ok_or("lost parallel arrays on rejection")?;
+            let retained = arrays.outdoor.as_ref().ok_or("invalid mapping moved Source owner")?;
+            assert_eq!(retained.as_ptr(), allocation);
+            assert_eq!(retained.iter().map(bits).collect::<Vec<_>>(), expected);
+            assert!(arrays.outdoor_to_model_swaps.is_empty());
+        }
+        let moved = context.take_selected_world_outdoor_rows(&model.typed)?;
+        assert_eq!(moved.as_ptr(), allocation, "take permutes the original allocation without cloning rows");
+        assert!(context.reports.surface_geometry_input.parallel_arrays.as_ref().ok_or("lost arrays after take")?.outdoor.is_none());
+        assert_eq!(physical.surfaces.len(), moved.len());
+        for ((surface, input), owner) in physical.surfaces.iter_mut().zip(&model.typed.surfaces).zip(moved) {
+            assert_eq!(surface.surface_id, input.id);
+            let source = source_ids.iter().position(|id| *id == surface.surface_id).ok_or("missing fixture physical association")?;
+            assert_eq!(bits(&owner), expected[source]);
+            assert_eq!(owner.manager_invoked, source % 2 == 0);
+            surface.outdoor_environment = owner;
+            assert_eq!(bits(&surface.outdoor_environment), expected[source]);
+        }
+        // A real post-take guard error exercises reverse custody, not a claimed
+        // Native/Solar rollback endpoint or another fabricated caller phase.
+        assert!(context.take_selected_world_outdoor_rows(&model.typed).is_err());
+        context.restore_selected_world_outdoor_rows(physical.surfaces);
+        let arrays = context.reports.surface_geometry_input.parallel_arrays.as_ref().ok_or("lost arrays at restore")?;
+        let restored = arrays.outdoor.as_ref().ok_or("lost actual outdoor values at restore")?;
+        assert_eq!(restored.iter().map(bits).collect::<Vec<_>>(), expected);
+        assert!(restored.iter().enumerate().all(|(index, owner)| owner.manager_invoked == (index % 2 == 0)));
+        assert!(arrays.outdoor_to_model_swaps.is_empty());
+        assert_eq!(context.reports.surface_geometry_input.final_surfaces.as_ref().ok_or("lost final Surface IDs")?
+            .iter().map(|row| row.typed_id).collect::<Vec<_>>(), source_ids.iter().copied().map(Some).collect::<Vec<_>>());
+    }
     Ok(())
 }
 

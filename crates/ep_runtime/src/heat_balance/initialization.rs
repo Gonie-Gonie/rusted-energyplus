@@ -187,12 +187,21 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     let mut zone_geometry_returns = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
-        let geometry = zone_geometry_properties(&model.typed, zone);
-        crate::geometry::zone_volume_trace::record(zone.id, &zone.name.0, &geometry);
-        let geometry = geometry.map_err(|error| RuntimeError::UnsupportedZoneVolumeGeometry {
-            zone_name: zone.name.0.clone(),
-            reason: error.to_string(),
-        })?;
+        let geometry = if selected_world_geometry {
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "retained World zone-volume context".into(),
+                })?
+                .selected_world_zone_volume(zone.id)?
+        } else {
+            let geometry = zone_geometry_properties(&model.typed, zone);
+            crate::geometry::zone_volume_trace::record(zone.id, &zone.name.0, &geometry);
+            geometry.map_err(|error| RuntimeError::UnsupportedZoneVolumeGeometry {
+                zone_name: zone.name.0.clone(),
+                reason: error.to_string(),
+            })?
+        };
         let volume_m3 = geometry.volume_m3;
         zone_geometry_returns.push(InitializedZoneGeometry {
             zone_id: zone.id,
@@ -336,9 +345,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 centroid[2] /= total_surface_area;
                 zone.centroid_m = Some(centroid);
             }
-            zone.ceiling_height = volume.returned.ceiling_height_m;
-            zone.volume = volume.returned.volume_m3;
-            zone.floor_area = volume.returned.floor_area_m2;
+            if !selected_world_geometry {
+                zone.ceiling_height = volume.returned.ceiling_height_m;
+                zone.volume = volume.returned.volume_m3;
+                zone.floor_area = volume.returned.floor_area_m2;
+            }
+            // World keeps the real earlier FloorArea and the same retained
+            // height/volume helper writes, including any preceding error prefix.
         }
         Some(geometry)
     } else {
@@ -393,7 +406,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     } else {
         None
     };
-    let mut surfaces = model
+    // Stage every fallible per-surface calculation before moving Source arrays.
+    // These closures own constructor inputs; none allocates an outdoor owner.
+    let surface_builders = model
         .typed
         .surfaces
         .iter()
@@ -448,7 +463,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 })
             };
 
-            Ok(SurfaceHeatBalanceState {
+            Ok(move |outdoor_environment: Option<super::convection::surface_environment::SurfaceOutdoorEnvironmentState>| SurfaceHeatBalanceState {
                 surface_id: surface.id,
                 zone_id: surface.zone,
                 surface_name: surface.name.0.clone(),
@@ -470,8 +485,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 azimuth_deg,
                 tilt_deg,
                 geometry,
-                outdoor_environment: super::convection::surface_environment::SurfaceOutdoorEnvironmentState::allocate(
-                    geometry.centroid_m.z_m, surface.wind_exposure == ep_model::WindExposure::WindExposed),
+                outdoor_environment: outdoor_environment.unwrap_or_else(||
+                    super::convection::surface_environment::SurfaceOutdoorEnvironmentState::allocate(
+                        geometry.centroid_m.z_m, surface.wind_exposure == ep_model::WindExposure::WindExposed)),
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,
@@ -499,6 +515,33 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
+    let mut surfaces = if selected_world_geometry {
+        let actual =
+            initialization
+                .as_deref_mut()
+                .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "Source outdoor handoff requires actual context".into(),
+                })?;
+        // Validate later sole-owner moves now; no guard failure follows the final move.
+        if actual.reports.selected_heat_balance_globals.is_none()
+            || actual.reports.selected_zone_input.is_none()
+        {
+            return Err(RuntimeError::WarmupUnavailable {
+                reason: "source owners before outdoor handoff".into(),
+            });
+        }
+        let outdoor = actual.take_selected_world_outdoor_rows(&model.typed)?;
+        surface_builders
+            .into_iter()
+            .zip(outdoor)
+            .map(|(build, row)| build(Some(row)))
+            .collect::<Vec<_>>()
+    } else {
+        surface_builders
+            .into_iter()
+            .map(|build| build(None))
+            .collect::<Vec<_>>()
+    };
     if let Some(input) = radiation_input {
         let actual = initialization.as_deref_mut().ok_or_else(|| {
             RuntimeError::from(super::radiation::ordinary::OrdinaryRadiationError::from(
@@ -506,16 +549,29 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             ))
         })?;
         let mut owner =
-            super::radiation::ordinary::OrdinarySolarRadiation::for_initialized_geometry(
+            match super::radiation::ordinary::OrdinarySolarRadiation::for_initialized_geometry(
                 &model.typed,
                 &surfaces,
                 input,
-            )?;
+            ) {
+                Ok(owner) => owner,
+                Err(error) => {
+                    if selected_world_geometry {
+                        actual.restore_selected_world_outdoor_rows(surfaces);
+                    }
+                    return Err(error.into());
+                }
+            };
         // Restore the real reached prefix before propagating any output/domain
         // failure, so the caller's reports/EIO/backend retain the partial owner.
         let result = owner.initialize_solar_at_input_boundary(&model.typed, &surfaces, actual);
         actual.reports.ordinary_solar_radiation = Some(owner);
-        result?;
+        if let Err(error) = result {
+            if selected_world_geometry {
+                actual.restore_selected_world_outdoor_rows(surfaces);
+            }
+            return Err(error.into());
+        }
         // These are the present typed-model consumers, not a claim that the
         // full Original ManageInternalHeatGains/GetInternalHeatGainsInput is ported.
         for zone in &mut zones {

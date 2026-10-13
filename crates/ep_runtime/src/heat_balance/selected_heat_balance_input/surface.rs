@@ -1,6 +1,6 @@
 //! Selected raw GetSurfaceData rows and retained opaque numerical prefix.
-//! Final Surface member copy/ranges/centroid are bounded producers only; parallel
-//! arrays and later getter/enclosure/report lifecycle remain unported.
+//! Bounded final copy, array constructors, floor areas and retained geometry are
+//! consumed; later getter/enclosure/report lifecycle remains incomplete.
 use super::super::selected_input_processor::{
     SelectedInputProcessor, SourceInputProcessorShortCut,
 };
@@ -13,12 +13,17 @@ use super::{
 use std::collections::BTreeMap;
 use std::io::Write;
 
+mod derived_arrays;
 mod final_mapping;
+mod floor_areas;
 mod foundation;
 mod geometry_rules;
 mod opaque;
+mod parallel_arrays;
 mod raw;
 mod vertices;
+mod volume_faces;
+mod window_arrays;
 
 /// Raw operands from the same admitted model; not another InputProcessor.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -94,6 +99,10 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) foundation: foundation::FoundationInput,
     pub(crate) coordinate: vertices::CoordinateOwner,
     pub(crate) final_surfaces: Option<Vec<final_mapping::FinalSurface>>,
+    pub(crate) surface_windows: Option<Vec<derived_arrays::SurfaceWindowCalculation>>,
+    pub(crate) surface_shades: Option<Vec<derived_arrays::SurfaceShade>>,
+    pub(crate) parallel_arrays: Option<parallel_arrays::SurfaceParallelArrays>,
+    pub(crate) window_arrays: Option<window_arrays::SurfaceWindowArrays>,
     pub(crate) class_moved: Vec<bool>,
     /// Retained actual local remapping, not a second geometry input owner.
     pub(crate) old_to_new: Vec<i32>,

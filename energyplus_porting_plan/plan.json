@@ -12621,6 +12621,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-same-input-sky/summary.json",
         "sha256": "052be0817fd5958e8a2e9d038ee83bbd4bf3a66baed4c59d076799ad006b64a4",
         "size_bytes": 5179
+      },
+      "actual_selected_ordinary_surface_array_floor": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-array-floor/summary.json",
+        "sha256": "d58669c058ec56f7fe652bc5840770a4809522fb0c53a0523fc6c48198249cd2",
+        "size_bytes": 12674
       }
     },
     {

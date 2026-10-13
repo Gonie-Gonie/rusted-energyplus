@@ -1,0 +1,2422 @@
+{
+  "schema": "src06-surface-array-floor-evidence.v1",
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/manifest.json",
+    "sha256": "91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529",
+    "size_bytes": 26304
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-application-review-01/review.json",
+    "sha256": "a84a57ed78d3b76c7c7bf47780587588f5dee9da28845fb7eb1b38451ece4a75",
+    "size_bytes": 20980
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/bd/bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715",
+    "sha256": "bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715"
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/manifest.json",
+      "sha256": "91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529",
+      "size_bytes": 26304,
+      "roles": [
+        "actual_formatted_11_path_assembly",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/apply.json",
+      "sha256": "c9854012b80d748ec68943b3c70244274ee19545fd7a3bfba46c516457660e54",
+      "size_bytes": 13483,
+      "roles": [
+        "actual_application",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/c9854012b80d748ec68943b3c70244274ee19545fd7a3bfba46c516457660e54"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/manifest.json",
+      "sha256": "a081ca59a04b4b6d8f63f91416c6a92893ca55df27b054f65f7817a692b9fcd5",
+      "size_bytes": 31993,
+      "roles": [
+        "accepted_11_path_Source_composition",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/a081ca59a04b4b6d8f63f91416c6a92893ca55df27b054f65f7817a692b9fcd5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-composition-Source-review-01/review.json",
+      "sha256": "86734791fc1a1571b0bb94845cdb0ceb05e8fa0e06f78e6841ff41851587ec54",
+      "size_bytes": 10444,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand",
+        "independent_composition_Source_review"
+      ],
+      "archive_member": "objects/86734791fc1a1571b0bb94845cdb0ceb05e8fa0e06f78e6841ff41851587ec54"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+      "size_bytes": 6202,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+      "size_bytes": 10196,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "size_bytes": 10665,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "size_bytes": 10665,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "531e958cedb8141de9363c4a2aa791d89cff706c1009da6f1aa3a0a45b7b752a",
+      "size_bytes": 5721,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/531e958cedb8141de9363c4a2aa791d89cff706c1009da6f1aa3a0a45b7b752a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "6ef428694bf5b409f519026e128806d12515587bd87b2e50937240e1e5e2f9bc",
+      "size_bytes": 6152,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/6ef428694bf5b409f519026e128806d12515587bd87b2e50937240e1e5e2f9bc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+      "size_bytes": 28932,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94",
+      "size_bytes": 31013,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f",
+      "size_bytes": 31406,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f",
+      "size_bytes": 31406,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "3dfc2e416f6baef9da4f461bb721db4acb0897e9546fe9ff2995dd5c37a67f90",
+      "size_bytes": 6730,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/3dfc2e416f6baef9da4f461bb721db4acb0897e9546fe9ff2995dd5c37a67f90"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "30964247ed4b2e39fcd16f12ed8abcd3d90bf77faaf8a7028b575cdff57437ba",
+      "size_bytes": 4734,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/30964247ed4b2e39fcd16f12ed8abcd3d90bf77faaf8a7028b575cdff57437ba"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+      "sha256": "a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338",
+      "size_bytes": 6911,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+      "sha256": "f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48",
+      "size_bytes": 7257,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+      "sha256": "f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48",
+      "size_bytes": 7257,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__derived_arrays.rs.diff",
+      "sha256": "a806a3bf2c39cf7b0fbdf2409cd3baead18b33e16ea55b703b6db3774f66fb7b",
+      "size_bytes": 7664,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/a806a3bf2c39cf7b0fbdf2409cd3baead18b33e16ea55b703b6db3774f66fb7b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__derived_arrays.rs.diff",
+      "sha256": "14bc184520bf1c9f7eabc7bceabffe4d556114d1366aedefc8e7bd2769d9fb18",
+      "size_bytes": 3755,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/14bc184520bf1c9f7eabc7bceabffe4d556114d1366aedefc8e7bd2769d9fb18"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+      "size_bytes": 20093,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9",
+      "size_bytes": 20742,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344",
+      "size_bytes": 20847,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344",
+      "size_bytes": 20847,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_mapping.rs.diff",
+      "sha256": "6b20bcb98c276bc073d07fe2aa5547586038fcdd4d2a196aec81e3dc0ec70e65",
+      "size_bytes": 1634,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/6b20bcb98c276bc073d07fe2aa5547586038fcdd4d2a196aec81e3dc0ec70e65"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_mapping.rs.diff",
+      "sha256": "caf987ad7ad934a9264105663454de7488839e75766f71ef7662e906abe077ff",
+      "size_bytes": 1602,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/caf987ad7ad934a9264105663454de7488839e75766f71ef7662e906abe077ff"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+      "sha256": "1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f",
+      "size_bytes": 7775,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+      "sha256": "723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722",
+      "size_bytes": 8922,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+      "sha256": "723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722",
+      "size_bytes": 8922,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__floor_areas.rs.diff",
+      "sha256": "ca8332db0405d5761039be40b5a3bbca5c2ab3f924db3807534460b51cfdef9a",
+      "size_bytes": 9297,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/ca8332db0405d5761039be40b5a3bbca5c2ab3f924db3807534460b51cfdef9a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__floor_areas.rs.diff",
+      "sha256": "82ca836cf99663399b45648fe492bc82d9bf317154d0d8732d6df6b25085fd1a",
+      "size_bytes": 10142,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/82ca836cf99663399b45648fe492bc82d9bf317154d0d8732d6df6b25085fd1a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+      "sha256": "acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b",
+      "size_bytes": 12707,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+      "sha256": "abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d",
+      "size_bytes": 13732,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+      "sha256": "abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d",
+      "size_bytes": 13732,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__parallel_arrays.rs.diff",
+      "sha256": "43478f0b47ae06ac7e603eee70235c33f6dcd43423fb62d04561c7387bdf7176",
+      "size_bytes": 14256,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/43478f0b47ae06ac7e603eee70235c33f6dcd43423fb62d04561c7387bdf7176"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__parallel_arrays.rs.diff",
+      "sha256": "f34edb471a566f1a230e515a781c265046babca5bfb9cf2a6d7bc1d20b67ef4b",
+      "size_bytes": 9260,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f34edb471a566f1a230e515a781c265046babca5bfb9cf2a6d7bc1d20b67ef4b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456",
+      "size_bytes": 2054,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "size_bytes": 2424,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "size_bytes": 2424,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__volume_faces.rs.diff",
+      "sha256": "957a7ee3dbe47d5dbcf2c07a25cabaddcd42967aa7b9a4ed7ff1b0eaaa8cb59b",
+      "size_bytes": 2682,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/957a7ee3dbe47d5dbcf2c07a25cabaddcd42967aa7b9a4ed7ff1b0eaaa8cb59b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__volume_faces.rs.diff",
+      "sha256": "334a1b1f1cce9394bc94163547fe7863c703be74ac1419657a32e529a455466f",
+      "size_bytes": 3542,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/334a1b1f1cce9394bc94163547fe7863c703be74ac1419657a32e529a455466f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+      "sha256": "09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77",
+      "size_bytes": 23698,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+      "sha256": "3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0",
+      "size_bytes": 25079,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+      "sha256": "3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0",
+      "size_bytes": 25079,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__window_arrays.rs.diff",
+      "sha256": "d053ebffe98562d5d4bdedf2c56abb28126c889af9ff1ea0f1f79a2ef09e3f25",
+      "size_bytes": 25570,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/d053ebffe98562d5d4bdedf2c56abb28126c889af9ff1ea0f1f79a2ef09e3f25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__window_arrays.rs.diff",
+      "sha256": "94045823dfa81e9f815be3b5e727770963fa1befd0ad1dfe38a3849d8c929434",
+      "size_bytes": 32070,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/94045823dfa81e9f815be3b5e727770963fa1befd0ad1dfe38a3849d8c929434"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+      "size_bytes": 12668,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621",
+      "size_bytes": 13079,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "size_bytes": 13079,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "size_bytes": 13079,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "83acf09a723aad68eeb335c016de2d3e6270dd643669e60ccbb4426aec890b8d",
+      "size_bytes": 1747,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/83acf09a723aad68eeb335c016de2d3e6270dd643669e60ccbb4426aec890b8d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "bb1a2802971b65daf897ce2db92d0b267c365841693951b42bb700c820215a24",
+      "size_bytes": 537,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/bb1a2802971b65daf897ce2db92d0b267c365841693951b42bb700c820215a24"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+      "size_bytes": 16569,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b",
+      "size_bytes": 16566,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b",
+      "size_bytes": 16566,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b",
+      "size_bytes": 16566,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.diff",
+      "sha256": "a254b28aaec9cebe0da4a776aab1f5d6d559b0c8a3eab9fe4bbd8e4fc798390d",
+      "size_bytes": 1870,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/a254b28aaec9cebe0da4a776aab1f5d6d559b0c8a3eab9fe4bbd8e4fc798390d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "71739d5b96befcab44802c1490f6f4d86739a756a682a209aa51a2cb17715151",
+      "size_bytes": 18800,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/71739d5b96befcab44802c1490f6f4d86739a756a682a209aa51a2cb17715151"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883",
+      "size_bytes": 28985,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand",
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883"
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883",
+      "size_bytes": 28985,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/after/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883",
+      "size_bytes": 28985,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/complete_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "39edee2390d2c829d4c7f7bb4aea7e34945441c0c600654fb4418ca69fedb00b",
+      "size_bytes": 10592,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/39edee2390d2c829d4c7f7bb4aea7e34945441c0c600654fb4418ca69fedb00b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-reviewed-packet-Root-02.py",
+      "sha256": "c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07",
+      "size_bytes": 2263,
+      "roles": [
+        "actual_formatted_11_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-application-review-01/review.json",
+      "sha256": "a84a57ed78d3b76c7c7bf47780587588f5dee9da28845fb7eb1b38451ece4a75",
+      "size_bytes": 20980,
+      "roles": [
+        "independent_actual_application_review"
+      ],
+      "archive_member": "objects/a84a57ed78d3b76c7c7bf47780587588f5dee9da28845fb7eb1b38451ece4a75"
+    },
+    {
+      "path": ".runtime/porting/source-objects/bd/bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715",
+      "sha256": "bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715",
+      "size_bytes": 1670122,
+      "roles": [
+        "actual_execution_source_snapshot",
+        "final_Source_metadata_only",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-fmt-01/receipt.json",
+      "sha256": "f4ba879058fc3051e02837b895459099b16bd35736968e705332524faf55e57c",
+      "size_bytes": 4634,
+      "roles": [
+        "actual_recorded_execution",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f4ba879058fc3051e02837b895459099b16bd35736968e705332524faf55e57c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/world-formatter-tokens-Header-01.py",
+      "sha256": "11bc3620568e5582d3c851c02f0daea50eac189957bf06c1b4cc80e7a2dda407",
+      "size_bytes": 2414,
+      "roles": [
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/11bc3620568e5582d3c851c02f0daea50eac189957bf06c1b4cc80e7a2dda407"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-array-floor-application-Header-01.py",
+      "sha256": "1029685158f22e0d0179fb8771f2d0c85fea78d038a907a065d1c251c047e5ae",
+      "size_bytes": 9537,
+      "roles": [
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/1029685158f22e0d0179fb8771f2d0c85fea78d038a907a065d1c251c047e5ae"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-05.py",
+      "sha256": "1c5379ed501b3a5d0d5573fd7a490a88f414bc7941efc42dbe0c75f45687e4ea",
+      "size_bytes": 4791,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/1c5379ed501b3a5d0d5573fd7a490a88f414bc7941efc42dbe0c75f45687e4ea"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-04.py",
+      "sha256": "3b74fdf7c2ff5912d7dfe426427405bbe3de3e9c474dc89efcd6ec3478e5fe56",
+      "size_bytes": 3984,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/3b74fdf7c2ff5912d7dfe426427405bbe3de3e9c474dc89efcd6ec3478e5fe56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-world-apply-prevalidation-failure-01.json",
+      "sha256": "bcc9e7252c91ffed9b6c9f623a71adceb0840f24bffb9c476d500d0340878c8b",
+      "size_bytes": 1071,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/bcc9e7252c91ffed9b6c9f623a71adceb0840f24bffb9c476d500d0340878c8b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/manifest.json",
+      "sha256": "c35a0bed15326226610be46e5fe799b3b63eb2d486e794ef3c2d156746fa6e5b",
+      "size_bytes": 33680,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal",
+        "accepted_11_path_Source_composition:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand",
+        "independent_Native03_Source_review:direct_operand",
+        "independent_existing_test_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/c35a0bed15326226610be46e5fe799b3b63eb2d486e794ef3c2d156746fa6e5b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-Source-review-03/review.json",
+      "sha256": "73d7d13a940002e585479ba5e94a45ba57d2809792c921e5d9fa7936bddf9035",
+      "size_bytes": 11366,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review",
+        "independent_composition_Source_review:direct_operand",
+        "independent_existing_test_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/73d7d13a940002e585479ba5e94a45ba57d2809792c921e5d9fa7936bddf9035"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/manifest.json",
+      "sha256": "4550832374446d2efbb13ec9228ea115b07088edfd3baf5193f5f0bf7f070225",
+      "size_bytes": 3670,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "existing_test_and_doc_Source_proposal",
+        "independent_existing_test_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/4550832374446d2efbb13ec9228ea115b07088edfd3baf5193f5f0bf7f070225"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+      "size_bytes": 6202,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "5796c3592d402aa5e523bda7849897ab845665914f9feab11a422f0e4480709d",
+      "size_bytes": 5225,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/5796c3592d402aa5e523bda7849897ab845665914f9feab11a422f0e4480709d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs.diff",
+      "sha256": "5796c3592d402aa5e523bda7849897ab845665914f9feab11a422f0e4480709d",
+      "size_bytes": 5225,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/5796c3592d402aa5e523bda7849897ab845665914f9feab11a422f0e4480709d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+      "size_bytes": 28932,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "ed2aea7307484ac104f410c8af1a4cd2a60b98836d6a0522b44891ec054cd79d",
+      "size_bytes": 6508,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/ed2aea7307484ac104f410c8af1a4cd2a60b98836d6a0522b44891ec054cd79d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/initialization.rs.diff",
+      "sha256": "ed2aea7307484ac104f410c8af1a4cd2a60b98836d6a0522b44891ec054cd79d",
+      "size_bytes": 6508,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/ed2aea7307484ac104f410c8af1a4cd2a60b98836d6a0522b44891ec054cd79d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__derived_arrays.rs.diff",
+      "sha256": "a666f3b6830a828979e9329959d0e062b5417ac3714a2fa8597ad803b95bb756",
+      "size_bytes": 7293,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/a666f3b6830a828979e9329959d0e062b5417ac3714a2fa8597ad803b95bb756"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs.diff",
+      "sha256": "a666f3b6830a828979e9329959d0e062b5417ac3714a2fa8597ad803b95bb756",
+      "size_bytes": 7293,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/a666f3b6830a828979e9329959d0e062b5417ac3714a2fa8597ad803b95bb756"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+      "size_bytes": 20093,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_mapping.rs.diff",
+      "sha256": "f794b4654dac7b53052c6bc1ce9acc289377ba0cf6d458f318fe2e636e719c14",
+      "size_bytes": 1524,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/f794b4654dac7b53052c6bc1ce9acc289377ba0cf6d458f318fe2e636e719c14"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs.diff",
+      "sha256": "f794b4654dac7b53052c6bc1ce9acc289377ba0cf6d458f318fe2e636e719c14",
+      "size_bytes": 1524,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/f794b4654dac7b53052c6bc1ce9acc289377ba0cf6d458f318fe2e636e719c14"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__floor_areas.rs.diff",
+      "sha256": "0d0ecf96989d213d7f0e1722689e84d2915baaf9461ca88699cdd06f251f52e3",
+      "size_bytes": 8100,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/0d0ecf96989d213d7f0e1722689e84d2915baaf9461ca88699cdd06f251f52e3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs.diff",
+      "sha256": "0d0ecf96989d213d7f0e1722689e84d2915baaf9461ca88699cdd06f251f52e3",
+      "size_bytes": 8100,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/0d0ecf96989d213d7f0e1722689e84d2915baaf9461ca88699cdd06f251f52e3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__parallel_arrays.rs.diff",
+      "sha256": "519c9a847295adbcec009a5cb3453d7a459485e77e381c95c70c8882b1818f3f",
+      "size_bytes": 13158,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/519c9a847295adbcec009a5cb3453d7a459485e77e381c95c70c8882b1818f3f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs.diff",
+      "sha256": "519c9a847295adbcec009a5cb3453d7a459485e77e381c95c70c8882b1818f3f",
+      "size_bytes": 13158,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/519c9a847295adbcec009a5cb3453d7a459485e77e381c95c70c8882b1818f3f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__volume_faces.rs.diff",
+      "sha256": "8aead87645010b4ae1b523a7738cdd1198710c15d2066a46baf87ab54b66ab90",
+      "size_bytes": 2292,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/8aead87645010b4ae1b523a7738cdd1198710c15d2066a46baf87ab54b66ab90"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs.diff",
+      "sha256": "8aead87645010b4ae1b523a7738cdd1198710c15d2066a46baf87ab54b66ab90",
+      "size_bytes": 2292,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/8aead87645010b4ae1b523a7738cdd1198710c15d2066a46baf87ab54b66ab90"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__window_arrays.rs.diff",
+      "sha256": "0bf7447cfb55540164cddac8a5354362d84ac94c2ea21c277d183eb197ee3e90",
+      "size_bytes": 24187,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/0bf7447cfb55540164cddac8a5354362d84ac94c2ea21c277d183eb197ee3e90"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs.diff",
+      "sha256": "0bf7447cfb55540164cddac8a5354362d84ac94c2ea21c277d183eb197ee3e90",
+      "size_bytes": 24187,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/0bf7447cfb55540164cddac8a5354362d84ac94c2ea21c277d183eb197ee3e90"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+      "size_bytes": 12668,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "8626896565289c8741bb3aa336ff2c62fb51984baf7d33a09d25a93665c44784",
+      "size_bytes": 1751,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/8626896565289c8741bb3aa336ff2c62fb51984baf7d33a09d25a93665c44784"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2",
+      "size_bytes": 13078,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "d6301eb80b0f0cad75c9bba1932c53321a23b0bf40c19c748abc960918bd822c",
+      "size_bytes": 677,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/d6301eb80b0f0cad75c9bba1932c53321a23b0bf40c19c748abc960918bd822c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.diff",
+      "sha256": "65a7f8e91ff60c5344caeeab1f9ae2dc6a5bd76dd583672d6a16bd6a80eaf1da",
+      "size_bytes": 1234,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/65a7f8e91ff60c5344caeeab1f9ae2dc6a5bd76dd583672d6a16bd6a80eaf1da"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+      "size_bytes": 16569,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.diff",
+      "sha256": "fbdee9ac316674b7e536be3286499e33f67730ce7eb7322a748e651a23cce842",
+      "size_bytes": 34195,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/fbdee9ac316674b7e536be3286499e33f67730ce7eb7322a748e651a23cce842"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs.diff",
+      "sha256": "fbdee9ac316674b7e536be3286499e33f67730ce7eb7322a748e651a23cce842",
+      "size_bytes": 34195,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/fbdee9ac316674b7e536be3286499e33f67730ce7eb7322a748e651a23cce842"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "71739d5b96befcab44802c1490f6f4d86739a756a682a209aa51a2cb17715151",
+      "size_bytes": 18800,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/71739d5b96befcab44802c1490f6f4d86739a756a682a209aa51a2cb17715151"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-reviewed-composition-prep-01/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "215c9eb5bec9d51dc93aba7b82b7997833b47cff586bf7b95407ea117f0dc48c",
+      "size_bytes": 10596,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/215c9eb5bec9d51dc93aba7b82b7997833b47cff586bf7b95407ea117f0dc48c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "215c9eb5bec9d51dc93aba7b82b7997833b47cff586bf7b95407ea117f0dc48c",
+      "size_bytes": 10596,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand",
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/215c9eb5bec9d51dc93aba7b82b7997833b47cff586bf7b95407ea117f0dc48c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.117-249.txt",
+      "sha256": "d1d094d7d39e9d52c35227c9b2cec05cbb38de5ecd16b50e6eb1ca8be0738b29",
+      "size_bytes": 10648,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/d1d094d7d39e9d52c35227c9b2cec05cbb38de5ecd16b50e6eb1ca8be0738b29"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.804-929.txt",
+      "sha256": "6334e4a4c8de16fb1bcf78769bf5c1d3efdde2edbeca2435afcf3688e8922b0c",
+      "size_bytes": 8857,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/6334e4a4c8de16fb1bcf78769bf5c1d3efdde2edbeca2435afcf3688e8922b0c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.1213-1224.txt",
+      "sha256": "aad9b1acf6b42e9c3c036212a0d6daf2407ead9a4b0cd9ed50ebcd2c03cab1ab",
+      "size_bytes": 665,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/aad9b1acf6b42e9c3c036212a0d6daf2407ead9a4b0cd9ed50ebcd2c03cab1ab"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.2302-2456.txt",
+      "sha256": "98fc300aeaea0d5f5d8c4fd0c956ba87cf34df3b4f5bfd45772c94074aa93b73",
+      "size_bytes": 10151,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/98fc300aeaea0d5f5d8c4fd0c956ba87cf34df3b4f5bfd45772c94074aa93b73"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.2458-2492.txt",
+      "sha256": "e6e90682ef124328393be5829c356313e6a86694553bd45f4b5f16c93f1c96e5",
+      "size_bytes": 2054,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/e6e90682ef124328393be5829c356313e6a86694553bd45f4b5f16c93f1c96e5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/SurfaceGeometry.cc.2588-2597.txt",
+      "sha256": "1ff85e31ae65c2d5a0a9c444f38548f2a47a5ed61e2f83d9cd43e549e91bca2c",
+      "size_bytes": 334,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/1ff85e31ae65c2d5a0a9c444f38548f2a47a5ed61e2f83d9cd43e549e91bca2c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataSurfaces.hh.1394-1469.txt",
+      "sha256": "48514c976afa3241db50d18fa58bf76398af5122721f9e1782e3d3b98ded94f7",
+      "size_bytes": 2772,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/48514c976afa3241db50d18fa58bf76398af5122721f9e1782e3d3b98ded94f7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataSurfaces.hh.1660-1835.txt",
+      "sha256": "b66992afd849a71c5df09be4d6b0fa6bb6aabaa8fa602664392b6aee2bfd4cf0",
+      "size_bytes": 18495,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/b66992afd849a71c5df09be4d6b0fa6bb6aabaa8fa602664392b6aee2bfd4cf0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataSurfaces.hh.889-970.txt",
+      "sha256": "b5e89ed377640d4f3aba7e37fffdab006a451fd2a153b7498464c172c076eb94",
+      "size_bytes": 4296,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/b5e89ed377640d4f3aba7e37fffdab006a451fd2a153b7498464c172c076eb94"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataWindowEquivalentLayer.hh.60-70.txt",
+      "sha256": "adfd5f722307ffb15f1bac2209fcf29f4484c4783aca31d820dab52a408c7126",
+      "size_bytes": 326,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/adfd5f722307ffb15f1bac2209fcf29f4484c4783aca31d820dab52a408c7126"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/ConvectionConstants.hh.62-108.txt",
+      "sha256": "6083607567bceba3271b14f8162ec177744fc0f9986a5c7f9d66fe7ccc4296ef",
+      "size_bytes": 1323,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/6083607567bceba3271b14f8162ec177744fc0f9986a5c7f9d66fe7ccc4296ef"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/ConvectionConstants.hh.235-277.txt",
+      "sha256": "97e04800351df512c4dd3e375f08e5b30d80ab8af65ec57741c2c18c39d6550a",
+      "size_bytes": 967,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/97e04800351df512c4dd3e375f08e5b30d80ab8af65ec57741c2c18c39d6550a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/ConvectionConstants.hh.391-460.txt",
+      "sha256": "8092d57a0435bacdbd3ae7ae6a27856b3c1e03342eb2d356ad11340a81b60023",
+      "size_bytes": 2437,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/8092d57a0435bacdbd3ae7ae6a27856b3c1e03342eb2d356ad11340a81b60023"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataHeatBalance.hh.437-475.txt",
+      "sha256": "94db9dd03bbce8d9e124468d7dbc1beb5b9020009e5fb94c00f4fd48575743d6",
+      "size_bytes": 3411,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/94db9dd03bbce8d9e124468d7dbc1beb5b9020009e5fb94c00f4fd48575743d6"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-01/Original/DataHeatBalance.hh.563-595.txt",
+      "sha256": "3bf3aac2b85f83916289c0b38181505ce2740c91cf9e79d4bbb564c0870a7f9d",
+      "size_bytes": 1935,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/3bf3aac2b85f83916289c0b38181505ce2740c91cf9e79d4bbb564c0870a7f9d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/Original/SurfaceGeometry.cc.455-548.txt",
+      "sha256": "e14af53e606a92170a1a5b0a33a6c4c4478a29707eefaa6dfb61e23e3e4ec7cd",
+      "size_bytes": 5473,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/e14af53e606a92170a1a5b0a33a6c4c4478a29707eefaa6dfb61e23e3e4ec7cd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/Original/SurfaceGeometry.cc.12010-12095.txt",
+      "sha256": "a056dc54afb3372ca5146119e3080202f057bb6f0b22fd98a7c876e288dbf1a6",
+      "size_bytes": 3812,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/a056dc54afb3372ca5146119e3080202f057bb6f0b22fd98a7c876e288dbf1a6"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/Original/SurfaceGeometry.cc.12198-12249.txt",
+      "sha256": "e0a1102418d3a563a5447c1bb8bd009a883e22a00fd94114fe66d5bcc3873a9d",
+      "size_bytes": 3322,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/e0a1102418d3a563a5447c1bb8bd009a883e22a00fd94114fe66d5bcc3873a9d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/Original/DataBSDFWindow.hh.322-339.txt",
+      "sha256": "cab5f792e1340e3c07ef2a062ecbcb1f047e8eea6215bade0d23da0123c72b56",
+      "size_bytes": 1038,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/cab5f792e1340e3c07ef2a062ecbcb1f047e8eea6215bade0d23da0123c72b56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/Original/Material.hh.380-504.txt",
+      "sha256": "b561b2b15c39e02bb82e6fddd73a2706a6c1198ae84b409161b1dd552192a046",
+      "size_bytes": 3919,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/b561b2b15c39e02bb82e6fddd73a2706a6c1198ae84b409161b1dd552192a046"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/Original/DataSurfaces.hh.165-180.txt",
+      "sha256": "d5e4b11d48d771c71652e7cded45a92775cbaa81385e1c05a0b6511418c3b4b9",
+      "size_bytes": 357,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/d5e4b11d48d771c71652e7cded45a92775cbaa81385e1c05a0b6511418c3b4b9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/Original/DataGlobalConstants.hh.588-599.txt",
+      "sha256": "71a849a8099f41478e6ab7d9874899f9c4aa2eacb39eb36589bfaccd957d3182",
+      "size_bytes": 869,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/71a849a8099f41478e6ab7d9874899f9c4aa2eacb39eb36589bfaccd957d3182"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-world-floor-volume-handoff-audit-01/audit.json",
+      "sha256": "325e1e371921267df642e98c6cbd52c9c0a44157bbb79377aa86d6c521846908",
+      "size_bytes": 16956,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "independent_retained_floor_volume_Source_audit"
+      ],
+      "archive_member": "objects/325e1e371921267df642e98c6cbd52c9c0a44157bbb79377aa86d6c521846908"
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "15416c5a6e0ee83155031c2cd5f3baae361799ef62b51eb6f1567a08388105a2",
+      "size_bytes": 15456,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "accepted_11_path_Source_composition:direct_operand",
+        "unchanged_existing_zone_volume_helper"
+      ],
+      "archive_member": "objects/15416c5a6e0ee83155031c2cd5f3baae361799ef62b51eb6f1567a08388105a2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compose-surface-array-floor-Root-01.py",
+      "sha256": "b7f780c91da9d9d89c79d0ca324da753d87ab1efd29050a001d602adea48f556",
+      "size_bytes": 5082,
+      "roles": [
+        "accepted_11_path_Source_composition:direct_operand"
+      ],
+      "archive_member": "objects/b7f780c91da9d9d89c79d0ca324da753d87ab1efd29050a001d602adea48f556"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-tests-Source-review-01/review.json",
+      "sha256": "b0c4ba421fafbdcea88bffd3f73633d30aa7384c823710480eb61748f0ca397d",
+      "size_bytes": 4284,
+      "roles": [
+        "independent_composition_Source_review:direct_operand",
+        "independent_existing_test_Source_review"
+      ],
+      "archive_member": "objects/b0c4ba421fafbdcea88bffd3f73633d30aa7384c823710480eb61748f0ca397d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-array-floor-composition-Header-01.py",
+      "sha256": "1a0ae4033718704daf019798f14e4dcc18954c4a2a6050950b8f0ebe390e98ae",
+      "size_bytes": 6774,
+      "roles": [
+        "independent_composition_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/1a0ae4033718704daf019798f14e4dcc18954c4a2a6050950b8f0ebe390e98ae"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/manifest.json",
+      "sha256": "9ac98b6433e266c9e7ab91b24f08b1e22c082f41192dbff68c70ebe2d65f3570",
+      "size_bytes": 29697,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/9ac98b6433e266c9e7ab91b24f08b1e22c082f41192dbff68c70ebe2d65f3570"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-Source-review-02/review.json",
+      "sha256": "f3f71b051efcfe27fbdc0182fc8866cfe9a471cfdfa271d430333151c51569a8",
+      "size_bytes": 20215,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/f3f71b051efcfe27fbdc0182fc8866cfe9a471cfdfa271d430333151c51569a8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-world-assembly-03/manifest.json",
+      "sha256": "d6a681804f6511b77fc9ad45c205e6a577b72817d9b41d32d034e095cb0b5629",
+      "size_bytes": 85580,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand",
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/d6a681804f6511b77fc9ad45c205e6a577b72817d9b41d32d034e095cb0b5629"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/parent_delta/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs.diff",
+      "sha256": "44bd1d4abf796059a38b3e054d8a4c0eac925934c41283105338a5806cdbf05e",
+      "size_bytes": 7310,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/44bd1d4abf796059a38b3e054d8a4c0eac925934c41283105338a5806cdbf05e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "sha256": "4e5a0ae4a33da9f0c362129ed64fb9de381b4b37d1b941a17beff718f1325878",
+      "size_bytes": 20527,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/4e5a0ae4a33da9f0c362129ed64fb9de381b4b37d1b941a17beff718f1325878"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/parent_delta/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs.diff",
+      "sha256": "c64679421ef1421a3f0af30d67a239808fbc4e9b8c5c6db4e00a64f03f2858c5",
+      "size_bytes": 1409,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/c64679421ef1421a3f0af30d67a239808fbc4e9b8c5c6db4e00a64f03f2858c5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-02/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "ea19befef25636543458e54417f5c949a30eff67ec67ec7212239c7d9aa3f3bf",
+      "size_bytes": 12897,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/ea19befef25636543458e54417f5c949a30eff67ec67ec7212239c7d9aa3f3bf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/parent_delta/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.diff",
+      "sha256": "48618f0571044db8688714e38b674a28fe8935e87deb8c5237f8f014a9aa6abd",
+      "size_bytes": 895,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/48618f0571044db8688714e38b674a28fe8935e87deb8c5237f8f014a9aa6abd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/README.md",
+      "sha256": "c0aafa1a2a3f7dffb9bf2f80ff3ce5d601b61946ea2f425fa3b2ccf5495c865e",
+      "size_bytes": 4719,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/c0aafa1a2a3f7dffb9bf2f80ff3ce5d601b61946ea2f425fa3b2ccf5495c865e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-surface-array-floor-closure-03.py",
+      "sha256": "47ffd08c74dc6d60b265f85734413681cc8c9704150581507b9e9792fb7708e0",
+      "size_bytes": 9506,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/47ffd08c74dc6d60b265f85734413681cc8c9704150581507b9e9792fb7708e0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-surface-array-floor-closure-03.py",
+      "sha256": "90ab85739d7c5fe73cc1dee020f5f5e1b723c50020110f38d72f9f1110806084",
+      "size_bytes": 10604,
+      "roles": [
+        "accepted_10_path_Native03_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/90ab85739d7c5fe73cc1dee020f5f5e1b723c50020110f38d72f9f1110806084"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-array-floor-Header-03.py",
+      "sha256": "1d3ca99dc5715de3ec2c7fbbb78d0a9f36efef1cda469fc4e7be551df79e438c",
+      "size_bytes": 9951,
+      "roles": [
+        "independent_Native03_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/1d3ca99dc5715de3ec2c7fbbb78d0a9f36efef1cda469fc4e7be551df79e438c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-surface-array-floor-tests-Owner-01.py",
+      "sha256": "29b61d1c6ebb8962249f3526a7cb14128cec1c38683eaae91c3a675356bdb726",
+      "size_bytes": 16255,
+      "roles": [
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/29b61d1c6ebb8962249f3526a7cb14128cec1c38683eaae91c3a675356bdb726"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2",
+      "size_bytes": 13078,
+      "roles": [
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/README.md",
+      "sha256": "3a3efbca4ccdf35c0f37ee944041514f854b7615d162e211b1b0c8e80c38dd85",
+      "size_bytes": 1483,
+      "roles": [
+        "existing_test_and_doc_Source_proposal:direct_operand"
+      ],
+      "archive_member": "objects/3a3efbca4ccdf35c0f37ee944041514f854b7615d162e211b1b0c8e80c38dd85"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-array-floor-tests-Header-01.py",
+      "sha256": "385905a6322c6355db4488d14b7b6919a985ef5cf7131eeddd48670447f771f8",
+      "size_bytes": 7358,
+      "roles": [
+        "independent_existing_test_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/385905a6322c6355db4488d14b7b6919a985ef5cf7131eeddd48670447f771f8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "roles": [
+        "actual_executed_recorder_bytes"
+      ],
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-quality-01/receipt.json",
+      "sha256": "eada3e630e0348267cf1e24bea555fde74e70a15625b7f44443fe1558833c514",
+      "size_bytes": 4682,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/eada3e630e0348267cf1e24bea555fde74e70a15625b7f44443fe1558833c514"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-quality-01/stdout.log",
+      "sha256": "3356e0603c88d60b465e3f525cefe9ea99d97d9c6f9d767d9fde2084a9c81cfb",
+      "size_bytes": 82,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/3356e0603c88d60b465e3f525cefe9ea99d97d9c6f9d767d9fde2084a9c81cfb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-clippy-01/receipt.json",
+      "sha256": "ae947086c749b407ae5d063995d85202dddc73124cb10f502d7f93f045d41fba",
+      "size_bytes": 4689,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/ae947086c749b407ae5d063995d85202dddc73124cb10f502d7f93f045d41fba"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-clippy-01/stderr.log",
+      "sha256": "40bc71c994477278c0297ab024f3bc870eebb5c4bba015dda0584713840a5f56",
+      "size_bytes": 221,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/40bc71c994477278c0297ab024f3bc870eebb5c4bba015dda0584713840a5f56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-focused-tests-01/receipt.json",
+      "sha256": "9d07a9b9332984e7f95bc499a76ca38c9b5a108f767d8e2ece8369651dd13c44",
+      "size_bytes": 4765,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/9d07a9b9332984e7f95bc499a76ca38c9b5a108f767d8e2ece8369651dd13c44"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-focused-tests-01/stdout.log",
+      "sha256": "e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e",
+      "size_bytes": 215,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_actual_test_stdout"
+      ],
+      "archive_member": "objects/e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-focused-tests-01/stderr.log",
+      "sha256": "c0f85245b02208289d32006fe4871b603848bc3909a1a12e9987d7e8b9ac9ca9",
+      "size_bytes": 254,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/c0f85245b02208289d32006fe4871b603848bc3909a1a12e9987d7e8b9ac9ca9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-cli-tests-01/receipt.json",
+      "sha256": "cbc8468feed9f051218c0893a5a914819d37b7b2a88bc4e5d49eaeefb77beb8a",
+      "size_bytes": 4720,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/cbc8468feed9f051218c0893a5a914819d37b7b2a88bc4e5d49eaeefb77beb8a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-cli-tests-01/stdout.log",
+      "sha256": "daa63addfe5a4717d0402ff5a71886ca20463585de30dbe427c074dbb5753448",
+      "size_bytes": 170,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_actual_test_stdout"
+      ],
+      "archive_member": "objects/daa63addfe5a4717d0402ff5a71886ca20463585de30dbe427c074dbb5753448"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-cli-tests-01/stderr.log",
+      "sha256": "17eb63e331bb00b301385c78fc42e8056ec47a21b0ef6839ac43fd460fbbfd08",
+      "size_bytes": 357,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/17eb63e331bb00b301385c78fc42e8056ec47a21b0ef6839ac43fd460fbbfd08"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-ci-timestep-tests-01/receipt.json",
+      "sha256": "1d8ece80c12c8afb0869d31e20c0bea46a2b85ff45f5a03ebbcc270dc0ceb2b4",
+      "size_bytes": 4721,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/1d8ece80c12c8afb0869d31e20c0bea46a2b85ff45f5a03ebbcc270dc0ceb2b4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-ci-timestep-tests-01/stdout.log",
+      "sha256": "7af80e5e7b1abf95aebb980a198d0c47b2599ab7430e4590532ee3b6e0903aba",
+      "size_bytes": 258,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_actual_test_stdout"
+      ],
+      "archive_member": "objects/7af80e5e7b1abf95aebb980a198d0c47b2599ab7430e4590532ee3b6e0903aba"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-ci-timestep-tests-01/stderr.log",
+      "sha256": "b5e861b561ab2dde80af736ee77054f3c73d7adf82bd0e4bd2942fa5939b2f17",
+      "size_bytes": 152,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/b5e861b561ab2dde80af736ee77054f3c73d7adf82bd0e4bd2942fa5939b2f17"
+    },
+    {
+      "path": ".runtime/porting/source-objects/9a/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "sha256": "9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "size_bytes": 10665,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56"
+    },
+    {
+      "path": ".runtime/porting/source-objects/31/310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f",
+      "sha256": "310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f",
+      "size_bytes": 31406,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/310a61cb316e195765fb7c52ceb3723febe02967139f0dd0b3b8fb3d0298928f"
+    },
+    {
+      "path": ".runtime/porting/source-objects/f1/f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48",
+      "sha256": "f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48",
+      "size_bytes": 7257,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/f1aa958edf328f8c73b02d243b2f46d736ec0816cc922ede6ce9a68262789a48"
+    },
+    {
+      "path": ".runtime/porting/source-objects/71/71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344",
+      "sha256": "71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344",
+      "size_bytes": 20847,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/71c2fe6cc51a840d8b483e92cbd67d531eb1c389d7c644c100eacb1fb652d344"
+    },
+    {
+      "path": ".runtime/porting/source-objects/72/723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722",
+      "sha256": "723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722",
+      "size_bytes": 8922,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722"
+    },
+    {
+      "path": ".runtime/porting/source-objects/ab/abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d",
+      "sha256": "abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d",
+      "size_bytes": 13732,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/abe403785f6a0e380b71f5dc090eb10f228073efae8a919e9ecbe57b2258777d"
+    },
+    {
+      "path": ".runtime/porting/source-objects/c6/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "sha256": "c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "size_bytes": 2424,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314"
+    },
+    {
+      "path": ".runtime/porting/source-objects/3c/3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0",
+      "sha256": "3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0",
+      "size_bytes": 25079,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/3c1e4068dc103057ffef0eb2de32e5e0b34f527cbe0e37c69f71a0c3d80b3bb0"
+    },
+    {
+      "path": ".runtime/porting/source-objects/04/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "sha256": "041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "size_bytes": 13079,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca"
+    },
+    {
+      "path": ".runtime/porting/source-objects/8b/8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b",
+      "sha256": "8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b",
+      "size_bytes": 16566,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/8b3c5ae22770907d28cba9fdff40791be1f5a4cf872aada74a20b2cff048fc5b"
+    },
+    {
+      "path": ".runtime/porting/source-objects/c3/c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883",
+      "sha256": "c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883",
+      "size_bytes": 28985,
+      "roles": [
+        "final_selected_Source_archive"
+      ],
+      "archive_member": "objects/c3b184c93b84e383668063f5600e9dd73f3d1b41260c2ed8fe9afc4689d65883"
+    },
+    {
+      "path": "scripts/quality/source-quality-gate.ps1",
+      "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+      "size_bytes": 3432,
+      "roles": [
+        "current_quality_script_not_historical_executed_script_capture"
+      ],
+      "archive_member": "objects/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365,
+      "roles": [
+        "current_CI_wrapper_not_historical_executed_script_capture"
+      ],
+      "archive_member": "objects/01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-command-01/receipt.json",
+      "sha256": "eca313b339a8d08e912a8eff05a0b20f6d4e83b1d43d6d4b7069637a3e4046ab",
+      "size_bytes": 5182,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/eca313b339a8d08e912a8eff05a0b20f6d4e83b1d43d6d4b7069637a3e4046ab"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-command-01/stdout.log",
+      "sha256": "fb71a443bd9bc61f67c6c4727b883a4572e763bc9b38b1f611dd21849db13f19",
+      "size_bytes": 27443,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/fb71a443bd9bc61f67c6c4727b883a4572e763bc9b38b1f611dd21849db13f19"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-command-01/stderr.log",
+      "sha256": "a4d5c2e2831bb60643e8aa401dceece425ca9a00c6b442ce16ba53a11cf026ae",
+      "size_bytes": 554,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/a4d5c2e2831bb60643e8aa401dceece425ca9a00c6b442ce16ba53a11cf026ae"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275,
+      "roles": [
+        "actual_unchanged_A_input"
+      ],
+      "archive_member": "objects/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/run-summary.json",
+      "sha256": "fb71a443bd9bc61f67c6c4727b883a4572e763bc9b38b1f611dd21849db13f19",
+      "size_bytes": 27443,
+      "roles": [
+        "actual_A_selected_output:run-summary.json"
+      ],
+      "archive_member": "objects/fb71a443bd9bc61f67c6c4727b883a4572e763bc9b38b1f611dd21849db13f19"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/diagnostics.json",
+      "sha256": "d683ba879aeff3d4b53c9f3b30d1223d2f603ab1a71dbd7b0525404554040b4e",
+      "size_bytes": 6151,
+      "roles": [
+        "actual_A_selected_output:diagnostics.json"
+      ],
+      "archive_member": "objects/d683ba879aeff3d4b53c9f3b30d1223d2f603ab1a71dbd7b0525404554040b4e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/eplusrs.err",
+      "sha256": "e0849b6017cdc9959b2e51bda6687eaad004a98bd3a8b4517a07666e5532acbe",
+      "size_bytes": 2052,
+      "roles": [
+        "actual_A_selected_output:eplusrs.err"
+      ],
+      "archive_member": "objects/e0849b6017cdc9959b2e51bda6687eaad004a98bd3a8b4517a07666e5532acbe"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/eplusrs.eio",
+      "sha256": "786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109",
+      "size_bytes": 7182,
+      "roles": [
+        "actual_A_selected_output:eplusrs.eio"
+      ],
+      "archive_member": "objects/786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/support-assessment.json",
+      "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+      "size_bytes": 13937,
+      "roles": [
+        "actual_A_selected_output:support-assessment.json"
+      ],
+      "archive_member": "objects/80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960,
+      "roles": [
+        "actual_A_selected_output:support-report.md"
+      ],
+      "archive_member": "objects/89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65,
+      "roles": [
+        "actual_A_selected_output:logs/command.log"
+      ],
+      "archive_member": "objects/ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "size_bytes": 546,
+      "roles": [
+        "actual_A_selected_output:reports/run-report.md"
+      ],
+      "archive_member": "objects/92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690,
+      "roles": [
+        "actual_A_selected_output:reports/compatibility-boundary.md"
+      ],
+      "archive_member": "objects/9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/input/input-hashes.json",
+      "sha256": "310e931e9733437a7a2eca7261aa6e48accaa75a03ea9c409d2fb799527d0008",
+      "size_bytes": 564,
+      "roles": [
+        "actual_A_selected_output:input/input-hashes.json"
+      ],
+      "archive_member": "objects/310e931e9733437a7a2eca7261aa6e48accaa75a03ea9c409d2fb799527d0008"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734,
+      "roles": [
+        "actual_A_selected_output:input/converted.epJSON"
+      ],
+      "archive_member": "objects/bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "roles": [
+        "actual_A_Rust_result_store"
+      ],
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-world-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "roles": [
+        "historical_World_A_Rust_result_store"
+      ],
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-surface-array-floor-Header-01.py",
+      "sha256": "96ed414ef91b03ad9fd64d93544e2e9ed7aed4d0cffa1d3a5fb69d0a765fc468",
+      "size_bytes": 17342,
+      "roles": [
+        "publisher_executed_Source"
+      ],
+      "archive_member": "objects/96ed414ef91b03ad9fd64d93544e2e9ed7aed4d0cffa1d3a5fb69d0a765fc468"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-publication-prep-01/manifest.json",
+      "sha256": "5930a628fe859ecf09a47fa8e97f71d9ebfe90cc0b5b6101cc18d0d274127688",
+      "size_bytes": 1908,
+      "roles": [
+        "independently_reviewable_publisher_Source_preparation"
+      ],
+      "archive_member": "objects/5930a628fe859ecf09a47fa8e97f71d9ebfe90cc0b5b6101cc18d0d274127688"
+    }
+  ],
+  "historical_reference_resolutions": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+        "size_bytes": 10196
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+        "size_bytes": 10196
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94",
+        "size_bytes": 31013
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94",
+        "size_bytes": 31013
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+        "sha256": "a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338",
+        "size_bytes": 6911
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+        "sha256": "a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338",
+        "size_bytes": 6911
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9",
+        "size_bytes": 20742
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9",
+        "size_bytes": 20742
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f",
+        "size_bytes": 7775
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f",
+        "size_bytes": 7775
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+        "sha256": "acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b",
+        "size_bytes": 12707
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+        "sha256": "acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b",
+        "size_bytes": 12707
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456",
+        "size_bytes": 2054
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456",
+        "size_bytes": 2054
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+        "sha256": "09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77",
+        "size_bytes": 23698
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+        "sha256": "09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77",
+        "size_bytes": 23698
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621",
+        "size_bytes": 13079
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621",
+        "size_bytes": 13079
+      },
+      "role": "actual_formatted_11_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+        "size_bytes": 10196
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+        "size_bytes": 10196
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94",
+        "size_bytes": 31013
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "8159bcc0148b2a4d6fe3d57a7aa6ca464d885a9bf54ed9fdbce2b7fd9f171e94",
+        "size_bytes": 31013
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+        "sha256": "a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338",
+        "size_bytes": 6911
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/derived_arrays.rs",
+        "sha256": "a5bac69e503d4866ea0f6a0a12df9c45c8a80ceabd0cc11ad69575eb74e00338",
+        "size_bytes": 6911
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9",
+        "size_bytes": 20742
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "e3d505850134e61b7e4538864663932c882e322fb1b5ce52ca1723536d5320c9",
+        "size_bytes": 20742
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f",
+        "size_bytes": 7775
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "1194e6d534c59ba91a523ec34b79fa93216db2185a2994cc426dc22701f14f0f",
+        "size_bytes": 7775
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+        "sha256": "acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b",
+        "size_bytes": 12707
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/parallel_arrays.rs",
+        "sha256": "acb84ab9bd54b3e539ab56391c0920273a087c43abb028207e4007095f29ac9b",
+        "size_bytes": 12707
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456",
+        "size_bytes": 2054
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "d87c219b38570ca724572cc4e5247411622f366a703924fead8e87f787ead456",
+        "size_bytes": 2054
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+        "sha256": "09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77",
+        "size_bytes": 23698
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs",
+        "sha256": "09abdca832466f6c643a59e84498d6c69da91c137914d47e518ba5f4fb914c77",
+        "size_bytes": 23698
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621",
+        "size_bytes": 13079
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-tests-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "558b918d87c9702a006b94703c2016b06b3b7981cc1879c4b1dee368362c3621",
+        "size_bytes": 13079
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+        "size_bytes": 6202
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+        "size_bytes": 6202
+      },
+      "role": "accepted_10_path_Native03_Source_proposal:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+        "size_bytes": 28932
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+        "size_bytes": 28932
+      },
+      "role": "accepted_10_path_Native03_Source_proposal:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+        "size_bytes": 20093
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+        "size_bytes": 20093
+      },
+      "role": "accepted_10_path_Native03_Source_proposal:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+        "size_bytes": 12668
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+        "size_bytes": 12668
+      },
+      "role": "accepted_10_path_Native03_Source_proposal:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+        "size_bytes": 16569
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+        "size_bytes": 16569
+      },
+      "role": "accepted_10_path_Native03_Source_proposal:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+        "size_bytes": 6202
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "c6794ebe9b0d8f99925981575a0515c6c6912ac8517b4baccbdbe932b65e9029",
+        "size_bytes": 6202
+      },
+      "role": "independent_Native03_Source_review:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+        "size_bytes": 28932
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "be5194d5c2f1b2b2da276ff8cedc931799df267d00ca0411f792f87340f044b0",
+        "size_bytes": 28932
+      },
+      "role": "independent_Native03_Source_review:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+        "size_bytes": 20093
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "c2ca3826c77078865ff72e1af0a65439647dc6f228dd108623424f6d26fb4396",
+        "size_bytes": 20093
+      },
+      "role": "independent_Native03_Source_review:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+        "size_bytes": 12668
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "53c3df384ca52ae8cba621d3b00bfa3c801f916df4f31ff40492f877b6e8b354",
+        "size_bytes": 12668
+      },
+      "role": "independent_Native03_Source_review:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+        "size_bytes": 16569
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "335bd26bbcdc48190583928e90578020535f368a1abe7cd350e085af795095a4",
+        "size_bytes": 16569
+      },
+      "role": "independent_Native03_Source_review:direct_operand"
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-array-floor/evidence.zip",
+    "sha256": "9ebbb3fa5d49dcf83f4d9c9579f465f8a0549096e3a9638d485810745adffe6e",
+    "size_bytes": 592183
+  },
+  "archive_member_count": 152,
+  "scope": "Finite11 selected paths/current/before/proposals/full diffs, direct22 Original literals, Source reviews and authored existing test, genuine6 final QA receipts/full stdout/stderr/recorder and Source metadata, selected11 Source archives, fresh A receipt/selected outputs. Referenced historical documents are metadata provenance without recursive expansion. No old evidence ZIP/whole Source payload walk, full official schema/EPW/Native binary/map/core/object or new Native capture.",
+  "gates_updated": false
+}

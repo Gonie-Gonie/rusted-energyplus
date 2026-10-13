@@ -48,6 +48,7 @@ impl SurfaceGeometryInputState {
         owners: &mut SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
         errors: &mut bool,
+        max_solid_window_layers: i32,
     ) -> Result<(), Error> {
         if *errors {
             // Original1215, before actual Surface allocation.
@@ -69,6 +70,21 @@ impl SurfaceGeometryInputState {
         let total = usize::try_from(self.total_surfaces)
             .map_err(|_| Error::Unavailable("actual final Surface count"))?;
         self.final_surfaces = Some(vec![FinalSurface::default(); total]); // selected Surface members,1219
+        self.surface_windows = Some(vec![
+            super::derived_arrays::SurfaceWindowCalculation::default(
+            );
+            total
+        ]); //1220
+        self.surface_shades = Some(vec![super::derived_arrays::SurfaceShade::default(); total]); //1221
+        self.parallel_arrays = Some(super::parallel_arrays::SurfaceParallelArrays::allocate(
+            total,
+        )); //1222
+        self.window_arrays = Some(super::window_arrays::SurfaceWindowArrays::allocate(
+            total,
+            max_solid_window_layers,
+        )?); //1223
+        // Literal selected constructor order1219–1223 is now retained. Later
+        // positive window/blind/BSDF producers remain outside admission.
         self.class_moved = vec![false; total]; // actual1439-1440
         self.moved_surfaces = 0;
         self.all_surface_list_report_order.reserve(total);
