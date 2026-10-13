@@ -78,6 +78,10 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     assert_ordinary_output_manifest(&output_dir)?;
     let eio = std::fs::read_to_string(output_dir.join("eplusrs.eio"))?;
     assert!(eio.starts_with("Program Version,"));
+    assert!(
+        !eio.contains("! <Surface Geometry>"),
+        "the existing no-GGR route must not enter the selected raw World getter"
+    );
     let sections = [
         "! <Environment:Weather Station>",
         "! <Building Information>",

@@ -9,7 +9,9 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
     match (family, name) {
         // Actual parser metadata only, including the existing unnamed reports.
         (
-            "Zone"
+            "GlobalGeometryRules"
+            | "BuildingSurface:Detailed"
+            | "Zone"
             | "Material"
             | "Material:NoMass"
             | "Version"

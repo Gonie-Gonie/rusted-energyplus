@@ -8,6 +8,8 @@ use std::collections::BTreeMap;
 pub struct SelectedHeatBalanceInput {
     /// Actual loader custody; IDF max fields are never inferred from JSON keys.
     pub source_is_epjson: bool,
+    /// Raw pre-transformation Surface operands from the same admitted model.
+    pub surface: super::surface::SelectedSurfaceInput,
     /// Genuine per-family getObjectItem order from the same admitted raw model.
     pub objects: BTreeMap<String, Vec<ProjectInputObject>>,
 }

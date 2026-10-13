@@ -78,6 +78,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .into());
     }
     let source_input_reached = source.is_some();
+    let mut selected_world_geometry = false;
     if let Some(source) = source {
         let actual =
             initialization
@@ -91,6 +92,8 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             source.minutes,
             source.output_host,
         )?;
+        selected_world_geometry =
+            actual.prepare_selected_world_surface_geometry(&model.typed, source.environment)?;
     }
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
@@ -115,7 +118,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .surfaces
                 .iter()
                 .map(|surface| {
-                    if source_input_reached {
+                    if source_input_reached && !selected_world_geometry {
                         initialization
                             .as_deref_mut()
                             .ok_or_else(|| RuntimeError::WarmupUnavailable {
@@ -123,11 +126,22 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                             })?
                             .mark_selected_surface_construction_used(surface.construction)?;
                     }
-                    let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
-                        .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
-                            surface_name: surface.name.0.clone(),
-                            reason: error.to_string(),
-                        })?;
+                    let geometry = if selected_world_geometry {
+                        initialization
+                            .as_deref()
+                            .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                                reason: "selected World geometry requires its retained context"
+                                    .into(),
+                            })?
+                            .selected_world_surface_properties(surface.id)?
+                    } else {
+                        crate::geometry::surface_geometry_properties(&surface.vertices).map_err(
+                            |error| RuntimeError::InvalidSurfaceGeometry {
+                                surface_name: surface.name.0.clone(),
+                                reason: error.to_string(),
+                            },
+                        )?
+                    };
                     let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
                     Ok::<_, RuntimeError>((geometry, boundary))
                 })
@@ -388,6 +402,10 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .map(|(index, (surface, boundary))| {
             let geometry = if let Some(data) = &admitted_surface_data {
                 data[index].0
+            } else if selected_world_geometry {
+                initialization.as_deref().ok_or_else(|| RuntimeError::WarmupUnavailable {
+                    reason: "selected World surface requires retained geometry".into(),
+                })?.selected_world_surface_properties(surface.id)?
             } else {
                 crate::geometry::surface_geometry_properties(&surface.vertices)
                     .map_err(|error| RuntimeError::InvalidSurfaceGeometry {

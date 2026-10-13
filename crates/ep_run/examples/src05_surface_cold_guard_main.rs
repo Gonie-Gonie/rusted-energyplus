@@ -239,6 +239,9 @@ impl Fixture {
             warmup_flag: boolean(&b["WarmupFlag"])?,
             doing_sizing: boolean(&b["DoingSizing"])?,
             tracking: SourceErrorTracking {
+                ask_for_surfaces_report: false,
+                total_coincident_vertices: 0,
+                total_degenerate_surfaces: 0,
                 match_counts,
                 abort_processing: boolean(&t["AbortProcessing"])?,
                 total_severe_errors: counter(&t["TotalSevereErrors"])?,

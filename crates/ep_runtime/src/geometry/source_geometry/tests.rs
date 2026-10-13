@@ -18,6 +18,21 @@ fn quad_centroid_is_area_weighted_and_not_vertex_mean() {
     assert_eq!(value.centroid_m.z_m, 2.0);
     assert_ne!(value.centroid_m.x_m, 1.5);
     assert_ne!(value.centroid_m.y_m, 1.0);
+    // The real later boundary consumes retained quantities without repeating
+    // normal/area/orientation, and preserves actual triangle scratch writes.
+    let vertices = [p(0., 0., 2.), p(4., 0., 2.), p(2., 2., 2.), p(0., 2., 2.)];
+    let quantities = get_vertices_properties(&vertices).unwrap();
+    let mut scratch = SourceCentroidScratch::default();
+    let centroid = source_surface_centroid(&vertices, quantities.gross_area_m2, &mut scratch);
+    assert_eq!(quantities.with_centroid(centroid), value);
+    assert_eq!(
+        scratch.triangle1,
+        [Some(vertices[0]), Some(vertices[1]), Some(vertices[2])]
+    );
+    assert_eq!(
+        scratch.triangle2,
+        [Some(vertices[0]), Some(vertices[2]), Some(vertices[3])]
+    );
 }
 
 #[test]
@@ -91,4 +106,18 @@ fn triangle_centroid_keeps_the_source_ordered_sum_and_signed_zero() {
     assert!(left_exact.x_m > 0.0);
     let zero = source_triangle_centroid(p(-0., 0., 0.), p(-0., 0., 0.), p(-0., 0., 0.));
     assert_eq!(zero.x_m.to_bits(), (-0.0f64).to_bits());
+    // The >=5 Source branch divides the ordered sum by Sides. The established
+    // legacy wrapper intentionally retains its reciprocal multiplication.
+    let vertices = [
+        p(3., 0., 0.),
+        p(0., 0., 0.),
+        p(0., 0., 0.),
+        p(0., 0., 0.),
+        p(0., 0., 0.),
+    ];
+    let mut scratch = SourceCentroidScratch::default();
+    let actual = source_surface_centroid(&vertices, 1.0, &mut scratch);
+    assert_eq!(actual.x_m.to_bits(), (3.0f64 / 5.0).to_bits());
+    assert_ne!(actual.x_m.to_bits(), (3.0f64 * (1.0 / 5.0)).to_bits());
+    assert_eq!(scratch, SourceCentroidScratch::default());
 }

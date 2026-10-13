@@ -1,7 +1,8 @@
 //! Ordered original opaque-surface geometry, separate from coordinate conversion.
 //!
 //! Mirrors Vectors.cc and the selected GetVertices/CalcSurfaceCentroid producers.
-//! Source warning buffers, global counters, shape and scratch state are unpaired.
+//! Legacy pure bundles remain available. The selected raw caller owns actual
+//! diagnostics, counters and later centroid scratch separately.
 
 use super::centroid_precision::multiply_by_source_third;
 use ep_model::Point3;
@@ -161,18 +162,37 @@ fn polygon_area(vertices: &[Point3; 3]) -> f64 {
     add_to(&mut sum, cross(points[2], points[0]));
     0.5 * dot(normal, sum).abs()
 }
-fn centroid(vertices: &[Point3], gross_area: f64) -> Point3 {
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceCentroidScratch {
+    // Original constructor allocates three Vector elements without a value.
+    pub(crate) triangle1: [Option<Point3>; 3],
+    pub(crate) triangle2: [Option<Point3>; 3],
+}
+
+fn centroid(
+    vertices: &[Point3],
+    gross_area: f64,
+    mut scratch: Option<&mut SourceCentroidScratch>,
+) -> Point3 {
     if vertices.len() == 3 {
         return source_triangle_centroid(vertices[0], vertices[1], vertices[2]);
     }
     if vertices.len() == 4 {
         let mut first = [vertices[0], vertices[1], vertices[2]];
         let mut second = [vertices[0], vertices[2], vertices[3]];
+        if let Some(scratch) = scratch.as_deref_mut() {
+            scratch.triangle1 = first.map(Some);
+            scratch.triangle2 = second.map(Some);
+        }
         let mut first_fraction = polygon_area(&first) / gross_area;
         let mut second_fraction = polygon_area(&second) / gross_area;
         if (first_fraction + second_fraction) > 1.05 {
             first = [vertices[0], vertices[1], vertices[3]];
             second = [vertices[1], vertices[2], vertices[3]];
+            if let Some(scratch) = scratch {
+                scratch.triangle1 = first.map(Some);
+                scratch.triangle2 = second.map(Some);
+            }
             let first_area = polygon_area(&first);
             let second_area = polygon_area(&second);
             let total_area = first_area + second_area;
@@ -192,12 +212,13 @@ fn centroid(vertices: &[Point3], gross_area: f64) -> Point3 {
     point(multiply(value, 1.0 / vertices.len() as f64))
 }
 
-pub(super) struct Orientation {
-    pub(super) azimuth_deg: f64,
-    pub(super) tilt_deg: f64,
-    lcsx: Vector,
-    lcsy: Vector,
-    lcsz: Vector,
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct Orientation {
+    pub(crate) azimuth_deg: f64,
+    pub(crate) tilt_deg: f64,
+    pub(crate) lcsx: Vector,
+    pub(crate) lcsy: Vector,
+    pub(crate) lcsz: Vector,
 }
 pub(super) fn orientation(vertices: &[Point3]) -> Option<Orientation> {
     if vertices.len() < 3 {
@@ -206,7 +227,7 @@ pub(super) fn orientation(vertices: &[Point3]) -> Option<Orientation> {
     Some(orientation_from_normal(vertices, cyclic_normal(vertices)))
 }
 
-fn orientation_from_normal(vertices: &[Point3], normal: Vector) -> Orientation {
+pub(crate) fn orientation_from_normal(vertices: &[Point3], normal: Vector) -> Orientation {
     let lcsx = normalize(subtract(vector(vertices[2]), vector(vertices[1])));
     let lcsz = normal;
     let lcsy = cross(lcsz, lcsx);
@@ -242,37 +263,79 @@ fn orientation_from_normal(vertices: &[Point3], normal: Vector) -> Orientation {
     }
 }
 
-/// Evaluates the actual opaque geometry bundle from already canonical vertices.
-/// Exact degenerate/nonfinite inputs fail before heat-balance state assembly.
-/// Unsafe native warning/centroid-retention helpers are deliberately unpaired.
-pub fn surface_geometry_properties(
-    vertices: &[Point3],
-) -> Result<SurfaceGeometryProperties, SurfaceGeometryError> {
-    if vertices.len() < 3 {
-        return Err(SurfaceGeometryError::TooFewVertices);
-    }
-    if vertices.iter().any(|value| {
-        vector(*value)
-            .iter()
-            .any(|component| !component.is_finite())
-    }) {
-        return Err(SurfaceGeometryError::Nonfinite);
-    }
-    // GetVertices producer order: cyclic normal, fan area, angles/local axes,
-    // stored trig, independently snapped outward normal; centroid is later.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct GetVerticesProperties {
+    /// Surface area without subtractions in this opaque input boundary.
+    pub(crate) area_m2: f64,
+    /// Gross area from the magnitude of the ordered Newell area vector.
+    pub(crate) gross_area_m2: f64,
+    /// Opaque area before any excluded subsurface subtraction.
+    pub(crate) net_area_shadow_m2: f64,
+    /// Original degree azimuth including the original cleanup branches.
+    pub(crate) azimuth_deg: f64,
+    /// Original degree tilt from the cyclic normalized Newell vector.
+    pub(crate) tilt_deg: f64,
+    /// Ordered fan cross sum divided by two.
+    pub(crate) newell_area_vector_m2: Vector,
+    /// Cyclic Newell normal normalized with ordered unfused arithmetic.
+    pub(crate) newell_normal: Vector,
+    /// Independently component-snapped outward normal, without renormalization.
+    pub(crate) out_norm: Vector,
+    /// Normalized vertex-three minus vertex-two local axis.
+    pub(crate) lcsx: Vector,
+    /// Cross product of local Z and local X.
+    pub(crate) lcsy: Vector,
+    /// Cyclic normalized Newell normal used for local Z.
+    pub(crate) lcsz: Vector,
+    /// Sine of stored azimuth times the source degree-to-radian constant.
+    pub(crate) sin_azimuth: f64,
+    /// Cosine of stored azimuth times the source degree-to-radian constant.
+    pub(crate) cos_azimuth: f64,
+    /// Sine of stored tilt times the source degree-to-radian constant.
+    pub(crate) sin_tilt: f64,
+    /// Cosine of stored tilt times the source degree-to-radian constant.
+    pub(crate) cos_tilt: f64,
+}
+
+/// Ordered numerical GetVertices quantities, excluding later centroid work.
+/// The actual SurfaceTmp consumer retains reached raw writes and diagnostics.
+/// Legacy nonfinite/degenerate numerical admission remains unchanged.
+/// Quantities assigned at actual GetVertices9383-9388, before diagnostics.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct SourceNormalArea {
+    pub(crate) newell_normal: Vector,
+    pub(crate) newell_area_vector_m2: Vector,
+    pub(crate) gross_area_m2: f64,
+}
+
+pub(crate) fn source_normal_area(vertices: &[Point3]) -> SourceNormalArea {
     let newell_normal = cyclic_normal(vertices);
     let newell_area_vector_m2 = area_vector(vertices);
     let gross_area_m2 = magnitude(newell_area_vector_m2);
+    SourceNormalArea {
+        newell_normal,
+        newell_area_vector_m2,
+        gross_area_m2,
+    }
+}
+
+/// Later trig/outward-normal numerical work, after real orientation diagnostics.
+pub(crate) fn finish_get_vertices_properties(
+    normal_area: SourceNormalArea,
+    orientation: Orientation,
+) -> GetVerticesProperties {
+    let SourceNormalArea {
+        newell_normal,
+        newell_area_vector_m2,
+        gross_area_m2,
+    } = normal_area;
     let Orientation {
         azimuth_deg,
         tilt_deg,
         lcsx,
         lcsy,
         lcsz,
-    } = orientation_from_normal(vertices, newell_normal);
-    if gross_area_m2 == 0.0 || newell_normal == [0.0; 3] {
-        return Err(SurfaceGeometryError::Degenerate);
-    }
+    } = orientation;
     let sin_azimuth = (azimuth_deg * DEG_TO_RAD).sin();
     let cos_azimuth = (azimuth_deg * DEG_TO_RAD).cos();
     let sin_tilt = (tilt_deg * DEG_TO_RAD).sin();
@@ -289,28 +352,7 @@ pub fn surface_geometry_properties(
             *value = 0.0;
         }
     }
-    let centroid_m = centroid(vertices, gross_area_m2);
-    if [
-        gross_area_m2,
-        azimuth_deg,
-        tilt_deg,
-        sin_azimuth,
-        cos_azimuth,
-        sin_tilt,
-        cos_tilt,
-    ]
-    .into_iter()
-    .chain(newell_normal)
-    .chain(out_norm)
-    .chain(vector(centroid_m))
-    .chain(lcsx)
-    .chain(lcsy)
-    .chain(lcsz)
-    .any(|value| !value.is_finite())
-    {
-        return Err(SurfaceGeometryError::Nonfinite);
-    }
-    Ok(SurfaceGeometryProperties {
+    GetVerticesProperties {
         area_m2: gross_area_m2,
         gross_area_m2,
         net_area_shadow_m2: gross_area_m2,
@@ -319,7 +361,6 @@ pub fn surface_geometry_properties(
         newell_area_vector_m2,
         newell_normal,
         out_norm,
-        centroid_m,
         lcsx,
         lcsy,
         lcsz,
@@ -327,7 +368,111 @@ pub fn surface_geometry_properties(
         cos_azimuth,
         sin_tilt,
         cos_tilt,
-    })
+    }
+}
+
+/// Existing legacy numerical admission, composed from the same ordered pieces.
+pub(crate) fn get_vertices_properties(
+    vertices: &[Point3],
+) -> Result<GetVerticesProperties, SurfaceGeometryError> {
+    if vertices.len() < 3 {
+        return Err(SurfaceGeometryError::TooFewVertices);
+    }
+    if vertices.iter().any(|value| {
+        vector(*value)
+            .iter()
+            .any(|component| !component.is_finite())
+    }) {
+        return Err(SurfaceGeometryError::Nonfinite);
+    }
+    let normal_area = source_normal_area(vertices);
+    let orientation = orientation_from_normal(vertices, normal_area.newell_normal);
+    if normal_area.gross_area_m2 == 0.0 || normal_area.newell_normal == [0.0; 3] {
+        return Err(SurfaceGeometryError::Degenerate);
+    }
+    let returned = finish_get_vertices_properties(normal_area, orientation);
+    if !returned.is_finite() {
+        return Err(SurfaceGeometryError::Nonfinite);
+    }
+    Ok(returned)
+}
+
+impl GetVerticesProperties {
+    pub(crate) fn is_finite(self) -> bool {
+        ![
+            self.gross_area_m2,
+            self.azimuth_deg,
+            self.tilt_deg,
+            self.sin_azimuth,
+            self.cos_azimuth,
+            self.sin_tilt,
+            self.cos_tilt,
+        ]
+        .into_iter()
+        .chain(self.newell_normal)
+        .chain(self.out_norm)
+        .chain(self.lcsx)
+        .chain(self.lcsy)
+        .chain(self.lcsz)
+        .any(|value| !value.is_finite())
+    }
+    /// Move the same quantities into the complete owner at CalcSurfaceCentroid.
+    pub(crate) fn with_centroid(self, centroid_m: Point3) -> SurfaceGeometryProperties {
+        SurfaceGeometryProperties {
+            area_m2: self.area_m2,
+            gross_area_m2: self.gross_area_m2,
+            net_area_shadow_m2: self.net_area_shadow_m2,
+            azimuth_deg: self.azimuth_deg,
+            tilt_deg: self.tilt_deg,
+            newell_area_vector_m2: self.newell_area_vector_m2,
+            newell_normal: self.newell_normal,
+            out_norm: self.out_norm,
+            lcsx: self.lcsx,
+            lcsy: self.lcsy,
+            lcsz: self.lcsz,
+            sin_azimuth: self.sin_azimuth,
+            cos_azimuth: self.cos_azimuth,
+            sin_tilt: self.sin_tilt,
+            cos_tilt: self.cos_tilt,
+            centroid_m,
+        }
+    }
+}
+
+/// Actual later centroid numerical producer. The caller owns warning output and
+/// stores the returned centroid before checking the supported finite domain.
+pub(crate) fn source_surface_centroid(
+    vertices: &[Point3],
+    gross_area_m2: f64,
+    scratch: &mut SourceCentroidScratch,
+) -> Point3 {
+    if vertices.len() >= 5 {
+        let mut value = [0.0; 3];
+        for vertex in vertices {
+            add_to(&mut value, vector(*vertex));
+        }
+        let sides = vertices.len() as f64;
+        // Literal Original14618 division, distinct from legacy reciprocal math.
+        for component in &mut value {
+            *component /= sides;
+        }
+        point(value)
+    } else {
+        centroid(vertices, gross_area_m2, Some(scratch))
+    }
+}
+
+/// Legacy bundle composed from the same existing numerical operations.
+/// The actual selected raw caller invokes the two boundaries separately.
+pub fn surface_geometry_properties(
+    vertices: &[Point3],
+) -> Result<SurfaceGeometryProperties, SurfaceGeometryError> {
+    let returned = get_vertices_properties(vertices)?;
+    let centroid_m = centroid(vertices, returned.gross_area_m2, None);
+    if vector(centroid_m).iter().any(|value| !value.is_finite()) {
+        return Err(SurfaceGeometryError::Nonfinite);
+    }
+    Ok(returned.with_centroid(centroid_m))
 }
 
 #[cfg(test)]

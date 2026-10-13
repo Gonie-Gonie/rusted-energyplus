@@ -12611,6 +12611,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-default-admission/summary.json",
         "sha256": "927c1620e3adce8b5f3c9e56bdda2b6393169bf1c4c368a60eebf475d4aa3ad7",
         "size_bytes": 13864
+      },
+      "actual_selected_ordinary_surface_world_geometry": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-world-geometry/summary.json",
+        "sha256": "5f2dd0d6299fcb64c9f71c95ab0f86f9f55a6e8f0e075106cfa17a64280fd69c",
+        "size_bytes": 21060
       }
     },
     {

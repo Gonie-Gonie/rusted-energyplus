@@ -138,6 +138,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "SizingPeriod:DesignDay",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "GlobalGeometryRules",
+        name_field_index: 0,
+    },
     // SurfaceGeometry::GetSurfaceData preserves IDF declaration order within
     // its Wall/Floor/Roof groups. Native epJSON keeps its own map order.
     IdfOrderTarget {
@@ -308,13 +312,23 @@ pub fn apply_idf_declaration_order(
             if unnamed_legacy_type(target.object_type)
                 || matches!(
                     target.object_type,
-                    "Material:NoMass" | "Building" | "Construction" | "Zone"
+                    "Material:NoMass"
+                        | "Building"
+                        | "Construction"
+                        | "Zone"
+                        | "BuildingSurface:Detailed"
                 )
             {
                 report_field_counts.push((
                     actual_type.clone(),
                     actual_name.clone(),
-                    idf_object.max_fields,
+                    if target.object_type == "BuildingSurface:Detailed" {
+                        idf_object.max_fields.max(20)
+                    } else {
+                        idf_object.max_fields
+                    },
+                    (target.object_type == "BuildingSurface:Detailed")
+                        .then_some(idf_object.max_fields.saturating_sub(11)),
                 ));
             }
             ordered_names.push(actual_name);
@@ -324,7 +338,7 @@ pub fn apply_idf_declaration_order(
     }
 
     // Apply only after every type/name/count has been reconciled successfully.
-    for (object_type, name, max_fields) in report_field_counts {
+    for (object_type, name, max_fields, max_extensible_fields) in report_field_counts {
         let object = model
             .objects
             .get_mut(&object_type)
@@ -334,6 +348,12 @@ pub fn apply_idf_declaration_order(
             FieldName("idf_max_fields".to_string()),
             RawValue::Number(max_fields.to_string()),
         );
+        if let Some(count) = max_extensible_fields {
+            object.fields.insert(
+                FieldName("idf_max_extensible_fields".into()),
+                RawValue::Number(count.to_string()),
+            );
+        }
     }
     model.idf_declaration_order = overlay;
     model.source_input_format = SourceInputFormat::Idf;
@@ -474,7 +494,8 @@ fn scan_target_objects(
 fn unnamed_legacy_type(object_type: &str) -> bool {
     matches!(
         object_type,
-        "Version"
+        "GlobalGeometryRules"
+            | "Version"
             | "HeatBalanceAlgorithm"
             | "Timestep"
             | "SimulationControl"
@@ -610,7 +631,7 @@ mod tests {
         IDF_ORDER_TARGETS, IdfOrderError, apply_idf_declaration_order,
         apply_idf_declaration_order_bytes,
     };
-    use crate::{parse_epjson_str, parse_epjson_str_with_idf_order};
+    use crate::{FieldName, RawValue, parse_epjson_str, parse_epjson_str_with_idf_order};
 
     const TWO_SPECIAL_DAYS_EPJSON: &str = r#"{
         "RunPeriodControl:SpecialDays": {
@@ -775,7 +796,43 @@ mod tests {
         };
         assert_eq!(names(&staged)?, ["Zulu Wall", "Beta Roof", "Alpha Floor"]);
         assert_eq!(names(&native)?, ["Alpha Floor", "Beta Roof", "Zulu Wall"]);
-        assert_eq!(staged.objects, native.objects);
+        for (_, object) in staged.ordered_instances("BuildingSurface:Detailed")? {
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number("20".into()))
+            );
+            assert_eq!(
+                object
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(&RawValue::Number("0".into()))
+            );
+        }
+        let mut without_metadata = staged.objects.clone();
+        for objects in without_metadata.values_mut() {
+            for object in objects.values_mut() {
+                object.fields.remove(&FieldName("idf_max_fields".into()));
+                object
+                    .fields
+                    .remove(&FieldName("idf_max_extensible_fields".into()));
+            }
+        }
+        assert_eq!(without_metadata, native.objects);
+        let rules = r#"{"GlobalGeometryRules":{"GlobalGeometryRules 1":{"starting_vertex_position":"UpperLeftCorner","vertex_entry_direction":"Counterclockwise","coordinate_system":"Relative"}}}"#;
+        let mut rules = parse_epjson_str_with_idf_order(
+            rules,
+            "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;",
+        )?;
+        let before = rules.clone();
+        assert_eq!(
+            rules.ordered_instances("GlobalGeometryRules")?[0]
+                .1
+                .fields
+                .get(&FieldName("idf_max_fields".into())),
+            Some(&RawValue::Number("3".into()))
+        );
+        assert!(apply_idf_declaration_order(&mut rules,"GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;",IDF_ORDER_TARGETS).is_err());
+        assert_eq!(rules, before);
         assert!(staged.has_idf_declaration_order("BuildingSurface:Detailed"));
         Ok(())
     }

@@ -4,6 +4,7 @@ use ep_runtime::heat_balance::selected_heat_balance_input::SelectedHeatBalanceIn
 use ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor;
 use ep_runtime::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue};
 use std::collections::BTreeMap;
+mod surface;
 
 pub(crate) fn resolve(
     raw: &RawModel,
@@ -13,6 +14,7 @@ pub(crate) fn resolve(
     // Existing ordinary admission has already checked this same raw model.
     let mut result = SelectedHeatBalanceInput {
         source_is_epjson: raw.is_epjson(),
+        surface: surface::resolve(raw, input)?,
         objects: BTreeMap::new(),
     };
     for family in [

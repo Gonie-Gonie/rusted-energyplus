@@ -313,6 +313,9 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
         warmup_flag: false,
         doing_sizing: false,
         tracking: SourceErrorTracking {
+            ask_for_surfaces_report: false,
+            total_coincident_vertices: 0,
+            total_degenerate_surfaces: 0,
             match_counts: [0; 20],
             abort_processing: false,
             total_severe_errors: 0,

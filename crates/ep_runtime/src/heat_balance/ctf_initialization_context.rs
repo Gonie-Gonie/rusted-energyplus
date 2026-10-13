@@ -16,6 +16,8 @@ use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
 use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
+mod world_surface_geometry;
+
 /// Full real registry/table/cache owners, retained even if initialization stops.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct CtfInitializationReports {
@@ -85,6 +87,9 @@ pub struct CtfInitializationReports {
     pub(crate) heat_balance_input_state:
         super::selected_heat_balance_input::SelectedHeatBalanceInputState,
     pub(crate) heat_balance_input_errors_found: bool,
+    /// Actual partial GetSurfaceData input state, retained across every failure.
+    pub(crate) surface_geometry_input:
+        super::selected_heat_balance_input::surface::SurfaceGeometryInputState,
     /// Raw Material operands, retaining original loader format/order.
     pub selected_material_input: Option<super::selected_material_data::SelectedMaterialInput>,
     pub(crate) selected_material_data: super::selected_material_data::SelectedMaterialData,
@@ -495,6 +500,7 @@ fn hb_input_error(
     use crate::error::{RuntimeError, WarmupOutputError};
     let output = match error {
         E::Backend(e) => WarmupOutputError::Backend(e),
+        E::Fatal(e) => return RuntimeError::HeatBalanceInput(Box::new(E::Fatal(e))),
         E::Io(e) => WarmupOutputError::Io(e),
         E::Output(e) => return e.into(),
         E::Unavailable(e) => WarmupOutputError::Unavailable(format!("GetHeatBalanceInput: {e}")),

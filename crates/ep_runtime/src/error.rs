@@ -7,6 +7,8 @@ use ep_model::{ConstructionKind, MaterialFamily};
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
+    /// Reached selected heat-balance input fatal with its original backend cause.
+    HeatBalanceInput(Box<crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>),
     /// Actual ordinary initialization owner/backend/fatal stop, with its original error retained.
     CtfInitialization(Box<crate::heat_balance::ctf_initialization_context::CtfInitializationError>),
     /// Actual selected public/history lifecycle stopped; no fallback or Native fatal is inferred.
@@ -129,6 +131,7 @@ impl Display for RuntimeError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InteriorRadiation(error) => Display::fmt(error, formatter),
+            Self::HeatBalanceInput(error) => Display::fmt(error, formatter),
             Self::OrdinaryRadiation(error) => Display::fmt(error, formatter),
             Self::CtfInitialization(error) => Display::fmt(error, formatter),
             Self::WarmupOutput(error) => Display::fmt(error, formatter),
@@ -244,6 +247,7 @@ impl std::error::Error for RuntimeError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::InteriorRadiation(error) => Some(error),
+            Self::HeatBalanceInput(error) => Some(error.as_ref()),
             Self::OrdinaryRadiation(error) => Some(error.as_ref()),
             Self::CtfInitialization(error) => Some(error.as_ref()),
             Self::WarmupOutput(error) => Some(error.as_ref()),

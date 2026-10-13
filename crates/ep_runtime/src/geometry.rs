@@ -11,6 +11,11 @@ pub use inside_convection_owners::{
     OpaqueGeometryOwners, OpaqueSurfaceDimensions, OpaqueZoneGeometry, opaque_geometry_owners,
     opaque_surface_dimensions,
 };
+pub(crate) use source_geometry::{
+    GetVerticesProperties, Orientation, SourceCentroidScratch, SourceNormalArea,
+    finish_get_vertices_properties, orientation_from_normal, source_normal_area,
+    source_surface_centroid,
+};
 pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
     surface_geometry_properties,

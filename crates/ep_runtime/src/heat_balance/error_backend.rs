@@ -28,6 +28,14 @@ pub struct SourceErrorTracking {
     pub match_counts: [i32; 20],
     /// Actual AbortProcessing flag.
     pub abort_processing: bool,
+    /// Actual deferred surface-report request; GetSurfaceData sets it before
+    /// row processing and ReportSurfaces clears it before report scanning.
+    /// The selected ShowFatalError API does not implement AbortEnergyPlus.
+    pub ask_for_surfaces_report: bool,
+    /// Actual GetVertices coincident counter, constructor zero.
+    pub total_coincident_vertices: i32,
+    /// Actual GetVertices degenerate counter, constructor zero.
+    pub total_degenerate_surfaces: i32,
     /// Actual severe count read by the fatal summary; fatal does not increment it.
     pub total_severe_errors: i32,
     /// Actual severe warmup count, with the original warmup guards.

@@ -15,6 +15,7 @@ mod construction;
 mod control;
 mod input;
 pub(crate) mod shadowing;
+pub mod surface;
 pub(crate) mod zone;
 pub use input::SelectedHeatBalanceInput;
 
@@ -23,6 +24,8 @@ pub use input::SelectedHeatBalanceInput;
 pub enum HeatBalanceInputError {
     /// The real borrowed UtilityRoutines backend failed.
     Backend(SourceErrorBackendFailure),
+    /// The reached actual ShowFatalError/backend stop retains its real cause.
+    Fatal(super::error_backend::SourceFatalStop),
     /// The real borrowed EIO stream failed.
     Io(io::Error),
     /// A real output registration/file-host failure.
@@ -46,6 +49,7 @@ impl std::fmt::Display for HeatBalanceInputError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Backend(e) => std::fmt::Display::fmt(e, f),
+            Self::Fatal(e) => std::fmt::Display::fmt(e, f),
             Self::Io(e) => std::fmt::Display::fmt(e, f),
             Self::Output(e) => std::fmt::Display::fmt(e, f),
             Self::Unavailable(e) => write!(f, "selected heat-balance input unavailable: {e}"),
@@ -57,6 +61,7 @@ impl std::error::Error for HeatBalanceInputError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Backend(e) => Some(e),
+            Self::Fatal(e) => Some(e),
             Self::Io(e) => Some(e),
             Self::Output(e) => Some(e),
             Self::Unavailable(_) | Self::Format(_) => None,
@@ -94,6 +99,7 @@ pub(crate) enum SelectedWindowOpticalModel {
 pub(crate) struct SelectedHeatBalanceInputState {
     pub(crate) building_name: String,
     pub(crate) building_azimuth: f64,
+    pub(crate) building_rotation_appendix_g: f64,
     pub(crate) loads_convergence_tolerance: f64,
     pub(crate) temperature_convergence_tolerance: f64,
     pub(crate) max_number_of_warmup_days: i32,
@@ -129,6 +135,7 @@ impl Default for SelectedHeatBalanceInputState {
         Self {
             building_name: String::new(),
             building_azimuth: 0.0,
+            building_rotation_appendix_g: 0.0,
             loads_convergence_tolerance: 0.0,
             temperature_convergence_tolerance: 0.0,
             max_number_of_warmup_days: 25,
@@ -223,5 +230,44 @@ impl SelectedHeatBalanceInputState {
             ))?;
         row.is_used_ctf = true;
         Ok(())
+    }
+}
+
+// RuntimeError's established equality API compares retained OS/backend identity.
+impl PartialEq for HeatBalanceInputError {
+    fn eq(&self, other: &Self) -> bool {
+        use super::error_backend::{SourceErrorBackendFailure as B, SourceFatalStop as F};
+        let io_eq = |a: &io::Error, b: &io::Error| {
+            a.kind() == b.kind()
+                && a.raw_os_error() == b.raw_os_error()
+                && a.to_string() == b.to_string()
+        };
+        let backend_eq = |a: &B, b: &B| match (a, b) {
+            (
+                B::Effect {
+                    operation: a,
+                    source: x,
+                },
+                B::Effect {
+                    operation: b,
+                    source: y,
+                },
+            ) => a == b && io_eq(x, y),
+            (
+                B::UndefinedCounterIncrement { counter: a },
+                B::UndefinedCounterIncrement { counter: b },
+            ) => a == b,
+            _ => false,
+        };
+        match (self, other) {
+            (Self::Backend(a), Self::Backend(b)) => backend_eq(a, b),
+            (Self::Io(a), Self::Io(b)) => io_eq(a, b),
+            (Self::Output(a), Self::Output(b)) => a == b,
+            (Self::Unavailable(a), Self::Unavailable(b)) => a == b,
+            (Self::Format(a), Self::Format(b)) => a == b,
+            (Self::Fatal(F::Fatal(a)), Self::Fatal(F::Fatal(b))) => a == b,
+            (Self::Fatal(F::Backend(a)), Self::Fatal(F::Backend(b))) => backend_eq(a, b),
+            _ => false,
+        }
     }
 }

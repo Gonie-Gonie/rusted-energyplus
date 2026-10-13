@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 23개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 24개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -109,6 +109,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 HB 입력 / 기상·출력 소유자 전달 | [요약](../evidence/SRC-06-ordinary-hb-input/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-input/evidence.zip) | 동일 IP·기상·EIO/MTD의 ProjectControl/Site/Material/Construction/Shadowing/Zone 입력과 기존 geometry 사용. 전체 GetHBInput/SurfaceTmp/Setup·수치 완료는 아님. |
 | 동일 기상 상태 / Zone·Surface 외기와 오류 보존 | [요약](../evidence/SRC-06-ordinary-same-environment-outdoor/summary.json) · [색인](../evidence/SRC-06-ordinary-same-environment-outdoor/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip) | 동일 Station/Site/current와 Zone 온도→guard→풍속·풍향→기존 Surface. 실패한 실제 State를 이동 보존; 전체 InitHB/Setup·Native 수치 완료는 아님. |
 | HeatBalanceAlgorithm 기본값 admission | [요약](../evidence/SRC-06-ordinary-hb-default-admission/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-default-admission/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-default-admission/evidence.zip) | 실제 numeric200/1000 기본값만 허용. 기존 lib1·일반 CLI1·실제 CI CLI1 확인; A 전후 실제 결과는 별도 보존하며 full Setup·Native 수치 PASS로 확대하지 않음. |
+| 실제 World 표면 기하 연결 | [요약](../evidence/SRC-06-ordinary-surface-world-geometry/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-world-geometry/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-world-geometry/evidence.zip) | 명시적 ULC/CCW/World의 raw 꼭짓점·최종 연결·중심점과 두 직접 Surface 소비자를 연결. 기존 lib9·일반 CLI1·실제 CI CLI1 및 실제 A의 EIO·여섯 표면 경로를 확인. 전체 geometry/HB/Setup·Native 수치 동등성은 미확인. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -167,6 +168,14 @@ Source `0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a`에서 
 ## HeatBalanceAlgorithm 기본값 admission 단위의 QA
 
 Source `194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e`에서 fmt·source-quality·영향받는 ep_run all-target Clippy와 기존 테스트 **3 passed / 0 failed / 0 ignored**를 확인했다. 같은 admission 본문에 열 개 표 행을 추가하고 일반 CLI1·실제 CI CLI1을 실행했다. A-24H 전후 실제 exit는 각각 6 / 0이며 실제 diagnostics와 함께 보존한다. A 실행은 테스트 수에 더하지 않고 성공·수치 동등성을 미리 가정하지 않는다. 전체 workspace 반복·새 Native 실행은 없으며 모든 gate와 A/B 완료 수는 그대로다.
+
+## 실제 World 표면 기하 연결 단위의 QA
+
+최종 Source `f793d3c3f896c106989d1c983fc3cc16562cee49b7cd5652d60de93a6fef83ac`에서 fmt·source-quality·all-target workspace Clippy와 기존 테스트 **11 passed / 0 failed / 0 ignored**를 확인했다. 한 Cargo 선택으로 geometry5·초기화1·raw2·admission1을 묶었고 일반 CLI1·실제 `CI_FORCE_TIME_STEP=Y` CLI1을 실행했다. 새 테스트 본문·binary와 전체 workspace 테스트 반복은 없다.
+
+같은 A-24H 입력의 실제 실행은 exit0이며, 새 원본 getter가 기록한 유일한 Surface Geometry EIO 행과 변환된 여섯 raw 표면을 확인했다. 이전 기본값 admission 실행에는 해당 행이 없다. 실제 출력 24 hourly samples는 96개 Source timestep·전체 Setup·Native 수치 동등성의 증거로 확대하지 않는다. 빠진/다른 좌표 규칙의 기존 경로도 유지한다.
+
+Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항목 실패101 및 당시 bytes·로그를 보존했다. 동일한 `1.0e-6` 임계값, 마지막 scratch 전달·같은 반개구간 조건·Wall 기본 생성·Kiva 대입 순서를 유지한 Source03에서 최종 QA를 수행했다. raw GetVertices 결과와 중심점은 두 직접 Surface 소비자가 재사용하지만, Zone 체적의 기존 `ZoneVolumeFace::from_surface` 경로는 아직 형상을 재계산한다. 병렬/window 배열·전체 getter 반환·후속 보고/enclosure·HB tail/firstTime 완료는 남아 있다. 기존 전체 비교 실패와 DesignDay 수치 실패, 네 gate 및 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

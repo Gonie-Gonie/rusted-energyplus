@@ -4,7 +4,9 @@ fn ctf_ordinary_output_test_state() -> crate::heat_balance::error_backend::Sourc
     SourceErrorState { output_error_header: true, version_string: "authored Rust caller".into(),
         idd_version_string: "authored typed input".into(), doing_input_processing: false,
         print_console_output: true, kickoff_simulation: false, developer_flag: false,
-        warmup_flag: false, doing_sizing: false, tracking: SourceErrorTracking {
+        warmup_flag: false, doing_sizing: false, tracking: SourceErrorTracking { ask_for_surfaces_report: false,
+            total_coincident_vertices: 0,
+            total_degenerate_surfaces: 0,
             match_counts:[0;20],abort_processing:false,total_severe_errors:0,last_severe_error:String::new(),
             total_severe_errors_during_warmup:0,total_severe_errors_during_sizing:0,
             total_warning_errors:0,total_warning_errors_during_warmup:0,total_warning_errors_during_sizing:0,
