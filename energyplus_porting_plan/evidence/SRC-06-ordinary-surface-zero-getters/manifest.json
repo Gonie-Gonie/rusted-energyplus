@@ -1,0 +1,1706 @@
+{
+  "schema": "src06-surface-zero-getters-evidence.v1",
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/manifest.json",
+    "sha256": "f1250f251e581135fe551c2acf32649fb43b91e0ae077150aa1cba108993c8b7",
+    "size_bytes": 12580
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-surface-zero-getters-application-review-01/review.json",
+    "sha256": "9ef318b09d4c83222ced9e292d6433d041cd3073658998fa71d1e8669c937680",
+    "size_bytes": 11300
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318",
+    "sha256": "d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318"
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/manifest.json",
+      "sha256": "f1250f251e581135fe551c2acf32649fb43b91e0ae077150aa1cba108993c8b7",
+      "size_bytes": 12580,
+      "roles": [
+        "actual_five_path_assembly",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f1250f251e581135fe551c2acf32649fb43b91e0ae077150aa1cba108993c8b7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/apply.json",
+      "sha256": "f1b454439fd5868f02c2d4a7c5353cc90a1d338799168dd5c4670810f3c3702b",
+      "size_bytes": 7268,
+      "roles": [
+        "actual_application",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/f1b454439fd5868f02c2d4a7c5353cc90a1d338799168dd5c4670810f3c3702b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/manifest.json",
+      "sha256": "b2a328304a858ce8e450d8945dd5286dbec62a6b68db22bd468d692a1bc8083c",
+      "size_bytes": 40182,
+      "roles": [
+        "accepted_rebased_Source",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand",
+        "independent_rebased_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/b2a328304a858ce8e450d8945dd5286dbec62a6b68db22bd468d692a1bc8083c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-zero-getters-rebased-Source-review-01/review.json",
+      "sha256": "1e5b31d46520a890cb5aefdc5063cb27758779e7419269b24f40a678680373c9",
+      "size_bytes": 3731,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand",
+        "independent_rebased_Source_review"
+      ],
+      "archive_member": "objects/1e5b31d46520a890cb5aefdc5063cb27758779e7419269b24f40a678680373c9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b",
+      "size_bytes": 6605,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/proposed/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "size_bytes": 6731,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125"
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "size_bytes": 6731,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/after/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "size_bytes": 6731,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/complete_actual_diff/crates__ep_run__src__ordinary_input_processor__schema.rs.diff",
+      "sha256": "e3af2eec021cc318070c9a7379e84a1876210c2200996f30fc8c5e47e57557c9",
+      "size_bytes": 611,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3af2eec021cc318070c9a7379e84a1876210c2200996f30fc8c5e47e57557c9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/held_to_actual_diff/crates__ep_run__src__ordinary_input_processor__schema.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "size_bytes": 10665,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868",
+      "size_bytes": 11177,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868",
+      "size_bytes": 11177,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868",
+      "size_bytes": 11177,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "6acfe47b7be721fa4fe3f45280394b8652cdd10aa0470bb9edb721302809d4f7",
+      "size_bytes": 1291,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/6acfe47b7be721fa4fe3f45280394b8652cdd10aa0470bb9edb721302809d4f7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+      "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+      "size_bytes": 6278,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+      "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+      "size_bytes": 6278,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+      "sha256": "b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7",
+      "size_bytes": 6498,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+      "sha256": "b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7",
+      "size_bytes": 6498,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__empty_subsurfaces.rs.diff",
+      "sha256": "a01d2f7439baca99566500f9f8e9a8d86a86300886c23b84e641b8bc8acdef20",
+      "size_bytes": 6853,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/a01d2f7439baca99566500f9f8e9a8d86a86300886c23b84e641b8bc8acdef20"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__empty_subsurfaces.rs.diff",
+      "sha256": "6e4fcdb6868be032f1c3d01bc823b240a3bc4103f6f4ebd333d0b9eb4b5d3d7f",
+      "size_bytes": 5169,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/6e4fcdb6868be032f1c3d01bc823b240a3bc4103f6f4ebd333d0b9eb4b5d3d7f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "size_bytes": 13079,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1",
+      "size_bytes": 13912,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1",
+      "size_bytes": 13912,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1",
+      "size_bytes": 13912,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "63718300b85ae7eec6294d722e0f07f9f05251a9f605801b805c435c4a87f4ba",
+      "size_bytes": 2914,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/63718300b85ae7eec6294d722e0f07f9f05251a9f605801b805c435c4a87f4ba"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+      "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+      "size_bytes": 7316,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+      "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+      "size_bytes": 7316,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "actual_application:direct_operand",
+        "actual_five_path_assembly:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+      "sha256": "4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00",
+      "size_bytes": 7926,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+      "sha256": "4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00",
+      "size_bytes": 7926,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_zero_suffix.rs.diff",
+      "sha256": "8fe81cbf035ca6678349017ff68ca0f5ee27e53e48af84882ef1cf2c8999db57",
+      "size_bytes": 8319,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/8fe81cbf035ca6678349017ff68ca0f5ee27e53e48af84882ef1cf2c8999db57"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_zero_suffix.rs.diff",
+      "sha256": "0327bf35a9f5e09deea33f9dcb3afad86c5bca9e25c410f6dd2645d7cdcc72b8",
+      "size_bytes": 8658,
+      "roles": [
+        "actual_five_path_assembly:direct_operand",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/0327bf35a9f5e09deea33f9dcb3afad86c5bca9e25c410f6dd2645d7cdcc72b8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-reviewed-packet-Root-02.py",
+      "sha256": "c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07",
+      "size_bytes": 2263,
+      "roles": [
+        "actual_five_path_assembly:direct_operand"
+      ],
+      "archive_member": "objects/c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-zero-getters-application-review-01/review.json",
+      "sha256": "9ef318b09d4c83222ced9e292d6433d041cd3073658998fa71d1e8669c937680",
+      "size_bytes": 11300,
+      "roles": [
+        "independent_actual_application_review"
+      ],
+      "archive_member": "objects/9ef318b09d4c83222ced9e292d6433d041cd3073658998fa71d1e8669c937680"
+    },
+    {
+      "path": ".runtime/porting/source-objects/d3/d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318",
+      "sha256": "d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318",
+      "size_bytes": 1670902,
+      "roles": [
+        "actual_execution_source_snapshot",
+        "final_Source_metadata_only",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-fmt-01/receipt.json",
+      "sha256": "ec12aa72a17e360e85a80b90247b9ee5251a25d47f3d79066cb20ae45ed268a8",
+      "size_bytes": 3572,
+      "roles": [
+        "actual_recorded_execution",
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/ec12aa72a17e360e85a80b90247b9ee5251a25d47f3d79066cb20ae45ed268a8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/world-formatter-tokens-Header-01.py",
+      "sha256": "11bc3620568e5582d3c851c02f0daea50eac189957bf06c1b4cc80e7a2dda407",
+      "size_bytes": 2414,
+      "roles": [
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/11bc3620568e5582d3c851c02f0daea50eac189957bf06c1b4cc80e7a2dda407"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-zero-getters-application-Header-01.py",
+      "sha256": "3b0055dd5a6bd9753d435e5074f7ea590b1e05fe7ce506a89c93a9f5c80183fe",
+      "size_bytes": 7566,
+      "roles": [
+        "independent_actual_application_review:direct_operand"
+      ],
+      "archive_member": "objects/3b0055dd5a6bd9753d435e5074f7ea590b1e05fe7ce506a89c93a9f5c80183fe"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-05.py",
+      "sha256": "1c5379ed501b3a5d0d5573fd7a490a88f414bc7941efc42dbe0c75f45687e4ea",
+      "size_bytes": 4791,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/1c5379ed501b3a5d0d5573fd7a490a88f414bc7941efc42dbe0c75f45687e4ea"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-04.py",
+      "sha256": "3b74fdf7c2ff5912d7dfe426427405bbe3de3e9c474dc89efcd6ec3478e5fe56",
+      "size_bytes": 3984,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/3b74fdf7c2ff5912d7dfe426427405bbe3de3e9c474dc89efcd6ec3478e5fe56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-world-apply-prevalidation-failure-01.json",
+      "sha256": "bcc9e7252c91ffed9b6c9f623a71adceb0840f24bffb9c476d500d0340878c8b",
+      "size_bytes": 1071,
+      "roles": [
+        "actual_application:direct_operand"
+      ],
+      "archive_member": "objects/bcc9e7252c91ffed9b6c9f623a71adceb0840f24bffb9c476d500d0340878c8b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/manifest.json",
+      "sha256": "415655fb931a9685d11bae905d1f3d9596b8074d3bdffeda82ecf47c55a52708",
+      "size_bytes": 19261,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "independent_zero_getter_Source_review:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand",
+        "underlying_zero_getter_Source"
+      ],
+      "archive_member": "objects/415655fb931a9685d11bae905d1f3d9596b8074d3bdffeda82ecf47c55a52708"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/manifest.json",
+      "sha256": "cd239284d12972e7d7656d8a2b3942ac27e4da6b110c530291b5e9fa8839a640",
+      "size_bytes": 12237,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "independent_final_suffix_Source_review:direct_operand",
+        "underlying_final_zero_suffix_Source"
+      ],
+      "archive_member": "objects/cd239284d12972e7d7656d8a2b3942ac27e4da6b110c530291b5e9fa8839a640"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-assembly-01/manifest.json",
+      "sha256": "91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529",
+      "size_bytes": 26304,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "historical_array_assembly_metadata_only",
+        "independent_rebased_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/91d32a6d329269154e021a0cbce2001ef7fd370294d79ee8b75521516bd80529"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b",
+      "size_bytes": 6605,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/diffs/crates__ep_run__src__ordinary_input_processor__schema.rs.diff",
+      "sha256": "63af01d658d5b604c4a94cc6c62ddf9b8cf53761d37b3c2dfef64f6f30f55896",
+      "size_bytes": 615,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/63af01d658d5b604c4a94cc6c62ddf9b8cf53761d37b3c2dfef64f6f30f55896"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b",
+      "size_bytes": 6605,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/669b51d2c4e44ab22ce6763005ebeccc321d8bebe2cd3cbfd6fcb8fda120057b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "size_bytes": 6731,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/diffs/crates/ep_run/src/ordinary_input_processor/schema.rs.diff",
+      "sha256": "63af01d658d5b604c4a94cc6c62ddf9b8cf53761d37b3c2dfef64f6f30f55896",
+      "size_bytes": 615,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/63af01d658d5b604c4a94cc6c62ddf9b8cf53761d37b3c2dfef64f6f30f55896"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56",
+      "size_bytes": 10665,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/9ad7b7ea93093f85a838966e6f7a094a9c0a44363b3b9d27b4693f98b22d8e56"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "9efd19ac0848388d4009db87fbe8ac2fcbf4bb3425c806168864c424bd807fa2",
+      "size_bytes": 1295,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/9efd19ac0848388d4009db87fbe8ac2fcbf4bb3425c806168864c424bd807fa2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade",
+      "size_bytes": 10196,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/18c6d59ab639edfdb96e9dc1acd2924c74180372db8fb3af8f7179e7367ebade"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "734b0b8f22f93116e5d99759d53b979552074e353e532d827f1ba3f867d67192",
+      "size_bytes": 10465,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/734b0b8f22f93116e5d99759d53b979552074e353e532d827f1ba3f867d67192"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs.diff",
+      "sha256": "f0b1b5481601ad3dfb37c596ae864f763bf22bed9cb910026464831d87727811",
+      "size_bytes": 664,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/f0b1b5481601ad3dfb37c596ae864f763bf22bed9cb910026464831d87727811"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "734b0b8f22f93116e5d99759d53b979552074e353e532d827f1ba3f867d67192",
+      "size_bytes": 10465,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/734b0b8f22f93116e5d99759d53b979552074e353e532d827f1ba3f867d67192"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "c5d80253f8f05a105912c19fdf01b384fd3552e4865a912fc228a977d3862ddf",
+      "size_bytes": 10708,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/c5d80253f8f05a105912c19fdf01b384fd3552e4865a912fc228a977d3862ddf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs.diff",
+      "sha256": "245f732197d4bdaa22b1564aec5b003f48c4d67d3cbce2ac40b8832d6e3a31eb",
+      "size_bytes": 819,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/245f732197d4bdaa22b1564aec5b003f48c4d67d3cbce2ac40b8832d6e3a31eb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__empty_subsurfaces.rs.diff",
+      "sha256": "879d5cc5d6682af11122c145cabc01dd06919222b0091dff48f7ffa589f10f04",
+      "size_bytes": 6618,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/879d5cc5d6682af11122c145cabc01dd06919222b0091dff48f7ffa589f10f04"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs.diff",
+      "sha256": "879d5cc5d6682af11122c145cabc01dd06919222b0091dff48f7ffa589f10f04",
+      "size_bytes": 6618,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/879d5cc5d6682af11122c145cabc01dd06919222b0091dff48f7ffa589f10f04"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca",
+      "size_bytes": 13079,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/041d8020370f966cbc085e89a0968a871b2e9f4abb60bd3bacb88f664abc99ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "0846f792cc401c39d51627a2a626be5518c43456dc8b06cebaba502719297df1",
+      "size_bytes": 2918,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/0846f792cc401c39d51627a2a626be5518c43456dc8b06cebaba502719297df1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2",
+      "size_bytes": 13078,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/5adf706f0b27ec42d0496741e9072f51bc13a40108227aa15d5a19422aa13ad2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "c613665d5ee975f9dbb9b35964e488e4e3b4dd1851df42bc41279c3e60734368",
+      "size_bytes": 13735,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/c613665d5ee975f9dbb9b35964e488e4e3b4dd1851df42bc41279c3e60734368"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.diff",
+      "sha256": "706b68a86815ab67182f3d4cdb95fb33b9aac7ce7e480297f8e387c0b85c8432",
+      "size_bytes": 2874,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/706b68a86815ab67182f3d4cdb95fb33b9aac7ce7e480297f8e387c0b85c8432"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "c613665d5ee975f9dbb9b35964e488e4e3b4dd1851df42bc41279c3e60734368",
+      "size_bytes": 13735,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/c613665d5ee975f9dbb9b35964e488e4e3b4dd1851df42bc41279c3e60734368"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "1fffb7101c28d0f21b9d23bee0274090cbb960aebef9691a89e7d0654c953f6d",
+      "size_bytes": 13922,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/1fffb7101c28d0f21b9d23bee0274090cbb960aebef9691a89e7d0654c953f6d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.diff",
+      "sha256": "49798bf3425ca44d15f6b09eecc5b3bf11ec51e257dc882cff1fdfc4d1efe284",
+      "size_bytes": 774,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/49798bf3425ca44d15f6b09eecc5b3bf11ec51e257dc882cff1fdfc4d1efe284"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-rebased-prep-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__final_zero_suffix.rs.diff",
+      "sha256": "d6bf0e59d92557fa8ccbf007de3d7e70b21b38130b0f39dd0f4d508d3d9eacf9",
+      "size_bytes": 7671,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/d6bf0e59d92557fa8ccbf007de3d7e70b21b38130b0f39dd0f4d508d3d9eacf9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs.diff",
+      "sha256": "d6bf0e59d92557fa8ccbf007de3d7e70b21b38130b0f39dd0f4d508d3d9eacf9",
+      "size_bytes": 7671,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/d6bf0e59d92557fa8ccbf007de3d7e70b21b38130b0f39dd0f4d508d3d9eacf9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.1033-1039.txt",
+      "sha256": "e7b22ec64bac791887fe7e1cdd7d1b29ff150aa6e1a830ae1b0302d2b380f841",
+      "size_bytes": 431,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/e7b22ec64bac791887fe7e1cdd7d1b29ff150aa6e1a830ae1b0302d2b380f841"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.1104-1147.txt",
+      "sha256": "b0f805610aab0999a8a0c189245e5fb79729426082baf257d7e2d2391982a90b",
+      "size_bytes": 4772,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/b0f805610aab0999a8a0c189245e5fb79729426082baf257d7e2d2391982a90b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.1150-1224.txt",
+      "sha256": "65ba49d6b832aa08690aa7ec8511bef28a9db419fbd8b92e550843701909238f",
+      "size_bytes": 3248,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/65ba49d6b832aa08690aa7ec8511bef28a9db419fbd8b92e550843701909238f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.3845-3855.txt",
+      "sha256": "dede44fc0af7aecc030205455bbb25b9a07eebe11fc7d900bda145e1e088b30e",
+      "size_bytes": 336,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/dede44fc0af7aecc030205455bbb25b9a07eebe11fc7d900bda145e1e088b30e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.4430-4547.txt",
+      "sha256": "50347955dbb9f0ca1e6b61f3ac9cfea964e63cb9d5a2bd4010bd0c7d8e8fe9a7",
+      "size_bytes": 5832,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/50347955dbb9f0ca1e6b61f3ac9cfea964e63cb9d5a2bd4010bd0c7d8e8fe9a7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.4787-4789.txt",
+      "sha256": "a36fdd15f284981beb01de8e6f75b942e8ae78f80381372e47bbef394cc3eba9",
+      "size_bytes": 47,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/a36fdd15f284981beb01de8e6f75b942e8ae78f80381372e47bbef394cc3eba9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.5032-5056.txt",
+      "sha256": "60fe72834768bd75d454f4429b8703077fdc677554a646e34838a69429790133",
+      "size_bytes": 1245,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/60fe72834768bd75d454f4429b8703077fdc677554a646e34838a69429790133"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.5383-5389.txt",
+      "sha256": "ed6642c8d612b4c9837322cca03e3f291693e0022159b1b841268f494f153958",
+      "size_bytes": 283,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/ed6642c8d612b4c9837322cca03e3f291693e0022159b1b841268f494f153958"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.5391-5473.txt",
+      "sha256": "0e5995210d45460744ccc357a2684c84e80f06f9de77c485488bcf4e955bdf4b",
+      "size_bytes": 3946,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/0e5995210d45460744ccc357a2684c84e80f06f9de77c485488bcf4e955bdf4b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.5742-5744.txt",
+      "sha256": "a36fdd15f284981beb01de8e6f75b942e8ae78f80381372e47bbef394cc3eba9",
+      "size_bytes": 47,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/a36fdd15f284981beb01de8e6f75b942e8ae78f80381372e47bbef394cc3eba9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.6371-6387.txt",
+      "sha256": "55834fe5d63a3380c0735f25dd65773102dfa91c8667b884f3c5c58aada6bc45",
+      "size_bytes": 999,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/55834fe5d63a3380c0735f25dd65773102dfa91c8667b884f3c5c58aada6bc45"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.6530-6531.txt",
+      "sha256": "f206e17d648acc4999177e39b33de026827b714d662b159dfd92f9abb0c394ee",
+      "size_bytes": 16,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/f206e17d648acc4999177e39b33de026827b714d662b159dfd92f9abb0c394ee"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.6550-6589.txt",
+      "sha256": "e720078d8af56784cff48a4a0148862f53933c961106ce749a90aeba5191a74e",
+      "size_bytes": 1567,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/e720078d8af56784cff48a4a0148862f53933c961106ce749a90aeba5191a74e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.6939-6941.txt",
+      "sha256": "bf3e37f679cd66702b71f3f98d7b2b62e000a33adb4891547c66a92d4124b179",
+      "size_bytes": 30,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/bf3e37f679cd66702b71f3f98d7b2b62e000a33adb4891547c66a92d4124b179"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.6986-6994.txt",
+      "sha256": "8330c05e8dacea60e32683f588f757ad6e6f6704b1f78763fcea6b1b0555fabf",
+      "size_bytes": 352,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/8330c05e8dacea60e32683f588f757ad6e6f6704b1f78763fcea6b1b0555fabf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.9704-9714.txt",
+      "sha256": "f5f914004f5b30db244730cb0243dd918911ec419f6de4102a9527508aea5d25",
+      "size_bytes": 556,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/f5f914004f5b30db244730cb0243dd918911ec419f6de4102a9527508aea5d25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.2494-2599.txt",
+      "sha256": "9dd203b4c223f0c5954fcd754d871985dbdbb685982215a3084d41b5253ea68a",
+      "size_bytes": 5178,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/9dd203b4c223f0c5954fcd754d871985dbdbb685982215a3084d41b5253ea68a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.2601-2915.txt",
+      "sha256": "78f44ce37d961d9f996d6a7ca211c7c815d730b81da5ddf5a0540b5f80b0c0cb",
+      "size_bytes": 19910,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/78f44ce37d961d9f996d6a7ca211c7c815d730b81da5ddf5a0540b5f80b0c0cb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/SurfaceGeometry.cc.12899-12985.txt",
+      "sha256": "387c93295db23f3a149103d088c18e25ef8ff03c048cc3d23bf68135027d74c8",
+      "size_bytes": 4144,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/387c93295db23f3a149103d088c18e25ef8ff03c048cc3d23bf68135027d74c8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/Original/DataSurfaces.hh.1470-1482.txt",
+      "sha256": "2c5b118b37c834d65db83fbaa92e8d80f8262ebbbda3e286cff65f1234d5009a",
+      "size_bytes": 906,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/2c5b118b37c834d65db83fbaa92e8d80f8262ebbbda3e286cff65f1234d5009a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/DataSurfaces.hh.790-806.txt",
+      "sha256": "7d21fe954cd7fcc4ab0f8e2a7438ba6775a747b8c41f43f454d7953ef0814327",
+      "size_bytes": 1578,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/7d21fe954cd7fcc4ab0f8e2a7438ba6775a747b8c41f43f454d7953ef0814327"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/DataSurfaces.hh.834-847.txt",
+      "sha256": "fcfa15054e296995bb186b2b62294cb8c918321e317c083cb0da007c874c76a4",
+      "size_bytes": 1630,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/fcfa15054e296995bb186b2b62294cb8c918321e317c083cb0da007c874c76a4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.2494-2599.txt",
+      "sha256": "9dd203b4c223f0c5954fcd754d871985dbdbb685982215a3084d41b5253ea68a",
+      "size_bytes": 5178,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/9dd203b4c223f0c5954fcd754d871985dbdbb685982215a3084d41b5253ea68a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.10258-10310.txt",
+      "sha256": "44c0df3798bbee9128f0a71d16977f0706e62b8c7b637680587beb3a1648d781",
+      "size_bytes": 3925,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/44c0df3798bbee9128f0a71d16977f0706e62b8c7b637680587beb3a1648d781"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.14656-14767.txt",
+      "sha256": "6ae7d6abc5faae6e0e608bcdc2fee9aa0cb60aeb1c9f6f9cdc24a97f96022557",
+      "size_bytes": 6397,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/6ae7d6abc5faae6e0e608bcdc2fee9aa0cb60aeb1c9f6f9cdc24a97f96022557"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.11780-11835.txt",
+      "sha256": "175290450688e54d097410947eb5d9b8a9722442f2a2ef9e85aa0ec7eada8899",
+      "size_bytes": 2196,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/175290450688e54d097410947eb5d9b8a9722442f2a2ef9e85aa0ec7eada8899"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.12000-12007.txt",
+      "sha256": "ec9488c2af48779b0a2648bfa0821f405a090467fb9632127840790d8691263b",
+      "size_bytes": 479,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/ec9488c2af48779b0a2648bfa0821f405a090467fb9632127840790d8691263b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.2601-2639.txt",
+      "sha256": "4d577ebbc248ed9e7003eab8db1436f1940298feb0dd9b60c330305bd31cae8b",
+      "size_bytes": 2644,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/4d577ebbc248ed9e7003eab8db1436f1940298feb0dd9b60c330305bd31cae8b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/SurfaceGeometry.cc.2721-2791.txt",
+      "sha256": "dff2670c28827e6b59df7174ea3c0464a09003bfdb67daf9e192a03d0cb1a97a",
+      "size_bytes": 4784,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/dff2670c28827e6b59df7174ea3c0464a09003bfdb67daf9e192a03d0cb1a97a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/HeatBalanceManager.cc.614-645.txt",
+      "sha256": "d8d3d7336c7e03164aa4b4d2dd881b4eaadac0828ef86ce2a4f7a2dc90f9a9cf",
+      "size_bytes": 2264,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/d8d3d7336c7e03164aa4b4d2dd881b4eaadac0828ef86ce2a4f7a2dc90f9a9cf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/Construction.hh.258-267.txt",
+      "sha256": "5a35f480af1687f3f35d90e3b9e905de7c283cb8ba0729e137f825260cdd670c",
+      "size_bytes": 1021,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/5a35f480af1687f3f35d90e3b9e905de7c283cb8ba0729e137f825260cdd670c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/DataHeatBalance.cc.375-430.txt",
+      "sha256": "58ebca1e95af83396ee18913e6b47ff7c2b3c4e46f39f058127c7c78e27240f9",
+      "size_bytes": 2677,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/58ebca1e95af83396ee18913e6b47ff7c2b3c4e46f39f058127c7c78e27240f9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/Original/DataHeatBalance.cc.774-797.txt",
+      "sha256": "9b1914f226bdfb5ed428d166614e4ab226bf67a1bd97868ee7aeb0a41997816e",
+      "size_bytes": 1275,
+      "roles": [
+        "accepted_rebased_Source:direct_operand",
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/9b1914f226bdfb5ed428d166614e4ab226bf67a1bd97868ee7aeb0a41997816e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/rebase-surface-zero-getters-Root-01.py",
+      "sha256": "b38f0a2916f90f28905001703b65c7341c761316ab0b6f343c9ce0453e3a0381",
+      "size_bytes": 7034,
+      "roles": [
+        "accepted_rebased_Source:direct_operand"
+      ],
+      "archive_member": "objects/b38f0a2916f90f28905001703b65c7341c761316ab0b6f343c9ce0453e3a0381"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-surface-zero-getters-Header-01.py",
+      "sha256": "77adb03bb545ead40873d88ffb81d6aedb10d5d807849760b0407adf7b263d5d",
+      "size_bytes": 13955,
+      "roles": [
+        "independent_final_suffix_Source_review:direct_operand",
+        "independent_rebased_Source_review:direct_operand",
+        "independent_zero_getter_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/77adb03bb545ead40873d88ffb81d6aedb10d5d807849760b0407adf7b263d5d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-zero-getters-Source-review-01/review.json",
+      "sha256": "715dbad0aa9a5442f6ebd9db7cec029b3343b4685ae4aae2b139f03a0dbfcaca",
+      "size_bytes": 3001,
+      "roles": [
+        "independent_rebased_Source_review:direct_operand",
+        "independent_zero_getter_Source_review"
+      ],
+      "archive_member": "objects/715dbad0aa9a5442f6ebd9db7cec029b3343b4685ae4aae2b139f03a0dbfcaca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-final-zero-suffix-Source-review-01/review.json",
+      "sha256": "bb9213679d212b1f1bd9009aa6cd0f48c2f95a60a7c8be489928f589c7bbf175",
+      "size_bytes": 3154,
+      "roles": [
+        "independent_final_suffix_Source_review",
+        "independent_rebased_Source_review:direct_operand"
+      ],
+      "archive_member": "objects/bb9213679d212b1f1bd9009aa6cd0f48c2f95a60a7c8be489928f589c7bbf175"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-closure-prep-03/manifest.json",
+      "sha256": "c35a0bed15326226610be46e5fe799b3b63eb2d486e794ef3c2d156746fa6e5b",
+      "size_bytes": 33680,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/c35a0bed15326226610be46e5fe799b3b63eb2d486e794ef3c2d156746fa6e5b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-surface-array-floor-Source-review-03/review.json",
+      "sha256": "73d7d13a940002e585479ba5e94a45ba57d2809792c921e5d9fa7936bddf9035",
+      "size_bytes": 11366,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/73d7d13a940002e585479ba5e94a45ba57d2809792c921e5d9fa7936bddf9035"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/schema/FenestrationSurface_Detailed.json",
+      "sha256": "9e515bbf231cf7bb2e726d860790f36020a6a20af9c928cfb9f1f3ed97ea0358",
+      "size_bytes": 9631,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/9e515bbf231cf7bb2e726d860790f36020a6a20af9c928cfb9f1f3ed97ea0358"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/schema/Shading_Zone_Detailed.json",
+      "sha256": "661b57bebb056f57f619faacc3b7168f78e38772e4dd487c37e703f436c8f6d7",
+      "size_bytes": 3915,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/661b57bebb056f57f619faacc3b7168f78e38772e4dd487c37e703f436c8f6d7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/AUDIT.md",
+      "sha256": "f898db0886c6eed029209319be2120ea77c046ef053f2fe1d72c9dbe053825d9",
+      "size_bytes": 7049,
+      "roles": [
+        "underlying_final_zero_suffix_Source:direct_operand",
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/f898db0886c6eed029209319be2120ea77c046ef053f2fe1d72c9dbe053825d9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/README.md",
+      "sha256": "aaa1aea80c822757f0edb86d3e4086ffef991ef3afd40ccf30ed787dd459b852",
+      "size_bytes": 2191,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/aaa1aea80c822757f0edb86d3e4086ffef991ef3afd40ccf30ed787dd459b852"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-surface-zero-getters-01.py",
+      "sha256": "d110b70e1e0f5ce1e8b48578d22abf52b73e93af8a7a328d337e8e77c942cb6b",
+      "size_bytes": 10129,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/d110b70e1e0f5ce1e8b48578d22abf52b73e93af8a7a328d337e8e77c942cb6b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-surface-zero-getters-01.py",
+      "sha256": "6b446e6e0647637f96d7d8bca6f4dbc8cc79213c186623d26f64d108cb9554de",
+      "size_bytes": 15636,
+      "roles": [
+        "underlying_zero_getter_Source:direct_operand"
+      ],
+      "archive_member": "objects/6b446e6e0647637f96d7d8bca6f4dbc8cc79213c186623d26f64d108cb9554de"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/README.md",
+      "sha256": "3d98536ed33acd0744ab1aa16fe11f606ed5befc8abc1b9bc915d861aba732b3",
+      "size_bytes": 4391,
+      "roles": [
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/3d98536ed33acd0744ab1aa16fe11f606ed5befc8abc1b9bc915d861aba732b3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-surface-final-zero-suffix-01.py",
+      "sha256": "f5ef4d4fba33c7f5fdf87335f6c31f2473105d7c38b6f9a67113381d8ed8cc96",
+      "size_bytes": 9913,
+      "roles": [
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/f5ef4d4fba33c7f5fdf87335f6c31f2473105d7c38b6f9a67113381d8ed8cc96"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-surface-final-zero-suffix-01.py",
+      "sha256": "59d89066418e43c45413bfdea47366274f5583dbbd325efefaa60551eeec6bad",
+      "size_bytes": 8529,
+      "roles": [
+        "underlying_final_zero_suffix_Source:direct_operand"
+      ],
+      "archive_member": "objects/59d89066418e43c45413bfdea47366274f5583dbbd325efefaa60551eeec6bad"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "roles": [
+        "actual_executed_recorder_bytes"
+      ],
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-quality-01/receipt.json",
+      "sha256": "48f6bdc4abe8b6e59e71eac72d3a7e71e0f97dfb465f9a0724fa8135840adb9a",
+      "size_bytes": 3623,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/48f6bdc4abe8b6e59e71eac72d3a7e71e0f97dfb465f9a0724fa8135840adb9a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-quality-01/stdout.log",
+      "sha256": "747e88aa559bb9c659c9a4310ffb2bd5ad4afd80a208d20a8989dd0dbbf172f7",
+      "size_bytes": 82,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/747e88aa559bb9c659c9a4310ffb2bd5ad4afd80a208d20a8989dd0dbbf172f7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-clippy-01/receipt.json",
+      "sha256": "88f05faa30c713aaebc42333da9f73c7f8ccc6cc07950f10dc2129b5d359528d",
+      "size_bytes": 3654,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/88f05faa30c713aaebc42333da9f73c7f8ccc6cc07950f10dc2129b5d359528d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-clippy-01/stderr.log",
+      "sha256": "a494a9b051934ad5e374d2c1e93dbd771d4e95fbedab0ca68782aa206dbc42bc",
+      "size_bytes": 319,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/a494a9b051934ad5e374d2c1e93dbd771d4e95fbedab0ca68782aa206dbc42bc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-focused-tests-01/receipt.json",
+      "sha256": "da0c7dc77fdd726b1c3b3f98e1fecd4884750aad657cc7b863901a54f4a545b5",
+      "size_bytes": 3705,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/da0c7dc77fdd726b1c3b3f98e1fecd4884750aad657cc7b863901a54f4a545b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-focused-tests-01/stdout.log",
+      "sha256": "e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e",
+      "size_bytes": 215,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_test_stdout"
+      ],
+      "archive_member": "objects/e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-focused-tests-01/stderr.log",
+      "sha256": "516e2e694c25a1646893a8825f2805c8e41898c805be75d7f295c8df9650a6cf",
+      "size_bytes": 254,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/516e2e694c25a1646893a8825f2805c8e41898c805be75d7f295c8df9650a6cf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-cli-tests-01/receipt.json",
+      "sha256": "5473c784a05579ed78339402ff6b69a0e3bf65a8c8896f649b3cbcc080bf51e1",
+      "size_bytes": 3660,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/5473c784a05579ed78339402ff6b69a0e3bf65a8c8896f649b3cbcc080bf51e1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-cli-tests-01/stdout.log",
+      "sha256": "daa63addfe5a4717d0402ff5a71886ca20463585de30dbe427c074dbb5753448",
+      "size_bytes": 170,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_test_stdout"
+      ],
+      "archive_member": "objects/daa63addfe5a4717d0402ff5a71886ca20463585de30dbe427c074dbb5753448"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-cli-tests-01/stderr.log",
+      "sha256": "368041bfadb45596dc79f401e939572d5f7fad12e4a21604df9ca4598d194652",
+      "size_bytes": 357,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/368041bfadb45596dc79f401e939572d5f7fad12e4a21604df9ca4598d194652"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-ci-timestep-tests-01/receipt.json",
+      "sha256": "a054b844383d87616a5e5445a088bd6bd75c150e3af131efb9f6384afcf5a237",
+      "size_bytes": 3662,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/a054b844383d87616a5e5445a088bd6bd75c150e3af131efb9f6384afcf5a237"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-ci-timestep-tests-01/stdout.log",
+      "sha256": "7af80e5e7b1abf95aebb980a198d0c47b2599ab7430e4590532ee3b6e0903aba",
+      "size_bytes": 258,
+      "roles": [
+        "actual_execution_stdout",
+        "complete_test_stdout"
+      ],
+      "archive_member": "objects/7af80e5e7b1abf95aebb980a198d0c47b2599ab7430e4590532ee3b6e0903aba"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-ci-timestep-tests-01/stderr.log",
+      "sha256": "fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376",
+      "size_bytes": 152,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376"
+    },
+    {
+      "path": ".runtime/porting/source-objects/1f/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "sha256": "1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125",
+      "size_bytes": 6731,
+      "roles": [
+        "final_five_selected_Source_archives"
+      ],
+      "archive_member": "objects/1f1786b88ba98122897d27f1dac0a0452661f971bde99cf04898c52357141125"
+    },
+    {
+      "path": ".runtime/porting/source-objects/0d/0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868",
+      "sha256": "0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868",
+      "size_bytes": 11177,
+      "roles": [
+        "final_five_selected_Source_archives"
+      ],
+      "archive_member": "objects/0dc3a3ac0b54ada5e79d08a0ffc4709c2969e7b444b0afb7da64ad559886d868"
+    },
+    {
+      "path": ".runtime/porting/source-objects/b8/b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7",
+      "sha256": "b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7",
+      "size_bytes": 6498,
+      "roles": [
+        "final_five_selected_Source_archives"
+      ],
+      "archive_member": "objects/b8d768f75ca0eb9c2bbf5618282de8d68b8cc0ab7a61374fc070938e0e0954e7"
+    },
+    {
+      "path": ".runtime/porting/source-objects/0d/0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1",
+      "sha256": "0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1",
+      "size_bytes": 13912,
+      "roles": [
+        "final_five_selected_Source_archives"
+      ],
+      "archive_member": "objects/0d520ab03d69f0aa422ebddd790a9a895da4997f81c8fffd5b38e1044ffa87e1"
+    },
+    {
+      "path": ".runtime/porting/source-objects/4c/4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00",
+      "sha256": "4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00",
+      "size_bytes": 7926,
+      "roles": [
+        "final_five_selected_Source_archives"
+      ],
+      "archive_member": "objects/4c14011d0bcff5388544bbe9ffe1f4b61d7e542496840ecb9da30937d4150d00"
+    },
+    {
+      "path": "scripts/quality/source-quality-gate.ps1",
+      "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+      "size_bytes": 3432,
+      "roles": [
+        "current_quality_script_not_historical_executed_script_capture"
+      ],
+      "archive_member": "objects/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365,
+      "roles": [
+        "current_CI_wrapper_not_historical_executed_script_capture"
+      ],
+      "archive_member": "objects/01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-command-01/receipt.json",
+      "sha256": "3ddb6b844a08aa40f05f6e8265f33c6b2f9467a891f3ff4fbdc1924aafa1d8b4",
+      "size_bytes": 4123,
+      "roles": [
+        "actual_recorded_execution"
+      ],
+      "archive_member": "objects/3ddb6b844a08aa40f05f6e8265f33c6b2f9467a891f3ff4fbdc1924aafa1d8b4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-command-01/stdout.log",
+      "sha256": "fb2a7b8f163420127a50de2c56254cdb2ed50d2e34c2e8d97de0b82e3740df70",
+      "size_bytes": 27467,
+      "roles": [
+        "actual_execution_stdout"
+      ],
+      "archive_member": "objects/fb2a7b8f163420127a50de2c56254cdb2ed50d2e34c2e8d97de0b82e3740df70"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-command-01/stderr.log",
+      "sha256": "31f3183b6c0a4dbdfcfdb53ebb1938886f59acc3b08295658028d2e934efee75",
+      "size_bytes": 555,
+      "roles": [
+        "actual_execution_stderr"
+      ],
+      "archive_member": "objects/31f3183b6c0a4dbdfcfdb53ebb1938886f59acc3b08295658028d2e934efee75"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275,
+      "roles": [
+        "unchanged_actual_A_input"
+      ],
+      "archive_member": "objects/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/run-summary.json",
+      "sha256": "fb2a7b8f163420127a50de2c56254cdb2ed50d2e34c2e8d97de0b82e3740df70",
+      "size_bytes": 27467,
+      "roles": [
+        "actual_A_selected_output:run-summary.json"
+      ],
+      "archive_member": "objects/fb2a7b8f163420127a50de2c56254cdb2ed50d2e34c2e8d97de0b82e3740df70"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/diagnostics.json",
+      "sha256": "e0d2994d86448b217d61348c434e93ff8552672df7d895d1ca44d1c9b85b6b7d",
+      "size_bytes": 6151,
+      "roles": [
+        "actual_A_selected_output:diagnostics.json"
+      ],
+      "archive_member": "objects/e0d2994d86448b217d61348c434e93ff8552672df7d895d1ca44d1c9b85b6b7d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/eplusrs.err",
+      "sha256": "fcf13277d3e8c6a307bddc6b5655e0a4f81057e411b9c00c37c943427c2bfc4c",
+      "size_bytes": 2052,
+      "roles": [
+        "actual_A_selected_output:eplusrs.err"
+      ],
+      "archive_member": "objects/fcf13277d3e8c6a307bddc6b5655e0a4f81057e411b9c00c37c943427c2bfc4c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/eplusrs.eio",
+      "sha256": "786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109",
+      "size_bytes": 7182,
+      "roles": [
+        "actual_A_selected_output:eplusrs.eio"
+      ],
+      "archive_member": "objects/786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/support-assessment.json",
+      "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+      "size_bytes": 13937,
+      "roles": [
+        "actual_A_selected_output:support-assessment.json"
+      ],
+      "archive_member": "objects/80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960,
+      "roles": [
+        "actual_A_selected_output:support-report.md"
+      ],
+      "archive_member": "objects/89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65,
+      "roles": [
+        "actual_A_selected_output:logs/command.log"
+      ],
+      "archive_member": "objects/ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "size_bytes": 546,
+      "roles": [
+        "actual_A_selected_output:reports/run-report.md"
+      ],
+      "archive_member": "objects/92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690,
+      "roles": [
+        "actual_A_selected_output:reports/compatibility-boundary.md"
+      ],
+      "archive_member": "objects/9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/input/input-hashes.json",
+      "sha256": "9e415f70b20cc32222eccb59a40b3945d089216cee3867e2d04bbbac6c3322e4",
+      "size_bytes": 566,
+      "roles": [
+        "actual_A_selected_output:input/input-hashes.json"
+      ],
+      "archive_member": "objects/9e415f70b20cc32222eccb59a40b3945d089216cee3867e2d04bbbac6c3322e4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734,
+      "roles": [
+        "actual_A_selected_output:input/converted.epJSON"
+      ],
+      "archive_member": "objects/bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "roles": [
+        "actual_A_Rust_result_store"
+      ],
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-array-floor-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "roles": [
+        "prior_array_floor_A_Rust_result_store"
+      ],
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-surface-zero-getters-Header-01.py",
+      "sha256": "eb2e41ee1753dcd6a8a38b79a852cbdc35f6a6cbf8564663c751e8b58f5cfa5e",
+      "size_bytes": 16429,
+      "roles": [
+        "publisher_executed_Source"
+      ],
+      "archive_member": "objects/eb2e41ee1753dcd6a8a38b79a852cbdc35f6a6cbf8564663c751e8b58f5cfa5e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-publication-prep-01/manifest.json",
+      "sha256": "e631fab05284c5661d496f9b2be5c3a9906b9602347ba886ac5c988eb9e73178",
+      "size_bytes": 1705,
+      "roles": [
+        "publisher_Source_preparation"
+      ],
+      "archive_member": "objects/e631fab05284c5661d496f9b2be5c3a9906b9602347ba886ac5c988eb9e73178"
+    }
+  ],
+  "historical_reference_resolutions": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+        "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+        "size_bytes": 6278
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+        "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+        "size_bytes": 6278
+      },
+      "role": "actual_five_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+        "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+        "size_bytes": 7316
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+        "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+        "size_bytes": 7316
+      },
+      "role": "actual_five_path_assembly:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+        "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+        "size_bytes": 6278
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/empty_subsurfaces.rs",
+        "sha256": "a2775e839bb1f545b05b00b9aaf7fb39b1776757eafecb187062ac36457a7ccb",
+        "size_bytes": 6278
+      },
+      "role": "actual_application:direct_operand"
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+        "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+        "size_bytes": 7316
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-final-zero-suffix-prep-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs",
+        "sha256": "2becc60357107256eaac94eea3e7554584cb067fdc3a6065be0752f7a2c24d34",
+        "size_bytes": 7316
+      },
+      "role": "actual_application:direct_operand"
+    }
+  ],
+  "metadata_only_authorities": [
+    {
+      "reference": {
+        "path": ".runtime/energyplus/26.1.0/Energy+.schema.epJSON",
+        "sha256": "60b24d904e6fa553f773b38037a8a09730e6da1538647df552cd77db8d6704a9",
+        "size_bytes": 10568550
+      },
+      "scope": "Historical whole-schema authority only; complete two selected excerpts are archived, no fresh whole-schema scan/hash/payload."
+    },
+    {
+      "reference": {
+        "path": ".runtime/energyplus/26.1.0/Energy+.schema.epJSON",
+        "sha256": "60b24d904e6fa553f773b38037a8a09730e6da1538647df552cd77db8d6704a9",
+        "size_bytes": 10568550
+      },
+      "scope": "Historical whole-schema authority only; complete two selected excerpts are archived, no fresh whole-schema scan/hash/payload."
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-zero-getters/evidence.zip",
+    "sha256": "02856b3e69fb49d995f722f6ad18fb73218ffb9282f0b5964746826f94b92d45",
+    "size_bytes": 468497
+  },
+  "archive_member_count": 128,
+  "gates_updated": false,
+  "scope": "Finite5 selected current/before/proposal/full actual and formatter diffs, direct33 Original literals/two schema excerpts, underlying/rebased/application Source reviews, six final QA receipts/full logs/actual recorder and Source metadata, only5 selected Source archives, fresh A and optional prior Rust result-store pair. No recursive historical Source/evidence ZIP expansion, prior array10 payload rescan, whole schema/EPW/Native binary/map/core/object payload or new Native execution."
+}

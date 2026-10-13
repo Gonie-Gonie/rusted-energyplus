@@ -11,6 +11,8 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Wall:Detailed", 8, 2, 0, 3, Some("vertices")),
         ("Floor:Detailed", 8, 2, 0, 3, Some("vertices")),
         ("RoofCeiling:Detailed", 8, 2, 0, 3, Some("vertices")),
+        ("FenestrationSurface:Detailed", 6, 15, 0, 0, None),
+        ("Shading:Zone:Detailed", 3, 1, 0, 3, Some("vertices")),
         ("Connector:Mixer", 2, 0, 1, 0, Some("branches")),
         ("Connector:Splitter", 2, 0, 1, 0, Some("branches")),
         ("ConnectorList", 5, 0, 0, 0, None),

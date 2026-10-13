@@ -12626,6 +12626,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-array-floor/summary.json",
         "sha256": "d58669c058ec56f7fe652bc5840770a4809522fb0c53a0523fc6c48198249cd2",
         "size_bytes": 12674
+      },
+      "actual_selected_ordinary_surface_zero_getters": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-zero-getters/summary.json",
+        "sha256": "a335f76968faf19d99618ff4e59ab35e5d59e4f6cf87a04dca543d169149b27c",
+        "size_bytes": 12656
       }
     },
     {

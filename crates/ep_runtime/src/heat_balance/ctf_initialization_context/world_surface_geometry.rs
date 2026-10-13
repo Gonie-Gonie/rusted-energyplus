@@ -129,6 +129,14 @@ impl CtfInitializationContext<'_> {
             )
             .map_err(hb_input_error)?;
         state
+            .finish_opaque_input_getters(
+                owners.input,
+                owners.shortcut,
+                &mut self.backend,
+                &mut reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
+        state
             .copy_final_opaque_surfaces(
                 &mut owners,
                 &mut self.backend,
@@ -143,7 +151,13 @@ impl CtfInitializationContext<'_> {
             .check_final_surface_areas(&mut self.backend)
             .map_err(hb_input_error)?;
         state
+            .check_opaque_window_shading_and_zones(&owners, &mut self.backend)
+            .map_err(hb_input_error)?;
+        state
             .calculate_final_centroids(&mut self.backend, environment)
+            .map_err(hb_input_error)?;
+        state
+            .read_empty_surface_solar_inputs(&mut owners)
             .map_err(hb_input_error)?;
         state.bind_typed_surfaces(&owners).map_err(hb_input_error)?;
         state.bind_outdoor_geometry().map_err(hb_input_error)?;

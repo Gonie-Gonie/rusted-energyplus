@@ -77,13 +77,13 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 - **선택 dispatcher:** `InitIntConvCoeff:141–391`, 사용자 입력/정적 geometry/Scan prefix와 순서 있는 Zone→Space→HT traversal을 구현했다. SpaceAir·Config·SurfHConvInt는 호출자의 단일 저장소를 대여한다. 명시적 입력·완전한 ID/개수·지원 범위를 쓰기 전에 검증한다. 선택 example의 성공은 ordinary manager 활성화가 아니다.
 - **ordinary 소유자:** 실제 raw 여섯 대류 family 개수와 하한, Zone ZT·Space MAT/ZT/ZTAV, In·Old·독립 Tmp를 보존한다. BeginEnvironment reset, Old←In, solver 반환값 Tmp→In, MAT commit과 disabled-space MAT/ZT copy의 한정된 전이를 연결했다. ZTAV를 이 copy로 덮어쓰지 않는다. geometry getter/Config와 공통 입력 저장소도 실제 caller에 연결했지만 전체 readiness는 미완성이다.
 - **복사·수치 생산자:** LU와 Fix/ScriptF의 실제 선택 입력 replay, typed 오류 전달 및 N1 Source 분기를 연결했다. 단일 불투명 enclosure의 선택 Solar 초기화와 부분 상태 이동, 현재 기상 태양 상태, DesignDay 기상 API도 구현했다. 실제 radiation cache·sigma·ordinary 반복 caller 완료를 의미하지 않는다.
-- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 전체 getter·Setup 호출 순서와 후속 enclosure/보고는 남아 있다.
+- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 빈 창·차양 조회와 중심점 전후의 조회·상태 변경도 연결했다. 전체 getter·Setup 호출 순서와 후속 enclosure/보고는 남아 있다.
 
 원본 호출 위치를 구분한다. BeginSim의 Solar 초기화는 **`HeatBalanceManager.cc:2617–2630`**이며 2629는 안내 출력, 2630이 `InitSolarCalculations` 호출이다. **`HeatBalanceSurfaceManager.cc:424–425`**는 공유 firstTime 조건의 `InitInteriorRadExchange`; **`HeatBalanceIntRadExchange.cc:610–614`**는 조건부 Solar F 복사다. HBSM615는 ZoneSizing Gather 분기의 닫는 행이며 Solar 초기화 위치가 아니다. 현재 Rust의 선택 초기화 순서 검증을 이 전체 Original caller의 완료로 확대하지 않는다.
 
 ## 실제 증거와 검증 범위
 
-아래 26개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 27개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -113,6 +113,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 World 표면 기하 연결 | [요약](../evidence/SRC-06-ordinary-surface-world-geometry/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-world-geometry/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-world-geometry/evidence.zip) | 명시적 ULC/CCW/World의 raw 꼭짓점·최종 연결·중심점과 두 직접 Surface 소비자를 연결. 기존 lib9·일반 CLI1·실제 CI CLI1 및 실제 A의 EIO·여섯 표면 경로를 확인. 전체 geometry/HB/Setup·Native 수치 동등성은 미확인. |
 | DD 같은 입력 sky 계산 | [요약](../evidence/SRC-06-ordinary-design-day-same-input-sky/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-same-input-sky/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-same-input-sky/evidence.zip) | 실제 여섯 호출·576 slot의 캡처된 DB/DP/RH/opaque-cover 입력으로 IR/Sky 두 출력 1,152 strict bits 일치. whole-DD 9 strict 차이·8 UNPAIRED와 모든 gate는 그대로. |
 | World 배열·바닥 면적·상태 전달 | [요약](../evidence/SRC-06-ordinary-surface-array-floor/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-array-floor/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-array-floor/evidence.zip) | 실제 기본 생성·배열 할당·면적 소유자와 raw face 수치 연결, 외기 이동·역복원. 기존 테스트 3개와 실제 A 성공; 전체 getter/Setup·Native 수치 동등성은 미완료. |
+| 빈 표면 부속 객체 조회 | [요약](../evidence/SRC-06-ordinary-surface-zero-getters/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-zero-getters/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-zero-getters/evidence.zip) | 창·차양 등의 빈 getter, 실제 개수·출력 인자·정의 조회와 중심점 전후 호출을 연결. 기존 테스트 3개와 실제 A 성공; 전체 getter/Setup 반환은 미완료. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -189,6 +190,12 @@ Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항�
 실제 Source `bd998f82e3356116b869a06566ab072be12cf3aefc8eb47ad566f8ff673a6715`에서 fmt·source-quality·영향받는 ep_runtime all-target Clippy와 기존 테스트 **3 passed / 0 failed / 0 ignored**를 확인했다. 기존 runtime 본문 한 곳에 실제 배열 할당·초기값·비자명한 ID 순열·잘못된 매핑의 이동 전 거부·부호 있는0을 포함한 이동/역복원을 묶었고, 일반 CLI1·실제 CI CLI1을 실행했다. 새 본문·binary와 변경되지 않은 geometry 수학 테스트의 반복은 없다. 이 API 검증을 실제 Solar 오류 endpoint나 Native 배열 관측으로 확대하지 않는다.
 
 같은 Source의 실제 A-24H 실행은 exit0, 24 hourly samples·390계열이며 직전 World A의 result-store와 전체 bytes가 같다. Source 바닥 면적은 후속 초기화에서 덮어쓰지 않고, 현재 체적 수치 연결은 이전 World 단위의 typed face 재계산 대신 보존한 raw face를 사용한다. 완전한 Original Setup의 높이/체적 경고·보정·Space 체적 순서, 후속 getter·enclosure·보고와 full 반환은 남아 있다. 기존 전체 비교·DesignDay 실패와 네 gate, A/B 완료 수는 그대로다.
+
+## 빈 표면 부속 객체 조회 단위의 QA
+
+실제 Source `d3cbb350b19a368bb39086ebfbba6d5601f69123bce155c409b296ce16e3a318`에서 fmt·source-quality·영향받는 ep_runtime/ep_run all-target Clippy와 기존 테스트 **3 passed / 0 failed / 0 ignored**를 확인했다. runtime1·일반 CLI1·실제 CI CLI1을 재사용했고 새 테스트 본문·binary는 없다. 같은 Source의 실제 A-24H 실행은 exit0, 24 hourly samples·390계열이며 직전 배열·바닥 면적 단위와 result-store 전체 bytes가 같다.
+
+원본 30개 count와 실제 출력 인자 reset 위치를 보존하고, 개수0에서도 실행되는 창·차양 정의 조회·null 삽입·공유 module 변경·InternalMass 재조회, 중심점 전후의 Zone 검사·태양광 네 조회·가동 단열 조회를 연결했다. 이는 선택된 빈 객체 경로의 Source 검증과 Rust 실행이며 개별 getter endpoint의 새 Native 관측은 아니다. 양성 객체 도메인, 후속 Construction/list/filter·enclosure·보고·fatal과 전체 getter/Setup 반환은 남아 있다. 기존 전체 비교·DesignDay 실패와 네 gate, A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

@@ -14,7 +14,9 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod derived_arrays;
+mod empty_subsurfaces;
 mod final_mapping;
+mod final_zero_suffix;
 mod floor_areas;
 mod foundation;
 mod geometry_rules;
@@ -72,6 +74,9 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) exterior_boundary: i32,
     pub(crate) exterior_solar: bool,
     pub(crate) exterior_wind: bool,
+    /// Actual SurfaceData constructor841 and default std::vector795.
+    pub(crate) has_shade_control: bool,
+    pub(crate) window_shading_control_list: Vec<i32>,
     pub(crate) view_factor_ground: f64,
     pub(crate) sides: i32,
     // Objexx Vector's default elements are not initialized numeric triples.
@@ -92,6 +97,13 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) surface_tmp: Option<Vec<SurfaceTmpInput>>,
     pub(crate) unique_names: BTreeMap<String, String>,
     pub(crate) total_surfaces: i32,
+    /// Actual GetSurfaceData1104-1133 locals, retained without repeat queries.
+    pub(crate) source_surface_counts: [i32; 30],
+    pub(crate) added_subsurfaces: i32,
+    /// Actual local operands are unwritten until the respective getter resets.
+    pub(crate) need_to_add_surfaces: Option<i32>,
+    pub(crate) need_to_add_subsurfaces: Option<i32>,
+    pub(crate) total_window_shading_control: i32,
     pub(crate) total_osc: i32,
     pub(crate) total_oscm: i32,
     pub(crate) osc: Option<Vec<std::convert::Infallible>>,
@@ -217,6 +229,7 @@ impl SurfaceGeometryInputState {
         for (slot, &(family, _)) in FAMILIES.iter().enumerate() {
             counts[slot] = signed(owners.input.get_num_objects_found(family))?;
         }
+        self.source_surface_counts = counts;
         self.total_osc = 0;
         owners.shortcut.current_module_object = "InternalMass".into(); // GetNumIntMassSurfaces7219
         if owners.input.get_num_objects_found("InternalMass") != 0 {
@@ -240,6 +253,7 @@ impl SurfaceGeometryInputState {
         let total = usize::try_from(self.total_surfaces)
             .map_err(|_| Error::Unavailable("surface allocation count"))?;
         self.surface_tmp = Some(vec![SurfaceTmpInput::default(); total]);
+        self.added_subsurfaces = 0; // actual local1151, after SurfaceTmp allocation
         backend.state.tracking.ask_for_surfaces_report = true; // Actual1152, same ErrorTracking owner.
         // GetDetShd3436 and GetRectDetShd3617 return before any scratch write.
         owners.shortcut.current_module_object = "SurfaceProperty:OtherSideCoefficients".into();
@@ -267,6 +281,7 @@ impl SurfaceGeometryInputState {
             owners.shortcut,
             owners.environment.elevation,
         )?;
+        self.need_to_add_surfaces = Some(0); // GetHTSurfaceData3851, after real Foundation
         owners.shortcut.current_module_object = "BuildingSurface:Detailed".into();
         let alphas = definition(owners.input, &owners.shortcut.current_module_object)?;
         if alphas != 9 {
