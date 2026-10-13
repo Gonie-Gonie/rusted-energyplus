@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 24개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 25개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -110,6 +110,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 동일 기상 상태 / Zone·Surface 외기와 오류 보존 | [요약](../evidence/SRC-06-ordinary-same-environment-outdoor/summary.json) · [색인](../evidence/SRC-06-ordinary-same-environment-outdoor/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip) | 동일 Station/Site/current와 Zone 온도→guard→풍속·풍향→기존 Surface. 실패한 실제 State를 이동 보존; 전체 InitHB/Setup·Native 수치 완료는 아님. |
 | HeatBalanceAlgorithm 기본값 admission | [요약](../evidence/SRC-06-ordinary-hb-default-admission/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-default-admission/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-default-admission/evidence.zip) | 실제 numeric200/1000 기본값만 허용. 기존 lib1·일반 CLI1·실제 CI CLI1 확인; A 전후 실제 결과는 별도 보존하며 full Setup·Native 수치 PASS로 확대하지 않음. |
 | 실제 World 표면 기하 연결 | [요약](../evidence/SRC-06-ordinary-surface-world-geometry/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-world-geometry/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-world-geometry/evidence.zip) | 명시적 ULC/CCW/World의 raw 꼭짓점·최종 연결·중심점과 두 직접 Surface 소비자를 연결. 기존 lib9·일반 CLI1·실제 CI CLI1 및 실제 A의 EIO·여섯 표면 경로를 확인. 전체 geometry/HB/Setup·Native 수치 동등성은 미확인. |
+| DD 같은 입력 sky 계산 | [요약](../evidence/SRC-06-ordinary-design-day-same-input-sky/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-same-input-sky/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-same-input-sky/evidence.zip) | 실제 여섯 호출·576 slot의 캡처된 DB/DP/RH/opaque-cover 입력으로 IR/Sky 두 출력 1,152 strict bits 일치. whole-DD 9 strict 차이·8 UNPAIRED와 모든 gate는 그대로. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -176,6 +177,10 @@ Source `194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e`에서 
 같은 A-24H 입력의 실제 실행은 exit0이며, 새 원본 getter가 기록한 유일한 Surface Geometry EIO 행과 변환된 여섯 raw 표면을 확인했다. 이전 기본값 admission 실행에는 해당 행이 없다. 실제 출력 24 hourly samples는 96개 Source timestep·전체 Setup·Native 수치 동등성의 증거로 확대하지 않는다. 빠진/다른 좌표 규칙의 기존 경로도 유지한다.
 
 Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항목 실패101 및 당시 bytes·로그를 보존했다. 동일한 `1.0e-6` 임계값, 마지막 scratch 전달·같은 반개구간 조건·Wall 기본 생성·Kiva 대입 순서를 유지한 Source03에서 최종 QA를 수행했다. raw GetVertices 결과와 중심점은 두 직접 Surface 소비자가 재사용하지만, Zone 체적의 기존 `ZoneVolumeFace::from_surface` 경로는 아직 형상을 재계산한다. 병렬/window 배열·전체 getter 반환·후속 보고/enclosure·HB tail/firstTime 완료는 남아 있다. 기존 전체 비교 실패와 DesignDay 수치 실패, 네 gate 및 A/B 완료 수는 그대로다.
+
+## DD 같은 입력 sky 계산 단위의 QA
+
+실제 Source `8242dfa9e85e325478e13b5897481b9a347196b08ae352e32cc72ece170b0a82`에서 기존 sky4+lifecycle1 결과는 **5 passed / 0 failed / 0 ignored**다. 1,152 strict bits 일치이며 실패의 원인을 추정하거나 whole-DD 수치 PASS로 확대하지 않는다. fmt와 영향받는 ep_runtime all-target Clippy는 실제 최종 Source에 고정하고, quality01은 production 두 파일 전체 동일·test-only 한 줄 수정의 명시적 범위로 재사용했다. 앞선 Clippy01 E0433=101과 역사적 whole-DD strict 실패는 별도 보존한다. 새 Native·A/CLI/CI 실행이나 새 tolerance는 없다.
 
 ## 이력과 증거 보존
 

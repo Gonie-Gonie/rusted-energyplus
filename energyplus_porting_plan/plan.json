@@ -12616,6 +12616,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-world-geometry/summary.json",
         "sha256": "5f2dd0d6299fcb64c9f71c95ab0f86f9f55a6e8f0e075106cfa17a64280fd69c",
         "size_bytes": 21060
+      },
+      "actual_selected_ordinary_design_day_same_input_sky": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-same-input-sky/summary.json",
+        "sha256": "052be0817fd5958e8a2e9d038ee83bbd4bf3a66baed4c59d076799ad006b64a4",
+        "size_bytes": 5179
       }
     },
     {

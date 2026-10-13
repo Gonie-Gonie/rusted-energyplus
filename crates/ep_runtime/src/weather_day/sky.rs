@@ -93,6 +93,21 @@ pub fn default_weather_file_sky(
     }
 }
 
+/// Writes the actual selected DesignDay sky fields in Source assignment order.
+/// The caller supplies the real slot and SetUpDesignDay's opaque-cover local.
+pub(super) fn initialize_design_day_sky(slot: &mut super::WeatherVars, opaque_sky_cover: f64) {
+    let emissivity = default_clark_allen_sky_emissivity(
+        opaque_sky_cover,
+        slot.out_dry_bulb_temp,
+        slot.out_dew_point_temp,
+        slot.out_rel_hum * 0.01,
+    );
+    let kelvin = slot.out_dry_bulb_temp + KELVIN;
+    let squared = kelvin * kelvin;
+    slot.horiz_ir_sky = emissivity * STEFAN_BOLTZMANN * (squared * squared);
+    slot.sky_temp = kelvin * emissivity.sqrt().sqrt() - KELVIN;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -164,16 +164,7 @@ impl DesignDayInput {
                 slot.out_dew_point_temp = dew_point(out_humidity, pressure);
                 slot.out_rel_hum =
                     relative_humidity(slot.out_dry_bulb_temp, out_humidity, pressure)? * 100.0;
-                let emissivity = super::super::sky::default_clark_allen_sky_emissivity(
-                    opaque_sky,
-                    slot.out_dry_bulb_temp,
-                    slot.out_dew_point_temp,
-                    slot.out_rel_hum * 0.01,
-                );
-                let kelvin = slot.out_dry_bulb_temp + 273.15;
-                let squared = kelvin * kelvin;
-                slot.horiz_ir_sky = emissivity * 5.6697e-8 * (squared * squared);
-                slot.sky_temp = kelvin * emissivity.sqrt().sqrt() - 273.15;
+                super::super::sky::initialize_design_day_sky(slot, opaque_sky);
                 let time = if steps != 1 {
                     (hour - 1) as f64 + (timestep + 1) as f64 * fraction
                 } else {

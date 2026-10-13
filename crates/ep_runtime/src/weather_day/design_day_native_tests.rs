@@ -100,6 +100,8 @@ pub(crate) fn verify_actual_design_day_weather() -> TestResult {
     let initial = series.snapshot();
     let mut ordinal = 0;
     let mut initialized_years = [0; 2];
+    let mut same_input_sky_slots = 0;
+    let mut same_input_sky_differences = Vec::new();
     for environment in 1..=2 {
         assert_eq!(series.next_setup_environment(&mut reports)?, (true, false));
         if environment == 1 {
@@ -177,6 +179,62 @@ pub(crate) fn verify_actual_design_day_weather() -> TestResult {
             }
             state::verify(&snapshot.state, native, ordinal)?;
             state::site_and_solar(&snapshot.state, native, -7.0)?;
+            // Isolate the actual DD sky producer from upstream PSY differences.
+            // These are complete captured Native slot operands, never expected
+            // values seeded into production. All six actual repeated carriers
+            // remain separate; neither the fixture nor Native output is changed.
+            let native_weather = &native["weather"];
+            assert_eq!(
+                native_weather["Environment"]["rows"][environment - 1]["value"]["skyTempModel"],
+                0,
+                "actual ClarkAllen owner"
+            );
+            assert_eq!(
+                native_weather["DesDayInput"]["rows"][environment - 1]["value"]["RainInd"],
+                0,
+                "actual OSky=0 Source branch"
+            );
+            for row in native_weather["wvarsHrTsToday"]["rows"]
+                .as_array()
+                .ok_or("actual DD sky operand rows")?
+            {
+                let value = &row["value"];
+                let captured = |field: &str| -> Result<f64, Box<dyn std::error::Error>> {
+                    Ok(f64::from_bits(u64::from_str_radix(
+                        value[field]["value_bits"]
+                            .as_str()
+                            .ok_or("actual DD sky operand bits")?,
+                        16,
+                    )?))
+                };
+                let mut slot = super::WeatherVars {
+                    out_dry_bulb_temp: captured("OutDryBulbTemp")?,
+                    out_dew_point_temp: captured("OutDewPointTemp")?,
+                    out_rel_hum: captured("OutRelHum")?,
+                    ..Default::default()
+                };
+                let opaque_sky_cover = captured("OpaqueSkyCover")?;
+                assert_eq!(opaque_sky_cover.to_bits(), 0.0_f64.to_bits());
+                super::super::sky::initialize_design_day_sky(&mut slot, opaque_sky_cover);
+                same_input_sky_slots += 1;
+                for (field, actual) in [
+                    ("HorizIRSky", slot.horiz_ir_sky),
+                    ("SkyTemp", slot.sky_temp),
+                ] {
+                    let expected = captured(field)?;
+                    assert!(actual.is_finite() && expected.is_finite());
+                    if actual.to_bits() != expected.to_bits() {
+                        same_input_sky_differences.push((
+                            ordinal,
+                            row["hour"].as_u64().ok_or("actual sky hour")?,
+                            row["timestep"].as_u64().ok_or("actual sky timestep")?,
+                            field,
+                            actual.to_bits(),
+                            expected.to_bits(),
+                        ));
+                    }
+                }
+            }
             verify_design_day_owners(&series, &native["weather"], &initialized_years)?;
             assert_eq!(snapshot.interpret_count, initial.interpret_count);
             assert_eq!(snapshot.line_read_count, initial.line_read_count);
@@ -208,6 +266,18 @@ pub(crate) fn verify_actual_design_day_weather() -> TestResult {
             "DD scoped assessment {name}: {role}; {observations} observations; {nonidentical_bits} nonidentical bits; maximum absolute {max_absolute:e}"
         );
     }
+    assert_eq!(same_input_sky_slots, 6 * 96);
+    for (call, hour, timestep, field, actual, expected) in &same_input_sky_differences {
+        eprintln!(
+            "DD same-input sky call{call} hour{hour} ts{timestep} {field}: Rust {actual:016x}, Native {expected:016x}"
+        );
+    }
+    assert!(
+        same_input_sky_differences.is_empty(),
+        "DD same-input sky strict bits: {} differences across {} outputs; no numerical PASS or cause attribution on failure",
+        same_input_sky_differences.len(),
+        same_input_sky_slots * 2
+    );
     // The immutable strict-bit diagnostic remains FAIL. Passing this regression
     // certifies its declared transport/owner scope, never all Native weather,
     // PSY cache/input pairing, full Setup, or a libm attribution.
