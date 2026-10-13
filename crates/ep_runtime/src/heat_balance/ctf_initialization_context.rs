@@ -484,7 +484,10 @@ impl CtfInitializationContext<'_> {
             .heat_balance_input_state
             .read_regular_construction_arguments(
                 raw,
-                model,
+                super::selected_heat_balance_input::ConstructionMaterialOwners {
+                    model,
+                    data: &reports.selected_material_data,
+                },
                 input,
                 &mut reports.input_processor_shortcut,
                 &mut reports.heat_balance_current_module_object,

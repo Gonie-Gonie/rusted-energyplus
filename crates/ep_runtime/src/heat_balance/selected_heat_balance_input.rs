@@ -12,6 +12,8 @@ use std::io;
 
 mod building;
 mod construction;
+mod construction_types;
+pub(crate) use construction::ConstructionMaterialOwners;
 mod control;
 mod input;
 pub(crate) mod shadowing;
@@ -198,6 +200,13 @@ fn absent(
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedConstructionUsage {
     pub(crate) construction_id: Option<ConstructionId>,
+    /// ConstructionProps constructor: TotLayers0 and eleven LayerPoint0.
+    pub(crate) total_layers: i32,
+    pub(crate) layer_points: [i32; 11],
+    /// Constructor false; target writes at real CheckAndSet boundary1795.
+    pub(crate) type_is_window: bool,
+    pub(crate) type_is_eco_roof: bool,
+    pub(crate) type_is_irt: bool,
     pub(crate) is_used: bool,
     pub(crate) is_used_ctf: bool,
     pub(crate) is_tc_master: bool,

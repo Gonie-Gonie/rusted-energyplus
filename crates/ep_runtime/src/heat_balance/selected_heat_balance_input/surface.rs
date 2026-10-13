@@ -20,6 +20,7 @@ mod final_zero_suffix;
 mod floor_areas;
 mod foundation;
 mod geometry_rules;
+mod lists;
 mod opaque;
 mod parallel_arrays;
 mod raw;
@@ -53,6 +54,10 @@ pub(crate) enum SurfaceClass {
     Wall,
     Floor,
     Roof,
+    #[allow(dead_code)] // Native predicate only; positive getter remains excluded.
+    Window,
+    #[allow(dead_code)] // Native predicate only; positive getter remains excluded.
+    Door,
     Invalid,
 }
 
@@ -74,6 +79,12 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) exterior_boundary: i32,
     pub(crate) exterior_solar: bool,
     pub(crate) exterior_wind: bool,
+    /// Genuine SurfaceData constructor0; positive window getter remains excluded.
+    pub(crate) frame_divider: i32,
+    /// SurfaceData constructor false; positive mirror/air-boundary getters stay excluded.
+    pub(crate) mirrored_surface: bool,
+    pub(crate) is_air_boundary_surface: bool,
+    pub(crate) is_shadow_possible_obstruction: bool,
     /// Actual SurfaceData constructor841 and default std::vector795.
     pub(crate) has_shade_control: bool,
     pub(crate) window_shading_control_list: Vec<i32>,
@@ -97,6 +108,9 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) surface_tmp: Option<Vec<SurfaceTmpInput>>,
     pub(crate) unique_names: BTreeMap<String, String>,
     pub(crate) total_surfaces: i32,
+    /// Actual DataSurface constructor0, used by list reserve2632-2635.
+    pub(crate) total_windows: i32,
+    pub(crate) surface_lists: lists::SurfaceLists,
     /// Actual GetSurfaceData1104-1133 locals, retained without repeat queries.
     pub(crate) source_surface_counts: [i32; 30],
     pub(crate) added_subsurfaces: i32,

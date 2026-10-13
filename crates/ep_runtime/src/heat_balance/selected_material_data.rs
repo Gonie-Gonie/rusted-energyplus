@@ -15,6 +15,8 @@ use std::io::Write;
 mod input;
 pub use input::SelectedMaterialInput;
 mod report;
+mod type_group;
+pub(crate) use type_group::SourceMaterialGroup;
 
 pub(super) fn unavailable(message: &str) -> RuntimeError {
     RuntimeError::WarmupOutput(Box::new(WarmupOutputError::Unavailable(format!(
@@ -42,6 +44,8 @@ pub(crate) enum SelectedFrameDividerProperties {}
 pub(crate) struct SelectedMaterialData {
     pub(crate) materials: Vec<MaterialId>,
     pub(crate) material_map: BTreeMap<String, i32>,
+    /// Same Material owner: group written by the actual input-family getter.
+    pub(crate) material_groups: BTreeMap<MaterialId, SourceMaterialGroup>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -128,13 +132,21 @@ fn typed_id(model: &TypedModel, name: &str, no_mass: bool) -> Result<MaterialId,
 }
 
 impl SelectedMaterialData {
-    fn insert(&mut self, name: &str, id: MaterialId) -> Result<(), RuntimeError> {
+    fn insert(
+        &mut self,
+        name: &str,
+        id: MaterialId,
+        group: SourceMaterialGroup,
+    ) -> Result<(), RuntimeError> {
         let key = name.to_ascii_uppercase();
         if self.material_map.contains_key(&key) {
             return Err(unavailable(
                 "duplicate-name diagnostic outside admitted compiled domain",
             ));
         }
+        // Material.cc199/275 writes group before push_back. The typed ID
+        // only binds the existing property owner; it does not infer group.
+        self.material_groups.insert(id, group);
         self.materials.push(id);
         let number = i32::try_from(self.materials.len())
             .map_err(|_| unavailable("Material.Num int capacity"))?;
@@ -160,7 +172,7 @@ impl SelectedMaterialData {
             // Direct JSON markObjectAsUsed; none of the six arrays is an argument.
             o.input.mark_object_as_used("Material", &object.object_name);
             let id = typed_id(o.model, &object.object_name, false)?;
-            self.insert(&object.object_name, id)?;
+            self.insert(&object.object_name, id, SourceMaterialGroup::Regular)?;
             let material = o
                 .model
                 .materials
@@ -208,7 +220,7 @@ impl SelectedMaterialData {
             let (_num_alphas, num_numbers) = raw.get_no_mass_item(object, o)?;
             let name = &o.shortcut.alpha_args[0];
             let id = typed_id(o.model, name, true)?;
-            self.insert(name, id)?;
+            self.insert(name, id, SourceMaterialGroup::Regular)?;
             let material = o
                 .model
                 .materials

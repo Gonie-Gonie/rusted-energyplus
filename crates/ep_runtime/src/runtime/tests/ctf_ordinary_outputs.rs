@@ -225,7 +225,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         space.zone_num = 1;
         let mut input = SelectedInputProcessor::from_admitted_input(Vec::new(), std::collections::BTreeMap::new())?;
         let mut shortcut = SourceInputProcessorShortCut::default();
-        let mut control = SelectedHeatBalanceInputState { construction_order: vec![ConstructionId(0)], ..Default::default() };
+        let mut control = SelectedHeatBalanceInputState { construction_order: vec![ConstructionId(0)],
+            construction_usage: vec![Default::default()], ..Default::default() };
         let globals = crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
         let environment = crate::weather::day::WeatherEnvironmentState::default();
         let mut owners = SurfaceGetterOwners { model: &model.typed, input: &mut input,
@@ -234,12 +235,29 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         let mut errors = false;
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
+        raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors)?;
         raw.bind_typed_surfaces(&owners)?;
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
         let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?
             .iter().map(|row| row.typed_id.ok_or("missing final physical ID")).collect::<Result<Vec<_>, _>>()?;
         assert_eq!(source_ids, [SurfaceId(2), SurfaceId(3), SurfaceId(4), SurfaceId(5), SurfaceId(0), SurfaceId(1)]);
+        // Authored constructor-type owner; actual Material type producers are exercised by A-24H.
+        let source_numbers = (1..=i32::try_from(total)?).collect::<Vec<_>>();
+        let zone = &zones.zones.as_ref().ok_or("authored Source list Zone")?[0];
+        for list in [&raw.surface_lists.all_ht, &raw.surface_lists.all_ht_non_window,
+            &raw.surface_lists.all_exterior_solar, &raw.surface_lists.all_shadow_possible_obstructions,
+            &zone.ht_surface_list, &zone.ht_non_window_surface_list] {
+            assert_eq!(list, &source_numbers);
+        }
+        assert!(raw.surface_lists.all_interzone.is_empty() && zone.iz_surface_list.is_empty());
+        assert!(raw.surface_lists.all_ht_window.is_empty() && zone.ht_window_surface_list.is_empty());
+        assert_eq!(raw.surface_lists.filters[0], source_numbers);
+        assert_eq!(raw.surface_lists.filters[2], [1, 2, 3, 4]);
+        assert_eq!(raw.surface_lists.filters[3], [6]);
+        assert_eq!(raw.surface_lists.filters[4], [5]);
+        // Literal2788 appends exterior Roof to AllInteriorCeilings.
+        assert_eq!(raw.surface_lists.filters[9], [6]);
         let arrays = raw.parallel_arrays.as_ref().ok_or("missing real parallel allocation")?;
         assert_eq!(arrays.surf_penumbra_id, vec![-1; total]);
         assert_eq!(arrays.surf_t_air_ref, vec![-1; total]);

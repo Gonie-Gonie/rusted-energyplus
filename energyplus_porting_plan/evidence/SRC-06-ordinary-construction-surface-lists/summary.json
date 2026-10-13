@@ -1,0 +1,321 @@
+{
+  "schema": "src06-construction-surface-lists-summary.v1",
+  "status": "Bounded genuine Construction type producers and retained Surface/Zone list prefix consumed; scoped Rust QA passed",
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-construction-lists-assembly-01/manifest.json",
+    "sha256": "796c814a5dac70f847caae46ec60945d2e15a09dd230985bbb310de8cccd49e4",
+    "size_bytes": 25685
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Peer-ordinary-construction-lists-application-review-03/review.json",
+    "sha256": "428e976639808aaa8e2daaf1a1d558b5fc4059d6a5d67014df0b77343fad0deb",
+    "size_bytes": 25828
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+    "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+  },
+  "behavior": "Actual Material and NoMass getters retain Group::Regular on their sole identity/order owner. Construction retains TotLayers/eleven LayerPoints and actual1795 target Window/EcoRoof/IRT predicates. The same final Surface2601-2791 owner consumes those flags, ordered global/Zone/interzone/obstruction lists, IRT guards and literal filters including exterior Roof to InteriorCeilings.",
+  "QA": [
+    {
+      "role": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-fmt-01/receipt.json",
+        "sha256": "527364612d2773141f86526c25f6c31888cac69b8c803c62fdedabd171d64bc4",
+        "size_bytes": 4485
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-quality-01/receipt.json",
+        "sha256": "4a0cb2f38bcf7c43e6d330f87fc8b2b20e673a74384a8c00ee761128f2eaef3c",
+        "size_bytes": 4535
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-clippy-01/receipt.json",
+        "sha256": "734af442fbd8d532da0def851a8ef7ccadcf4d7ec3d2fd91f38c2bd95307348a",
+        "size_bytes": 4541
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "focused-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-focused-tests-01/receipt.json",
+        "sha256": "34c64843573b0ae8e6cafee407a6f01500201206f0734caf00b4b9c6289b9830",
+        "size_bytes": 4617
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--nocapture"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "cli-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-cli-tests-01/receipt.json",
+        "sha256": "86340bdba802e056aa18178dc11d68e2115acd0985281e1dc1e634a0b86bbb43",
+        "size_bytes": 4571
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "actual_exit_code": 0
+    },
+    {
+      "role": "ci-timestep-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-ci-timestep-tests-01/receipt.json",
+        "sha256": "af9728d0870bc2ea9eb49d60e1fa8fda49765ce86ff3ea291fb4aeb8bf62b703",
+        "size_bytes": 4574
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ],
+      "actual_exit_code": 0
+    }
+  ],
+  "historical_QA": [],
+  "tests": {
+    "selections": [
+      {
+        "role": "focused-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "role": "cli-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "role": "ci-timestep-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "actual_groups": [
+          [
+            1,
+            0,
+            0
+          ]
+        ]
+      }
+    ],
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "QA_scope": "Affected ep_runtime all-target Clippy only, one existing runtime body extended by18 lines and one normalCLI/one actualCI selection. Existing actual final-copy fixture protects Source list order/ownership/classification. No new test body/run, fake InputProcessor setup, pure-kernel/full-workspace repeat or Native capture.",
+  "actual_A": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-command-01/receipt.json",
+      "sha256": "c1a01f31e9f02b3be1830aab8bd3730911591a0e1971753846dd3cd53428e5b0",
+      "size_bytes": 5033
+    },
+    "actual_command": [
+      "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+      "run",
+      "-p",
+      "ep_cli",
+      "--bin",
+      "eplus-rs",
+      "--",
+      "run",
+      "energyplus_porting_plan/cases/A-24H/input.idf",
+      "--weather",
+      ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output",
+      "--mode",
+      "compatibility",
+      "--partial",
+      "deny",
+      "--porting-scope",
+      "A",
+      "--format",
+      "rust-native",
+      "--hours",
+      "24",
+      "--keep-intermediate",
+      "--trace-level",
+      "summary",
+      "--json"
+    ],
+    "Source_snapshot": {
+      "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+      "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+    },
+    "actual_exit_code": 0,
+    "status": "success",
+    "message": "arbitrary run completed",
+    "runtime_samples": 24,
+    "runtime_series": 390,
+    "Surface_Geometry_headers": [
+      "! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System"
+    ],
+    "Surface_Geometry_rows": [
+      " Surface Geometry,UpperLeftCorner,Counterclockwise,WorldCoordinateSystem,RelativeCoordinateSystem,RelativeToZoneOrigin"
+    ],
+    "selected_outputs": {
+      "run-summary.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/run-summary.json",
+        "sha256": "c78be6f8d5cafbb31d38ec34ea671753139718dd751f4e556a54b55c757e17c7",
+        "size_bytes": 27418
+      },
+      "diagnostics.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/diagnostics.json",
+        "sha256": "4407b0b670880f5a6b1b0c8866771a58d5362311db3c644c9cffa4dcf67092f2",
+        "size_bytes": 6151
+      },
+      "eplusrs.err": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/eplusrs.err",
+        "sha256": "34b4c2a06bb0c4258a734fded2f453b11e9ec8c6dbaf55c3053fda89e5907115",
+        "size_bytes": 2052
+      },
+      "eplusrs.eio": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/eplusrs.eio",
+        "sha256": "786a020a2b11d89d2e8ea23758df5c1f1d7b14628b871d863847bb45974bc109",
+        "size_bytes": 7182
+      },
+      "support-assessment.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/support-assessment.json",
+        "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+        "size_bytes": 13937
+      },
+      "support-report.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/support-report.md",
+        "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+        "size_bytes": 3960
+      },
+      "logs/command.log": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/logs/command.log",
+        "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+        "size_bytes": 65
+      },
+      "reports/run-report.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/reports/run-report.md",
+        "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+        "size_bytes": 546
+      },
+      "reports/compatibility-boundary.md": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/reports/compatibility-boundary.md",
+        "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+        "size_bytes": 690
+      },
+      "input/input-hashes.json": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/input/input-hashes.json",
+        "sha256": "7f5f053d2f8ffd08850215d6089fd81f793e9e067b1384613acd3bdaf82d0459",
+        "size_bytes": 562
+      },
+      "input/converted.epJSON": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/input/converted.epJSON",
+        "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+        "size_bytes": 27734
+      }
+    },
+    "oracle_status": "not-requested",
+    "compare_status": "not-requested",
+    "conformance_claim": false,
+    "Rust_output_regression": {
+      "actual": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-lists-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "prior": {
+        "path": ".runtime/porting/SRC-06/ordinary-surface-zero-getters-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "whole_byte_exact": true,
+      "scope": "Finite same-input Rust24-hour result-store pair only; not a Native comparison, Source endpoint observation or whole Setup conformance."
+    }
+  },
+  "A_proof_scope": "Final-source actual CLI success and the unique raw World EIO row identify the reached real Material/Construction/list route.24 hourly outputs do not observe native Type/list endpoints, prove96 Source steps, full getter/Setup return or Native pairing.",
+  "limitations": [
+    "Construction target-type projection is not complete CheckAndSet/GetConstructData optical/thermal/NominalU/error lifecycle. Positive window/EcoRoof/IRT/AirGap/Kiva/mirror/air-boundary producers remain excluded.",
+    "Source2795+ warning/error-tracking and2850+ getters/enclosure/report/fatal/active suffix plus later distinct ProcessSurfaceVertices/height/volume/nominal-U order remain pending. No Ready/shared-firstTime/HB-tail/full getter/Setup/InitHB completion is introduced.",
+    "Authored list regression uses a genuine Default ConstructionUsage constructor; it does not observe Native material/type endpoints. Existing array/floor/retained numerical handoff and allocator/capacity/OOM qualifications remain unchanged.",
+    "Construction README stale historical HEAD57679331 is preserved only as provenance; actual clean application base is recorded in the assembly. Reviewer-only prevalidation failures are archived separately from actual Rust QA.",
+    "Ordinary235456 mismatch/2754 unavailable and whole DesignDay strict differences/eightUNPAIRED unchanged. Four SRC06 gates remain unverified; A14/54 and B14/64 remain unchanged."
+  ],
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-surface-lists/manifest.json",
+    "sha256": "858f26e7bf96a03b85267a4994372c0dcbb792e2efed82de0f7440fd4d666bca",
+    "size_bytes": 141463
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-surface-lists/evidence.zip",
+    "sha256": "2f4c26db8f57ba81bef1cafbc9497db347e785ac30aad43c916b595f44a10293",
+    "size_bytes": 592483
+  },
+  "gates_updated": false
+}

@@ -159,6 +159,13 @@ impl CtfInitializationContext<'_> {
         state
             .read_empty_surface_solar_inputs(&mut owners)
             .map_err(hb_input_error)?;
+        state
+            .build_opaque_surface_lists(
+                &mut owners,
+                &mut self.backend,
+                reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
         state.bind_typed_surfaces(&owners).map_err(hb_input_error)?;
         state.bind_outdoor_geometry().map_err(hb_input_error)?;
         // Do not clear SetupGeometry trig arrays here: Original310's caller

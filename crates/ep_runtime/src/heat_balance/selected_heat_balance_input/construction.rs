@@ -6,16 +6,24 @@ use super::{
 };
 use ep_model::{MaterialKind, TypedModel};
 
+/// Borrow the existing physical material properties and same Source identity/group owner.
+pub(crate) struct ConstructionMaterialOwners<'a> {
+    pub(crate) model: &'a TypedModel,
+    pub(crate) data: &'a super::super::selected_material_data::SelectedMaterialData,
+}
+
 impl SelectedHeatBalanceInputState {
     pub(crate) fn read_regular_construction_arguments(
         &mut self,
         raw: &SelectedHeatBalanceInput,
-        model: &TypedModel,
+        materials: ConstructionMaterialOwners<'_>,
         input: &mut SelectedInputProcessor,
         shortcut: &mut SourceInputProcessorShortCut,
         current_module_object: &mut String,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), HeatBalanceInputError> {
+        let model = materials.model;
+        let materials = materials.data;
         // Original1341 returns before ANY count or scratch operation.
         if !self.unique_construction_names.is_empty() {
             return Ok(());
@@ -77,7 +85,10 @@ impl SelectedHeatBalanceInputState {
                     .ok_or(HeatBalanceInputError::Unavailable(
                         "Construction Name argument",
                     ))?;
-            if layers != construction.effective_layers().len() || layers == 0 {
+            // Original1458 precedes layer lookup and its failure prefix.
+            self.construction_usage[index].total_layers = i32::try_from(layers)
+                .map_err(|_| HeatBalanceInputError::Unavailable("Construction TotLayers int"))?;
+            if layers != construction.effective_layers().len() || layers == 0 || layers > 11 {
                 return Err(HeatBalanceInputError::Unavailable(
                     "actual construction layer argument count",
                 ));
@@ -94,6 +105,25 @@ impl SelectedHeatBalanceInputState {
                         "actual construction material association",
                     ));
                 }
+                // Same native MaterialMap and actual material-order owner:
+                // LayerPoint is assigned before inspecting the layer group.
+                let point = materials
+                    .material_map
+                    .get(&values.alphas[layer + 1])
+                    .copied()
+                    .unwrap_or(0);
+                self.construction_usage[index].layer_points[layer] = point;
+                let material_index = point
+                    .checked_sub(1)
+                    .and_then(|value| usize::try_from(value).ok())
+                    .ok_or(HeatBalanceInputError::Unavailable(
+                        "Construction native MaterialNum",
+                    ))?;
+                if materials.materials.get(material_index) != Some(id) {
+                    return Err(HeatBalanceInputError::Unavailable(
+                        "Construction native/typed MaterialNum association",
+                    ));
+                }
                 let material = model.materials.iter().find(|m| m.id == *id).ok_or(
                     HeatBalanceInputError::Unavailable("actual construction material"),
                 )?;
@@ -106,9 +136,8 @@ impl SelectedHeatBalanceInputState {
                         ));
                     }
                 }
-                // NominalR and CheckAndSetConstructionProperties are provided
-                // by the existing material/property producer. Do not compute
-                // a second copy here or claim its partial failure lifecycle.
+                // The existing producer retains physical properties. This
+                // input hook does not recompute resistance or CTF caches.
             }
         }
         *current_module_object = "ConstructionProperty:InternalHeatSource".into();
@@ -131,8 +160,13 @@ impl SelectedHeatBalanceInputState {
         }
         *current_module_object = "Construction:WindowEquivalentLayer".into();
         *current_module_object = "Construction:WindowDataFile".into();
-        // Both actual window loops are empty; the temporary WConstructNames
-        // allocation is deallocated here. Existing physical properties follow.
+        // Both actual window loops are empty; WConstructNames is gone at1776.
+        // Target Type* writes occur at1795, after all regular input tails.
+        // This consumed subset is not the complete optical/property routine
+        // or the missing NominalU/error lifecycle at1786-1793.
+        for row in &mut self.construction_usage {
+            row.write_selected_type_predicates(materials)?;
+        }
         Ok(())
     }
 }
