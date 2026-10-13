@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 22개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 23개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -108,6 +108,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 kickoff 직전 검사 / sizing 조정의 비활성 경로 | [요약](../evidence/SRC-06-ordinary-run-prefix-checks/summary.json) · [색인](../evidence/SRC-06-ordinary-run-prefix-checks/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-run-prefix-checks/evidence.zip) | 실제243–267의 Available·Branch fatal·DisplayString과 두 실제 비활성 sizing 조정 함수. Kickoff268/Reset270/Setup272·양의 sizing 수치 완료는 아님. |
 | 실제 HB 입력 / 기상·출력 소유자 전달 | [요약](../evidence/SRC-06-ordinary-hb-input/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-input/evidence.zip) | 동일 IP·기상·EIO/MTD의 ProjectControl/Site/Material/Construction/Shadowing/Zone 입력과 기존 geometry 사용. 전체 GetHBInput/SurfaceTmp/Setup·수치 완료는 아님. |
 | 동일 기상 상태 / Zone·Surface 외기와 오류 보존 | [요약](../evidence/SRC-06-ordinary-same-environment-outdoor/summary.json) · [색인](../evidence/SRC-06-ordinary-same-environment-outdoor/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip) | 동일 Station/Site/current와 Zone 온도→guard→풍속·풍향→기존 Surface. 실패한 실제 State를 이동 보존; 전체 InitHB/Setup·Native 수치 완료는 아님. |
+| HeatBalanceAlgorithm 기본값 admission | [요약](../evidence/SRC-06-ordinary-hb-default-admission/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-default-admission/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-default-admission/evidence.zip) | 실제 numeric200/1000 기본값만 허용. 기존 lib1·일반 CLI1·실제 CI CLI1 확인; A 전후 실제 결과는 별도 보존하며 full Setup·Native 수치 PASS로 확대하지 않음. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -162,6 +163,10 @@ Source `7cef065bae90e71aafb7bc3d64fc788ce8a06d0f1199b3c3474bc72fbbca8ba8`에서 
 ## 동일 기상 상태 외기 연결 단위의 QA
 
 Source `0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a`에서 fmt·source-quality·all-target workspace Clippy와 기존 테스트 **7 passed / 0 failed / 0 ignored**를 확인했다. runtime 한 선택으로 기존 외기 guard4·초기화 table1을 묶고 일반 CLI1·실제 `CI_FORCE_TIME_STEP=Y` CLI1을 실행했다. 기존 본문3개에서 기상 매개변수·부호 있는0·cold fatal 이전 완료 온도/미실행 wind 및 실제 Surface/Solar와 작성한 Zone/global의 이동 보존을 검사했다. Source01 Clippy101과 이전 bytes/로그를 보존했고, 같은 마지막 컨텍스트를 직접 전달한 Source02에서 확인했다. 실제 전체 runtime 실패/새 Native endpoint는 이 PASS의 범위가 아니다. 새 본문·binary·전체 workspace 반복·새 Native 실행은 없다. 앞 단위 성공을 합산하지 않으며 모든 gate와 A/B 완료 수는 그대로다.
+
+## HeatBalanceAlgorithm 기본값 admission 단위의 QA
+
+Source `194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e`에서 fmt·source-quality·영향받는 ep_run all-target Clippy와 기존 테스트 **3 passed / 0 failed / 0 ignored**를 확인했다. 같은 admission 본문에 열 개 표 행을 추가하고 일반 CLI1·실제 CI CLI1을 실행했다. A-24H 전후 실제 exit는 각각 6 / 0이며 실제 diagnostics와 함께 보존한다. A 실행은 테스트 수에 더하지 않고 성공·수치 동등성을 미리 가정하지 않는다. 전체 workspace 반복·새 Native 실행은 없으며 모든 gate와 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

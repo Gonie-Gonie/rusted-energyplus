@@ -12606,6 +12606,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-same-environment-outdoor/summary.json",
         "sha256": "8ed55cf5031f394c71b0c39d9fdd6fc48c2682955c8c778c65b519f58def2c3f",
         "size_bytes": 9010
+      },
+      "actual_selected_ordinary_heat_balance_default_admission": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-default-admission/summary.json",
+        "sha256": "927c1620e3adce8b5f3c9e56bdda2b6393169bf1c4c368a60eebf475d4aa3ad7",
+        "size_bytes": 13864
       }
     },
     {

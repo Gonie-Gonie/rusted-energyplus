@@ -1,0 +1,325 @@
+{
+  "schema": "src06-hb-default-admission-summary.v1",
+  "status": "Exact default-only HeatBalanceAlgorithm ordinary admission connected",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/19/194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e",
+    "sha256": "194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e"
+  },
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/manifest.json",
+    "sha256": "07d32d1aec8250ad86ce61a710b09ba96a8e7b03f10594445cfdb5779fb671f3",
+    "size_bytes": 3154
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Owner-ordinary-hb-default-admission-application-review-01/review.json",
+    "sha256": "928f57b1adfe3aeb2c8b3fd55f9464839c62451677da34f492eefee4cad64e2e",
+    "size_bytes": 3875
+  },
+  "behavior": "Existing absent/null/blank behavior retained. Finite numeric upper-temperature200 and maximum-HConv1000 are admitted exactly, separately or together; nondefaults, numeric strings, unsupported algorithms/fields remain rejected. Actual production getter and min-HConv math unchanged.",
+  "QA": [
+    {
+      "scope": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-fmt-01/receipt.json",
+        "sha256": "b674b42ace5fda5e3497bc310f030b6eb132a8089ae818801a4a5799bbc37f43",
+        "size_bytes": 2802
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "scope": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-quality-01/receipt.json",
+        "sha256": "100d5a1a654e2ec7fc650472bec4249314eadbf8cca89072918851ff9560b815",
+        "size_bytes": 2853
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "scope": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-clippy-01/receipt.json",
+        "sha256": "4d21830977b96db3566f4ae765e7eea4a463a656eb04337563ef927d6e61f8b2",
+        "size_bytes": 2854
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "scope": "focused-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-focused-tests-01/receipt.json",
+        "sha256": "79d19d75aeefbd3b04ccbe297f57517cd33a3b05ee3d12609b57a7d4a517e2f4",
+        "size_bytes": 2976
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--lib",
+        "ordinary_equipment_input::tests::raw_equipment_admission_preserves_empty_presence_and_rejects_positive_or_field_branches",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0
+    },
+    {
+      "scope": "cli-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-cli-tests-01/receipt.json",
+        "sha256": "a0fcb7ba01d3c3da63982b16ae497876f1e2a493f19f910e371b0bcd2bec8067",
+        "size_bytes": 2890
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "exit_code": 0
+    },
+    {
+      "scope": "ci-timestep-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-ci-timestep-tests-01/receipt.json",
+        "sha256": "021c1227cdacfb5dc97f8753bcc01b79429b4a7e166aa3a66334fe3d84e22a0b",
+        "size_bytes": 2892
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "tests": {
+    "selections": [
+      {
+        "scope": "focused-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "cli-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "ci-timestep-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "QA_scope": "fmt/source-quality plus affected ep_run all-target Clippy; one existing admission lib body with ten new rows, normal CLI1 and real CI_FORCE_TIME_STEP=Y CLI1. No full workspace Clippy or test repeat.",
+  "A_executions": [
+    {
+      "role": "historical_before",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-command-01/receipt.json",
+        "sha256": "794eca25891b3bf266796ddb3aad745f84a59f54711116cf1030ad9a0fd68b16",
+        "size_bytes": 3228
+      },
+      "exit_code": 6,
+      "launch_error": null,
+      "Source_snapshot": {
+        "path": ".runtime/porting/source-objects/0a/0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+        "sha256": "0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a"
+      },
+      "run_status": "runtime",
+      "run_message": "Rust runtime failed",
+      "selected_actual_outputs": {
+        "run-summary.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/run-summary.json",
+          "sha256": "72bd57b82902b5336add97e74c1c7bffe6ce60a165e8275ef32891fbf3ef22a9",
+          "size_bytes": 8372
+        },
+        "diagnostics.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/diagnostics.json",
+          "sha256": "48ab68c0e709ec60e39b844698e79135d7444b89fce7fdac661a4a2b3482ef62",
+          "size_bytes": 6539
+        },
+        "eplusrs.err": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/eplusrs.err",
+          "sha256": "14646751ca7a431a6015f3fb76d963faf52317beffb997d25b01183ce83ecacd",
+          "size_bytes": 2160
+        },
+        "support-assessment.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/support-assessment.json",
+          "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+          "size_bytes": 13937
+        },
+        "support-report.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/support-report.md",
+          "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+          "size_bytes": 3960
+        },
+        "logs/command.log": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/logs/command.log",
+          "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+          "size_bytes": 65
+        },
+        "reports/run-report.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/reports/run-report.md",
+          "sha256": "976508129a53f4639c9924c212b27c7ad99e565d82a29456f581c3b8c0e03f11",
+          "size_bytes": 547
+        },
+        "reports/compatibility-boundary.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/reports/compatibility-boundary.md",
+          "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+          "size_bytes": 690
+        },
+        "input/input-hashes.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/input/input-hashes.json",
+          "sha256": "cd6819d4e976b3bee341e37b5a0d18056e5c33e94e3c6236c7fc76780c41eb0e",
+          "size_bytes": 556
+        },
+        "input/converted.epJSON": {
+          "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/input/converted.epJSON",
+          "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+          "size_bytes": 27734
+        }
+      },
+      "not_emitted_selected_outputs": [],
+      "runtime_samples": null,
+      "runtime_series": null,
+      "sample_count_scope": "Actual CLI output sample count only; no Source timestep count inferred from input Timestep or sample count.",
+      "conformance_claim": false,
+      "oracle_status": "not-requested",
+      "compare_status": "not-requested",
+      "qualification": "Actual execution result only; not a unit-test count, Native pairing, full Setup or conformance PASS."
+    },
+    {
+      "role": "actual_after",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-command-01/receipt.json",
+        "sha256": "8cec9836d89a589cf162e3ccf2768241f151188ad809769d03c343f48d4d4a54",
+        "size_bytes": 3353
+      },
+      "exit_code": 0,
+      "launch_error": null,
+      "Source_snapshot": {
+        "path": ".runtime/porting/source-objects/19/194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e",
+        "sha256": "194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e"
+      },
+      "run_status": "success",
+      "run_message": "arbitrary run completed",
+      "selected_actual_outputs": {
+        "run-summary.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/run-summary.json",
+          "sha256": "b39ba3f8deb93b5834bb37b3400aa133644ffc47b5638705b53774e99e1dfdeb",
+          "size_bytes": 27467
+        },
+        "diagnostics.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/diagnostics.json",
+          "sha256": "d3d42bc2e5290af119cf7466dd757a79c03037611e78a853407bf5b688ab461b",
+          "size_bytes": 6151
+        },
+        "eplusrs.err": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/eplusrs.err",
+          "sha256": "d74fe3031691f98037ffbe30287d85eda4e27c28d2922979aa55eeaaac04a32c",
+          "size_bytes": 2052
+        },
+        "support-assessment.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/support-assessment.json",
+          "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+          "size_bytes": 13937
+        },
+        "support-report.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/support-report.md",
+          "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+          "size_bytes": 3960
+        },
+        "logs/command.log": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/logs/command.log",
+          "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+          "size_bytes": 65
+        },
+        "reports/run-report.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/reports/run-report.md",
+          "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+          "size_bytes": 546
+        },
+        "reports/compatibility-boundary.md": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/reports/compatibility-boundary.md",
+          "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+          "size_bytes": 690
+        },
+        "input/input-hashes.json": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/input/input-hashes.json",
+          "sha256": "b031b79fbadfd3d1bbae41b09f499ec5e7845800f2d43bd61583ba82b9977c6e",
+          "size_bytes": 566
+        },
+        "input/converted.epJSON": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/input/converted.epJSON",
+          "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+          "size_bytes": 27734
+        }
+      },
+      "not_emitted_selected_outputs": [],
+      "runtime_samples": 24,
+      "runtime_series": 390,
+      "sample_count_scope": "Actual CLI output sample count only; no Source timestep count inferred from input Timestep or sample count.",
+      "conformance_claim": false,
+      "oracle_status": "not-requested",
+      "compare_status": "not-requested",
+      "qualification": "Actual execution result only; not a unit-test count, Native pairing, full Setup or conformance PASS."
+    }
+  ],
+  "limitations": [
+    "A before/after actual exits and diagnostics are preserved independently of the three passing tests. An A exit0, if observed, is not Native numerical or full Setup equivalence.",
+    "Nondefault high/max support, full GetSurfaceData/SetupZoneGeometry/GetHBInput/InitHB/Setup and downstream numerical inside/radiation/HVAC remain pending.",
+    "Existing ordinary235456 mismatches/2754 unavailable and DesignDay nine strict failures/eight UNPAIRED are unchanged. Four gates remain unverified; A14/54 and B14/64 unchanged."
+  ],
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-default-admission/manifest.json",
+    "sha256": "2db5eb4bad19589aad3812fa4e8c48047a91b8d493b65c2e8d9df0eabf1a8963",
+    "size_bytes": 19591
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-default-admission/evidence.zip",
+    "sha256": "6d7ac606a2ba414fc1d770c99c60f1d99562672aa2975f8278cbce29b398e2cd",
+    "size_bytes": 584070
+  },
+  "gates_updated": false
+}

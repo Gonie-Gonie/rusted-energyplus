@@ -116,12 +116,15 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
             let allowed = match family.0.as_str() {
                 "HeatBalanceAlgorithm" => {
                     selected(object, "algorithm", &["ConductionTransferFunction"])
-                        && field(object, "surface_temperature_upper_limit").is_none_or(blank)
+                        // Explicit schema defaults have the same retained values as blanks.
+                        // Dynamic nondefault high limits still lack downstream consumers.
+                        && field(object, "surface_temperature_upper_limit")
+                            .is_none_or(|value| blank(value) || number(value) == Some(200.0))
                         && field(
                             object,
                             "maximum_surface_convection_heat_transfer_coefficient_value",
                         )
-                        .is_none_or(blank)
+                        .is_none_or(|value| blank(value) || number(value) == Some(1000.0))
                 }
                 "SurfaceConvectionAlgorithm:Inside" => selected(object, "algorithm", &["TARP"]),
                 "SurfaceConvectionAlgorithm:Outside" => selected(object, "algorithm", &["DOE-2"]),
@@ -427,6 +430,38 @@ mod tests {
         ] {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
+        }
+        for (fields, accepted) in [
+            (r#""surface_temperature_upper_limit":200"#, true),
+            (
+                r#""maximum_surface_convection_heat_transfer_coefficient_value":1000"#,
+                true,
+            ),
+            (
+                r#""algorithm":"ConductionTransferFunction","surface_temperature_upper_limit":200,"minimum_surface_convection_heat_transfer_coefficient_value":0.1,"maximum_surface_convection_heat_transfer_coefficient_value":1000"#,
+                true,
+            ),
+            (r#""surface_temperature_upper_limit":201"#, false),
+            (
+                r#""maximum_surface_convection_heat_transfer_coefficient_value":1001"#,
+                false,
+            ),
+            (r#""surface_temperature_upper_limit":"200""#, false),
+            (
+                r#""maximum_surface_convection_heat_transfer_coefficient_value":"1000""#,
+                false,
+            ),
+            (
+                r#""surface_temperature_upper_limit":null,"maximum_surface_convection_heat_transfer_coefficient_value":" ""#,
+                true,
+            ),
+            (r#""algorithm":"ConductionFiniteDifference""#, false),
+            (r#""unknown_high_limit":1000"#, false),
+        ] {
+            let raw = parse_epjson_str(&format!(
+                "{{{base},\"HeatBalanceAlgorithm\":{{\"h\":{{{fields}}}}}}}"
+            ))?;
+            assert_eq!(resolve(&raw).is_ok(), accepted, "HB fields {fields}");
         }
         for (name, input, expected_timestep) in [
             (

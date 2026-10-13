@@ -1,0 +1,431 @@
+{
+  "schema": "src06-hb-default-admission-evidence.v1",
+  "actual_assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/manifest.json",
+    "sha256": "07d32d1aec8250ad86ce61a710b09ba96a8e7b03f10594445cfdb5779fb671f3",
+    "size_bytes": 3154
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/19/194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e",
+    "sha256": "194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e"
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/manifest.json",
+      "sha256": "07d32d1aec8250ad86ce61a710b09ba96a8e7b03f10594445cfdb5779fb671f3",
+      "size_bytes": 3154
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/apply.json",
+      "sha256": "c8e8d314c9855dc8cf268e2bca02deac424409008ba3d205f876b9edb08db0d4",
+      "size_bytes": 2178
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-prep-01/manifest.json",
+      "sha256": "5a2b1d100d31d2ccef5b3bf20474805b7dc853ab66b1291f172ce66b8ab3c09d",
+      "size_bytes": 3836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-hb-default-admission-Source-review-01/review.json",
+      "sha256": "f41ddbd164f604481266c4393e7d750ca662a81aa674960e339fffbae2d56688",
+      "size_bytes": 4698
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/before/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "357189200effa9e7fbbf3e5cd34fb9b2ddc59d05c7b69ea288a532245705a710",
+      "size_bytes": 21222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-prep-01/proposed/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "ed80fdc9334fe6c51f69f8387a28b49ed30b8d00932d9e0d0636e8f314aaacc0",
+      "size_bytes": 23008
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "ed80fdc9334fe6c51f69f8387a28b49ed30b8d00932d9e0d0636e8f314aaacc0",
+      "size_bytes": 23008
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/after/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "ed80fdc9334fe6c51f69f8387a28b49ed30b8d00932d9e0d0636e8f314aaacc0",
+      "size_bytes": 23008
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/complete_actual_diff/crates__ep_run__src__ordinary_equipment_input.rs.diff",
+      "sha256": "98fd195edbdc831260b0d758ed67cf7a1fd01284553e245a6d42e6519780e9d6",
+      "size_bytes": 3115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-assembly-01/held_to_actual_diff/crates__ep_run__src__ordinary_equipment_input.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-reviewed-packet-Root-02.py",
+      "sha256": "c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07",
+      "size_bytes": 2263
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-hb-default-admission-application-review-01/review.json",
+      "sha256": "928f57b1adfe3aeb2c8b3fd55f9464839c62451677da34f492eefee4cad64e2e",
+      "size_bytes": 3875
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-prep-01/before/crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "357189200effa9e7fbbf3e5cd34fb9b2ddc59d05c7b69ea288a532245705a710",
+      "size_bytes": 21222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-prep-01/ordinary_equipment_input.rs.diff",
+      "sha256": "98fd195edbdc831260b0d758ed67cf7a1fd01284553e245a6d42e6519780e9d6",
+      "size_bytes": 3115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/audit.json",
+      "sha256": "f2763ad51b14e55989fc2bddd2993cc4a1a05170220fe50e0befde71e5713d8e",
+      "size_bytes": 6074
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/Original/idd__Energy+.idd.in.720-748.txt",
+      "sha256": "8b306d384b3d9d0f42ff6663cd9a905467c0ab788336bf08fb2c5fb2c97ae8fe",
+      "size_bytes": 1188
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/Original/src__EnergyPlus__HeatBalanceManager.cc.800-891.txt",
+      "sha256": "92ee91b34ccc6abe5a6ed234a0d7c2079259bdc220a82ebdd28ec00afdb61ff4",
+      "size_bytes": 6326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/Original/src__EnergyPlus__DataHeatBalance.hh.1790-1808.txt",
+      "sha256": "10fac12558575055c8d43a66a40f500e6fc23930fa25c33b89f46a150e9c90e4",
+      "size_bytes": 2054
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/Original/src__EnergyPlus__DataHeatBalSurface.hh.60-90.txt",
+      "sha256": "daf11be3deff537598d5327bb5a2b30b570937229f570b8450ff0ab747cb3913",
+      "size_bytes": 1939
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-hb-default-admission-Root-01.py",
+      "sha256": "d889a27b20975f90ff00b772043e84912930bfeb3e7b6f6d607f54ed153c984d",
+      "size_bytes": 5366
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-command-01/receipt.json",
+      "sha256": "794eca25891b3bf266796ddb3aad745f84a59f54711116cf1030ad9a0fd68b16",
+      "size_bytes": 3228
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Owner-ordinary-heat-balance-default-admission-audit-01/HeatBalanceAlgorithm.official-subtree.json",
+      "sha256": "4b649b1f824d32f0f027b3c2bcfd917eb43ce30b6ca6fc5dfe2dd3c5b1973b44",
+      "size_bytes": 2685
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input/fields.rs",
+      "sha256": "e65e2fe32f6c8cd44704e145884bf4f85268c16b15f841afea8f2f92bdaeba53",
+      "size_bytes": 35218
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "98285d42896c8afaa615ac8b0718486c1204895c4f379b19efc604445da22848",
+      "size_bytes": 8849
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs",
+      "sha256": "6688bb16f391b3660e978857318182da5b042ee3ac6cfcf3f04eb65cdb912ac4",
+      "size_bytes": 9753
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/input.rs",
+      "sha256": "4aa769f227939f6adce1cd22fa0ce7f2ae1036d1af2283d273f8fae5b4b1ade8",
+      "size_bytes": 6774
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/input/schema.rs",
+      "sha256": "4f6608b1a65633b1fd79a3d335ecb5be4b92c769c07750d9dc2918f3a4d3895d",
+      "size_bytes": 5374
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-03.py",
+      "sha256": "a0e5840d5953e1e9663c65726ea6f922706eb1f805525edd5883d4a98b517414",
+      "size_bytes": 3603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-02.py",
+      "sha256": "5a695f87dcbc39c0c936ba23168019cd9fdb60262bade15dc7e8828aeb16ea28",
+      "size_bytes": 3664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-fmt-01/receipt.json",
+      "sha256": "b674b42ace5fda5e3497bc310f030b6eb132a8089ae818801a4a5799bbc37f43",
+      "size_bytes": 2802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/19/194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e",
+      "sha256": "194be5e62f5dcbb34d9a52adfd41883dc8cdc8d22d2fb743e771ee32f3e6dd8e",
+      "size_bytes": 1664778
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-quality-01/receipt.json",
+      "sha256": "100d5a1a654e2ec7fc650472bec4249314eadbf8cca89072918851ff9560b815",
+      "size_bytes": 2853
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-quality-01/stdout.log",
+      "sha256": "9c423adc4366fa56fe90dadc5eac620aa6ac20f95818bab2afd8482046bf85c3",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-clippy-01/receipt.json",
+      "sha256": "4d21830977b96db3566f4ae765e7eea4a463a656eb04337563ef927d6e61f8b2",
+      "size_bytes": 2854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-clippy-01/stderr.log",
+      "sha256": "cadb79d24203dad30a67b2c4dc00dc6cd064bd2feba0b153a4791492dcc82d5b",
+      "size_bytes": 377
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-focused-tests-01/receipt.json",
+      "sha256": "79d19d75aeefbd3b04ccbe297f57517cd33a3b05ee3d12609b57a7d4a517e2f4",
+      "size_bytes": 2976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-focused-tests-01/stdout.log",
+      "sha256": "3db6120270e6f1e147921f505e49941bdcdc5d998e35415c8ddefd098cd1fdd5",
+      "size_bytes": 247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-focused-tests-01/stderr.log",
+      "sha256": "a1eaa66b531ac4a7c0925f495b85b9ecab834a58551c99560ecbccbd6b35f9ee",
+      "size_bytes": 242
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-cli-tests-01/receipt.json",
+      "sha256": "a0fcb7ba01d3c3da63982b16ae497876f1e2a493f19f910e371b0bcd2bec8067",
+      "size_bytes": 2890
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-cli-tests-01/stdout.log",
+      "sha256": "daa63addfe5a4717d0402ff5a71886ca20463585de30dbe427c074dbb5753448",
+      "size_bytes": 170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-cli-tests-01/stderr.log",
+      "sha256": "fb36d5f768a1a3889c543c043575d32afd22ea210af0401513cf580b021b9184",
+      "size_bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-ci-timestep-tests-01/receipt.json",
+      "sha256": "021c1227cdacfb5dc97f8753bcc01b79429b4a7e166aa3a66334fe3d84e22a0b",
+      "size_bytes": 2892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-ci-timestep-tests-01/stdout.log",
+      "sha256": "7af80e5e7b1abf95aebb980a198d0c47b2599ab7430e4590532ee3b6e0903aba",
+      "size_bytes": 258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-ci-timestep-tests-01/stderr.log",
+      "sha256": "462e02ddded28c06b1d8fc4d0cb316c390062c0a9bb5a492c34062ec517cd95f",
+      "size_bytes": 152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365
+    },
+    {
+      "path": "scripts/quality/source-quality-gate.ps1",
+      "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+      "size_bytes": 3432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-command-01/stdout.log",
+      "sha256": "72bd57b82902b5336add97e74c1c7bffe6ce60a165e8275ef32891fbf3ef22a9",
+      "size_bytes": 8372
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-command-01/stderr.log",
+      "sha256": "db4786b805c343f062a45492aec09bbc03c05d130a34f1ee2621cfd1c3bad066",
+      "size_bytes": 985
+    },
+    {
+      "path": ".runtime/porting/source-objects/0a/0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+      "sha256": "0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+      "size_bytes": 1664778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/run-summary.json",
+      "sha256": "72bd57b82902b5336add97e74c1c7bffe6ce60a165e8275ef32891fbf3ef22a9",
+      "size_bytes": 8372
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/diagnostics.json",
+      "sha256": "48ab68c0e709ec60e39b844698e79135d7444b89fce7fdac661a4a2b3482ef62",
+      "size_bytes": 6539
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/eplusrs.err",
+      "sha256": "14646751ca7a431a6015f3fb76d963faf52317beffb997d25b01183ce83ecacd",
+      "size_bytes": 2160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/support-assessment.json",
+      "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+      "size_bytes": 13937
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/reports/run-report.md",
+      "sha256": "976508129a53f4639c9924c212b27c7ad99e565d82a29456f581c3b8c0e03f11",
+      "size_bytes": 547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-post-hb-outdoor-A-24H-cli-01/output/input/input-hashes.json",
+      "sha256": "cd6819d4e976b3bee341e37b5a0d18056e5c33e94e3c6236c7fc76780c41eb0e",
+      "size_bytes": 556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-command-01/receipt.json",
+      "sha256": "8cec9836d89a589cf162e3ccf2768241f151188ad809769d03c343f48d4d4a54",
+      "size_bytes": 3353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-command-01/stdout.log",
+      "sha256": "b39ba3f8deb93b5834bb37b3400aa133644ffc47b5638705b53774e99e1dfdeb",
+      "size_bytes": 27467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-command-01/stderr.log",
+      "sha256": "a345b91f4ed9cf09d25b192efcbfd2a48e4a14ebe1cd61f092741d313111ea82",
+      "size_bytes": 555
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/run-summary.json",
+      "sha256": "b39ba3f8deb93b5834bb37b3400aa133644ffc47b5638705b53774e99e1dfdeb",
+      "size_bytes": 27467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/diagnostics.json",
+      "sha256": "d3d42bc2e5290af119cf7466dd757a79c03037611e78a853407bf5b688ab461b",
+      "size_bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/eplusrs.err",
+      "sha256": "d74fe3031691f98037ffbe30287d85eda4e27c28d2922979aa55eeaaac04a32c",
+      "size_bytes": 2052
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/support-assessment.json",
+      "sha256": "80845104add10a25165ccd13c0768006bd7213366666353e89aff4ea5860e274",
+      "size_bytes": 13937
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "size_bytes": 546
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/input/input-hashes.json",
+      "sha256": "b031b79fbadfd3d1bbae41b09f499ec5e7845800f2d43bd61583ba82b9977c6e",
+      "size_bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-A-24H-cli-01/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-hb-default-admission-Header-01.py",
+      "sha256": "45c57094f7505121e3118bccfb89cab4e42f85a3d20bb7c7a4e9e681059ddead",
+      "size_bytes": 13380
+    }
+  ],
+  "historical_references": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "357189200effa9e7fbbf3e5cd34fb9b2ddc59d05c7b69ea288a532245705a710",
+        "size_bytes": 21222
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-default-admission-prep-01/before/crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "357189200effa9e7fbbf3e5cd34fb9b2ddc59d05c7b69ea288a532245705a710",
+        "size_bytes": 21222
+      }
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-default-admission/evidence.zip",
+    "sha256": "6d7ac606a2ba414fc1d770c99c60f1d99562672aa2975f8278cbce29b398e2cd",
+    "size_bytes": 584070
+  },
+  "archive_member_count": 79,
+  "gates_updated": false,
+  "scope": "One current Source/before/after and diffs; actual application and reviews; finite default audit/four Original ranges/schema excerpt; six final QA receipts/full logs/indexes/actual recorder; before-and-after A receipts and finite actual diagnostics. No recursive historical archives, EPW payload, Native binary/map/core or numerical comparison."
+}
