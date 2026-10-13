@@ -390,6 +390,19 @@ mod tests {
                 .is_object_unused("Output:Table:SummaryReports", "summary")
         );
         success.initialize_source_run_prefix(&ep_model::ReportInputs::default())?;
+        assert_eq!(success.reports.source_run_available, Some(true));
+        let expected_progress = [
+            "Adjusting Air System Sizing",
+            "Adjusting Standard 62.1 Ventilation Sizing",
+            "Initializing Simulation",
+        ];
+        let progress = String::from_utf8(success.console.clone())?;
+        let reached_progress = progress
+            .lines()
+            .filter(|line| expected_progress.contains(line))
+            .collect::<Vec<_>>();
+        assert_eq!(reached_progress, expected_progress.to_vec());
+        assert!(!success.state.kickoff_simulation);
         assert!(success.reports.setup_simulation_registry_prepared);
         assert!(success.reports.registry.report_count > 0);
         assert!(

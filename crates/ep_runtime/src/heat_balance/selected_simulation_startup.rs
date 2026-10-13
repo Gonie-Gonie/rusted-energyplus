@@ -66,6 +66,8 @@ pub(crate) struct SelectedRuntimeLanguage {
 /// Sole selected DataHVACGlobals scalars; constructors are +0, not the zone step.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedHvacGlobals {
+    /// DataHVACGlobals507 constructor; not DataSizing/NumAirLoops or a raw recount.
+    pub(crate) number_of_primary_air_systems: i32,
     pub(crate) time_step_sys: f64,
     pub(crate) time_step_sys_seconds: f64,
     pub(crate) limit_num_sys_steps: i32,
@@ -75,6 +77,7 @@ pub(crate) struct SelectedHvacGlobals {
 impl Default for SelectedHvacGlobals {
     fn default() -> Self {
         Self {
+            number_of_primary_air_systems: 0,
             time_step_sys: 0.0,
             time_step_sys_seconds: 0.0,
             limit_num_sys_steps: 0,

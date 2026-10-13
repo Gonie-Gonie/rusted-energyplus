@@ -24,6 +24,9 @@ pub struct CtfInitializationReports {
     /// True only after the selected Setup caller reached SetPredefinedTables215.
     /// Legacy callers still register normally; this is not inferred from size.
     pub setup_simulation_registry_prepared: bool,
+    /// Actual RunSimulation249 local, None before that assignment is reached.
+    /// Retained across a later error; this is not weather/Setup readiness.
+    pub source_run_available: Option<bool>,
     /// Sole actual raw/schema input owner, retained across runtime success and failure.
     /// Legacy callers that supply no raw projection retain None.
     pub selected_input_processor: Option<super::selected_input_processor::SelectedInputProcessor>,

@@ -9,6 +9,7 @@ use super::selected_input_processor::{
 use super::selected_schedule_manager::{
     SelectedScheduleError, SelectedScheduleManager, SourceScheduleIndex,
 };
+use super::selected_simulation_startup::SelectedHvacGlobals;
 use crate::weather::day::SetupSimulationControls;
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 
@@ -465,6 +466,36 @@ impl SelectedSizingManager {
         self.zone_sizing = None; // unconditional real ZoneSizing.deallocate613.
         // SpaceSizing is retained because its actual selected sizing switch is false.
         // DoingSizing233/240 belongs to the real caller, including failure retention.
+        Ok(())
+    }
+}
+
+impl SelectedSizingManager {
+    /// Actual770-1207 has only a reference alias outside this literal predicate.
+    /// The unentered positive body performs zone equipment and sizing/report work.
+    pub(crate) fn manage_system_sizing_adjustments(
+        &self,
+        globals: &SelectedHeatBalanceGlobals,
+    ) -> Result<(), SelectedSizingError> {
+        if self.number_of_system_sizing_input > 0 && globals.do_system_sizing {
+            return Err(SelectedSizingError::Unavailable(
+                "positive ManageSystemSizingAdjustments body",
+            ));
+        }
+        Ok(())
+    }
+
+    /// Actual1209-2023 has four reference aliases and two NumPrimaryAirSys loops.
+    /// Count0 executes no numeric, equipment or predefined-table write at all.
+    pub(crate) fn manage_system_ventilation_adjustments(
+        &self,
+        hvac: &SelectedHvacGlobals,
+    ) -> Result<(), SelectedSizingError> {
+        if hvac.number_of_primary_air_systems != 0 {
+            return Err(SelectedSizingError::Unavailable(
+                "nonzero ManageSystemVentilationAdjustments primary-air-system domain",
+            ));
+        }
         Ok(())
     }
 }

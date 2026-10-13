@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 19개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 20개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -105,6 +105,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 PostIP / 출력 사전 검색 | [요약](../evidence/SRC-06-ordinary-output-prescan/summary.json) · [색인](../evidence/SRC-06-ordinary-output-prescan/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-output-prescan/evidence.zip) | 실제 raw lexical 입력·첫 이름 표기·중복 count·공백/단위·wildcard와 반복/오류 상태를 보존. 전체 startup/RE2/API/monthly 완료는 아님. |
 | 실제 여섯 초기화 handler / 파일·시간 전달 | [요약](../evidence/SRC-06-ordinary-source-initialization/summary.json) · [색인](../evidence/SRC-06-ordinary-source-initialization/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-source-initialization/evidence.zip) | 실제 guard·Psych/Fluid/Schedule·Project/EMS/Curve 호출, 동일 EIO·오류 prefix와 effective timestep/reporting 전달. 전체 startup/Setup 완료나 Native 수치 동등성은 아님. |
 | 실제 실행 전 검사 / Sizing·출력 시간 연결 | [요약](../evidence/SRC-06-ordinary-run-prefix/summary.json) · [색인](../evidence/SRC-06-ordinary-run-prefix/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-run-prefix/evidence.zip) | 실제205/213–241의 검사·등록·bounds·서비스·8개 sizing getter, 동일 상태와 오류 prefix. 전체 startup/Setup·Native 수치 완료는 아님. |
+| 실제 kickoff 직전 검사 / sizing 조정의 비활성 경로 | [요약](../evidence/SRC-06-ordinary-run-prefix-checks/summary.json) · [색인](../evidence/SRC-06-ordinary-run-prefix-checks/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-run-prefix-checks/evidence.zip) | 실제243–267의 Available·Branch fatal·DisplayString과 두 실제 비활성 sizing 조정 함수. Kickoff268/Reset270/Setup272·양의 sizing 수치 완료는 아님. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -147,6 +148,10 @@ Assembly01의 실제 Clippy 실패(exit101)는 보존했다. Assembly02는 중�
 ## 실제 실행 전 검사 연결 단위의 QA
 
 Source `424bf058824956e69d1e29309f76e5976bb8a235772c9828e5d4fdd1e8fa8ae1`에서 fmt·source-quality·all-target workspace Clippy와 기존 입력/출력 2개·일반 CLI 1개·실제 `CI_FORCE_TIME_STEP=Y` CLI 1개, **4 passed / 0 failed / 0 ignored**를 확인했다. 기존 output/fatal 본문에 SummaryReports의 정확한 unused erase, 실제215 이후218 재호출 fatal과234 실패 시 DoingSizing=true 보존을 추가했다. 새 테스트 본문·binary와 전체 workspace 반복 실행은 없다. actual 파일 16개의 전체 diff·독립 검토와 실제 QA Source를 고정했으며, 앞 단위의20개 성공은 중복 합산하지 않는다. 모든 gate와 A/B 완료 수는 그대로다.
+
+## 실제 kickoff 직전 검사 단위의 QA
+
+Source `7fc13f241290a1edb5caaba011937b9328020662df20820ddaf9b680f08458ca`에서 fmt·source-quality·all-target workspace Clippy와 기존 입력/출력 2개·일반 CLI 1개·실제 `CI_FORCE_TIME_STEP=Y` CLI 1개, **4 passed / 0 failed / 0 ignored**를 확인했다. 기존 본문에서 세 실제 진행 문자열 순서와249 Available·kickoff 미대입을 검사했다. 새 테스트 본문·binary·전체 workspace 반복·새 Native 실행은 없다. 앞 단위의 성공을 중복 합산하지 않으며 실제 양의 sizing/Branch fatal 실행은 이 테스트의 PASS에 넣지 않는다. 모든 gate와 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

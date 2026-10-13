@@ -1,4 +1,4 @@
-//! Reached RunSimulation213-241 prefix, before the sole weather owner moves.
+//! Reached RunSimulation213-267 prefix, before the sole weather owner moves.
 //! No SetupSimulation, HB allocation or downstream numerical completion implied.
 use super::{CtfInitializationReports, SourceInitializationError};
 use crate::heat_balance::ctf_initialization_context::CtfInitializationError;
@@ -23,7 +23,7 @@ fn failure(
 }
 
 impl CtfInitializationReports {
-    /// Run actual213-241 on the same reached owners after both real init guards.
+    /// Run actual213-267 on the same reached owners after both real init guards.
     /// Reentry is not silently skipped: the original duplicate time-pointer fatal
     /// occurs after its actual repeated checks and predefined-table registration.
     ///
@@ -153,6 +153,50 @@ impl CtfInitializationReports {
         globals.doing_sizing = false;
         backend.state.doing_sizing = globals.doing_sizing;
         self.heat_balance_space_controls.current = self.heat_balance_space_controls.simulation;
+
+        // Actual243-247 consumes input switches, not calculation-ready flags.
+        if (globals.do_zone_sizing || globals.do_system_sizing || globals.do_plant_sizing)
+            && !(weather.global.do_des_day_sim
+                || (weather.global.do_weath_sim && startup.run_periods_in_input))
+        {
+            backend.show_warning_error("ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl object). Succeeding warnings/errors may be confusing.")
+                .map_err(|e| failure("RunSimulation warning245", e))?;
+        }
+        // Retain the real249 caller local, including a later actual fatal.
+        self.source_run_available = Some(true);
+        if globals.do_pure_load_calc {
+            // Real GetProjectData1187 requires Zone/SystemSizing for true;
+            // the selected234 domain rejects those switches before this point.
+            // Do not fabricate its unported WriteTabularFiles254 owner/route.
+            return Err(SourceInitializationError::Association(
+                "positive DoPureLoadCalc251 requires the sizing/tabular caller",
+            ));
+        }
+        if self.selected_branches.invalid_branch_definitions {
+            return match backend
+                .show_fatal_error("Preceding error(s) in Branch Input cause termination.")
+            {
+                Ok(never) => match never {},
+                Err(stop) => Err(failure("BranchInput fatal258", stop)),
+            };
+        }
+        backend
+            .display_string("Adjusting Air System Sizing")
+            .map_err(|e| failure("DisplayString261", e))?;
+        self.selected_sizing_manager
+            .manage_system_sizing_adjustments(globals)
+            .map_err(|e| failure("ManageSystemSizingAdjustments262", e))?;
+        backend
+            .display_string("Adjusting Standard 62.1 Ventilation Sizing")
+            .map_err(|e| failure("DisplayString264", e))?;
+        self.selected_sizing_manager
+            .manage_system_ventilation_adjustments(&startup.hvac_globals)
+            .map_err(|e| failure("ManageSystemVentilationAdjustments265", e))?;
+        backend
+            .display_string("Initializing Simulation")
+            .map_err(|e| failure("DisplayString267", e))?;
+        // Stop before actual KickOffSimulation268, ResetEnvironmentCounter270
+        // and SetupSimulation272. No completion/readiness flag substitutes.
         Ok(())
     }
 
