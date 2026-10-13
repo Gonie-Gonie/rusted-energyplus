@@ -91,7 +91,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         };
         assert!(reports.progress.postlude_returned);
         let owner = if success {
-            let output = result?;
+            let mut output = result?;
             assert!(reports.ordinary_solar_radiation.is_none(), "successful owner must move into State");
             let surface = &output.surfaces[0];
             assert_eq!(surface.inside_solar_absorptance.to_bits(), 0.25_f64.to_bits());
@@ -100,7 +100,42 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             assert!((surface.inside_radiant_internal_gain_w_per_m2 - 3.0).abs() < 1.0e-12);
             assert_eq!(profile.initialization.cached_value_lookup_count, 2,
                 "both actual gain consumers run after successful InitSolar");
-            output.ordinary_solar_radiation.ok_or("missing moved actual Solar owner")?
+            // Authored Rust failure-custody payload, not Native getter endpoints.
+            // Preserve the actual initialized Surface/Solar allocations by move.
+            use crate::heat_balance::selected_heat_balance_input::zone::{SelectedZoneData, SelectedZoneInputOwners};
+            output.selected_zone_input = Some(SelectedZoneInputOwners {
+                zones: Some(vec![SelectedZoneData {
+                    typed_zone_id: Some(model.typed.zones[0].id),
+                    name: model.typed.zones[0].name.0.clone(),
+                    dry_bulb: -101.0, wet_bulb: -99.0, wind_speed: -0.0,
+                    ..Default::default()
+                }]), ..Default::default()
+            });
+            output.selected_heat_balance_globals = Some(Default::default());
+            let surface_allocation = output.surfaces.as_ptr();
+            let zone_allocation = output.selected_zone_input.as_ref().and_then(|owner| owner.zones.as_ref())
+                .ok_or("authored custody Zone allocation")?.as_ptr();
+            assert!(reports.failed_heat_balance_state.is_none());
+            {
+                let mut context = CtfInitializationContext { reports: &mut reports, eio: &mut eio,
+                    backend: SourceErrorBackend { state: &mut state, error_stream: Some(&mut error),
+                        console: &mut console, out_unit1: None, out_unit2: None, f_message: None,
+                        message_callback: None, error_callback: None, sqlite: None } };
+                crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                    output, Some(&mut context),
+                );
+            }
+            assert!(reports.selected_zone_input.is_none());
+            assert!(reports.selected_heat_balance_globals.is_none());
+            let mut failed = reports.failed_heat_balance_state.take().ok_or("missing moved failed State")?;
+            assert_eq!(failed.surfaces.as_ptr(), surface_allocation);
+            let rows = failed.selected_zone_input.as_ref().and_then(|owner| owner.zones.as_ref())
+                .ok_or("failed State lost Zone allocation")?;
+            assert_eq!(rows.as_ptr(), zone_allocation);
+            assert_eq!([rows[0].dry_bulb, rows[0].wet_bulb], [-101.0, -99.0]);
+            assert_eq!(rows[0].wind_speed.to_bits(), (-0.0_f64).to_bits());
+            assert!(failed.selected_heat_balance_globals.is_some());
+            failed.ordinary_solar_radiation.take().ok_or("failed State lost moved actual Solar owner")?
         } else {
             use crate::heat_balance::radiation::ordinary::{OrdinaryRadiationError, OrdinaryRadiationUnavailable};
             assert!(matches!(result, Err(RuntimeError::OrdinaryRadiation(error))

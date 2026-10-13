@@ -1,0 +1,1079 @@
+{
+  "schema": "src06-same-environment-outdoor-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/0a/0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+    "sha256": "0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a"
+  },
+  "assembly": {
+    "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/manifest.json",
+    "sha256": "2dd2a0449b1b5867cbf7dbcafb8fccc423ef8247bc75a5ade699d341253f3099",
+    "size_bytes": 20555
+  },
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/manifest.json",
+      "sha256": "2dd2a0449b1b5867cbf7dbcafb8fccc423ef8247bc75a5ade699d341253f3099",
+      "size_bytes": 20555
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/apply.json",
+      "sha256": "b51eff5ea7f9658b8732283e7895aa3b3b7214180a05d33ba97c93464bd9497e",
+      "size_bytes": 10687
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/manifest.json",
+      "sha256": "228825afb936cb3e28b7d0d226a1a039fc59909bdd948f10bd4302575f1fa3b6",
+      "size_bytes": 20519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-Source-review-02/review.json",
+      "sha256": "cbbecf799ab08c27221040fef8e7b41f57e6a4bb4f98a48cbfc446cbb4e66fef",
+      "size_bytes": 20142
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/manifest.json",
+      "sha256": "c36dde44363d638c74a046ce6784f6c7c4b5cf4030a6cabd9b8e6b3ff2756871",
+      "size_bytes": 18474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-correction-prep-01/manifest.json",
+      "sha256": "9ab8fa83c2d7d1c5081ffa8a97c456fe791425c416ca3c407413ca26dca83169",
+      "size_bytes": 2844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-correction-Source-review-01/review.json",
+      "sha256": "7741e20f7105715901b2c9fe99bf4bfdac1711be3e16456ebfc8e3d33c24b3a3",
+      "size_bytes": 6083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-application-review-01/review.json",
+      "sha256": "68696b4340323a0edfb4a67ee5891bc6bb8061196267bdd1217c1baa4ec6801e",
+      "size_bytes": 17312
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-01/receipt.json",
+      "sha256": "23d170b54747578c537f9c50fc2d9c489c1d9b126b8d5d01b93e33507842acbf",
+      "size_bytes": 3833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-01/receipt.json",
+      "sha256": "937901e47d158989db24c5597e1b3874dfb07bafaf2a374583b0b3fbae9fd542",
+      "size_bytes": 3882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-01/receipt.json",
+      "sha256": "2d8155351acd7e8fbc4c5bbe96690052287d249539512baf09912706027ca2c5",
+      "size_bytes": 3883
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "576190619787c358c45ae13477a3b8e072ab7f29430a994afc72a67b721c8ade",
+      "size_bytes": 11594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "18cc94418ad07b3a3a62a27c92d2d67c64b4e53c14bb582b8f3edf636e8424d1",
+      "size_bytes": 13942
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "071e0cf18e497cc95b7f664e570822a0527c95ee3d42382c69575009ef8844e4",
+      "size_bytes": 14059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "071e0cf18e497cc95b7f664e570822a0527c95ee3d42382c69575009ef8844e4",
+      "size_bytes": 14059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "3c27e106e37407030bc028f652365709855ade28d5e285f9d5afc3aeda1c9a62",
+      "size_bytes": 8294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "efafb6c1f201474991f46ac7159ba98984cdfe498e6e157667bd9220bc600263",
+      "size_bytes": 2889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "a5b9bd7cc96f1909cf732a16cf217d51302b1bc940261bcdf872419814175733",
+      "size_bytes": 5888
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "7a4e401127b17fb7eabb4897b5c82163b9b1c816e37673c41e363ec1ebb563e0",
+      "size_bytes": 6662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "7a4e401127b17fb7eabb4897b5c82163b9b1c816e37673c41e363ec1ebb563e0",
+      "size_bytes": 6662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "efab19e761326733f08fe0af681197797dbff53a908f7c91c9127e21de99380f",
+      "size_bytes": 7027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "44153f75c3f9660f4c08fec2f56633e791b8229d3711f556369e8444f99964cf",
+      "size_bytes": 8321
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "a54af570cf047a0a6b49f89d65f485cb9f7bb3e72f4fdbcfb9dc91fd7b81d25b",
+      "size_bytes": 6886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "88902372ae7921fd94499709060f2e8699fafdc9d4cd26628c39312d04ff1cae",
+      "size_bytes": 11085
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "3a2f0af5e991cf6f169ac97e53838cd950c1c740e6f5d295382b1b98f50f51cf",
+      "size_bytes": 11758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "3a2f0af5e991cf6f169ac97e53838cd950c1c740e6f5d295382b1b98f50f51cf",
+      "size_bytes": 11758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "c23c7a944a2956671e5df59a14a997b1a64704316b0421a1e210b1cffcc1dce7",
+      "size_bytes": 5536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "5a494cb11ab5ec2e85821cd141980f339b09c730bda1de655bcdb4f7348b825e",
+      "size_bytes": 7455
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "aab06f785b0ab958f2a8f44b183f75c0f4e70ebb18c300ab9a1fc5a9aeaf0d78",
+      "size_bytes": 27286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "09af2679bb8a6fe3f965a41ebcd0a0ca6ef3bd0d837f1be231c80a1ce6086b28",
+      "size_bytes": 27604
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "09af2679bb8a6fe3f965a41ebcd0a0ca6ef3bd0d837f1be231c80a1ce6086b28",
+      "size_bytes": 27604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "09af2679bb8a6fe3f965a41ebcd0a0ca6ef3bd0d837f1be231c80a1ce6086b28",
+      "size_bytes": 27604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "8359aeca802f4470e911c3b163ee95ec0a570010ebe3cbbe800cfe27f96775a5",
+      "size_bytes": 942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+      "size_bytes": 3173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "fcffc5aa768e1109df7b22bd9ce0acdcb8ed22f8a54cb2da8ce89f9ba9f10b88",
+      "size_bytes": 3205
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "fcffc5aa768e1109df7b22bd9ce0acdcb8ed22f8a54cb2da8ce89f9ba9f10b88",
+      "size_bytes": 3205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "fcffc5aa768e1109df7b22bd9ce0acdcb8ed22f8a54cb2da8ce89f9ba9f10b88",
+      "size_bytes": 3205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "ed14b57ef1a1049384fdbbc807cb1eb7ca06e59a8bfd4599a2631e88a81e3322",
+      "size_bytes": 410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+      "size_bytes": 23780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "74f487fdbab3cb1f599466f43d3692635fc416812d34751c2fcc322db85ece08",
+      "size_bytes": 23816
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "74f487fdbab3cb1f599466f43d3692635fc416812d34751c2fcc322db85ece08",
+      "size_bytes": 23816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "74f487fdbab3cb1f599466f43d3692635fc416812d34751c2fcc322db85ece08",
+      "size_bytes": 23816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "bccf2681274648d568ad6f1f2cb86186f39adb23f19c528093b61a3d684d514a",
+      "size_bytes": 360
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "526d6489a2ef11c87e1bf2cc79e8f64a9e1a4fce87cf463376f7f9659b446387",
+      "size_bytes": 32828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-correction-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "adfede01d5313a2a72605b5205c3a3c7116d2f50b22873b0617ceaabccf1e984",
+      "size_bytes": 34786
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "sha256": "adfede01d5313a2a72605b5205c3a3c7116d2f50b22873b0617ceaabccf1e984",
+      "size_bytes": 34786
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/runtime.rs",
+      "sha256": "adfede01d5313a2a72605b5205c3a3c7116d2f50b22873b0617ceaabccf1e984",
+      "size_bytes": 34786
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "8f4e952bf1c095c11a00cc1658977a71faee4a29d619548d92fedbfa09661f7f",
+      "size_bytes": 5590
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "d1ded98c753371a2c6403e9102c67359f493dd1137283f2877bce1d2b3dffac8",
+      "size_bytes": 16241
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "f280eed927d1157885cb41987fea158876efa168002e25d49c02b96da70f87c6",
+      "size_bytes": 18684
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "f280eed927d1157885cb41987fea158876efa168002e25d49c02b96da70f87c6",
+      "size_bytes": 18684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/after/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "f280eed927d1157885cb41987fea158876efa168002e25d49c02b96da70f87c6",
+      "size_bytes": 18684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/complete_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "88de6a173c9fbc46d24e9f46e9e328d64d4c50f20715a8da6337fc0c76f8141b",
+      "size_bytes": 3699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-02/held_to_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-reviewed-packet-Root-02.py",
+      "sha256": "c7e366356d849444567a18cdf7a7fd6150983a774825c3247c7beb1ad7246d07",
+      "size_bytes": 2263
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.cc",
+      "sha256": "7635486c6051b3ab4d2be69ab3e419ce2cccb5f988bc44fe4ac6d1017bc6ccad",
+      "size_bytes": 54019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/Original/DataHeatBalance.cc.144-214.txt",
+      "sha256": "c359bc2ab6b6da97b6cf0963c850eddff09450752b7ac2950199519d51f4ed7c",
+      "size_bytes": 2889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/Original/DataHeatBalance.cc.302-339.txt",
+      "sha256": "9db9cfcc8e74350bd9dd394b8e8f94cd8c8cf4b4a9103df70fc0c3ad888454d9",
+      "size_bytes": 1098
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.cc",
+      "sha256": "7c73d349c92e3f6bee981d6b5400870b4640136728f1226b00e0c1fa13ba3121",
+      "size_bytes": 12552
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/Original/DataEnvironment.cc.236-248.txt",
+      "sha256": "acae1a3945c9e49b814daf115e6c86e67217d4e18ff99bb6fd182fdba9abc308",
+      "size_bytes": 760
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/Original/HeatBalanceManager.cc.2742-2820.txt",
+      "sha256": "d7517a03bcbf5d5d7de47316c895cafd105ba6ea5adaef88e28155bec719670c",
+      "size_bytes": 5322
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+      "size_bytes": 698972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/Original/HeatBalanceSurfaceManager.cc.299-354.txt",
+      "sha256": "1fb160b180d9ebc4032a3ae39537804424854645c04c59dec12dcb981ba2e805",
+      "size_bytes": 3338
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "fe28c7e2d965ed7108eb4f87c5eaea60079b6d0333374c8fe6a8f3412883710f",
+      "size_bytes": 54515
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "a5945eee6c7e06077f00fc079c6828e1ee3948d5d60fb51c86fecadeccd4e8eb",
+      "size_bytes": 15189
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_globals.rs",
+      "sha256": "2dacc792a3f3bd176945b8462ade7d8fae4c7163df0208a71a0df71d3df3a377",
+      "size_bytes": 2780
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production/source_environment.rs",
+      "sha256": "4585a9e43cb0a202e53e281a147147ad4ce31116af62558dea977aec3bef056f",
+      "size_bytes": 7093
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "057bee754fb84e4a040d90492e9fd91fbcc890e9a90fbd3a87fa536bcbf3dea0",
+      "size_bytes": 16087
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+      "sha256": "18f38186b243c2369bf142c97c5c2280829af2f2c64f3da3b75edc7d454e1c9b",
+      "size_bytes": 3054
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+      "sha256": "ea04180ea8d05a2d3cc58b89699758df5a4c3c8eb2ad3c0c524fdbecaa289efb",
+      "size_bytes": 11831
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+      "sha256": "357189200effa9e7fbbf3e5cd34fb9b2ddc59d05c7b69ea288a532245705a710",
+      "size_bytes": 21222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-input-assembly-03/manifest.json",
+      "sha256": "befac98ef8fadbaff474407f2f01543f3e6e1bc17053b074393ed6db1cee6c15",
+      "size_bytes": 103972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/manifest.json",
+      "sha256": "92d5f11bbd05014ae16de26b8f02d69e0a42b417a2ccb756dbe1022d994f5a23",
+      "size_bytes": 12452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "576190619787c358c45ae13477a3b8e072ab7f29430a994afc72a67b721c8ade",
+      "size_bytes": 11594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "925837af101962ddcb135b22f9386f052f8b6d28fc09cfd9108148cdfe9aeae8",
+      "size_bytes": 8164
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "9d2175aa7f0929441a1285c4093c1a718deb6e416c1f4ee5f63d10dc9ef65efd",
+      "size_bytes": 28795
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "a509a170263544a21ea5af0dde1918b32cedfbb0cfbeb38766a842a709abaacd",
+      "size_bytes": 6115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "65d4a058c66843b09ffb87c2424cd4447737258683d586e2acd0142a5f261772",
+      "size_bytes": 966
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "a54af570cf047a0a6b49f89d65f485cb9f7bb3e72f4fdbcfb9dc91fd7b81d25b",
+      "size_bytes": 6886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "9a25e9fada1cb93f281b379de5b31588f731da867859e188c7a23113d74b9395",
+      "size_bytes": 4791
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "22089d9580283b69da8eb2d7fb1162ae429bd2069bf5c8514cc95f57a2c417de",
+      "size_bytes": 23314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "526d6489a2ef11c87e1bf2cc79e8f64a9e1a4fce87cf463376f7f9659b446387",
+      "size_bytes": 32828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "74930953ee0c0814bbd85e4e95db29aa7567abcd691b178d32c4414c7accd455",
+      "size_bytes": 34592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "ed40a1130a36b5be9fd739b3873c5b557928bad7263ce3568976298389742ff7",
+      "size_bytes": 5384
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "489eb9b516b461f6f88665b213b67801ec78222adeb3c28a22eb9a95179b26b8",
+      "size_bytes": 69987
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+      "size_bytes": 23780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "bccf2681274648d568ad6f1f2cb86186f39adb23f19c528093b61a3d684d514a",
+      "size_bytes": 360
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "b57a015c0fde000f4e2153fa9a81a52373ed0f7c2fcf47548313b78c8e1a0ffb",
+      "size_bytes": 49772
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+      "size_bytes": 3173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "ed14b57ef1a1049384fdbbc807cb1eb7ca06e59a8bfd4599a2631e88a81e3322",
+      "size_bytes": 410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "128947e97bf239dd064ec8b6e841f40c7a86a37d3060e19a3d0bb1335785d2fe",
+      "size_bytes": 6940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "aab06f785b0ab958f2a8f44b183f75c0f4e70ebb18c300ab9a1fc5a9aeaf0d78",
+      "size_bytes": 27286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "8359aeca802f4470e911c3b163ee95ec0a570010ebe3cbbe800cfe27f96775a5",
+      "size_bytes": 942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "df7ab6d33f3ad82de88ccab5c339768fa6143be59f8b90dcfbd5669eb8acbf9c",
+      "size_bytes": 1017
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "d1ded98c753371a2c6403e9102c67359f493dd1137283f2877bce1d2b3dffac8",
+      "size_bytes": 16241
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "88de6a173c9fbc46d24e9f46e9e328d64d4c50f20715a8da6337fc0c76f8141b",
+      "size_bytes": 3699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/exact_parent_diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "4059fa4b7d75e79d01dba60fa83fb2b01630d1734dd9bcc966c7c4602197e5f3",
+      "size_bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/README.md",
+      "sha256": "8debf38c53d91c951acbfdee9c90359e16b3b87dab1cf2efff1248a5bf57a493",
+      "size_bytes": 4722
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-same-environment-outdoor-Owner-02.py",
+      "sha256": "6dfdd9639d84368bd62c806ca0a230f55afc39493101b686891070c55bb81748",
+      "size_bytes": 18469
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-input-assembly-02/manifest.json",
+      "sha256": "1f3340abd98595022b4def0ab6d2904d3be611ec1766b113063fc7b473cf7018",
+      "size_bytes": 99683
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "576190619787c358c45ae13477a3b8e072ab7f29430a994afc72a67b721c8ade",
+      "size_bytes": 11594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "0413d38bb58fb0a05466255a6785e801e914ef914caaf5a327fe0809108ffd6c",
+      "size_bytes": 13806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "33d8b46cbe02ab83caa356e2b38cfc8bc0192eae4d7a2dcd362563430ae8620a",
+      "size_bytes": 26238
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "fb1d92a2c4f87106831623643a656747e345e462debca5868e0aadaae56a161b",
+      "size_bytes": 5854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "3444bddde6519c7922309e03f39a1852277acc362eaec7888f2600d2f66ca9f0",
+      "size_bytes": 6006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "a54af570cf047a0a6b49f89d65f485cb9f7bb3e72f4fdbcfb9dc91fd7b81d25b",
+      "size_bytes": 6886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "5b3eb4f8879facb2efb9b6d84d912701961606677dffbfac59086a4599c9f40f",
+      "size_bytes": 11351
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "f827ce2bc327f5ce74e858a3bd8036e717e0f73ded5e6a97445a8b45477d7ced",
+      "size_bytes": 18897
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "526d6489a2ef11c87e1bf2cc79e8f64a9e1a4fce87cf463376f7f9659b446387",
+      "size_bytes": 32828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "278a8148b0f5f5bfd9f58a2beabdbd4d12e79e46e2221a43a646c24b901544d6",
+      "size_bytes": 33622
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "d8cb4edc99f58bf0d9fd436e53f2d6f5a3ee0f9c8b20f5270d93c057010a811d",
+      "size_bytes": 68035
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+      "size_bytes": 23780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "18e38e8ef57c04a493675b0109f5de459d906da675fd953f1ce0910caf15bf90",
+      "size_bytes": 24440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "40e0500be7e8f2e7184bc68dc622937bcc92c79962c6edbbc7e86f4a191f2772",
+      "size_bytes": 49585
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/before/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+      "size_bytes": 3173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/proposed/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "01e59ed141336813e01e2708fe63a3b6dace9e44fac697fab91207404d04aa71",
+      "size_bytes": 3283
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/diffs/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "031447fe1133aae95d4ead4cb3efa20fe4ee99abfd7030c499e749f4bb168946",
+      "size_bytes": 6757
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-01/README.md",
+      "sha256": "058f8fd5dee39e1d03f2dfe73c00fc0cd5aa66ee68f55b05ece99091ed04a08a",
+      "size_bytes": 2814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-same-environment-outdoor-Owner-01.py",
+      "sha256": "1ea8100cbc94f3f60e92c1151279d07943154e051d1b22416ff6250af8e93a43",
+      "size_bytes": 24282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-same-environment-outdoor-Header-02.py",
+      "sha256": "44f9bb80eef28dd4e1de795d1f092be7d2956eaaef9c6368ad84fb335c6a14af",
+      "size_bytes": 9406
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-application-review-02/review.json",
+      "sha256": "d7ccc927808a9d8ce0a8fd4ac0660454789a9f6214dbe75a61e75fa24a765324",
+      "size_bytes": 16012
+    },
+    {
+      "path": ".runtime/porting/source-objects/0a/0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+      "sha256": "0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+      "size_bytes": 1664778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-02/receipt.json",
+      "sha256": "c669dde4c42d941aa02494c9bbc9dafb78dd2b5136002785c025805cb7fe3752",
+      "size_bytes": 3833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-same-environment-outdoor-application-Header-02.py",
+      "sha256": "aade9d42c6f29d0f424cdf548909184dd6b99a5152767b856067ddfbba31351d",
+      "size_bytes": 7993
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-outdoor-correction-Root-01.py",
+      "sha256": "a9b216a7a1ac97d1a9f1d2e10b18663ce50867d82867b4b4dfbea727bf689419",
+      "size_bytes": 4487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/apply.json",
+      "sha256": "ed5b89ffaa5bb75684695b049685a74e7f70ac79d7aef8730f7e06a56d7dfab3",
+      "size_bytes": 9063
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "576190619787c358c45ae13477a3b8e072ab7f29430a994afc72a67b721c8ade",
+      "size_bytes": 11594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+      "sha256": "071e0cf18e497cc95b7f664e570822a0527c95ee3d42382c69575009ef8844e4",
+      "size_bytes": 14059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "3c27e106e37407030bc028f652365709855ade28d5e285f9d5afc3aeda1c9a62",
+      "size_bytes": 8294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary.rs.diff",
+      "sha256": "efafb6c1f201474991f46ac7159ba98984cdfe498e6e157667bd9220bc600263",
+      "size_bytes": 2889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+      "sha256": "7a4e401127b17fb7eabb4897b5c82163b9b1c816e37673c41e363ec1ebb563e0",
+      "size_bytes": 6662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "efab19e761326733f08fe0af681197797dbff53a908f7c91c9127e21de99380f",
+      "size_bytes": 7027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary__source.rs.diff",
+      "sha256": "44153f75c3f9660f4c08fec2f56633e791b8229d3711f556369e8444f99964cf",
+      "size_bytes": 8321
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "a54af570cf047a0a6b49f89d65f485cb9f7bb3e72f4fdbcfb9dc91fd7b81d25b",
+      "size_bytes": 6886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+      "sha256": "3a2f0af5e991cf6f169ac97e53838cd950c1c740e6f5d295382b1b98f50f51cf",
+      "size_bytes": 11758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "c23c7a944a2956671e5df59a14a997b1a64704316b0421a1e210b1cffcc1dce7",
+      "size_bytes": 5536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__convection__surface_environment__ordinary_tests.rs.diff",
+      "sha256": "5a494cb11ab5ec2e85821cd141980f339b09c730bda1de655bcdb4f7348b825e",
+      "size_bytes": 7455
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "526d6489a2ef11c87e1bf2cc79e8f64a9e1a4fce87cf463376f7f9659b446387",
+      "size_bytes": 32828
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/runtime.rs",
+      "sha256": "474c2fecf6f05cd1a8816a753ae532fe64eac93f8fc65d80a4443e4971e7f67e",
+      "size_bytes": 34801
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "b042fb3dfb32b8438f044e7b81563cf9c694693af9ec5342011270d482849294",
+      "size_bytes": 5605
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__runtime.rs.diff",
+      "sha256": "1bff7b5aaee46a0155e7cc0ee87abdc452bfa75e661f019cf95ca1a3cebb5ee8",
+      "size_bytes": 2709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "7416d1ffd4a96fca4a88b9acff0e4e8e35fd0f311ff24f8e35a39e00145e230b",
+      "size_bytes": 23780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "74f487fdbab3cb1f599466f43d3692635fc416812d34751c2fcc322db85ece08",
+      "size_bytes": 23816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "bccf2681274648d568ad6f1f2cb86186f39adb23f19c528093b61a3d684d514a",
+      "size_bytes": 360
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "def2a55d3d3bdad25a49a1e1533f359b7841dd80d1d6784d13b060bf5ce3e6a5",
+      "size_bytes": 3173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "sha256": "fcffc5aa768e1109df7b22bd9ce0acdcb8ed22f8a54cb2da8ce89f9ba9f10b88",
+      "size_bytes": 3205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "ed14b57ef1a1049384fdbbc807cb1eb7ca06e59a8bfd4599a2631e88a81e3322",
+      "size_bytes": 410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__run_period__standalone.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "aab06f785b0ab958f2a8f44b183f75c0f4e70ebb18c300ab9a1fc5a9aeaf0d78",
+      "size_bytes": 27286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "09af2679bb8a6fe3f965a41ebcd0a0ca6ef3bd0d837f1be231c80a1ce6086b28",
+      "size_bytes": 27604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "8359aeca802f4470e911c3b163ee95ec0a570010ebe3cbbe800cfe27f96775a5",
+      "size_bytes": 942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "d1ded98c753371a2c6403e9102c67359f493dd1137283f2877bce1d2b3dffac8",
+      "size_bytes": 16241
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "f280eed927d1157885cb41987fea158876efa168002e25d49c02b96da70f87c6",
+      "size_bytes": 18684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/complete_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "88de6a173c9fbc46d24e9f46e9e328d64d4c50f20715a8da6337fc0c76f8141b",
+      "size_bytes": 3699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/held_to_actual_diff/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-reviewed-packet-Root-01.py",
+      "sha256": "ee866fe1a9518480652b433c6fd94744478977d3faa205be9946237b3a242887",
+      "size_bytes": 2204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-03.py",
+      "sha256": "a0e5840d5953e1e9663c65726ea6f922706eb1f805525edd5883d4a98b517414",
+      "size_bytes": 3603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-reviewed-packet-Root-02.py",
+      "sha256": "5a695f87dcbc39c0c936ba23168019cd9fdb60262bade15dc7e8828aeb16ea28",
+      "size_bytes": 3664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-correction-prep-01/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "474c2fecf6f05cd1a8816a753ae532fe64eac93f8fc65d80a4443e4971e7f67e",
+      "size_bytes": 34801
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-correction-prep-01/runtime.rs.diff",
+      "sha256": "d12e4e5f287f415a58779b11e263076642a1e311b945b9c7f9b7a973840ed415",
+      "size_bytes": 335
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-outdoor-correction-Root-01.py",
+      "sha256": "f2404c8ca2179839581df9d51b9123cef1af898f327bf916b7a4f341fce0a84f",
+      "size_bytes": 3249
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/cf/cf36d99712d95e66c217f7c6233ecb6a1e80ae982ca64faff43c1e2829681379",
+      "sha256": "cf36d99712d95e66c217f7c6233ecb6a1e80ae982ca64faff43c1e2829681379",
+      "size_bytes": 1664778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-01/stdout.log",
+      "sha256": "9c423adc4366fa56fe90dadc5eac620aa6ac20f95818bab2afd8482046bf85c3",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-01/stderr.log",
+      "sha256": "ec55edd8069cfc47e8919f61d913b0d5f8f8c6ef6ae2bcd312054d0ef740d0a8",
+      "size_bytes": 875
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-outdoor-correction-Header-01.py",
+      "sha256": "b94a0b3bb78f1de25600ec3f7f5c5382c860ed697b2e348d3a71851d79f5950f",
+      "size_bytes": 4689
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-same-environment-outdoor-application-Header-01.py",
+      "sha256": "4d63df6655894c2bd8f000a8b3665521eb2400d20ca14af04458b78f038348d7",
+      "size_bytes": 8892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-02/receipt.json",
+      "sha256": "51b9b220c45e2a3d7aab8050cf64483534bc59a9e1c4455b16a2bb488721f88e",
+      "size_bytes": 3883
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-02/stdout.log",
+      "sha256": "9c423adc4366fa56fe90dadc5eac620aa6ac20f95818bab2afd8482046bf85c3",
+      "size_bytes": 82
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-02/receipt.json",
+      "sha256": "e5fa20f24bd439179a2a64f214854bd1b266192fe887ddb6f06e19c5754dbd98",
+      "size_bytes": 3880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-02/stderr.log",
+      "sha256": "75ba0e042943f51ea99b1fed6611ea7ca0505d1ec275bb9223460ea88ae004fc",
+      "size_bytes": 363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-focused-tests-02/receipt.json",
+      "sha256": "7b95c074e4eb0b57daf26ee3c9fedf5ad17cedb0264e04f2dc88fcd87af95d0a",
+      "size_bytes": 4018
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-focused-tests-02/stdout.log",
+      "sha256": "2b512fb7228bc9acbc360e684f5ca9f757e91cee879dd0d8e05aeaf685e309da",
+      "size_bytes": 770
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-focused-tests-02/stderr.log",
+      "sha256": "5322e49152746dafa8544a33de673fa9bd448243be3fbe48eb5a353a1747285c",
+      "size_bytes": 254
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-cli-tests-02/receipt.json",
+      "sha256": "cf3618db2b494b5291075a0a040674ffcbbf357f25194718aba10958d3797124",
+      "size_bytes": 3919
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-cli-tests-02/stdout.log",
+      "sha256": "34363468186e2c3223919cfe0cd4d362b4f439d1d92a80c5b6515215d4e17dd8",
+      "size_bytes": 170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-cli-tests-02/stderr.log",
+      "sha256": "54aa6e25eddbb885400f5a23f932ee3d0b6a97ee4b07b78a41ef06fd14daf7f1",
+      "size_bytes": 357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-ci-timestep-tests-02/receipt.json",
+      "sha256": "f6ad039a9c7c352baeeda1f129e78065f0ce624b403ead6398677c3bb2ccfc9a",
+      "size_bytes": 3922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-ci-timestep-tests-02/stdout.log",
+      "sha256": "c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1",
+      "size_bytes": 258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-ci-timestep-tests-02/stderr.log",
+      "sha256": "b5e861b561ab2dde80af736ee77054f3c73d7adf82bd0e4bd2942fa5939b2f17",
+      "size_bytes": 152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-outdoor-Root-01.py",
+      "sha256": "4de13b131b102b4c582b058b2b11cb72062d45292aa683e02ea3695ccab818b3",
+      "size_bytes": 13141
+    }
+  ],
+  "historical_references": [
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+        "sha256": "18cc94418ad07b3a3a62a27c92d2d67c64b4e53c14bb582b8f3edf636e8424d1",
+        "size_bytes": 13942
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary.rs",
+        "sha256": "18cc94418ad07b3a3a62a27c92d2d67c64b4e53c14bb582b8f3edf636e8424d1",
+        "size_bytes": 13942
+      },
+      "qualification": "Immutable exact historical bytes, not relabeled current."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+        "sha256": "a5b9bd7cc96f1909cf732a16cf217d51302b1bc940261bcdf872419814175733",
+        "size_bytes": 5888
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary/source.rs",
+        "sha256": "a5b9bd7cc96f1909cf732a16cf217d51302b1bc940261bcdf872419814175733",
+        "size_bytes": 5888
+      },
+      "qualification": "Immutable exact historical bytes, not relabeled current."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+        "sha256": "88902372ae7921fd94499709060f2e8699fafdc9d4cd26628c39312d04ff1cae",
+        "size_bytes": 11085
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+        "sha256": "88902372ae7921fd94499709060f2e8699fafdc9d4cd26628c39312d04ff1cae",
+        "size_bytes": 11085
+      },
+      "qualification": "Immutable exact historical bytes, not relabeled current."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "74930953ee0c0814bbd85e4e95db29aa7567abcd691b178d32c4414c7accd455",
+        "size_bytes": 34592
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-prep-02/proposed/crates/ep_runtime/src/runtime.rs",
+        "sha256": "74930953ee0c0814bbd85e4e95db29aa7567abcd691b178d32c4414c7accd455",
+        "size_bytes": 34592
+      },
+      "qualification": "Immutable exact historical bytes, not relabeled current."
+    },
+    {
+      "historical_reference": {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "474c2fecf6f05cd1a8816a753ae532fe64eac93f8fc65d80a4443e4971e7f67e",
+        "size_bytes": 34801
+      },
+      "exact_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-assembly-01/after/crates/ep_runtime/src/runtime.rs",
+        "sha256": "474c2fecf6f05cd1a8816a753ae532fe64eac93f8fc65d80a4443e4971e7f67e",
+        "size_bytes": 34801
+      },
+      "qualification": "Immutable exact historical bytes, not relabeled current."
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip",
+    "sha256": "6fd7c39992e5bdaa89c2fcaa703dea84bfb53741ea709b5a6fd4e9257acf6747",
+    "size_bytes": 1188583
+  },
+  "archive_member_count": 198,
+  "archive_scope": "Eight actual full Source02 before/after files and final/formatter diffs, immutable Source01 custody and one literal Option correction; two finite preparations and their exact proposal custody; five literal Original ranges; independent Source/application/correction reviews; six final and three genuine historical QA receipts/logs/Source indexes. Older HB full archives and Native objects are referenced rather than recursively bundled.",
+  "gates_updated": false
+}

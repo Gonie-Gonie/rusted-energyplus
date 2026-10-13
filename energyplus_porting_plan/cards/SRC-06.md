@@ -82,7 +82,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 21개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 22개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -107,6 +107,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 실행 전 검사 / Sizing·출력 시간 연결 | [요약](../evidence/SRC-06-ordinary-run-prefix/summary.json) · [색인](../evidence/SRC-06-ordinary-run-prefix/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-run-prefix/evidence.zip) | 실제205/213–241의 검사·등록·bounds·서비스·8개 sizing getter, 동일 상태와 오류 prefix. 전체 startup/Setup·Native 수치 완료는 아님. |
 | 실제 kickoff 직전 검사 / sizing 조정의 비활성 경로 | [요약](../evidence/SRC-06-ordinary-run-prefix-checks/summary.json) · [색인](../evidence/SRC-06-ordinary-run-prefix-checks/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-run-prefix-checks/evidence.zip) | 실제243–267의 Available·Branch fatal·DisplayString과 두 실제 비활성 sizing 조정 함수. Kickoff268/Reset270/Setup272·양의 sizing 수치 완료는 아님. |
 | 실제 HB 입력 / 기상·출력 소유자 전달 | [요약](../evidence/SRC-06-ordinary-hb-input/summary.json) · [색인](../evidence/SRC-06-ordinary-hb-input/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-hb-input/evidence.zip) | 동일 IP·기상·EIO/MTD의 ProjectControl/Site/Material/Construction/Shadowing/Zone 입력과 기존 geometry 사용. 전체 GetHBInput/SurfaceTmp/Setup·수치 완료는 아님. |
+| 동일 기상 상태 / Zone·Surface 외기와 오류 보존 | [요약](../evidence/SRC-06-ordinary-same-environment-outdoor/summary.json) · [색인](../evidence/SRC-06-ordinary-same-environment-outdoor/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip) | 동일 Station/Site/current와 Zone 온도→guard→풍속·풍향→기존 Surface. 실패한 실제 State를 이동 보존; 전체 InitHB/Setup·Native 수치 완료는 아님. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -157,6 +158,10 @@ Source `7fc13f241290a1edb5caaba011937b9328020662df20820ddaf9b680f08458ca`에서 
 ## 실제 HB 입력 연결 단위의 QA
 
 Source `7cef065bae90e71aafb7bc3d64fc788ce8a06d0f1199b3c3474bc72fbbca8ba8`에서 fmt·source-quality·all-target workspace Clippy와 기존 테스트 **16 passed / 0 failed / 0 ignored**를 확인했다. raw IDF 필드 개수1·compiler 보고 입력8·runtime3·입력/오류2를 네 패키지의 한 Cargo 선택으로 묶어14개를 실행했고, 일반 CLI1·실제 `CI_FORCE_TIME_STEP=Y` CLI1을 확인했다. 실제 Station→Building→Site→Shadow EIO 순서·MTD와 출력 getter의 local scratch/unused/오류 prefix를 검사했다. Source01 컴파일 실패101, Source02 Clippy와 오래된 staged-IDF 불일치 실패101·부분 성공10개를 보존했다. API/import/기존 호출부와 동일 출력·문자 집합의 lint 문법 및 해당 fixture를 수정한 최종 Source03에서 확인했으며 생산 검증은 완화하지 않았다. 새 본문·binary·전체 workspace 중복 실행·새 Native 실행은 없다. 앞 단위의 성공은 합산하지 않으며 모든 gate와 A/B 완료 수는 그대로다.
+
+## 동일 기상 상태 외기 연결 단위의 QA
+
+Source `0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a`에서 fmt·source-quality·all-target workspace Clippy와 기존 테스트 **7 passed / 0 failed / 0 ignored**를 확인했다. runtime 한 선택으로 기존 외기 guard4·초기화 table1을 묶고 일반 CLI1·실제 `CI_FORCE_TIME_STEP=Y` CLI1을 실행했다. 기존 본문3개에서 기상 매개변수·부호 있는0·cold fatal 이전 완료 온도/미실행 wind 및 실제 Surface/Solar와 작성한 Zone/global의 이동 보존을 검사했다. Source01 Clippy101과 이전 bytes/로그를 보존했고, 같은 마지막 컨텍스트를 직접 전달한 Source02에서 확인했다. 실제 전체 runtime 실패/새 Native endpoint는 이 PASS의 범위가 아니다. 새 본문·binary·전체 workspace 반복·새 Native 실행은 없다. 앞 단위 성공을 합산하지 않으며 모든 gate와 A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

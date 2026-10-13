@@ -88,6 +88,10 @@ pub struct CtfInitializationReports {
     /// Raw Material operands, retaining original loader format/order.
     pub selected_material_input: Option<super::selected_material_data::SelectedMaterialInput>,
     pub(crate) selected_material_data: super::selected_material_data::SelectedMaterialData,
+    /// Rust failure custody after the Source-connected State has been moved.
+    /// On a later outdoor/runtime error the actual State moves here without
+    /// cloning its Zone/global/Solar owners; this is not an Original flag.
+    pub(crate) failed_heat_balance_state: Option<Box<super::state::HeatBalanceState>>,
     /// Actual partial Zone/Space arrays, moved only after initializer success.
     pub(crate) selected_zone_input:
         Option<super::selected_heat_balance_input::zone::SelectedZoneInputOwners>,

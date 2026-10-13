@@ -12601,6 +12601,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-input/summary.json",
         "sha256": "0870832d0106eababfcad7449dcd8153d30e2f38566a46a7c635e86e886f43ec",
         "size_bytes": 13136
+      },
+      "actual_selected_ordinary_same_environment_outdoor": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-same-environment-outdoor/summary.json",
+        "sha256": "8ed55cf5031f394c71b0c39d9fdd6fc48c2682955c8c778c65b519f58def2c3f",
+        "size_bytes": 9010
       }
     },
     {

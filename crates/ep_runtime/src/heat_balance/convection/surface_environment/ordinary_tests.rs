@@ -64,6 +64,88 @@ fn three_operand_minimum_retains_objexx_nan_and_tie_routes() {
         (-0.0_f64).to_bits()
     );
     assert_eq!(minimum_three(0.0, -0.0, 0.0).to_bits(), 0.0_f64.to_bits());
+
+    use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneData;
+    let mut zones = [SelectedZoneData {
+        name: "actual Zone owner".into(),
+        centroid_m: Some([0.0, 0.0, 10.0]),
+        ..Default::default()
+    }];
+    let mut parameters = SurfaceOutdoorEnvironmentParameters {
+        site_temperature_gradient_k_per_m: 0.0,
+        weather_file_temperature_modifier_c: 123.0,
+        site_wind_exponent: 0.0,
+        site_wind_boundary_layer_height_m: 77.0,
+        weather_file_wind_modifier: 19.0,
+    };
+    let weather = SurfaceOutdoorWeather {
+        dry_bulb_c: 21.0,
+        wet_bulb_c: 13.0,
+        wind_speed_m_per_s: 4.0,
+        wind_direction_deg: -0.0,
+    };
+    let (mut error_state, mut error, mut console) = (state(), Vec::new(), Vec::new());
+    assert!(
+        source::update_zones(
+            &mut zones,
+            parameters,
+            weather,
+            &mut backend(&mut error_state, &mut error, &mut console)
+        )
+        .is_ok()
+    );
+    assert_eq!(
+        [zones[0].dry_bulb, zones[0].wet_bulb, zones[0].wind_speed],
+        [21.0, 13.0, 4.0]
+    );
+    assert_eq!(zones[0].wind_direction.to_bits(), (-0.0_f64).to_bits());
+    parameters.site_temperature_gradient_k_per_m = 0.0065;
+    parameters.weather_file_temperature_modifier_c = 0.75;
+    parameters.site_wind_exponent = 0.22;
+    parameters.weather_file_wind_modifier = 1.25;
+    assert!(
+        source::update_zones(
+            &mut zones,
+            parameters,
+            weather,
+            &mut backend(&mut error_state, &mut error, &mut console)
+        )
+        .is_ok()
+    );
+    assert_eq!(
+        zones[0].dry_bulb.to_bits(),
+        (21.0_f64 + 0.75 - 0.0065 * 6_356_000.0 * 10.0 / (6_356_000.0 + 10.0)).to_bits()
+    );
+    assert_eq!(
+        zones[0].wind_speed.to_bits(),
+        (4.0_f64 * 1.25 * 77.0_f64.powf(-0.22) * 10.0_f64.powf(0.22)).to_bits()
+    );
+    zones[0].centroid_m = Some([0.0, 0.0, -1.0]);
+    assert!(
+        source::update_zones(
+            &mut zones,
+            parameters,
+            weather,
+            &mut backend(&mut error_state, &mut error, &mut console)
+        )
+        .is_ok()
+    );
+    assert_eq!(zones[0].dry_bulb, 21.75);
+    assert_eq!(zones[0].wet_bulb, 13.75);
+    assert_eq!(zones[0].wind_speed.to_bits(), 0.0_f64.to_bits());
+    zones[0].centroid_m = None;
+    let before = zones.clone();
+    assert!(matches!(
+        source::update_zones(
+            &mut zones,
+            parameters,
+            weather,
+            &mut backend(&mut error_state, &mut error, &mut console)
+        ),
+        Err(SurfaceOutdoorEnvironmentError::Unavailable(_))
+    ));
+    assert_eq!(zones, before);
+    assert!(error.is_empty());
 }
 
 #[test]
@@ -113,6 +195,64 @@ fn guard_uses_first_reached_cold_surface_and_actual_severity_state()
     let text = std::str::from_utf8(&error)?;
     assert!(text.contains("Reference severe error count=8"));
     assert!(!text.contains("must not be visited"));
+
+    use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneData;
+    let mut zones = [
+        SelectedZoneData {
+            name: "first cold Zone".into(),
+            centroid_m: Some([0.0, 0.0, 20000.0]),
+            wind_speed: -0.0,
+            wind_direction: 321.0,
+            ..Default::default()
+        },
+        SelectedZoneData {
+            name: "later Zone".into(),
+            centroid_m: Some([0.0, 0.0, 1.0]),
+            wind_speed: 987.0,
+            wind_direction: -0.0,
+            ..Default::default()
+        },
+    ];
+    let incoming = zones.clone();
+    let parameters = SurfaceOutdoorEnvironmentParameters {
+        site_temperature_gradient_k_per_m: 0.0,
+        weather_file_temperature_modifier_c: 99.0,
+        site_wind_exponent: 0.22,
+        site_wind_boundary_layer_height_m: 370.0,
+        weather_file_wind_modifier: 1.0,
+    };
+    let weather = SurfaceOutdoorWeather {
+        dry_bulb_c: -101.0,
+        wet_bulb_c: -99.0,
+        wind_speed_m_per_s: 4.0,
+        wind_direction_deg: 123.0,
+    };
+    let mut zone_error = Vec::new();
+    let result = source::update_zones(
+        &mut zones,
+        parameters,
+        weather,
+        &mut backend(&mut state, &mut zone_error, &mut console),
+    );
+    assert!(matches!(
+        result,
+        Err(SurfaceOutdoorEnvironmentError::Fatal(_))
+    ));
+    for (zone, before) in zones.iter().zip(&incoming) {
+        assert_eq!([zone.dry_bulb, zone.wet_bulb], [-101.0, -99.0]);
+        assert_eq!(zone.wind_speed.to_bits(), before.wind_speed.to_bits());
+        assert_eq!(
+            zone.wind_direction.to_bits(),
+            before.wind_direction.to_bits()
+        );
+    }
+    let text = std::str::from_utf8(&zone_error)?;
+    assert!(text.contains("SetOutBulbTempAt: Zone Outdoor Temperatures < -100 C"));
+    assert!(text.contains("...check Zone Heights - Maximum Zone Height=[20000]."));
+    assert!(text.contains("...look at Zone Name= first cold Zone"));
+    assert!(!text.contains("later Zone"));
+    assert_eq!(state.tracking.total_severe_errors, 9);
+    assert_eq!(state.tracking.total_severe_errors_during_warmup, 6);
     Ok(())
 }
 

@@ -44,6 +44,7 @@ pub(crate) fn sample_heat_balance_run_period(
                 model,
                 state,
                 weather_context,
+                weather_driver,
                 output.as_deref_mut(),
             )?;
             advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(

@@ -1,0 +1,201 @@
+{
+  "schema": "src06-same-environment-outdoor-summary.v1",
+  "status": "Actual same-production-environment Zone/Surface outdoor setters and moved failed-State custody connected; full InitHeatBalance pending",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/0a/0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a",
+    "sha256": "0a08f1192e7375d816f0119e01b79b5fb4dc222a0902d9c8ba66f0ca5b0abd4a"
+  },
+  "behavior": [
+    "The constructor, warmup and run-period outdoor calls borrow the same retained production weather session and its actual Station/Site parameters. Current weather is bit-joined to that session; no second Zone/weather owner or default terrain substitution is used for Source-connected owners.",
+    "The sole retained Zone array is updated in Original bulk order: every dry/wet temperature, first reached cold guard/fatal, every wind speed and every wind direction. Existing Surface setters follow only after that successful Zone return.",
+    "Actual complete Zone-ID sets, centroids, linked-node/EMS exclusion and Surface identity/order are validated before writes. Legacy callers without either Source owner preserve the existing surface-only route.",
+    "On fallible post-initializer preparation, initial outdoor, warmup, run-period or final-weather return, the sole Source-connected State moves into one Rust host Option<Box<HeatBalanceState>> in retained reports. Completed Zone/Surface/global/Solar owners survive without cloning or changing the actual error. The slot is not an Original flag or a retry permission."
+  ],
+  "QA": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-02/receipt.json",
+        "sha256": "c669dde4c42d941aa02494c9bbc9dafb78dd2b5136002785c025805cb7fe3752",
+        "size_bytes": 3833
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-02/receipt.json",
+        "sha256": "51b9b220c45e2a3d7aab8050cf64483534bc59a9e1c4455b16a2bb488721f88e",
+        "size_bytes": 3883
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-02/receipt.json",
+        "sha256": "e5fa20f24bd439179a2a64f214854bd1b266192fe887ddb6f06e19c5754dbd98",
+        "size_bytes": 3880
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-focused-tests-02/receipt.json",
+        "sha256": "7b95c074e4eb0b57daf26ee3c9fedf5ad17cedb0264e04f2dc88fcd87af95d0a",
+        "size_bytes": 4018
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "--",
+        "heat_balance::convection::surface_environment::ordinary::tests::",
+        "ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-cli-tests-02/receipt.json",
+        "sha256": "cf3618db2b494b5291075a0a040674ffcbbf357f25194718aba10958d3797124",
+        "size_bytes": 3919
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-ci-timestep-tests-02/receipt.json",
+        "sha256": "f6ad039a9c7c352baeeda1f129e78065f0ce624b403ead6398677c3bb2ccfc9a",
+        "size_bytes": 3922
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "historical_QA": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-fmt-01/receipt.json",
+        "sha256": "23d170b54747578c537f9c50fc2d9c489c1d9b126b8d5d01b93e33507842acbf",
+        "size_bytes": 3833
+      },
+      "exit_code": 0,
+      "qualification": "Actual Source01 result, not final Source02. No tests executed on Source01."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-quality-01/receipt.json",
+        "sha256": "937901e47d158989db24c5597e1b3874dfb07bafaf2a374583b0b3fbae9fd542",
+        "size_bytes": 3882
+      },
+      "exit_code": 0,
+      "qualification": "Actual Source01 result, not final Source02. No tests executed on Source01."
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-same-environment-outdoor-clippy-01/receipt.json",
+        "sha256": "2d8155351acd7e8fbc4c5bbe96690052287d249539512baf09912706027ca2c5",
+        "size_bytes": 3883
+      },
+      "exit_code": 101,
+      "qualification": "Actual Source01 result, not final Source02. No tests executed on Source01."
+    }
+  ],
+  "tests": {
+    "selections": [
+      {
+        "scope": "focused-tests",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "cli-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "scope": "ci-timestep-tests",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "validation_scope": "One filtered runtime lib command executes four existing outdoor guard tests and one existing initializer-table test; normal CLI1 and actual CI_FORCE_TIME_STEP=Y CLI1. Three existing bodies extended. One fmt/source-quality/all-target workspace Clippy. No full workspace-test repeat or new Native execution; earlier successes not recounted.",
+  "limitations": [
+    "Full GetSurfaceData/SetupZoneGeometry, GetHeatBalanceInput, InitHeatBalance, SetupSimulation, numerical inside/radiation/HVAC and whole-port completion remain pending.",
+    "Cold/fatal tests certify actual in-call Zone prefixes; the existing initializer-table row separately certifies move-only allocation custody using actual initialized Surface/Solar plus clearly authored Zone/global payload. It is not a captured Native error endpoint or a forced public whole-runtime failure.",
+    "The Rust host retains the most recent failed Source-connected State. Legacy/manual failures retain their previous behavior; no new retry guarantee is introduced.",
+    "Preparation01 is preserved with its CRLF proposal conversion and imprecise historical HB02/HB47 labels. Preparation02 authenticates the actual complete HB48 Source03 on clean c5c4ab18 and preserves LF. Historical language is not a remaining HB blocker.",
+    "Actual Source01 fmt/quality passed and Clippy failed101 on the final needless_option_as_deref; no tests ran on that Source. Reviewed Source02 passes the same final context directly into failed-State custody, with no later use and no owner/math/error/assertion change. Original failed receipt and all Source01 bytes remain preserved.",
+    "Whole ordinary235456 mismatches/2754 unavailable and DesignDay nine strict failures/eight UNPAIRED remain unchanged. SRC06 four gates stay unverified; A14/54 B14/64 unchanged."
+  ],
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-Source-review-02/review.json",
+    "sha256": "cbbecf799ab08c27221040fef8e7b41f57e6a4bb4f98a48cbfc446cbb4e66fef",
+    "size_bytes": 20142
+  },
+  "independent_application_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-same-environment-outdoor-application-review-02/review.json",
+    "sha256": "d7ccc927808a9d8ce0a8fd4ac0660454789a9f6214dbe75a61e75fa24a765324",
+    "size_bytes": 16012
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-same-environment-outdoor/manifest.json",
+    "sha256": "bb77538f6fec9a841042cf5495f1373423abcf525456c9f9f87cb63a3f7acf50",
+    "size_bytes": 55315
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-same-environment-outdoor/evidence.zip",
+    "sha256": "6fd7c39992e5bdaa89c2fcaa703dea84bfb53741ea709b5a6fd4e9257acf6747",
+    "size_bytes": 1188583
+  },
+  "gates_updated": false
+}

@@ -186,6 +186,7 @@ where
                     simulation_model,
                     state,
                     weather_context,
+                    weather_driver,
                     output.as_deref_mut(),
                 )?;
                 advance_timestep(

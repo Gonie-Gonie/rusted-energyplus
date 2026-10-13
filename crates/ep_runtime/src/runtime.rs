@@ -525,16 +525,25 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             };
             if reporting.is_some() {
                 if state.ordinary_equipment.is_none() {
+                    crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                        state, initialization.as_deref_mut(),
+                    );
                     return Err(RuntimeError::WarmupUnavailable {
                         reason: "missing retained geometry equipment owner".into(),
                     });
                 }
-                crate::heat_balance::convection::surface_environment::ordinary::invoke(
+                if let Err(error) = crate::heat_balance::convection::surface_environment::ordinary::invoke_from_driver(
                     model,
                     &mut state,
                     initial_weather_context,
+                    weather_driver,
                     initialization.as_deref_mut(),
-                )?;
+                ) {
+                    crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                        state, initialization.as_deref_mut(),
+                    );
+                    return Err(error);
+                }
             }
             seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
@@ -556,18 +565,28 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             Ok::<_, RuntimeError>((state, schedule_cache, schedule_cache_profile))
         })?;
     if let Some(input) = reporting {
-        crate::heat_balance::warmup::ordinary::prepare(
-            model,
-            &mut state,
-            weather_driver,
-            input,
-            initialization
-                .as_deref_mut()
-                .ok_or_else(|| RuntimeError::WarmupUnavailable {
-                    reason: "missing explicit ordinary output context".into(),
-                })?,
-        )?;
-        crate::heat_balance::ordinary_inside_temperatures::prepare(
+        let prepared = initialization
+            .as_deref_mut()
+            .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                reason: "missing explicit ordinary output context".into(),
+            })
+            .and_then(|context| {
+                crate::heat_balance::warmup::ordinary::prepare(
+                    model,
+                    &mut state,
+                    weather_driver,
+                    input,
+                    context,
+                )
+            });
+        if let Err(error) = prepared {
+            crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                state,
+                initialization.as_deref_mut(),
+            );
+            return Err(error);
+        }
+        let prepared = crate::heat_balance::ordinary_inside_temperatures::prepare(
             &model.typed,
             &mut state,
             heat_balance_runtime_config,
@@ -579,10 +598,17 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         )
         .map_err(|reason| RuntimeError::WarmupUnavailable {
             reason: format!("ordinary temperature owner unavailable: {reason:?}"),
-        })?;
+        });
+        if let Err(error) = prepared {
+            crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                state,
+                initialization.as_deref_mut(),
+            );
+            return Err(error);
+        }
     }
     let mut warmup_day_end_zone_air_states = Vec::new();
-    let warmup = run_heat_balance_run_period_warmup_with_reporting(
+    let warmup = match run_heat_balance_run_period_warmup_with_reporting(
         model,
         &mut state,
         weather_dry_bulb_c,
@@ -619,7 +645,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 surface_loop_zone_air_correction,
             )
         },
-    )?;
+    ) {
+        Ok(warmup) => warmup,
+        Err(error) => {
+            crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                state,
+                initialization.as_deref_mut(),
+            );
+            return Err(error);
+        }
+    };
     let run_period_initial_zone_air_states = state
         .zones
         .iter()
@@ -649,7 +684,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_air_first_sample_trace,
         surface_iteration_first_sample_trace,
         surface_iteration_sample_trace,
-    } = sample_heat_balance_run_period(
+    } = match sample_heat_balance_run_period(
         model,
         &internal_gain_schedule_cache,
         &mut internal_gain_schedule_cache_profile.run_period,
@@ -662,10 +697,25 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_steps_per_hour,
         seconds_per_timestep,
         first_hour_interpolation_starting_values,
-        initialization,
-    )?;
-    if let Some(driver) = weather_driver {
-        driver.finish_environment()?;
+        initialization.as_deref_mut(),
+    ) {
+        Ok(sampled) => sampled,
+        Err(error) => {
+            crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+                state,
+                initialization.as_deref_mut(),
+            );
+            return Err(error);
+        }
+    };
+    if let Some(driver) = weather_driver
+        && let Err(error) = driver.finish_environment()
+    {
+        crate::heat_balance::convection::surface_environment::ordinary::retain_failed_state(
+            state,
+            initialization,
+        );
+        return Err(error);
     }
     let results = heat_balance_result_store_from_traces(HeatBalanceResultSeriesTraces {
         zone_temperatures,

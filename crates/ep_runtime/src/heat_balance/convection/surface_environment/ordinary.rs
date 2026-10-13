@@ -8,7 +8,10 @@ use crate::heat_balance::ctf_initialization_context::CtfInitializationContext;
 use crate::heat_balance::error_backend::{
     SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop,
 };
-use crate::heat_balance::state::HeatBalanceState;
+use crate::heat_balance::state::{HeatBalanceState, SurfaceHeatBalanceState};
+use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
+
+mod source;
 use crate::weather::{HeatBalanceWeatherContext, day::WeatherDayPhase};
 use ep_model::{SimulationModel, WindExposure};
 use std::fmt::{Display, Formatter};
@@ -149,24 +152,41 @@ pub fn check_surface_out_bulb_temperatures<'a>(
     rows: impl IntoIterator<Item = (&'a SurfaceOutdoorEnvironmentRow, &'a str)>,
     backend: &mut SourceErrorBackend<'_>,
 ) -> Result<(), SurfaceOutdoorEnvironmentError> {
+    check_out_bulb_temperatures(
+        "Surface",
+        rows.into_iter()
+            .map(|(row, name)| (row.dry_bulb_c, row.wet_bulb_c, row.centroid_height_m, name)),
+        backend,
+    )
+}
+
+// Both Original bulk guards invoke the same DataEnvironment error routine.
+fn check_out_bulb_temperatures<'a>(
+    kind: &str,
+    rows: impl IntoIterator<Item = (f64, f64, f64, &'a str)>,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), SurfaceOutdoorEnvironmentError> {
     let mut min_bulb = 0.0;
-    for (row, name) in rows {
-        min_bulb = minimum_three(min_bulb, row.dry_bulb_c, row.wet_bulb_c);
+    for (dry_bulb, wet_bulb, centroid_height, name) in rows {
+        min_bulb = minimum_three(min_bulb, dry_bulb, wet_bulb);
         if min_bulb < -100.0 {
-            backend.show_severe_error("SetOutBulbTempAt: Surface Outdoor Temperatures < -100 C")?;
+            backend.show_severe_error(&format!(
+                "SetOutBulbTempAt: {kind} Outdoor Temperatures < -100 C"
+            ))?;
             // Source formats this only after ShowSevereError has returned.
-            let height = crate::heat_balance::source_round_format::round(row.centroid_height_m, 0)
+            let height = crate::heat_balance::source_round_format::round(centroid_height, 0)
                 .map_err(|error| {
                     SurfaceOutdoorEnvironmentError::Format(format!(
-                        "surface height .0R unavailable: {error:?}"
+                        "{} height .0R unavailable: {error:?}",
+                        kind.to_ascii_lowercase()
                     ))
                 })?;
             backend.show_continue_error(&format!(
-                "...check Surface Heights - Maximum Surface Height=[{height}]."
+                "...check {kind} Heights - Maximum {kind} Height=[{height}]."
             ))?;
-            if row.centroid_height_m >= 20000.0 {
+            if centroid_height >= 20000.0 {
                 backend.show_continue_error("...according to your maximum Z height, your building is somewhere in the Stratosphere.")?;
-                backend.show_continue_error(&format!("...look at Surface Name= {name}"))?;
+                backend.show_continue_error(&format!("...look at {kind} Name= {name}"))?;
             }
             return match backend
                 .show_fatal_error("Program terminates due to preceding condition(s).")
@@ -205,6 +225,27 @@ pub(crate) fn invoke(
         .as_ref()
         .ok_or_else(|| unavailable("surface weather requires actual compiled Building terrain"))?
         .terrain;
+    validate_surfaces(model, state)?;
+    output.backend.state.warmup_flag = matches!(clock.phase, WeatherDayPhase::Warmup { .. });
+    let parameters = SurfaceOutdoorEnvironmentParameters::default_weather_station(terrain);
+    let weather = SurfaceOutdoorWeather {
+        dry_bulb_c: actual.current_weather.out_dry_bulb_temp,
+        wet_bulb_c: actual.current_weather.out_wet_bulb_temp,
+        wind_speed_m_per_s: actual.current_weather.wind_speed,
+        wind_direction_deg: actual.current_weather.wind_dir,
+    };
+    apply_surfaces(
+        &mut state.surfaces,
+        parameters,
+        weather,
+        &mut output.backend,
+    )
+}
+
+fn validate_surfaces(
+    model: &SimulationModel,
+    state: &HeatBalanceState,
+) -> Result<(), RuntimeError> {
     if state.surfaces.len() != model.typed.surfaces.len()
         || state
             .surfaces
@@ -230,56 +271,87 @@ pub(crate) fn invoke(
             "surface weather ID/order/height/exposure owner changed",
         ));
     }
-    output.backend.state.warmup_flag = matches!(clock.phase, WeatherDayPhase::Warmup { .. });
-    let parameters = SurfaceOutdoorEnvironmentParameters::default_weather_station(terrain);
-    let weather = SurfaceOutdoorWeather {
-        dry_bulb_c: actual.current_weather.out_dry_bulb_temp,
-        wet_bulb_c: actual.current_weather.out_wet_bulb_temp,
-        wind_speed_m_per_s: actual.current_weather.wind_speed,
-        wind_direction_deg: actual.current_weather.wind_dir,
-    };
-    for surface in &mut state.surfaces {
+    Ok(())
+}
+
+fn apply_surfaces(
+    surfaces: &mut [SurfaceHeatBalanceState],
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    weather: SurfaceOutdoorWeather,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), RuntimeError> {
+    for surface in surfaces.iter_mut() {
         surface.outdoor_environment.manager_invoked = true;
     }
     super::set_surface_out_bulb_temperature_rows(
         parameters,
         weather,
-        state
-            .surfaces
+        surfaces
             .iter_mut()
             .map(|surface| &mut surface.outdoor_environment.row),
     );
     check_surface_out_bulb_temperatures(
-        state.surfaces.iter().map(|surface| {
+        surfaces.iter().map(|surface| {
             (
                 &surface.outdoor_environment.row,
                 surface.surface_name.as_str(),
             )
         }),
-        &mut output.backend,
+        backend,
     )?;
     super::set_surface_wind_speed_rows(
         parameters,
         weather.wind_speed_m_per_s,
-        state
-            .surfaces
+        surfaces
             .iter_mut()
             .map(|surface| &mut surface.outdoor_environment.row),
     );
     super::set_surface_wind_direction_rows(
         weather.wind_direction_deg,
-        state
-            .surfaces
+        surfaces
             .iter_mut()
             .map(|surface| &mut surface.outdoor_environment.row),
     );
     Ok(())
 }
 
+/// Rust failure custody for a moved Source-connected State. This is not an
+/// Original readiness flag or a second live simulation owner.
+pub(crate) fn retain_failed_state(
+    state: HeatBalanceState,
+    context: Option<&mut CtfInitializationContext<'_>>,
+) {
+    if (state.selected_zone_input.is_some() || state.selected_heat_balance_globals.is_some())
+        && let Some(context) = context
+    {
+        context.reports.failed_heat_balance_state = Some(Box::new(state));
+    }
+}
+
+/// Source-connected callers borrow the existing production session. Legacy
+/// callers without either Source owner retain the surface-only invocation.
+pub(crate) fn invoke_from_driver(
+    model: &SimulationModel,
+    state: &mut HeatBalanceState,
+    weather: Option<HeatBalanceWeatherContext<'_>>,
+    driver: Option<HeatBalanceWeatherDriver<'_>>,
+    output: Option<&mut CtfInitializationContext<'_>>,
+) -> Result<(), RuntimeError> {
+    match (
+        state.selected_zone_input.is_some(),
+        state.selected_heat_balance_globals.is_some(),
+    ) {
+        (false, false) => invoke(model, state, weather, output),
+        (true, true) => source::invoke(model, state, weather, driver, output),
+        _ => Err(unavailable("partial Source Zone/global outdoor ownership")),
+    }
+}
+
 pub(crate) fn invoke_if_active(
     model: &SimulationModel,
     state: &mut HeatBalanceState,
     weather: Option<HeatBalanceWeatherContext<'_>>,
+    driver: Option<HeatBalanceWeatherDriver<'_>>,
     output: Option<&mut CtfInitializationContext<'_>>,
 ) -> Result<(), RuntimeError> {
     if state
@@ -294,7 +366,7 @@ pub(crate) fn invoke_if_active(
         {
             return Err(unavailable("partial ordinary surface weather activation"));
         }
-        invoke(model, state, weather, output)?;
+        invoke_from_driver(model, state, weather, driver, output)?;
     }
     Ok(())
 }
