@@ -16,14 +16,14 @@ impl SurfaceGeometryInputState {
         input: &SelectedInputProcessor,
         owners: &mut SelectedZoneInputOwners,
         control: &SelectedHeatBalanceInputState,
-    ) -> Result<(), Error> {
+    ) -> Result<bool, Error> {
         // The genuine debug header precedes every area write. Its positive
         // OutputFile branch is unavailable; it is never replaced by a sink.
-        if input
+        let detailed_wwr = input
             .get_num_sections_found("DETAILEDWWR_DEBUG")
             .map_err(|_| Error::Unavailable("actual DetailedWWR section count"))?
-            > 0
-        {
+            > 0;
+        if detailed_wwr {
             return Err(Error::Unavailable("positive DetailedWWR debug OutputFile"));
         }
         let surfaces = self
@@ -105,6 +105,6 @@ impl SurfaceGeometryInputState {
             }
         }
         // DetailedWWR is false, so its450-453 footer has no side effect.
-        Ok(()) // Stop before455 height traversal and548 CalculateZoneVolume.
+        Ok(detailed_wwr) // Carry the same370 local into the455 height traversal.
     }
 }

@@ -1,4 +1,4 @@
-//! Copies the actual retained Source owners into the existing Full trace.
+//! Copies the actual retained Source owners into the existing geometry trace.
 use super::bits;
 use ep_runtime::heat_balance::ctf_initialization_context::OrdinarySurfaceGeometry;
 use serde_json::{Value, json};
@@ -27,7 +27,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
     let process = &owners.process;
     json!({
         "schema":"ordinary-source-geometry.v1",
-        "capture_boundary":"actual successful Rust simulation return; retained partial Setup313-454 owners",
+        "capture_boundary":"actual successful Rust simulation return; retained partial Setup313-547 owners",
         "observer_supplies_inputs":false,
         "names_origin":"actual Source getter Name members; physical typed IDs remain separate",
         "array_bounds_semantics":"allocated Rust storage observed in its existing one-based Source index domain; unallocated bounds remain unknown",
@@ -62,6 +62,8 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         })).collect::<Vec<_>>(),
         "zones":owners.zones.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
+            "ceiling_height_m":scalar(row.ceiling_height_m),
+            "ceiling_height_entered":row.ceiling_height_entered,
             "Multiplier":row.multiplier, "ListMultiplier":row.list_multiplier,
             "HasWindow":row.has_window,
             "geometric_floor_area_m2":scalar(row.geometric_floor_area_m2),

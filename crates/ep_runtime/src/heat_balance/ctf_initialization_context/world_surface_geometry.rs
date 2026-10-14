@@ -300,11 +300,8 @@ impl CtfInitializationContext<'_> {
         // Copy the same live Setup388/390 totals into the existing qualified
         // numeric helper; do not sum the retained faces into a second producer.
         let result = (|| {
-            let height = crate::geometry::prepare_zone_height(&mut numeric);
-            // Preserve partial helper writes before either numerical error.
-            zone.ceiling_height = numeric.ceiling_height_m;
-            zone.ceiling_height_entered = numeric.ceiling_height_entered;
-            height?;
+            // The actual Setup455-547 caller already assigned height once.
+            // Replaying it would misclassify an automatic positive height as entered.
             let volume = crate::geometry::calculate_zone_volume(&mut numeric);
             zone.volume = numeric.volume_m3;
             volume?;

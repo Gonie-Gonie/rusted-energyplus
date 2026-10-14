@@ -231,8 +231,10 @@ fn z_limits(face: &ZoneVolumeFace) -> Option<(f64, f64)> {
     Some((lo, hi))
 }
 
-/// Executes the selected Setup455-546 height preparation once on actual fields.
-pub fn prepare_zone_height(state: &mut ZoneGeometryProperties) -> Result<(), ZoneVolumeError> {
+/// Reuse the existing ordered height calculation without assigning Zone fields.
+pub(crate) fn calculated_zone_height(
+    state: &ZoneGeometryProperties,
+) -> Result<f64, ZoneVolumeError> {
     if !finite_fields(state) {
         return Err(ZoneVolumeError::Nonfinite);
     }
@@ -282,6 +284,12 @@ pub fn prepare_zone_height(state: &mut ZoneGeometryProperties) -> Result<(), Zon
     if average_height <= 0.0 {
         average_height = zmax - zmin;
     }
+    Ok(average_height)
+}
+
+/// Executes the selected Setup455-546 height preparation once on actual fields.
+pub fn prepare_zone_height(state: &mut ZoneGeometryProperties) -> Result<(), ZoneVolumeError> {
+    let average_height = calculated_zone_height(state)?;
     if state.ceiling_height_m > 0.0 {
         state.ceiling_height_entered = true;
     }

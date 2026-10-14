@@ -1,4 +1,4 @@
-//! Bounded SetupZoneGeometry292-454 continuation; no complete Setup/HB claim.
+//! Bounded SetupZoneGeometry292-547 continuation; no complete Setup/HB claim.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -126,7 +126,7 @@ impl CtfInitializationContext<'_> {
                 &mut reports.heat_balance_input_state,
             )
             .map_err(hb_input_error)?;
-        reports
+        let detailed_wwr = reports
             .surface_geometry_input
             .accumulate_opaque_setup_areas(
                 input,
@@ -136,6 +136,17 @@ impl CtfInitializationContext<'_> {
                 &reports.heat_balance_input_state,
             )
             .map_err(hb_input_error)?;
-        Ok(()) // Stop before455 height traversal and548 CalculateZoneVolume.
+        reports
+            .surface_geometry_input
+            .prepare_opaque_setup_heights(
+                reports.selected_zone_input.as_mut().ok_or_else(|| {
+                    hb_input_error(E::Unavailable("same actual height Zone/Space owner"))
+                })?,
+                globals.display_extra_warnings,
+                detailed_wwr,
+                &mut self.backend,
+            )
+            .map_err(hb_input_error)?;
+        Ok(()) // Stop before548 CalculateZoneVolume; its existing helper stays qualified.
     }
 }

@@ -22,6 +22,7 @@ pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
     surface_geometry_properties,
 };
+pub(crate) use zone_volume::calculated_zone_height;
 pub use zone_volume::{
     ZONE_GEOMETRY_AUTO_CALCULATE, ZoneGeometryProperties, ZoneVolumeDiagnostics, ZoneVolumeEdge,
     ZoneVolumeError, ZoneVolumeFace, calculate_zone_volume, prepare_zone_height,

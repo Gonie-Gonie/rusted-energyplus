@@ -29,6 +29,7 @@ mod raw;
 mod return_suffix;
 mod setup_area;
 mod setup_continuation;
+mod setup_height;
 mod setup_process;
 mod vertices;
 mod volume_faces;
@@ -121,6 +122,8 @@ pub(crate) struct SurfaceTmpInput {
 pub(crate) struct SurfaceGeometryInputState {
     pub(crate) entered_once: bool,
     pub(crate) warning_displayed: bool,
+    /// SurfaceGeometryData ErrCount constructor0; Setup514 reads it without incrementing.
+    pub(crate) err_count: i32,
     /// Actual SurfaceGeometry constructor counters; positive Window5/6 writers stay excluded.
     pub(crate) warning1_count: i32,
     pub(crate) warning2_count: i32,

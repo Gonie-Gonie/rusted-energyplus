@@ -454,6 +454,31 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("positive area window/frame branch"))));
         assert_eq!(window_zones, expected_prefix, "window boundary retains only the reached totals/geometric prefix");
         raw.bind_typed_surfaces(&owners)?;
+        let mut height_zones = owners.zones.clone();
+        let detailed_wwr = raw.accumulate_opaque_setup_areas(owners.input, &mut height_zones, owners.control)?;
+        assert!(!detailed_wwr && raw.err_count == 0);
+        raw.prepare_opaque_setup_heights(&mut height_zones, false, detailed_wwr, &mut context.backend)?;
+        let zone = &height_zones.zones.as_ref().ok_or("actual automatic height Zone")?[0];
+        assert_eq!(zone.ceiling_height.to_bits(), 1.0_f64.to_bits());
+        assert!(!zone.ceiling_height_entered, "automatic positive height is not user-entered");
+        // A real warning stream failure must preserve the prior entered flag
+        // write, without assigning the automatic height or fabricating ErrCount.
+        let mut warning_rows = raw.clone();
+        warning_rows.err_count = 1;
+        let mut warning_zones = height_zones.clone();
+        warning_zones.zones.as_mut().ok_or("authored entered height Zone")?[0].ceiling_height = 2.0;
+        let mut expected_failure = warning_zones.clone();
+        expected_failure.zones.as_mut().ok_or("authored warning prefix")?[0].ceiling_height_entered = true;
+        let (mut warning_state, mut warning_console, mut failing) =
+            (ctf_ordinary_output_test_state(), Vec::new(), OrdinaryFailingEio);
+        let failure = warning_rows.prepare_opaque_setup_heights(&mut warning_zones, false, detailed_wwr,
+            &mut SourceErrorBackend { state: &mut warning_state, error_stream: Some(&mut failing),
+                console: &mut warning_console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None });
+        assert!(matches!(failure, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_))));
+        assert_eq!(warning_zones, expected_failure);
+        assert_eq!(warning_rows.err_count, 1);
+        assert_eq!(warning_state.tracking.total_warning_errors, 1);
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
         let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?

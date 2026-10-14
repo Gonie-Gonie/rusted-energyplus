@@ -28,6 +28,10 @@ pub struct OrdinaryGeometryZone<'a> {
     pub typed_id: ZoneId,
     /// Actual retained Zone.Name bytes.
     pub name: &'a str,
+    /// Actual retained Source CeilingHeight, without recalculation.
+    pub ceiling_height_m: f64,
+    /// Actual retained Source ceilingHeightEntered flag.
+    pub ceiling_height_entered: bool,
     /// Actual geometricFloorArea from the Setup GrossArea accumulation.
     pub geometric_floor_area_m2: f64,
     /// Actual geometricCeilingArea, distinct from CeilingArea.
@@ -256,6 +260,8 @@ impl CtfInitializationReports {
                 Ok(OrdinaryGeometryZone {
                     source_number: number(n)?,
                     name: &row.name,
+                    ceiling_height_m: row.ceiling_height,
+                    ceiling_height_entered: row.ceiling_height_entered,
                     geometric_floor_area_m2: row.geometric_floor_area,
                     geometric_ceiling_area_m2: row.geometric_ceiling_area,
                     exterior_total_surface_area_m2: row.exterior_total_surface_area,
