@@ -1,0 +1,257 @@
+{
+  "schema": "src06-ordinary-setup-process-world-join-summary.v1",
+  "status": "Actual selected A World producer and retained Process endpoint comparison PASS",
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-source-geometry-cumulative-Source-review-03/review.json",
+    "sha256": "d948cf8b6e1c341bb9694edb7dd18b28237267d9279f55ac60a1925374d828ad",
+    "size_bytes": 11449
+  },
+  "Rust_files": 8,
+  "Construction_Name_writer_Original_line": 1455,
+  "behavior": "Borrow immutable genuine Source owners/Name through the existing geometry trace; Full and Surface geometry tracing share the same observed retained fields.",
+  "pairing": {
+    "surfaces": 6,
+    "zones": 1,
+    "spaces": 1,
+    "constructions": 3,
+    "strict_finite_binary64_components": 270,
+    "discrete_checks": 449,
+    "differences": 0,
+    "unknowns": 0,
+    "producer": "PASS",
+    "retained_Process_endpoint": "PASS",
+    "signed_zero_preserved": true,
+    "tolerances_used": false,
+    "boundary": "Native outer GetBuildingData stored owners versus actual Rust successful simulation retained Source owners; no internal Setup369 checkpoint.",
+    "scope": "Selected actual A retained owners and declared producer/Process/global fields only; independently joined Names, Source order and associations."
+  },
+  "QA": {
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-fmt-command-02/receipt.json",
+        "sha256": "7125431901e98ebbf636b539b6bd14484be0cde6d5086a53b3409d5c1431bcb6",
+        "size_bytes": 3781
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    "quality": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-quality-command-02/receipt.json",
+        "sha256": "c7ae274bfa78c12853439e4276cd1739848ed2ece0d9a590bad3a198590c49ff",
+        "size_bytes": 3831
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-clippy-command-02/receipt.json",
+        "sha256": "3b7a76ba14789cd522f1574c67c411a1657388938025e019843cd771641d5ec0",
+        "size_bytes": 3861
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    "normalCLI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-cli-tests-command-01/receipt.json",
+        "sha256": "63bd7cc42ca9d832da5c8ffcf391034cbbd41bd68441f71f92537d037d6af321",
+        "size_bytes": 3867
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    "CI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "7f2a8bed44611952f9c068fa6aa4f23e3d24de52d9a5b17073eb629a3fb58b90",
+        "size_bytes": 3869
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    "A": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-command-02/receipt.json",
+        "sha256": "b0f9696e68682a212fce3611f150dda420835c9f8b6decd1dcf106396d12d511",
+        "size_bytes": 4318
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-02/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    }
+  },
+  "tests": {
+    "existing_selections": 2,
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "independent_final_actual_readback": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-source-world-join-actual-review-01/review.json",
+    "sha256": "776f276b35cd41622c561bde6f89bc0ae34cfefe3fd3e41e39e2948cc324a8d6",
+    "size_bytes": 12938
+  },
+  "actual_A": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-command-02/receipt.json",
+      "sha256": "b0f9696e68682a212fce3611f150dda420835c9f8b6decd1dcf106396d12d511",
+      "size_bytes": 4318
+    },
+    "run_summary": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-02/output/run-summary.json",
+      "sha256": "61684002f7fdc8c11994add8dd5485280ae79831a2fa845c61d45465638b0b79",
+      "size_bytes": 27576
+    },
+    "samples": 24,
+    "series": 390,
+    "trace": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-02/output/geometry-consumers.json",
+      "sha256": "fc22c799886d07594b61e08a1ce77455ac72359a17c8c8398688fd01bc431f23",
+      "size_bytes": 36133
+    },
+    "result_pair": {
+      "current": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-02/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "prior": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-surfaces-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "whole_byte_exact": true
+    },
+    "conformance_claim": false
+  },
+  "comparison_receipt": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-compare-surface-command-01/receipt.json",
+    "sha256": "11ed8e6d848344303256101a7297eddaf569d39ab7bb7e96d13a1958dcaf04f2",
+    "size_bytes": 4943
+  },
+  "comparison_Source": {
+    "path": ".runtime/porting/SRC-06/compare-ordinary-source-world-Peer-02.py",
+    "sha256": "3f3c9afd7eb63001e7a37ab69ada119312f1e5be4e6aee1905f5965ab1f62eb0",
+    "size_bytes": 15812
+  },
+  "Native_reused_capture": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+    "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+    "size_bytes": 173622
+  },
+  "Native_capture_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+    "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+    "size_bytes": 2885
+  },
+  "Native_build_or_kernel_replay_performed_in_this_unit": false,
+  "production_math_or_inputs_changed": false,
+  "efficiency": {
+    "actual_trace_level": "surface",
+    "Full_history_comparison": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-comparison-full-01/summary.json",
+      "sha256": "2564b989135449dcd09ebb44a58979b841e888bb8b19422a41028ae58b149083",
+      "size_bytes": 4002
+    },
+    "Full_Surface_geometry_whole_byte_exact": true,
+    "Full_Surface_result_whole_byte_exact": true,
+    "unused_weather_trace_cleanup": {
+      "path": ".runtime/porting/SRC-06/ordinary-source-world-unused-weather-trace-cleanup-01.json",
+      "sha256": "d12c6d43e99ea7f95bd1ecdac20900097e74620ed410ebbc70b30ff37418fd6b",
+      "size_bytes": 689
+    },
+    "weather_payload_read_or_hashed": false,
+    "moved_for_manual_deletion": "C:\\Users\\GonieGonie\\Downloads\\rusted-energyplus-delete-me\\clk03-weather-day-production-trace-20261014.json",
+    "moved_bytes": 734855267
+  },
+  "limitations": [
+    "Native outer GetBuildingData and actual Rust successful simulation retention are distinct observed boundaries; no internal Setup369 checkpoint or Native final Zone/Space area reset is paired.",
+    "Whole Setup370+ area/height/volume/report and HB readiness remain pending. This selected A owner/retained-field PASS introduces no whole-engine conformance.",
+    "Historical whole DesignDay/PSY9949 strict differences and unpaired qualifications remain unchanged; port gates remain unchanged.",
+    "Existing Full capture staticQA/A/comparator receipts are retained as history; final Surface Source uses its own common38ab receipts. Large weather/helper/core/map payloads are not read, hashed or archived."
+  ],
+  "gates_updated": false,
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-world-join/manifest.json",
+    "sha256": "2968de1165070024eab6a4aaa018e4b4cda453163d3db61c4a405e915a867d0f",
+    "size_bytes": 69419
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-world-join/evidence.zip",
+    "sha256": "d1e1ea493ca73c3f5f85ae101f5dad9d07ff4f48a6b5ea08974b2466de04305a",
+    "size_bytes": 792321
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-comparison-surface-01/summary.json",
+    "sha256": "d7e32cd6d83670ed26a5f91f6777751ed95b5e300811a87a9c8eed5ceffe0bae",
+    "size_bytes": 4002
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/38/38abf9324345f14e56ee93dbc2d580eb9a55758bfe2d257f9212863169ed1ab2",
+    "sha256": "38abf9324345f14e56ee93dbc2d580eb9a55758bfe2d257f9212863169ed1ab2"
+  }
+}

@@ -16,8 +16,13 @@ use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
 use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
+mod ordinary_surface_geometry;
 mod setup_zone_geometry;
 mod world_surface_geometry;
+pub use ordinary_surface_geometry::{
+    OrdinaryGeometryConstruction, OrdinaryGeometryProcess, OrdinaryGeometryShadeVertices,
+    OrdinaryGeometrySpace, OrdinaryGeometrySurface, OrdinaryGeometryZone, OrdinarySurfaceGeometry,
+};
 
 /// Full real registry/table/cache owners, retained even if initialization stops.
 #[derive(Clone, Debug, Default, PartialEq)]

@@ -12666,6 +12666,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-surfaces/summary.json",
         "sha256": "bd506821d1453d3fc50cafc308d1b7d4ae96ca3d9b7b312610c9c98a21840bb5",
         "size_bytes": 17576
+      },
+      "actual_selected_ordinary_setup_process_world_join": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-world-join/summary.json",
+        "sha256": "16135c750c0a2778c7e91d752a1c9dfcb7252c96e03f9f00ce2bc3e87406e91b",
+        "size_bytes": 10190
       }
     },
     {

@@ -210,6 +210,8 @@ fn absent(
 /// Same Construction input owner; no per-Surface copies of these flags.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedConstructionUsage {
+    /// Construction.Name, assigned from the actual zeroth alpha after uniqueness.
+    pub(crate) name: String,
     pub(crate) construction_id: Option<ConstructionId>,
     /// ConstructionProps constructor: TotLayers0 and eleven LayerPoint0.
     pub(crate) total_layers: i32,

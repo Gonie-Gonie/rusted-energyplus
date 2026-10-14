@@ -61,6 +61,11 @@ impl SelectedHeatBalanceInputState {
                     "unadmitted duplicate construction",
                 ));
             }
+            // Original1455 follows the uniqueness continue and precedes layers.
+            // Keep actual uppercase/untrimmed alpha bytes on later failures.
+            self.construction_usage[index]
+                .name
+                .clone_from(&values.alphas[0]);
             let mut matches = model.constructions.iter().filter(|c| {
                 original_loader_name(&model.ctf_report_names.constructions, c.id, &c.name)
                     .is_ok_and(|name| name.to_ascii_uppercase() == values.alphas[0])

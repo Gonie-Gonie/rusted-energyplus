@@ -178,6 +178,10 @@ impl CtfRunOutputs {
             .map_err(|e| e.to_string())
     }
 
+    pub(crate) fn reports(&self) -> &CtfInitializationReports {
+        &self.reports
+    }
+
     pub(crate) fn context(&mut self) -> CtfInitializationContext<'_> {
         self.reached = true;
         CtfInitializationContext {

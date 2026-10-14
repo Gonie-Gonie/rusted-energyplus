@@ -1455,7 +1455,7 @@ fn run_with_optional_porting_scope_impl(
                             assessment.runtime_class,
                             source_order_gate,
                             &mut runtime_inputs,
-                            config.trace_level == TraceLevel::Full,
+                            matches!(config.trace_level, TraceLevel::Full | TraceLevel::Surface),
                             &mut ctf_outputs,
                             &config.output_dir,
                         )
@@ -3779,8 +3779,10 @@ fn execute_rust_runtime(
             }.map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
                 geometry_snapshot: capture_geometry.then(|| {
-                    crate::geometry_trace::runtime_projection(&model.typed, &simulation.state)
-                }),
+                    crate::geometry_trace::runtime_projection_with_source(
+                        &model.typed, &simulation.state, ctf_outputs.reports(),
+                    )
+                }).transpose()?,
                 results: simulation.results,
                 runtime_class,
                 sample_count,
@@ -4699,9 +4701,15 @@ fn execute_rust_runtime(
                         .calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
                 );
             Ok(RustRuntimeResult {
-                geometry_snapshot: capture_geometry.then(|| {
-                    crate::geometry_trace::runtime_projection(&model.typed, &simulation.state)
-                }),
+                geometry_snapshot: capture_geometry
+                    .then(|| {
+                        crate::geometry_trace::runtime_projection_with_source(
+                            &model.typed,
+                            &simulation.state,
+                            ctf_outputs.reports(),
+                        )
+                    })
+                    .transpose()?,
                 results: simulation.results,
                 runtime_class,
                 sample_count,

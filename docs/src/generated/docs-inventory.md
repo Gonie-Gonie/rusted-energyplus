@@ -117,7 +117,7 @@ none
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/variable-coverage.md | generated | Generated References | present | none |  |  |  |
-| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-12 |
+| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-14 |
 | docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
 | docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | none |  |  |  |
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |

@@ -7,6 +7,8 @@ use ep_runtime::heat_balance::HeatBalanceState;
 use serde_json::{Value, json};
 use std::io::{BufWriter, Write};
 
+mod ordinary_source;
+
 const SELECTED_OBJECTS: &[&str] = &[
     "Building",
     "Zone",
@@ -197,12 +199,26 @@ pub(crate) fn runtime_projection(model: &TypedModel, state: &HeatBalanceState) -
     })
 }
 
+pub(crate) fn runtime_projection_with_source(
+    model: &TypedModel,
+    state: &HeatBalanceState,
+    reports: &ep_runtime::heat_balance::ctf_initialization_context::CtfInitializationReports,
+) -> Result<Value, String> {
+    let mut artifact = runtime_projection(model, state);
+    artifact["ordinary_source_geometry"] = reports
+        .ordinary_surface_geometry(state)
+        .map_err(|error| error.to_string())?
+        .map(ordinary_source::projection)
+        .unwrap_or(Value::Null);
+    Ok(artifact)
+}
+
 pub(crate) fn write_compiled_geometry(
     config: &RunConfig,
     raw: &RawModel,
     model: Option<&TypedModel>,
 ) -> Result<(), RunError> {
-    if config.trace_level != TraceLevel::Full {
+    if !matches!(config.trace_level, TraceLevel::Full | TraceLevel::Surface) {
         return Ok(());
     }
     let Some(model) = model else {

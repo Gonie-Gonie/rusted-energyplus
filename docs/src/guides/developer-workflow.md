@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-12
+last_reviewed: 2026-10-14
 ---
 
 # Developer Workflow
@@ -38,6 +38,13 @@ cargo run -p ep_cli -- model plan <input.epJSON>
 
 These commands inspect input and planning state; they do not establish
 numerical compatibility.
+
+For geometry changes, add `--trace-level surface` to the usual `run` command.
+It writes `compiled-geometry.json` and `geometry-consumers.json`, including
+retained Source owners when that route is reached. Use `full` when schedule,
+weather, psychrometric, and other detailed event traces are required. Compare
+the fields declared by the relevant porting card; tracing alone does not
+certify numerical compatibility.
 
 When changing plans, claim boundaries, object coverage, variable coverage, or
 algorithm status, update the matching file under `specs/` and regenerate the
