@@ -1,0 +1,123 @@
+{
+  "plan_key": "actual_selected_ordinary_hb_solar_initialization",
+  "status": "Actual selected HB316 retained Solar initialization comparison PASS",
+  "card_summary_number": 45,
+  "comparison_scope": "Native actual nine-phase GetHeatBalanceInput parent return (including later internal-gain input) versus actual Rust successful retained owners; no exact internal316 checkpoint or whole parent/Setup proof",
+  "Source_base": "b042d88c26f7e37cf2533ea71ef4a54b0d98763d",
+  "committed_Source_HEAD": "add087dc617e50c7080802abf78df3022d525f5a",
+  "actual_Source_QA_bridge": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-solar-source-QA-bridge-Root-01.json",
+    "sha256": "aa4e0244c7a390e2e4e2fe8e0e89b3844b1423528dd06cc8753d5645f9ed20b5",
+    "size_bytes": 5798
+  },
+  "no_new_test_body_or_binary": true,
+  "no_Native_expected_values_seeded": true,
+  "genuine_Rust_Source_call": 316,
+  "next_missing_Source_call": 320,
+  "all_prior_numerical_FAILs_and_gates_unchanged": true,
+  "authentic_Native_boundary": "First eight genuine loader phases followed by one GetHeatBalanceInput parent call; no five-getter replay or appended Solar scientific kernel.",
+  "historical_build_metadata_scope": "Exactly three prior live build descriptors are metadata only and joined to actual configure3e948 immutable before aliases; full compile graphs/old outputs are not reopened.",
+  "historical_Rust_Source_scope": "Exactly six old live canonical before descriptors from held proposals are metadata only; final Source348 authenticates immutable before_Git aliases and actual final current bytes.",
+  "static_provider_scope": "22 genuine Original providers and static PE import search closure; no Native loaded-module trace or complete OS forwarder graph.",
+  "EIO_scope": "The same two exact Solar lines moved to the authentic early Source call; remaining whole EIO bytes and the whole result-store are checked separately.",
+  "unpaired": [
+    "Native MaterialBase separate Name/ROnly/Thickness/Conductivity/Resistance/*Input/allocation-pointer identity",
+    "Native LayerPoint allocated flag versus Rust fixed-array storage; common complete bounds/values are compared",
+    "ScriptF and later longwave/InitInteriorRadiation numeric owners",
+    "actual800 temperature caller/current-weather equivalence",
+    "parent local ErrorsFound, warning/fatal/zero-surface/repair/positive-user-F branches and backend timing",
+    "Native caller timestep4 versus prior Rust clock qualification; no timestep execution equivalence"
+  ],
+  "remaining": "Native whole parent return is a later boundary than internal316; HB320 input, ScriptF/later longwave, positive/warning/fatal/repair branches, actual800 live-weather pairing and whole Setup/HB/engine remain unpaired.",
+  "replay_environment_guard": "Root launcher attestation only; no independent complete process-environment certificate.",
+  "schema": "src06-ordinary-hb-solar-initialization-summary.v1",
+  "outcome": "PASS",
+  "new_comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-solar-parent-comparison-01/summary.json",
+    "sha256": "f4900662005e14aa6906f67beacfe5c06645bba058477e2dfa46eab8ec961204",
+    "size_bytes": 19144
+  },
+  "actual_inventory": {
+    "producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 141
+    },
+    "construction": {
+      "binary64_scalars": 24,
+      "discrete_values": 156
+    },
+    "solar": {
+      "binary64_scalars": 3,
+      "discrete_values": 12
+    },
+    "nominal": {
+      "binary64_scalars": 12,
+      "discrete_values": 64
+    },
+    "solar_initialization": {
+      "binary64_scalars": 60,
+      "discrete_values": 297
+    },
+    "materials": {
+      "binary64_scalars": 12,
+      "discrete_values": 6
+    }
+  },
+  "new_Solar_array_inventory": {
+    "binary64_scalars": 60,
+    "discrete_values": 297
+  },
+  "actual_total_binary64_scalars": 111,
+  "component_outcomes": {
+    "solar": "PASS",
+    "materials": "PASS",
+    "construction": "PASS",
+    "nominal": "PASS",
+    "solar_initialization": "PASS"
+  },
+  "differences": 0,
+  "unknowns": 0,
+  "Rust_execution_HEAD": "b042d88c26f7e37cf2533ea71ef4a54b0d98763d",
+  "Native_execution_HEAD": "add087dc617e50c7080802abf78df3022d525f5a",
+  "common_Rust_SourceSnapshot": {
+    "path": ".runtime/porting/source-objects/63/63d258fe13817aa66689af6165e4f098d85707624b81a1817c13e35aaaca3831",
+    "sha256": "63d258fe13817aa66689af6165e4f098d85707624b81a1817c13e35aaaca3831"
+  },
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-solar-final-Source-review-01/review.json",
+    "sha256": "7dfa78adf63601f0a7e26c6d5e6a93bbc77b58418730fb21efbc550d33523752",
+    "size_bytes": 23614
+  },
+  "actual_independent_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-solar-parent-actual-review-01/review.json",
+    "sha256": "2482106a93eda615d2ca2d99e60744ef2174b43cbd450a57b6d161f66bb0ead3",
+    "size_bytes": 32813
+  },
+  "old_geometry_EIO_regression": "PASS (318 binary64/487 discrete and1115B literal EIO; unchanged scope)",
+  "tests": {
+    "selections": 3,
+    "distinct_bodies": 2,
+    "new_bodies_or_bins": 0,
+    "backend_rerun": false
+  },
+  "actual_A": {
+    "hourly_samples": 24,
+    "series": 390,
+    "conformance_claim": false,
+    "result_store_whole_bytes_unchanged": true,
+    "EIO_only_same_two_Solar_lines_relocated": true,
+    "EIO_whole_bytes_unchanged": false
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-solar-initialization/manifest.json",
+    "sha256": "76ec8a2c8b51b6246442144cf3922a96e595c7568f5aa93a22c797120421ff63",
+    "size_bytes": 246153
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-solar-initialization/evidence.zip",
+    "sha256": "78f72eb3380a6c08b1a623f3a4f1ecafd8f9e649db2b1e6e05ed01029a79a14b",
+    "size_bytes": 1480963
+  },
+  "whole_Setup_HB_or_engine_PASS_claimed": false,
+  "gates_updated": false
+}

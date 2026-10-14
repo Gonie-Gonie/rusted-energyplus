@@ -12716,6 +12716,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-material/summary.json",
         "sha256": "c483b3d9e2e4f811eb14598e2554a30efac5ca329e9d67783457358ce2ba9613",
         "size_bytes": 5687
+      },
+      "actual_selected_ordinary_hb_solar_initialization": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-solar-initialization/summary.json",
+        "sha256": "52bf160f80fa7b4bc9dc5dedcf2a2c789e6a6a43a61634f1ab2a7a264257ad05",
+        "size_bytes": 5909
       }
     },
     {
