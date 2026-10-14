@@ -350,6 +350,9 @@ impl SurfaceGeometryInputState {
                     | SurfaceClass::Invalid
                     | SurfaceClass::Window
                     | SurfaceClass::Door
+                    | SurfaceClass::GlassDoor
+                    | SurfaceClass::TddDome
+                    | SurfaceClass::TddDiffuser
                     | SurfaceClass::Shading
                     | SurfaceClass::DetachedFixed
                     | SurfaceClass::DetachedBuilding

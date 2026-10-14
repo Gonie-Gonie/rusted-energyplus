@@ -329,45 +329,46 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .ok_or_else(|| RuntimeError::WarmupUnavailable {
                     reason: "actual Zone volume return absent".into(),
                 })?;
-            // SurfaceGeometry557-597: reset, then actual Space/opaque-class
-            // traversal using already returned Surface.Centroid/GrossArea.
-            let layout = super::inside_convection_layout::InsideConvectionLayout::from_typed_model(
-                &model.typed,
-            )
-            .map_err(|_| RuntimeError::WarmupUnavailable {
-                reason: "actual Zone centroid traversal".into(),
-            })?;
-            let mut centroid = [0.0; 3];
-            let mut total_surface_area = 0.0;
-            zone.centroid_m = Some(centroid);
-            for group in layout.groups().iter().filter(|group| group.zone_id == id) {
-                for surface_id in &group.surfaces {
-                    let (_, geometry) = actual_surface_geometry
-                        .iter()
-                        .find(|row| row.0 == *surface_id)
-                        .ok_or_else(|| RuntimeError::WarmupUnavailable {
-                            reason: "actual Zone centroid surface return".into(),
-                        })?;
-                    centroid[0] += geometry.centroid_m.x_m * geometry.gross_area_m2;
-                    centroid[1] += geometry.centroid_m.y_m * geometry.gross_area_m2;
-                    centroid[2] += geometry.centroid_m.z_m * geometry.gross_area_m2;
-                    total_surface_area += geometry.gross_area_m2;
+            if !selected_world_geometry {
+                // Preserve the qualified legacy projection. The selected World
+                // caller already wrote the same Source centroid at actual550.
+                let layout =
+                    super::inside_convection_layout::InsideConvectionLayout::from_typed_model(
+                        &model.typed,
+                    )
+                    .map_err(|_| RuntimeError::WarmupUnavailable {
+                        reason: "actual Zone centroid traversal".into(),
+                    })?;
+                let mut centroid = [0.0; 3];
+                let mut total_surface_area = 0.0;
+                zone.centroid_m = Some(centroid);
+                for group in layout.groups().iter().filter(|group| group.zone_id == id) {
+                    for surface_id in &group.surfaces {
+                        let (_, geometry) = actual_surface_geometry
+                            .iter()
+                            .find(|row| row.0 == *surface_id)
+                            .ok_or_else(|| RuntimeError::WarmupUnavailable {
+                                reason: "actual Zone centroid surface return".into(),
+                            })?;
+                        centroid[0] += geometry.centroid_m.x_m * geometry.gross_area_m2;
+                        centroid[1] += geometry.centroid_m.y_m * geometry.gross_area_m2;
+                        centroid[2] += geometry.centroid_m.z_m * geometry.gross_area_m2;
+                        total_surface_area += geometry.gross_area_m2;
+                        zone.centroid_m = Some(centroid);
+                    }
+                }
+                if total_surface_area > 0.0 {
+                    centroid[0] /= total_surface_area;
+                    centroid[1] /= total_surface_area;
+                    centroid[2] /= total_surface_area;
                     zone.centroid_m = Some(centroid);
                 }
-            }
-            if total_surface_area > 0.0 {
-                centroid[0] /= total_surface_area;
-                centroid[1] /= total_surface_area;
-                centroid[2] /= total_surface_area;
-                zone.centroid_m = Some(centroid);
-            }
-            if !selected_world_geometry {
                 zone.ceiling_height = volume.returned.ceiling_height_m;
                 zone.volume = volume.returned.volume_m3;
                 zone.floor_area = volume.returned.floor_area_m2;
             }
-            // World keeps the real earlier FloorArea and the same retained
-            // height/volume helper writes, including any preceding error prefix.
+            // World keeps the genuine earlier area/height/volume and550 centroid
+            // writes, including any preceding error prefix.
         }
         Some(geometry)
     } else {

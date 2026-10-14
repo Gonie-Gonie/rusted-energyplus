@@ -114,18 +114,18 @@ fn dimension_length(a: Point3, b: Point3) -> f64 {
 }
 
 // std::min/max preserve the first operand on ties, unlike Rust f64::min/max.
-fn source_min(a: f64, b: f64) -> f64 {
+pub(crate) fn source_min(a: f64, b: f64) -> f64 {
     if b < a { b } else { a }
 }
-fn source_max(a: f64, b: f64) -> f64 {
+pub(crate) fn source_max(a: f64, b: f64) -> f64 {
     if a < b { b } else { a }
 }
 // Outer unqualified EnergyPlus min/max resolves to ObjexxFCL double overloads:
 // min retains the SECOND operand on ties; max retains the FIRST, like std.
-fn source_bound_min(a: f64, b: f64) -> f64 {
+pub(crate) fn source_bound_min(a: f64, b: f64) -> f64 {
     if a < b { a } else { b }
 }
-fn source_bound_max(a: f64, b: f64) -> f64 {
+pub(crate) fn source_bound_max(a: f64, b: f64) -> f64 {
     if a < b { b } else { a }
 }
 

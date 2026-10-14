@@ -1,4 +1,4 @@
-//! Bounded Setup through the selected548 volume return; no full Setup/HB claim.
+//! Bounded Setup through639 counts; NominalU/reporting641 remains separate.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -147,7 +147,7 @@ impl CtfInitializationContext<'_> {
                 &mut self.backend,
             )
             .map_err(hb_input_error)?;
-        reports
+        let volume_returns = reports
             .surface_geometry_input
             .calculate_opaque_setup_volumes(
                 input,
@@ -157,6 +157,18 @@ impl CtfInitializationContext<'_> {
                 globals.display_extra_warnings,
                 &mut self.backend,
             )
-            .map_err(hb_input_error) // Stop before550 centroid/bounds.
+            .map_err(hb_input_error)?;
+        reports
+            .surface_geometry_input
+            .prepare_opaque_setup_zone_bounds(
+                reports.selected_zone_input.as_mut().ok_or_else(|| {
+                    hb_input_error(E::Unavailable("same actual centroid/bounds Zone owner"))
+                })?,
+                globals.num_of_zones,
+                &mut self.backend,
+                &mut reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
+        Ok(volume_returns) // Stop before641 NominalU/report loop.
     }
 }

@@ -525,6 +525,30 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(volume_rows.err_count5, 1, "counter increment precedes failed informational note");
         assert_eq!(user_volume, before_failure, "user volume and pending Space fields survive note failure");
         assert_eq!(note_state.tracking.total_warning_errors, 0);
+        // Authored checkpoints use the genuine earlier centroid producer and
+        // actual550 suffix, without Native AFTER injection or new test bodies.
+        let mut bounds_rows = raw.clone();
+        bounds_rows.calculate_final_centroids(&mut context.backend, &environment)?;
+        bounds_rows.final_surfaces.as_mut().ok_or("authored self-adjacency")?[0].row.exterior_boundary = 1;
+        let mut bounds_zones = volume_zones.clone();
+        assert!(bounds_rows.adjacent_zone.is_none());
+        assert_eq!(bounds_zones.zones.as_ref().ok_or("ctor-zero counts")?[0].num_surfaces, 0);
+        bounds_rows.prepare_opaque_setup_zone_bounds(&mut bounds_zones, 1, &mut context.backend, &mut errors)?;
+        let zone = &bounds_zones.zones.as_ref().ok_or("actual bounds Zone")?[0];
+        assert_eq!(zone.centroid_m, Some([0.5; 3]));
+        assert_eq!(zone.bounds_m, [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]);
+        assert_eq!((zone.num_surfaces, zone.num_sub_surfaces, zone.num_shading_surfaces), (6, 0, 0));
+        let mut expected_adjacent = vec![0; total]; expected_adjacent[0] = 1;
+        assert_eq!(bounds_rows.adjacent_zone, Some(expected_adjacent.clone()));
+        bounds_rows.prepare_opaque_setup_zone_bounds(&mut bounds_zones, 1, &mut context.backend, &mut errors)?;
+        assert_eq!(bounds_zones.zones.as_ref().ok_or("cumulative counts")?[0].num_surfaces, 12);
+        let before_adjacency_failure = bounds_zones.clone();
+        bounds_rows.adjacent_zone = Some(vec![-7; total]);
+        bounds_rows.final_surfaces.as_mut().ok_or("authored missing adjacency")?[1].row.exterior_boundary = i32::try_from(total + 1)?;
+        let failure = bounds_rows.prepare_opaque_setup_zone_bounds(&mut bounds_zones, 1, &mut context.backend, &mut errors);
+        assert!(matches!(failure, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual adjacent Surface association"))));
+        assert_eq!(bounds_zones, before_adjacency_failure, "completed centroid/bounds and prior volume retained; counts not reached");
+        assert_eq!(bounds_rows.adjacent_zone, Some(expected_adjacent), "new dimension and first entry retained at invalid second association");
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
         let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?

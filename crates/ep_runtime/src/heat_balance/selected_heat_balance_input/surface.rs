@@ -32,6 +32,7 @@ mod setup_continuation;
 mod setup_height;
 mod setup_process;
 mod setup_volume;
+mod setup_zone_bounds;
 mod vertices;
 mod volume_faces;
 mod window_arrays;
@@ -66,6 +67,12 @@ pub(crate) enum SurfaceClass {
     Window,
     #[allow(dead_code)] // Native predicate only; positive getter remains excluded.
     Door,
+    #[allow(dead_code)] // Genuine Setup count predicate; positive getter remains excluded.
+    GlassDoor,
+    #[allow(dead_code)] // Genuine Setup count predicate; positive getter remains excluded.
+    TddDome,
+    #[allow(dead_code)] // Genuine Setup count predicate; positive getter remains excluded.
+    TddDiffuser,
     #[allow(dead_code)] // Genuine Setup predicate; positive getter remains excluded.
     Shading,
     #[allow(dead_code)] // Genuine Setup predicate; positive getter remains excluded.
@@ -174,6 +181,8 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) process_vertices_scratch: setup_process::ProcessVerticesScratch,
     pub(crate) setup_shading: setup_process::SetupShadingCounters,
     pub(crate) final_surfaces: Option<Vec<final_mapping::FinalSurface>>,
+    /// DataSurface SurfAdjacentZone constructor-unallocated; dimensioned at Setup607.
+    pub(crate) adjacent_zone: Option<Vec<i32>>,
     pub(crate) surface_windows: Option<Vec<derived_arrays::SurfaceWindowCalculation>>,
     pub(crate) surface_shades: Option<Vec<derived_arrays::SurfaceShade>>,
     pub(crate) parallel_arrays: Option<parallel_arrays::SurfaceParallelArrays>,

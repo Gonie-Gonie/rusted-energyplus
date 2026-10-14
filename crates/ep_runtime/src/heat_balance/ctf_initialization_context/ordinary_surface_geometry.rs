@@ -36,6 +36,8 @@ pub struct OrdinaryGeometryZone<'a> {
     pub ceiling_height_entered: bool,
     /// Actual retained Zone.Volume, without recalculation.
     pub volume_m3: f64,
+    /// Actual retained minX/maxX/minY/maxY/minZ/maxZ in Source order.
+    pub bounds_m: [f64; 6],
     /// Actual geometricFloorArea from the Setup GrossArea accumulation.
     pub geometric_floor_area_m2: f64,
     /// Actual geometricCeilingArea, distinct from CeilingArea.
@@ -144,6 +146,8 @@ pub struct OrdinaryGeometrySurface<'a> {
     pub is_shadowing: bool,
     /// Complete written Vertex storage in original order, borrowing each triple.
     pub world_vertices: Vec<&'a [f64; 3]>,
+    /// Actual final Surface.Centroid, distinct from bare GetVertices properties.
+    pub centroid_m: [f64; 3],
     /// Actual GetVertices GrossArea value.
     pub gross_area_m2: f64,
     /// Actual retained Surface.Area, without aliasing it to GrossArea.
@@ -271,6 +275,7 @@ impl CtfInitializationReports {
                     ceiling_height_m: row.ceiling_height,
                     ceiling_height_entered: row.ceiling_height_entered,
                     volume_m3: row.volume,
+                    bounds_m: row.bounds_m,
                     geometric_floor_area_m2: row.geometric_floor_area,
                     geometric_ceiling_area_m2: row.geometric_ceiling_area,
                     exterior_total_surface_area_m2: row.exterior_total_surface_area,
@@ -401,6 +406,7 @@ impl CtfInitializationReports {
                 mirrored_surface: row.mirrored_surface,
                 is_shadowing: row.is_shadowing,
                 world_vertices,
+                centroid_m: surface.centroid,
                 gross_area_m2: normal.gross_area_m2,
                 area_m2: properties.area_m2,
                 cos_tilt: properties.cos_tilt,

@@ -11,6 +11,9 @@ pub use inside_convection_owners::{
     OpaqueGeometryOwners, OpaqueSurfaceDimensions, OpaqueZoneGeometry, opaque_geometry_owners,
     opaque_surface_dimensions,
 };
+pub(crate) use inside_convection_owners::{
+    source_bound_max, source_bound_min, source_max, source_min,
+};
 pub(crate) use source_geometry::{
     GetVerticesProperties, Orientation, SourceCentroidScratch, SourceNormalArea,
     SourceProcessShape, area_vector as source_newell_area_vector, finish_get_vertices_properties,

@@ -12686,6 +12686,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-volume-continuation/summary.json",
         "sha256": "676c830da6c1b390a623341c01c84719c10abfc1d3ec9276a1df5099872d811d",
         "size_bytes": 17023
+      },
+      "actual_selected_ordinary_setup_zone_bounds_continuation": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-zone-bounds-continuation/summary.json",
+        "sha256": "7f41a1f19c3a5447a5219bc445ebe96576f20f66bcd1ab63b2dd0e488ab81ffe",
+        "size_bytes": 10656
       }
     },
     {

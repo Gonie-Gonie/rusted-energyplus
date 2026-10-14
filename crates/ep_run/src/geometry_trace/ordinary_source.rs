@@ -27,7 +27,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
     let process = &owners.process;
     json!({
         "schema":"ordinary-source-geometry.v1",
-        "capture_boundary":"actual successful Rust simulation return; retained selected Setup313-548 owners",
+        "capture_boundary":"actual successful Rust simulation return; retained selected Setup313-639 owners",
         "observer_supplies_inputs":false,
         "names_origin":"actual Source getter Name members; physical typed IDs remain separate",
         "array_bounds_semantics":"allocated Rust storage observed in its existing one-based Source index domain; unallocated bounds remain unknown",
@@ -44,6 +44,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             }).collect::<Vec<_>>(),
             "geometry":{
                 "area_m2":scalar(row.area_m2),
+                "centroid_m":vector(&row.centroid_m),
                 "gross_area_m2":scalar(row.gross_area_m2), "cos_tilt":scalar(row.cos_tilt),
                 "lcsx":vector(row.lcsx), "lcsy":vector(row.lcsy), "lcsz":vector(row.lcsz),
             },
@@ -65,6 +66,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "ceiling_height_m":scalar(row.ceiling_height_m),
             "ceiling_height_entered":row.ceiling_height_entered,
             "volume_m3":scalar(row.volume_m3),
+            "bounds_m":row.bounds_m.iter().copied().map(scalar).collect::<Vec<_>>(),
             "Multiplier":row.multiplier, "ListMultiplier":row.list_multiplier,
             "HasWindow":row.has_window,
             "geometric_floor_area_m2":scalar(row.geometric_floor_area_m2),

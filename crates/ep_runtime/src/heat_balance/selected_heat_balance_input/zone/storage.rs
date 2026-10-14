@@ -38,6 +38,12 @@ pub(crate) struct SelectedZoneData {
     /// ZoneData explicitly constructs Centroid(0.0, 0.0, 0.0).
     /// The completed geometry return later overwrites that same live owner.
     pub(crate) centroid_m: Option<[f64; 3]>,
+    /// ZoneData constructor-zero MinimumX/MaximumX, then Y and Z pairs.
+    pub(crate) bounds_m: [f64; 6],
+    /// Actual constructor-zero counts incremented, without reset, at Setup616-638.
+    pub(crate) num_surfaces: i32,
+    pub(crate) num_sub_surfaces: i32,
+    pub(crate) num_shading_surfaces: i32,
     pub(crate) inside_algorithm: Inside,
     pub(crate) outside_algorithm: Outside,
     pub(crate) is_part_of_total_area: bool,
@@ -90,6 +96,10 @@ impl Default for SelectedZoneData {
             exterior_perimeter: 0.0,
             exterior_gross_wall_area_multiplied: 0.0,
             centroid_m: Some([0.0; 3]),
+            bounds_m: [0.0; 6],
+            num_surfaces: 0,
+            num_sub_surfaces: 0,
+            num_shading_surfaces: 0,
             inside_algorithm: Inside::Simple,
             outside_algorithm: Outside::SimpleCombined,
             is_part_of_total_area: true,
