@@ -1,0 +1,343 @@
+{
+  "schema": "src06-ordinary-hb-pre-solar-input-summary.v1",
+  "status": "Selected Source HB278-313 pre-solar input prefix and ordinary opaque CheckAndSet properties connected; existing geometry and literal EIO regression PASS",
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-02/review.json",
+    "sha256": "b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162",
+    "size_bytes": 43012
+  },
+  "actual_independent_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-pre-solar-input-actual-review-01/review.json",
+    "sha256": "28024b2bb91db2267a92b5edf3f828f86e5e02e20da07a5a4f0b91af606e05a1",
+    "size_bytes": 20592
+  },
+  "Rust_files": 9,
+  "Source_interval": "HeatBalanceManager278-313 after selected successful GetBuildingData; stops before InitSolar316. Ordinary opaque CheckAndSet DataHeatBalance341-423/753-798 at actual GetConstructData1795.",
+  "behavior": "Same retained Source owners receive variable-absorptance zero guard, incident/scheduled count writes, unconditional4A schema lookup, genuine construction usage and real backend warning/severe/fatal prefixes. Same Construction rows receive ctor-defaulted optical/thermal/roughness properties in Original order through actual MaterialNum and a unique borrowed validated Material payload.",
+  "pairing": {
+    "strict_finite_binary64_components": 318,
+    "discrete_checks": 487,
+    "differences": 0,
+    "unknowns": 0,
+    "new_nominal_comparisons": 0,
+    "new_EIO_inventory": {
+      "sections": 3,
+      "header_lines": 3,
+      "record_lines": 3,
+      "unique_Zone_rows": 1,
+      "whole_literal_block_comparisons": 1,
+      "Native_selected_block_bytes": 1115,
+      "Rust_selected_block_bytes": 1115
+    },
+    "signed_zero_preserved": true,
+    "tolerances_used": false,
+    "new_Solar_temperature_comparisons": 0,
+    "regression_only": true,
+    "new_post_building_input_comparisons": 0,
+    "new_Construction_property_comparisons": 0
+  },
+  "QA": {
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/receipt.json",
+        "sha256": "9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a",
+        "size_bytes": 4091
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    "quality": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/receipt.json",
+        "sha256": "65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06",
+        "size_bytes": 4141
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/receipt.json",
+        "sha256": "985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf",
+        "size_bytes": 4170
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    "runtime": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/receipt.json",
+        "sha256": "b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00",
+        "size_bytes": 4235
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    "normalCLI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/receipt.json",
+        "sha256": "6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d",
+        "size_bytes": 4177
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    "CI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d",
+        "size_bytes": 4180
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    "A": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/receipt.json",
+        "sha256": "40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180",
+        "size_bytes": 4622
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    }
+  },
+  "tests": {
+    "executions": 3,
+    "distinct_existing_bodies": 2,
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "added_existing_body_lines": 60,
+    "new_test_bodies": 0,
+    "new_binaries": 0,
+    "scope": "FINAL PASS selections only: existing runtime body once and same CLI body under normal/CI settings (3). Total attempts4 includes historical runtime01 failure1; no new bodies/bins. Literal60added1removed final lines; backend API unchanged and not rerun.",
+    "literal_diff_added_removed": {
+      "added": 60,
+      "removed": 1
+    },
+    "total_attempted_test_executions": 4,
+    "historical_failed_test_executions": 1
+  },
+  "actual_A": {
+    "hourly_samples": 24,
+    "series": 390,
+    "result_store_whole_bytes_unchanged": true,
+    "source_timestep_conformance": false,
+    "geometry_trace_whole_bytes_unchanged": true,
+    "EIO_whole_bytes_unchanged": true
+  },
+  "no_new_Native_build": true,
+  "no_kernel_replay": true,
+  "no_full_workspace_test_repeat": true,
+  "replay_environment_guard": "No Native kernel replay requested by current commands; no independent process environment certificate is claimed.",
+  "remaining": "Native raw post-GetBuildingData counts/flags/diagnostics and Construction CheckAndSet properties remain UNPAIRED. Positive window/family/diagnostic variants and actual InitSolar316/full GetHeatBalanceInput/Setup-HB remain incomplete; no prior numerical FAIL/gate promotion.",
+  "gates_updated": false,
+  "centroid_and_bounds_scope_qualification": {
+    "paired": "Six actual final Surface.Centroid triples and same-owner Zone minX/maxX/minY/maxY/minZ/maxZ only; every earlier producer/Process/area/height/volume prerequisite remains mandatory.",
+    "Native_missing_fields": "UNPAIRED: Zone.Centroid, SurfAdjacentZone and Zone surface/subsurface/shading counts are absent from the reused Native capture and are neither inferred nor compared.",
+    "positive_error_and_unsupported_variants": "UNPAIRED: internal-mass-only errors, air-boundary/other unsupported positive variants and nonfinite/missing storage are not positive Native certificates.",
+    "boundary": "Native outer GetBuildingData retained values versus actual Rust successful simulation-retained owners; no internal Setup639 checkpoint or full Setup/HB claim."
+  },
+  "volume_scope_qualification": {
+    "paired": "Actual same-owner Zone.Volume, Space.Volume, Space.fracZoneVolume and SurfaceGeometry.ErrCount5 only; every earlier producer/Process/area/height prerequisite remains mandatory.",
+    "Native_closure_predicate": "UNPAIRED: Native isEnclosedVolume return is not dumped; enclosure is not inferred from matched retained values.",
+    "Native_warning_debug_and_fallback_variants": "UNPAIRED: positive SHOWZONESURFACES_DEBUG, warning/ErrCount5 increments, nonclosed repairs/fallbacks and nonpositive volume clamp variants are not paired by the reused A capture.",
+    "ShowZoneSurfaceHeaders_or_P0_context_compared": false,
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup548 checkpoint is claimed."
+  },
+  "height_scope_qualification": {
+    "paired": "Actual same-owner Zone.CeilingHeight and ceilingHeightEntered only; prior producer/area prerequisites remain mandatory.",
+    "Native_warning_variants": "UNPAIRED: Source455-547 entered-height warning/ErrCount/DisplayExtraWarnings variants are not paired by the reused A capture.",
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup547 checkpoint is claimed."
+  },
+  "area_scope_qualification": {
+    "paired": "Six actual A Surface.Area inputs, outside/air-boundary operands, Zone multipliers/HasWindow and14 Zone/Space area values.",
+    "Native_TypeIsWindow_predicate": "UNPAIRED: not present in reused Native capture; no predicate is inferred from zero window outputs.",
+    "unpaired_positive_branches": [
+      "windows/frame areas",
+      "ground contacts",
+      "nonunit multipliers",
+      "DETAILEDWWR_DEBUG positive"
+    ],
+    "status_scope": "Area PASS certifies only declared actual A stored operands/outputs; missing declared fields remain mandatory UNKNOWN. Shared producer/Width prerequisites are retained."
+  },
+  "comparison_role": "Comparator07 existing318 binary64/487 discrete geometry and1115B literal EIO regression only; no new raw Native post-building input or Construction property inventory.",
+  "nominal_scope_qualification": {
+    "Native_Material_NominalR": "UNPAIRED",
+    "Native_Construction_NominalU": "UNPAIRED",
+    "Setup641_activated": true,
+    "new_Native_nominal_comparison_inventory_added": false
+  },
+  "geometry_capture_clarification": "Native selected_geometry lacks raw Zone centroid/count/adjacency fields. The same capture does contain formatted EIO Zone centroid and integer counts; prior absence wording is limited to raw owner fields. No rounded text is reconstructed into binary64 values.",
+  "Source_reporting_stop_line": 792,
+  "full_Setup_HB_proof": false,
+  "EIO_scope_qualification": {
+    "paired": "Actual unique contiguous Shading Summary, Zone Summary and one authentic Zone Information header/row sequence; literal UTF8 bytes only.",
+    "raw_selected_owner_fields": "UNPAIRED: raw Native Zone.Centroid, SurfAdjacentZone and Zone counts are absent from selected_geometry. Formatted EIO contains rounded Zone center and integer count text; only that actual text is paired here.",
+    "Native_raw_nominal_R_U_or_film_table": "UNPAIRED: no raw Material.NominalR, Construction.NominalU or film predefined-table endpoint comparison.",
+    "raw_floats_reconstructed_from_EIO": false,
+    "full_Setup_HB_or_whole_engine_claim": false,
+    "boundary": "Native actual outer GetBuildingData EIO versus actual closed Rust A retained EIO subset, not whole-file/full-engine equivalence."
+  },
+  "plan_key": "actual_selected_ordinary_hb_pre_solar_input",
+  "card_number": 43,
+  "solar_temperature_scope_qualification": {
+    "selected_Source_calls": [
+      797,
+      800,
+      801
+    ],
+    "Native_raw_Solar_enclosure_storage_and_associations": "UNPAIRED",
+    "Native_raw_Setup800_801_temperature_operands_and_outputs": "UNPAIRED",
+    "current_weather_reset_or_preset_used": false,
+    "existing_geometry_and_EIO_comparison_is_regression_only": true,
+    "new_Native_Solar_or_temperature_inventory_added": false,
+    "whole_transitive_Setup_HB_or_engine_claim": false
+  },
+  "all_prior_numerical_FAILs_and_gates_unchanged": true,
+  "Source_input_stop_before_call": 316,
+  "pre_solar_input_scope_qualification": {
+    "Source_parent_lines": [
+      278,
+      313
+    ],
+    "Source_CheckAndSet_ranges": [
+      [
+        341,
+        423
+      ],
+      [
+        753,
+        798
+      ]
+    ],
+    "Native_raw_post_GetBuildingData_count_flag_diagnostic_endpoints": "UNPAIRED",
+    "Native_raw_Construction_CheckAndSet_properties": "UNPAIRED",
+    "existing_geometry_and_EIO_comparison_is_regression_only": true,
+    "new_Native_post_prefix_or_Construction_property_inventory_added": false,
+    "actual_InitSolar316_caller_added": false,
+    "whole_GetHeatBalanceInput_or_Setup_HB_proof": false
+  },
+  "historical_test_failure": {
+    "first_QA": {
+      "fmt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-01/receipt.json",
+        "sha256": "843db5c6fc77e1a728c09a752950d73f06f388b3d9b9a526c92267e2d2bb9bbd",
+        "size_bytes": 4091
+      },
+      "quality": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-01/receipt.json",
+        "sha256": "b81bdb6ce9f4765c357b7a7f0cd18489a057426ad452d2590d55d6f61ce86d0f",
+        "size_bytes": 4140
+      },
+      "clippy": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-01/receipt.json",
+        "sha256": "f72ab5cd2e97780c9455865902517007e05f6622ec24596baffcb3fa44bb7700",
+        "size_bytes": 4171
+      },
+      "runtime": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-01/receipt.json",
+        "sha256": "e1591f108bebe38a85e32e90259b258939b67f682aa45861e8c401b0fbdc6b63",
+        "size_bytes": 4237
+      }
+    },
+    "correction": {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/manifest.json",
+      "sha256": "ded198479d97da67e27006e541a44c9106a245cefc621643abcbaf91c5c28fc9",
+      "size_bytes": 4086
+    },
+    "qualification": "First static01 all0; runtime01 failed only an authored AbortProcessing expectation. Exact test-only correction retained all eight production paths; final QA is separately bound."
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-pre-solar-input/manifest.json",
+    "sha256": "d265c33f0286f5e535e5fed1720f3402425a5161355710742a25332f944ed7c3",
+    "size_bytes": 127553
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-pre-solar-input/evidence.zip",
+    "sha256": "8746c8d484467bbf5bb4e0312a906aab49ccb226e7af0fc75b29307aa4caf914",
+    "size_bytes": 1088127
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-comparison-01/summary.json",
+    "sha256": "e6a629627d3f58afb980bcee63551175903e5db2a03b9c0f8b2a9bb839cabe94",
+    "size_bytes": 10268
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/ba/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+    "sha256": "ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0"
+  }
+}

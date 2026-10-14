@@ -1,0 +1,2386 @@
+{
+  "schema": "src06-hb-pre-solar-input-finite-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/ba/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+    "sha256": "ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0"
+  },
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-02/review.json",
+    "sha256": "b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162",
+    "size_bytes": 43012
+  },
+  "Rust_sources": [
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389
+    }
+  ],
+  "commands": [
+    {
+      "role": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/receipt.json",
+        "sha256": "9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a",
+        "size_bytes": 4091
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    {
+      "role": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/receipt.json",
+        "sha256": "65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06",
+        "size_bytes": 4141
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    {
+      "role": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/receipt.json",
+        "sha256": "985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf",
+        "size_bytes": 4170
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "role": "runtime",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/receipt.json",
+        "sha256": "b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00",
+        "size_bytes": 4235
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "role": "normalCLI",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/receipt.json",
+        "sha256": "6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d",
+        "size_bytes": 4177
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    {
+      "role": "CI",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d",
+        "size_bytes": 4180
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    {
+      "role": "A",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/receipt.json",
+        "sha256": "40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180",
+        "size_bytes": 4622
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    },
+    {
+      "role": "comparator",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/receipt.json",
+        "sha256": "9a2cd3402db8b95665a357f9fc2ff91f2a18361e65c8c1b27e025fd3e9e84503",
+        "size_bytes": 5377
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        ".runtime/porting/SRC-06/compare-ordinary-source-EIO-Peer-07.py",
+        "--native",
+        ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json#c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+        "--native-custody",
+        ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json#fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+        "--rust-trace",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/geometry-consumers.json#5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571",
+        "--rust-receipt",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/receipt.json#40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180",
+        "--rust-input",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/input/original.idf#db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-comparison-01",
+        "--rust-eio",
+        ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/eplusrs.eio#fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-inputs-Root-01.json",
+      "sha256": "1bd9d532f9f5a79dfa8a91848fb4de890a6e2ce40a2ea9311be782c33e52adfe",
+      "size_bytes": 68632,
+      "role": "actual Root config",
+      "archive_member": "objects/1bd9d532f9f5a79dfa8a91848fb4de890a6e2ce40a2ea9311be782c33e52adfe"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-02/review.json",
+      "sha256": "b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162",
+      "size_bytes": 43012,
+      "role": "accepted independent nine-file Source review",
+      "archive_member": "objects/b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162"
+    },
+    {
+      "origin": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3",
+      "size_bytes": 7275,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3",
+      "size_bytes": 7275,
+      "role": "exact Git before",
+      "archive_member": "objects/5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3"
+    },
+    {
+      "origin": "generated full diff:crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "1257ffd1fc56e115601ce55b5807b62b2b6112725786af4a0b16a5a78a47bddd",
+      "size_bytes": 562,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/1257ffd1fc56e115601ce55b5807b62b2b6112725786af4a0b16a5a78a47bddd"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c",
+      "size_bytes": 28630,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c",
+      "size_bytes": 28630,
+      "role": "exact Git before",
+      "archive_member": "objects/972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "dc33b1a5c2ae54e85d6a904320a3c3395b2a4ad9da0053d998c8c70d0aa838a0",
+      "size_bytes": 329,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/dc33b1a5c2ae54e85d6a904320a3c3395b2a4ad9da0053d998c8c70d0aa838a0"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-01/new-path-empty-before.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "exact Git before",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "a3cddf2494ff9efd661d52e22f0899ed56d314fec5e41b236a844386a946b6f5",
+      "size_bytes": 9663,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/a3cddf2494ff9efd661d52e22f0899ed56d314fec5e41b236a844386a946b6f5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03",
+      "size_bytes": 33343,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03",
+      "size_bytes": 33343,
+      "role": "exact Git before",
+      "archive_member": "objects/eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "fabdb336d7a1b0c5258855bd7fd09066c4c3300df5197e90b9ee7e3cc0dc68bc",
+      "size_bytes": 378,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/fabdb336d7a1b0c5258855bd7fd09066c4c3300df5197e90b9ee7e3cc0dc68bc"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c",
+      "size_bytes": 12410,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c",
+      "size_bytes": 12410,
+      "role": "exact Git before",
+      "archive_member": "objects/b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "f2ffd58f46d681091b59fb6ea2b19b32d30f446534bcb3da75a95ee2b138d740",
+      "size_bytes": 1598,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/f2ffd58f46d681091b59fb6ea2b19b32d30f446534bcb3da75a95ee2b138d740"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d",
+      "size_bytes": 10864,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d",
+      "size_bytes": 10864,
+      "role": "exact Git before",
+      "archive_member": "objects/da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "1abf4c97ebc0caddc8d3806856ad64a5b414ceff6d076f18ba7c958d3e7a617e",
+      "size_bytes": 1842,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/1abf4c97ebc0caddc8d3806856ad64a5b414ceff6d076f18ba7c958d3e7a617e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746",
+      "size_bytes": 3189,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746",
+      "size_bytes": 3189,
+      "role": "exact Git before",
+      "archive_member": "objects/774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "34dea555a78310fbcc7f1eaf9d8d8915654acc68b7342ac456753dcb1f997817",
+      "size_bytes": 5660,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/34dea555a78310fbcc7f1eaf9d8d8915654acc68b7342ac456753dcb1f997817"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6",
+      "size_bytes": 17765,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6",
+      "size_bytes": 17765,
+      "role": "exact Git before",
+      "archive_member": "objects/5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8a38cc932981fd37ae917b2894f6630830d5b0deee22905cc146a87ea5a0fd63",
+      "size_bytes": 872,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/8a38cc932981fd37ae917b2894f6630830d5b0deee22905cc146a87ea5a0fd63"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Root-02/after.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6",
+      "size_bytes": 67380,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6"
+    },
+    {
+      "origin": "Git 1892254435d6d72c74a638ca0aee9f234199eddf:crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6",
+      "size_bytes": 67380,
+      "role": "exact Git before",
+      "archive_member": "objects/2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2bb52fbf3c32a4a126e5ab3a05cbcb66148e8eedb582575e8927965f78c04e33",
+      "size_bytes": 6767,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/2bb52fbf3c32a4a126e5ab3a05cbcb66148e8eedb582575e8927965f78c04e33"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/receipt.json",
+      "sha256": "9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a",
+      "size_bytes": 4091,
+      "role": "fmt actual receipt",
+      "archive_member": "objects/9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "fmt complete stdout",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "fmt complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "fmt executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/receipt.json",
+      "sha256": "65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06",
+      "size_bytes": 4141,
+      "role": "quality actual receipt",
+      "archive_member": "objects/65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/stdout.log",
+      "sha256": "5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73",
+      "size_bytes": 82,
+      "role": "quality complete stdout",
+      "archive_member": "objects/5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "quality complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "quality executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/receipt.json",
+      "sha256": "985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf",
+      "size_bytes": 4170,
+      "role": "clippy actual receipt",
+      "archive_member": "objects/985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "clippy complete stdout",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/stderr.log",
+      "sha256": "4de909d9f78f2444787e6e9eaaec0fa94585576713ff6e5f8b171cc0806340e3",
+      "size_bytes": 167,
+      "role": "clippy complete stderr",
+      "archive_member": "objects/4de909d9f78f2444787e6e9eaaec0fa94585576713ff6e5f8b171cc0806340e3"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "clippy executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/receipt.json",
+      "sha256": "b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00",
+      "size_bytes": 4235,
+      "role": "runtime actual receipt",
+      "archive_member": "objects/b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/stdout.log",
+      "sha256": "7db0be4b7cf156945871d0ae1ec7491a1ad037d607064989f28b5902a40f2327",
+      "size_bytes": 215,
+      "role": "runtime complete stdout",
+      "archive_member": "objects/7db0be4b7cf156945871d0ae1ec7491a1ad037d607064989f28b5902a40f2327"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/stderr.log",
+      "sha256": "99b895c0ed41d171250bc392cc7cd3e6c4c17fc7917a874039f4173b72793dcf",
+      "size_bytes": 254,
+      "role": "runtime complete stderr",
+      "archive_member": "objects/99b895c0ed41d171250bc392cc7cd3e6c4c17fc7917a874039f4173b72793dcf"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "runtime executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/receipt.json",
+      "sha256": "6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d",
+      "size_bytes": 4177,
+      "role": "normalCLI actual receipt",
+      "archive_member": "objects/6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/stdout.log",
+      "sha256": "7f24a1a4e169bfd375a30fd760c312268aa314bde5b738d70135d251d45b6842",
+      "size_bytes": 170,
+      "role": "normalCLI complete stdout",
+      "archive_member": "objects/7f24a1a4e169bfd375a30fd760c312268aa314bde5b738d70135d251d45b6842"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/stderr.log",
+      "sha256": "5faf7ddd8d9568af092dd20603ea01eafd38972363db08bd1cf27ce0305930ba",
+      "size_bytes": 357,
+      "role": "normalCLI complete stderr",
+      "archive_member": "objects/5faf7ddd8d9568af092dd20603ea01eafd38972363db08bd1cf27ce0305930ba"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "normalCLI executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/receipt.json",
+      "sha256": "f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d",
+      "size_bytes": 4180,
+      "role": "CI actual receipt",
+      "archive_member": "objects/f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/stdout.log",
+      "sha256": "c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1",
+      "size_bytes": 258,
+      "role": "CI complete stdout",
+      "archive_member": "objects/c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/stderr.log",
+      "sha256": "fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376",
+      "size_bytes": 152,
+      "role": "CI complete stderr",
+      "archive_member": "objects/fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "CI executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/receipt.json",
+      "sha256": "40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180",
+      "size_bytes": 4622,
+      "role": "A actual receipt",
+      "archive_member": "objects/40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/stdout.log",
+      "sha256": "baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec",
+      "size_bytes": 27425,
+      "role": "A complete stdout",
+      "archive_member": "objects/baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/stderr.log",
+      "sha256": "7a2612bae6a108a31f9bd33e506e1fd72f3ef6700b281ad32b2753998ec1b6e0",
+      "size_bytes": 553,
+      "role": "A complete stderr",
+      "archive_member": "objects/7a2612bae6a108a31f9bd33e506e1fd72f3ef6700b281ad32b2753998ec1b6e0"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "A executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/receipt.json",
+      "sha256": "9a2cd3402db8b95665a357f9fc2ff91f2a18361e65c8c1b27e025fd3e9e84503",
+      "size_bytes": 5377,
+      "role": "comparator actual receipt",
+      "archive_member": "objects/9a2cd3402db8b95665a357f9fc2ff91f2a18361e65c8c1b27e025fd3e9e84503"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/stdout.log",
+      "sha256": "22221931267dc9642539db609acecb1dedbad86b996e48b987ce0d4da96f7e0d",
+      "size_bytes": 216,
+      "role": "comparator complete stdout",
+      "archive_member": "objects/22221931267dc9642539db609acecb1dedbad86b996e48b987ce0d4da96f7e0d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "comparator complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "comparator executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ba/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+      "sha256": "ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+      "size_bytes": 1679621,
+      "role": "common Source index metadata",
+      "archive_member": "objects/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ca/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/d2/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/47/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/d0/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ab/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/55/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/3f/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/91/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/2c/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "only selected nine Source archives",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/compare-ordinary-source-EIO-Peer-07.py",
+      "sha256": "228dcbe7f56adcfc5eb585cc7df40439d70ca3ad875a35a07bf1d049c52eea98",
+      "size_bytes": 29830,
+      "role": "actual comparator Source",
+      "archive_member": "objects/228dcbe7f56adcfc5eb585cc7df40439d70ca3ad875a35a07bf1d049c52eea98"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-comparison-01/summary.json",
+      "sha256": "e6a629627d3f58afb980bcee63551175903e5db2a03b9c0f8b2a9bb839cabe94",
+      "size_bytes": 10268,
+      "role": "actual complete strict comparison",
+      "archive_member": "objects/e6a629627d3f58afb980bcee63551175903e5db2a03b9c0f8b2a9bb839cabe94"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+      "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+      "size_bytes": 173622,
+      "role": "actual native_capture",
+      "archive_member": "objects/c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+      "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+      "size_bytes": 2885,
+      "role": "actual native_custody",
+      "archive_member": "objects/fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571",
+      "size_bytes": 39475,
+      "role": "actual trace",
+      "archive_member": "objects/5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275,
+      "role": "actual input",
+      "archive_member": "objects/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595,
+      "role": "actual native_eio",
+      "archive_member": "objects/5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/eplusrs.eio",
+      "sha256": "fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1",
+      "size_bytes": 8761,
+      "role": "actual rust_eio",
+      "archive_member": "objects/fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+      "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+      "size_bytes": 173622,
+      "role": "actual Native EIO descriptor owner",
+      "archive_member": "objects/c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595,
+      "role": "actual Native literal EIO",
+      "archive_member": "objects/5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595,
+      "role": "c9af-owned raw EIO",
+      "archive_member": "objects/5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+      "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+      "size_bytes": 2885,
+      "role": "reused actual Native custody",
+      "archive_member": "objects/fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-prep-01/request.proposed.json",
+      "sha256": "1b2952111a50ec8c45bea1b36172f721549cbac88f95b581e0a1a5aec00af8ed",
+      "size_bytes": 11508,
+      "role": "reused Native request",
+      "archive_member": "objects/1b2952111a50ec8c45bea1b36172f721549cbac88f95b581e0a1a5aec00af8ed"
+    },
+    {
+      "origin": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-temperature/summary.json",
+      "sha256": "370e9ebea66c5454ce711eefcd54643b72476f9c303bb1a7e6f447738ef5a116",
+      "size_bytes": 14222,
+      "role": "prior public summary",
+      "archive_member": "objects/370e9ebea66c5454ce711eefcd54643b72476f9c303bb1a7e6f447738ef5a116"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "current actual Rust result",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-solar-temperature-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "prior same-input Rust result",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-02/review.json",
+      "sha256": "b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162",
+      "size_bytes": 43012,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b41e6bc1296652e45d18568ee79505fc9c041886d69561d6aff50ad4e2253162"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-01/new-path-empty-before.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__post_building_input.rs.diff",
+      "sha256": "92d6ad6438bb4e607b6e1b52044ced3d2306ed1c0da9d8b37f3418d1bbceac08",
+      "size_bytes": 9667,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/92d6ad6438bb4e607b6e1b52044ced3d2306ed1c0da9d8b37f3418d1bbceac08"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__ctf_initialization_context__post_building_input.rs.diff",
+      "sha256": "b93544b9b3039c3461b6f73224e9f4107f8d3409819cb0d23d4d052a72fd551c",
+      "size_bytes": 9667,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b93544b9b3039c3461b6f73224e9f4107f8d3409819cb0d23d4d052a72fd551c"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c",
+      "size_bytes": 28630,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/972ba5ad471cc2d07c96511d760055693cceb258d462e9758f50be68b673a66c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "622bb0a5f036a7a8243e009160f64233f93e3d305cdf27fbf2ed3a84047f7451",
+      "size_bytes": 333,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/622bb0a5f036a7a8243e009160f64233f93e3d305cdf27fbf2ed3a84047f7451"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs.diff",
+      "sha256": "ecd8b816f2f7f4fbf5c47a5af416ed7f0520eeafcc850d0c8223afd7e4432a6a",
+      "size_bytes": 333,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ecd8b816f2f7f4fbf5c47a5af416ed7f0520eeafcc850d0c8223afd7e4432a6a"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03",
+      "size_bytes": 33343,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/eb87f6984c4e0c29e4934cbabae7f80f11de42d7224863d983fb0e1069a64e03"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "f31a7c48c4ad38df63c7bd52d327b1877c26d5a49b0d69d60bee310d43c231d8",
+      "size_bytes": 382,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f31a7c48c4ad38df63c7bd52d327b1877c26d5a49b0d69d60bee310d43c231d8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "528a2ba8c3af082a1562af1fffdff9410360f8b33d5e83d0b0d94a35c2c3206a",
+      "size_bytes": 382,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/528a2ba8c3af082a1562af1fffdff9410360f8b33d5e83d0b0d94a35c2c3206a"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6",
+      "size_bytes": 17765,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5146788367767ef386015a8643dbba14e1930493c7f582fa57ec72134fd5e6a6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "8933bb92eb05d9580f210a3ba22327f2d90eb8ae1dfcfda7ee610ed89b98887d",
+      "size_bytes": 876,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/8933bb92eb05d9580f210a3ba22327f2d90eb8ae1dfcfda7ee610ed89b98887d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "52122b7d721f991a79fe4d8780e39675918a80e4e5d52d0dcd76e2a1b50df45d",
+      "size_bytes": 876,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/52122b7d721f991a79fe4d8780e39675918a80e4e5d52d0dcd76e2a1b50df45d"
+    },
+    {
+      "origin": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3",
+      "size_bytes": 7275,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5ca4a2dae7d8155d70e505bc9f6e4cc47212626b91d24e8242501812a41ae7e3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_run__src__ordinary_input_processor__schema.rs.diff",
+      "sha256": "fcb56671909174a16949c0dab7dd14383e9c57451883604355085d0890d47846",
+      "size_bytes": 566,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fcb56671909174a16949c0dab7dd14383e9c57451883604355085d0890d47846"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_run__src__ordinary_input_processor__schema.rs.diff",
+      "sha256": "a1c1f6f7e1ba1c08b4b11d38fe7a8615e01cfa1decb2fe146a3a8462684d8a13",
+      "size_bytes": 566,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a1c1f6f7e1ba1c08b4b11d38fe7a8615e01cfa1decb2fe146a3a8462684d8a13"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6",
+      "size_bytes": 67380,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2823d48eb2df149bb198ab9827b72478c06e7e4f3fdc3495f4c7c3b39cf963c6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Root-02/after.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Root-02/complete.diff",
+      "sha256": "4e6a6ee2e1a0f8ff5093024773d104e6751b5a24042fceb03ebfe8d9981132c5",
+      "size_bytes": 7098,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/4e6a6ee2e1a0f8ff5093024773d104e6751b5a24042fceb03ebfe8d9981132c5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Root-02/complete.inverse.diff",
+      "sha256": "7eeedb13064eaa915ebeaf210663f164e4c45274d674854a6fb6af77de051af8",
+      "size_bytes": 7098,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7eeedb13064eaa915ebeaf210663f164e4c45274d674854a6fb6af77de051af8"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c",
+      "size_bytes": 12410,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input.rs.diff",
+      "sha256": "17f9fed141eaafb51f780f39ab4d297d70fb24af3d4012b01e57bdffc701bdb7",
+      "size_bytes": 1602,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/17f9fed141eaafb51f780f39ab4d297d70fb24af3d4012b01e57bdffc701bdb7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__selected_heat_balance_input.rs.diff",
+      "sha256": "1435f317830fb59fb8eb664617f2c1715319355bd7af5a3a54fd27812fae907a",
+      "size_bytes": 1602,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1435f317830fb59fb8eb664617f2c1715319355bd7af5a3a54fd27812fae907a"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d",
+      "size_bytes": 10864,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__construction.rs.diff",
+      "sha256": "a55f991dcd7a7f34e7fc499596d8f3b5787147fccac3057730cec8d1ab6b80a7",
+      "size_bytes": 1846,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a55f991dcd7a7f34e7fc499596d8f3b5787147fccac3057730cec8d1ab6b80a7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__construction.rs.diff",
+      "sha256": "500552329dfca8fccf9a56109abea544d5422ae4c843ec62aeced899df7fe306",
+      "size_bytes": 1846,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/500552329dfca8fccf9a56109abea544d5422ae4c843ec62aeced899df7fe306"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746",
+      "size_bytes": 3189,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__construction_types.rs.diff",
+      "sha256": "bc696fe53dcbf702c712368b5b2bec532cb9a79da82c0c3226b2a662fc96194c",
+      "size_bytes": 5664,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bc696fe53dcbf702c712368b5b2bec532cb9a79da82c0c3226b2a662fc96194c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__construction_types.rs.diff",
+      "sha256": "a6dd1f53832e3a354c0ee5615e1efe457cd9a1078de5d4363b55fb801aec086b",
+      "size_bytes": 5664,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a6dd1f53832e3a354c0ee5615e1efe457cd9a1078de5d4363b55fb801aec086b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Root-02/manifest.json",
+      "sha256": "b12025586148a052f937399d25b0f3b7005908513b433135a9fbdd14ceaccb50",
+      "size_bytes": 35851,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b12025586148a052f937399d25b0f3b7005908513b433135a9fbdd14ceaccb50"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/manifest.json",
+      "sha256": "86f40afc9d616877ec659519a581c348c10719f88d2c6f821c8f7ec7395f22fb",
+      "size_bytes": 17462,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/86f40afc9d616877ec659519a581c348c10719f88d2c6f821c8f7ec7395f22fb"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.243-327.txt",
+      "sha256": "dce45d86722cba7a2334532729e7fd682be4d9d1d4c6cd5a01e88f6762ca452f",
+      "size_bytes": 3483,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/dce45d86722cba7a2334532729e7fd682be4d9d1d4c6cd5a01e88f6762ca452f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/DataSurfaces.cc.749-798.txt",
+      "sha256": "ec6eab07443a5408ea99ebf2652ae0b154b6a64002a717e7357ded59cf4d66a4",
+      "size_bytes": 2427,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ec6eab07443a5408ea99ebf2652ae0b154b6a64002a717e7357ded59cf4d66a4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.2084-2099.txt",
+      "sha256": "85b80e60983a8f241978ecb93bbd072f3ce2ca6b9a06f12dca028b6a30e4a0e2",
+      "size_bytes": 763,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/85b80e60983a8f241978ecb93bbd072f3ce2ca6b9a06f12dca028b6a30e4a0e2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.4984-5034.txt",
+      "sha256": "b553d57640966702f3c57daa52ba8576a16dcd2b92373d2b997bd2cc6fe16e8c",
+      "size_bytes": 2514,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b553d57640966702f3c57daa52ba8576a16dcd2b92373d2b997bd2cc6fe16e8c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.5086-5098.txt",
+      "sha256": "e1d4f7a6d17190ba32819c5839a010b424feeddd607a02897af33ba541f23fd7",
+      "size_bytes": 833,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e1d4f7a6d17190ba32819c5839a010b424feeddd607a02897af33ba541f23fd7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.5175-5183.txt",
+      "sha256": "daa5dff3f8e9865f7f91321b5e7719790b82f4a06b211459dcd667dbd21f28fe",
+      "size_bytes": 424,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/daa5dff3f8e9865f7f91321b5e7719790b82f4a06b211459dcd667dbd21f28fe"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.5256-5285.txt",
+      "sha256": "79e2e239a5e0ab0a766b4870c1125b90497dbda563e564b88e51ab763db49c4a",
+      "size_bytes": 1227,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/79e2e239a5e0ab0a766b4870c1125b90497dbda563e564b88e51ab763db49c4a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.329-403.txt",
+      "sha256": "01b353b138ae4d5bb44700b2002fa5fcf1e431beb466a3dcf253bac1d5a0e07f",
+      "size_bytes": 4400,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/01b353b138ae4d5bb44700b2002fa5fcf1e431beb466a3dcf253bac1d5a0e07f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/HeatBalanceManager.cc.405-451.txt",
+      "sha256": "73620984601560b0c774f16449e2bd6a1aa10217b6cb9a4109c9861f0222979e",
+      "size_bytes": 2368,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/73620984601560b0c774f16449e2bd6a1aa10217b6cb9a4109c9861f0222979e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/DataSurfaces.hh.1484-1486.txt",
+      "sha256": "b8bf469bda0708b4e8fe262d4686f1ddceed0536624ffb1cb5564976acc3705c",
+      "size_bytes": 343,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b8bf469bda0708b4e8fe262d4686f1ddceed0536624ffb1cb5564976acc3705c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/Construction.hh.138-146.txt",
+      "sha256": "89450f57c93632a7da9a943ac68d1b6f10372422910faa3c39ac5bf0ad27291a",
+      "size_bytes": 826,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/89450f57c93632a7da9a943ac68d1b6f10372422910faa3c39ac5bf0ad27291a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/Construction.hh.265-275.txt",
+      "sha256": "0a17a22985335e5052ad31e0a4e124a7a95b1bd92eb7079b82d214a190ad37b7",
+      "size_bytes": 807,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/0a17a22985335e5052ad31e0a4e124a7a95b1bd92eb7079b82d214a190ad37b7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Original/Energy+.idd.in.18825-18842.txt",
+      "sha256": "c91c857290c04aa65a57ce2cd7e35ca185493f3a7852881e3e5022e579ee6973",
+      "size_bytes": 769,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/c91c857290c04aa65a57ce2cd7e35ca185493f3a7852881e3e5022e579ee6973"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/DataHeatBalance.cc.341-423.txt",
+      "sha256": "88c35d0dbd578503c08bf4c21e7715c38ce1ef1b591847d0f295ff9372c79217",
+      "size_bytes": 3954,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/88c35d0dbd578503c08bf4c21e7715c38ce1ef1b591847d0f295ff9372c79217"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/DataHeatBalance.cc.753-798.txt",
+      "sha256": "368148d59a96bd4a4d503b48df114781e4562583bb5296f2f78a31a008c2d7ae",
+      "size_bytes": 2275,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/368148d59a96bd4a4d503b48df114781e4562583bb5296f2f78a31a008c2d7ae"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/Construction.hh.138-155.txt",
+      "sha256": "03cdf1932ec57124b3935c4c07f4bff3a3cbac13c4ba125fafdf2d7c8c366250",
+      "size_bytes": 1871,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/03cdf1932ec57124b3935c4c07f4bff3a3cbac13c4ba125fafdf2d7c8c366250"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/Construction.hh.217-230.txt",
+      "sha256": "04bea6521c8edb522b9c9e8081e09f22cd118908fe396e1c8a1159f2159c4ca0",
+      "size_bytes": 1520,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/04bea6521c8edb522b9c9e8081e09f22cd118908fe396e1c8a1159f2159c4ca0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/HeatBalanceManager.cc.1779-1795.txt",
+      "sha256": "5f85dbf2977cf18f86e09ec0157ce99e8423636671de99f248cbd7cfdb5ffd88",
+      "size_bytes": 919,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5f85dbf2977cf18f86e09ec0157ce99e8423636671de99f248cbd7cfdb5ffd88"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/Material.hh.164-179.txt",
+      "sha256": "583c907c2c690533e46b6cc710d6cebc6d2c20dcb864ccfc0f8e9dd69fd61e35",
+      "size_bytes": 473,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/583c907c2c690533e46b6cc710d6cebc6d2c20dcb864ccfc0f8e9dd69fd61e35"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/Material.cc.192-217.txt",
+      "sha256": "56111f8cea74632687644fd4fc3a1dc36d67a093e08e9f88a765b929f598434d",
+      "size_bytes": 1623,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/56111f8cea74632687644fd4fc3a1dc36d67a093e08e9f88a765b929f598434d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original/Material.cc.274-308.txt",
+      "sha256": "456cf38c30c1d50195ca560fd33f0be3bbc843f9c50055d537fb4e2d2ca25ca5",
+      "size_bytes": 1291,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/456cf38c30c1d50195ca560fd33f0be3bbc843f9c50055d537fb4e2d2ca25ca5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Rust/selected_material_data.rs.333-348.txt",
+      "sha256": "47bb9223d4528d3233fe95a9ae4625afa23568d3da2d8ffcf4d638a376b300dc",
+      "size_bytes": 719,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/47bb9223d4528d3233fe95a9ae4625afa23568d3da2d8ffcf4d638a376b300dc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Rust/selected_heat_balance_input.rs.218-254.txt",
+      "sha256": "271c278bc6ab78fdbf7b2087f94759d0ba9d491b6578cbbe020fcd7e4190062e",
+      "size_bytes": 1538,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/271c278bc6ab78fdbf7b2087f94759d0ba9d491b6578cbbe020fcd7e4190062e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Rust/opaque.rs.86-112.txt",
+      "sha256": "ce1839afdf149fef009a7e65786fbf1214268ff5b0c01472eced94fb336d5a0e",
+      "size_bytes": 1234,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ce1839afdf149fef009a7e65786fbf1214268ff5b0c01472eced94fb336d5a0e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/Rust/selected_input_processor.rs.262-279.txt",
+      "sha256": "75523fdff60569a8eaf4d912fb115b61c5135873f04c946d2bf4f729aa23d38e",
+      "size_bytes": 731,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/75523fdff60569a8eaf4d912fb115b61c5135873f04c946d2bf4f729aa23d38e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_material_data.rs",
+      "sha256": "6e7063ad00b6e56d41da504deed8c49a3923536ef1ab3c8244b4be9944923c56",
+      "size_bytes": 18087,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6e7063ad00b6e56d41da504deed8c49a3923536ef1ab3c8244b4be9944923c56"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Rust/selected_material_data.rs.190-216.txt",
+      "sha256": "9fb94b7110979ca56025e09783deb5997e9f2f8eba5df1d92bd399d151bed5dc",
+      "size_bytes": 1201,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9fb94b7110979ca56025e09783deb5997e9f2f8eba5df1d92bd399d151bed5dc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Rust/selected_material_data.rs.253-272.txt",
+      "sha256": "88f724a76f7b721afed11e3f5bbff2e2c16b92b51796ec03622d2fb709c9b2e9",
+      "size_bytes": 774,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/88f724a76f7b721afed11e3f5bbff2e2c16b92b51796ec03622d2fb709c9b2e9"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_material_data/type_group.rs",
+      "sha256": "00a48806f0a508582d120865478e303af72f7734a3699a19123fe32872da5f42",
+      "size_bytes": 2385,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/00a48806f0a508582d120865478e303af72f7734a3699a19123fe32872da5f42"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Rust/type_group.rs.65-87.txt",
+      "sha256": "da684eb968c1b6d29df7f5c9d536429b46b033bad46c9004852a48753243fc11",
+      "size_bytes": 749,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/da684eb968c1b6d29df7f5c9d536429b46b033bad46c9004852a48753243fc11"
+    },
+    {
+      "origin": "crates/ep_model/src/objects/materials.rs",
+      "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+      "size_bytes": 54627,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Rust/materials.rs.1119-1123.txt",
+      "sha256": "70a4351fec5e663f049ab8ff447a84494dc8c184aadc1c3f466cbafa2dfba9d0",
+      "size_bytes": 225,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/70a4351fec5e663f049ab8ff447a84494dc8c184aadc1c3f466cbafa2dfba9d0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Rust/materials.rs.1165-1189.txt",
+      "sha256": "100261a7d7b96123de03dea033cad3bce359e7f8bac3aa13091296fc573c8970",
+      "size_bytes": 871,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/100261a7d7b96123de03dea033cad3bce359e7f8bac3aa13091296fc573c8970"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/16/164b014df8a5275980d563fbcbe0f16dbeb794a75678ae65bb5de7c66bec50f2",
+      "sha256": "164b014df8a5275980d563fbcbe0f16dbeb794a75678ae65bb5de7c66bec50f2",
+      "size_bytes": 1679238,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/164b014df8a5275980d563fbcbe0f16dbeb794a75678ae65bb5de7c66bec50f2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-post-building-Source-review-01/review.json",
+      "sha256": "f6bac11b31300dd88cdc329a3e5cef74c1a4236ef2b7842e5416274ceae433fe",
+      "size_bytes": 40093,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f6bac11b31300dd88cdc329a3e5cef74c1a4236ef2b7842e5416274ceae433fe"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/manifest.json",
+      "sha256": "ded198479d97da67e27006e541a44c9106a245cefc621643abcbaf91c5c28fc9",
+      "size_bytes": 4086,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ded198479d97da67e27006e541a44c9106a245cefc621643abcbaf91c5c28fc9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-01/receipt.json",
+      "sha256": "e1591f108bebe38a85e32e90259b258939b67f682aa45861e8c401b0fbdc6b63",
+      "size_bytes": 4237,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e1591f108bebe38a85e32e90259b258939b67f682aa45861e8c401b0fbdc6b63"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-01/stdout.log",
+      "sha256": "8f37a10d369c1e138161af5eaef97f92e48adb5161f1d70d59313c8455dcf4af",
+      "size_bytes": 826,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/8f37a10d369c1e138161af5eaef97f92e48adb5161f1d70d59313c8455dcf4af"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-01/stderr.log",
+      "sha256": "63f6d935e8758ac14e7765a8306fe005eeb87bfd6e95045e582b6dc7ec30771f",
+      "size_bytes": 310,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/63f6d935e8758ac14e7765a8306fe005eeb87bfd6e95045e582b6dc7ec30771f"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/UtilityRoutines.cc.351-379.txt",
+      "sha256": "2ba501f50437814fbf9bc39bf77819d315d467e55ac4952bf4a24ec599cccefe",
+      "size_bytes": 1020,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2ba501f50437814fbf9bc39bf77819d315d467e55ac4952bf4a24ec599cccefe"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/UtilityRoutines.cc.757-798.txt",
+      "sha256": "e3cb577d4e9afa606d6357d0d22c71e378439f3d81f6dd073bb2498eee02628a",
+      "size_bytes": 1824,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3cb577d4e9afa606d6357d0d22c71e378439f3d81f6dd073bb2498eee02628a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-pre-solar-input-actual-review-01/review.json",
+      "sha256": "28024b2bb91db2267a92b5edf3f828f86e5e02e20da07a5a4f0b91af606e05a1",
+      "size_bytes": 20592,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/28024b2bb91db2267a92b5edf3f828f86e5e02e20da07a5a4f0b91af606e05a1"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ba/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+      "sha256": "ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0",
+      "size_bytes": 1679621,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ba09d3ca12630f4bcd0c7d7438a857d3bed8716722f0cb62e25ade27de6a20f0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/receipt.json",
+      "sha256": "9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a",
+      "size_bytes": 4091,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9959090e34b1e3134560f154be38cc572bf968ba5715dd1e4ddfdb6fa250c40a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/receipt.json",
+      "sha256": "65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06",
+      "size_bytes": 4141,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/65c91263b1ea5ad38f6819c3fc9aed717173203eaa7d800ad8254ca2264cae06"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/stdout.log",
+      "sha256": "5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73",
+      "size_bytes": 82,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/receipt.json",
+      "sha256": "985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf",
+      "size_bytes": 4170,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/985736ffa18da7ce6b43682124fb29efe019103e62adf13e89f850641fc2bbbf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-02/stderr.log",
+      "sha256": "4de909d9f78f2444787e6e9eaaec0fa94585576713ff6e5f8b171cc0806340e3",
+      "size_bytes": 167,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/4de909d9f78f2444787e6e9eaaec0fa94585576713ff6e5f8b171cc0806340e3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/receipt.json",
+      "sha256": "b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00",
+      "size_bytes": 4235,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b485780a467a1192e78d2acd4c333f243093a55cf23111d944614f547c898f00"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/stdout.log",
+      "sha256": "7db0be4b7cf156945871d0ae1ec7491a1ad037d607064989f28b5902a40f2327",
+      "size_bytes": 215,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7db0be4b7cf156945871d0ae1ec7491a1ad037d607064989f28b5902a40f2327"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-runtime-tests-command-02/stderr.log",
+      "sha256": "99b895c0ed41d171250bc392cc7cd3e6c4c17fc7917a874039f4173b72793dcf",
+      "size_bytes": 254,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/99b895c0ed41d171250bc392cc7cd3e6c4c17fc7917a874039f4173b72793dcf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/receipt.json",
+      "sha256": "6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d",
+      "size_bytes": 4177,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6522c17bec4fd70c468a90cf9ccd6c99912e7b745733989e3c5c77a088590d6d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/stdout.log",
+      "sha256": "7f24a1a4e169bfd375a30fd760c312268aa314bde5b738d70135d251d45b6842",
+      "size_bytes": 170,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7f24a1a4e169bfd375a30fd760c312268aa314bde5b738d70135d251d45b6842"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-cli-tests-command-01/stderr.log",
+      "sha256": "5faf7ddd8d9568af092dd20603ea01eafd38972363db08bd1cf27ce0305930ba",
+      "size_bytes": 357,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5faf7ddd8d9568af092dd20603ea01eafd38972363db08bd1cf27ce0305930ba"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/receipt.json",
+      "sha256": "f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d",
+      "size_bytes": 4180,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f469aab1dd96e2d0a381ae8daec9d97d483bf9ffe60b7989e121764f9277368d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/stdout.log",
+      "sha256": "c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1",
+      "size_bytes": 258,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-ci-timestep-tests-command-01/stderr.log",
+      "sha256": "fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376",
+      "size_bytes": 152,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fd37e860837813b006bad2df7c1aa5cb2aecaf285e7bbaa016e09121886e5376"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/receipt.json",
+      "sha256": "40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180",
+      "size_bytes": 4622,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/40d054ad520156eec24c083b35f2b8e534b77c736c724c07bd9af8edf9faf180"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/stdout.log",
+      "sha256": "baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec",
+      "size_bytes": 27425,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-command-01/stderr.log",
+      "sha256": "7a2612bae6a108a31f9bd33e506e1fd72f3ef6700b281ad32b2753998ec1b6e0",
+      "size_bytes": 553,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7a2612bae6a108a31f9bd33e506e1fd72f3ef6700b281ad32b2753998ec1b6e0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/receipt.json",
+      "sha256": "9a2cd3402db8b95665a357f9fc2ff91f2a18361e65c8c1b27e025fd3e9e84503",
+      "size_bytes": 5377,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9a2cd3402db8b95665a357f9fc2ff91f2a18361e65c8c1b27e025fd3e9e84503"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/stdout.log",
+      "sha256": "22221931267dc9642539db609acecb1dedbad86b996e48b987ce0d4da96f7e0d",
+      "size_bytes": 216,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/22221931267dc9642539db609acecb1dedbad86b996e48b987ce0d4da96f7e0d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-compare-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/run-summary.json",
+      "sha256": "baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec",
+      "size_bytes": 27425,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/baf1344d57f900d8bcb0892855bebd6330041a674edf2a693802fb4a9cef61ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-comparison-01/summary.json",
+      "sha256": "e6a629627d3f58afb980bcee63551175903e5db2a03b9c0f8b2a9bb839cabe94",
+      "size_bytes": 10268,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e6a629627d3f58afb980bcee63551175903e5db2a03b9c0f8b2a9bb839cabe94"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-comparison-01/differences.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "size_bytes": 3,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571",
+      "size_bytes": 39475,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-solar-temperature-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571",
+      "size_bytes": 39475,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5d66c729df107ed989491284a6f022d275060c959e5decff55f0f8e6c2f26571"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-solar-temperature-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/eplusrs.eio",
+      "sha256": "fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1",
+      "size_bytes": 8761,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-solar-temperature-A-24H-cli-01/output/eplusrs.eio",
+      "sha256": "fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1",
+      "size_bytes": 8761,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fe74839bf773f9d514ab846e5fbaa8f89d46287cfe049f7758c87d7e2c0d68e1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-01/receipt.json",
+      "sha256": "843db5c6fc77e1a728c09a752950d73f06f388b3d9b9a526c92267e2d2bb9bbd",
+      "size_bytes": 4091,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/843db5c6fc77e1a728c09a752950d73f06f388b3d9b9a526c92267e2d2bb9bbd"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-fmt-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-01/receipt.json",
+      "sha256": "b81bdb6ce9f4765c357b7a7f0cd18489a057426ad452d2590d55d6f61ce86d0f",
+      "size_bytes": 4140,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b81bdb6ce9f4765c357b7a7f0cd18489a057426ad452d2590d55d6f61ce86d0f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-01/stdout.log",
+      "sha256": "5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73",
+      "size_bytes": 82,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5420bbba4d9b8b3f57798fe31ed2287ae8f4a2aacf39a72c62668bf46ef3ea73"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-quality-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-01/receipt.json",
+      "sha256": "f72ab5cd2e97780c9455865902517007e05f6622ec24596baffcb3fa44bb7700",
+      "size_bytes": 4171,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f72ab5cd2e97780c9455865902517007e05f6622ec24596baffcb3fa44bb7700"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-clippy-command-01/stderr.log",
+      "sha256": "6fe0d20c8bc8442465df955fe1354034ef506b5c091ee03388febabc7f56e217",
+      "size_bytes": 265,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6fe0d20c8bc8442465df955fe1354034ef506b5c091ee03388febabc7f56e217"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-hb-pre-solar-input-publisher-preflight-01/review.json",
+      "sha256": "1dae1ae9fbadf067686d90481b5e1147f686e479277bd6e437e722041f2222b8",
+      "size_bytes": 3311,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1dae1ae9fbadf067686d90481b5e1147f686e479277bd6e437e722041f2222b8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-plan-01/plan.json",
+      "sha256": "25bec7a574493800ccb394da8f840fa854167ab310ab52c9a46eafaf989dd325",
+      "size_bytes": 18454,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/25bec7a574493800ccb394da8f840fa854167ab310ab52c9a46eafaf989dd325"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/Original-index.json",
+      "sha256": "1b1993d5ae38707da4e7d8e2fb3340ffb25551ff3f3f4437ed7855df2a5c8a8c",
+      "size_bytes": 5377,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1b1993d5ae38707da4e7d8e2fb3340ffb25551ff3f3f4437ed7855df2a5c8a8c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/manifest.json",
+      "sha256": "14130e00a6b54c9c60a93715d3895d5a14fa8666fe60349915febc98f60ae32e",
+      "size_bytes": 35544,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/14130e00a6b54c9c60a93715d3895d5a14fa8666fe60349915febc98f60ae32e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/after/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "954e3550b278b2da1db4e01e3ab01f9de5b9cea0830d2cb1830349b5cb425574",
+      "size_bytes": 72316,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/954e3550b278b2da1db4e01e3ab01f9de5b9cea0830d2cb1830349b5cb425574"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/after.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-fatal-test-correction-Root-01/correction.diff",
+      "sha256": "92331c3369119d059c2c5eec115ae25e41fd1536c724383a1331611017534756",
+      "size_bytes": 976,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/92331c3369119d059c2c5eec115ae25e41fd1536c724383a1331611017534756"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-01.rs",
+      "sha256": "b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c",
+      "size_bytes": 12410,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-Git-01.rs",
+      "sha256": "b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c",
+      "size_bytes": 12410,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b9302300f01e706fed2f421fbece5c06a5e4eb2f580feaa87240a4a528679b5c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/after-01.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-01.diff",
+      "sha256": "17f9fed141eaafb51f780f39ab4d297d70fb24af3d4012b01e57bdffc701bdb7",
+      "size_bytes": 1602,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/17f9fed141eaafb51f780f39ab4d297d70fb24af3d4012b01e57bdffc701bdb7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-inverse-01.diff",
+      "sha256": "1435f317830fb59fb8eb664617f2c1715319355bd7af5a3a54fd27812fae907a",
+      "size_bytes": 1602,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1435f317830fb59fb8eb664617f2c1715319355bd7af5a3a54fd27812fae907a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-02.rs",
+      "sha256": "da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d",
+      "size_bytes": 10864,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-Git-02.rs",
+      "sha256": "da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d",
+      "size_bytes": 10864,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/da438e658ae36cdb52d615aae4abaa4b92041112d97877b750c794eab400434d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/after-02.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-02.diff",
+      "sha256": "a55f991dcd7a7f34e7fc499596d8f3b5787147fccac3057730cec8d1ab6b80a7",
+      "size_bytes": 1846,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a55f991dcd7a7f34e7fc499596d8f3b5787147fccac3057730cec8d1ab6b80a7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-inverse-02.diff",
+      "sha256": "500552329dfca8fccf9a56109abea544d5422ae4c843ec62aeced899df7fe306",
+      "size_bytes": 1846,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/500552329dfca8fccf9a56109abea544d5422ae4c843ec62aeced899df7fe306"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-03.rs",
+      "sha256": "774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746",
+      "size_bytes": 3189,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/before-Git-03.rs",
+      "sha256": "774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746",
+      "size_bytes": 3189,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/774593458d83b7b8271206da6d296ad0d618634090547c7ce79b198ad006c746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/after-03.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-03.diff",
+      "sha256": "bc696fe53dcbf702c712368b5b2bec532cb9a79da82c0c3226b2a662fc96194c",
+      "size_bytes": 5664,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bc696fe53dcbf702c712368b5b2bec532cb9a79da82c0c3226b2a662fc96194c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-construction-properties-source-Peer-01/complete-inverse-03.diff",
+      "sha256": "a6dd1f53832e3a354c0ee5615e1efe457cd9a1078de5d4363b55fb801aec086b",
+      "size_bytes": 5664,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a6dd1f53832e3a354c0ee5615e1efe457cd9a1078de5d4363b55fb801aec086b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+      "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+      "size_bytes": 173622,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+      "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+      "size_bytes": 2885,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-A-24H-cli-01/output/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-02/manifest.json",
+      "sha256": "5f967594b55163d7f1b4b248e9d63882d6ddf86cf79b93c29c28486d621db129",
+      "size_bytes": 4908,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5f967594b55163d7f1b4b248e9d63882d6ddf86cf79b93c29c28486d621db129"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-01/manifest.json",
+      "sha256": "665e12267d905331ae67e4a4f48e4fbc78014efbb871af7c01d565dbf38d8cb2",
+      "size_bytes": 4482,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/665e12267d905331ae67e4a4f48e4fbc78014efbb871af7c01d565dbf38d8cb2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-hb-pre-solar-input-Peer-01.py",
+      "sha256": "63633fdac493e31fb4780c9900d5f702938f3bffa8373f6e610348f98207f0b9",
+      "size_bytes": 18829,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/63633fdac493e31fb4780c9900d5f702938f3bffa8373f6e610348f98207f0b9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-setup-solar-temperature-Peer-01.py",
+      "sha256": "f9ee1fb99fa008bc3a52dfd91ce74616dd21d70543fd0fb3e809d92abf32a6ce",
+      "size_bytes": 17630,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f9ee1fb99fa008bc3a52dfd91ce74616dd21d70543fd0fb3e809d92abf32a6ce"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-01/publish-hb-pre-solar-input-Peer-01.complete-parent.diff",
+      "sha256": "35605cd1ba5d2bbaf5cb3ad4c1ae4d47580667534c765c28fa93aa539edbe4b9",
+      "size_bytes": 10530,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/35605cd1ba5d2bbaf5cb3ad4c1ae4d47580667534c765c28fa93aa539edbe4b9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-01/publish-hb-pre-solar-input-Peer-01.literal-inverse.json",
+      "sha256": "9909afe55c64a7573057b3be30f123280ab9d097d928f4322489d41de47d1ad2",
+      "size_bytes": 5772,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9909afe55c64a7573057b3be30f123280ab9d097d928f4322489d41de47d1ad2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/prepare-hb-pre-solar-input-publication-Peer-03.py",
+      "sha256": "944560e8c5ce696108ad285013d4ee819c869c0f742556a2e72efc5a3de11ba1",
+      "size_bytes": 10441,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/944560e8c5ce696108ad285013d4ee819c869c0f742556a2e72efc5a3de11ba1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/prepare-hb-pre-solar-input-publication-Peer-02.py",
+      "sha256": "8852187db8326c7141b63b1a186f7b0f44c437dda83d7a7150805ca5782ada77",
+      "size_bytes": 10368,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/8852187db8326c7141b63b1a186f7b0f44c437dda83d7a7150805ca5782ada77"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-02/prepare-hb-pre-solar-input-publication-Peer-03.complete-parent.diff",
+      "sha256": "7e9added31960d38e8760fd338f1df182ede78a1b8940e33ff5bf33f9f9fee83",
+      "size_bytes": 4291,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7e9added31960d38e8760fd338f1df182ede78a1b8940e33ff5bf33f9f9fee83"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-02/literal-inverse.json",
+      "sha256": "d98bbf8ffb16372cdeaf46c4f105f4eff012f098f33254c8bfc80c70e1ad6b65",
+      "size_bytes": 1120,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d98bbf8ffb16372cdeaf46c4f105f4eff012f098f33254c8bfc80c70e1ad6b65"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-02/prepare-hb-pre-solar-input-publication-Peer-03.complete-Solar-parent.diff",
+      "sha256": "d35d8d0877f5222978a01812a2b21f762f88a1feaf55673b97a32d8d55340d45",
+      "size_bytes": 15604,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d35d8d0877f5222978a01812a2b21f762f88a1feaf55673b97a32d8d55340d45"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/prepare-setup-solar-temperature-publication-Root-02.py",
+      "sha256": "14dadcbbadfae2eed691a4bc0c3a19f5aed1e2d18fefdbb68568cc3b1bfe85dc",
+      "size_bytes": 9388,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/14dadcbbadfae2eed691a4bc0c3a19f5aed1e2d18fefdbb68568cc3b1bfe85dc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-pre-solar-input-publication-prep-01/contract.json",
+      "sha256": "7f4207d4513b36362c6f64543d9558997d2603b23158af49d25791838a15e7ef",
+      "size_bytes": 3003,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7f4207d4513b36362c6f64543d9558997d2603b23158af49d25791838a15e7ef"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-solar-temperature-publication-inputs-Root-01.json",
+      "sha256": "6f3ceaa9c402e8283452c9ea3657f505f93cf2c7de09ae2330d03492cb3dbb64",
+      "size_bytes": 65397,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6f3ceaa9c402e8283452c9ea3657f505f93cf2c7de09ae2330d03492cb3dbb64"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/74/749954e0c455f662b969d3515d745d251fde67f2cb3477735053fb18cb285b94",
+      "sha256": "749954e0c455f662b969d3515d745d251fde67f2cb3477735053fb18cb285b94",
+      "size_bytes": 1679621,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/749954e0c455f662b969d3515d745d251fde67f2cb3477735053fb18cb285b94"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "c0538d30a05b74e1ff0c5da55a0e728c1a0120cafb999974bdbe8bdefe0a5d28",
+      "size_bytes": 6697,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/c0538d30a05b74e1ff0c5da55a0e728c1a0120cafb999974bdbe8bdefe0a5d28"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-hb-post-building-source-Header-01/inverse/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "cc7aa6e4859d4835086d3f09abaeaf40b48908dcde029ed47fda4236471b6566",
+      "size_bytes": 6697,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/cc7aa6e4859d4835086d3f09abaeaf40b48908dcde029ed47fda4236471b6566"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-hb-pre-solar-input-Peer-01.py",
+      "sha256": "63633fdac493e31fb4780c9900d5f702938f3bffa8373f6e610348f98207f0b9",
+      "size_bytes": 18829,
+      "role": "executed publisher Source",
+      "archive_member": "objects/63633fdac493e31fb4780c9900d5f702938f3bffa8373f6e610348f98207f0b9"
+    },
+    {
+      "origin": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+      "size_bytes": 7342,
+      "role": "last Source bytes check",
+      "archive_member": "objects/ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746",
+      "size_bytes": 28655,
+      "role": "last Source bytes check",
+      "archive_member": "objects/d22769ecd4fa4af0091be35d7d54cfe941735c10c8d9a2b829aa545235e7e746"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/post_building_input.rs",
+      "sha256": "471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de",
+      "size_bytes": 9246,
+      "role": "last Source bytes check",
+      "archive_member": "objects/471413d445b79811c6493086122b0e81fe2ec568e07145159d854be252dac8de"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c",
+      "size_bytes": 33416,
+      "role": "last Source bytes check",
+      "archive_member": "objects/d021638f7f33af916f40971ef07e4569316a0be9e95fa20ca846d97a1d02062c"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2",
+      "size_bytes": 13110,
+      "role": "last Source bytes check",
+      "archive_member": "objects/abfa81a20f8017200d9220006d1add65f5556388206e000b32fd4195e1fa01b2"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction.rs",
+      "sha256": "55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40",
+      "size_bytes": 10967,
+      "role": "last Source bytes check",
+      "archive_member": "objects/55c61a704a14309f46bccfb0c8e1cd379dc4210700388976ebe3f013c441bf40"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/construction_types.rs",
+      "sha256": "3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e",
+      "size_bytes": 5503,
+      "role": "last Source bytes check",
+      "archive_member": "objects/3f93a01fe0c3c733dc3085afdb2aaf825ccf13e92598426fb00e4a62a2d71b2e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f",
+      "size_bytes": 18110,
+      "role": "last Source bytes check",
+      "archive_member": "objects/9174c3325087b824bc344c5eb4861459aa9ab486b6102ea2e3b8b73e5e47123f"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01",
+      "size_bytes": 72389,
+      "role": "last Source bytes check",
+      "archive_member": "objects/2c901f9bf887044a24bdeef5c9fea84933dd4dc858237b34cb49f4e01d570b01"
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-pre-solar-input/evidence.zip",
+    "sha256": "8746c8d484467bbf5bb4e0312a906aab49ccb226e7af0fc75b29307aa4caf914",
+    "size_bytes": 1088127
+  },
+  "members": 152,
+  "comparison_scope": "Existing318/487 geometry plus1115B literal EIO regression only; new Native raw HB278-313 and CheckAndSet properties UNPAIRED",
+  "existing_test_executions": {
+    "selections": 3,
+    "distinct_bodies": 2,
+    "new_bodies_or_bins": 0,
+    "backend_rerun": false
+  },
+  "metadata_only": [
+    {
+      "role": "reused_Native_helper_binary",
+      "reference": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-setup-process-native-build-01/bin/setup_process_surface_helper_01.exe",
+        "sha256": "974c60505110b8f5b40499ef20374f89ad3db03b99fb6a2fb5651367698b2ea2",
+        "size_bytes": 1299490506
+      }
+    },
+    {
+      "role": "reused_Native_link_map",
+      "reference": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-setup-process-native-build-01/bin/setup_process_surface_helper_01.map",
+        "sha256": "bd711a40fc6ed471a87420cbd9f5763f2cf9ee0f34352d13a11a0975f9075f3d",
+        "size_bytes": 306296950
+      }
+    },
+    {
+      "role": "historical_Original_core",
+      "reference": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+        "size_bytes": 1832731010
+      }
+    }
+  ],
+  "metadata_only_payloads_read_or_hashed": false,
+  "whole_ZIP_CRC_SHA_size_readback": true
+}

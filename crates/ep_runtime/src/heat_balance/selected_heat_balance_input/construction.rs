@@ -182,13 +182,20 @@ impl SelectedHeatBalanceInputState {
         *current_module_object = "Construction:WindowEquivalentLayer".into();
         *current_module_object = "Construction:WindowDataFile".into();
         // Both actual window loops are empty; WConstructNames is gone at1776.
-        self.finish_selected_construction_nominal_u(materials, backend, errors_found)
+        self.finish_selected_construction_nominal_u(
+            ConstructionMaterialOwners {
+                model,
+                data: materials,
+            },
+            backend,
+            errors_found,
+        )
     }
 
-    /// Actual1779-1795 nominal reciprocal/error prefix before existing target Type* writes.
+    /// Actual1779-1795 nominal reciprocal/error prefix and ordinary opaque properties.
     pub(crate) fn finish_selected_construction_nominal_u(
         &mut self,
-        materials: &super::super::selected_material_data::SelectedMaterialData,
+        materials: ConstructionMaterialOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
         errors_found: &mut bool,
     ) -> Result<(), HeatBalanceInputError> {
@@ -219,9 +226,9 @@ impl SelectedHeatBalanceInputState {
                 ))?;
                 *errors_found = true;
             }
-            // This remains the existing bounded1795 target projection, not a
-            // claim of complete CheckAndSetConstructionProperties/optical work.
-            row.write_selected_type_predicates(materials)?;
+            // Same actual MaterialNum/property owners at1795; window optical
+            // calculations and positive diagnostic branches stay unavailable.
+            row.write_selected_opaque_properties(&materials)?;
         }
         Ok(())
     }

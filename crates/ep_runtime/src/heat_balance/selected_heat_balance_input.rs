@@ -216,7 +216,7 @@ fn absent(
     Ok(())
 }
 
-/// Same Construction input owner; no per-Surface copies of these flags.
+/// Same Construction input owner; no per-Surface copies of these properties.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedConstructionUsage {
     /// Construction.Name, assigned from the actual zeroth alpha after uniqueness.
@@ -225,6 +225,20 @@ pub(crate) struct SelectedConstructionUsage {
     /// ConstructionProps constructor: TotLayers0 and eleven LayerPoint0.
     pub(crate) total_layers: i32,
     pub(crate) layer_points: [i32; 11],
+    /// ConstructionProps ctor0; actual CheckAndSet writes at GetConstructData1795.
+    pub(crate) total_solid_layers: i32,
+    pub(crate) total_glass_layers: i32,
+    pub(crate) inside_absorp_vis: f64,
+    pub(crate) outside_absorp_vis: f64,
+    pub(crate) inside_absorp_solar: f64,
+    pub(crate) outside_absorp_solar: f64,
+    pub(crate) inside_absorp_thermal: f64,
+    pub(crate) outside_absorp_thermal: f64,
+    pub(crate) reflect_vis_diff_back: f64,
+    pub(crate) abs_diff_shade: f64,
+    pub(crate) daylt_prop_ptr: i32,
+    /// None is the genuine SurfaceRoughness::Invalid constructor, not a material value.
+    pub(crate) outside_roughness: Option<ep_model::MaterialSurfaceRoughness>,
     /// Constructor false; target writes at real CheckAndSet boundary1795.
     pub(crate) type_is_window: bool,
     /// ConstructionProps constructor false; actual positive AirBoundary getter stays excluded.

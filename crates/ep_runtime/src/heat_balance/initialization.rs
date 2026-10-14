@@ -108,6 +108,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 source.minutes,
                 &mut *source.output_host,
             )?;
+            actual.continue_selected_heat_balance_input_before_solar()?;
         }
     }
     if let Some(actual) = initialization.as_deref_mut() {

@@ -730,6 +730,29 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(nominal.nominal_u, Some(vec![0.5]));
         assert_eq!(nominal.nominal_u_before_adjusted.as_ref().ok_or("actual U-before dimension")?[0].to_bits(), 0.0_f64.to_bits());
         assert_eq!(nominal.coefficient_adjustment_ratio, Some(vec![1.0]));
+        let material_surface = layered.materials[0].surface_properties().ok_or("authored opaque properties")?;
+        let properties = &nominal.construction_usage[0];
+        assert_eq!([properties.inside_absorp_vis, properties.outside_absorp_vis,
+            properties.inside_absorp_solar, properties.outside_absorp_solar,
+            properties.inside_absorp_thermal, properties.outside_absorp_thermal,
+            properties.reflect_vis_diff_back].map(f64::to_bits),
+            [material_surface.visible_absorptance, material_surface.visible_absorptance,
+            material_surface.solar_absorptance, material_surface.solar_absorptance,
+            material_surface.thermal_absorptance, material_surface.thermal_absorptance,
+            1.0 - material_surface.visible_absorptance].map(f64::to_bits));
+        assert_eq!(properties.outside_roughness, layered.materials[0].roughness());
+        assert_eq!((properties.daylt_prop_ptr, properties.total_solid_layers, properties.total_glass_layers), (0, 0, 0));
+        assert_eq!(properties.abs_diff_shade.to_bits(), 0.0_f64.to_bits());
+        // Both actual early returns preserve every prior Construction field.
+        for no_layers in [true, false] {
+            let mut early = nominal.clone(); early.construction_usage[0].type_is_window = true;
+            if no_layers { early.construction_usage[0].total_layers = 0; }
+            else { early.construction_usage[0].layer_points[1] = 0; }
+            let before = early.construction_usage.clone();
+            early.finish_selected_construction_nominal_u(ConstructionMaterialOwners { model: &layered, data: &materials },
+                &mut context.backend, &mut errors)?;
+            assert_eq!(early.construction_usage, before);
+        }
         // Same authored owners exercise report-ID order, referenced-class film
         // selection, and the actual table-before-EIO partial-failure boundary.
         let mut report_owner = CtfInitializationReports {
@@ -770,11 +793,47 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(prefix, first_header.as_bytes());
         assert_eq!(report_owner.table.num_table_entry, i32::try_from(2 * total)?);
         assert_eq!(report_owner.table.entries.as_ref().ok_or("retained second film entries")?[total].original_real_entry.to_bits(), 0.0_f64.to_bits());
+        // Actual zero getters still query the schema and insert its absent
+        // family. This authored unused Construction exercises the real warning.
+        let mut scheduled_definition = crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+            object_type: "SurfaceProperty:SolarIncidentInside".into(), alpha_fields: 4, numeric_fields: 0,
+            alpha_extensions: 0, numeric_extensions: 0, extension: None,
+        };
+        report_owner.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(
+            vec![scheduled_definition.clone()], Default::default())?);
+        let (mut parent_state, mut parent_error, mut parent_console, mut parent_eio) =
+            (ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new());
+        let mut parent = CtfInitializationContext { reports: &mut report_owner, eio: &mut parent_eio,
+            backend: SourceErrorBackend { state: &mut parent_state, error_stream: Some(&mut parent_error),
+                console: &mut parent_console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None } };
+        parent.continue_selected_heat_balance_input_before_solar()?;
+        assert_eq!(parent.reports.input_processor_shortcut.current_module_object, "ComplexFenestrationProperty:SolarAbsorbedLayers");
+        assert_eq!((parent.reports.surface_geometry_input.total_incident_solar_multipliers,
+            parent.reports.surface_geometry_input.total_incident_solar_scheduled_gains,
+            parent.reports.surface_geometry_input.total_fenestration_absorbed_solar_scheduled_gains), (0, 0, 0));
+        assert!(matches!(parent.reports.selected_input_processor.as_ref().ok_or("same scheduled IP")?
+            .family("SurfaceProperty:SolarIncidentInside"), Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Null)));
+        assert_eq!(parent.backend.state.tracking.total_warning_errors, 1);
+        assert!(!parent.reports.heat_balance_input_errors_found);
+        // One malformed definition earns the real ErrorsFound write, then
+        // reaches the parent fatal only after all preceding selected helpers.
+        scheduled_definition.alpha_fields = 3;
+        parent.reports.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(
+            vec![scheduled_definition], Default::default())?);
+        let failure = parent.continue_selected_heat_balance_input_before_solar();
+        assert!(matches!(failure, Err(crate::RuntimeError::HeatBalanceInput(error))
+            if matches!(*error, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(
+                crate::heat_balance::error_backend::SourceFatalStop::Fatal(_)))));
+        assert!(parent.reports.heat_balance_input_errors_found);
+        assert!(!parent.backend.state.tracking.abort_processing, "ShowFatalError throws before separate AbortEnergyPlus");
+        assert_eq!(parent.reports.input_processor_shortcut.current_module_object, "ComplexFenestrationProperty:SolarAbsorbedLayers");
+        assert!(!parent.reports.heat_balance_input_state.construction_usage[0].is_used);
         nominal.nominal_r_for_u = Some(vec![0.0]); nominal.construction_usage[0].type_is_window = true;
         let retained = nominal.clone();
         let (mut zero_state, mut zero_console, mut zero_failure) =
             (ctf_ordinary_output_test_state(), Vec::new(), OrdinaryFailingEio);
-        let failure = nominal.finish_selected_construction_nominal_u(&materials,
+        let failure = nominal.finish_selected_construction_nominal_u(ConstructionMaterialOwners { model: &layered, data: &materials },
             &mut SourceErrorBackend { state: &mut zero_state, error_stream: Some(&mut zero_failure),
                 console: &mut zero_console, out_unit1: None, out_unit2: None, f_message: None,
                 message_callback: None, error_callback: None, sqlite: None }, &mut errors);

@@ -12706,6 +12706,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-temperature/summary.json",
         "sha256": "370e9ebea66c5454ce711eefcd54643b72476f9c303bb1a7e6f447738ef5a116",
         "size_bytes": 14222
+      },
+      "actual_selected_ordinary_hb_pre_solar_input": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-pre-solar-input/summary.json",
+        "sha256": "bcdd46d4590a0428a3c1a8bc4d9dce934ee8405c036b984337a8c7f466f07fe3",
+        "size_bytes": 15720
       }
     },
     {

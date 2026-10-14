@@ -158,6 +158,11 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) total_window_shading_control: i32,
     pub(crate) total_osc: i32,
     pub(crate) total_oscm: i32,
+    /// DataSurface constructor0; actual parent GetIncidentSolarMultiplier count.
+    pub(crate) total_incident_solar_multipliers: i32,
+    /// DataSurface constructor0; actual GetScheduledSurfaceGains count owners.
+    pub(crate) total_incident_solar_scheduled_gains: i32,
+    pub(crate) total_fenestration_absorbed_solar_scheduled_gains: i32,
     /// Actual TotExtVentCav constructor0 and reached count; only allocate(0) is represented.
     pub(crate) total_ext_vented_cavities: i32,
     /// Actual DataSurface TotStormWin constructor0; positive writer stays excluded.
