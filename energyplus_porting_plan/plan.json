@@ -12701,6 +12701,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-reporting-continuation/summary.json",
         "sha256": "80976ee6d3c92fb265836a63790e9505c0540a263345a70d63137aebd58781f5",
         "size_bytes": 12141
+      },
+      "actual_selected_ordinary_setup_solar_temperature": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-temperature/summary.json",
+        "sha256": "370e9ebea66c5454ce711eefcd54643b72476f9c303bb1a7e6f447738ef5a116",
+        "size_bytes": 14222
       }
     },
     {

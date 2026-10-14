@@ -144,6 +144,8 @@ pub(crate) struct SelectedSpaceData {
     pub(crate) exterior_total_surface_area: f64,
     pub(crate) exterior_perimeter: f64,
     pub(crate) radiant_enclosure_num: i32,
+    /// Actual ZoneSpaceData solarEnclosureNum constructor0, written at Setup797.
+    pub(crate) solar_enclosure_num: i32,
     pub(crate) space_type: String,
     pub(crate) space_type_num: i32,
     pub(crate) tags: Vec<String>,
@@ -180,6 +182,7 @@ impl Default for SelectedSpaceData {
             exterior_total_surface_area: 0.0,
             exterior_perimeter: 0.0,
             radiant_enclosure_num: 0,
+            solar_enclosure_num: 0,
             space_type: "General".into(),
             space_type_num: 0,
             tags: Vec::new(),

@@ -1,6 +1,6 @@
-//! Actual selected SurfaceGeometry2857 radiant enclosure setup.
+//! Actual selected SurfaceGeometry2857 radiant and797 solar enclosure setup.
 //! Opaque one-Zone/implicit-Space only; AirBoundary producers remain excluded.
-use super::{OrdinarySolarRadiation, RadiantRadiationEnclosure};
+use super::{OrdinarySolarRadiation, RadiantRadiationEnclosure, SolarRadiationEnclosure};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_heat_balance_input::surface::{
     SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners,
@@ -161,6 +161,158 @@ impl OrdinarySolarRadiation {
             return Err(Error::Unavailable("Source radiant size assertion"));
         }
         self.radiant.truncate(count); // Source resize after the same size assertion.
+
+        self.finish_enclosure_setup(owners, output)
+    }
+
+    pub(crate) fn setup_solar_enclosures(
+        &mut self,
+        surface_state: &SurfaceGeometryInputState,
+        owners: &mut SurfaceGetterOwners<'_>,
+        output: &mut EnclosureOutputOwners<'_>,
+    ) -> Result<(), Error> {
+        // Original14788: allocation precedes AirBoundary/association checks.
+        let spaces_count = usize::try_from(owners.globals.num_spaces)
+            .map_err(|_| Error::Unavailable("actual numSpaces solar allocation"))?;
+        self.solar = Some(vec![SolarRadiationEnclosure::default(); spaces_count]);
+        if owners
+            .control
+            .construction_usage
+            .iter()
+            .any(|row| row.type_is_air_boundary)
+        {
+            return Err(Error::Unavailable(
+                "positive Construction:AirBoundary solar grouping",
+            ));
+        }
+        let zones = owners
+            .zones
+            .zones
+            .as_mut()
+            .ok_or(Error::Unavailable("same Zone solar enclosure owner"))?;
+        let spaces = owners
+            .zones
+            .spaces
+            .as_mut()
+            .ok_or(Error::Unavailable("same Space solar enclosure owner"))?;
+        if spaces_count != 1
+            || spaces.len() != spaces_count
+            || zones.len() != 1
+            || owners.globals.num_of_zones != 1
+        {
+            return Err(Error::Unavailable(
+                "one-Zone implicit-Space solar enclosure domain",
+            ));
+        }
+        let surfaces = surface_state
+            .final_surfaces
+            .as_ref()
+            .ok_or(Error::Unavailable("same final solar Surface traversal"))?;
+        let solar = self
+            .solar
+            .as_mut()
+            .ok_or(Error::Unavailable("actual EnclSolInfo allocation"))?;
+        let mut any_grouped_spaces = false;
+        let mut enclosure_num = 0_i32;
+        for zone in zones.iter() {
+            let mut new_enclosure_num = 0;
+            for &space_num in &zone.space_indexes {
+                let space = spaces
+                    .get_mut(index(space_num)?)
+                    .ok_or(Error::Unavailable("actual Zone solar Space index"))?;
+                let space_enclosure_num = space.solar_enclosure_num;
+                let mut space_has_only_floors = false;
+                if space_enclosure_num == 0 {
+                    space_has_only_floors = true;
+                    for &surface_num in &space.surfaces {
+                        let surface = surfaces
+                            .get(index(surface_num)?)
+                            .ok_or(Error::Unavailable("actual solar Space Surface index"))?;
+                        if surface.row.class == SurfaceClass::IntMass {
+                            continue;
+                        }
+                        if surface.row.class != SurfaceClass::Floor {
+                            space_has_only_floors = false;
+                            break;
+                        }
+                    }
+                }
+                if space_enclosure_num == 0 && space_has_only_floors {
+                    any_grouped_spaces = true;
+                    if new_enclosure_num == 0 {
+                        enclosure_num = enclosure_num
+                            .checked_add(1)
+                            .ok_or(Error::Unavailable("Source solar enclosure count"))?;
+                        new_enclosure_num = enclosure_num;
+                    }
+                    space.solar_enclosure_num = enclosure_num;
+                    let enclosure = solar
+                        .get_mut(index(enclosure_num)?)
+                        .ok_or(Error::Unavailable("allocated grouped solar enclosure"))?;
+                    enclosure.name.clone_from(&zone.name);
+                    enclosure.space_names.push(space.name.clone());
+                    enclosure.space_nums.push(space_num);
+                    // The actual floor-only branch ASSIGNS these scalar fields.
+                    enclosure.floor_area = space.floor_area;
+                    enclosure.exterior_window_area = space.exterior_window_area;
+                    enclosure.total_surface_area = space.total_surface_area;
+                }
+            }
+        }
+        if any_grouped_spaces {
+            for space in spaces.iter() {
+                if space.solar_enclosure_num == 0 {
+                    return Err(Error::Unavailable(
+                        "remaining grouped/remainder solar Space producer",
+                    ));
+                }
+            }
+            self.num_solar_enclosures = enclosure_num;
+        } else {
+            for (offset, space) in spaces.iter_mut().enumerate() {
+                let space_num = i32::try_from(offset)
+                    .ok()
+                    .and_then(|n| n.checked_add(1))
+                    .ok_or(Error::Unavailable("Source solar Space number"))?;
+                let enclosure = solar
+                    .get_mut(offset)
+                    .ok_or(Error::Unavailable("allocated solar Space row"))?;
+                enclosure.name.clone_from(&space.name);
+                enclosure.space_names.push(space.name.clone());
+                enclosure.space_nums.push(space_num);
+                enclosure.floor_area = space.floor_area;
+                space.solar_enclosure_num = space_num;
+                enclosure.exterior_window_area = space.exterior_window_area;
+                enclosure.total_surface_area = space.total_surface_area;
+            }
+            self.num_solar_enclosures = owners.globals.num_spaces;
+        }
+        let count = usize::try_from(self.num_solar_enclosures)
+            .map_err(|_| Error::Unavailable("Source solar resize count"))?;
+        if count > solar.len() {
+            return Err(Error::Unavailable("Source solar size assertion"));
+        }
+        solar.truncate(count);
+        // The common Source suffix deliberately registers RADIANT rows again,
+        // then updates the same Zone radiant ranges, even during Solar setup.
+        self.finish_enclosure_setup(owners, output)
+    }
+
+    fn finish_enclosure_setup(
+        &mut self,
+        owners: &mut SurfaceGetterOwners<'_>,
+        output: &mut EnclosureOutputOwners<'_>,
+    ) -> Result<(), Error> {
+        let zones = owners
+            .zones
+            .zones
+            .as_mut()
+            .ok_or(Error::Unavailable("same Zone enclosure output owner"))?;
+        let spaces = owners
+            .zones
+            .spaces
+            .as_ref()
+            .ok_or(Error::Unavailable("same Space enclosure output owner"))?;
 
         // Real unmatched OutputProcessor branch still writes dictionary/setup
         // counts. Requested MRT stops at its existing unported OutVar boundary;

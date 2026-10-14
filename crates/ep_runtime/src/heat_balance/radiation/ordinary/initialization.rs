@@ -11,6 +11,20 @@ pub(super) fn allocate_enclosure(
     surfaces: &[SurfaceHeatBalanceState],
     layout: &InsideConvectionLayout,
 ) -> Result<SolarRadiationEnclosure, OrdinaryRadiationError> {
+    let mut enclosure = SolarRadiationEnclosure {
+        name: model.spaces[0].name.0.clone(),
+        ..Default::default()
+    };
+    bind_enclosure_geometry(&mut enclosure, model, surfaces, layout)?;
+    Ok(enclosure)
+}
+
+pub(super) fn bind_enclosure_geometry(
+    enclosure: &mut SolarRadiationEnclosure,
+    _model: &TypedModel,
+    surfaces: &[SurfaceHeatBalanceState],
+    layout: &InsideConvectionLayout,
+) -> Result<(), OrdinaryRadiationError> {
     let group = &layout.groups()[0];
     let n = group.surfaces.len();
     n.checked_mul(n)
@@ -49,22 +63,12 @@ pub(super) fn allocate_enclosure(
     // Source SurfaceGeometry1506-1536/1727-1733: on this one-Space domain
     // without subsurfaces, both traversal/report order are Wall,Floor,Roof,
     // retaining actual within-class input order. No SurfaceId-as-index cast.
-    Ok(SolarRadiationEnclosure {
-        id: 1,
-        name: model.spaces[0].name.0.clone(),
-        zone_id: group.zone_id,
-        space_ids: vec![group.space_id],
-        surface_ptr: Vec::new(),
-        surface_indexes: indexes,
-        surface_report_nums: Vec::new(),
-        // The geometry setup does not allocate InitSolar/InitInterior arrays.
-        area: Vec::new(),
-        absorptance: Vec::new(),
-        azimuth: Vec::new(),
-        tilt: Vec::new(),
-        f: Vec::new(),
-        fix: None,
-    })
+    enclosure.id = 1;
+    enclosure.zone_id = Some(group.zone_id);
+    enclosure.space_ids = vec![group.space_id];
+    enclosure.surface_indexes = indexes;
+    // Geometry setup/binding does not allocate InitSolar/InitInterior arrays.
+    Ok(())
 }
 
 fn view_factor_scan(
@@ -148,7 +152,9 @@ fn approximate_and_fix(
     let approximate = super::super::calculate_selected_approximate_view_factors(
         super::super::ApproximateViewFactorContext {
             enclosure_index: enclosure.id,
-            zone_id: enclosure.zone_id,
+            zone_id: enclosure
+                .zone_id
+                .ok_or(OrdinaryRadiationUnavailable::EnclosureDomain)?,
         },
         &rows,
     )
@@ -227,7 +233,11 @@ impl OrdinarySolarRadiation {
         output: &mut CtfInitializationContext<'_>,
     ) -> Result<(), OrdinaryRadiationError> {
         view_factor_scan(model, output)?;
-        for (number, enclosure) in self.solar.iter_mut().enumerate() {
+        let solar = self
+            .solar
+            .as_mut()
+            .ok_or(OrdinaryRadiationUnavailable::EnclosureDomain)?;
+        for (number, enclosure) in solar.iter_mut().enumerate() {
             if number == 0 && self.input.advanced_report_variables {
                 writeln!(
                     output.eio,

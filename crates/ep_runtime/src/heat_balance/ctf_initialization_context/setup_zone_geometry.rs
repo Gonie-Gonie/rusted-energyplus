@@ -1,4 +1,4 @@
-//! Bounded Setup through792 reports; Solar enclosures796 remain separate.
+//! Selected Setup through801; full transitive Setup/HB closure remains separate.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -27,6 +27,9 @@ impl CtfInitializationContext<'_> {
         &mut self,
         model: &ep_model::TypedModel,
         clock: Option<OrdinaryEquipmentInput>,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        minutes_in_time_step: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
     ) -> Result<Vec<crate::geometry::InitializedZoneGeometry>, RuntimeError> {
         let reports = &mut *self.reports;
         if reports
@@ -170,6 +173,83 @@ impl CtfInitializationContext<'_> {
             )
             .map_err(hb_input_error)?;
         reports.write_selected_setup_geometry_reports(self.eio)?;
-        Ok(volume_returns) // Stop before796 Solar enclosures and stratosphere checks.
+        // Actual797 borrows the same earlier radiant/Solar container and the
+        // caller's still-live IP/output owners, before any800 temperature write.
+        {
+            let radiation = reports.ordinary_solar_radiation.as_mut().ok_or_else(|| {
+                hb_input_error(E::Unavailable(
+                    "same retained Source Solar enclosure container",
+                ))
+            })?;
+            let mut owners =
+                crate::heat_balance::selected_heat_balance_input::surface::SurfaceGetterOwners {
+                    model,
+                    environment,
+                    input: reports.selected_input_processor.as_mut().ok_or_else(|| {
+                        hb_input_error(E::Unavailable("same Source IP at Solar enclosure setup"))
+                    })?,
+                    shortcut: &mut reports.input_processor_shortcut,
+                    zones: reports.selected_zone_input.as_mut().ok_or_else(|| {
+                        hb_input_error(E::Unavailable(
+                            "same Source Zone/Space at Solar enclosure setup",
+                        ))
+                    })?,
+                    control: &mut reports.heat_balance_input_state,
+                    globals: reports
+                        .selected_heat_balance_globals
+                        .as_ref()
+                        .ok_or_else(|| {
+                            hb_input_error(E::Unavailable(
+                                "same Source DataGlobal at Solar enclosure setup",
+                            ))
+                        })?,
+                };
+            let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
+                output: &mut reports.output_registration,
+                prescan: &reports.output_prescan,
+                minimum_report_frequency: &reports
+                    .selected_project_data
+                    .as_ref()
+                    .ok_or_else(|| {
+                        hb_input_error(E::Unavailable("same Solar enclosure process settings"))
+                    })?
+                    .system
+                    .minimum_report_frequency,
+                minutes_in_time_step,
+                host,
+                eio: self.eio,
+            };
+            radiation
+                .setup_solar_enclosures(&reports.surface_geometry_input, &mut owners, &mut output)
+                .map_err(hb_input_error)?;
+        }
+        // Existing returned getters witness the actual Site/Station operands;
+        // their absence cannot silently substitute constructor parameters.
+        if !environment.source_weather_station_initialized
+            || !environment.source_site_atmosphere_initialized
+        {
+            return Err(hb_input_error(E::Unavailable(
+                "actual returned Site/Station before Setup800",
+            )));
+        }
+        let zones = reports
+            .selected_zone_input
+            .as_mut()
+            .and_then(|owner| owner.zones.as_deref_mut())
+            .ok_or_else(|| {
+                hb_input_error(E::Unavailable(
+                    "same Source Zone allocation before Setup800",
+                ))
+            })?;
+        // Actual800 writes every Zone's bulbs;801 then performs the ordered
+        // cumulative check. Wind and Surface weather updates are later work.
+        crate::heat_balance::convection::surface_environment::ordinary::update_zone_out_bulb_temperatures(
+            zones,
+            environment.outdoor_environment_parameters,
+            environment.current_weather.out_dry_bulb_temp,
+            environment.current_weather.out_wet_bulb_temp,
+            &mut self.backend,
+        )?;
+        Ok(volume_returns)
     }
 }

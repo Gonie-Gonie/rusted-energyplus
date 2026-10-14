@@ -150,15 +150,25 @@ pub struct RadiantRadiationEnclosure {
 }
 
 /// Actual selected solar enclosure, available through immutable owner inspection.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct SolarRadiationEnclosure {
-    /// One-based solar enclosure index.
+    /// One-based Rust association, assigned by the later physical binder.
     pub id: usize,
-    /// Actual implicit-Space enclosure name.
+    /// Actual enclosure Name, initially empty and written at geometry setup797.
     pub name: String,
-    /// Actual owning Zone identity.
-    pub zone_id: ZoneId,
-    /// Actual member Space identities.
+    /// Actual ordered member Space names.
+    pub space_names: Vec<String>,
+    /// Actual one-based Source Space indices.
+    pub space_nums: Vec<i32>,
+    /// Actual constructor-zero FloorArea, written by geometry setup797.
+    pub floor_area: f64,
+    /// Actual constructor-zero ExtWindowArea.
+    pub exterior_window_area: f64,
+    /// Actual constructor-zero TotalSurfArea.
+    pub total_surface_area: f64,
+    /// Physical Zone binding is unavailable until the genuine later binder.
+    pub zone_id: Option<ZoneId>,
+    /// Actual bound physical member Space identities.
     pub space_ids: Vec<SpaceId>,
     /// Actual Wall/Floor/Roof traversal for both F axes.
     pub surface_ptr: Vec<SurfaceId>,
@@ -184,9 +194,11 @@ pub struct SolarRadiationEnclosure {
 #[derive(Clone, Debug, PartialEq)]
 pub struct OrdinarySolarRadiation {
     input: OrdinaryRadiationInput,
-    solar: Vec<SolarRadiationEnclosure>,
+    // Source EnclSolInfo constructor-unallocated, then actual797 allocation.
+    solar: Option<Vec<SolarRadiationEnclosure>>,
     radiant: Vec<RadiantRadiationEnclosure>,
     num_radiant_enclosures: i32,
+    num_solar_enclosures: i32,
     // Surface.SolarEnclIndex, RadEnclIndex, SolarEnclSurfIndex, one-based.
     // Original InitSolar writes these associations even before radiant init.
     back_pointers: Vec<(usize, usize, usize)>,
@@ -199,9 +211,10 @@ impl OrdinarySolarRadiation {
     pub(crate) fn for_surface_input(input: OrdinaryRadiationInput) -> Self {
         Self {
             input,
-            solar: Vec::new(),
+            solar: None,
             radiant: Vec::new(),
             num_radiant_enclosures: 0,
+            num_solar_enclosures: 0,
             back_pointers: Vec::new(),
             solar_initialized: false,
         }
@@ -222,7 +235,13 @@ impl OrdinarySolarRadiation {
     /// Retained actual solar enclosure storage and reached numeric prefix.
     #[must_use]
     pub fn enclosures(&self) -> &[SolarRadiationEnclosure] {
-        &self.solar
+        self.solar.as_deref().unwrap_or_default()
+    }
+
+    /// Genuine NumOfSolarEnclosures, independent of allocated row count.
+    #[must_use]
+    pub fn num_solar_enclosures(&self) -> i32 {
+        self.num_solar_enclosures
     }
 
     /// Actual one-based surface enclosure associations written by InitSolar.
@@ -255,7 +274,7 @@ impl OrdinarySolarRadiation {
         surfaces: &[SurfaceHeatBalanceState],
         input: OrdinaryRadiationInput,
     ) -> Result<(), OrdinaryRadiationError> {
-        if self.input != input || !self.solar.is_empty() {
+        if self.input != input {
             return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
         }
         let layout = InsideConvectionLayout::from_typed_model(model)
@@ -276,8 +295,27 @@ impl OrdinarySolarRadiation {
         {
             return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
         }
-        let enclosure = initialization::allocate_enclosure(model, surfaces, &layout)?;
-        self.solar = vec![enclosure];
+        if let Some(rows) = &mut self.solar {
+            if self.num_solar_enclosures != 1 || rows.len() != 1 {
+                return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
+            }
+            let enclosure = &mut rows[0];
+            if enclosure.space_nums != [1]
+                || enclosure.zone_id.is_some()
+                || !enclosure.surface_indexes.is_empty()
+            {
+                return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
+            }
+            // Enrich this same early Source row. No Name/Space metadata,
+            // scalar totals or EnclSolInfo allocation is replaced here.
+            initialization::bind_enclosure_geometry(enclosure, model, surfaces, &layout)?;
+        } else {
+            // Legacy callers retain their previous constructor and numeric path;
+            // absence of early Source797 does not claim its metadata writes.
+            self.solar = Some(vec![initialization::allocate_enclosure(
+                model, surfaces, &layout,
+            )?]);
+        }
         self.back_pointers = vec![(0, 0, 0); surfaces.len()];
         Ok(())
     }

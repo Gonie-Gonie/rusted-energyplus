@@ -112,15 +112,16 @@ pub(super) fn invoke(
     })
 }
 
-// Source DataHeatBalance SetZoneOutBulbTempAt/Check/SetWindSpeedAt/SetWindDirAt.
-// The selected raw admission excludes local-environment and EMS families;
-// linked-node and actual EMS ownership are also checked before any writes.
-pub(super) fn update_zones(
+// Source DataHeatBalance SetZoneOutBulbTempAt then CheckZoneOutBulbTempAt.
+// Return the existing transient height projection for the later wind setter;
+// this is not another retained Zone or weather owner. No wind field is changed.
+pub(crate) fn update_zone_out_bulb_temperatures(
     zones: &mut [SelectedZoneData],
     parameters: SurfaceOutdoorEnvironmentParameters,
-    weather: SurfaceOutdoorWeather,
+    dry_bulb_c: f64,
+    wet_bulb_c: f64,
     backend: &mut SourceErrorBackend<'_>,
-) -> Result<(), SurfaceOutdoorEnvironmentError> {
+) -> Result<Vec<f64>, SurfaceOutdoorEnvironmentError> {
     if zones.iter().any(|zone| zone.linked_outdoor_air_node != 0) {
         return Err(SurfaceOutdoorEnvironmentError::Unavailable(
             "Zone outdoor centroid/linked-node association",
@@ -137,8 +138,8 @@ pub(super) fn update_zones(
         })
         .collect::<Result<Vec<_>, _>>()?;
     for (zone, &height) in zones.iter_mut().zip(&heights) {
-        zone.dry_bulb = parameters.temperature_at_height(weather.dry_bulb_c, height);
-        zone.wet_bulb = parameters.temperature_at_height(weather.wet_bulb_c, height);
+        zone.dry_bulb = parameters.temperature_at_height(dry_bulb_c, height);
+        zone.wet_bulb = parameters.temperature_at_height(wet_bulb_c, height);
     }
     check_out_bulb_temperatures(
         "Zone",
@@ -146,6 +147,25 @@ pub(super) fn update_zones(
             .iter()
             .zip(&heights)
             .map(|(zone, &height)| (zone.dry_bulb, zone.wet_bulb, height, zone.name.as_str())),
+        backend,
+    )?;
+    Ok(heights)
+}
+
+// Source DataHeatBalance SetZoneOutBulbTempAt/Check/SetWindSpeedAt/SetWindDirAt.
+// The selected raw admission excludes local-environment and EMS families;
+// linked-node and actual EMS ownership are also checked before any writes.
+pub(super) fn update_zones(
+    zones: &mut [SelectedZoneData],
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    weather: SurfaceOutdoorWeather,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), SurfaceOutdoorEnvironmentError> {
+    let heights = update_zone_out_bulb_temperatures(
+        zones,
+        parameters,
+        weather.dry_bulb_c,
+        weather.wet_bulb_c,
         backend,
     )?;
     let factor = weather.wind_speed_m_per_s

@@ -14,6 +14,7 @@ use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
 mod source;
 use crate::weather::{HeatBalanceWeatherContext, day::WeatherDayPhase};
 use ep_model::{SimulationModel, WindExposure};
+pub(crate) use source::update_zone_out_bulb_temperatures;
 use std::fmt::{Display, Formatter};
 
 /// Real formatting/backend/fatal cause; an unavailable prerequisite is separate.

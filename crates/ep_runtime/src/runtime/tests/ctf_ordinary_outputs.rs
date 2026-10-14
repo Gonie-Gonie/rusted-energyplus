@@ -153,7 +153,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(owner.enclosures().len(), 1);
         let enclosure = &owner.enclosures()[0];
         assert_eq!(enclosure.id, 1);
-        assert_eq!(enclosure.zone_id, model.typed.zones[0].id);
+        assert_eq!(enclosure.zone_id, Some(model.typed.zones[0].id));
         assert_eq!(enclosure.space_ids, [model.typed.spaces[0].id]);
         assert_eq!(enclosure.surface_ptr,
             model.typed.surfaces.iter().map(|surface| surface.id).collect::<Vec<_>>());
@@ -308,7 +308,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             let space = &mut owners.zones.spaces.as_mut().ok_or("actual enclosure Space")?[0];
             space.name = "authored Source Space".into(); space.floor_area = 25.0;
             space.radiant_enclosure_num = 0;
+            space.solar_enclosure_num = 0;
             let mut radiation = crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(radiation_input);
+            assert!(radiation.enclosures().is_empty()); assert_eq!(radiation.num_solar_enclosures(), 0);
             let mut registration = crate::heat_balance::source_output_registration::SourceOutputRegistration::default();
             let prescan = crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
             let mut host = EnclosureTestHost { calls: 0, fail };
@@ -332,22 +334,50 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             assert_eq!(radiation.radiant_enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
             assert_eq!(radiation.radiant_enclosures()[0].mean_radiant_temperature.to_bits(), 0.0_f64.to_bits());
             assert_eq!(owners.zones.spaces.as_ref().ok_or("retained enclosure Space")?[0].radiant_enclosure_num, 1);
-            let zone = &owners.zones.zones.as_ref().ok_or("retained enclosure Zone")?[0];
             if fail {
+                let zone = &owners.zones.zones.as_ref().ok_or("retained enclosure Zone")?[0];
                 assert!(result.is_err());
                 assert_eq!((zone.radiant_enclosure_first, zone.radiant_enclosure_last), (-1, -1));
                 assert!(registration.output_initialized);
                 assert_eq!(registration.num_real_variables_setup, 0);
+                // Separate authored OP checkpoint: fail the common registration
+                // after actual Solar allocation/Space writes, not a runtime retry.
+                let mut solar_registration = Default::default();
+                let failure = radiation.setup_solar_enclosures(&enclosure_surfaces, &mut owners,
+                    &mut crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
+                        output: &mut solar_registration, prescan: &prescan, minimum_report_frequency: "",
+                        minutes_in_time_step: 15, host: &mut host, eio: &mut registration_eio,
+                    });
+                assert!(failure.is_err()); assert_eq!(radiation.num_solar_enclosures(), 1);
+                assert_eq!(radiation.enclosures()[0].space_nums, [1]);
+                assert!(radiation.enclosures()[0].zone_id.is_none());
+                assert_eq!(owners.zones.spaces.as_ref().ok_or("failed solar Space prefix")?[0].solar_enclosure_num, 1);
+                let zone = &owners.zones.zones.as_ref().ok_or("failed solar Zone prefix")?[0];
+                assert_eq!((zone.radiant_enclosure_first, zone.radiant_enclosure_last), (-1, -1));
+                assert_eq!(solar_registration.num_real_variables_setup, 0);
+                assert!(solar_registration.output_initialized);
             } else {
                 result?;
+                radiation.setup_solar_enclosures(&enclosure_surfaces, &mut owners, &mut output)?;
+                let zone = &owners.zones.zones.as_ref().ok_or("retained enclosure Zone")?[0];
                 assert_eq!((zone.radiant_enclosure_first, zone.radiant_enclosure_last), (1, 1));
-                assert_eq!(registration.num_real_variables_setup, 1);
+                assert_eq!(registration.num_real_variables_setup, 2, "Solar repeats real MRT registration");
                 assert_eq!(registration.dictionary_variables[0].name, "Enclosure Mean Radiant Temperature");
                 assert_eq!(registration.dictionary_variables[0].key_out_var_nums.len(), 0,
                     "unmatched Source registration does not fabricate an MRT variable handle");
                 let allocation = radiation.radiant_enclosures().as_ptr();
+                let solar_allocation = radiation.enclosures().as_ptr();
+                assert_eq!(radiation.num_solar_enclosures(), 1);
+                assert_eq!(radiation.enclosures()[0].space_names, ["authored Source Space"]);
+                assert_eq!(radiation.enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
+                assert!(radiation.enclosures()[0].zone_id.is_none() && radiation.enclosures()[0].f.is_empty());
                 radiation.bind_initialized_solar_geometry(&model.typed, &physical.surfaces, radiation_input)?;
                 assert_eq!(radiation.radiant_enclosures().as_ptr(), allocation);
+                assert_eq!(radiation.enclosures().as_ptr(), solar_allocation, "later bind keeps the early Solar Vec");
+                assert_eq!(radiation.enclosures()[0].zone_id, Some(model.typed.zones[0].id));
+                assert_eq!(radiation.enclosures()[0].name,
+                    if floor_only { "authored Source Zone" } else { "authored Source Space" });
+                assert_eq!(radiation.enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
                 assert_eq!(radiation.radiant_enclosures()[0].name,
                     if floor_only { "authored Source Zone" } else { "authored Source Space" });
                 assert_eq!(radiation.radiant_enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
@@ -355,7 +385,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
                 let moved = context.reports.ordinary_solar_radiation.take().ok_or("lost same radiation container")?;
                 assert_eq!(moved.radiant_enclosures().as_ptr(), allocation);
             }
-            assert_eq!(host.calls, 1);
+            assert_eq!(host.calls, if fail { 2 } else { 1 });
         }
         // Reuse this authored owner fixture for the newly reached zero suffix.
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-suffix Surface")?.iter()
@@ -550,6 +580,25 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(bounds_zones, before_adjacency_failure, "completed centroid/bounds and prior volume retained; counts not reached");
         assert_eq!(bounds_rows.adjacent_zone, Some(expected_adjacent), "new dimension and first entry retained at invalid second association");
         assert!(!errors);
+        // The Setup800/801 prefix updates bulbs and preserves both wind fields.
+        let mut bulb_zones = bounds_zones.zones.as_ref().ok_or("authored bulb Zone")?.clone();
+        bulb_zones[0].wind_speed = -9.0; bulb_zones[0].wind_direction = 17.0;
+        let mut parameters = environment.outdoor_environment_parameters;
+        parameters.site_temperature_gradient_k_per_m = 0.0;
+        crate::heat_balance::convection::surface_environment::ordinary::update_zone_out_bulb_temperatures(
+            &mut bulb_zones, parameters, 12.0, 10.0, &mut context.backend)?;
+        let bulb_fields = |zone: &SelectedZoneData| [zone.dry_bulb, zone.wet_bulb, zone.wind_speed, zone.wind_direction].map(f64::to_bits);
+        assert_eq!(bulb_fields(&bulb_zones[0]), [12.0_f64, 10.0, -9.0, 17.0].map(f64::to_bits));
+        let (mut bulb_state, mut bulb_console, mut bulb_failure) =
+            (ctf_ordinary_output_test_state(), Vec::new(), OrdinaryFailingEio);
+        let failure = crate::heat_balance::convection::surface_environment::ordinary::update_zone_out_bulb_temperatures(
+            &mut bulb_zones, parameters, -101.0, -102.0,
+            &mut SourceErrorBackend { state: &mut bulb_state, error_stream: Some(&mut bulb_failure),
+                console: &mut bulb_console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None });
+        assert!(matches!(failure, Err(crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentError::Backend(_))));
+        assert_eq!(bulb_fields(&bulb_zones[0]), [-101.0_f64, -102.0, -9.0, 17.0].map(f64::to_bits));
+        assert_eq!(bulb_state.tracking.total_severe_errors, 1);
         assert!(raw.surface_tmp.is_none());
         let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?
             .iter().map(|row| row.typed_id.ok_or("missing final physical ID")).collect::<Result<Vec<_>, _>>()?;

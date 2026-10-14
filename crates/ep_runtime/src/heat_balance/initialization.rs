@@ -101,8 +101,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             &mut *source.output_host,
         )?;
         if selected_world_geometry {
-            selected_world_zone_returns =
-                actual.continue_selected_setup_zone_geometry(&model.typed, equipment_input)?;
+            selected_world_zone_returns = actual.continue_selected_setup_zone_geometry(
+                &model.typed,
+                equipment_input,
+                source.environment,
+                source.minutes,
+                &mut *source.output_host,
+            )?;
         }
     }
     if let Some(actual) = initialization.as_deref_mut() {
