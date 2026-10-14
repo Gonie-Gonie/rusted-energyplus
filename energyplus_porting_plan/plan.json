@@ -12656,6 +12656,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-zone-continuation/summary.json",
         "sha256": "c6d7f0a965cd195afadc9b9c7ccda3d57ae15ad430b1e13e8c8b8ba078f827a9",
         "size_bytes": 15053
+      },
+      "actual_selected_design_day_psychrometric_precision_context_diagnosis": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/summary.json",
+        "sha256": "90cecaa11cffeee2f5388e188a9b303ece29d164ab5126e6187aa2d76b9f0541",
+        "size_bytes": 12930
       }
     },
     {

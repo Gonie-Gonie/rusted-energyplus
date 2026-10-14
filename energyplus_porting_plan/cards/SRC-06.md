@@ -84,7 +84,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 32개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 33개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -120,6 +120,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | DD 습공기 실제 입력·cache 관측 | [요약](../evidence/SRC-06-ordinary-design-day-passive-psy/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-passive-psy/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-passive-psy/evidence.zip) | 과거 F66 Source에서 Native 2개 구간·192 slot·5,583 호출/반환 쌍·최초 cache 접근 1,949개를 확인, 관측 검증 issue0. 이 관측 단위 당시 Rust 재현 미실행; 후속 같은 입력 재현은 아래 별도 FAIL 증거. 기존 9FAIL/8UNPAIRED 유지. |
 | DD 같은 입력·cache 재현 | [요약](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/evidence.zip) | 실제 두 구간·962개 바깥 호출·11,585개 cache 이벤트를 완주, **strict FAIL**. 호출 차이241·cache 차이9,705·최종 상태 차이 범주3; 최초 Psat 값 쓰기1 ULP. 전체 raw/Iterate·대입 경로 UNKNOWN, whole-DD9FAIL/8UNPAIRED 유지. |
 | 표면 입력 이후 Setup 초기화 | [요약](../evidence/SRC-06-ordinary-setup-zone-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-zone-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-zone-continuation/evidence.zip) | Source292–311의 실제 오류 cleanup·같은 입력 처리기/장비/Node/gain 소유자·빈 airflow/storm·불투명 class skip·trig 배열 해제. 기존 테스트4개·두 crate Clippy·실제 A24 및 Rust 결과 전체 bytes 일치; Source313+·전체 Setup/HB 완료는 미확인. |
+| DD 계산의 스레드 정밀도 진단 | [요약](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/evidence.zip) | 두 입력의 독립 실행에서 x87 PC 비트 교환만으로 exp 결과1 ULP 차이가 양방향으로 바뀌고 복원됐다. 기존 전체9,949개 차이·whole-DD 실패와 과거 실제 프로세스 FP 상태/호출 대상은 별도 미확정. 생산 수식·unsafe 정책·gate 변경 없음. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -239,6 +240,14 @@ Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항�
 선택한 GetSurfaceData 반환 이후 원본292의 오류 정리, 298의 같은 입력 처리기와 실제 Zone/Space/global 개수·연결을 사용하는 장비 초기화, 300/302의 빈 airflow/storm 입력과 할당 상태, 308의 class 우선 불투명 분기, 310/311의 실제 trig 배열 해제를 연결했다. 장비 입력용 인자 배열은 local이며 공유 shortcut을 덮어쓰지 않는다. 실제 schema 여섯 정의의 부재/빈 최대 alpha 개수1/2/8/7/2/2와 numeric0을 사용한다. Source 경로는 family projection을 다시 만들지 않으며 기존 legacy 경로의 projection만 명시적으로 보존한다. 같은 Construction의 CTF 사용 표시는 World GetSurfaceData의 실제 writer 한 곳에서 수행한다.
 
 장비·Node·gain·Config 부분 소유자는 실패 시 Reports에 남고 마지막 성공 시 다른 상태와 함께 이동한다. 실제 A-24H는 exit0, 24 hourly samples·390계열이며 기존 같은 입력 Rust result-store와 전체 bytes가 같다. World/CTF EIO 행은 도달한 기존 표면 경로의 증거이고, 새 Setup continuation 연결은 Source·기존 상태 검증으로 확인했다. Source313 이후 순회·ProcessSurfaceVertices·전체 Setup/HB 반환과 readiness, 수치 복사 동등성은 남아 있다. 앞선 DD 같은 입력 strict FAIL·whole-DD9FAIL/8UNPAIRED·네 gate·A/B 완료 수는 그대로다.
+
+## DD 계산의 스레드 정밀도 진단
+
+실제 Native에서 얻은 대표 입력95.18151092529297°C와15.5°C를 작은 C++/Rust 독립 실행으로 비교했다. 메인 스레드에서는 두 언어의40개 비교 가능한 중간값과 최종값이 일치했다. 같은 Rust 실행 파일의 새 스레드에서는 ln 결과·exp 인자는 그대로인데 exp 결과만 각1 ULP 커졌고, 기존 Cargo 재현의 첫 차이 값과 같았다. 두 스레드에서 읽은 x87 control word는 각각 `037f`·`027f`이며 MXCSR 초기값은 같았다.
+
+독립 진단 프로세스 안에서 x87 precision-control 비트만 서로 교환하자 두 입력의 차이가 양방향으로 바뀌었다. 원래 control word로 복원하면 결과도 되돌아왔고, 정상 경로의 정확한 CW 복원·MXCSR 보존2건을 확인했다. 6개 문맥·278행을 전부 인증했으며, 메인/스레드 구분 실험90행과 읽기 전용 FP 관측92행도 별도로 보존했다. 비트8·9의 정밀도 제어 의미는 [Intel 설명](https://www.intel.com/content/dam/support/us/en/documents/processors/pentium4/sb/25366521.pdf)에 따른다.
+
+이는 두 입력의 독립 실행에서 확인한 원인이다. 과거 실제 Native helper와 Cargo 테스트 프로세스의 FP 상태·정확한 수학 함수 호출 대상은 당시 작은 기록으로 묶이지 않았으므로 전체9,949개 차이의 원인이나 해결로 확대하지 않는다. 별도 진단용 unsafe assembly는 ignored Source에만 있으며 생산 수식·캐시 계산·workspace unsafe 금지 정책은 그대로다. 새 Cargo 테스트 본문·binary나 전체 workspace 반복은 없다. 네 번의 작은 실험에서 컴파일/실행 명령10개가 exit0이고, 공개 ZIP은 약190KB다. 기존 같은 입력 재현 FAIL·whole-DD9FAIL/8UNPAIRED·전체 raw/Iterate/대입 경로 UNKNOWN과 네 gate·A/B 완료 수는 유지한다.
 
 ## 이력과 증거 보존
 
