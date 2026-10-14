@@ -1,0 +1,366 @@
+{
+  "schema": "src06-passive-PSY-observed-operands-summary.v1",
+  "status": "Actual passive DesignDay PSY selected operand observation closed; numerical DP/RH remains UNKNOWN",
+  "native_Source08": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-prep-08/manifest.json",
+    "sha256": "dea52773d543100ddd3a9d96ba9540bd5ca793762e4a8ae235e280875a0ff2b1",
+    "size_bytes": 22494
+  },
+  "builder_Source05": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-prep-05/manifest.json",
+    "sha256": "ee96a00b543cdf2a4ec2cb6e40010ca6e1072ecc261b3f5b63865f41d197356f",
+    "size_bytes": 12336
+  },
+  "provider_Source04": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-provider-prep-04/manifest.json",
+    "sha256": "393e9e59516d5597dbb51b2972395e05a00133d705bf821be117a16ec6132ea5",
+    "size_bytes": 12718
+  },
+  "capture_checker_Source05": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-capture-prep-05/manifest.json",
+    "sha256": "1591772390d0d93e0fe355e59725018690cc48a131f9f25846a021b8bd965e76",
+    "size_bytes": 7791
+  },
+  "actual_build03": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-03/native-build.json",
+    "sha256": "2a821bc46e3b3823c65af2aeb6375f4bf2d332335e1ec98e80d8641246eab319",
+    "size_bytes": 76789
+  },
+  "actual_provider_review": {
+    "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-passive-psy-provider-review-03/review.json",
+    "sha256": "b8f8793f76fdb5ea4002611f45e3ad26712b9cff7c14f7f717d1926a90201ccd",
+    "size_bytes": 9800
+  },
+  "actual_runtime_closure": {
+    "path": ".runtime/porting/SRC-06/Root-ordinary-design-day-passive-psy-provider-acceptance-01/runtime-closure.json",
+    "sha256": "d61b79c1d1a37456a8f98287874fb25c9666c95ff9971066b23cc4b06e53d234",
+    "size_bytes": 6884
+  },
+  "actual_capture_custody": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-passive-psy-native-capture-01/custody.json",
+    "sha256": "27b793e830da95ae80d29ab994b200003b6abb88417a41ddb0022172b973b616",
+    "size_bytes": 31107
+  },
+  "actual_checker_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-command-01/receipt.json",
+    "sha256": "6d41c598f5a5ead360cef66ea879b396de2011b48328ef722cc78ec1fad624e8",
+    "size_bytes": 4275
+  },
+  "actual_facts": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/facts.json",
+    "sha256": "139dba2ce0204b4b55655b2b3c02a6fc5a8ee32ab6465e6a773aa7c726f8a562",
+    "size_bytes": 6110
+  },
+  "independent_finite_facts_review": {
+    "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-actual-facts-review-01/review.json",
+    "sha256": "47bb81bac714b706ee8a1edf6452b886282718e146c8d19d476aac6a617e62e0",
+    "size_bytes": 7364
+  },
+  "captured_historical_Rust_Source": {
+    "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+    "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+  },
+  "current_Rust_Source_equality_claimed": false,
+  "actual_native_capture": {
+    "native_exit_code": 0,
+    "normal_native_children": 1,
+    "transport_custody_accepted": true,
+    "inherited_environment_merged": false,
+    "outer_capture_recorder_receipt": null,
+    "primary_transport_authority": "Exact approved Source05 and actual custody/native-child stdout/stderr; Root directly executed the capture launcher."
+  },
+  "actual_counts": {
+    "shared_events": 32671,
+    "windows": 2,
+    "slot_records": 192,
+    "calls": 5583,
+    "returns": 5583,
+    "issues": 0,
+    "first_touch_records": 1949,
+    "first_touch_by_family": {
+      "Psat": 1774,
+      "Twb": 87,
+      "Tsat": 88
+    },
+    "window_records": [
+      {
+        "window_ordinal": 1,
+        "SetUp_scope_call_ordinal": 1,
+        "thread": "1",
+        "state_address": 267393162528,
+        "environment_argument": 1,
+        "calls": 924,
+        "returns": 924,
+        "unwinds": 0,
+        "slots": 96,
+        "coverage_gaps": 0,
+        "touched_cache_entries": 26,
+        "outside_window_history_captured": false
+      },
+      {
+        "window_ordinal": 2,
+        "SetUp_scope_call_ordinal": 2,
+        "thread": "1",
+        "state_address": 267393162528,
+        "environment_argument": 2,
+        "calls": 4659,
+        "returns": 4659,
+        "unwinds": 0,
+        "slots": 96,
+        "coverage_gaps": 0,
+        "touched_cache_entries": 1923,
+        "outside_window_history_captured": false
+      }
+    ],
+    "PSY_event_counts": {
+      "psy_window_entry": 2,
+      "SetUp_Warmup_write": 2,
+      "SetUp_pressure_before": 2,
+      "SetUp_pressure_ten_percent_predicate": 2,
+      "SetUp_resolved_pressure": 2,
+      "psy_call_entry": 5583,
+      "Psat_cache_before": 2469,
+      "Psat_cache_miss": 1784,
+      "Psat_cache_tag_write_before_raw": 1784,
+      "Psat_representative_raw_argument": 1784,
+      "Psat_actual_kelvin": 1784,
+      "psy_call_return": 5583,
+      "Psat_cache_write": 1784,
+      "Psat_cache_after": 2469,
+      "W_from_WB_actual_intermediates": 194,
+      "SetUp_constant_humidity_WetBulb": 2,
+      "psy_actual_local_slot": 192,
+      "SetUp_slot_DB": 192,
+      "Twb_cache_before": 192,
+      "Twb_cache_miss": 87,
+      "Twb_cache_tag_writes_before_raw": 87,
+      "Twb_representative_raw_arguments": 87,
+      "Twb_boil_scalar_miss": 1,
+      "Tsat_cache_before": 193,
+      "Tsat_cache_miss": 88,
+      "Tsat_cache_tag_write_before_raw": 88,
+      "Tsat_Press_Save_write": 88,
+      "Tsat_iteration_before_Iterate": 1227,
+      "Tsat_iteration_after_Iterate": 1227,
+      "Tsat_scalar_return_write": 88,
+      "Tsat_cache_write": 88,
+      "Tsat_cache_after": 193,
+      "Twb_initial_guess": 87,
+      "Twb_iteration_before_Iterate": 664,
+      "Twb_iteration_after_Iterate": 664,
+      "Twb_final_temperature_clamp": 87,
+      "Twb_cache_write": 87,
+      "Twb_cache_after": 192,
+      "W_from_DP_actual_intermediates": 192,
+      "SetUp_saturation_before_predicate": 192,
+      "SetUp_saturation_branch": 192,
+      "SetUp_DP_RH_formals": 192,
+      "DP_actual_intermediates": 192,
+      "RH_actual_intermediates": 192,
+      "SetUp_DP_RH_assigned": 192,
+      "psy_window_return": 2,
+      "Twb_boil_scalar_hit": 86
+    }
+  },
+  "actual_emitting_configurations": {
+    "WeatherManager.dd_psy.cc": {
+      "EP_IF97": false,
+      "EP_cache_PsyPsatFnTemp": true,
+      "EP_cache_PsyTsatFnPb": true,
+      "EP_cache_PsyTwbFnTdbWPb": true,
+      "EP_nocache_Psychrometrics": false,
+      "EP_psych_errors": true,
+      "EP_psych_stats": false,
+      "psatcache_mask": 1048575,
+      "psatcache_size": 1048576,
+      "psatprecision_bits": 24,
+      "tsatcache_mask": 1048575,
+      "tsatcache_size": 1048576,
+      "twbcache_size": 1048576,
+      "twbprecision_bits": 20
+    },
+    "Psychrometrics.dd_psy.cc": {
+      "EP_IF97": false,
+      "EP_cache_PsyPsatFnTemp": true,
+      "EP_cache_PsyTsatFnPb": true,
+      "EP_cache_PsyTwbFnTdbWPb": true,
+      "EP_nocache_Psychrometrics": false,
+      "EP_psych_errors": true,
+      "EP_psych_stats": false,
+      "psatcache_mask": 1048575,
+      "psatcache_size": 1048576,
+      "psatprecision_bits": 24,
+      "tsatcache_mask": 1048575,
+      "tsatcache_size": 1048576,
+      "twbcache_size": 1048576,
+      "twbprecision_bits": 20
+    }
+  },
+  "small_streamed_payloads": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/first-touch.ndjson",
+      "sha256": "59d4339ba2daef724dd3f0071d90b7e29c071bc5ab9e759215ae50951b69953e",
+      "size_bytes": 419291
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/slots.ndjson",
+      "sha256": "7ba3a88a471b269ddb04e94062596a157a4f2b5e394f5aa4b320ccd175f64fd4",
+      "size_bytes": 274333
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/windows.ndjson",
+      "sha256": "ded93d88d9134c995daa2558c10e5f71b79b82159101e9de505398ba4f33cfe1",
+      "size_bytes": 506
+    }
+  ],
+  "historical_failed_Native_builds": [
+    {
+      "unit": "01",
+      "actual_commands": [
+        {
+          "role": "failed_Native_build01:configure",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-01/configure-command-01/receipt.json",
+            "sha256": "800bc62fe60e76998e095af78847bfad3ebccd2a7e15481cba8636d09ae802c9",
+            "size_bytes": 5339
+          },
+          "actual_exit_code": 0,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        },
+        {
+          "role": "failed_Native_build01:dry_run",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-01/dry-run-command-01/receipt.json",
+            "sha256": "7f73302f7f4051b107afd5869c1a1f230abfedbb8cd7b13c33643de38ad397d5",
+            "size_bytes": 4734
+          },
+          "actual_exit_code": 0,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        },
+        {
+          "role": "failed_Native_build01:compile",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-01/compile-command-01/receipt.json",
+            "sha256": "d2a7866cb6f34d316841e87ba2b5b384a246c2794549f5e8a44346f25a88b5b9",
+            "size_bytes": 4809
+          },
+          "actual_exit_code": 1,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        }
+      ],
+      "actual_compile_exit_code": 1,
+      "status": "Actual compilation failed; no successful Native build metadata or engine result inferred"
+    },
+    {
+      "unit": "02",
+      "actual_commands": [
+        {
+          "role": "failed_Native_build02:configure",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-02/configure-command-01/receipt.json",
+            "sha256": "eca8acb7007cd7b7b95b01ee64c397057bfec6e260f8adaa3930498a8f538751",
+            "size_bytes": 3543
+          },
+          "actual_exit_code": 0,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        },
+        {
+          "role": "failed_Native_build02:dry_run",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-02/dry-run-command-01/receipt.json",
+            "sha256": "723a584dc0796264c5348d1b84e1b488054e742385d771a51fdc623f78d7ed91",
+            "size_bytes": 2937
+          },
+          "actual_exit_code": 0,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        },
+        {
+          "role": "failed_Native_build02:compile",
+          "receipt": {
+            "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-02/compile-command-01/receipt.json",
+            "sha256": "8f91845534cd1065b504f017d797101283a47576b80e7f9d4dea7bb914b0116b",
+            "size_bytes": 3013
+          },
+          "actual_exit_code": 1,
+          "actual_launch_error": null,
+          "actual_Source_snapshot": {
+            "path": ".runtime/porting/source-objects/f6/f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6",
+            "sha256": "f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6"
+          },
+          "source_bytes_match_before_and_after": true
+        }
+      ],
+      "actual_compile_exit_code": 1,
+      "status": "Actual compilation failed; no successful Native build metadata or engine result inferred"
+    }
+  ],
+  "historical_failed_provider_attempts": [
+    {
+      "failed_Source_version": "02",
+      "custody": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-provider-prep-03/actual-provider02-failure-custody.json",
+        "sha256": "7c3b03108ba5fa7995b3e806a66ce69122c94c952fad6d7e6a251129aa499467",
+        "size_bytes": 4927
+      },
+      "authority": "Root-reported overall assertion failure plus genuine completed tool receipts; no outer receipt invented"
+    },
+    {
+      "failed_Source_version": "03",
+      "custody": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-provider-prep-04/actual-provider03-failure-custody.json",
+        "sha256": "eb09591ff78869c3b2c6436241a7de14cdfc7f7037c57c2e64bf4d45bfb33083",
+        "size_bytes": 1520
+      },
+      "authority": "Root-reported overall assertion failure plus genuine completed tool receipts; no outer receipt invented"
+    }
+  ],
+  "no_new_Rust_QA_or_Native_rerun_by_publication": true,
+  "numerical_DP_RH_status": "UNKNOWN",
+  "Rust_same_input_replay_performed": false,
+  "limitations": [
+    "Selected two SetUp windows and their genuine nested call/cache/slot operands are observed. This is no psychrometric numerical comparison or Native PASS certificate.",
+    "First-touch entries seed observed per-window state; cold cache, outside-window/other-thread history and complete historical writer closure are not assumed.",
+    "Actual three retained object digests remain prior preconfigure authority with identity/command/dependency continuity; publication does not rehash objects or core.",
+    "Provider provenance is static map/PE/addr2line/import evidence plus a separate Python API-set resolver. No Native-helper loaded-module trace or complete OS export/forwarder/transitive graph is claimed.",
+    "Raw128,881,930B, PSY-events91,624,882B, helper1,306,181,710B, map, core, binary tools/DLLs/objects, full F66 Source index and oversized helper objdump stdout are metadata-only.",
+    "Facts were captured and checked under historical F66 before Root29 canonical changes. This packet does not borrow Root29 QA or claim current-source equality.",
+    "Whole DD nine FAIL/eight UNPAIRED and whole-port gates remain unchanged; no full Setup/GetSurfaceData/heat-balance completion follows."
+  ],
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-passive-psy/manifest.json",
+    "sha256": "8e76857ac84d7fc19b87308e9f1cf38435e432f35e9c320bb9ec9e39d1ef2615",
+    "size_bytes": 172439
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-passive-psy/evidence.zip",
+    "sha256": "ba90e35ace49f84da957f375a05e7a6a6171edf456a6a1dc8c23666eacd3ffb9",
+    "size_bytes": 1287276
+  },
+  "whole_DD_9_FAIL_8_UNPAIRED_unchanged": true,
+  "gates_updated": false
+}

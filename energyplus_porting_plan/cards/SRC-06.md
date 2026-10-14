@@ -77,13 +77,14 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 - **선택 dispatcher:** `InitIntConvCoeff:141–391`, 사용자 입력/정적 geometry/Scan prefix와 순서 있는 Zone→Space→HT traversal을 구현했다. SpaceAir·Config·SurfHConvInt는 호출자의 단일 저장소를 대여한다. 명시적 입력·완전한 ID/개수·지원 범위를 쓰기 전에 검증한다. 선택 example의 성공은 ordinary manager 활성화가 아니다.
 - **ordinary 소유자:** 실제 raw 여섯 대류 family 개수와 하한, Zone ZT·Space MAT/ZT/ZTAV, In·Old·독립 Tmp를 보존한다. BeginEnvironment reset, Old←In, solver 반환값 Tmp→In, MAT commit과 disabled-space MAT/ZT copy의 한정된 전이를 연결했다. ZTAV를 이 copy로 덮어쓰지 않는다. geometry getter/Config와 공통 입력 저장소도 실제 caller에 연결했지만 전체 readiness는 미완성이다.
 - **복사·수치 생산자:** LU와 Fix/ScriptF의 실제 선택 입력 replay, typed 오류 전달 및 N1 Source 분기를 연결했다. 단일 불투명 enclosure의 선택 Solar 초기화와 부분 상태 이동, 현재 기상 태양 상태, DesignDay 기상 API도 구현했다. 실제 radiation cache·sigma·ordinary 반복 caller 완료를 의미하지 않는다.
+- **DD 습공기 관측:** Native의 실제 두 SetUp 구간에서 함수 인자·중첩 호출·cache 최초 접근 전 상태와 192개 slot을 관측했다. 실제 관측 기록의 무결성과 범위 검증은 통과했으며, 같은 입력·상태의 Rust 재현과 DP/RH 수치 판정은 아직 미확인이다.
 - **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 전체 Setup 호출 순서·보고와 후속 수치 복사 계산은 남아 있다.
 
 원본 호출 위치를 구분한다. BeginSim의 Solar 초기화는 **`HeatBalanceManager.cc:2617–2630`**이며 2629는 안내 출력, 2630이 `InitSolarCalculations` 호출이다. **`HeatBalanceSurfaceManager.cc:424–425`**는 공유 firstTime 조건의 `InitInteriorRadExchange`; **`HeatBalanceIntRadExchange.cc:610–614`**는 조건부 Solar F 복사다. HBSM615는 ZoneSizing Gather 분기의 닫는 행이며 Solar 초기화 위치가 아니다. 현재 Rust의 선택 초기화 순서 검증을 이 전체 Original caller의 완료로 확대하지 않는다.
 
 ## 실제 증거와 검증 범위
 
-아래 29개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 30개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -116,6 +117,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 빈 표면 부속 객체 조회 | [요약](../evidence/SRC-06-ordinary-surface-zero-getters/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-zero-getters/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-zero-getters/evidence.zip) | 창·차양 등의 빈 getter, 실제 개수·출력 인자·정의 조회와 중심점 전후 호출을 연결. 기존 테스트 3개와 실제 A 성공; 전체 getter/Setup 반환은 미완료. |
 | Construction 판정·표면 목록 | [요약](../evidence/SRC-06-ordinary-construction-surface-lists/summary.json) · [색인](../evidence/SRC-06-ordinary-construction-surface-lists/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-construction-surface-lists/evidence.zip) | 실제 Material group·Construction layer/type 판정과 순서 있는 Surface/Zone 목록·filter 연결. 기존 본문 +18줄·테스트 3개와 실제 A 성공; 전체 CheckAndSet/getter/Setup은 미완료. |
 | 표면 입력 반환·radiant enclosure | [요약](../evidence/SRC-06-ordinary-surface-tail-radiant-enclosures/summary.json) · [색인](../evidence/SRC-06-ordinary-surface-tail-radiant-enclosures/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-surface-tail-radiant-enclosures/evidence.zip) | Source2795–2915의 진단·빈 경계 입력·CTF 대입, 같은 radiant 상태와 선택 본문 반환 연결. 기존 테스트 4개·실제 A 성공; 전체 Setup/HB 반환·수치 복사 동등성은 미확인. |
+| DD 습공기 실제 입력·cache 관측 | [요약](../evidence/SRC-06-ordinary-design-day-passive-psy/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-passive-psy/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-passive-psy/evidence.zip) | 과거 F66 Source에서 Native 2개 구간·192 slot·5,583 호출/반환 쌍·최초 cache 접근 1,949개를 확인, 관측 검증 issue0. Rust 재현 미실행·DP/RH UNKNOWN, 기존 9FAIL/8UNPAIRED 유지. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -127,7 +129,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | DesignDay 계산값 strict-bit 진단 | **FAIL 유지**: 차이 9종, 최대 절대 차이 `2.2737367544323206e-13` | 원인 미확정. 새 허용오차로 PASS로 바꾸지 않았다. 기존 PSY 계약의 caller-output 5종 평가는 중간 입력 비트·cache 동등성 증거가 아니다. |
 | DesignDay 계산값 8종 | **UNPAIRED**, 수치 PASS 없음 | `OutRelHum`, `OutRelHumValue`, `SkyTemp`, `SkyTempKelvin`, `HorizIRSky`, `BeamSolarRad`, `DifSolarRad`, `GndSolarRad`. 유한-domain·class/부호 있는 0 검사는 수치 크기 판정이 아니다. |
 
-DesignDay의 정수·플래그·배열 범위·보고 문자열과 Rust 내부 Today→Tomorrow 전체 carrier copy는 별도의 exact 검증이다. Native 계산값 전체의 비트 동등성, psychrometric 입력/cache, 원인으로서의 libm은 확인되지 않았다. Natural의 생성 nonfinite 6개, dispatcher의 Native-only 264개와 geometry의 선택 외 19개도 수치 PASS에 포함하지 않는다.
+DesignDay의 정수·플래그·배열 범위·보고 문자열과 Rust 내부 Today→Tomorrow 전체 carrier copy는 별도의 exact 검증이다. Native의 선택 psychrometric 입력/cache는 새 관측으로 확보했지만, 같은 상태의 Rust 재현·계산값 전체의 비트 동등성과 차이의 원인은 미확인이다. Natural의 생성 nonfinite 6개, dispatcher의 Native-only 264개와 geometry의 선택 외 19개도 수치 PASS에 포함하지 않는다.
 
 ## 남은 실제 연결 작업
 
@@ -212,6 +214,12 @@ Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항�
 원본2795–2915의 message-only 진단 후 일괄 개수 갱신, 빈 vented/exposed·override/물성 조회·실제 CTF/EIO, 초기 radiant enclosure·출력 등록, 빈 Ground/Surrounding/Local 입력과 두 fatal predicate·active/representative 대입을 연결했다. 실제 Surface 생성자의 Invalid와 전역 CTF 기본값을 구분한다. 후속 Solar는 초기 radiant 상태를 이동해 쓰고 실패 시 실제 부분 상태·외기 소유자를 보존한다. 한정된 GetSurfaceData 본문 반환은 전체 SetupZoneGeometry나 HB 입력 완료 flag가 아니다.
 
 같은 Source의 A-24H는 exit0, 24 hourly samples·390계열이며 기존 result-store와 전체 bytes가 같다. 실제 유일한 World Surface Geometry·CTF EIO 행도 확인했다. 양성 부속 객체 분기·요청 MRT 수치·InitInterior F/ScriptF·전체 Setup 반환과 Native 수치 비교는 남아 있다. 기존 전체 비교·DesignDay 실패와 네 gate, A/B 완료 수는 그대로다.
+
+## DD 습공기 실제 입력·cache 관측 단위
+
+과거 Source `f66ef5df4f6b8542349fd7689ee8f89fcd4d92a1f0c2e7bfbca5186eb1eed8b6`에서 승인한 Native Source08·build05·provider04·capture/checker05로 실제 관측을 완료했다. Native child 1회 exit0 후 checker exit0, 실제 두 SetUp 구간·192개 slot·5,583개 호출/반환 쌍·1,949개 최초 cache 접근을 확인했고 issue는 0이다. 최초 접근 전 tag/value와 실제 scalar 상태를 보존하므로 cold cache를 가정하지 않는다. 별도 독립 검토는 세 작은 결과 파일의 모든 행과 receipt/custody 연결을 확인했다.
+
+이는 입력·상태 관측의 검증이며 Rust 같은 입력 재현은 아직 실행하지 않았다. DP/RH는 **UNKNOWN**, whole-DD 9FAIL/8UNPAIRED와 네 gate·A/B 완료 수는 유지한다. 현재 표면 입력 Source의 QA를 이 과거 관측에 빌려 쓰지 않는다. 두 번의 실제 Native 빌드 실패·두 provider 중단과 최종 Source/명령/로그를 보존했고, 공개 ZIP은 약 1.3MB의 유한 자료로 정리했다. 대형 helper·core·map·raw/events와 바이너리 provider는 기존 식별 metadata만 남겼으며, 이 문서화 과정에서 다시 읽거나 실행하지 않았다.
 
 ## 이력과 증거 보존
 

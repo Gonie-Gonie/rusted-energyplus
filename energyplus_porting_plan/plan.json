@@ -12641,6 +12641,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-tail-radiant-enclosures/summary.json",
         "sha256": "d5b8c95af35c90a7f06f6e229df236161e1b92e7ef2f95bb0cada8a8b73fda60",
         "size_bytes": 17678
+      },
+      "actual_selected_design_day_passive_psychrometric_operand_capture": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-passive-psy/summary.json",
+        "sha256": "b9143beff734c5494bddd2bf035e80e72ee67e6d2f64fb7283884bd7b6dfb118",
+        "size_bytes": 15905
       }
     },
     {
