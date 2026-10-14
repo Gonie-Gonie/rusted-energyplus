@@ -5,6 +5,7 @@ fn ctf_ordinary_output_test_state() -> crate::heat_balance::error_backend::Sourc
         idd_version_string: "authored typed input".into(), doing_input_processing: false,
         print_console_output: true, kickoff_simulation: false, developer_flag: false,
         warmup_flag: false, doing_sizing: false, tracking: SourceErrorTracking { ask_for_surfaces_report: false,
+            total_multiplied_windows: 0,
             total_coincident_vertices: 0,
             total_degenerate_surfaces: 0,
             match_counts:[0;20],abort_processing:false,total_severe_errors:0,last_severe_error:String::new(),
@@ -223,11 +224,19 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         let space = &mut zones.spaces.as_mut().ok_or("authored actual Space allocation")?[0];
         space.typed_space_id = Some(model.typed.spaces[0].id);
         space.zone_num = 1;
-        let mut input = SelectedInputProcessor::from_admitted_input(Vec::new(), std::collections::BTreeMap::new())?;
+        let mut input = SelectedInputProcessor::from_admitted_input(vec![
+            crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type: "SurfaceProperty:ExteriorNaturalVentedCavity".into(),
+                alpha_fields: 3, numeric_fields: 8, alpha_extensions: 1,
+                numeric_extensions: 0, extension: Some("surface".into()),
+            },
+        ], std::collections::BTreeMap::new())?;
         let mut shortcut = SourceInputProcessorShortCut::default();
-        let mut control = SelectedHeatBalanceInputState { construction_order: vec![ConstructionId(0)],
+        let mut control = SelectedHeatBalanceInputState { any_ctf: true, construction_order: vec![ConstructionId(0)],
             construction_usage: vec![Default::default()], ..Default::default() };
-        let globals = crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
+        let globals = crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals {
+            num_spaces: 1, num_of_zones: 1, ..Default::default()
+        };
         let environment = crate::weather::day::WeatherEnvironmentState::default();
         let mut owners = SurfaceGetterOwners { model: &model.typed, input: &mut input,
             shortcut: &mut shortcut, zones: &mut zones, control: &mut control,
@@ -236,6 +245,101 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors)?;
+        assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()
+            .all(|surface| surface.row.heat_transfer_algorithm == crate::heat_balance::selected_heat_balance_input::SelectedHeatTransferModel::Invalid));
+        raw.report_surface_input_diagnostics(&mut context.backend)?;
+        raw.read_empty_surface_boundary_inputs(&mut owners, &mut context.backend, context.eio, &mut errors)?;
+        assert_eq!(owners.shortcut.current_module_object, "SurfaceProperty:HeatTransferAlgorithm:Construction");
+        assert!(matches!(owners.input.family("SurfaceProperty:ExteriorNaturalVentedCavity"),
+            Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Null)));
+        assert_eq!(raw.total_ext_vented_cavities, 0);
+        assert!(raw.ext_vented_cavities.as_ref().is_some_and(Vec::is_empty));
+        assert!(raw.final_surfaces.as_ref().ok_or("actual Surface algorithm rows")?.iter()
+            .all(|surface| surface.row.heat_transfer_algorithm == crate::heat_balance::selected_heat_balance_input::SelectedHeatTransferModel::Ctf));
+        assert!(owners.control.construction_usage[0].is_used_ctf);
+        // Authored callback host tests the existing OP interface; actual A uses
+        // the real retained filesystem MTD host. No OS success is inferred here.
+        struct EnclosureTestHost { calls: usize, fail: bool }
+        impl crate::heat_balance::source_output_registration::SourceOutputFileHost for EnclosureTestHost {
+            fn ensure_mtd_open(&mut self) -> std::io::Result<()> {
+                self.calls += 1;
+                if self.fail { return Err(std::io::Error::other("authored enclosure MTD failure")); }
+                Ok(())
+            }
+        }
+        let radiation_input = crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory([], false)?;
+        for (floor_only, fail) in [(false, false), (true, false), (false, true)] {
+            let zone = &mut owners.zones.zones.as_mut().ok_or("actual enclosure Zone")?[0];
+            zone.name = "authored Source Zone".into();
+            zone.radiant_enclosure_first = -1; zone.radiant_enclosure_last = -1;
+            let space = &mut owners.zones.spaces.as_mut().ok_or("actual enclosure Space")?[0];
+            space.name = "authored Source Space".into(); space.floor_area = 25.0;
+            space.radiant_enclosure_num = 0;
+            let mut radiation = crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(radiation_input);
+            let mut registration = crate::heat_balance::source_output_registration::SourceOutputRegistration::default();
+            let prescan = crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            let mut host = EnclosureTestHost { calls: 0, fail };
+            let mut registration_eio = Vec::new();
+            let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
+                output: &mut registration, prescan: &prescan, minimum_report_frequency: "",
+                minutes_in_time_step: 15, host: &mut host, eio: &mut registration_eio,
+            };
+            // Scoped authored class inputs cover the otherwise independent
+            // floor-only grouping branch; no geometry/Native endpoint is inferred.
+            let mut enclosure_surfaces = raw.clone();
+            if floor_only {
+                for surface in enclosure_surfaces.final_surfaces.as_mut().ok_or("authored floor-only rows")? {
+                    surface.row.class = SurfaceClass::Floor;
+                }
+            }
+            let result = radiation.setup_radiant_enclosures(&enclosure_surfaces, &mut owners, &mut output);
+            assert_eq!(radiation.num_radiant_enclosures(), 1);
+            assert_eq!(radiation.radiant_enclosures()[0].space_nums, [1]);
+            assert_eq!(radiation.radiant_enclosures()[0].space_names, ["authored Source Space"]);
+            assert_eq!(radiation.radiant_enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
+            assert_eq!(radiation.radiant_enclosures()[0].mean_radiant_temperature.to_bits(), 0.0_f64.to_bits());
+            assert_eq!(owners.zones.spaces.as_ref().ok_or("retained enclosure Space")?[0].radiant_enclosure_num, 1);
+            let zone = &owners.zones.zones.as_ref().ok_or("retained enclosure Zone")?[0];
+            if fail {
+                assert!(result.is_err());
+                assert_eq!((zone.radiant_enclosure_first, zone.radiant_enclosure_last), (-1, -1));
+                assert!(registration.output_initialized);
+                assert_eq!(registration.num_real_variables_setup, 0);
+            } else {
+                result?;
+                assert_eq!((zone.radiant_enclosure_first, zone.radiant_enclosure_last), (1, 1));
+                assert_eq!(registration.num_real_variables_setup, 1);
+                assert_eq!(registration.dictionary_variables[0].name, "Enclosure Mean Radiant Temperature");
+                assert_eq!(registration.dictionary_variables[0].key_out_var_nums.len(), 0,
+                    "unmatched Source registration does not fabricate an MRT variable handle");
+                let allocation = radiation.radiant_enclosures().as_ptr();
+                radiation.bind_initialized_solar_geometry(&model.typed, &physical.surfaces, radiation_input)?;
+                assert_eq!(radiation.radiant_enclosures().as_ptr(), allocation);
+                assert_eq!(radiation.radiant_enclosures()[0].name,
+                    if floor_only { "authored Source Zone" } else { "authored Source Space" });
+                assert_eq!(radiation.radiant_enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
+                context.reports.ordinary_solar_radiation = Some(radiation);
+                let moved = context.reports.ordinary_solar_radiation.take().ok_or("lost same radiation container")?;
+                assert_eq!(moved.radiant_enclosures().as_ptr(), allocation);
+            }
+            assert_eq!(host.calls, 1);
+        }
+        // Reuse this authored owner fixture for the newly reached zero suffix.
+        assert!(raw.final_surfaces.as_ref().ok_or("actual pre-suffix Surface")?.iter()
+            .all(|surface| surface.representative_calc_surface_num == -1));
+        assert!(raw.window_arrays.as_ref().ok_or("actual pre-suffix window arrays")?
+            .surf_active_construction.iter().all(|&value| value == 0));
+        raw.finish_selected_surface_input(&mut owners, &mut context.backend, &mut errors)?;
+        assert_eq!(owners.shortcut.current_module_object, "SurfaceProperty:LocalEnvironment");
+        assert_eq!((raw.total_surface_ground_properties, raw.total_surface_local_environments), (0, 0));
+        assert!(owners.input.find_exact_family("SurfaceProperty:GroundSurfaces").is_none());
+        assert!(raw.ground_surface_properties.is_none() && raw.surrounding_surface_properties.is_none()
+            && raw.surface_local_environments.is_none());
+        assert!(raw.selected_get_surface_data_returned);
+        assert_eq!(raw.final_surfaces.as_ref().ok_or("actual representative rows")?.iter()
+            .map(|surface| surface.representative_calc_surface_num).collect::<Vec<_>>(), (1..=i32::try_from(total)?).collect::<Vec<_>>());
+        assert_eq!(raw.window_arrays.as_ref().ok_or("actual active Construction owner")?
+            .surf_active_construction, vec![1; total]);
         raw.bind_typed_surfaces(&owners)?;
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
@@ -331,6 +435,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert!(arrays.outdoor_to_model_swaps.is_empty());
         assert_eq!(context.reports.surface_geometry_input.final_surfaces.as_ref().ok_or("lost final Surface IDs")?
             .iter().map(|row| row.typed_id).collect::<Vec<_>>(), source_ids.iter().copied().map(Some).collect::<Vec<_>>());
+        let reached_eio = String::from_utf8(eio)?;
+        assert_eq!(reached_eio.matches("! <Surface Heat Transfer Algorithm>").count(), 1);
+        assert!(reached_eio.contains("Surface Heat Transfer Algorithm, CTF - ConductionTransferFunction,200,0.10,1000.0\n"));
     }
     Ok(())
 }

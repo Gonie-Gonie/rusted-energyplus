@@ -240,6 +240,7 @@ impl Fixture {
             doing_sizing: boolean(&b["DoingSizing"])?,
             tracking: SourceErrorTracking {
                 ask_for_surfaces_report: false,
+                total_multiplied_windows: 0,
                 total_coincident_vertices: 0,
                 total_degenerate_surfaces: 0,
                 match_counts,

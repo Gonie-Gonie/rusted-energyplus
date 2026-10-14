@@ -1,7 +1,8 @@
 //! Actual raw World row producers and required retained numerical properties.
 //!
 //! The boolean selects this bounded prefix only. It is not a completed
-//! GetSurfaceData/SetupZoneGeometry/HeatBalanceInput return or readiness flag.
+//! SetupZoneGeometry/HeatBalanceInput return or readiness flag. The admitted
+//! GetSurfaceData body return is retained as its own bounded diagnostic only.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::geometry::SurfaceGeometryProperties;
@@ -38,6 +39,9 @@ impl CtfInitializationContext<'_> {
         &mut self,
         model: &TypedModel,
         environment: &crate::weather::day::WeatherEnvironmentState,
+        radiation_input: Option<crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput>,
+        minutes_in_time_step: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
     ) -> Result<bool, RuntimeError> {
         let reports = &mut *self.reports;
         let Some(raw) = reports.heat_balance_input.as_ref() else {
@@ -164,6 +168,53 @@ impl CtfInitializationContext<'_> {
                 &mut owners,
                 &mut self.backend,
                 reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
+        state
+            .report_surface_input_diagnostics(&mut self.backend)
+            .map_err(hb_input_error)?;
+        state
+            .read_empty_surface_boundary_inputs(
+                &mut owners,
+                &mut self.backend,
+                self.eio,
+                &mut reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
+        // Actual2857: create and retain the SAME container used by later Solar.
+        // No new input count query or typed enclosure surrogate is introduced.
+        let radiation_input = radiation_input.ok_or_else(|| {
+            hb_input_error(E::Unavailable(
+                "actual radiation input for sole early container",
+            ))
+        })?;
+        let radiation = reports.ordinary_solar_radiation.get_or_insert_with(|| {
+            crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(
+                radiation_input,
+            )
+        });
+        let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
+            output: &mut reports.output_registration,
+            prescan: &reports.output_prescan,
+            minimum_report_frequency: &reports
+                .selected_project_data
+                .as_ref()
+                .ok_or_else(|| hb_input_error(E::Unavailable("same enclosure process settings")))?
+                .system
+                .minimum_report_frequency,
+            minutes_in_time_step,
+            host,
+            eio: self.eio,
+        };
+        radiation
+            .setup_radiant_enclosures(state, &mut owners, &mut output)
+            .map_err(hb_input_error)?;
+        // Actual2859-2915, after the same radiant producer and before caller binding.
+        state
+            .finish_selected_surface_input(
+                &mut owners,
+                &mut self.backend,
+                &mut reports.heat_balance_input_errors_found,
             )
             .map_err(hb_input_error)?;
         state.bind_typed_surfaces(&owners).map_err(hb_input_error)?;

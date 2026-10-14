@@ -1,6 +1,6 @@
 //! Selected raw GetSurfaceData rows and retained opaque numerical prefix.
 //! Bounded final copy, array constructors, floor areas and retained geometry are
-//! consumed; later getter/enclosure/report lifecycle remains incomplete.
+//! consumed; the admitted body return is distinct from SetupZoneGeometry/HB readiness.
 use super::super::selected_input_processor::{
     SelectedInputProcessor, SourceInputProcessorShortCut,
 };
@@ -13,7 +13,9 @@ use super::{
 use std::collections::BTreeMap;
 use std::io::Write;
 
+mod boundary_inputs;
 mod derived_arrays;
+mod diagnostics;
 mod empty_subsurfaces;
 mod final_mapping;
 mod final_zero_suffix;
@@ -24,6 +26,7 @@ mod lists;
 mod opaque;
 mod parallel_arrays;
 mod raw;
+mod return_suffix;
 mod vertices;
 mod volume_faces;
 mod window_arrays;
@@ -61,7 +64,7 @@ pub(crate) enum SurfaceClass {
     Invalid,
 }
 
-/// Only the actual SurfaceData members written/read by the pre-vertex slice.
+/// Selected actual SurfaceData members reached by the bounded raw/final prefix.
 /// No full Native SurfaceData storage/copy or geometry-success claim follows.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SurfaceTmpInput {
@@ -70,6 +73,8 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) construction: i32,
     pub(crate) construction_stored_input: i32,
     pub(crate) heat_transfer_surface: bool,
+    /// Actual SurfaceData constructor Invalid, overwritten at reached override8453.
+    pub(crate) heat_transfer_algorithm: super::SelectedHeatTransferModel,
     pub(crate) base_surface: i32,
     pub(crate) base_surface_name: String,
     pub(crate) zone_name: String,
@@ -100,6 +105,10 @@ pub(crate) struct SurfaceTmpInput {
 pub(crate) struct SurfaceGeometryInputState {
     pub(crate) entered_once: bool,
     pub(crate) warning_displayed: bool,
+    /// Actual SurfaceGeometry constructor counters; positive Window5/6 writers stay excluded.
+    pub(crate) warning1_count: i32,
+    pub(crate) warning2_count: i32,
+    pub(crate) warning3_count: i32,
     pub(crate) corner: i32,
     pub(crate) counterclockwise: bool,
     pub(crate) world_coordinates: bool,
@@ -120,6 +129,19 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) total_window_shading_control: i32,
     pub(crate) total_osc: i32,
     pub(crate) total_oscm: i32,
+    /// Actual TotExtVentCav constructor0 and reached count; only allocate(0) is represented.
+    pub(crate) total_ext_vented_cavities: i32,
+    /// Genuine DataSurface constructor0 and Ground8253/Local7972 count owners.
+    pub(crate) total_surface_ground_properties: i32,
+    pub(crate) total_surface_local_environments: i32,
+    /// EPVector default unallocated; the selected zero loops do not allocate(0).
+    pub(crate) ground_surface_properties: Option<Vec<std::convert::Infallible>>,
+    pub(crate) surrounding_surface_properties: Option<Vec<std::convert::Infallible>>,
+    pub(crate) surface_local_environments: Option<Vec<std::convert::Infallible>>,
+    /// Diagnostic boundary only for this admitted GetSurfaceData body return.
+    /// It does not complete SetupZoneGeometry or HeatBalanceInput readiness.
+    pub(crate) selected_get_surface_data_returned: bool,
+    pub(crate) ext_vented_cavities: Option<Vec<std::convert::Infallible>>,
     pub(crate) osc: Option<Vec<std::convert::Infallible>>,
     pub(crate) oscm: Option<Vec<std::convert::Infallible>>,
     pub(crate) foundation: foundation::FoundationInput,

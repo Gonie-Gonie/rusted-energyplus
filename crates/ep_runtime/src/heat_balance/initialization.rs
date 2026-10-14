@@ -92,8 +92,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             source.minutes,
             source.output_host,
         )?;
-        selected_world_geometry =
-            actual.prepare_selected_world_surface_geometry(&model.typed, source.environment)?;
+        selected_world_geometry = actual.prepare_selected_world_surface_geometry(
+            &model.typed,
+            source.environment,
+            radiation_input,
+            source.minutes,
+            &mut *source.output_host,
+        )?;
     }
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
@@ -548,20 +553,28 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 super::radiation::ordinary::OrdinaryRadiationUnavailable::MissingInitializationContext,
             ))
         })?;
-        let mut owner =
-            match super::radiation::ordinary::OrdinarySolarRadiation::for_initialized_geometry(
+        let mut owner = if selected_world_geometry {
+            let Some(mut owner) = actual.reports.ordinary_solar_radiation.take() else {
+                actual.restore_selected_world_outdoor_rows(surfaces);
+                return Err(RuntimeError::WarmupUnavailable {
+                    reason: "missing same early radiant enclosure container".into(),
+                });
+            };
+            if let Err(error) =
+                owner.bind_initialized_solar_geometry(&model.typed, &surfaces, input)
+            {
+                actual.reports.ordinary_solar_radiation = Some(owner);
+                actual.restore_selected_world_outdoor_rows(surfaces);
+                return Err(error.into());
+            }
+            owner
+        } else {
+            super::radiation::ordinary::OrdinarySolarRadiation::for_initialized_geometry(
                 &model.typed,
                 &surfaces,
                 input,
-            ) {
-                Ok(owner) => owner,
-                Err(error) => {
-                    if selected_world_geometry {
-                        actual.restore_selected_world_outdoor_rows(surfaces);
-                    }
-                    return Err(error.into());
-                }
-            };
+            )?
+        };
         // Restore the real reached prefix before propagating any output/domain
         // failure, so the caller's reports/EIO/backend retain the partial owner.
         let result = owner.initialize_solar_at_input_boundary(&model.typed, &surfaces, actual);

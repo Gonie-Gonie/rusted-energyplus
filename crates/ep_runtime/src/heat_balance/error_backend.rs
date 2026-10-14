@@ -32,6 +32,8 @@ pub struct SourceErrorTracking {
     /// row processing and ReportSurfaces clears it before report scanning.
     /// The selected ShowFatalError API does not implement AbortEnergyPlus.
     pub ask_for_surfaces_report: bool,
+    /// Actual window multiplier counter, constructor zero; positive window writers remain excluded.
+    pub total_multiplied_windows: i32,
     /// Actual GetVertices coincident counter, constructor zero.
     pub total_coincident_vertices: i32,
     /// Actual GetVertices degenerate counter, constructor zero.
@@ -44,7 +46,7 @@ pub struct SourceErrorTracking {
     pub total_severe_errors_during_sizing: i32,
     /// Actual last severe text read by the fatal summary.
     pub last_severe_error: String,
-    /// Actual warning total, incremented by ShowWarningError only.
+    /// Actual warning total, including reached aggregate diagnostic additions.
     pub total_warning_errors: i32,
     /// Actual warning warmup count.
     pub total_warning_errors_during_warmup: i32,
@@ -302,6 +304,55 @@ impl SourceErrorBackend<'_> {
         }
         effect("display console", writeln!(self.console, "{message}"))?;
         effect("display console flush", self.console.flush())
+    }
+
+    /// Literal ShowWarningMessage: search counts/output/SQLite count0/callback,
+    /// without incrementing warning, warmup or sizing totals.
+    pub fn show_warning_message(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
+        for (&needle, count) in MESSAGE_SEARCH
+            .iter()
+            .zip(&mut self.state.tracking.match_counts)
+        {
+            if message.contains(needle) {
+                increment(count, "MatchCounts")?;
+            }
+        }
+        self.show_error_message(&format!(" ** Warning ** {message}"))?;
+        if let Some(sqlite) = self.sqlite.as_deref_mut() {
+            effect(
+                "SQLite create warning",
+                sqlite.create_error_record(1, 0, message, 0),
+            )?;
+        }
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Warning, message);
+        }
+        Ok(())
+    }
+
+    /// Literal ShowSevereMessage: search counts/output/last text/SQLite count0/
+    /// callback, without incrementing severe, warmup or sizing totals.
+    pub fn show_severe_message(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
+        for (&needle, count) in MESSAGE_SEARCH
+            .iter()
+            .zip(&mut self.state.tracking.match_counts)
+        {
+            if message.contains(needle) {
+                increment(count, "MatchCounts")?;
+            }
+        }
+        self.show_error_message(&format!(" ** Severe  ** {message}"))?;
+        self.state.tracking.last_severe_error = message.to_owned();
+        if let Some(sqlite) = self.sqlite.as_deref_mut() {
+            effect(
+                "SQLite create severe",
+                sqlite.create_error_record(1, 1, message, 0),
+            )?;
+        }
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Severe, message);
+        }
+        Ok(())
     }
 
     /// Genuine warning counters, output, optional SQLite and final callback.

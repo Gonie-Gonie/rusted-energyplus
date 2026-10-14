@@ -11,13 +11,26 @@ use ep_model::{
     OutsideBoundaryCondition, Point3, SunExposure, SurfaceId, SurfaceType, WindExposure,
 };
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct FinalSurface {
     pub(crate) row: SurfaceTmpInput,
     pub(crate) original_class: SurfaceClass,
+    /// Genuine SurfaceData constructor -1; actual2882 writes this same final owner.
+    pub(crate) representative_calc_surface_num: i32,
     // SurfaceData constructor explicitly initializes Centroid(0,0,0).
     pub(crate) centroid: [f64; 3],
     pub(crate) typed_id: Option<SurfaceId>,
+}
+impl Default for FinalSurface {
+    fn default() -> Self {
+        Self {
+            row: SurfaceTmpInput::default(),
+            original_class: SurfaceClass::default(),
+            representative_calc_surface_num: -1,
+            centroid: [0.0; 3],
+            typed_id: None,
+        }
+    }
 }
 
 fn index(value: i32) -> Result<usize, Error> {
@@ -273,7 +286,7 @@ impl SurfaceGeometryInputState {
     }
 
     /// Actual selected area diagnostics and OriginalClass write2458-2492.
-    /// SurfError stays distinct from ErrorsFound until the unported final fatal.
+    /// SurfError stays distinct from ErrorsFound until the reached final fatal.
     pub(crate) fn check_final_surface_areas(
         &mut self,
         backend: &mut SourceErrorBackend<'_>,

@@ -82,8 +82,10 @@ pub(crate) enum SelectedSolarDistribution {
     FullExterior,
     FullInteriorExterior,
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub(crate) enum SelectedHeatTransferModel {
+    #[default]
+    Invalid,
     Ctf,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -110,6 +112,10 @@ pub(crate) struct SelectedHeatBalanceInputState {
     pub(crate) solar_distribution: SelectedSolarDistribution,
     pub(crate) calculate_solar_reflections: bool,
     pub(crate) any_ctf: bool,
+    // Actual constructor false; unsupported GetSolutionAlgorithm branches do not write these.
+    pub(crate) any_empd: bool,
+    pub(crate) any_cond_fd: bool,
+    pub(crate) any_hamt: bool,
     pub(crate) all_ctf: bool,
     pub(crate) overall_heat_transfer_solution: SelectedHeatTransferModel,
     pub(crate) low_hconv_limit: f64,
@@ -146,6 +152,9 @@ impl Default for SelectedHeatBalanceInputState {
             solar_distribution: SelectedSolarDistribution::FullExterior,
             calculate_solar_reflections: false,
             any_ctf: false,
+            any_empd: false,
+            any_cond_fd: false,
+            any_hamt: false,
             all_ctf: true,
             overall_heat_transfer_solution: SelectedHeatTransferModel::Ctf,
             low_hconv_limit: 0.1,
@@ -205,6 +214,8 @@ pub(crate) struct SelectedConstructionUsage {
     pub(crate) layer_points: [i32; 11],
     /// Constructor false; target writes at real CheckAndSet boundary1795.
     pub(crate) type_is_window: bool,
+    /// ConstructionProps constructor false; actual positive AirBoundary getter stays excluded.
+    pub(crate) type_is_air_boundary: bool,
     pub(crate) type_is_eco_roof: bool,
     pub(crate) type_is_irt: bool,
     pub(crate) is_used: bool,

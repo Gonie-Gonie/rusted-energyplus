@@ -15,6 +15,7 @@ fn state() -> SourceErrorState {
         doing_sizing: false,
         tracking: SourceErrorTracking {
             ask_for_surfaces_report: false,
+            total_multiplied_windows: 0,
             total_coincident_vertices: 0,
             total_degenerate_surfaces: 0,
             match_counts: [0; 20],
@@ -366,7 +367,36 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
     );
     assert_eq!(state.tracking.total_warning_errors, 4);
     assert_eq!(state.tracking.total_severe_errors, 7);
-    assert!(String::from_utf8(error)?.ends_with("   **   ~~~   **  details\n"));
+    assert!(String::from_utf8(error.clone())?.ends_with("   **   ~~~   **  details\n"));
+    // Message-only aggregate diagnostics retain count0 SQLite and no totals.
+    {
+        let mut actual = backend(&mut state, &mut error, &mut console);
+        actual.sqlite = Some(&mut sqlite);
+        actual.error_callback = Some(&mut e);
+        actual.show_warning_message("Deprecated summary warning")?;
+        actual.show_severe_message("Deprecated summary severe")?;
+    }
+    assert_eq!(
+        &calls.borrow()[4..],
+        [
+            "create:1:0:Deprecated summary warning:0",
+            "callback:2:Deprecated summary warning",
+            "create:1:1:Deprecated summary severe:0",
+            "callback:3:Deprecated summary severe",
+        ]
+    );
+    assert_eq!(state.tracking.total_warning_errors, 4);
+    assert_eq!(state.tracking.total_severe_errors, 7);
+    assert_eq!(state.tracking.total_warning_errors_during_warmup, 2);
+    assert_eq!(state.tracking.total_severe_errors_during_warmup, 4);
+    assert_eq!(state.tracking.total_warning_errors_during_sizing, 1);
+    assert_eq!(state.tracking.total_severe_errors_during_sizing, 2);
+    assert_eq!(state.tracking.match_counts[6], 2);
+    assert_eq!(
+        state.tracking.last_severe_error,
+        "Deprecated summary severe"
+    );
+    assert!(String::from_utf8(error)?.ends_with("   ** Severe  ** Deprecated summary severe\n"));
     Ok(())
 }
 

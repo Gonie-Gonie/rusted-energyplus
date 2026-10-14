@@ -12636,6 +12636,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-surface-lists/summary.json",
         "sha256": "edee037c53dd71123ae3e43a2e88b1556e17e09564c7b6155e27188aa726f6fb",
         "size_bytes": 13025
+      },
+      "actual_selected_ordinary_surface_tail_radiant_enclosures": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-surface-tail-radiant-enclosures/summary.json",
+        "sha256": "d5b8c95af35c90a7f06f6e229df236161e1b92e7ef2f95bb0cada8a8b73fda60",
+        "size_bytes": 17678
       }
     },
     {

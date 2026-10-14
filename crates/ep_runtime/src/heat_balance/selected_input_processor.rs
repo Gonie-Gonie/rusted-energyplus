@@ -184,6 +184,12 @@ impl SelectedInputProcessor {
             .contains(&(object_type.into(), object_name.into()))
     }
 
+    /// Literal epJSON.find identity: exact case, no insertion or count query.
+    /// Distinguishes absent, an earlier definition-created null, and an empty map.
+    pub(crate) fn find_exact_family(&self, object_type: &str) -> Option<&SourceInputFamily> {
+        self.families.get(object_type)
+    }
+
     /// Actual presence, including null insertion, is observable by subsequent getters.
     pub fn family(&self, object_type: &str) -> Option<&SourceInputFamily> {
         self.families.get(object_type).or_else(|| {

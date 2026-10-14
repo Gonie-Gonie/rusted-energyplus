@@ -3,7 +3,9 @@
 //! Original HeatBalanceIntRadExchange.cc811-1103. No
 //! diagnostic probe supplies a caller flag, iteration count or cache result.
 
+mod enclosure_setup;
 mod initialization;
+pub(crate) use enclosure_setup::EnclosureOutputOwners;
 
 use crate::error::{RuntimeError, WarmupOutputError};
 use crate::heat_balance::inside_convection_layout::InsideConvectionLayout;
@@ -127,6 +129,26 @@ impl From<OrdinaryRadiationError> for RuntimeError {
     }
 }
 
+/// Actual radiant enclosure fields written/read by geometry setup2857.
+/// Later InitInterior must extend this same owner; no F/ScriptF storage is inferred.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct RadiantRadiationEnclosure {
+    /// Actual Enclosure.Name, initially empty.
+    pub name: String,
+    /// Actual ordered member Space names.
+    pub space_names: Vec<String>,
+    /// Actual one-based Source Space indices, not copied typed IDs.
+    pub space_nums: Vec<i32>,
+    /// Actual geometry-setup FloorArea, constructor positive zero.
+    pub floor_area: f64,
+    /// Actual ExtWindowArea; radiant normal branch leaves constructor zero.
+    pub exterior_window_area: f64,
+    /// Actual TotalSurfArea; radiant normal branch leaves constructor zero.
+    pub total_surface_area: f64,
+    /// Actual MRT output field, constructor zero; no MRT numerical updater claimed.
+    pub mean_radiant_temperature: f64,
+}
+
 /// Actual selected solar enclosure, available through immutable owner inspection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SolarRadiationEnclosure {
@@ -157,12 +179,14 @@ pub struct SolarRadiationEnclosure {
     fix: Option<super::FixedViewFactors>,
 }
 
-/// Solar prefix retained on error by CtfInitializationReports, then moved into
-/// HeatBalanceState on success. It supplies no radiant cache or caller flags.
+/// Sole radiation container retained from early geometry/radiant setup through
+/// the later Solar prefix, then moved into State. No radiant numeric cache is inferred.
 #[derive(Clone, Debug, PartialEq)]
 pub struct OrdinarySolarRadiation {
     input: OrdinaryRadiationInput,
     solar: Vec<SolarRadiationEnclosure>,
+    radiant: Vec<RadiantRadiationEnclosure>,
+    num_radiant_enclosures: i32,
     // Surface.SolarEnclIndex, RadEnclIndex, SolarEnclSurfIndex, one-based.
     // Original InitSolar writes these associations even before radiant init.
     back_pointers: Vec<(usize, usize, usize)>,
@@ -170,6 +194,31 @@ pub struct OrdinarySolarRadiation {
 }
 
 impl OrdinarySolarRadiation {
+    /// Construct the same container at the reached geometry boundary. Solar
+    /// arrays and back-pointers remain untouched until their later real binder.
+    pub(crate) fn for_surface_input(input: OrdinaryRadiationInput) -> Self {
+        Self {
+            input,
+            solar: Vec::new(),
+            radiant: Vec::new(),
+            num_radiant_enclosures: 0,
+            back_pointers: Vec::new(),
+            solar_initialized: false,
+        }
+    }
+
+    /// Actual retained radiant rows allocated by the geometry setup call.
+    #[must_use]
+    pub fn radiant_enclosures(&self) -> &[RadiantRadiationEnclosure] {
+        &self.radiant
+    }
+
+    /// Actual NumOfRadiantEnclosures, separate from the allocated row count.
+    #[must_use]
+    pub fn num_radiant_enclosures(&self) -> i32 {
+        self.num_radiant_enclosures
+    }
+
     /// Retained actual solar enclosure storage and reached numeric prefix.
     #[must_use]
     pub fn enclosures(&self) -> &[SolarRadiationEnclosure] {
@@ -193,6 +242,22 @@ impl OrdinarySolarRadiation {
         surfaces: &[SurfaceHeatBalanceState],
         input: OrdinaryRadiationInput,
     ) -> Result<Self, OrdinaryRadiationError> {
+        let mut owner = Self::for_surface_input(input);
+        owner.bind_initialized_solar_geometry(model, surfaces, input)?;
+        Ok(owner)
+    }
+
+    /// Bind later Solar geometry into the SAME early radiant container.
+    /// A failed bind leaves its actual radiant allocation and values untouched.
+    pub(crate) fn bind_initialized_solar_geometry(
+        &mut self,
+        model: &TypedModel,
+        surfaces: &[SurfaceHeatBalanceState],
+        input: OrdinaryRadiationInput,
+    ) -> Result<(), OrdinaryRadiationError> {
+        if self.input != input || !self.solar.is_empty() {
+            return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
+        }
         let layout = InsideConvectionLayout::from_typed_model(model)
             .map_err(|_| OrdinaryRadiationUnavailable::EnclosureDomain)?;
         if input.user_view_factor_count != 0
@@ -212,11 +277,8 @@ impl OrdinarySolarRadiation {
             return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
         }
         let enclosure = initialization::allocate_enclosure(model, surfaces, &layout)?;
-        Ok(Self {
-            input,
-            solar: vec![enclosure],
-            back_pointers: vec![(0, 0, 0); surfaces.len()],
-            solar_initialized: false,
-        })
+        self.solar = vec![enclosure];
+        self.back_pointers = vec![(0, 0, 0); surfaces.len()];
+        Ok(())
     }
 }
