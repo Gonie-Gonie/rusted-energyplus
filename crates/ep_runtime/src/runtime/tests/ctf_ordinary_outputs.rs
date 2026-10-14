@@ -681,6 +681,46 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(nominal.nominal_u, Some(vec![0.5]));
         assert_eq!(nominal.nominal_u_before_adjusted.as_ref().ok_or("actual U-before dimension")?[0].to_bits(), 0.0_f64.to_bits());
         assert_eq!(nominal.coefficient_adjustment_ratio, Some(vec![1.0]));
+        // Same authored owners exercise report-ID order, referenced-class film
+        // selection, and the actual table-before-EIO partial-failure boundary.
+        let mut report_owner = CtfInitializationReports {
+            registry: context.reports.registry.clone(),
+            surface_geometry_input: context.reports.surface_geometry_input.clone(),
+            selected_zone_input: Some(bounds_zones.clone()), selected_heat_balance_globals: Some(globals.clone()),
+            heat_balance_input_state: nominal.clone(), ..Default::default()
+        };
+        let first = usize::try_from(report_owner.surface_geometry_input.all_surface_list_report_order[0] - 1)?;
+        let rows = report_owner.surface_geometry_input.final_surfaces.as_mut().ok_or("actual report rows")?;
+        assert_eq!(rows[first].row.class, SurfaceClass::Wall);
+        let floor = rows.iter().position(|row| row.row.class == SurfaceClass::Floor).ok_or("authored referenced Floor")?;
+        rows[first].row.exterior_boundary = i32::try_from(floor + 1)?;
+        report_owner.selected_zone_input.as_mut().and_then(|owner| owner.zones.as_mut())
+            .ok_or("actual report Zone")?[0].name = "AUTHORED ZONE".into();
+        let mut report_eio = Vec::new();
+        report_owner.write_selected_setup_geometry_reports(&mut report_eio)?;
+        assert_eq!(report_owner.table.num_table_entry, i32::try_from(total)?);
+        let entries = report_owner.table.entries.as_ref().ok_or("actual film entries")?;
+        assert_eq!(entries[0].original_real_entry.to_bits(), (1.0_f64 / (0.1197548 + 2.0 + 0.1620212)).to_bits());
+        let expected_names = report_owner.surface_geometry_input.all_surface_list_report_order.iter()
+            .map(|number| report_owner.surface_geometry_input.final_surfaces.as_ref().ok_or("report allocation")?
+                .get(usize::try_from(number - 1)?).map(|row| row.row.name.as_str()).ok_or("report association".into()))
+            .collect::<Result<Vec<_>, Box<dyn std::error::Error>>>()?;
+        assert_eq!(entries[..total].iter().map(|entry| entry.object_name.as_str()).collect::<Vec<_>>(), expected_names);
+        let report_text = String::from_utf8(report_eio)?;
+        assert_eq!(report_text.lines().count(), 6);
+        assert!(report_text.contains(" Shading Summary,0,0,0\n"));
+        assert!(report_text.contains(" Zone Summary,1,6,0\n"));
+        assert!(report_text.contains(" Zone Information, AUTHORED ZONE,0.0,0.00,0.00,0.00,0.50,0.50,0.50,"));
+        assert!(report_text.ends_with(",12,0,0,Yes\n"));
+        let first_header = report_text.lines().next().ok_or("first report header")?.to_owned() + "\n";
+        let row = &mut report_owner.surface_geometry_input.final_surfaces.as_mut().ok_or("invalid construction report row")?[first].row;
+        row.construction = 0; row.exterior_boundary = -3; // No Compute call, so OSC is not reached.
+        let mut prefix = vec![0_u8; first_header.len()];
+        let failure = report_owner.write_selected_setup_geometry_reports(&mut std::io::Cursor::new(prefix.as_mut_slice()));
+        assert!(matches!(failure, Err(crate::RuntimeError::WarmupOutput(error)) if matches!(*error, crate::error::WarmupOutputError::Io(_))));
+        assert_eq!(prefix, first_header.as_bytes());
+        assert_eq!(report_owner.table.num_table_entry, i32::try_from(2 * total)?);
+        assert_eq!(report_owner.table.entries.as_ref().ok_or("retained second film entries")?[total].original_real_entry.to_bits(), 0.0_f64.to_bits());
         nominal.nominal_r_for_u = Some(vec![0.0]); nominal.construction_usage[0].type_is_window = true;
         let retained = nominal.clone();
         let (mut zero_state, mut zero_console, mut zero_failure) =

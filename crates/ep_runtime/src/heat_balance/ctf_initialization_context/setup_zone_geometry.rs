@@ -1,4 +1,4 @@
-//! Bounded Setup through639 counts; NominalU/reporting641 remains separate.
+//! Bounded Setup through792 reports; Solar enclosures796 remain separate.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -169,6 +169,7 @@ impl CtfInitializationContext<'_> {
                 &mut reports.heat_balance_input_errors_found,
             )
             .map_err(hb_input_error)?;
-        Ok(volume_returns) // Stop before641 NominalU/report loop.
+        reports.write_selected_setup_geometry_reports(self.eio)?;
+        Ok(volume_returns) // Stop before796 Solar enclosures and stratosphere checks.
     }
 }

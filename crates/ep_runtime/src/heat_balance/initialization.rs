@@ -393,12 +393,16 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             // Legacy/None routes retain genuine repeated registration.
             actual.prepare_registry(&model.typed)?;
         }
-        crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
-            &model.typed,
-            &actual.reports.registry,
-            &mut actual.reports.table,
-        )
-        .map_err(crate::heat_balance::ctf_initialization_context::CtfInitializationError::Owner)?;
+        if !selected_world_geometry {
+            crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
+                &model.typed,
+                &actual.reports.registry,
+                &mut actual.reports.table,
+            )
+            .map_err(
+                crate::heat_balance::ctf_initialization_context::CtfInitializationError::Owner,
+            )?;
+        }
         ConstructionThermalDataCache::build_with_initialization_context(
             &model.typed,
             &ctf_coefficients_by_construction,

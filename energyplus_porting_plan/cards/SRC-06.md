@@ -78,13 +78,13 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 - **ordinary 소유자:** 실제 raw 여섯 대류 family 개수와 하한, Zone ZT·Space MAT/ZT/ZTAV, In·Old·독립 Tmp를 보존한다. BeginEnvironment reset, Old←In, solver 반환값 Tmp→In, MAT commit과 disabled-space MAT/ZT copy의 한정된 전이를 연결했다. ZTAV를 이 copy로 덮어쓰지 않는다. geometry getter/Config와 공통 입력 저장소도 실제 caller에 연결했지만 전체 readiness는 미완성이다.
 - **복사·수치 생산자:** LU와 Fix/ScriptF의 실제 선택 입력 replay, typed 오류 전달 및 N1 Source 분기를 연결했다. 단일 불투명 enclosure의 선택 Solar 초기화와 부분 상태 이동, 현재 기상 태양 상태, DesignDay 기상 API도 구현했다. 실제 radiation cache·sigma·ordinary 반복 caller 완료를 의미하지 않는다.
 - **DD 습공기 관측·재현:** Native의 실제 두 SetUp 구간에서 함수 인자·중첩 호출·cache 최초 접근 전 상태와 192개 slot을 관측했다. 동일 BEFORE 입력·cache 상태의 Rust 재현은 두 구간 모두 끝까지 실행했으며, 962개 바깥 호출 중 241개와 11,585개 cache 이벤트 중 9,705개에서 차이를 확인했다. 최초 Psat 값 쓰기는 1 ULP 차이다. 전체 raw/Iterate·DP/RH 대입 경로와 원인은 미확인이다.
-- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313–369의 표면 순회·Process 기하·scratch와 마지막 Zone/Space reset도 연결했다. 같은 입력의 Native BEFORE kernel 대조에 이어 실제 A 생산자와 보존된 Process 상태의 선택 대조도 통과했다. 370–454의 같은 Zone/Space 면적 누적과 실제 A 선택 수치 대조도 연결했다. 455–547의 실제 높이 계산과 경고 순서, 선택 높이 대조도 연결했다. 548의 선택 닫힌 체적·Space 비율, 550–639의 중심점·경계·인접 배열·표면 수 쓰기도 연결했다. Native 표면 중심점·Zone 경계 대조는 통과했으며, Zone 중심점·인접·표면 수 대조와641 이후 보고·전체 반환은 남아 있다.
+- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313–369의 표면 순회·Process 기하·scratch와 마지막 Zone/Space reset도 연결했다. 같은 입력의 Native BEFORE kernel 대조에 이어 실제 A 생산자와 보존된 Process 상태의 선택 대조도 통과했다. 370–454의 같은 Zone/Space 면적 누적과 실제 A 선택 수치 대조도 연결했다. 455–547의 실제 높이 계산과 경고 순서, 선택 높이 대조도 연결했다. 548의 선택 닫힌 체적·Space 비율, 550–639의 중심점·경계·인접 배열·표면 수 쓰기도 연결했다. Native 표면 중심점·Zone 경계 대조를 통과했고, 실제 저장 U를 사용하는641–792 보고와 EIO 세 구간의 원문 대조도 연결했다. raw Zone 중심점·인접·표면 수와 raw NominalR/U·film 표 대조,797 이후·전체 반환은 남아 있다.
 
 원본 호출 위치를 구분한다. BeginSim의 Solar 초기화는 **`HeatBalanceManager.cc:2617–2630`**이며 2629는 안내 출력, 2630이 `InitSolarCalculations` 호출이다. **`HeatBalanceSurfaceManager.cc:424–425`**는 공유 firstTime 조건의 `InitInteriorRadExchange`; **`HeatBalanceIntRadExchange.cc:610–614`**는 조건부 Solar F 복사다. HBSM615는 ZoneSizing Gather 분기의 닫는 행이며 Solar 초기화 위치가 아니다. 현재 Rust의 선택 초기화 순서 검증을 이 전체 Original caller의 완료로 확대하지 않는다.
 
 ## 실제 증거와 검증 범위
 
-아래 40개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 41개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -128,6 +128,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | Setup 선택 닫힌 체적·Space 비율 | [요약](../evidence/SRC-06-ordinary-setup-volume-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-volume-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-volume-continuation/evidence.zip) | Source548의 선택 닫힌 여섯 면 계산과 같은 Zone/Space 체적·비율 쓰기를 연결하고 뒤의 재계산을 제거했다. 기존291/465와 새 체적·비율3/ErrCount5 1을 합쳐294개 수치·466개 이산 검사에서 차이·UNKNOWN0. 기존 선택 테스트4회·A24·정적 검사 통과. 최초 작성 fixture 실패도 보존하며 전체 체적 분기/Setup은 미확인. |
 | Setup 중심점·Zone 경계·인접·표면 수 | [요약](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/evidence.zip) | Source550–639의 같은 Zone 중심점·경계, 별도 SurfAdjacentZone 배열과 누적 표면 수를 연결했다. 실제 보존된 Surface 중심점18·Zone 경계6을 추가해318개 수치·487개 이산 검사에서 차이·UNKNOWN0. 기존 테스트3회·A24·정적 검사 통과. Native Zone 중심점·인접·표면 수와641 이후·전체 gate는 미확인. |
 | Material·Construction NominalR/U 소유자 | [요약](../evidence/SRC-06-ordinary-construction-nominal-owners/summary.json) · [색인](../evidence/SRC-06-ordinary-construction-nominal-owners/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-construction-nominal-owners/evidence.zip) | 실제 재료 getter의 NominalR와 Construction 네 배열·층 합산·역수/오류 순서를 연결했다. 기존 테스트3회·A24·정적 검사와 기존318/487 기하 회귀 통과, 기하·결과 전체 bytes 동일. 최초 테스트 import 컴파일 실패·수정도 보존했다. 새 NominalR/U Native 대조와641 보고는 미검증. |
+| Setup 실제 순서·저장 U·EIO 보고 | [요약](../evidence/SRC-06-ordinary-setup-reporting-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-reporting-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-reporting-continuation/evidence.zip) | Source641–792의 실제 보고 순서·저장 NominalU·표 항목과 Shading/Zone EIO를 연결했다. Native의 실제 header3/row3,1,115바이트가 정확히 일치하며 기존318/487 회귀도 통과했다. 기존 테스트3회·A24·정적 검사 통과; raw NominalR/U·film 표 값과797 이후·전체 Setup/HB는 미검증. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -309,6 +310,16 @@ Material.cc219–220/308의 실제 raw 두께·전도율 나눗셈과 NoMass 인
 실제 A-24H는24표본·390계열이며 기하 추적39,475바이트와 결과147,618바이트가 직전 bounds 단위와 전체 bytes 동일하다. 기존 **318개 유한 수치 비트·487개 이산 검사에서 차이0·UNKNOWN0**인 것은 기하 회귀 증거다. 새 Material.NominalR·Construction.NominalU와 새로운 오류 분기의 Native 직접 대조는 **UNPAIRED**이며 이를 새 수치 PASS로 확대하지 않는다. 전체 수치 FAIL·네 gate·A/B 완료 수는 그대로다.
 
 최초 Clippy는 테스트가 private 하위 모듈을 import해 E0603·exit101이었다. 기존 crate-visible 재노출 경로로 import 한 곳만 수정했으며 네 생산 파일의 bytes는 동일하다. 최초 fmt/quality 통과·실패 Source와 수정 diff를 최종 QA와 구분해 보존한다. Native 캡처 부재에 대한 앞선 표현은 selected_geometry의 원시 Zone 중심점·표면 수·인접 필드에 한정한다. 같은 캡처의 실제 EIO 문자열에는 반올림한 Zone 중심점과 정수 표면 수가 이미 있다. 이를 원시 binary64로 역산하지 않으며, 후속 보고 단계에서 실제 문자열 자체를 대조할 수 있다.
+
+## Setup 실제 순서·저장 U·EIO 보고의 QA
+
+최종 Source `f2e29a5cfe28eb34514e7016be54aa91a78a69b6d9791264de1454ca9da1004b`에서 fmt·source-quality·ep_runtime all-target Clippy와 기존 runtime1·일반 CLI1·실제 CI CLI1, **3 passed / 0 failed / 0 ignored**를 확인했다. 기존 본문에40줄을 추가해 실제 보고 ID/이름 순서, Wall의 인접 Floor film 선택, 여섯 EIO 행과 첫 헤더 다음 출력 실패에서 표 항목·헤더 보존을 검사했다. Construction0은 OSC 계산을 호출하지 않고 원본처럼 기본+0을 표에 남긴다. 새 테스트 본문·binary·Native 빌드·전체 workspace 반복은 없다.
+
+Source641–792는 같은 all_surface_list_report_order에서 final Surface와 실제 NominalU를 읽는다. 외부 film 선택→양의 U 분기→`1/(inside + (1/U) + outside)`의 순서와 결합을 보존하며, inside0일 때 outside도0으로 만들고 역수 왕복을 생략하지 않는다. 실제 predefined 열·표 저장소에 기록한 뒤 같은 shading counters·global 개수·Zone 중심점/경계/면적/표면 수와 알고리즘 enum으로 원본 EIO 세 구간을 출력한다. 기존 `.R` formatter를 재사용하고 선택 World 경로의 뒤쪽 typed 보고 재계산을 제거했다. legacy 경로는 유지하며, 표의 기존 유한값·절댓값1e8 미만 범위를 전체 포맷 지원으로 확대하지 않는다.
+
+실제 A-24H는24표본·390계열이며 기하 추적39,475바이트와 결과147,618바이트가 이전 Nominal 단위와 전체 bytes 동일하다. 기존 **318개 유한 수치 비트·487개 이산 검사에서 차이0·UNKNOWN0**을 유지했다. 같은 Native 캡처의 실제 EIO 파일5,595바이트와 보존 문자열이 일치하는지 확인하고, Shading Summary·Zone Summary·Zone Information의 header3/row3, **1,115바이트**를 Rust 실제 파일과 공백·행 끝까지 정확히 대조했다. Rust EIO8,761바이트에서 이 한 구간만 제거하면 이전7,646바이트와 전체 bytes가 같다.
+
+이는 Native outer GetBuildingData와 Rust 성공 실행에서 살아 있는 선택 출력 문자열의 대조다. 반올림된 Zone 중심점 문자열을 원시 binary64로 역산하지 않는다. raw Material.NominalR·Construction.NominalU·film 표 값과 raw Zone 중심점/인접/표면 수는 미대조다. 실제 후속 호출은 Solar enclosure797, Zone 외기 설정800·검사801이며 이번792행 경계 밖이다. 전체 Setup/HB·엔진 수치 FAIL와 네 gate·A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 

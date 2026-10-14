@@ -67,12 +67,17 @@ fn film_u(model: &TypedModel, surface: &Surface) -> Result<(bool, f64), CtfRepor
         _ => return Err(CtfReportUnavailable::SurfaceBoundary(surface.id)),
     };
     let nominal = nominal_u(model, surface)?;
-    let value = if nominal > 0.0 {
+    let value = nominal_u_with_films(nominal, inside, outside);
+    Ok((exterior, value))
+}
+
+/// Pure ComputeNominalUwithConvCoeffs reciprocal tail; callers own film selection.
+pub(crate) fn nominal_u_with_films(nominal: f64, inside: f64, outside: f64) -> f64 {
+    if nominal > 0.0 {
         1.0 / (inside + (1.0 / nominal) + outside)
     } else {
         nominal
-    };
-    Ok((exterior, value))
+    }
 }
 
 /// Append the ordinary opaque GetSurfaceData film-U entries in real report order.

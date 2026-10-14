@@ -17,6 +17,7 @@ use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
 mod ordinary_surface_geometry;
+mod setup_geometry_reports;
 mod setup_zone_geometry;
 mod world_surface_geometry;
 pub use ordinary_surface_geometry::{

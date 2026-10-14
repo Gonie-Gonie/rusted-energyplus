@@ -12696,6 +12696,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-nominal-owners/summary.json",
         "sha256": "e8c0c2c582c6e26c8ade880fba310c19f2e53a688faaf499e925e775d4776af8",
         "size_bytes": 11479
+      },
+      "actual_selected_ordinary_setup_reporting_continuation": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-reporting-continuation/summary.json",
+        "sha256": "80976ee6d3c92fb265836a63790e9505c0540a263345a70d63137aebd58781f5",
+        "size_bytes": 12141
       }
     },
     {
