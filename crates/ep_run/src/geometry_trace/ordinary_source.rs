@@ -24,6 +24,57 @@ fn array(values: Option<&[f64]>) -> Value {
     }
 }
 
+// The retained flags, not Vec emptiness, describe reached Source dimensions.
+fn solar_real_array(allocated: bool, values: &[f64]) -> Value {
+    json!({
+        "container":"Rust Vec with explicit retained Source allocation state",
+        "allocated":allocated, "size":values.len(),
+        "lower":allocated.then_some(1), "upper":allocated.then_some(values.len()),
+        "values":if allocated { values.iter().copied().enumerate().map(|(n,value)|
+            json!({"index":n+1,"value":scalar(value)})).collect::<Vec<_>>() } else { Vec::new() },
+    })
+}
+
+fn solar_integer_array(values: Option<&[i32]>) -> Value {
+    json!({
+        "container":"Rust Option<Vec<i32>> in the actual one-based Source domain",
+        "allocated":values.is_some(), "size":values.map_or(0, <[_]>::len),
+        "lower":values.map(|_|1), "upper":values.map(<[_]>::len),
+        "values":values.map(|values| values.iter().copied().enumerate().map(|(n,value)|
+            json!({"index":n+1,"value":value})).collect::<Vec<_>>()).unwrap_or_default(),
+    })
+}
+
+fn solar_matrix(allocated: bool, num_surfaces: i32, values: &[f64]) -> Value {
+    let width = usize::try_from(num_surfaces).ok();
+    let complete = width.filter(|n| n.checked_mul(*n) == Some(values.len()));
+    let cells = if allocated {
+        complete.map(|n| {
+            let mut cells = Vec::with_capacity(values.len());
+            // Native emits j-outer/i-inner, but logical F(i,j) is Rust f[i*N+j].
+            for j in 0..n {
+                for i in 0..n {
+                    cells.push(json!({"i":i+1,"j":j+1,"value":scalar(values[i*n+j])}));
+                }
+            }
+            cells
+        })
+    } else {
+        Some(Vec::new())
+    };
+    json!({
+        "container":"Rust Vec; explicit Source F dimension and logical indices",
+        "allocated":allocated, "size":values.len(),
+        "l1":allocated.then_some(1), "u1":if allocated { width } else { None },
+        "l2":allocated.then_some(1), "u2":if allocated { width } else { None },
+        "axis_contract":"F(i,j) is from source surface j to receiving surface i",
+        "values":cells,
+        "raw_storage_if_shape_unavailable":if allocated && complete.is_none() {
+            Some(values.iter().copied().map(scalar).collect::<Vec<_>>())
+        } else { None },
+    })
+}
+
 fn solar(owner: Option<&OrdinarySolarRadiation>) -> Value {
     let Some(owner) = owner else {
         return Value::Null;
@@ -43,8 +94,17 @@ fn solar(owner: Option<&OrdinarySolarRadiation>) -> Value {
             "FloorArea":scalar(row.floor_area),
             "ExtWindowArea":scalar(row.exterior_window_area),
             "TotalSurfArea":scalar(row.total_surface_area),
+            "NumOfSurfaces":row.num_surfaces, "HasInterZoneWindow":row.has_interzone_window,
+            "F":solar_matrix(row.source_array_allocated[0], row.num_surfaces, &row.f),
+            "Area":solar_real_array(row.source_array_allocated[1], &row.area),
+            "SolAbsorptance":solar_real_array(row.source_array_allocated[2], &row.absorptance),
+            "Azimuth":solar_real_array(row.source_array_allocated[3], &row.azimuth),
+            "Tilt":solar_real_array(row.source_array_allocated[4], &row.tilt),
+            "SurfacePtr":solar_integer_array(row.source_surface_ptr.as_deref()),
+            "SurfaceReportNums":row.source_surface_report_nums,
+            "SurfaceReportNums_size":row.source_surface_report_nums.len(),
         })).collect::<Vec<_>>()),
-        "capture_boundary":"same owner retained from Setup797 and moved into State; late numeric Solar fields excluded",
+        "capture_boundary":"same retained owner moved into State; reported Source numeric arrays use reached allocation flags",
     })
 }
 
@@ -60,6 +120,8 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
             "class":row.class_code, "zone_id":row.zone_number, "space_id":row.space_number,
             "construction_id":row.construction_number, "base_surface":row.base_surface,
+            "SolarEnclSurfIndex":row.solar_enclosure_surface_index,
+            "SolarEnclIndex":row.solar_enclosure_index, "RadEnclIndex":row.radiant_enclosure_index,
             "sides":row.sides, "heat_transfer_surface":row.heat_transfer_surface,
             "ext_solar":row.ext_solar, "mirrored_surface":row.mirrored_surface,
             "is_shadowing":row.is_shadowing, "outside_boundary":row.outside_boundary,

@@ -350,6 +350,12 @@ Rust 관측 QA는 Source `4a2298a33fe3db81842cbc0ebae7633b0c3e0e228232dbbe7417c8
 
 별도 Native Material.Name/Resistance/Thickness/Input 필드·포인터 할당 동등성, fixed LayerPoint의 할당 flag 동등성, 후행 Solar F/ScriptF 및 실제800 온도 호출은 **UNPAIRED**다. 실제 InitSolar316 연결과 전체 GetHeatBalanceInput·Setup/HB·engine 완료는 남아 있다. 과거 수치 FAIL·네 gate·A/B 완료 수는 그대로이며, 위44개 actual 요약과1,572,346바이트 증거 ZIP에 현재 범위를 보존한다.
 
+## 실제 InitSolar316 연결 — Native 직접 대조 진행 중
+
+`GetHeatBalanceInput`의 원본316 위치에 선택 Solar 초기화를 연결했다. 같은 enclosure 저장소에서 배열 할당·SurfacePtr·보고 순서·Surface 역참조를 원본 순서로 기록하고, 뒤의 물리 연결에서는 이 수치와 할당을 보존한다. 기존 수치 helper와 legacy 초기화는 유지했다. 양의 사용자 view factor·전체 상세 보고·오류 보정 분기는 아직 선택 범위 밖이다.
+
+동결 Source `63d258fe13817aa66689af6165e4f098d85707624b81a1817c13e35aaaca3831`에서 형식·source-quality·두 crate Clippy와 기존 runtime1·일반 CLI1·실제 CI CLI1을 통과했다. 새 테스트 본문·binary는 없으며 기존 runtime 본문에42줄을 추가했다. 실제 A24는24표본·390계열이며, 기존318개 수치·487개 이산 검사와 EIO1,115바이트 대조에서 차이0·UNKNOWN0을 유지했다. 새 Solar 배열의 원본 직접 대조는 진행 중이며, 이 구현 커밋으로 새 수치 PASS·45번째 actual 요약·전체 포팅 완료를 주장하지 않는다. 기존 수치 FAIL·네 gate·A/B 완료 수는 그대로다.
+
 ## 이력과 증거 보존
 
 반복된 착수 전 산문과 당시 미완료 목록은 현재 범위와 위 표로 통합했다. 원본 범위·적용/formatter diff·실패/중단 명령·실제 QA·선택 입력과 uncapped ledger는 기존 요약/색인/ZIP에 그대로 남긴다. 초기 입력/transport/compile/Clippy 실패를 나중 성공 로그로 바꾸지 않는다. 과거 global file-size 실패와 구조적 부채도 현재 통과로 다시 쓰지 않는다.

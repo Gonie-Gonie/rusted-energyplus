@@ -301,6 +301,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             }
         }
         let radiation_input = crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory([], false)?;
+        let mut source_solar = None;
         for (floor_only, fail) in [(false, false), (true, false), (false, true)] {
             let zone = &mut owners.zones.zones.as_mut().ok_or("actual enclosure Zone")?[0];
             zone.name = "authored Source Zone".into();
@@ -371,6 +372,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
                 assert_eq!(radiation.enclosures()[0].space_names, ["authored Source Space"]);
                 assert_eq!(radiation.enclosures()[0].floor_area.to_bits(), 25.0_f64.to_bits());
                 assert!(radiation.enclosures()[0].zone_id.is_none() && radiation.enclosures()[0].f.is_empty());
+                if !floor_only { source_solar = Some(radiation.clone()); }
                 radiation.bind_initialized_solar_geometry(&model.typed, &physical.surfaces, radiation_input)?;
                 assert_eq!(radiation.radiant_enclosures().as_ptr(), allocation);
                 assert_eq!(radiation.enclosures().as_ptr(), solar_allocation, "later bind keeps the early Solar Vec");
@@ -683,6 +685,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         // A real post-take guard error exercises reverse custody, not a claimed
         // Native/Solar rollback endpoint or another fabricated caller phase.
         assert!(context.take_selected_world_outdoor_rows(&model.typed).is_err());
+        let source_solar_physical = physical.surfaces.clone();
         context.restore_selected_world_outdoor_rows(physical.surfaces);
         let arrays = context.reports.surface_geometry_input.parallel_arrays.as_ref().ok_or("lost arrays at restore")?;
         let restored = arrays.outdoor.as_ref().ok_or("lost actual outdoor values at restore")?;
@@ -816,6 +819,45 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             .family("SurfaceProperty:SolarIncidentInside"), Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Null)));
         assert_eq!(parent.backend.state.tracking.total_warning_errors, 1);
         assert!(!parent.reports.heat_balance_input_errors_found);
+        // Authored checkpoint of the real early owner, not a Native numeric fixture.
+        // The preceding report-only failure used an intentionally invalid row.
+        parent.reports.surface_geometry_input = context.reports.surface_geometry_input.clone();
+        parent.reports.ordinary_solar_radiation = Some(crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(radiation_input));
+        parent.initialize_selected_solar_view_factors(&model.typed)?;
+        assert!(parent.reports.ordinary_solar_radiation.as_ref().ok_or("zero-enclosure owner")?
+            .enclosure_storage().is_none(), "zero actual enclosure count preserves unallocated Solar");
+        parent.reports.ordinary_solar_radiation = source_solar;
+        let solar_allocation = parent.reports.ordinary_solar_radiation.as_ref().ok_or("same early Solar")?
+            .enclosures().as_ptr();
+        parent.initialize_selected_solar_view_factors(&model.typed)?;
+        let solar = parent.reports.ordinary_solar_radiation.as_ref().ok_or("retained early Solar")?;
+        let row = &solar.enclosures()[0];
+        assert_eq!(solar.enclosures().as_ptr(), solar_allocation);
+        assert!(solar.is_initialized()); assert!(row.source_array_allocated.iter().all(|value| *value));
+        assert_eq!(row.num_surfaces, i32::try_from(total)?);
+        assert_eq!(row.source_surface_ptr.as_ref().ok_or("actual Source pointers")?, &source_numbers);
+        assert_eq!(row.source_surface_report_nums, parent.reports.surface_geometry_input.all_surface_list_report_order);
+        assert!(row.surface_ptr.is_empty(), "physical IDs are joined only by the later binder");
+        assert!(row.absorptance.iter().all(|value| value.to_bits()
+            == parent.reports.heat_balance_input_state.construction_usage[0].inside_absorp_solar.to_bits()));
+        assert!(parent.reports.surface_geometry_input.final_surfaces.as_ref().ok_or("same final rows")?
+            .iter().enumerate().all(|(index, surface)| (surface.row.solar_encl_index,
+                surface.row.rad_encl_index, surface.row.solar_encl_surface_index) == (1, 1, i32::try_from(index + 1).unwrap_or(-1))));
+        let retained_f = row.f.clone();
+        parent.initialize_selected_solar_view_factors(&model.typed)?;
+        assert_eq!(parent.reports.ordinary_solar_radiation.as_ref().ok_or("repeated same Source call")?
+            .enclosures()[0].source_surface_report_nums,
+            parent.reports.surface_geometry_input.all_surface_list_report_order.iter()
+                .chain(&parent.reports.surface_geometry_input.all_surface_list_report_order).copied().collect::<Vec<_>>());
+        let retained_f_allocation = parent.reports.ordinary_solar_radiation.as_ref().ok_or("repeated F allocation")?
+            .enclosures()[0].f.as_ptr();
+        parent.reports.ordinary_solar_radiation.as_mut().ok_or("same late Solar")?
+            .bind_source_initialized_solar_geometry(&model.typed, &source_solar_physical, radiation_input,
+                &parent.reports.surface_geometry_input)?;
+        let row = &parent.reports.ordinary_solar_radiation.as_ref().ok_or("late joined Solar")?.enclosures()[0];
+        assert_eq!(row.f, retained_f, "late physical join preserves Source numeric writes");
+        assert_eq!(row.f.as_ptr(), retained_f_allocation, "late join retains the reached repeated-call F allocation");
+        assert_eq!(row.surface_ptr, source_ids);
         // One malformed definition earns the real ErrorsFound write, then
         // reaches the parent fatal only after all preceding selected helpers.
         scheduled_definition.alpha_fields = 3;

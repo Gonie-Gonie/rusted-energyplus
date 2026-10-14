@@ -211,6 +211,12 @@ pub struct OrdinaryGeometrySurface<'a> {
     pub space_number: i32,
     /// Actual Source Construction index.
     pub construction_number: i32,
+    /// Actual Source SolarEnclSurfIndex written by the reached HB316 caller.
+    pub solar_enclosure_surface_index: i32,
+    /// Actual Source SolarEnclIndex; independent of typed physical identities.
+    pub solar_enclosure_index: i32,
+    /// Actual Source RadEnclIndex, without a radiant numeric initialization claim.
+    pub radiant_enclosure_index: i32,
     /// Actual remapped BaseSurf index.
     pub base_surface: i32,
     /// Actual stored Sides.
@@ -565,6 +571,9 @@ impl CtfInitializationReports {
                 zone_number: row.zone,
                 space_number: row.space,
                 construction_number: row.construction,
+                solar_enclosure_surface_index: row.solar_encl_surface_index,
+                solar_enclosure_index: row.solar_encl_index,
+                radiant_enclosure_index: row.rad_encl_index,
                 base_surface: row.base_surface,
                 sides: row.sides,
                 heat_transfer_surface: row.heat_transfer_surface,

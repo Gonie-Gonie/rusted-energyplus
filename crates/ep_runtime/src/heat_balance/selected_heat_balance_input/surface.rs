@@ -95,6 +95,10 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) heat_transfer_surface: bool,
     /// Actual SurfaceData constructor Invalid, overwritten at reached override8453.
     pub(crate) heat_transfer_algorithm: super::SelectedHeatTransferModel,
+    /// Actual SurfaceData constructor0, written by InitSolar887-889.
+    pub(crate) solar_encl_surface_index: i32,
+    pub(crate) solar_encl_index: i32,
+    pub(crate) rad_encl_index: i32,
     pub(crate) base_surface: i32,
     pub(crate) base_surface_name: String,
     pub(crate) zone_name: String,

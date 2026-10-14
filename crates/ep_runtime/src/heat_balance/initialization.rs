@@ -109,6 +109,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 &mut *source.output_host,
             )?;
             actual.continue_selected_heat_balance_input_before_solar()?;
+            actual.initialize_selected_solar_view_factors(&model.typed)?;
         }
     }
     if let Some(actual) = initialization.as_deref_mut() {
@@ -583,9 +584,12 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                     reason: "missing same early radiant enclosure container".into(),
                 });
             };
-            if let Err(error) =
-                owner.bind_initialized_solar_geometry(&model.typed, &surfaces, input)
-            {
+            if let Err(error) = owner.bind_source_initialized_solar_geometry(
+                &model.typed,
+                &surfaces,
+                input,
+                &actual.reports.surface_geometry_input,
+            ) {
                 actual.reports.ordinary_solar_radiation = Some(owner);
                 actual.restore_selected_world_outdoor_rows(surfaces);
                 return Err(error.into());
@@ -600,7 +604,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         };
         // Restore the real reached prefix before propagating any output/domain
         // failure, so the caller's reports/EIO/backend retain the partial owner.
-        let result = owner.initialize_solar_at_input_boundary(&model.typed, &surfaces, actual);
+        let result = if selected_world_geometry {
+            // Actual316 has already initialized this same owner from Source
+            // Surface/Construct operands. Late binding must not fill it again.
+            Ok(())
+        } else {
+            owner.initialize_solar_at_input_boundary(&model.typed, &surfaces, actual)
+        };
         actual.reports.ordinary_solar_radiation = Some(owner);
         if let Err(error) = result {
             if selected_world_geometry {

@@ -5,6 +5,7 @@
 
 mod enclosure_setup;
 mod initialization;
+mod source_initialization;
 pub(crate) use enclosure_setup::EnclosureOutputOwners;
 
 use crate::error::{RuntimeError, WarmupOutputError};
@@ -166,11 +167,22 @@ pub struct SolarRadiationEnclosure {
     pub exterior_window_area: f64,
     /// Actual constructor-zero TotalSurfArea.
     pub total_surface_area: f64,
+    /// Genuine EnclosureViewFactorInformation constructor0/false.
+    pub num_surfaces: i32,
+    /// Genuine constructor false; InitSolar890-893 only assigns true.
+    pub has_interzone_window: bool,
+    /// Sole Source Array1D_int pointer, unallocated until actual InitSolar874.
+    pub source_surface_ptr: Option<Vec<i32>>,
+    /// One-based Source enclosure positions, appended in actual report order.
+    pub source_surface_report_nums: Vec<i32>,
+    /// Reached allocation state of the SAME F/Area/Absorptance/Azimuth/Tilt
+    /// vectors below, in Source869-873 order; constructor false means unallocated.
+    pub source_array_allocated: [bool; 5],
     /// Physical Zone binding is unavailable until the genuine later binder.
     pub zone_id: Option<ZoneId>,
     /// Actual bound physical member Space identities.
     pub space_ids: Vec<SpaceId>,
-    /// Actual Wall/Floor/Roof traversal for both F axes.
+    /// Physical IDs joined to Source SurfacePtr by the later selected binder.
     pub surface_ptr: Vec<SurfaceId>,
     /// Explicit joins to retained SurfaceHeatBalanceState elements.
     pub surface_indexes: Vec<usize>,
