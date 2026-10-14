@@ -5,6 +5,13 @@
 //! diagnostics, counters and later centroid scratch separately.
 
 use super::centroid_precision::multiply_by_source_third;
+mod process_vertices;
+pub(crate) use process_vertices::{
+    SourceProcessShape, source_process_coplanarity, source_process_distance,
+    source_process_is_rectangle, source_process_shift, source_process_sky_rad_split,
+    source_process_translation,
+};
+
 use ep_model::Point3;
 use std::fmt::{Display, Formatter};
 

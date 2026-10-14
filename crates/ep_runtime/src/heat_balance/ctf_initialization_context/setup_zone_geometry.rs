@@ -1,4 +1,4 @@
-//! Bounded SetupZoneGeometry292-311 continuation; no complete Setup/HB claim.
+//! Bounded SetupZoneGeometry292-369 continuation; no complete Setup/HB claim.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -117,6 +117,15 @@ impl CtfInitializationContext<'_> {
                 reports.heat_balance_input_errors_found,
             )
             .map_err(hb_input_error)?;
-        Ok(()) // Stop before313 resets/324 traversal/ProcessSurfaceVertices.
+        reports
+            .surface_geometry_input
+            .process_opaque_setup_surfaces(
+                reports.selected_zone_input.as_mut().ok_or_else(|| {
+                    hb_input_error(E::Unavailable("same actual Setup Zone/Space owner"))
+                })?,
+                &mut reports.heat_balance_input_state,
+            )
+            .map_err(hb_input_error)?;
+        Ok(()) // Stop before370 DetailedWWR/376 area accumulation.
     }
 }

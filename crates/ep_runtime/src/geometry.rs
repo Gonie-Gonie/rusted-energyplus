@@ -13,8 +13,10 @@ pub use inside_convection_owners::{
 };
 pub(crate) use source_geometry::{
     GetVerticesProperties, Orientation, SourceCentroidScratch, SourceNormalArea,
-    finish_get_vertices_properties, orientation_from_normal, source_normal_area,
-    source_surface_centroid,
+    SourceProcessShape, finish_get_vertices_properties, orientation_from_normal,
+    source_normal_area, source_process_coplanarity, source_process_distance,
+    source_process_is_rectangle, source_process_shift, source_process_sky_rad_split,
+    source_process_translation, source_surface_centroid,
 };
 pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,

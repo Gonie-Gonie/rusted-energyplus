@@ -78,13 +78,13 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 - **ordinary 소유자:** 실제 raw 여섯 대류 family 개수와 하한, Zone ZT·Space MAT/ZT/ZTAV, In·Old·독립 Tmp를 보존한다. BeginEnvironment reset, Old←In, solver 반환값 Tmp→In, MAT commit과 disabled-space MAT/ZT copy의 한정된 전이를 연결했다. ZTAV를 이 copy로 덮어쓰지 않는다. geometry getter/Config와 공통 입력 저장소도 실제 caller에 연결했지만 전체 readiness는 미완성이다.
 - **복사·수치 생산자:** LU와 Fix/ScriptF의 실제 선택 입력 replay, typed 오류 전달 및 N1 Source 분기를 연결했다. 단일 불투명 enclosure의 선택 Solar 초기화와 부분 상태 이동, 현재 기상 태양 상태, DesignDay 기상 API도 구현했다. 실제 radiation cache·sigma·ordinary 반복 caller 완료를 의미하지 않는다.
 - **DD 습공기 관측·재현:** Native의 실제 두 SetUp 구간에서 함수 인자·중첩 호출·cache 최초 접근 전 상태와 192개 slot을 관측했다. 동일 BEFORE 입력·cache 상태의 Rust 재현은 두 구간 모두 끝까지 실행했으며, 962개 바깥 호출 중 241개와 11,585개 cache 이벤트 중 9,705개에서 차이를 확인했다. 최초 Psat 값 쓰기는 1 ULP 차이다. 전체 raw/Iterate·DP/RH 대입 경로와 원인은 미확인이다.
-- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313 이후의 순회·기하 계산·보고와 전체 반환은 남아 있다.
+- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313–369의 표면 순회·Process 기하·scratch와 마지막 Zone/Space reset도 연결했다. 같은 입력의 Native BEFORE kernel 대조를 통과했으며 실제 World 생산자/endpoint 대조, 370 이후 면적·높이·체적·보고와 전체 반환은 남아 있다.
 
 원본 호출 위치를 구분한다. BeginSim의 Solar 초기화는 **`HeatBalanceManager.cc:2617–2630`**이며 2629는 안내 출력, 2630이 `InitSolarCalculations` 호출이다. **`HeatBalanceSurfaceManager.cc:424–425`**는 공유 firstTime 조건의 `InitInteriorRadExchange`; **`HeatBalanceIntRadExchange.cc:610–614`**는 조건부 Solar F 복사다. HBSM615는 ZoneSizing Gather 분기의 닫는 행이며 Solar 초기화 위치가 아니다. 현재 Rust의 선택 초기화 순서 검증을 이 전체 Original caller의 완료로 확대하지 않는다.
 
 ## 실제 증거와 검증 범위
 
-아래 33개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 34개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -121,6 +121,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | DD 같은 입력·cache 재현 | [요약](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/evidence.zip) | 실제 두 구간·962개 바깥 호출·11,585개 cache 이벤트를 완주, **strict FAIL**. 호출 차이241·cache 차이9,705·최종 상태 차이 범주3; 최초 Psat 값 쓰기1 ULP. 전체 raw/Iterate·대입 경로 UNKNOWN, whole-DD9FAIL/8UNPAIRED 유지. |
 | 표면 입력 이후 Setup 초기화 | [요약](../evidence/SRC-06-ordinary-setup-zone-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-zone-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-zone-continuation/evidence.zip) | Source292–311의 실제 오류 cleanup·같은 입력 처리기/장비/Node/gain 소유자·빈 airflow/storm·불투명 class skip·trig 배열 해제. 기존 테스트4개·두 crate Clippy·실제 A24 및 Rust 결과 전체 bytes 일치; Source313+·전체 Setup/HB 완료는 미확인. |
 | DD 계산의 스레드 정밀도 진단 | [요약](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/summary.json) · [색인](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/evidence.zip) | 두 입력의 독립 실행에서 x87 PC 비트 교환만으로 exp 결과1 ULP 차이가 양방향으로 바뀌고 복원됐다. 기존 전체9,949개 차이·whole-DD 실패와 과거 실제 프로세스 FP 상태/호출 대상은 별도 미확정. 생산 수식·unsafe 정책·gate 변경 없음. |
+| Setup 표면 순회·Process 기하 | [요약](../evidence/SRC-06-ordinary-setup-process-surfaces/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-process-surfaces/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-process-surfaces/evidence.zip) | Source313–369의 순서 있는 표면 순회·scratch·Process 계산·Zone/Space reset을 연결했다. 실제 Native BEFORE 6개 사례·180개 scalar가 strict bits 일치한다. 최종 기존 테스트3개·정적 검사·실제 A24와 이전 Rust 결과 bytes 일치; 실제 World 생산자/endpoint 대조·370 이후·전체 gate는 미확인. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -248,6 +249,12 @@ Source01의 지수 문법 컴파일 실패101과 Source02의 Clippy 일곱 항�
 독립 진단 프로세스 안에서 x87 precision-control 비트만 서로 교환하자 두 입력의 차이가 양방향으로 바뀌었다. 원래 control word로 복원하면 결과도 되돌아왔고, 정상 경로의 정확한 CW 복원·MXCSR 보존2건을 확인했다. 6개 문맥·278행을 전부 인증했으며, 메인/스레드 구분 실험90행과 읽기 전용 FP 관측92행도 별도로 보존했다. 비트8·9의 정밀도 제어 의미는 [Intel 설명](https://www.intel.com/content/dam/support/us/en/documents/processors/pentium4/sb/25366521.pdf)에 따른다.
 
 이는 두 입력의 독립 실행에서 확인한 원인이다. 과거 실제 Native helper와 Cargo 테스트 프로세스의 FP 상태·정확한 수학 함수 호출 대상은 당시 작은 기록으로 묶이지 않았으므로 전체9,949개 차이의 원인이나 해결로 확대하지 않는다. 별도 진단용 unsafe assembly는 ignored Source에만 있으며 생산 수식·캐시 계산·workspace unsafe 금지 정책은 그대로다. 새 Cargo 테스트 본문·binary나 전체 workspace 반복은 없다. 네 번의 작은 실험에서 컴파일/실행 명령10개가 exit0이고, 공개 ZIP은 약190KB다. 기존 같은 입력 재현 FAIL·whole-DD9FAIL/8UNPAIRED·전체 raw/Iterate/대입 경로 UNKNOWN과 네 gate·A/B 완료 수는 유지한다.
+
+## Setup 표면 순회·Process 기하 단위의 QA
+
+최종 Source `093c0c1a4ee3f5ba5c71ac9c4d8670f1a31715617fb608eb61cf1eb230f66584`에서 fmt·source-quality·ep_runtime/ep_run all-target Clippy가 통과했다. 기존 runtime 본문1·일반 CLI1·실제 `CI_FORCE_TIME_STEP=Y` CLI1, **3 passed / 0 failed / 0 ignored**이며 새 테스트 본문·binary는 없다. 같은 최종 runtime 본문에서 실제 Native BEFORE 여섯 표면의 입력으로 180개 유한 scalar를 부호 있는 0까지 정확히 대조했다. Native AFTER 값은 생산 입력으로 공급하지 않는다. 작성된 소유자 fixture와 원본 입력 재현은 실제 World 생산자/endpoint 대조와 구분한다.
+
+Source313–369는 shading counters·reserve/append·sky split·IsShadowing 대입, Process의 단회 scratch 할당·기존 처리 short circuit·plane/coplanarity/rectangle/변환·ShadeV 복사와 마지막 Zone5/Space2 reset을 보존한다. 실제 A-24H는 exit0·24 hourly samples·390계열이며 이전 같은 입력의 Rust result-store147,618바이트와 전체 bytes가 같다. Native의 96 Source timestep 실행이나 전체 Setup/HB 완료를 뜻하지 않는다. 최초 두 Rust101과 수정 전 Clippy101, configure 성공 후 adapter 검사 실패·복구는 당시 기록 그대로 보존했다. 전체 workspace 반복·장비 테스트 중복 실행은 없고 기존 수치 FAIL 및 모든 gate는 유지한다.
 
 ## 이력과 증거 보존
 

@@ -25,6 +25,7 @@ enum Filter {
 pub(crate) struct SurfaceLists {
     pub(crate) all_ht: Vec<i32>,
     pub(crate) all_exterior_solar: Vec<i32>,
+    pub(crate) all_exterior_solar_and_shading: Vec<i32>,
     pub(crate) all_shadow_possible_obstructions: Vec<i32>,
     pub(crate) all_interzone: Vec<i32>,
     pub(crate) all_ht_non_window: Vec<i32>,
@@ -50,7 +51,7 @@ fn construction(
         .get(index(number)?)
         .ok_or(Error::Unavailable("same Construction type/list owner"))
 }
-fn reserve(list: &mut Vec<i32>, requested: usize) {
+pub(super) fn reserve(list: &mut Vec<i32>, requested: usize) {
     // C++ reserve(n) is absolute; Rust reserve is additional to current length.
     // Capacity/address/allocator/OOM equivalence is not claimed.
     if requested > list.len() {
@@ -348,7 +349,11 @@ impl SurfaceGeometryInputState {
                     SurfaceClass::None
                     | SurfaceClass::Invalid
                     | SurfaceClass::Window
-                    | SurfaceClass::Door => {}
+                    | SurfaceClass::Door
+                    | SurfaceClass::Shading
+                    | SurfaceClass::DetachedFixed
+                    | SurfaceClass::DetachedBuilding
+                    | SurfaceClass::IntMass => {}
                 }
             }
         }

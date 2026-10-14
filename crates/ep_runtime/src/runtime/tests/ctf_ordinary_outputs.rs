@@ -1,4 +1,6 @@
 
+include!("ctf_ordinary_process_reference.rs");
+
 fn ctf_ordinary_output_test_state() -> crate::heat_balance::error_backend::SourceErrorState {
     use crate::heat_balance::error_backend::{SourceErrorState, SourceErrorTracking};
     SourceErrorState { output_error_header: true, version_string: "authored Rust caller".into(),
@@ -256,6 +258,22 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             shortcut: &mut shortcut, zones: &mut zones, control: &mut control,
             globals: &globals, environment: &environment };
         let mut errors = false;
+        // Authored checkpoint only, not a GetVertices/World producer certificate.
+        // This cube intentionally has inward floor/roof winding. Do not bypass
+        // the real warning/reversal IO by calling GetVertices on these rows.
+        for (index, row) in raw.surface_tmp.as_mut().ok_or("authored checkpoint rows")?.iter_mut().enumerate() {
+            let points = row.vertex.as_ref().ok_or("authored checkpoint vertices")?.iter().map(|vertex| {
+                let [x_m, y_m, z_m] = vertex.ok_or("authored written checkpoint vertex")?;
+                Ok(ep_model::Point3 { x_m, y_m, z_m })
+            }).collect::<Result<Vec<_>, &str>>()?;
+            row.base_surface = i32::try_from(index + 1)?;
+            raw.coordinate.max_vertices_per_surface = raw.coordinate.max_vertices_per_surface.max(points.len());
+            let normal = crate::geometry::source_normal_area(&points);
+            let orientation = crate::geometry::orientation_from_normal(&points, normal.newell_normal);
+            row.vertex_progress.normal_area = Some(normal);
+            row.vertex_progress.orientation_return = Some(orientation);
+            row.vertex_progress.properties = Some(crate::geometry::finish_get_vertices_properties(normal, orientation));
+        }
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.initialize_coordinate_owners(&owners)?;
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
@@ -373,6 +391,35 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(raw.total_storm_windows, 0);
         assert!(raw.storm_windows.is_none());
         assert!(raw.coordinate.cos_zone_relative.is_none() && raw.coordinate.sin_zone_relative.is_none());
+        assert!(raw.process_vertices_scratch.one_time);
+        assert!(raw.process_vertices_scratch.x.is_none());
+        // Constructor-zero X0 is checked before the actual Process writer.
+        assert!(raw.parallel_arrays.as_ref().ok_or("pre-Process parallel owner")?.x0.iter()
+            .all(|value| value.to_bits() == 0.0_f64.to_bits()));
+        raw.process_opaque_setup_surfaces(owners.zones, owners.control)?;
+        assert!(!raw.process_vertices_scratch.one_time);
+        let process_arrays = raw.parallel_arrays.as_ref().ok_or("actual processed parallel owner")?;
+        let process_rows = raw.final_surfaces.as_ref().ok_or("actual processed final owner")?;
+        for (row, shade) in process_rows.iter().zip(&process_arrays.shade_vertices) {
+            assert!(row.row.vertices_processed && !row.row.is_shadowing);
+            assert_eq!(row.row.shape, crate::geometry::SourceProcessShape::Rectangle);
+            assert_eq!(shade.n_vert, row.row.sides);
+            let vertices = row.row.vertex.as_ref().ok_or("actual Process vertex owner")?;
+            for (component, values) in [shade.xv.as_ref(),shade.yv.as_ref(),shade.zv.as_ref()].into_iter().enumerate() {
+                let values = values.ok_or("actual allocated ShadeV component")?;
+                assert_eq!(values.len(),vertices.len());
+                assert_eq!(values.iter().map(|v|v.to_bits()).collect::<Vec<_>>(),vertices.iter().map(|v|v.ok_or("actual written vertex").map(|p|p[component].to_bits())).collect::<Result<Vec<_>,_>>()?);
+            }
+        }
+        assert_eq!(raw.surface_lists.all_exterior_solar_and_shading, raw.surface_lists.all_exterior_solar);
+        assert_eq!(raw.setup_shading.last,-1);
+        for zone in owners.zones.zones.as_ref().ok_or("actual Setup reset zones")? {
+            assert!(!zone.has_window);
+            assert_eq!([zone.exterior_window_area,zone.exterior_gross_wall_area,zone.exterior_net_wall_area,zone.total_surface_area],[0.0;4]);
+        }
+        for space in owners.zones.spaces.as_ref().ok_or("actual Setup reset spaces")? {
+            assert_eq!([space.exterior_window_area,space.total_surface_area],[0.0;2]);
+        }
         raw.bind_typed_surfaces(&owners)?;
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
@@ -399,7 +446,6 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(arrays.surf_penumbra_id, vec![-1; total]);
         assert_eq!(arrays.surf_t_air_ref, vec![-1; total]);
         assert_eq!(arrays.x0.len(), total);
-        assert!(arrays.x0.iter().all(|value| value.to_bits() == 0.0_f64.to_bits()));
         let windows = raw.window_arrays.as_ref().ok_or("missing actual window allocation")?;
         assert_eq!((windows.rows, windows.equivalent_layer_columns, windows.solid_window_columns), (total, 7, 3));
         assert_eq!((windows.surf_win_a.len(), windows.surf_win_acf_overlap.len()), (total * 7, total * 3));
@@ -472,6 +518,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(reached_eio.matches("! <Surface Heat Transfer Algorithm>").count(), 1);
         assert!(reached_eio.contains("Surface Heat Transfer Algorithm, CTF - ConductionTransferFunction,200,0.10,1000.0\n"));
     }
+    check_setup_process_native_reference_if_requested()?;
     Ok(())
 }
 

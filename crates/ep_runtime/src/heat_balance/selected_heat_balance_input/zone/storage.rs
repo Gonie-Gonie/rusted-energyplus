@@ -23,6 +23,11 @@ pub(crate) struct SelectedZoneData {
     pub(crate) ceiling_area: f64,
     pub(crate) has_floor: bool,
     pub(crate) has_roof: bool,
+    pub(crate) exterior_window_area: f64,
+    pub(crate) has_window: bool,
+    pub(crate) exterior_gross_wall_area: f64,
+    pub(crate) exterior_net_wall_area: f64,
+    pub(crate) total_surface_area: f64,
     /// ZoneData explicitly constructs Centroid(0.0, 0.0, 0.0).
     /// The completed geometry return later overwrites that same live owner.
     pub(crate) centroid_m: Option<[f64; 3]>,
@@ -67,6 +72,11 @@ impl Default for SelectedZoneData {
             ceiling_area: 0.0,
             has_floor: false,
             has_roof: false,
+            exterior_window_area: 0.0,
+            has_window: false,
+            exterior_gross_wall_area: 0.0,
+            exterior_net_wall_area: 0.0,
+            total_surface_area: 0.0,
             centroid_m: Some([0.0; 3]),
             inside_algorithm: Inside::Simple,
             outside_algorithm: Outside::SimpleCombined,

@@ -12661,6 +12661,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psychrometric-precision-context/summary.json",
         "sha256": "90cecaa11cffeee2f5388e188a9b303ece29d164ab5126e6187aa2d76b9f0541",
         "size_bytes": 12930
+      },
+      "actual_selected_ordinary_setup_process_surfaces": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-surfaces/summary.json",
+        "sha256": "bd506821d1453d3fc50cafc308d1b7d4ae96ca3d9b7b312610c9c98a21840bb5",
+        "size_bytes": 17576
       }
     },
     {

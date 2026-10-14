@@ -111,6 +111,7 @@ pub(crate) struct SelectedHeatBalanceInputState {
     pub(crate) outside_convection_algorithm: OutsideSurfaceConvectionAlgorithm,
     pub(crate) solar_distribution: SelectedSolarDistribution,
     pub(crate) calculate_solar_reflections: bool,
+    pub(crate) calculate_window_reveal_reflection: bool,
     pub(crate) any_ctf: bool,
     // Actual constructor false; unsupported GetSolutionAlgorithm branches do not write these.
     pub(crate) any_empd: bool,
@@ -151,6 +152,7 @@ impl Default for SelectedHeatBalanceInputState {
             outside_convection_algorithm: OutsideSurfaceConvectionAlgorithm::SimpleCombined,
             solar_distribution: SelectedSolarDistribution::FullExterior,
             calculate_solar_reflections: false,
+            calculate_window_reveal_reflection: false,
             any_ctf: false,
             any_empd: false,
             any_cond_fd: false,

@@ -28,6 +28,7 @@ mod parallel_arrays;
 mod raw;
 mod return_suffix;
 mod setup_continuation;
+mod setup_process;
 mod vertices;
 mod volume_faces;
 mod window_arrays;
@@ -62,6 +63,14 @@ pub(crate) enum SurfaceClass {
     Window,
     #[allow(dead_code)] // Native predicate only; positive getter remains excluded.
     Door,
+    #[allow(dead_code)] // Genuine Setup predicate; positive getter remains excluded.
+    Shading,
+    #[allow(dead_code)] // Genuine Setup predicate; positive getter remains excluded.
+    DetachedFixed,
+    #[allow(dead_code)] // Genuine Setup predicate; positive getter remains excluded.
+    DetachedBuilding,
+    #[allow(dead_code)] // Genuine Setup skip predicate; positive getter remains excluded.
+    IntMass,
     Invalid,
 }
 
@@ -91,6 +100,11 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) mirrored_surface: bool,
     pub(crate) is_air_boundary_surface: bool,
     pub(crate) is_shadow_possible_obstruction: bool,
+    pub(crate) is_shadowing: bool,
+    pub(crate) shape: crate::geometry::SourceProcessShape,
+    pub(crate) vertices_processed: bool,
+    pub(crate) x_shift: f64,
+    pub(crate) y_shift: f64,
     /// Actual SurfaceData constructor841 and default std::vector795.
     pub(crate) has_shade_control: bool,
     pub(crate) window_shading_control_list: Vec<i32>,
@@ -150,6 +164,8 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) oscm: Option<Vec<std::convert::Infallible>>,
     pub(crate) foundation: foundation::FoundationInput,
     pub(crate) coordinate: vertices::CoordinateOwner,
+    pub(crate) process_vertices_scratch: setup_process::ProcessVerticesScratch,
+    pub(crate) setup_shading: setup_process::SetupShadingCounters,
     pub(crate) final_surfaces: Option<Vec<final_mapping::FinalSurface>>,
     pub(crate) surface_windows: Option<Vec<derived_arrays::SurfaceWindowCalculation>>,
     pub(crate) surface_shades: Option<Vec<derived_arrays::SurfaceShade>>,
