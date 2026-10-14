@@ -27,6 +27,7 @@ mod opaque;
 mod parallel_arrays;
 mod raw;
 mod return_suffix;
+mod setup_area;
 mod setup_continuation;
 mod setup_process;
 mod vertices;

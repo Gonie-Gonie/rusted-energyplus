@@ -28,6 +28,30 @@ pub struct OrdinaryGeometryZone<'a> {
     pub typed_id: ZoneId,
     /// Actual retained Zone.Name bytes.
     pub name: &'a str,
+    /// Actual geometricFloorArea from the Setup GrossArea accumulation.
+    pub geometric_floor_area_m2: f64,
+    /// Actual geometricCeilingArea, distinct from CeilingArea.
+    pub geometric_ceiling_area_m2: f64,
+    /// Actual ExteriorTotalSurfArea.
+    pub exterior_total_surface_area_m2: f64,
+    /// Actual ExtGrossWallArea_Multiplied, with Source multiplication order.
+    pub exterior_gross_wall_area_multiplied_m2: f64,
+    /// Actual extPerimeter, accumulated from retained Process Width.
+    pub exterior_perimeter_m: f64,
+    /// Actual ExtGrossWallArea.
+    pub exterior_gross_wall_area_m2: f64,
+    /// Actual ExtNetWallArea, accumulated from Surface.Area.
+    pub exterior_net_wall_area_m2: f64,
+    /// Actual TotalSurfArea.
+    pub total_surface_area_m2: f64,
+    /// Actual ExtWindowArea, without an inferred window producer.
+    pub exterior_window_area_m2: f64,
+    /// Actual HasWindow.
+    pub has_window: bool,
+    /// Actual retained Zone.Multiplier.
+    pub multiplier: i32,
+    /// Actual retained Zone.ListMultiplier.
+    pub list_multiplier: i32,
 }
 
 /// Actual Source Space identity and its genuine Zone association.
@@ -40,6 +64,16 @@ pub struct OrdinaryGeometrySpace<'a> {
     pub name: &'a str,
     /// Actual Source Zone association, not a physical ZoneId.
     pub zone_number: i32,
+    /// Actual inherited ExtGrossWallArea.
+    pub exterior_gross_wall_area_m2: f64,
+    /// Actual inherited ExteriorTotalSurfArea.
+    pub exterior_total_surface_area_m2: f64,
+    /// Actual inherited extPerimeter.
+    pub exterior_perimeter_m: f64,
+    /// Actual totalSurfArea.
+    pub total_surface_area_m2: f64,
+    /// Actual extWindowArea.
+    pub exterior_window_area_m2: f64,
 }
 
 /// Actual regular Construction identity and reached Name writer.
@@ -86,6 +120,10 @@ pub struct OrdinaryGeometrySurface<'a> {
     pub sides: i32,
     /// Actual HeatTransSurf.
     pub heat_transfer_surface: bool,
+    /// Actual ExtBoundCond, in the Source signed boundary/index domain.
+    pub outside_boundary: i32,
+    /// Actual IsAirBoundarySurf.
+    pub air_boundary_surface: bool,
     /// Actual ExtSolar.
     pub ext_solar: bool,
     /// Actual MirroredSurf.
@@ -96,6 +134,8 @@ pub struct OrdinaryGeometrySurface<'a> {
     pub world_vertices: Vec<&'a [f64; 3]>,
     /// Actual GetVertices GrossArea value.
     pub gross_area_m2: f64,
+    /// Actual retained Surface.Area, without aliasing it to GrossArea.
+    pub area_m2: f64,
     /// Actual stored CosTilt value.
     pub cos_tilt: f64,
     /// Actual stored local X axis.
@@ -216,6 +256,18 @@ impl CtfInitializationReports {
                 Ok(OrdinaryGeometryZone {
                     source_number: number(n)?,
                     name: &row.name,
+                    geometric_floor_area_m2: row.geometric_floor_area,
+                    geometric_ceiling_area_m2: row.geometric_ceiling_area,
+                    exterior_total_surface_area_m2: row.exterior_total_surface_area,
+                    exterior_gross_wall_area_multiplied_m2: row.exterior_gross_wall_area_multiplied,
+                    exterior_perimeter_m: row.exterior_perimeter,
+                    exterior_gross_wall_area_m2: row.exterior_gross_wall_area,
+                    exterior_net_wall_area_m2: row.exterior_net_wall_area,
+                    total_surface_area_m2: row.total_surface_area,
+                    exterior_window_area_m2: row.exterior_window_area,
+                    has_window: row.has_window,
+                    multiplier: row.multiplier,
+                    list_multiplier: row.list_multiplier,
                     typed_id: row
                         .typed_zone_id
                         .ok_or(Error::Unavailable("actual bound Source ZoneId"))?,
@@ -230,6 +282,11 @@ impl CtfInitializationReports {
                     source_number: number(n)?,
                     name: &row.name,
                     zone_number: row.zone_num,
+                    exterior_gross_wall_area_m2: row.exterior_gross_wall_area,
+                    exterior_total_surface_area_m2: row.exterior_total_surface_area,
+                    exterior_perimeter_m: row.exterior_perimeter,
+                    total_surface_area_m2: row.total_surface_area,
+                    exterior_window_area_m2: row.exterior_window_area,
                     typed_id: row
                         .typed_space_id
                         .ok_or(Error::Unavailable("actual bound Source SpaceId"))?,
@@ -321,11 +378,14 @@ impl CtfInitializationReports {
                 base_surface: row.base_surface,
                 sides: row.sides,
                 heat_transfer_surface: row.heat_transfer_surface,
+                outside_boundary: row.exterior_boundary,
+                air_boundary_surface: row.is_air_boundary_surface,
                 ext_solar: row.exterior_solar,
                 mirrored_surface: row.mirrored_surface,
                 is_shadowing: row.is_shadowing,
                 world_vertices,
                 gross_area_m2: normal.gross_area_m2,
+                area_m2: properties.area_m2,
                 cos_tilt: properties.cos_tilt,
                 lcsx: &properties.lcsx,
                 lcsy: &properties.lcsy,

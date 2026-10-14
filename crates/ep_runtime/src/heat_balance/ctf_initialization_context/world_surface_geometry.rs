@@ -290,24 +290,15 @@ impl CtfInitializationContext<'_> {
             floor_area_m2: zone.floor_area,
             user_entered_floor_area_m2: zone.user_entered_floor_area,
             ceiling_area_m2: zone.ceiling_area,
+            geometric_floor_area_m2: zone.geometric_floor_area,
+            geometric_ceiling_area_m2: zone.geometric_ceiling_area,
             has_floor: zone.has_floor,
             has_roof: zone.has_roof,
             faces,
             ..Default::default()
         };
-        // Temporary numeric denominators only. No second persistent Zone owner,
-        // inferred multiplier or Source geometric-area producer is installed.
-        for face in &numeric.faces {
-            match face.surface_type {
-                ep_model::SurfaceType::Floor => {
-                    numeric.geometric_floor_area_m2 += face.gross_area_m2
-                }
-                ep_model::SurfaceType::Roof | ep_model::SurfaceType::Ceiling => {
-                    numeric.geometric_ceiling_area_m2 += face.gross_area_m2
-                }
-                ep_model::SurfaceType::Wall => {}
-            }
-        }
+        // Copy the same live Setup388/390 totals into the existing qualified
+        // numeric helper; do not sum the retained faces into a second producer.
         let result = (|| {
             let height = crate::geometry::prepare_zone_height(&mut numeric);
             // Preserve partial helper writes before either numerical error.

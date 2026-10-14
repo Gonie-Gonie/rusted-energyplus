@@ -21,6 +21,9 @@ pub(crate) struct SelectedZoneData {
     pub(crate) user_entered_floor_area: f64,
     pub(crate) floor_area: f64,
     pub(crate) ceiling_area: f64,
+    /// Distinct constructor-zero GrossArea totals, written at Setup388/390.
+    pub(crate) geometric_floor_area: f64,
+    pub(crate) geometric_ceiling_area: f64,
     pub(crate) has_floor: bool,
     pub(crate) has_roof: bool,
     pub(crate) exterior_window_area: f64,
@@ -28,6 +31,10 @@ pub(crate) struct SelectedZoneData {
     pub(crate) exterior_gross_wall_area: f64,
     pub(crate) exterior_net_wall_area: f64,
     pub(crate) total_surface_area: f64,
+    /// ZoneSpaceData constructor-zero fields; not reset at Setup358-369.
+    pub(crate) exterior_total_surface_area: f64,
+    pub(crate) exterior_perimeter: f64,
+    pub(crate) exterior_gross_wall_area_multiplied: f64,
     /// ZoneData explicitly constructs Centroid(0.0, 0.0, 0.0).
     /// The completed geometry return later overwrites that same live owner.
     pub(crate) centroid_m: Option<[f64; 3]>,
@@ -70,6 +77,8 @@ impl Default for SelectedZoneData {
             user_entered_floor_area: -99999.0,
             floor_area: 0.0,
             ceiling_area: 0.0,
+            geometric_floor_area: 0.0,
+            geometric_ceiling_area: 0.0,
             has_floor: false,
             has_roof: false,
             exterior_window_area: 0.0,
@@ -77,6 +86,9 @@ impl Default for SelectedZoneData {
             exterior_gross_wall_area: 0.0,
             exterior_net_wall_area: 0.0,
             total_surface_area: 0.0,
+            exterior_total_surface_area: 0.0,
+            exterior_perimeter: 0.0,
+            exterior_gross_wall_area_multiplied: 0.0,
             centroid_m: Some([0.0; 3]),
             inside_algorithm: Inside::Simple,
             outside_algorithm: Outside::SimpleCombined,
@@ -115,6 +127,10 @@ pub(crate) struct SelectedSpaceData {
     /// SpaceData constructor zeros; later SetupZoneGeometry367+ writes these same fields.
     pub(crate) exterior_window_area: f64,
     pub(crate) total_surface_area: f64,
+    /// ZoneSpaceData constructor-zero fields; not reset at Setup367-369.
+    pub(crate) exterior_gross_wall_area: f64,
+    pub(crate) exterior_total_surface_area: f64,
+    pub(crate) exterior_perimeter: f64,
     pub(crate) radiant_enclosure_num: i32,
     pub(crate) space_type: String,
     pub(crate) space_type_num: i32,
@@ -147,6 +163,9 @@ impl Default for SelectedSpaceData {
             fraction_zone_floor_area: 0.0,
             exterior_window_area: 0.0,
             total_surface_area: 0.0,
+            exterior_gross_wall_area: 0.0,
+            exterior_total_surface_area: 0.0,
+            exterior_perimeter: 0.0,
             radiant_enclosure_num: 0,
             space_type: "General".into(),
             space_type_num: 0,

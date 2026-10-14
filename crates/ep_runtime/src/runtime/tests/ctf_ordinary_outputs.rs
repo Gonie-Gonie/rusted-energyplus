@@ -420,6 +420,39 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         for space in owners.zones.spaces.as_ref().ok_or("actual Setup reset spaces")? {
             assert_eq!([space.exterior_window_area,space.total_surface_area],[0.0;2]);
         }
+        // Authored negative operands exercise reached failure custody, without
+        // supplying Native AFTER values or broadening positive raw admission.
+        let debug = SelectedInputProcessor::from_admitted_input(vec![
+            crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type: "DETAILEDWWR_DEBUG".into(), alpha_fields: 0, numeric_fields: 0,
+                alpha_extensions: 0, numeric_extensions: 0, extension: None,
+            }], std::collections::BTreeMap::from([("DETAILEDWWR_DEBUG".into(),
+                crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: "authored debug section".into(), field_sizes: Default::default(),
+                    }]))]))?;
+        assert_eq!(debug.get_num_sections_found("DETAILEDWWR_DEBUG")?, 1);
+        let mut debug_zones = owners.zones.clone();
+        let before_debug = debug_zones.clone();
+        assert!(matches!(raw.accumulate_opaque_setup_areas(&debug, &mut debug_zones, owners.control),
+            Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("positive DetailedWWR debug OutputFile"))));
+        assert_eq!(debug_zones, before_debug, "debug header failure precedes every area write");
+        let mut window_rows = raw.clone();
+        let first = &mut window_rows.final_surfaces.as_mut().ok_or("authored area rows")?[0].row;
+        first.class = SurfaceClass::Floor; // Reach the distinct geometric prefix in this test-owned row.
+        let area = first.vertex_progress.properties.ok_or("authored retained Area")?.area_m2;
+        let gross = first.vertex_progress.normal_area.ok_or("authored retained GrossArea")?.gross_area_m2;
+        let mut window_control = owners.control.clone();
+        window_control.construction_usage[0].type_is_window = true;
+        let mut window_zones = owners.zones.clone();
+        let mut expected_prefix = window_zones.clone();
+        let zone = &mut expected_prefix.zones.as_mut().ok_or("authored prefix Zone")?[0];
+        zone.total_surface_area += area;
+        zone.geometric_floor_area += gross;
+        expected_prefix.spaces.as_mut().ok_or("authored prefix Space")?[0].total_surface_area += area;
+        assert!(matches!(window_rows.accumulate_opaque_setup_areas(owners.input, &mut window_zones, &window_control),
+            Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("positive area window/frame branch"))));
+        assert_eq!(window_zones, expected_prefix, "window boundary retains only the reached totals/geometric prefix");
         raw.bind_typed_surfaces(&owners)?;
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());

@@ -1,0 +1,276 @@
+{
+  "schema": "src06-ordinary-setup-area-accumulation-summary.v1",
+  "status": "Selected actual A ordered Setup370-454 area producer/endpoints PASS",
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-area-Source-review-01/review.json",
+    "sha256": "438974b56ae427d4bbb40f5381558e24adce87a3ac918a97f422b2a6e25aeee6",
+    "size_bytes": 19030
+  },
+  "Rust_files": 8,
+  "behavior": "Eight genuine constructor-zero fields are live in the same Zone/Space owners. Final Source surface order preserves Area totals, GrossArea Roof/Floor totals, exterior Wall net/gross totals, left-associated f64 multiplier writes and retained Process.Width perimeters. World zone-volume handoff copies the same geometric totals.",
+  "Source_interval": "SurfaceGeometry.cc370-454 only; Source455+ traversal not activated",
+  "new_constructor_zero_fields": 8,
+  "pairing": {
+    "surfaces": 6,
+    "zones": 1,
+    "spaces": 1,
+    "area_values": 14,
+    "Surface_Area_inputs": 6,
+    "strict_finite_binary64_components": 290,
+    "discrete_checks": 464,
+    "differences": 0,
+    "unknowns": 0,
+    "prior_Process_inventory": {
+      "binary64_scalars": 198,
+      "world_vertex_scalars": 72,
+      "discrete_values": 449
+    },
+    "new_area_inventory": {
+      "binary64_scalars": 20,
+      "world_vertex_scalars": 0,
+      "discrete_values": 15
+    },
+    "producer": "PASS",
+    "retained_Process": "PASS",
+    "area_operands_and_endpoints": "PASS",
+    "signed_zero_preserved": true,
+    "tolerances_used": false,
+    "boundary": "Native outer GetBuildingData stored owners versus actual Rust successful simulation retained Source owners; area370-454 values are compared under their declared survival proof, not an internal Setup369 reset checkpoint."
+  },
+  "QA": {
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-fmt-command-01/receipt.json",
+        "sha256": "0c321ab9bf3351843e886a6a9e695c2d286509115247cc251ca18c888c3470c9",
+        "size_bytes": 4048
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    "quality": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-quality-command-01/receipt.json",
+        "sha256": "8f7d325a6de935bbd9c60520c28d2255674fe8c3a551f39aaa8fc717d802f2c0",
+        "size_bytes": 4096
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-clippy-command-01/receipt.json",
+        "sha256": "ae3e00403e840b1e0bbecab508c239d62948c38dba903a49e38f64e6d13efb7f",
+        "size_bytes": 4128
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    "runtime": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-runtime-tests-command-01/receipt.json",
+        "sha256": "f8becf17729b71e2f4fe31a690c4b397069f51fd036a913cb0aabf02f55983dc",
+        "size_bytes": 4191
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    "normalCLI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-cli-tests-command-01/receipt.json",
+        "sha256": "c372db5683a1bd867b07edb05980ebda1349a3eeedfe47c97430840c76224131",
+        "size_bytes": 4133
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    "CI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "fb0e06dbbf72afe73c040ab476227eca3e3a67b62d4264088cb36e6c14863115",
+        "size_bytes": 4135
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    "A": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-command-01/receipt.json",
+        "sha256": "1cc556cc2fab213532ea27ddcf19587b3bc45d9f9351be0498d7e70077b0b040",
+        "size_bytes": 4570
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    }
+  },
+  "tests": {
+    "existing_selections": 3,
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "negative_partial_write_checks_in_same_runtime_body": 2,
+    "new_bodies": 0,
+    "new_binaries": 0
+  },
+  "independent_final_actual_readback": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-area-actual-review-01/review.json",
+    "sha256": "422cfd20bf2b87d9e8ec4080d9cde1bf80b73c41ddc9535a1bc6a3de4f43eeb5",
+    "size_bytes": 14403
+  },
+  "actual_A": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-command-01/receipt.json",
+      "sha256": "1cc556cc2fab213532ea27ddcf19587b3bc45d9f9351be0498d7e70077b0b040",
+      "size_bytes": 4570
+    },
+    "run_summary": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-01/output/run-summary.json",
+      "sha256": "3cf9d32d349bb259821b992956e42eccf41eed223975c0011b06858e7574f1bc",
+      "size_bytes": 27225
+    },
+    "samples": 24,
+    "series": 390,
+    "trace": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "2e8b784f2c581f903ae0d3e0d4e6bd05d13dde4796ee50a540c12a1cf5fa1fc3",
+      "size_bytes": 37876
+    },
+    "result_pair": {
+      "current": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-area-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "prior": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-process-world-join-A-24H-cli-02/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "whole_byte_exact": true
+    },
+    "conformance_claim": false
+  },
+  "comparison_receipt": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-area-compare-command-01/receipt.json",
+    "sha256": "02e60694a8f85c711842d7abfb385a0b353de4724695e29aa341185e6341c1a2",
+    "size_bytes": 5128
+  },
+  "comparison_Source": {
+    "path": ".runtime/porting/SRC-06/compare-ordinary-source-area-Peer-03.py",
+    "sha256": "78f31fa1166a80ee1c4a7e36fc8fc19604ad7dbe8449c494dfbfd6943ca67de6",
+    "size_bytes": 19513
+  },
+  "Native_reused_capture": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+    "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+    "size_bytes": 173622
+  },
+  "Native_capture_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+    "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+    "size_bytes": 2885
+  },
+  "Native_build_or_kernel_replay_performed_in_this_unit": false,
+  "Native_TypeIsWindow_predicate": "UNPAIRED: not present in reused Native capture; no predicate is inferred from zero window outputs.",
+  "unpaired_positive_branches": [
+    "windows/frame areas",
+    "ground contacts",
+    "nonunit multipliers",
+    "DETAILEDWWR_DEBUG positive"
+  ],
+  "limitations": [
+    "PASS covers only declared actual A opaque Outdoors/self-Adiabatic operands and fourteen Zone/Space area values. Native Construction.TypeIsWindow is not dumped; no false predicate is inferred from zero window totals.",
+    "Windows/frame, ground contacts, nonunit multipliers and positive DETAILEDWWR_DEBUG remain Native-unpaired. Two Rust negative-prefix custody checks are not positive Native branch certificates.",
+    "Native outer GetBuildingData and Rust successful simulation-retained fields are distinct boundaries; no internal Setup369 zero-reset snapshot or whole Setup455+/height/volume/report/HB readiness is claimed.",
+    "Historical whole DesignDay/PSY9949 differences and unpaired status remain unchanged. Existing height/volume helper qualifications persist and port gates remain unchanged.",
+    "No new Native build/kernel replay or test body/binary was introduced. Large Native/weather/core/map payloads remain unread and unarchived."
+  ],
+  "gates_updated": false,
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-area-accumulation/manifest.json",
+    "sha256": "78a55c62bf211718df95d7a1dcabe6a6bf80f131f11d0ce312e73d746c7d1ee4",
+    "size_bytes": 69548
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-area-accumulation/evidence.zip",
+    "sha256": "0e742dc75bb67d98aa8d71721f2a345d5796feeec02703ffea2b3585fab38328",
+    "size_bytes": 463380
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-area-comparison-01/summary.json",
+    "sha256": "b6dc3def36cfa4753cb47500215204b3d6482e5d141bb6ed9ff4899966494edb",
+    "size_bytes": 5041
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/56feb0493c4ee5c61e8a032a6ee8d61c5018c8526c532f463558d3905328e2dc",
+    "sha256": "56feb0493c4ee5c61e8a032a6ee8d61c5018c8526c532f463558d3905328e2dc"
+  }
+}

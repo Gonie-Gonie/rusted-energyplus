@@ -12671,6 +12671,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-process-world-join/summary.json",
         "sha256": "16135c750c0a2778c7e91d752a1c9dfcb7252c96e03f9f00ce2bc3e87406e91b",
         "size_bytes": 10190
+      },
+      "actual_selected_ordinary_setup_area_accumulation": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-area-accumulation/summary.json",
+        "sha256": "69987ffc00d7ff0ea7659883e29267437b7dae8b9b0e69e4ca45b0b6fc877e22",
+        "size_bytes": 10647
       }
     },
     {

@@ -27,7 +27,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
     let process = &owners.process;
     json!({
         "schema":"ordinary-source-geometry.v1",
-        "capture_boundary":"actual successful Rust simulation return; retained partial Setup313-369 owners",
+        "capture_boundary":"actual successful Rust simulation return; retained partial Setup313-454 owners",
         "observer_supplies_inputs":false,
         "names_origin":"actual Source getter Name members; physical typed IDs remain separate",
         "array_bounds_semantics":"allocated Rust storage observed in its existing one-based Source index domain; unallocated bounds remain unknown",
@@ -37,11 +37,13 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "construction_id":row.construction_number, "base_surface":row.base_surface,
             "sides":row.sides, "heat_transfer_surface":row.heat_transfer_surface,
             "ext_solar":row.ext_solar, "mirrored_surface":row.mirrored_surface,
-            "is_shadowing":row.is_shadowing,
+            "is_shadowing":row.is_shadowing, "outside_boundary":row.outside_boundary,
+            "air_boundary_surface":row.air_boundary_surface,
             "world_vertex_bits":row.world_vertices.iter().map(|vertex|{
                 vertex.iter().copied().map(bits).collect::<Vec<_>>()
             }).collect::<Vec<_>>(),
             "geometry":{
+                "area_m2":scalar(row.area_m2),
                 "gross_area_m2":scalar(row.gross_area_m2), "cos_tilt":scalar(row.cos_tilt),
                 "lcsx":vector(row.lcsx), "lcsy":vector(row.lcsy), "lcsz":vector(row.lcsz),
             },
@@ -60,10 +62,30 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         })).collect::<Vec<_>>(),
         "zones":owners.zones.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
+            "Multiplier":row.multiplier, "ListMultiplier":row.list_multiplier,
+            "HasWindow":row.has_window,
+            "geometric_floor_area_m2":scalar(row.geometric_floor_area_m2),
+            "geometric_ceiling_area_m2":scalar(row.geometric_ceiling_area_m2),
+            "exterior_areas":{
+                "ExtGrossWallArea":scalar(row.exterior_gross_wall_area_m2),
+                "ExtNetWallArea":scalar(row.exterior_net_wall_area_m2),
+                "TotalSurfArea":scalar(row.total_surface_area_m2),
+                "ExtWindowArea":scalar(row.exterior_window_area_m2),
+                "ExteriorTotalSurfArea":scalar(row.exterior_total_surface_area_m2),
+                "ExtGrossWallArea_Multiplied":scalar(row.exterior_gross_wall_area_multiplied_m2),
+                "extPerimeter":scalar(row.exterior_perimeter_m),
+            },
         })).collect::<Vec<_>>(),
         "spaces":owners.spaces.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
             "zone_id":row.zone_number,
+            "exterior_areas":{
+                "ExtGrossWallArea":scalar(row.exterior_gross_wall_area_m2),
+                "ExteriorTotalSurfArea":scalar(row.exterior_total_surface_area_m2),
+                "extPerimeter":scalar(row.exterior_perimeter_m),
+                "totalSurfArea":scalar(row.total_surface_area_m2),
+                "extWindowArea":scalar(row.exterior_window_area_m2),
+            },
         })).collect::<Vec<_>>(),
         "constructions":owners.constructions.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
