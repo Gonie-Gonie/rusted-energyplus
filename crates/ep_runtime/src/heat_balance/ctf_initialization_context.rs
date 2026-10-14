@@ -22,8 +22,9 @@ mod setup_geometry_reports;
 mod setup_zone_geometry;
 mod world_surface_geometry;
 pub use ordinary_surface_geometry::{
-    OrdinaryGeometryConstruction, OrdinaryGeometryProcess, OrdinaryGeometryShadeVertices,
-    OrdinaryGeometrySpace, OrdinaryGeometrySurface, OrdinaryGeometryZone, OrdinarySurfaceGeometry,
+    OrdinaryGeometryConstruction, OrdinaryGeometryMaterial, OrdinaryGeometryProcess,
+    OrdinaryGeometryShadeVertices, OrdinaryGeometrySpace, OrdinaryGeometrySurface,
+    OrdinaryGeometryZone, OrdinarySurfaceGeometry,
 };
 
 /// Full real registry/table/cache owners, retained even if initialization stops.

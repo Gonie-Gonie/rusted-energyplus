@@ -1,6 +1,7 @@
 //! Copies the actual retained Source owners into the existing geometry trace.
 use super::bits;
 use ep_runtime::heat_balance::ctf_initialization_context::OrdinarySurfaceGeometry;
+use ep_runtime::heat_balance::radiation::ordinary::OrdinarySolarRadiation;
 use serde_json::{Value, json};
 
 fn scalar(value: f64) -> Value {
@@ -21,6 +22,30 @@ fn array(values: Option<&[f64]>) -> Value {
             "allocated":false, "lower":null, "size":null, "upper":null, "values":null,
         }),
     }
+}
+
+fn solar(owner: Option<&OrdinarySolarRadiation>) -> Value {
+    let Some(owner) = owner else {
+        return Value::Null;
+    };
+    let storage = owner.enclosure_storage();
+    json!({
+        "NumOfSolarEnclosures":owner.num_solar_enclosures(),
+        "NumOfRadiantEnclosures":owner.num_radiant_enclosures(),
+        "EnclSolInfo_allocation":{
+            "allocated":storage.is_some(), "size":storage.map(<[_]>::len),
+            "operator_parentheses_indexing":"one-based Source association domain",
+        },
+        "EnclSolInfo":storage.map(|rows| rows.iter().enumerate().map(|(n,row)|json!({
+            "index":n+1, "Name":row.name,
+            "spaceNames":row.space_names, "spaceNames_size":row.space_names.len(),
+            "spaceNums":row.space_nums, "spaceNums_size":row.space_nums.len(),
+            "FloorArea":scalar(row.floor_area),
+            "ExtWindowArea":scalar(row.exterior_window_area),
+            "TotalSurfArea":scalar(row.total_surface_area),
+        })).collect::<Vec<_>>()),
+        "capture_boundary":"same owner retained from Setup797 and moved into State; late numeric Solar fields excluded",
+    })
 }
 
 pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
@@ -84,6 +109,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         "spaces":owners.spaces.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
             "zone_id":row.zone_number,
+            "solarEnclosureNum":row.solar_enclosure_number,
             "volume_m3":scalar(row.volume_m3),
             "fraction_zone_volume":scalar(row.fraction_zone_volume),
             "exterior_areas":{
@@ -96,7 +122,55 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         })).collect::<Vec<_>>(),
         "constructions":owners.constructions.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
+            "TotLayers":row.total_layers,
+            "LayerPoint":{
+                "lower":1, "upper":row.layer_points.len(), "size":row.layer_points.len(),
+                "values":row.layer_points,
+            },
+            "TotSolidLayers":row.total_solid_layers, "TotGlassLayers":row.total_glass_layers,
+            "DayltPropPtr":row.daylt_prop_ptr,
+            "TypeIsWindow":row.type_is_window, "WindowTypeEQL":row.window_type_eql,
+            "TypeIsEcoRoof":row.type_is_eco_roof, "TypeIsIRT":row.type_is_irt,
+            "IsUsed":row.is_used, "IsUsedCTF":row.is_used_ctf,
+            "InsideAbsorpVis":scalar(row.inside_absorp_vis),
+            "OutsideAbsorpVis":scalar(row.outside_absorp_vis),
+            "InsideAbsorpSolar":scalar(row.inside_absorp_solar),
+            "OutsideAbsorpSolar":scalar(row.outside_absorp_solar),
+            "InsideAbsorpThermal":scalar(row.inside_absorp_thermal),
+            "OutsideAbsorpThermal":scalar(row.outside_absorp_thermal),
+            "ReflectVisDiffBack":scalar(row.reflect_vis_diff_back),
+            "AbsDiffShade":scalar(row.abs_diff_shade),
+            "OutsideRoughness":row.outside_roughness,
         })).collect::<Vec<_>>(),
+        "solar":solar(owners.solar),
+        "materials":{
+            "materialMap":owners.material_map,
+            "Source_order_storage":{
+                "size":owners.materials.len(), "one_based_indexing":true,
+                "Native_allocation_and_pointer_identity":"UNPAIRED",
+            },
+            "rows":owners.materials.iter().map(|row|json!({
+                "id":row.source_number, "typed_id":row.typed_id.0, "map_key":row.map_key,
+                "group":row.group_code, "NominalR":scalar(row.nominal_r),
+                "validated_typed_properties":{
+                    "Roughness":row.roughness_code,
+                    "AbsorpThermal":scalar(row.thermal_absorptance),
+                    "AbsorpSolar":scalar(row.solar_absorptance),
+                    "AbsorpVisible":scalar(row.visible_absorptance),
+                },
+            })).collect::<Vec<_>>(),
+            "property_origin":"unique Source MaterialNum to sole typed property owner, bit-validated by actual raw getter; no physical cache reconstruction",
+            "unrepresented_Native_MaterialBase_members":[
+                "separate Name member", "ROnly", "Thickness", "Conductivity", "Resistance",
+                "AbsorpThermalInput", "AbsorpSolarInput", "AbsorpVisibleInput",
+            ],
+        },
+        "heat_balance_nominal":{
+            "NominalRforNominalUCalculation":array(owners.nominal_r_for_u),
+            "NominalU":array(owners.nominal_u),
+            "NominalUBeforeAdjusted":array(owners.nominal_u_before_adjusted),
+            "CoeffAdjRatio":array(owners.coefficient_adjustment_ratio),
+        },
         "geometry_context":{"err_count5":owners.err_count5},
         "global_Process_return":{
             "process_one_time_flag":process.process_one_time_flag,

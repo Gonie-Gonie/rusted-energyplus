@@ -1,10 +1,14 @@
 //! Read-only views of actual retained World/Process owners, without recomputation.
 use super::CtfInitializationReports;
+use crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, surface::SurfaceClass,
 };
 use crate::heat_balance::state::HeatBalanceState;
-use ep_model::{ConstructionId, SpaceId, SurfaceId, ZoneId};
+use ep_model::{
+    ConstructionId, MaterialId, MaterialSurfaceRoughness, SpaceId, SurfaceId, TypedModel, ZoneId,
+};
+use std::collections::BTreeMap;
 
 /// Ephemeral descriptors of existing Source owners, without replacement state.
 pub struct OrdinarySurfaceGeometry<'a> {
@@ -16,6 +20,20 @@ pub struct OrdinarySurfaceGeometry<'a> {
     pub spaces: Vec<OrdinaryGeometrySpace<'a>>,
     /// Actual regular Construction order and retained getter names.
     pub constructions: Vec<OrdinaryGeometryConstruction<'a>>,
+    /// Same retained Source Material order, with separately bound physical IDs.
+    pub materials: Vec<OrdinaryGeometryMaterial<'a>>,
+    /// Actual getter-owned uppercase name-to-Source-number map.
+    pub material_map: &'a BTreeMap<String, i32>,
+    /// Same Solar owner moved into State; None remains unavailable storage.
+    pub solar: Option<&'a OrdinarySolarRadiation>,
+    /// Actual four Construction-indexed nominal arrays; None is unallocated.
+    pub nominal_r_for_u: Option<&'a [f64]>,
+    /// Actual retained NominalU array, without recomputation.
+    pub nominal_u: Option<&'a [f64]>,
+    /// Actual retained NominalUBeforeAdjusted array.
+    pub nominal_u_before_adjusted: Option<&'a [f64]>,
+    /// Actual retained CoeffAdjRatio array.
+    pub coefficient_adjustment_ratio: Option<&'a [f64]>,
     /// Existing caller/scratch/list members, with no inferred readiness.
     pub process: OrdinaryGeometryProcess<'a>,
     /// Actual retained SurfaceGeometry.ErrCount5 owner.
@@ -74,6 +92,8 @@ pub struct OrdinaryGeometrySpace<'a> {
     pub name: &'a str,
     /// Actual Source Zone association, not a physical ZoneId.
     pub zone_number: i32,
+    /// Actual Source Space.solarEnclosureNum written by Setup797.
+    pub solar_enclosure_number: i32,
     /// Actual retained inherited Space.Volume.
     pub volume_m3: f64,
     /// Actual retained Space.fracZoneVolume.
@@ -98,6 +118,69 @@ pub struct OrdinaryGeometryConstruction<'a> {
     pub typed_id: ConstructionId,
     /// Actual ConstructAlphas(0) bytes retained at Original1455.
     pub name: &'a str,
+    /// Actual TotLayers and full constructor-dimensioned LayerPoint storage.
+    pub total_layers: i32,
+    /// Complete retained one-based eleven-slot LayerPoint array.
+    pub layer_points: &'a [i32; 11],
+    /// Actual CheckAndSet retained counts and flags, without typed inference.
+    pub total_solid_layers: i32,
+    /// Actual TotGlassLayers.
+    pub total_glass_layers: i32,
+    /// Actual DayltPropPtr.
+    pub daylt_prop_ptr: i32,
+    /// Actual TypeIsWindow.
+    pub type_is_window: bool,
+    /// Actual WindowTypeEQL.
+    pub window_type_eql: bool,
+    /// Actual TypeIsEcoRoof.
+    pub type_is_eco_roof: bool,
+    /// Actual TypeIsIRT.
+    pub type_is_irt: bool,
+    /// Actual IsUsed.
+    pub is_used: bool,
+    /// Actual IsUsedCTF.
+    pub is_used_ctf: bool,
+    /// Actual inside/outside visible, solar and thermal absorptance members.
+    pub inside_absorp_vis: f64,
+    /// Actual OutsideAbsorpVis.
+    pub outside_absorp_vis: f64,
+    /// Actual InsideAbsorpSolar.
+    pub inside_absorp_solar: f64,
+    /// Actual OutsideAbsorpSolar.
+    pub outside_absorp_solar: f64,
+    /// Actual InsideAbsorpThermal.
+    pub inside_absorp_thermal: f64,
+    /// Actual OutsideAbsorpThermal.
+    pub outside_absorp_thermal: f64,
+    /// Actual ReflectVisDiffBack.
+    pub reflect_vis_diff_back: f64,
+    /// Actual AbsDiffShade.
+    pub abs_diff_shade: f64,
+    /// Explicit Original roughness code; None retains the ctor Invalid state.
+    pub outside_roughness: Option<i32>,
+}
+
+/// Actual MaterialNum/order/map/NominalR plus already validated sole properties.
+/// Separate Native MaterialBase members absent from this owner are not invented.
+pub struct OrdinaryGeometryMaterial<'a> {
+    /// Actual one-based retained Source Material order.
+    pub source_number: i32,
+    /// Independently and uniquely bound physical Material identity.
+    pub typed_id: MaterialId,
+    /// Borrowed actual materialMap key; not a reconstructed Material.Name member.
+    pub map_key: &'a str,
+    /// Actual getter-written Material group, using explicit Original enum values.
+    pub group_code: i32,
+    /// Actual retained MaterialBase.NominalR producer value.
+    pub nominal_r: f64,
+    /// Sole physical roughness already validated against the actual raw getter.
+    pub roughness_code: i32,
+    /// Sole physical thermal absorptance validated by the actual getter.
+    pub thermal_absorptance: f64,
+    /// Sole physical solar absorptance validated by the actual getter.
+    pub solar_absorptance: f64,
+    /// Sole physical visible absorptance validated by the actual getter.
+    pub visible_absorptance: f64,
 }
 
 /// Borrowed actual ShadeV members; None means the array is unallocated.
@@ -221,6 +304,17 @@ fn index(number: i32) -> Result<usize, Error> {
         .ok_or(Error::Unavailable("positive Source geometry association"))
 }
 
+fn roughness_code(value: MaterialSurfaceRoughness) -> i32 {
+    match value {
+        MaterialSurfaceRoughness::VeryRough => 0,
+        MaterialSurfaceRoughness::Rough => 1,
+        MaterialSurfaceRoughness::MediumRough => 2,
+        MaterialSurfaceRoughness::MediumSmooth => 3,
+        MaterialSurfaceRoughness::Smooth => 4,
+        MaterialSurfaceRoughness::VerySmooth => 5,
+    }
+}
+
 impl CtfInitializationReports {
     /// Borrow actual retained World/Process fields after successful initialization.
     /// The legacy unentered route returns None. This never invokes a getter,
@@ -232,6 +326,7 @@ impl CtfInitializationReports {
     pub fn ordinary_surface_geometry<'a>(
         &'a self,
         state: &'a HeatBalanceState,
+        model: &'a TypedModel,
     ) -> Result<Option<OrdinarySurfaceGeometry<'a>>, Error> {
         let source = &self.surface_geometry_input;
         if !source.entered_once {
@@ -302,6 +397,7 @@ impl CtfInitializationReports {
                     source_number: number(n)?,
                     name: &row.name,
                     zone_number: row.zone_num,
+                    solar_enclosure_number: row.solar_enclosure_num,
                     volume_m3: row.volume,
                     fraction_zone_volume: row.fraction_zone_volume,
                     exterior_gross_wall_area_m2: row.exterior_gross_wall_area,
@@ -332,6 +428,78 @@ impl CtfInitializationReports {
                     source_number: number(n)?,
                     name: &row.name,
                     typed_id,
+                    total_layers: row.total_layers,
+                    layer_points: &row.layer_points,
+                    total_solid_layers: row.total_solid_layers,
+                    total_glass_layers: row.total_glass_layers,
+                    daylt_prop_ptr: row.daylt_prop_ptr,
+                    type_is_window: row.type_is_window,
+                    window_type_eql: row.window_type_eql,
+                    type_is_eco_roof: row.type_is_eco_roof,
+                    type_is_irt: row.type_is_irt,
+                    is_used: row.is_used,
+                    is_used_ctf: row.is_used_ctf,
+                    inside_absorp_vis: row.inside_absorp_vis,
+                    outside_absorp_vis: row.outside_absorp_vis,
+                    inside_absorp_solar: row.inside_absorp_solar,
+                    outside_absorp_solar: row.outside_absorp_solar,
+                    inside_absorp_thermal: row.inside_absorp_thermal,
+                    outside_absorp_thermal: row.outside_absorp_thermal,
+                    reflect_vis_diff_back: row.reflect_vis_diff_back,
+                    abs_diff_shade: row.abs_diff_shade,
+                    outside_roughness: row.outside_roughness.map(roughness_code),
+                })
+            })
+            .collect::<Result<Vec<_>, Error>>()?;
+        let material_owner = &self.selected_material_data;
+        if material_owner.materials.len() != material_owner.nominal_r.len()
+            || material_owner.material_map.len() != material_owner.materials.len()
+        {
+            return Err(Error::Unavailable(
+                "complete retained Source Material owners",
+            ));
+        }
+        let materials = material_owner
+            .materials
+            .iter()
+            .enumerate()
+            .map(|(n, id)| {
+                let source_number = number(n)?;
+                let mut keys = material_owner
+                    .material_map
+                    .iter()
+                    .filter(|(_, value)| **value == source_number);
+                let (map_key, _) = keys
+                    .next()
+                    .ok_or(Error::Unavailable("actual materialMap Source number"))?;
+                if keys.next().is_some() {
+                    return Err(Error::Unavailable("unique materialMap Source number"));
+                }
+                let mut matches = model.materials.iter().filter(|row| row.id == *id);
+                let material = matches.next().ok_or(Error::Unavailable(
+                    "actual Source Material physical identity",
+                ))?;
+                if matches.next().is_some() {
+                    return Err(Error::Unavailable(
+                        "unique Source Material physical identity",
+                    ));
+                }
+                let surface = material.surface_properties().ok_or(Error::Unavailable(
+                    "actual validated opaque Material properties",
+                ))?;
+                let roughness = material
+                    .roughness()
+                    .ok_or(Error::Unavailable("actual validated Material roughness"))?;
+                Ok(OrdinaryGeometryMaterial {
+                    source_number,
+                    typed_id: *id,
+                    map_key,
+                    group_code: material_owner.source_group_at(source_number)? as i32,
+                    nominal_r: material_owner.nominal_r[n],
+                    roughness_code: roughness_code(roughness),
+                    thermal_absorptance: surface.thermal_absorptance,
+                    solar_absorptance: surface.solar_absorptance,
+                    visible_absorptance: surface.visible_absorptance,
                 })
             })
             .collect::<Result<Vec<_>, Error>>()?;
@@ -452,6 +620,13 @@ impl CtfInitializationReports {
             zones,
             spaces,
             constructions,
+            materials,
+            material_map: &material_owner.material_map,
+            solar: state.ordinary_solar_radiation.as_ref(),
+            nominal_r_for_u: control.nominal_r_for_u.as_deref(),
+            nominal_u: control.nominal_u.as_deref(),
+            nominal_u_before_adjusted: control.nominal_u_before_adjusted.as_deref(),
+            coefficient_adjustment_ratio: control.coefficient_adjustment_ratio.as_deref(),
             err_count5: source.err_count5,
             process: OrdinaryGeometryProcess {
                 process_one_time_flag: scratch.one_time,

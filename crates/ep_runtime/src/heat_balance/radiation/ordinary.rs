@@ -238,6 +238,12 @@ impl OrdinarySolarRadiation {
         self.solar.as_deref().unwrap_or_default()
     }
 
+    /// Actual Solar allocation, preserving constructor None versus allocated rows.
+    #[must_use]
+    pub fn enclosure_storage(&self) -> Option<&[SolarRadiationEnclosure]> {
+        self.solar.as_deref()
+    }
+
     /// Genuine NumOfSolarEnclosures, independent of allocated row count.
     #[must_use]
     pub fn num_solar_enclosures(&self) -> i32 {

@@ -339,6 +339,14 @@ Source641–792는 같은 all_surface_list_report_order에서 final Surface와 �
 
 실제 A-24H는24표본·390계열이고 기하39,475바이트·결과147,618바이트·EIO8,761바이트가 직전 Solar 단위와 전체 bytes 동일하다. 기존 **318개 유한 수치 비트·487개 이산 검사와 EIO header3/row3의1,115바이트** 대조에서 차이0·UNKNOWN0을 유지했다. 이 대조는 기존 회귀이며 새 입력 개수·진단·Construction 속성의 Native 원시 상태는 **UNPAIRED**다. 양의 window/부속 객체·경고 분기와 전체 GetHeatBalanceInput·transitive Setup/HB, 기존 수치 FAIL·네 gate·A/B 완료 수는 그대로 남는다.
 
+## Solar·재료 상태 관측 준비 — Native 대조 대기
+
+읽기 전용 관측 확장 5개 파일은 `radiation/ordinary.rs`, `ctf_initialization_context.rs`, `ctf_initialization_context/ordinary_surface_geometry.rs`, `ep_run/geometry_trace.rs`, `ep_run/geometry_trace/ordinary_source.rs`다. 같은 State의 Solar 저장소·실제 개수, Source MaterialNum/map/NominalR와 검증된 단일 재료 속성, Construction의 전체 LayerPoint·보존 속성 및 네 nominal 배열을 복사한다. 계산·초기화·생성자·테스트 파일은 변경하지 않았다. 별도 Native Material.Name/Resistance/Thickness/Input 필드나 포인터·할당 동등성을 만들어 넣지 않으며 후행 Solar 수치 배열도 제외한다.
+
+Source `4a2298a33fe3db81842cbc0ebae7633b0c3e0e228232dbbe7417c83a3956fc20`에서 fmt·source-quality·ep_runtime/ep_run all-target Clippy, 기존 `one_zone_runtime_writes_stable_output_layout` 1 passed와 A-24H surface 관측 실행24표본·390계열을 확인했다. 변경하지 않은 runtime·CI·backend 테스트와 전체 workspace는 반복하지 않았다. 기하 추적은 새 관측 필드가 추가된45,112바이트이며 결과147,618바이트·EIO8,761바이트는 직전 단위와 전체 bytes가 같다. 기존 comparator07의318개 수치 비트·487개 이산 검사 및 실제 EIO1,115바이트도 차이0·UNKNOWN0이다. 원시 명령·출력은 `.runtime/porting/SRC-06/ordinary-solar-material-observer-*`에 보존한다.
+
+새 Native helper/어댑터는 소스 검토만 완료했다. 원본 GetBuildingData 반환 시점의 같은 Solar·재료·Construction 필드를 실제 실행에서 관측한 뒤 별도로 직접 대조해야 한다. 이 준비 단계는 새 Native 수치 PASS나 실제 InitSolar316·전체 Setup/HB 완료가 아니며, 위43개 actual 요약과 네 gate·A/B 완료 수는 그대로다.
+
 ## 이력과 증거 보존
 
 반복된 착수 전 산문과 당시 미완료 목록은 현재 범위와 위 표로 통합했다. 원본 범위·적용/formatter diff·실패/중단 명령·실제 QA·선택 입력과 uncapped ledger는 기존 요약/색인/ZIP에 그대로 남긴다. 초기 입력/transport/compile/Clippy 실패를 나중 성공 로그로 바꾸지 않는다. 과거 global file-size 실패와 구조적 부채도 현재 통과로 다시 쓰지 않는다.

@@ -206,7 +206,7 @@ pub(crate) fn runtime_projection_with_source(
 ) -> Result<Value, String> {
     let mut artifact = runtime_projection(model, state);
     artifact["ordinary_source_geometry"] = reports
-        .ordinary_surface_geometry(state)
+        .ordinary_surface_geometry(state, model)
         .map_err(|error| error.to_string())?
         .map(ordinary_source::projection)
         .unwrap_or(Value::Null);
