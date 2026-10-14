@@ -1,4 +1,4 @@
-//! Bounded SetupZoneGeometry292-547 continuation; no complete Setup/HB claim.
+//! Bounded Setup through the selected548 volume return; no full Setup/HB claim.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -27,7 +27,7 @@ impl CtfInitializationContext<'_> {
         &mut self,
         model: &ep_model::TypedModel,
         clock: Option<OrdinaryEquipmentInput>,
-    ) -> Result<(), RuntimeError> {
+    ) -> Result<Vec<crate::geometry::InitializedZoneGeometry>, RuntimeError> {
         let reports = &mut *self.reports;
         if reports
             .surface_geometry_input
@@ -147,6 +147,16 @@ impl CtfInitializationContext<'_> {
                 &mut self.backend,
             )
             .map_err(hb_input_error)?;
-        Ok(()) // Stop before548 CalculateZoneVolume; its existing helper stays qualified.
+        reports
+            .surface_geometry_input
+            .calculate_opaque_setup_volumes(
+                input,
+                reports.selected_zone_input.as_mut().ok_or_else(|| {
+                    hb_input_error(E::Unavailable("same actual volume Zone/Space owner"))
+                })?,
+                globals.display_extra_warnings,
+                &mut self.backend,
+            )
+            .map_err(hb_input_error) // Stop before550 centroid/bounds.
     }
 }

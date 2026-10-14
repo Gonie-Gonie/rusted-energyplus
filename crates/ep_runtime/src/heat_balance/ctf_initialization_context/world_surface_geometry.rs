@@ -258,55 +258,25 @@ impl CtfInitializationContext<'_> {
             .restore_outdoor_from_surfaces(surfaces);
     }
 
-    /// Qualified existing numeric handoff, supplied by genuine retained faces.
-    /// This is not the complete Source SetupZoneGeometry height/volume suffix.
+    /// Move the actual early548 return into the existing initializer consumer.
+    /// This invokes no geometry, getter or second numerical volume calculation.
     pub(crate) fn selected_world_zone_volume(
-        &mut self,
+        &self,
         id: ep_model::ZoneId,
+        returned: &mut Vec<crate::geometry::InitializedZoneGeometry>,
     ) -> Result<crate::geometry::ZoneGeometryProperties, RuntimeError> {
-        let reports = &mut *self.reports;
-        let zones = reports
+        let zone = self
+            .reports
             .selected_zone_input
-            .as_mut()
-            .and_then(|owner| owner.zones.as_mut())
-            .ok_or_else(|| hb_input_error(E::Unavailable("same selected Zone volume owner")))?;
-        let number = zones
+            .as_ref()
+            .and_then(|owner| owner.zones.as_ref())
+            .and_then(|zones| zones.iter().find(|zone| zone.typed_zone_id == Some(id)))
+            .ok_or_else(|| hb_input_error(E::Unavailable("same actual Source548 Zone owner")))?;
+        let index = returned
             .iter()
-            .position(|zone| zone.typed_zone_id == Some(id))
-            .ok_or_else(|| hb_input_error(E::Unavailable("actual selected volume ZoneId")))?;
-        let source_number = i32::try_from(number)
-            .ok()
-            .and_then(|value| value.checked_add(1))
-            .ok_or_else(|| hb_input_error(E::Unavailable("Source signed volume Zone index")))?;
-        let faces = reports
-            .surface_geometry_input
-            .retained_zone_volume_faces(source_number)
-            .map_err(hb_input_error)?;
-        let zone = &mut zones[number];
-        let mut numeric = crate::geometry::ZoneGeometryProperties {
-            volume_m3: zone.volume,
-            ceiling_height_m: zone.ceiling_height,
-            ceiling_height_entered: zone.ceiling_height_entered,
-            floor_area_m2: zone.floor_area,
-            user_entered_floor_area_m2: zone.user_entered_floor_area,
-            ceiling_area_m2: zone.ceiling_area,
-            geometric_floor_area_m2: zone.geometric_floor_area,
-            geometric_ceiling_area_m2: zone.geometric_ceiling_area,
-            has_floor: zone.has_floor,
-            has_roof: zone.has_roof,
-            faces,
-            ..Default::default()
-        };
-        // Copy the same live Setup388/390 totals into the existing qualified
-        // numeric helper; do not sum the retained faces into a second producer.
-        let result = (|| {
-            // The actual Setup455-547 caller already assigned height once.
-            // Replaying it would misclassify an automatic positive height as entered.
-            let volume = crate::geometry::calculate_zone_volume(&mut numeric);
-            zone.volume = numeric.volume_m3;
-            volume?;
-            Ok(numeric)
-        })();
+            .position(|row| row.zone_id == id)
+            .ok_or_else(|| hb_input_error(E::Unavailable("actual carried Source548 return")))?;
+        let result = Ok(returned.remove(index).returned);
         crate::geometry::zone_volume_trace::record(id, &zone.name, &result);
         result.map_err(|error: crate::geometry::ZoneVolumeError| {
             RuntimeError::UnsupportedZoneVolumeGeometry {

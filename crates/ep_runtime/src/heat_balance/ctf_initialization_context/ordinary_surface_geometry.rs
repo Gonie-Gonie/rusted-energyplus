@@ -18,6 +18,8 @@ pub struct OrdinarySurfaceGeometry<'a> {
     pub constructions: Vec<OrdinaryGeometryConstruction<'a>>,
     /// Existing caller/scratch/list members, with no inferred readiness.
     pub process: OrdinaryGeometryProcess<'a>,
+    /// Actual retained SurfaceGeometry.ErrCount5 owner.
+    pub err_count5: i32,
 }
 
 /// Actual Source Zone identity; its number is not a typed or Native ID alias.
@@ -32,6 +34,8 @@ pub struct OrdinaryGeometryZone<'a> {
     pub ceiling_height_m: f64,
     /// Actual retained Source ceilingHeightEntered flag.
     pub ceiling_height_entered: bool,
+    /// Actual retained Zone.Volume, without recalculation.
+    pub volume_m3: f64,
     /// Actual geometricFloorArea from the Setup GrossArea accumulation.
     pub geometric_floor_area_m2: f64,
     /// Actual geometricCeilingArea, distinct from CeilingArea.
@@ -68,6 +72,10 @@ pub struct OrdinaryGeometrySpace<'a> {
     pub name: &'a str,
     /// Actual Source Zone association, not a physical ZoneId.
     pub zone_number: i32,
+    /// Actual retained inherited Space.Volume.
+    pub volume_m3: f64,
+    /// Actual retained Space.fracZoneVolume.
+    pub fraction_zone_volume: f64,
     /// Actual inherited ExtGrossWallArea.
     pub exterior_gross_wall_area_m2: f64,
     /// Actual inherited ExteriorTotalSurfArea.
@@ -262,6 +270,7 @@ impl CtfInitializationReports {
                     name: &row.name,
                     ceiling_height_m: row.ceiling_height,
                     ceiling_height_entered: row.ceiling_height_entered,
+                    volume_m3: row.volume,
                     geometric_floor_area_m2: row.geometric_floor_area,
                     geometric_ceiling_area_m2: row.geometric_ceiling_area,
                     exterior_total_surface_area_m2: row.exterior_total_surface_area,
@@ -288,6 +297,8 @@ impl CtfInitializationReports {
                     source_number: number(n)?,
                     name: &row.name,
                     zone_number: row.zone_num,
+                    volume_m3: row.volume,
+                    fraction_zone_volume: row.fraction_zone_volume,
                     exterior_gross_wall_area_m2: row.exterior_gross_wall_area,
                     exterior_total_surface_area_m2: row.exterior_total_surface_area,
                     exterior_perimeter_m: row.exterior_perimeter,
@@ -435,6 +446,7 @@ impl CtfInitializationReports {
             zones,
             spaces,
             constructions,
+            err_count5: source.err_count5,
             process: OrdinaryGeometryProcess {
                 process_one_time_flag: scratch.one_time,
                 max_vertices_per_surface: source.coordinate.max_vertices_per_surface,

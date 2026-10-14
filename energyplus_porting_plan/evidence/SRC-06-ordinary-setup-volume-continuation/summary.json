@@ -1,0 +1,386 @@
+{
+  "schema": "src06-ordinary-setup-volume-continuation-summary.v1",
+  "status": "Selected actual A Setup548 closed-volume producer/retained endpoints PASS",
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/review.json",
+    "sha256": "2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4",
+    "size_bytes": 41954
+  },
+  "Rust_files": 16,
+  "behavior": "The genuine548 call consumes actual final AllSurface order, recomputes each copied FacePoints Newell and VecLength/SumAreas once, invokes orientation/wall-height/initial enclosure before closed polyhedron volume, and assigns the same live Zone/Space/fraction owners. Its numerical return moves through a local vector to the existing initializer consumer; the later selected calculation replay is removed. Actual warning counter and informational backend prefix are preserved.",
+  "Source_interval": "SetupZoneGeometry548 selected initially-closed six-quad CalculateZoneVolume return only; stops before550 centroid/bounds.",
+  "pairing": {
+    "surfaces": 6,
+    "zones": 1,
+    "spaces": 1,
+    "strict_finite_binary64_components": 294,
+    "discrete_checks": 466,
+    "differences": 0,
+    "unknowns": 0,
+    "prior_Process_area_and_height_inventory": {
+      "binary64_scalars": 219,
+      "world_vertex_scalars": 72,
+      "discrete_values": 465
+    },
+    "new_volume_inventory": {
+      "binary64_scalars": 3,
+      "world_vertex_scalars": 0,
+      "discrete_values": 1
+    },
+    "producer": "PASS",
+    "retained_Process": "PASS",
+    "area_operands_and_endpoints": "PASS",
+    "height_endpoints": "PASS",
+    "volume_endpoints": "PASS",
+    "signed_zero_preserved": true,
+    "tolerances_used": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup548 checkpoint is claimed."
+  },
+  "volume_scope_qualification": {
+    "paired": "Actual same-owner Zone.Volume, Space.Volume, Space.fracZoneVolume and SurfaceGeometry.ErrCount5 only; every earlier producer/Process/area/height prerequisite remains mandatory.",
+    "Native_closure_predicate": "UNPAIRED: Native isEnclosedVolume return is not dumped; enclosure is not inferred from matched retained values.",
+    "Native_warning_debug_and_fallback_variants": "UNPAIRED: positive SHOWZONESURFACES_DEBUG, warning/ErrCount5 increments, nonclosed repairs/fallbacks and nonpositive volume clamp variants are not paired by the reused A capture.",
+    "ShowZoneSurfaceHeaders_or_P0_context_compared": false,
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup548 checkpoint is claimed.",
+    "Native_positive_user_Zone_and_Space_volume_and_no_floor": "UNPAIRED: authored Rust fixture checks do not certify these Native variants.",
+    "P0_and_header_context": "Native capture contains both; no corresponding retained Rust Source owners exist, so neither context is paired.",
+    "local_Face_and_notused_allocation_lifetime": "UNPAIRED: existing Rust numerical faces are carried locally to the initializer consumer; Native allocation/deallocation parity is not claimed."
+  },
+  "height_scope_qualification": {
+    "paired": "Actual same-owner Zone.CeilingHeight and ceilingHeightEntered only; prior producer/area prerequisites remain mandatory.",
+    "Native_warning_variants": "UNPAIRED: Source455-547 entered-height warning/ErrCount/DisplayExtraWarnings variants are not paired by the reused A capture.",
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup547 checkpoint is claimed."
+  },
+  "area_scope_qualification": {
+    "paired": "Six actual A Surface.Area inputs, outside/air-boundary operands, Zone multipliers/HasWindow and14 Zone/Space area values.",
+    "Native_TypeIsWindow_predicate": "UNPAIRED: not present in reused Native capture; no predicate is inferred from zero window outputs.",
+    "unpaired_positive_branches": [
+      "windows/frame areas",
+      "ground contacts",
+      "nonunit multipliers",
+      "DETAILEDWWR_DEBUG positive"
+    ],
+    "status_scope": "Area PASS certifies only declared actual A stored operands/outputs; missing declared fields remain mandatory UNKNOWN. Shared producer/Width prerequisites are retained."
+  },
+  "QA": {
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-02/receipt.json",
+        "sha256": "f3571463fe293dbb3b2f82edce2c268948ee4b657f7ef65ec3ffff310122373b",
+        "size_bytes": 5053
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    "quality": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-02/receipt.json",
+        "sha256": "0abd1bd23f4c566f1b7e379de7b493d5ff5bd415c2cc687fae8c5f2637d31a02",
+        "size_bytes": 5103
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-02/receipt.json",
+        "sha256": "a2386048ec1c2f759ebbf14b98bdfefecd35c6a6e0cf70964ca766e2aae37ce4",
+        "size_bytes": 5133
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    "runtime": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-02/receipt.json",
+        "sha256": "26d92eca17fe11d854db9f7afc6d7187a50341d8dfd4dc2d4b6c066186b783cf",
+        "size_bytes": 5197
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    "backend": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-backend-tests-command-01/receipt.json",
+        "sha256": "e25b85843743a51a0cd45b2cafb4522671c84f61c60bee0c06b8e873f91ae67b",
+        "size_bytes": 5219
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "heat_balance::error_backend::tests::warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts",
+        "--",
+        "--exact"
+      ]
+    },
+    "normalCLI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-cli-tests-command-01/receipt.json",
+        "sha256": "d8a1552355f9659d2c9f96b5d77d1cf0bb036dce469cb85a5957258bd7af16e3",
+        "size_bytes": 5140
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    "CI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "ba4b0b3a884c19e5c24f09300a2d8a07364a29df4695c82648b7d075959d3f33",
+        "size_bytes": 5142
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    "A": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/receipt.json",
+        "sha256": "1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782",
+        "size_bytes": 5578
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    }
+  },
+  "tests": {
+    "existing_selections": 4,
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0,
+    "existing_bodies": 3,
+    "new_bodies": 0,
+    "new_binaries": 0,
+    "authored_runtime_cases": [
+      "fresh548 Newell from outward-reversed copied cube",
+      "debug rejection after Zone/Space/fraction writes",
+      "positive user volume priority",
+      "ErrCount5 retained before failed informational note"
+    ],
+    "same_backend_body_cases": [
+      "Info output/SQLite/callback order with unchanged counters",
+      "empty message no SQLite/callback"
+    ]
+  },
+  "independent_final_actual_readback": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-actual-review-01/review.json",
+    "sha256": "15fae4346ac4821466fb4651f2547e05a55172c22b54444b4abbbeae8c92519c",
+    "size_bytes": 21019
+  },
+  "actual_A": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/receipt.json",
+      "sha256": "1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782",
+      "size_bytes": 5578
+    },
+    "run_summary": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/run-summary.json",
+      "sha256": "50abe90f209f098894b94c3eba53094d8f5cb08393548234e8632bb943767955",
+      "size_bytes": 27275
+    },
+    "samples": 24,
+    "series": 390,
+    "trace": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "74b7e1504b9956c292190ec3205c171e9b6b2f28aa498abfacdf42b10781a2f8",
+      "size_bytes": 38214
+    },
+    "result_pair": {
+      "current": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "prior": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-height-A-24H-cli-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "size_bytes": 147618
+      },
+      "whole_byte_exact": true
+    },
+    "conformance_claim": false,
+    "source_timestep_execution_count_inferred": false
+  },
+  "comparison_receipt": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-volume-compare-command-01/receipt.json",
+    "sha256": "4f95842698033a4c8fbaf6bf5faae01868ed330694933e035ec96b8f70375d38",
+    "size_bytes": 6144
+  },
+  "comparison_Source": {
+    "path": ".runtime/porting/SRC-06/compare-ordinary-source-volume-Peer-05.py",
+    "sha256": "828081e38411333e857ed0d2eab36b9db4413f4045f496238db9c2567b709aa0",
+    "size_bytes": 23654
+  },
+  "Native_reused_capture": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+    "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+    "size_bytes": 173622
+  },
+  "Native_capture_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+    "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+    "size_bytes": 2885
+  },
+  "historical_Source01": {
+    "Source_snapshot": "323f7f453f6ff0ffb9e90fa3ba0b3bb36c9e9ee491b83cf0b0ca6c8e52baa3e8",
+    "QA": {
+      "fmt": {
+        "receipt": {
+          "path": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-01/receipt.json",
+          "sha256": "df02b47fc888155c44a636924e2a92bd1c238a285f5ca74cf6947629f05f2709",
+          "size_bytes": 5053
+        },
+        "exit_code": 0
+      },
+      "quality": {
+        "receipt": {
+          "path": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-01/receipt.json",
+          "sha256": "76b05dafcdb13b8b7361e07806186180e2ced689ecbeda5ee5b72d769b20a30b",
+          "size_bytes": 5103
+        },
+        "exit_code": 0
+      },
+      "clippy": {
+        "receipt": {
+          "path": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-01/receipt.json",
+          "sha256": "1d8746adbcf938942999d9a8b3ebb7b1896cc8744ff7ed1259c621bc15b94596",
+          "size_bytes": 5133
+        },
+        "exit_code": 0
+      },
+      "runtime": {
+        "receipt": {
+          "path": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-01/receipt.json",
+          "sha256": "e551f6e3cd0740bdd6b3db2d000868afea629f6a04decfb962762d7833ad632c",
+          "size_bytes": 5199
+        },
+        "exit_code": 101
+      }
+    },
+    "correction_manifest": {
+      "path": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/manifest.json",
+      "sha256": "48bba2a17cb44b051c9db007c333424a7ca1fee51ba2c863f866a48b3fed3e00",
+      "size_bytes": 6592
+    },
+    "reason": "The inherited authored cube is inward on all six faces. Reversing only floor/roof creates inconsistent edge winding and signed -1/3; fixture-only all-face reversal corrects this, retaining cached Newell to exercise the genuine fresh548 call. The other15 paths are whole-byte unchanged. Original failure and static passes remain historical, not final QA."
+  },
+  "Native_execution_scope": {
+    "new_Native_build": false,
+    "runtime02_replay_absence_authority": "Root-observed literal PowerShell environment guard immediately before its recorder in the same process with no intervening environment mutation; not an independently captured environment certificate.",
+    "huge_Native_helper_core_map_tool_weather_payloads_opened_or_archived": false
+  },
+  "limitations": [
+    "PASS adds only Zone.Volume, Space.Volume, Space.fracZoneVolume and ErrCount5 on the actual A branch; prior291/465 comparisons remain mandatory and unchanged.",
+    "Six faces/quads, consistent winding and positive signed volume are conservative Rust admission; Native closure return is not observed or inferred from matching endpoint values.",
+    "Native positive user Zone/Space volume, no-floor, warning/detail/counter/backend-failure/debug, polygon-repair/open/nonpositive10m3 fallback and local Face/notused lifetime variants remain UNPAIRED.",
+    "Native P0 and ShowZoneSurfaceHeaders ARE captured; neither has a corresponding retained Rust Source owner, so context pairing is UNPAIRED.",
+    "No Space height,550+ centroid/bounds, full CalculateZoneVolume, whole Setup/report/HB readiness, whole-engine conformance or internal548 Native checkpoint is claimed.",
+    "Native TypeIsWindow and positive window/frame/ground/nonunit-multiplier/DETAILEDWWR variants remain unpaired.",
+    "Historical whole DesignDay9FAIL/8UNPAIRED and passivePSY9949 mismatches/full DP/RH/raw/Iterate UNKNOWN remain unchanged.",
+    "Four executions across three existing test bodies introduce no new test body/binary or Native build. Actual A reports24 samples/390 series; no96-step execution inference."
+  ],
+  "legacy_whole_DD": {
+    "FAIL": 9,
+    "UNPAIRED": 8,
+    "changed": false
+  },
+  "passive_PSY": {
+    "prior_mismatches": 9949,
+    "full_DP_RH_assignment_raw_Iterate": "UNKNOWN",
+    "changed": false
+  },
+  "gates_updated": false,
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-volume-continuation/manifest.json",
+    "sha256": "de0674739c1bfbd587a9ae2f6ad75534276730e9a22d058328a194a7e3a6472b",
+    "size_bytes": 114008
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-volume-continuation/evidence.zip",
+    "sha256": "0a08e02b2a03b51d5533c6a7df5af7381c868b18acd5776b937eadcf176b07d1",
+    "size_bytes": 838847
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-volume-comparison-01/summary.json",
+    "sha256": "1470c84646b49eaee1a525ad1edc953996d0adae130aebc94a6fb30516ae402e",
+    "size_bytes": 7262
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/e6/e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea",
+    "sha256": "e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea"
+  }
+}

@@ -13,20 +13,24 @@ pub use inside_convection_owners::{
 };
 pub(crate) use source_geometry::{
     GetVerticesProperties, Orientation, SourceCentroidScratch, SourceNormalArea,
-    SourceProcessShape, finish_get_vertices_properties, orientation_from_normal,
-    source_normal_area, source_process_coplanarity, source_process_distance,
-    source_process_is_rectangle, source_process_shift, source_process_sky_rad_split,
-    source_process_translation, source_surface_centroid,
+    SourceProcessShape, area_vector as source_newell_area_vector, finish_get_vertices_properties,
+    magnitude as source_vector_length, orientation_from_normal, source_normal_area,
+    source_process_coplanarity, source_process_distance, source_process_is_rectangle,
+    source_process_shift, source_process_sky_rad_split, source_process_translation,
+    source_surface_centroid,
 };
 pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
     surface_geometry_properties,
 };
-pub(crate) use zone_volume::calculated_zone_height;
 pub use zone_volume::{
     ZONE_GEOMETRY_AUTO_CALCULATE, ZoneGeometryProperties, ZoneVolumeDiagnostics, ZoneVolumeEdge,
     ZoneVolumeError, ZoneVolumeFace, calculate_zone_volume, prepare_zone_height,
     zone_geometry_input_value, zone_geometry_properties,
+};
+pub(crate) use zone_volume::{
+    bounded_topology_rejection, calculated_zone_height, initial_enclosure, polyhedron_volume,
+    surface_orientation, wall_heights_same,
 };
 /// Actual original product precision observed for the bounded centroid owner.
 pub const SOURCE_CENTROID_PRODUCT_PRECISION_BITS: u32 =

@@ -6,6 +6,10 @@
 //! automatic topology is unsupported. Vertices are already world coordinates.
 
 mod topology;
+pub(crate) use topology::{
+    bounded_topology_rejection, initial_enclosure, polyhedron_volume, surface_orientation,
+    wall_heights_same,
+};
 
 use super::surface_geometry_properties;
 use ep_model::{AutoOrNumber, Point3, Surface, SurfaceId, SurfaceType, TypedModel, Zone};
@@ -75,6 +79,9 @@ pub struct ZoneVolumeEdge {
 /// Actual numerical observations of this owner, without source warning globals.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ZoneVolumeDiagnostics {
+    /// Actual CalculateZoneVolume SumAreas local, retained by the selected caller.
+    /// The legacy numerical route leaves this newly observed local at zero.
+    pub sum_face_areas_m2: f64,
     /// Source-order first-pass unique point count.
     pub initial_unique_vertex_count: usize,
     /// First-pass edges, before any excluded source polygon repair.

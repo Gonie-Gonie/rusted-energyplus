@@ -78,13 +78,13 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 - **ordinary 소유자:** 실제 raw 여섯 대류 family 개수와 하한, Zone ZT·Space MAT/ZT/ZTAV, In·Old·독립 Tmp를 보존한다. BeginEnvironment reset, Old←In, solver 반환값 Tmp→In, MAT commit과 disabled-space MAT/ZT copy의 한정된 전이를 연결했다. ZTAV를 이 copy로 덮어쓰지 않는다. geometry getter/Config와 공통 입력 저장소도 실제 caller에 연결했지만 전체 readiness는 미완성이다.
 - **복사·수치 생산자:** LU와 Fix/ScriptF의 실제 선택 입력 replay, typed 오류 전달 및 N1 Source 분기를 연결했다. 단일 불투명 enclosure의 선택 Solar 초기화와 부분 상태 이동, 현재 기상 태양 상태, DesignDay 기상 API도 구현했다. 실제 radiation cache·sigma·ordinary 반복 caller 완료를 의미하지 않는다.
 - **DD 습공기 관측·재현:** Native의 실제 두 SetUp 구간에서 함수 인자·중첩 호출·cache 최초 접근 전 상태와 192개 slot을 관측했다. 동일 BEFORE 입력·cache 상태의 Rust 재현은 두 구간 모두 끝까지 실행했으며, 962개 바깥 호출 중 241개와 11,585개 cache 이벤트 중 9,705개에서 차이를 확인했다. 최초 Psat 값 쓰기는 1 ULP 차이다. 전체 raw/Iterate·DP/RH 대입 경로와 원인은 미확인이다.
-- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313–369의 표면 순회·Process 기하·scratch와 마지막 Zone/Space reset도 연결했다. 같은 입력의 Native BEFORE kernel 대조에 이어 실제 A 생산자와 보존된 Process 상태의 선택 대조도 통과했다. 370–454의 같은 Zone/Space 면적 누적과 실제 A 선택 수치 대조도 연결했다. 455–547의 실제 높이 계산과 경고 순서, 선택 높이 대조도 연결했다. 548 이후 체적·보고와 전체 반환은 남아 있다.
+- **선택 World 기하:** 실제 Surface·창호 기본 생성과 병렬/window 배열 할당, Space/Zone 바닥·지붕 면적을 연결했다. 체적의 현재 수치 연결은 보존한 raw face를 사용하며 외기 행은 ID 매핑을 검증해 물리 Surface로 이동·역복원한다. 실제 재료에서 만든 Construction 종류·표면 목록, 진단·CTF 대입과 빈 부속 객체 조회를 거쳐 한정된 GetSurfaceData 본문 반환까지 연결했다. 초기 radiant enclosure는 후속 Solar가 같은 상태를 이동해 사용한다. 이어지는 Setup292–311에서 같은 입력 처리기의 장비·Node·gain 소유자와 빈 airflow/storm 입력, 불투명 class 분기 및 실제 trig 배열 해제를 연결했다. Setup313–369의 표면 순회·Process 기하·scratch와 마지막 Zone/Space reset도 연결했다. 같은 입력의 Native BEFORE kernel 대조에 이어 실제 A 생산자와 보존된 Process 상태의 선택 대조도 통과했다. 370–454의 같은 Zone/Space 면적 누적과 실제 A 선택 수치 대조도 연결했다. 455–547의 실제 높이 계산과 경고 순서, 선택 높이 대조도 연결했다. 548의 선택 닫힌 체적·Space 비율 쓰기도 연결했다. 550 이후 중심점·bounds·보고와 전체 반환은 남아 있다.
 
 원본 호출 위치를 구분한다. BeginSim의 Solar 초기화는 **`HeatBalanceManager.cc:2617–2630`**이며 2629는 안내 출력, 2630이 `InitSolarCalculations` 호출이다. **`HeatBalanceSurfaceManager.cc:424–425`**는 공유 firstTime 조건의 `InitInteriorRadExchange`; **`HeatBalanceIntRadExchange.cc:610–614`**는 조건부 Solar F 복사다. HBSM615는 ZoneSizing Gather 분기의 닫는 행이며 Solar 초기화 위치가 아니다. 현재 Rust의 선택 초기화 순서 검증을 이 전체 Original caller의 완료로 확대하지 않는다.
 
 ## 실제 증거와 검증 범위
 
-아래 37개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 38개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -125,6 +125,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | 실제 World 생산자·보존된 Process 상태 | [요약](../evidence/SRC-06-ordinary-setup-process-world-join/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-process-world-join/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-process-world-join/evidence.zip) | 실제 A 입력의 표면6·Zone1·Space1·Construction3 이름과 소속을 독립 연결했다. 꼭짓점·입력·보존된 Process/global 값270개 strict bits 및 이산 검사449개에서 차이·UNKNOWN0. 기존 CLI2개·A24와 정적 검사 통과. Surface 추적은 Full과 같은 기하·결과 bytes를 보존하며 전체 Setup/gate 완료는 아님. |
 | Setup 같은 Zone/Space 면적 누적 | [요약](../evidence/SRC-06-ordinary-setup-area-accumulation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-area-accumulation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-area-accumulation/evidence.zip) | Source370–454의 순서 있는 면적·외벽 배수·둘레 대입을 같은 소유자에 연결했다. 기존270/449와 새20/15를 합쳐290개 수치·464개 이산 검사에서 차이·UNKNOWN0. 기존 테스트3개와 A24·정적 검사 통과. 창·지면·양의 debug 분기와455 이후·전체 gate는 미확인. |
 | Setup 같은 Zone 높이·경고 순서 | [요약](../evidence/SRC-06-ordinary-setup-height-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-height-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-height-continuation/evidence.zip) | Source455–547의 실제 Space 범위 순회와 기존 높이 식을 연결했다. 자동 높이의 재계산을 제거해 입력 여부를 보존한다. 기존290/464와 새 높이1/입력 여부1을 합쳐291개 수치·465개 이산 검사에서 차이·UNKNOWN0. 기존 테스트3개·A24·정적 검사 통과; 경고 변형·전체 체적/Setup은 미확인. |
+| Setup 선택 닫힌 체적·Space 비율 | [요약](../evidence/SRC-06-ordinary-setup-volume-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-volume-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-volume-continuation/evidence.zip) | Source548의 선택 닫힌 여섯 면 계산과 같은 Zone/Space 체적·비율 쓰기를 연결하고 뒤의 재계산을 제거했다. 기존291/465와 새 체적·비율3/ErrCount5 1을 합쳐294개 수치·466개 이산 검사에서 차이·UNKNOWN0. 기존 선택 테스트4회·A24·정적 검사 통과. 최초 작성 fixture 실패도 보존하며 전체 체적 분기/Setup은 미확인. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -278,6 +279,16 @@ Source370–454는 생성자에서0인 여덟 필드를 같은 Zone/Space에 보
 Source455–547는 Zone→spaceIndexes→Space.AllSurfaceFirst..Last 순서로 보존된 꼭짓점·GrossArea와 같은 geometric 면적을 기존 높이 식에 전달한다. 양의 입력 높이는 경고보다 먼저 입력 여부를 기록하고 실제 backend 오류에서도 그 대입을 유지한다. ErrCount는 생성자0이며 원본처럼 읽기만 한다. 상세 경고의 .2F는 .R 보정과 구분한다. 이후 선택 체적 handoff에서 높이 계산을 다시 호출하지 않아 자동 계산값이 사용자 입력으로 바뀌지 않는다. 기존 legacy wrapper의 수식·검증 순서는 보존했다.
 
 대조 경계는 Native outer GetBuildingData와 Rust 성공 실행 후 살아 있는 선택 필드다. 내부 Setup547 checkpoint·Space 높이·550 이후 bounds·전체 CalculateZoneVolume/Setup/HB 증명은 포함하지 않는다. 입력 높이 경고·ErrCount·DisplayExtraWarnings·.2F 텍스트의 Native 변형은 미대조이며 Rust 실패 검사를 Native 경고 동등성으로 확대하지 않는다. 앞선 미대조 면적 분기와 전체 수치 FAIL·네 gate·A/B 완료 수는 그대로다.
+
+## Setup 선택 닫힌 체적·Space 비율의 QA
+
+최종 Source `e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea`에서 fmt·source-quality·두 crate all-target Clippy와 기존 runtime1·backend1·일반 CLI1·실제 CI CLI1, **4 passed / 0 failed / 0 ignored**를 확인했다. 서로 다른 기존 본문은 세 개이며 CLI 본문을 두 설정에서 실행했다. 새 테스트 본문·binary·Native 빌드·전체 workspace 반복은 없다. 작성한 큐브 복사본으로 fresh Newell 계산·합계6, 입력 체적 우선순위, 디버그 출력 직전까지의 Zone/Space/비율 쓰기, 안내 출력 실패 이전 ErrCount5 증가를 검사했다. 기존 backend 본문에서는 일반 메시지의 SQLite -1/count0→Info1 콜백 순서, 빈 메시지와 counter 보존을 확인했다.
+
+Source548의 선택 경로는 실제 Zone.AllSurfaceFirst..Last의 꼭짓점을 복사하고 Newell·VecLength→수평/수직 검사→벽 높이 검사→초기 edge 폐합→부호 있는 체적 계산 순서를 실행한다. 같은 Zone의 입력 체적/높이 우선순위와 Space 체적·비율을 기록한 뒤 기존 초기화 소비자에 계산 반환값을 이동한다. 뒤에서 높이·체적을 재계산하지 않는다. 여섯 사각형·일관된 면 방향·양의 부호 체적은 Rust의 한정된 admission이며 Native 폐합 조건을 추가 검증한 것으로 보지 않는다. Native 임시 배열의 할당·해제나 p0 전역 소유자 전체 대응도 이 반환 projection으로 증명하지 않는다.
+
+실제 A-24H는24표본·390계열이며 이전 결과147,618바이트와 전체 bytes가 같다. Native outer GetBuildingData의 같은 Zone.Volume·Space.Volume·fracZoneVolume 세 수치와 ErrCount5를 추가 대조해 기존 검사를 포함한 **294개 유한 수치 비트·466개 이산 검사에서 차이0·UNKNOWN0**을 확인했다. Native p0·ShowZoneSurfaceHeaders는 기존 캡처에 있으나 Rust의 보존된 대응 소유자가 없어 대조하지 않는다. Native 폐합 반환, 양의 사용자 Zone/Space 체적·바닥 부재 경고·일반/상세 경고·양의 debug·polygon repair/open fallback·10m³ clamp와 내부 Setup548 checkpoint·전체 함수/Setup/HB는 미검증이다. 기존 수치 FAIL와 네 gate·A/B 완료 수는 그대로다.
+
+최초 Source `323f7f453f6ff0ffb9e90fa3ba0b3bb36c9e9ee491b83cf0b0ca6c8e52baa3e8`의 정적 검사 세 개는 통과했으나 runtime101이었다. 작성한 큐브의 여섯 면이 모두 안쪽인데 수평 두 면만 뒤집어 한정된 폐합 admission에서 실패한 기록이다. 기존 본문의 복사본에서 여섯 Vertex 목록만 뒤집고 cached Newell은 유지해 실제 재계산을 검사했다. 다른 Source 15파일은 동일하며 최초 실패·수정 diff와 최종 QA를 함께 보존한다.
 
 ## 이력과 증거 보존
 

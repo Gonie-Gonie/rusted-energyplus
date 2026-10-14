@@ -120,6 +120,8 @@ pub(crate) struct SelectedSpaceData {
     pub(crate) zone_num: i32,
     pub(crate) ceiling_height: f64,
     pub(crate) volume: f64,
+    /// SpaceData fracZoneVolume constructor0, written at CalculateZoneVolume12262.
+    pub(crate) fraction_zone_volume: f64,
     pub(crate) user_entered_floor_area: f64,
     pub(crate) floor_area: f64,
     pub(crate) has_floor: bool,
@@ -157,6 +159,7 @@ impl Default for SelectedSpaceData {
             zone_num: 0,
             ceiling_height: -99999.0,
             volume: -99999.0,
+            fraction_zone_volume: 0.0,
             user_entered_floor_area: -99999.0,
             floor_area: 0.0,
             has_floor: false,

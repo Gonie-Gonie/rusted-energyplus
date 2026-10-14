@@ -79,6 +79,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     }
     let source_input_reached = source.is_some();
     let mut selected_world_geometry = false;
+    let mut selected_world_zone_returns = Vec::new();
     if let Some(source) = source {
         let actual =
             initialization
@@ -100,7 +101,8 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             &mut *source.output_host,
         )?;
         if selected_world_geometry {
-            actual.continue_selected_setup_zone_geometry(&model.typed, equipment_input)?;
+            selected_world_zone_returns =
+                actual.continue_selected_setup_zone_geometry(&model.typed, equipment_input)?;
         }
     }
     if let Some(actual) = initialization.as_deref_mut() {
@@ -207,7 +209,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .ok_or_else(|| RuntimeError::WarmupUnavailable {
                     reason: "retained World zone-volume context".into(),
                 })?
-                .selected_world_zone_volume(zone.id)?
+                .selected_world_zone_volume(zone.id, &mut selected_world_zone_returns)?
         } else {
             let geometry = zone_geometry_properties(&model.typed, zone);
             crate::geometry::zone_volume_trace::record(zone.id, &zone.name.0, &geometry);

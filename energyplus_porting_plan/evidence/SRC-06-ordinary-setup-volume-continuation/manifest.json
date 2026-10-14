@@ -1,0 +1,2171 @@
+{
+  "schema": "src06-volume-continuation-finite-evidence.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/e6/e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea",
+    "sha256": "e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea"
+  },
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/review.json",
+    "sha256": "2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4",
+    "size_bytes": 41954
+  },
+  "Rust_sources": [
+    {
+      "path": "crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry.rs",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210
+    }
+  ],
+  "commands": [
+    {
+      "role": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-02/receipt.json",
+        "sha256": "f3571463fe293dbb3b2f82edce2c268948ee4b657f7ef65ec3ffff310122373b",
+        "size_bytes": 5053
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    {
+      "role": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-02/receipt.json",
+        "sha256": "0abd1bd23f4c566f1b7e379de7b493d5ff5bd415c2cc687fae8c5f2637d31a02",
+        "size_bytes": 5103
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    {
+      "role": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-02/receipt.json",
+        "sha256": "a2386048ec1c2f759ebbf14b98bdfefecd35c6a6e0cf70964ca766e2aae37ce4",
+        "size_bytes": 5133
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "role": "runtime",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-02/receipt.json",
+        "sha256": "26d92eca17fe11d854db9f7afc6d7187a50341d8dfd4dc2d4b6c066186b783cf",
+        "size_bytes": 5197
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "role": "backend",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-backend-tests-command-01/receipt.json",
+        "sha256": "e25b85843743a51a0cd45b2cafb4522671c84f61c60bee0c06b8e873f91ae67b",
+        "size_bytes": 5219
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "heat_balance::error_backend::tests::warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "role": "normalCLI",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-cli-tests-command-01/receipt.json",
+        "sha256": "d8a1552355f9659d2c9f96b5d77d1cf0bb036dce469cb85a5957258bd7af16e3",
+        "size_bytes": 5140
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    {
+      "role": "CI",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "ba4b0b3a884c19e5c24f09300a2d8a07364a29df4695c82648b7d075959d3f33",
+        "size_bytes": 5142
+      },
+      "actual_command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    {
+      "role": "A",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/receipt.json",
+        "sha256": "1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782",
+        "size_bytes": 5578
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    },
+    {
+      "role": "comparator",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-setup-volume-compare-command-01/receipt.json",
+        "sha256": "4f95842698033a4c8fbaf6bf5faae01868ed330694933e035ec96b8f70375d38",
+        "size_bytes": 6144
+      },
+      "actual_command": [
+        "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        ".runtime/porting/SRC-06/compare-ordinary-source-volume-Peer-05.py",
+        "--native",
+        ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json#c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+        "--native-custody",
+        ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json#fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+        "--rust-trace",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/geometry-consumers.json#74b7e1504b9956c292190ec3205c171e9b6b2f28aa498abfacdf42b10781a2f8",
+        "--rust-receipt",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/receipt.json#1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782",
+        "--rust-input",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/input/original.idf#db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-setup-volume-comparison-01"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-publication-inputs-Root-03.json",
+      "sha256": "adec145d35f099ce173e42d6a4953164c4a270d827870a66c0c992c6e22fc75a",
+      "size_bytes": 48460,
+      "role": "actual Root config",
+      "archive_member": "objects/adec145d35f099ce173e42d6a4953164c4a270d827870a66c0c992c6e22fc75a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/review.json",
+      "sha256": "2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4",
+      "size_bytes": 41954,
+      "role": "accepted sixteen-file Source review",
+      "archive_member": "objects/2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4"
+    },
+    {
+      "origin": "crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "dfabd40315351de6f87611cc37bb42d4cd88819e14542786839b7445a0c419c7",
+      "size_bytes": 6075,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/dfabd40315351de6f87611cc37bb42d4cd88819e14542786839b7445a0c419c7"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "dfabd40315351de6f87611cc37bb42d4cd88819e14542786839b7445a0c419c7",
+      "size_bytes": 6075,
+      "role": "exact Git before",
+      "archive_member": "objects/dfabd40315351de6f87611cc37bb42d4cd88819e14542786839b7445a0c419c7"
+    },
+    {
+      "origin": "generated full diff:crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "dc0d9479fdf1fdbe50de041d411bfbe106ad40e2ce566888ad491c88eb35d957",
+      "size_bytes": 2160,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/dc0d9479fdf1fdbe50de041d411bfbe106ad40e2ce566888ad491c88eb35d957"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry.rs",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/geometry.rs",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/geometry.rs",
+      "sha256": "1348a79a7746b30b94aff2bdc3f9ab34a63e5917648f4ed05a692779a7df6f0f",
+      "size_bytes": 5013,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/1348a79a7746b30b94aff2bdc3f9ab34a63e5917648f4ed05a692779a7df6f0f"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/geometry.rs",
+      "sha256": "1348a79a7746b30b94aff2bdc3f9ab34a63e5917648f4ed05a692779a7df6f0f",
+      "size_bytes": 5013,
+      "role": "exact Git before",
+      "archive_member": "objects/1348a79a7746b30b94aff2bdc3f9ab34a63e5917648f4ed05a692779a7df6f0f"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/geometry.rs",
+      "sha256": "34e1225fde6a4b4170cc3b6140cda17990055c5fb82802f81d3aaf2ea41f7a72",
+      "size_bytes": 1688,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/34e1225fde6a4b4170cc3b6140cda17990055c5fb82802f81d3aaf2ea41f7a72"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "2cfd3eb9788ef0834584a88ad08dcda8ad297cdb318f8df9b73690b7b6b982c5",
+      "size_bytes": 17131,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/2cfd3eb9788ef0834584a88ad08dcda8ad297cdb318f8df9b73690b7b6b982c5"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "2cfd3eb9788ef0834584a88ad08dcda8ad297cdb318f8df9b73690b7b6b982c5",
+      "size_bytes": 17131,
+      "role": "exact Git before",
+      "archive_member": "objects/2cfd3eb9788ef0834584a88ad08dcda8ad297cdb318f8df9b73690b7b6b982c5"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "d6a9dd4de8fe1bcd48a8afd3df5a7338b8f9600c5569dc690828ed00c4ae2cea",
+      "size_bytes": 696,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/d6a9dd4de8fe1bcd48a8afd3df5a7338b8f9600c5569dc690828ed00c4ae2cea"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "229d41ce7300c8af8a50ec89ffb3a5540f697416ca0e28d2ca2f1bad114745cd",
+      "size_bytes": 15730,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/229d41ce7300c8af8a50ec89ffb3a5540f697416ca0e28d2ca2f1bad114745cd"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "229d41ce7300c8af8a50ec89ffb3a5540f697416ca0e28d2ca2f1bad114745cd",
+      "size_bytes": 15730,
+      "role": "exact Git before",
+      "archive_member": "objects/229d41ce7300c8af8a50ec89ffb3a5540f697416ca0e28d2ca2f1bad114745cd"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "1e32af1160665674ecd7d2d53c1641b9732f1ef2103dfbca15c731a8f0855dd5",
+      "size_bytes": 1040,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/1e32af1160665674ecd7d2d53c1641b9732f1ef2103dfbca15c731a8f0855dd5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "794f4b71b9f2bdfc7aef78a52055a6d5f2e488389e930b5da2c4cde5a5200db6",
+      "size_bytes": 6082,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/794f4b71b9f2bdfc7aef78a52055a6d5f2e488389e930b5da2c4cde5a5200db6"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "794f4b71b9f2bdfc7aef78a52055a6d5f2e488389e930b5da2c4cde5a5200db6",
+      "size_bytes": 6082,
+      "role": "exact Git before",
+      "archive_member": "objects/794f4b71b9f2bdfc7aef78a52055a6d5f2e488389e930b5da2c4cde5a5200db6"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "436b92410c189ad653847d8c322599a67dffecf66d5fe455821af2fbc9b07d32",
+      "size_bytes": 7438,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/436b92410c189ad653847d8c322599a67dffecf66d5fe455821af2fbc9b07d32"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "95e29456333f19eaef032ed10de7fed689655b4aba08275f31aa19d2110303e4",
+      "size_bytes": 19167,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/95e29456333f19eaef032ed10de7fed689655b4aba08275f31aa19d2110303e4"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "95e29456333f19eaef032ed10de7fed689655b4aba08275f31aa19d2110303e4",
+      "size_bytes": 19167,
+      "role": "exact Git before",
+      "archive_member": "objects/95e29456333f19eaef032ed10de7fed689655b4aba08275f31aa19d2110303e4"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "39aba346e2f82317543cf7bc48979b6bb203dbdece9a0e8d0965837fa5bada5e",
+      "size_bytes": 2695,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/39aba346e2f82317543cf7bc48979b6bb203dbdece9a0e8d0965837fa5bada5e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "8e0ec1372e766ab095f1089205f2d9100216f8184b4117adb30cdb1a5a2201aa",
+      "size_bytes": 6180,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/8e0ec1372e766ab095f1089205f2d9100216f8184b4117adb30cdb1a5a2201aa"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "8e0ec1372e766ab095f1089205f2d9100216f8184b4117adb30cdb1a5a2201aa",
+      "size_bytes": 6180,
+      "role": "exact Git before",
+      "archive_member": "objects/8e0ec1372e766ab095f1089205f2d9100216f8184b4117adb30cdb1a5a2201aa"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "6b1f2dc843483fd47d94d8c593da73872734eea50651b845de498a1993e8304f",
+      "size_bytes": 1542,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/6b1f2dc843483fd47d94d8c593da73872734eea50651b845de498a1993e8304f"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "ef2bdf1b46d56a18fa6cb44724ac1e38ac6b3aeca31281e44ba62b4560b70a7b",
+      "size_bytes": 13221,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/ef2bdf1b46d56a18fa6cb44724ac1e38ac6b3aeca31281e44ba62b4560b70a7b"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "ef2bdf1b46d56a18fa6cb44724ac1e38ac6b3aeca31281e44ba62b4560b70a7b",
+      "size_bytes": 13221,
+      "role": "exact Git before",
+      "archive_member": "objects/ef2bdf1b46d56a18fa6cb44724ac1e38ac6b3aeca31281e44ba62b4560b70a7b"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "954ad9d72a65ed66e9d44c64fdb2ddcb2232781e2006d6bda391a05e13cf2123",
+      "size_bytes": 3719,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/954ad9d72a65ed66e9d44c64fdb2ddcb2232781e2006d6bda391a05e13cf2123"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "0a45a4d3c85ccb515d8cdf4823ca59d3a1d96d2c5531c81f7ea0a031ce6e8b82",
+      "size_bytes": 19522,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/0a45a4d3c85ccb515d8cdf4823ca59d3a1d96d2c5531c81f7ea0a031ce6e8b82"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "0a45a4d3c85ccb515d8cdf4823ca59d3a1d96d2c5531c81f7ea0a031ce6e8b82",
+      "size_bytes": 19522,
+      "role": "exact Git before",
+      "archive_member": "objects/0a45a4d3c85ccb515d8cdf4823ca59d3a1d96d2c5531c81f7ea0a031ce6e8b82"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "49210e766807a38d1c069932fcb788f5952505d59b98d746bdb6479055db2dbc",
+      "size_bytes": 1537,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/49210e766807a38d1c069932fcb788f5952505d59b98d746bdb6479055db2dbc"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "965ba7e3c9807885deb400d1603623577059623b3ddc0f245cff605212b9adf6",
+      "size_bytes": 21952,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/965ba7e3c9807885deb400d1603623577059623b3ddc0f245cff605212b9adf6"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "965ba7e3c9807885deb400d1603623577059623b3ddc0f245cff605212b9adf6",
+      "size_bytes": 21952,
+      "role": "exact Git before",
+      "archive_member": "objects/965ba7e3c9807885deb400d1603623577059623b3ddc0f245cff605212b9adf6"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "4501be47ca114e0caef095c31bd2a74b869c08dd42cfd22246b1f7392a2cac08",
+      "size_bytes": 1151,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/4501be47ca114e0caef095c31bd2a74b869c08dd42cfd22246b1f7392a2cac08"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "24ecb1fd517efe0fb6cad84ca41a102f41b1e94132e8f99eee17fbd8f6ed38a4",
+      "size_bytes": 32814,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/24ecb1fd517efe0fb6cad84ca41a102f41b1e94132e8f99eee17fbd8f6ed38a4"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "24ecb1fd517efe0fb6cad84ca41a102f41b1e94132e8f99eee17fbd8f6ed38a4",
+      "size_bytes": 32814,
+      "role": "exact Git before",
+      "archive_member": "objects/24ecb1fd517efe0fb6cad84ca41a102f41b1e94132e8f99eee17fbd8f6ed38a4"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "a3bc585774279267f6cc60afc3aa3fc304a93a562fcc436955d3a8a961e1acc9",
+      "size_bytes": 1300,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/a3bc585774279267f6cc60afc3aa3fc304a93a562fcc436955d3a8a961e1acc9"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "4a7c4fd37dd6713b7bcc8b756ac2321209974d78a6884fb520525c325dfebc36",
+      "size_bytes": 17152,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/4a7c4fd37dd6713b7bcc8b756ac2321209974d78a6884fb520525c325dfebc36"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "4a7c4fd37dd6713b7bcc8b756ac2321209974d78a6884fb520525c325dfebc36",
+      "size_bytes": 17152,
+      "role": "exact Git before",
+      "archive_member": "objects/4a7c4fd37dd6713b7bcc8b756ac2321209974d78a6884fb520525c325dfebc36"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "fb6e2acc8a30d7b599fc69e736cf9dc6d8e1a8b20ed094d157bafb072ff3a944",
+      "size_bytes": 784,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/fb6e2acc8a30d7b599fc69e736cf9dc6d8e1a8b20ed094d157bafb072ff3a944"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "exact Git before",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "8e7196284fc47c409e341701f8145ffcbb84012ad24e80423613ab8ae8537a70",
+      "size_bytes": 9901,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/8e7196284fc47c409e341701f8145ffcbb84012ad24e80423613ab8ae8537a70"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "size_bytes": 2424,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314",
+      "size_bytes": 2424,
+      "role": "exact Git before",
+      "archive_member": "objects/c6a624ed0f408d3302bf9d450893b3bde775c9486e75ac06e2fa955fa6fb4314"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "0c9b78786de772e873d78b7ef18c1aeaeea943438d1e4041e2b909fdd7de8ff5",
+      "size_bytes": 5110,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/0c9b78786de772e873d78b7ef18c1aeaeea943438d1e4041e2b909fdd7de8ff5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "2220c8d4feee9cfb8aa5762afebef725b8f88a26e249a3a77e8c7b890bb6347d",
+      "size_bytes": 18930,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/2220c8d4feee9cfb8aa5762afebef725b8f88a26e249a3a77e8c7b890bb6347d"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "2220c8d4feee9cfb8aa5762afebef725b8f88a26e249a3a77e8c7b890bb6347d",
+      "size_bytes": 18930,
+      "role": "exact Git before",
+      "archive_member": "objects/2220c8d4feee9cfb8aa5762afebef725b8f88a26e249a3a77e8c7b890bb6347d"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "b81fcd61e15cdeaf531cb2afe97d48f769f4dbd4ed4a771b6f72c6fa75a2ca49",
+      "size_bytes": 788,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/b81fcd61e15cdeaf531cb2afe97d48f769f4dbd4ed4a771b6f72c6fa75a2ca49"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "current approved Rust Source",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/after/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "immutable accepted Rust Source",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "dab6bf060538435faece79a548d6abc6dbe66de232efdc275d3145d8638bd50a",
+      "size_bytes": 49197,
+      "role": "reviewed exact Git before/empty new path",
+      "archive_member": "objects/dab6bf060538435faece79a548d6abc6dbe66de232efdc275d3145d8638bd50a"
+    },
+    {
+      "origin": "Git 6bbf2bad2ba917c757cbeb27c5e366f66125ddf5:crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "dab6bf060538435faece79a548d6abc6dbe66de232efdc275d3145d8638bd50a",
+      "size_bytes": 49197,
+      "role": "exact Git before",
+      "archive_member": "objects/dab6bf060538435faece79a548d6abc6dbe66de232efdc275d3145d8638bd50a"
+    },
+    {
+      "origin": "generated full diff:crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "512dee898aae8e344fd8505a19271bcd8277f8859c08a534475dca1e4654eb1c",
+      "size_bytes": 4537,
+      "role": "complete diff; line endings normalized only here",
+      "archive_member": "objects/512dee898aae8e344fd8505a19271bcd8277f8859c08a534475dca1e4654eb1c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-02/receipt.json",
+      "sha256": "f3571463fe293dbb3b2f82edce2c268948ee4b657f7ef65ec3ffff310122373b",
+      "size_bytes": 5053,
+      "role": "fmt actual receipt",
+      "archive_member": "objects/f3571463fe293dbb3b2f82edce2c268948ee4b657f7ef65ec3ffff310122373b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "fmt complete stdout",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "fmt complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "fmt executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-02/receipt.json",
+      "sha256": "0abd1bd23f4c566f1b7e379de7b493d5ff5bd415c2cc687fae8c5f2637d31a02",
+      "size_bytes": 5103,
+      "role": "quality actual receipt",
+      "archive_member": "objects/0abd1bd23f4c566f1b7e379de7b493d5ff5bd415c2cc687fae8c5f2637d31a02"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-02/stdout.log",
+      "sha256": "8f55a84f0100ca610ff9e13768a16eb3e47e2d69de8cd9bcb1b7800c956f2290",
+      "size_bytes": 82,
+      "role": "quality complete stdout",
+      "archive_member": "objects/8f55a84f0100ca610ff9e13768a16eb3e47e2d69de8cd9bcb1b7800c956f2290"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "quality complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "quality executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-02/receipt.json",
+      "sha256": "a2386048ec1c2f759ebbf14b98bdfefecd35c6a6e0cf70964ca766e2aae37ce4",
+      "size_bytes": 5133,
+      "role": "clippy actual receipt",
+      "archive_member": "objects/a2386048ec1c2f759ebbf14b98bdfefecd35c6a6e0cf70964ca766e2aae37ce4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "clippy complete stdout",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-02/stderr.log",
+      "sha256": "647391e475cdd2ccdf6dee588a026d1cc5da2565d4b1569d32da4d9b81e59ca0",
+      "size_bytes": 167,
+      "role": "clippy complete stderr",
+      "archive_member": "objects/647391e475cdd2ccdf6dee588a026d1cc5da2565d4b1569d32da4d9b81e59ca0"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "clippy executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-02/receipt.json",
+      "sha256": "26d92eca17fe11d854db9f7afc6d7187a50341d8dfd4dc2d4b6c066186b783cf",
+      "size_bytes": 5197,
+      "role": "runtime actual receipt",
+      "archive_member": "objects/26d92eca17fe11d854db9f7afc6d7187a50341d8dfd4dc2d4b6c066186b783cf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-02/stdout.log",
+      "sha256": "e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e",
+      "size_bytes": 215,
+      "role": "runtime complete stdout",
+      "archive_member": "objects/e6f5c3efa1087791aa6ac6146636857f3bdb3a735c58afc0ca00bf71ed3bdf8e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-02/stderr.log",
+      "sha256": "e88052dc85f22d6381c6bcfab6b72ef69c3e280e2dc3c61ab8c9d083164ded34",
+      "size_bytes": 254,
+      "role": "runtime complete stderr",
+      "archive_member": "objects/e88052dc85f22d6381c6bcfab6b72ef69c3e280e2dc3c61ab8c9d083164ded34"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "runtime executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-backend-tests-command-01/receipt.json",
+      "sha256": "e25b85843743a51a0cd45b2cafb4522671c84f61c60bee0c06b8e873f91ae67b",
+      "size_bytes": 5219,
+      "role": "backend actual receipt",
+      "archive_member": "objects/e25b85843743a51a0cd45b2cafb4522671c84f61c60bee0c06b8e873f91ae67b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-backend-tests-command-01/stdout.log",
+      "sha256": "eabafd37d1ff8957c48135cb45ec20c75b1e02dc7b6e7b216bdc7ec4d8d41232",
+      "size_bytes": 235,
+      "role": "backend complete stdout",
+      "archive_member": "objects/eabafd37d1ff8957c48135cb45ec20c75b1e02dc7b6e7b216bdc7ec4d8d41232"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-backend-tests-command-01/stderr.log",
+      "sha256": "4d9f8920885ba806831416ed72dda4df7db8f9b936e06e96cf950494c9b11213",
+      "size_bytes": 147,
+      "role": "backend complete stderr",
+      "archive_member": "objects/4d9f8920885ba806831416ed72dda4df7db8f9b936e06e96cf950494c9b11213"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "backend executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-cli-tests-command-01/receipt.json",
+      "sha256": "d8a1552355f9659d2c9f96b5d77d1cf0bb036dce469cb85a5957258bd7af16e3",
+      "size_bytes": 5140,
+      "role": "normalCLI actual receipt",
+      "archive_member": "objects/d8a1552355f9659d2c9f96b5d77d1cf0bb036dce469cb85a5957258bd7af16e3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-cli-tests-command-01/stdout.log",
+      "sha256": "34363468186e2c3223919cfe0cd4d362b4f439d1d92a80c5b6515215d4e17dd8",
+      "size_bytes": 170,
+      "role": "normalCLI complete stdout",
+      "archive_member": "objects/34363468186e2c3223919cfe0cd4d362b4f439d1d92a80c5b6515215d4e17dd8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-cli-tests-command-01/stderr.log",
+      "sha256": "490330deedad1af188f2f5556804b1d13be6fa865eb2a2ed127f9211c2a9e372",
+      "size_bytes": 357,
+      "role": "normalCLI complete stderr",
+      "archive_member": "objects/490330deedad1af188f2f5556804b1d13be6fa865eb2a2ed127f9211c2a9e372"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "normalCLI executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-ci-timestep-tests-command-01/receipt.json",
+      "sha256": "ba4b0b3a884c19e5c24f09300a2d8a07364a29df4695c82648b7d075959d3f33",
+      "size_bytes": 5142,
+      "role": "CI actual receipt",
+      "archive_member": "objects/ba4b0b3a884c19e5c24f09300a2d8a07364a29df4695c82648b7d075959d3f33"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-ci-timestep-tests-command-01/stdout.log",
+      "sha256": "c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1",
+      "size_bytes": 258,
+      "role": "CI complete stdout",
+      "archive_member": "objects/c6c14f7fab4318b234a9436fafe3912cc38ac3013ed1f78da2cf78b4b21c8da1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-ci-timestep-tests-command-01/stderr.log",
+      "sha256": "55bc855fd782dd6b1d70e4bc5240414d590c8c54bbb0962107b01e7093597950",
+      "size_bytes": 152,
+      "role": "CI complete stderr",
+      "archive_member": "objects/55bc855fd782dd6b1d70e4bc5240414d590c8c54bbb0962107b01e7093597950"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "CI executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/receipt.json",
+      "sha256": "1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782",
+      "size_bytes": 5578,
+      "role": "A actual receipt",
+      "archive_member": "objects/1e219464f0f090f74111048192e07a4ddcf338d017280b361a25a269384aa782"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/stdout.log",
+      "sha256": "50abe90f209f098894b94c3eba53094d8f5cb08393548234e8632bb943767955",
+      "size_bytes": 27275,
+      "role": "A complete stdout",
+      "archive_member": "objects/50abe90f209f098894b94c3eba53094d8f5cb08393548234e8632bb943767955"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-command-01/stderr.log",
+      "sha256": "126ea562036f94913b011eca8b3b49fde253641a25d75606ed8e12619aa2f8df",
+      "size_bytes": 547,
+      "role": "A complete stderr",
+      "archive_member": "objects/126ea562036f94913b011eca8b3b49fde253641a25d75606ed8e12619aa2f8df"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "A executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-compare-command-01/receipt.json",
+      "sha256": "4f95842698033a4c8fbaf6bf5faae01868ed330694933e035ec96b8f70375d38",
+      "size_bytes": 6144,
+      "role": "comparator actual receipt",
+      "archive_member": "objects/4f95842698033a4c8fbaf6bf5faae01868ed330694933e035ec96b8f70375d38"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-compare-command-01/stdout.log",
+      "sha256": "a5b2ad760671a666ac3adc005a99a9b069bd180c1fd3065712f948e78a92e0e0",
+      "size_bytes": 210,
+      "role": "comparator complete stdout",
+      "archive_member": "objects/a5b2ad760671a666ac3adc005a99a9b069bd180c1fd3065712f948e78a92e0e0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-compare-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "comparator complete stderr",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "comparator executed recorder Source",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/e6/e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea",
+      "sha256": "e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea",
+      "size_bytes": 1678459,
+      "role": "common Source index metadata",
+      "archive_member": "objects/e65f7ef83b067753ca9af08c293b278cd63162c7022dcfab444b988e12649eea"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/63/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002"
+    },
+    {
+      "origin": "crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/04/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry.rs",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/e9/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/95/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/45/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/da/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/1a/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/0d/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/05/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ea/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/43/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/8d/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/23/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/9f/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/ce/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/6f/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "only selected sixteen Source archives",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "final current Rust recheck",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/compare-ordinary-source-volume-Peer-05.py",
+      "sha256": "828081e38411333e857ed0d2eab36b9db4413f4045f496238db9c2567b709aa0",
+      "size_bytes": 23654,
+      "role": "actual comparator Source",
+      "archive_member": "objects/828081e38411333e857ed0d2eab36b9db4413f4045f496238db9c2567b709aa0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-comparison-01/summary.json",
+      "sha256": "1470c84646b49eaee1a525ad1edc953996d0adae130aebc94a6fb30516ae402e",
+      "size_bytes": 7262,
+      "role": "actual complete strict comparison",
+      "archive_member": "objects/1470c84646b49eaee1a525ad1edc953996d0adae130aebc94a6fb30516ae402e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture/output/setup-process-reference.json",
+      "sha256": "c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024",
+      "size_bytes": 173622,
+      "role": "actual native_capture",
+      "archive_member": "objects/c9af89246bae6f94fa8ac785267b022450501c43721b78621f8f01556ae3f024"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+      "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+      "size_bytes": 2885,
+      "role": "actual native_custody",
+      "archive_member": "objects/fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/geometry-consumers.json",
+      "sha256": "74b7e1504b9956c292190ec3205c171e9b6b2f28aa498abfacdf42b10781a2f8",
+      "size_bytes": 38214,
+      "role": "actual trace",
+      "archive_member": "objects/74b7e1504b9956c292190ec3205c171e9b6b2f28aa498abfacdf42b10781a2f8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275,
+      "role": "actual input",
+      "archive_member": "objects/db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-build-01/capture-custody.json",
+      "sha256": "fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c",
+      "size_bytes": 2885,
+      "role": "reused actual Native custody",
+      "archive_member": "objects/fa1805ed3a2414cfae87ba929f44e2e641b3ee0c94fbb888a92ce38d39b7540c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-process-native-prep-01/request.proposed.json",
+      "sha256": "1b2952111a50ec8c45bea1b36172f721549cbac88f95b581e0a1a5aec00af8ed",
+      "size_bytes": 11508,
+      "role": "reused Native request",
+      "archive_member": "objects/1b2952111a50ec8c45bea1b36172f721549cbac88f95b581e0a1a5aec00af8ed"
+    },
+    {
+      "origin": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-height-continuation/summary.json",
+      "sha256": "6e3a09b6acdeb6257b97806e9fb97a3c8354cc6e4664ffa37a94feb840c33ed3",
+      "size_bytes": 12173,
+      "role": "prior public summary",
+      "archive_member": "objects/6e3a09b6acdeb6257b97806e9fb97a3c8354cc6e4664ffa37a94feb840c33ed3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "current actual Rust result",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-height-A-24H-cli-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "size_bytes": 147618,
+      "role": "prior same-input Rust result",
+      "archive_member": "objects/71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/review.json",
+      "sha256": "5c8ec85ca68d37c31020b08ca589bceac4b4675a43dbb10f9f8fe6eed43feed6",
+      "size_bytes": 38193,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5c8ec85ca68d37c31020b08ca589bceac4b4675a43dbb10f9f8fe6eed43feed6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/manifest.json",
+      "sha256": "a01cab0ec482aa0bdc0349ea81a0e5dee8dc50c91dc3d0064f6c647291242171",
+      "size_bytes": 28918,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a01cab0ec482aa0bdc0349ea81a0e5dee8dc50c91dc3d0064f6c647291242171"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/README.txt",
+      "sha256": "f3056a94859c97429b410f684a62447a7317c98ed922496e1d88d67cc6c5f2de",
+      "size_bytes": 2301,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f3056a94859c97429b410f684a62447a7317c98ed922496e1d88d67cc6c5f2de"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original-index.json",
+      "sha256": "9f179ef405e0ea7e153327faf1b7271362bbcb208e12eee798006d62f205a30d",
+      "size_bytes": 10637,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9f179ef405e0ea7e153327faf1b7271362bbcb208e12eee798006d62f205a30d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__geometry.rs.diff",
+      "sha256": "d181780986d9410a67daa7521d2bb8ca402bd838de48afe2173f8564887670f4",
+      "size_bytes": 1701,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d181780986d9410a67daa7521d2bb8ca402bd838de48afe2173f8564887670f4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__geometry__source_geometry.rs.diff",
+      "sha256": "7d3d01b7e9318ca49c73154f4eca6d004b7593c96c6ebecf636e98bb6aaa35d3",
+      "size_bytes": 709,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7d3d01b7e9318ca49c73154f4eca6d004b7593c96c6ebecf636e98bb6aaa35d3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__geometry__zone_volume.rs.diff",
+      "sha256": "e796acd338163b0a1b753fb46b847e729492474f780423ef89344acdeb3db722",
+      "size_bytes": 1053,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e796acd338163b0a1b753fb46b847e729492474f780423ef89344acdeb3db722"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__geometry__zone_volume__topology.rs.diff",
+      "sha256": "d2fcfeb1718f447d59406dc40fdf27dc4bceff4e6d0349139bcafd08567d060f",
+      "size_bytes": 7451,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d2fcfeb1718f447d59406dc40fdf27dc4bceff4e6d0349139bcafd08567d060f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__error_backend.rs.diff",
+      "sha256": "bdffba9b3ea1ed93ee1bcc54f6da3a867d182429476a2352218187e95d4ce72f",
+      "size_bytes": 1550,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bdffba9b3ea1ed93ee1bcc54f6da3a867d182429476a2352218187e95d4ce72f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.diff",
+      "sha256": "ee9c483e27e97ef7cb5397bf673536139ff2c4507cddd6ebb3a6912ac336374d",
+      "size_bytes": 801,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ee9c483e27e97ef7cb5397bf673536139ff2c4507cddd6ebb3a6912ac336374d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.diff",
+      "sha256": "7757c786758012c880bf3e3d5ed857e7ea457574f2fec9a8163c5695dbdf739e",
+      "size_bytes": 797,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7757c786758012c880bf3e3d5ed857e7ea457574f2fec9a8163c5695dbdf739e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__setup_volume.rs.diff",
+      "sha256": "e9ccb0a04e036ac85be39dc7fad56b77566746bb3c2027f496a40db55c6fe20e",
+      "size_bytes": 9914,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e9ccb0a04e036ac85be39dc7fad56b77566746bb3c2027f496a40db55c6fe20e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__volume_faces.rs.diff",
+      "sha256": "51eabef1438d5b92043e0d935b22003ef782fc65f9dcc7b679c07f12c0ae7de0",
+      "size_bytes": 5123,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/51eabef1438d5b92043e0d935b22003ef782fc65f9dcc7b679c07f12c0ae7de0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__setup_zone_geometry.rs.diff",
+      "sha256": "445c11e4b14777227e4919388b991733b9cbe082cd1897cab07cd10756efd862",
+      "size_bytes": 1555,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/445c11e4b14777227e4919388b991733b9cbe082cd1897cab07cd10756efd862"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__world_surface_geometry.rs.diff",
+      "sha256": "e87c156350631717a749dd1ad2f6da2fddb8eb6a5566be1373620aec82127caf",
+      "size_bytes": 3732,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e87c156350631717a749dd1ad2f6da2fddb8eb6a5566be1373620aec82127caf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+      "sha256": "bbab98c64743f56819b5e7a2dcb78bd4e35c0f141f851fd4414da5514724edc4",
+      "size_bytes": 1313,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bbab98c64743f56819b5e7a2dcb78bd4e35c0f141f851fd4414da5514724edc4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "d3d1db600af9c18da9050a40ac471a44fdcc859bd39f7a90efdd7f3cce12479e",
+      "size_bytes": 4655,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d3d1db600af9c18da9050a40ac471a44fdcc859bd39f7a90efdd7f3cce12479e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__ctf_initialization_context__ordinary_surface_geometry.rs.diff",
+      "sha256": "6b20b0a3dc46decd748e2223e09871dd3cb4eaadb2cdbd467bc6d66b991abba2",
+      "size_bytes": 2708,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6b20b0a3dc46decd748e2223e09871dd3cb4eaadb2cdbd467bc6d66b991abba2"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_run__src__geometry_trace__ordinary_source.rs.diff",
+      "sha256": "cfe65b8c81d409650ab03dff92320e76793707040215c42d2abeb8aa6323aa96",
+      "size_bytes": 2173,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/cfe65b8c81d409650ab03dff92320e76793707040215c42d2abeb8aa6323aa96"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/diffs/crates__ep_runtime__src__heat_balance__error_backend_tests.rs.diff",
+      "sha256": "bae5bcfe12a5697d3655fd71f1a4e1633fd6c2bcc1ddc0ce73016c3ac094140b",
+      "size_bytes": 1164,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bae5bcfe12a5697d3655fd71f1a4e1633fd6c2bcc1ddc0ce73016c3ac094140b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.543-551.literal",
+      "sha256": "9f86b1d1d0fe721fe723ad0a5bfde5eff2bc7bc0c8b6a2130fe3448d3180f292",
+      "size_bytes": 347,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9f86b1d1d0fe721fe723ad0a5bfde5eff2bc7bc0c8b6a2130fe3448d3180f292"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12010-12322.literal",
+      "sha256": "0c0d518a8f311391a383ff5256746da79a9d68a13813254096980282c4db33b6",
+      "size_bytes": 18861,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/0c0d518a8f311391a383ff5256746da79a9d68a13813254096980282c4db33b6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12325-12350.literal",
+      "sha256": "e97ca163a91b212acf570cccbdbaf32ac93a50ec151c70995a8f60bd8eb287b6",
+      "size_bytes": 1676,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e97ca163a91b212acf570cccbdbaf32ac93a50ec151c70995a8f60bd8eb287b6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12382-12448.literal",
+      "sha256": "a4f171a189695c1aea459d68a7ef9308c4c885edaa4dfeb5fd4cc1b8a5103715",
+      "size_bytes": 3139,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a4f171a189695c1aea459d68a7ef9308c4c885edaa4dfeb5fd4cc1b8a5103715"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12451-12478.literal",
+      "sha256": "fc99aef6a4ff52df16a46dcf5748dbb743dbb025a5015ada052d0d87a573499d",
+      "size_bytes": 1103,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fc99aef6a4ff52df16a46dcf5748dbb743dbb025a5015ada052d0d87a573499d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12580-12611.literal",
+      "sha256": "a7cf778e90fa037e7761e3ae700b7aa1320f92d2419f898b903502cea662ccf1",
+      "size_bytes": 1360,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a7cf778e90fa037e7761e3ae700b7aa1320f92d2419f898b903502cea662ccf1"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12614-12639.literal",
+      "sha256": "a6cda4f5cced11e6013a4f6b61160eaf2e631805e6d264a53da0c76f974fd05e",
+      "size_bytes": 1383,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a6cda4f5cced11e6013a4f6b61160eaf2e631805e6d264a53da0c76f974fd05e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12754-12759.literal",
+      "sha256": "a295e677e548e0b7a95070fa34fd8ab9f135138aaebb39358ea4823ea113d434",
+      "size_bytes": 314,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a295e677e548e0b7a95070fa34fd8ab9f135138aaebb39358ea4823ea113d434"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.cc.12779-12790.literal",
+      "sha256": "56cf9d477ce9a643b658aad40f990e38b0fc0d580f0da5ae618e892dd7e122bd",
+      "size_bytes": 377,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/56cf9d477ce9a643b658aad40f990e38b0fc0d580f0da5ae618e892dd7e122bd"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/Vectors.cc.140-160.literal",
+      "sha256": "bd43d236588cd68e3ee1342fb2c6826a8dddadcbf66ddf6759e9e04f3e57acd0",
+      "size_bytes": 428,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/bd43d236588cd68e3ee1342fb2c6826a8dddadcbf66ddf6759e9e04f3e57acd0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/Vectors.cc.347-370.literal",
+      "sha256": "3f2cca0997d7f6fd80e8276776a3c89d226564adf3160f529d2dfc03d425bcb3",
+      "size_bytes": 706,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/3f2cca0997d7f6fd80e8276776a3c89d226564adf3160f529d2dfc03d425bcb3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/Vectors.cc.505-529.literal",
+      "sha256": "f71ac1e24a0674318cf51eda4db0fe37fc7f587c9be3b803d6e3fff9ebbbc155",
+      "size_bytes": 765,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f71ac1e24a0674318cf51eda4db0fe37fc7f587c9be3b803d6e3fff9ebbbc155"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/Vectors.hh.126-146.literal",
+      "sha256": "b77076fc43d2228ed4729ec328e6d29d045c4c73e7f5a33dca1019f887f747e6",
+      "size_bytes": 480,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/b77076fc43d2228ed4729ec328e6d29d045c4c73e7f5a33dca1019f887f747e6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/DataVectorTypes.hh.558-578.literal",
+      "sha256": "e472a6b4ebace311d36cc9c80bb2894031646ac9704af68fccd693191c954c2f",
+      "size_bytes": 611,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e472a6b4ebace311d36cc9c80bb2894031646ac9704af68fccd693191c954c2f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/DataGlobalConstants.hh.580-609.literal",
+      "sha256": "08f8a868eb29ade78036fc7cd9defc42144cc9ea936167bcff925f832f5b7564",
+      "size_bytes": 2292,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/08f8a868eb29ade78036fc7cd9defc42144cc9ea936167bcff925f832f5b7564"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/SurfaceGeometry.hh.482-489.literal",
+      "sha256": "9135c5177c8b029bb5419373c7ec1d6b15bf165834fc0e923b554628090f13ee",
+      "size_bytes": 262,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/9135c5177c8b029bb5419373c7ec1d6b15bf165834fc0e923b554628090f13ee"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/DataHeatBalance.hh.450-464.literal",
+      "sha256": "6cdd22069c2f4e6694076deb2c491ae090a5c510423a0603dc878e5dc90b57b6",
+      "size_bytes": 1257,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6cdd22069c2f4e6694076deb2c491ae090a5c510423a0603dc878e5dc90b57b6"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/UtilityRoutines.cc.954-978.literal",
+      "sha256": "4ff99997a48b26e7349904b8f5e1cf38be98aaab569b39f6e42ac38650ef9c1d",
+      "size_bytes": 942,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/4ff99997a48b26e7349904b8f5e1cf38be98aaab569b39f6e42ac38650ef9c1d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-source-Header-01/Original/TypeDefs.h.54-64.literal",
+      "sha256": "1f6c54a752318969756ef989030f53a4b8f07a4ea049b9fb4d5028c3e553b3e4",
+      "size_bytes": 150,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1f6c54a752318969756ef989030f53a4b8f07a4ea049b9fb4d5028c3e553b3e4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/Original/src__EnergyPlus__Vectors.cc.153-164.txt",
+      "sha256": "1b993cc1e7914e4f481290441a584719a13c40c8e5664ae577f846652f0f9a9b",
+      "size_bytes": 221,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1b993cc1e7914e4f481290441a584719a13c40c8e5664ae577f846652f0f9a9b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/Original/src__EnergyPlus__SurfaceGeometry.cc.550-802.txt",
+      "sha256": "1d143128b15276285baa7084968004a02250782d097f8e12df369a13d4f45211",
+      "size_bytes": 14334,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1d143128b15276285baa7084968004a02250782d097f8e12df369a13d4f45211"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/Original/src__EnergyPlus__HeatBalanceManager.cc.1800-1821.txt",
+      "sha256": "6e26720086f5df89b3c3c40fb892b891ace02ca30f952e930771b3758878f150",
+      "size_bytes": 763,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6e26720086f5df89b3c3c40fb892b891ace02ca30f952e930771b3758878f150"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/Original/src__EnergyPlus__UtilityRoutines.cc.251-283.txt",
+      "sha256": "0195e974c48b357271b1446c4cc2fb536e4d0389c16821e9606e36448a5b2c90",
+      "size_bytes": 1466,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/0195e974c48b357271b1446c4cc2fb536e4d0389c16821e9606e36448a5b2c90"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-01/Original/SurfaceGeometry-volume-member-occurrences.json",
+      "sha256": "48cbdc6ba888d6187fb82028bf98af58b74aa819ed0dced27a8c2c5fdad2953c",
+      "size_bytes": 3807,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/48cbdc6ba888d6187fb82028bf98af58b74aa819ed0dced27a8c2c5fdad2953c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/manifest.json",
+      "sha256": "48bba2a17cb44b051c9db007c333424a7ca1fee51ba2c863f866a48b3fed3e00",
+      "size_bytes": 6592,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/48bba2a17cb44b051c9db007c333424a7ca1fee51ba2c863f866a48b3fed3e00"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/before.rs",
+      "sha256": "e122b628ab23dd1bd3278acf55c39bd41479fb9a8092e06c21998784d8bd41e7",
+      "size_bytes": 53313,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e122b628ab23dd1bd3278acf55c39bd41479fb9a8092e06c21998784d8bd41e7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/after.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/complete-parent.diff",
+      "sha256": "42ccb5a97441b0e0c4bb41b92fa962f38dc371fae6d27447f421e27dc49426a9",
+      "size_bytes": 1249,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/42ccb5a97441b0e0c4bb41b92fa962f38dc371fae6d27447f421e27dc49426a9"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/cube_surfaces.literal.rs",
+      "sha256": "ef0d586d0d989b46a31212a293e7f1f7beab86ef5af96e6448134b25a9429ae0",
+      "size_bytes": 2201,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/ef0d586d0d989b46a31212a293e7f1f7beab86ef5af96e6448134b25a9429ae0"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/part09.rs",
+      "sha256": "2d9a6bc79a0488b189668754d6527c4e5586f1e391097d513231125588757d9a",
+      "size_bytes": 15358,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2d9a6bc79a0488b189668754d6527c4e5586f1e391097d513231125588757d9a"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fixture-correction-Header-01/literal-coordinate-diagnosis.json",
+      "sha256": "2915575d4f3d9dd3b461ed7a76b510992701286933bb374180c50349872c471c",
+      "size_bytes": 10754,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2915575d4f3d9dd3b461ed7a76b510992701286933bb374180c50349872c471c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-volume-comparator-prep-05/manifest.json",
+      "sha256": "adaf93cd11e5b45e240ec307b76b5d8384bcbe25401207f89a176d771c5f5046",
+      "size_bytes": 2333,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/adaf93cd11e5b45e240ec307b76b5d8384bcbe25401207f89a176d771c5f5046"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/compare-ordinary-source-volume-Peer-05.py",
+      "sha256": "828081e38411333e857ed0d2eab36b9db4413f4045f496238db9c2567b709aa0",
+      "size_bytes": 23654,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/828081e38411333e857ed0d2eab36b9db4413f4045f496238db9c2567b709aa0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/compare-ordinary-source-height-Peer-04.py",
+      "sha256": "a90091137743ea53273c89c12b897f35b9e46ff3832998fa662c6c42f4dab490",
+      "size_bytes": 21342,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/a90091137743ea53273c89c12b897f35b9e46ff3832998fa662c6c42f4dab490"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-height-comparator-prep-04/manifest.json",
+      "sha256": "cef6e55393cedcfb925f3cabaec8781b0ab41b947e8eaac0f295a11382043dac",
+      "size_bytes": 2329,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/cef6e55393cedcfb925f3cabaec8781b0ab41b947e8eaac0f295a11382043dac"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-volume-comparator-prep-05/complete-parent.diff",
+      "sha256": "19157996fe782d5f44e173a53921cda150aa85ea10ed7af40181d5f1738dd9fd",
+      "size_bytes": 4562,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/19157996fe782d5f44e173a53921cda150aa85ea10ed7af40181d5f1738dd9fd"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-volume-comparator-prep-05/complete-parent-inverse.diff",
+      "sha256": "fcf8ecc612860907a0c70d31f7a0de5ebaa5089bf49649e6228fb9a7aaf0b6e0",
+      "size_bytes": 4562,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/fcf8ecc612860907a0c70d31f7a0de5ebaa5089bf49649e6228fb9a7aaf0b6e0"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-volume-comparator-prep-05/literal-inverse.json",
+      "sha256": "071e629641549d61e6382556f8343e4451a0f15672984c272c9c0370ca43855f",
+      "size_bytes": 3384,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/071e629641549d61e6382556f8343e4451a0f15672984c272c9c0370ca43855f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-source-volume-comparator-prep-05/contract.json",
+      "sha256": "2c6a5d708977ff17bb3c562a2ab4a93a4f0d64e0e19a83f4061ffee9580faec7",
+      "size_bytes": 2256,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2c6a5d708977ff17bb3c562a2ab4a93a4f0d64e0e19a83f4061ffee9580faec7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-source-volume-comparator-Source-review-05/review.json",
+      "sha256": "1680798908dce94079c271627f63147846590c773ea2c6886d322e50b75567cf",
+      "size_bytes": 3751,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1680798908dce94079c271627f63147846590c773ea2c6886d322e50b75567cf"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-01/receipt.json",
+      "sha256": "df02b47fc888155c44a636924e2a92bd1c238a285f5ca74cf6947629f05f2709",
+      "size_bytes": 5053,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/df02b47fc888155c44a636924e2a92bd1c238a285f5ca74cf6947629f05f2709"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-fmt-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/32/323f7f453f6ff0ffb9e90fa3ba0b3bb36c9e9ee491b83cf0b0ca6c8e52baa3e8",
+      "sha256": "323f7f453f6ff0ffb9e90fa3ba0b3bb36c9e9ee491b83cf0b0ca6c8e52baa3e8",
+      "size_bytes": 1678459,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/323f7f453f6ff0ffb9e90fa3ba0b3bb36c9e9ee491b83cf0b0ca6c8e52baa3e8"
+    },
+    {
+      "origin": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "size_bytes": 8557,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-01/receipt.json",
+      "sha256": "76b05dafcdb13b8b7361e07806186180e2ced689ecbeda5ee5b72d769b20a30b",
+      "size_bytes": 5103,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/76b05dafcdb13b8b7361e07806186180e2ced689ecbeda5ee5b72d769b20a30b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-01/stdout.log",
+      "sha256": "8f55a84f0100ca610ff9e13768a16eb3e47e2d69de8cd9bcb1b7800c956f2290",
+      "size_bytes": 82,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/8f55a84f0100ca610ff9e13768a16eb3e47e2d69de8cd9bcb1b7800c956f2290"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-quality-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-01/receipt.json",
+      "sha256": "1d8746adbcf938942999d9a8b3ebb7b1896cc8744ff7ed1259c621bc15b94596",
+      "size_bytes": 5133,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/1d8746adbcf938942999d9a8b3ebb7b1896cc8744ff7ed1259c621bc15b94596"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-clippy-command-01/stderr.log",
+      "sha256": "d65f52188cf844f4de148feb60bed762adb8e8e168a8c4b685859459d0d8623e",
+      "size_bytes": 265,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/d65f52188cf844f4de148feb60bed762adb8e8e168a8c4b685859459d0d8623e"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-01/receipt.json",
+      "sha256": "e551f6e3cd0740bdd6b3db2d000868afea629f6a04decfb962762d7833ad632c",
+      "size_bytes": 5199,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e551f6e3cd0740bdd6b3db2d000868afea629f6a04decfb962762d7833ad632c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-01/stdout.log",
+      "sha256": "14bcad42ee95cbf9da4a7b5db70fec7bd17a78ceeac8db153170c97aeca400c3",
+      "size_bytes": 515,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/14bcad42ee95cbf9da4a7b5db70fec7bd17a78ceeac8db153170c97aeca400c3"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-runtime-tests-command-01/stderr.log",
+      "sha256": "032c864498ac9b6de44303c01f0b1935b436949cdf03dbbad6bb872190cca09d",
+      "size_bytes": 310,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/032c864498ac9b6de44303c01f0b1935b436949cdf03dbbad6bb872190cca09d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-setup-volume-continuation-Header-01.py",
+      "sha256": "add93d10e60e0603189dc2a4aea8502ddfbeb237ac8df9aefc97672819bc716f",
+      "size_bytes": 12878,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/add93d10e60e0603189dc2a4aea8502ddfbeb237ac8df9aefc97672819bc716f"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-setup-volume-continuation-Header-01.complete-parent.diff",
+      "sha256": "e76e6b15246c99afb5b925d415af8786160eb4eb7c4e4b86bcde97e4b3d67e1b",
+      "size_bytes": 9342,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/e76e6b15246c99afb5b925d415af8786160eb4eb7c4e4b86bcde97e4b3d67e1b"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/review.json",
+      "sha256": "2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4",
+      "size_bytes": 41954,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/2b1f6c81d37a26a2c39e1b2d2a4d1cf3be36ff991be9f9032bd65866da5076a4"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-Source-review-02/diffs/crates__ep_runtime__src__runtime__tests__ctf_ordinary_outputs.rs.diff",
+      "sha256": "5d2276818bcd00f6f1c8d4a2fbe78ddd78fde2d07357af59266443e248a90ec7",
+      "size_bytes": 4550,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/5d2276818bcd00f6f1c8d4a2fbe78ddd78fde2d07357af59266443e248a90ec7"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-actual-review-01/review.json",
+      "sha256": "15fae4346ac4821466fb4651f2547e05a55172c22b54444b4abbbeae8c92519c",
+      "size_bytes": 21019,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/15fae4346ac4821466fb4651f2547e05a55172c22b54444b4abbbeae8c92519c"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-publication-known-inputs-Header-01.json",
+      "sha256": "f5f05ddf206c204ddbc6353129264e82e5415c52fe368e0e4df42e4ddf6a80eb",
+      "size_bytes": 23950,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/f5f05ddf206c204ddbc6353129264e82e5415c52fe368e0e4df42e4ddf6a80eb"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-volume-publisher-Source-preflight-01/review.json",
+      "sha256": "65764313b2349d98b6998cdcc0da7428372c49b45461aee79aade50215c4f7ea",
+      "size_bytes": 2635,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/65764313b2349d98b6998cdcc0da7428372c49b45461aee79aade50215c4f7ea"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-comparison-01/differences.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "size_bytes": 3,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "origin": "scripts/quality/source-quality-gate.ps1",
+      "sha256": "7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227",
+      "size_bytes": 3432,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/7338bd4b9fba9c5ac746649e3bfba625ad0582584b2eb03449b2c4f53dcff227"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1",
+      "sha256": "01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5",
+      "size_bytes": 365,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/01d4d7cc466a0d52b7a6c3e276e9e80133bef15333a351a313320546b9fdc2b5"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-A-24H-cli-01/output/run-summary.json",
+      "sha256": "50abe90f209f098894b94c3eba53094d8f5cb08393548234e8632bb943767955",
+      "size_bytes": 27275,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/50abe90f209f098894b94c3eba53094d8f5cb08393548234e8632bb943767955"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/ordinary-setup-volume-publication-inputs-Header-02.json",
+      "sha256": "4f9e1e9cfcbd18f913f6c29007a03fff5ff65f4f3c600cae69ac0c96483bba7d",
+      "size_bytes": 49312,
+      "role": "explicit finite additional reference",
+      "archive_member": "objects/4f9e1e9cfcbd18f913f6c29007a03fff5ff65f4f3c600cae69ac0c96483bba7d"
+    },
+    {
+      "origin": ".runtime/porting/SRC-06/publish-setup-volume-continuation-Header-01.py",
+      "sha256": "add93d10e60e0603189dc2a4aea8502ddfbeb237ac8df9aefc97672819bc716f",
+      "size_bytes": 12878,
+      "role": "executed publisher Source",
+      "archive_member": "objects/add93d10e60e0603189dc2a4aea8502ddfbeb237ac8df9aefc97672819bc716f"
+    },
+    {
+      "origin": "crates/ep_run/src/geometry_trace/ordinary_source.rs",
+      "sha256": "63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002",
+      "size_bytes": 6300,
+      "role": "last Source bytes check",
+      "archive_member": "objects/63b422ad5195d749ee1ae7fbb88d437dfd8447c0decd36700531eff44d95e002"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry.rs",
+      "sha256": "043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9",
+      "size_bytes": 5213,
+      "role": "last Source bytes check",
+      "archive_member": "objects/043f981f74584589c47872714a38fb8c6065b86c53a98c6f8b0f4d5261e60da9"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1",
+      "size_bytes": 17153,
+      "role": "last Source bytes check",
+      "archive_member": "objects/e9e29b514ce54969c9e61c7c2e580fa7fe300bfd36f0fa1402c4444ec9eb63a1"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "size_bytes": 16067,
+      "role": "last Source bytes check",
+      "archive_member": "objects/95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "size_bytes": 7166,
+      "role": "last Source bytes check",
+      "archive_member": "objects/45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/ordinary_surface_geometry.rs",
+      "sha256": "da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746",
+      "size_bytes": 19683,
+      "role": "last Source bytes check",
+      "archive_member": "objects/da150101229f1b6ce18d4e5bfbcb4738db126c6403de0f100d6300a8221aa746"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401",
+      "size_bytes": 6603,
+      "role": "last Source bytes check",
+      "archive_member": "objects/1add9c31fd7302382393690d464c84c0022da427008077e5aa033f0c619e4401"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+      "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+      "size_bytes": 11802,
+      "role": "last Source bytes check",
+      "archive_member": "objects/0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc",
+      "size_bytes": 20325,
+      "role": "last Source bytes check",
+      "archive_member": "objects/055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48",
+      "size_bytes": 22633,
+      "role": "last Source bytes check",
+      "archive_member": "objects/ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559",
+      "size_bytes": 32948,
+      "role": "last Source bytes check",
+      "archive_member": "objects/4372835434c7d3b3598f78504fa3d5b67d92681d39279f92e6707a6b60a7f559"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "sha256": "8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432",
+      "size_bytes": 17286,
+      "role": "last Source bytes check",
+      "archive_member": "objects/8d6682efb056ad52a972de3d271e2de7141f74075b47974afb1691b1c0cda432"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "size_bytes": 9508,
+      "role": "last Source bytes check",
+      "archive_member": "objects/235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+      "size_bytes": 3375,
+      "role": "last Source bytes check",
+      "archive_member": "objects/9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113"
+    },
+    {
+      "origin": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6",
+      "size_bytes": 19095,
+      "role": "last Source bytes check",
+      "archive_member": "objects/cec23b5b785fc70bae58ab73217b4052a13461aaf0afa0c389ff198b54a2dff6"
+    },
+    {
+      "origin": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec",
+      "size_bytes": 53210,
+      "role": "last Source bytes check",
+      "archive_member": "objects/6f82913230467f27a15d642e95781873937de1483a09118c7eff3b9202fa40ec"
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-volume-continuation/evidence.zip",
+    "sha256": "0a08e02b2a03b51d5533c6a7df5af7381c868b18acd5776b937eadcf176b07d1",
+    "size_bytes": 838847
+  },
+  "members": 159,
+  "metadata_only": [
+    {
+      "role": "reused_Native_helper_binary",
+      "reference": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-setup-process-native-build-01/bin/setup_process_surface_helper_01.exe",
+        "sha256": "974c60505110b8f5b40499ef20374f89ad3db03b99fb6a2fb5651367698b2ea2",
+        "size_bytes": 1299490506
+      }
+    },
+    {
+      "role": "reused_Native_link_map",
+      "reference": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-setup-process-native-build-01/bin/setup_process_surface_helper_01.map",
+        "sha256": "bd711a40fc6ed471a87420cbd9f5763f2cf9ee0f34352d13a11a0975f9075f3d",
+        "size_bytes": 306296950
+      }
+    },
+    {
+      "role": "historical_Original_core",
+      "reference": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+        "size_bytes": 1832731010
+      }
+    }
+  ],
+  "metadata_only_payloads_read_or_hashed": false,
+  "whole_ZIP_CRC_SHA_size_readback": true
+}

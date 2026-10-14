@@ -479,6 +479,52 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(warning_zones, expected_failure);
         assert_eq!(warning_rows.err_count, 1);
         assert_eq!(warning_state.tracking.total_warning_errors, 1);
+        // All six authored cube faces are inward-wound. Reverse every copied
+        // Vertex list; cached Newell values stay unchanged so548 recomputes them.
+        let mut volume_rows = raw.clone();
+        for surface in volume_rows.final_surfaces.as_mut().ok_or("authored volume rows")? {
+            surface.row.vertex.as_mut().ok_or("authored volume vertices")?.reverse();
+        }
+        let mut volume_zones = height_zones.clone();
+        volume_zones.zones.as_mut().ok_or("authored floor-present checkpoint")?[0].has_floor = true;
+        let before_volume = volume_zones.clone();
+        let returned = volume_rows.calculate_opaque_setup_volumes(owners.input, &mut volume_zones, false, &mut context.backend)?;
+        assert_eq!(returned.len(), 1);
+        assert_eq!(returned[0].returned.volume_m3.to_bits(), 1.0_f64.to_bits());
+        assert_eq!(returned[0].returned.diagnostics.sum_face_areas_m2.to_bits(), 6.0_f64.to_bits());
+        assert_eq!(volume_zones.spaces.as_ref().ok_or("actual computed Space volume")?[0].volume.to_bits(), 1.0_f64.to_bits());
+        assert_eq!(volume_zones.spaces.as_ref().ok_or("actual computed fraction")?[0].fraction_zone_volume.to_bits(), 1.0_f64.to_bits());
+        let show_debug = SelectedInputProcessor::from_admitted_input(vec![
+            crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type: "SHOWZONESURFACES_DEBUG".into(), alpha_fields: 0, numeric_fields: 0,
+                alpha_extensions: 0, numeric_extensions: 0, extension: None,
+            }], std::collections::BTreeMap::from([("SHOWZONESURFACES_DEBUG".into(),
+                crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: "authored debug section".into(), field_sizes: Default::default(),
+                    }]))]))?;
+        let mut debug_volume = before_volume.clone();
+        assert!(matches!(volume_rows.calculate_opaque_setup_volumes(&show_debug, &mut debug_volume, false, &mut context.backend),
+            Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("positive SHOWZONESURFACES debug OutputFile"))));
+        assert_eq!(debug_volume, volume_zones, "first debug print follows Zone/Space/fraction writes");
+        let mut retained_user_volume = before_volume.clone();
+        retained_user_volume.zones.as_mut().ok_or("authored positive user volume")?[0].volume = 1.01;
+        let retained = volume_rows.calculate_opaque_setup_volumes(owners.input, &mut retained_user_volume, false, &mut context.backend)?;
+        assert_eq!(retained[0].returned.volume_m3.to_bits(), 1.01_f64.to_bits());
+        assert_eq!(retained_user_volume.spaces.as_ref().ok_or("user-priority Space volume")?[0].volume.to_bits(), 1.01_f64.to_bits());
+        let mut user_volume = before_volume;
+        user_volume.zones.as_mut().ok_or("authored user volume")?[0].volume = 2.0;
+        let before_failure = user_volume.clone();
+        let (mut note_state, mut note_console, mut note_failure) =
+            (ctf_ordinary_output_test_state(), Vec::new(), OrdinaryFailingEio);
+        let failure = volume_rows.calculate_opaque_setup_volumes(owners.input, &mut user_volume, false,
+            &mut SourceErrorBackend { state: &mut note_state, error_stream: Some(&mut note_failure),
+                console: &mut note_console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None });
+        assert!(matches!(failure, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_))));
+        assert_eq!(volume_rows.err_count5, 1, "counter increment precedes failed informational note");
+        assert_eq!(user_volume, before_failure, "user volume and pending Space fields survive note failure");
+        assert_eq!(note_state.tracking.total_warning_errors, 0);
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());
         let source_ids = raw.final_surfaces.as_ref().ok_or("missing final Surface")?

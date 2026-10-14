@@ -13,6 +13,8 @@ use std::io::{self, Write};
 pub enum SourceErrorLevel {
     /// ShowContinueError's unformatted callback argument.
     Continue = 0,
+    /// ShowMessage's unformatted informational callback argument.
+    Info = 1,
     /// ShowWarningError's unformatted callback argument.
     Warning = 2,
     /// ShowSevereError's unformatted callback argument.
@@ -304,6 +306,24 @@ impl SourceErrorBackend<'_> {
         }
         effect("display console", writeln!(self.console, "{message}"))?;
         effect("display console flush", self.console.flush())
+    }
+
+    /// Literal ShowMessage: output, optional SQLite info record and callback.
+    pub fn show_message(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
+        if message.is_empty() {
+            return self.show_error_message(" *************");
+        }
+        self.show_error_message(&format!(" ************* {message}"))?;
+        if let Some(sqlite) = self.sqlite.as_deref_mut() {
+            effect(
+                "SQLite create info",
+                sqlite.create_error_record(1, -1, message, 0),
+            )?;
+        }
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Info, message);
+        }
+        Ok(())
     }
 
     /// Literal ShowWarningMessage: search counts/output/SQLite count0/callback,

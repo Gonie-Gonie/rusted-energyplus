@@ -31,6 +31,7 @@ mod setup_area;
 mod setup_continuation;
 mod setup_height;
 mod setup_process;
+mod setup_volume;
 mod vertices;
 mod volume_faces;
 mod window_arrays;
@@ -124,6 +125,8 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) warning_displayed: bool,
     /// SurfaceGeometryData ErrCount constructor0; Setup514 reads it without incrementing.
     pub(crate) err_count: i32,
+    /// SurfaceGeometryData ErrCount5 constructor0; volume mismatches increment it.
+    pub(crate) err_count5: i32,
     /// Actual SurfaceGeometry constructor counters; positive Window5/6 writers stay excluded.
     pub(crate) warning1_count: i32,
     pub(crate) warning2_count: i32,

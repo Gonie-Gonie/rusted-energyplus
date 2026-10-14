@@ -12681,6 +12681,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-height-continuation/summary.json",
         "sha256": "6e3a09b6acdeb6257b97806e9fb97a3c8354cc6e4664ffa37a94feb840c33ed3",
         "size_bytes": 12173
+      },
+      "actual_selected_ordinary_setup_volume_continuation": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-volume-continuation/summary.json",
+        "sha256": "676c830da6c1b390a623341c01c84719c10abfc1d3ec9276a1df5099872d811d",
+        "size_bytes": 17023
       }
     },
     {

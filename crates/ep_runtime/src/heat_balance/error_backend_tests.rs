@@ -396,7 +396,29 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
         state.tracking.last_severe_error,
         "Deprecated summary severe"
     );
-    assert!(String::from_utf8(error)?.ends_with("   ** Severe  ** Deprecated summary severe\n"));
+    assert!(
+        String::from_utf8(error.clone())?.ends_with("   ** Severe  ** Deprecated summary severe\n")
+    );
+    let retained_tracking = state.tracking.clone();
+    {
+        let mut actual = backend(&mut state, &mut error, &mut console);
+        actual.sqlite = Some(&mut sqlite);
+        actual.error_callback = Some(&mut e);
+        actual.show_message("Setup volume note")?;
+        actual.show_message("")?;
+    }
+    assert_eq!(
+        &calls.borrow()[8..],
+        [
+            "create:1:-1:Setup volume note:0",
+            "callback:1:Setup volume note"
+        ]
+    );
+    assert_eq!(state.tracking, retained_tracking);
+    assert!(
+        String::from_utf8(error)?
+            .ends_with("   ************* Setup volume note\n   *************\n")
+    );
     Ok(())
 }
 

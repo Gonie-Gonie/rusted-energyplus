@@ -27,7 +27,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
     let process = &owners.process;
     json!({
         "schema":"ordinary-source-geometry.v1",
-        "capture_boundary":"actual successful Rust simulation return; retained partial Setup313-547 owners",
+        "capture_boundary":"actual successful Rust simulation return; retained selected Setup313-548 owners",
         "observer_supplies_inputs":false,
         "names_origin":"actual Source getter Name members; physical typed IDs remain separate",
         "array_bounds_semantics":"allocated Rust storage observed in its existing one-based Source index domain; unallocated bounds remain unknown",
@@ -64,6 +64,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
             "ceiling_height_m":scalar(row.ceiling_height_m),
             "ceiling_height_entered":row.ceiling_height_entered,
+            "volume_m3":scalar(row.volume_m3),
             "Multiplier":row.multiplier, "ListMultiplier":row.list_multiplier,
             "HasWindow":row.has_window,
             "geometric_floor_area_m2":scalar(row.geometric_floor_area_m2),
@@ -81,6 +82,8 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         "spaces":owners.spaces.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
             "zone_id":row.zone_number,
+            "volume_m3":scalar(row.volume_m3),
+            "fraction_zone_volume":scalar(row.fraction_zone_volume),
             "exterior_areas":{
                 "ExtGrossWallArea":scalar(row.exterior_gross_wall_area_m2),
                 "ExteriorTotalSurfArea":scalar(row.exterior_total_surface_area_m2),
@@ -92,6 +95,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
         "constructions":owners.constructions.iter().map(|row|json!({
             "id":row.source_number, "typed_id":row.typed_id.0, "name":row.name,
         })).collect::<Vec<_>>(),
+        "geometry_context":{"err_count5":owners.err_count5},
         "global_Process_return":{
             "process_one_time_flag":process.process_one_time_flag,
             "max_vertices_per_surface":process.max_vertices_per_surface,

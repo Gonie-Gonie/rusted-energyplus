@@ -98,7 +98,7 @@ fn cross(a: Vector, b: Vector) -> Vector {
 fn dot(a: Vector, b: Vector) -> f64 {
     a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 }
-fn magnitude(v: Vector) -> f64 {
+pub(crate) fn magnitude(v: Vector) -> f64 {
     (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt()
 }
 fn normalize(v: Vector) -> Vector {
@@ -117,7 +117,7 @@ fn add_to(target: &mut Vector, value: Vector) {
 fn multiply(value: Vector, factor: f64) -> Vector {
     [value[0] * factor, value[1] * factor, value[2] * factor]
 }
-fn area_vector(vertices: &[Point3]) -> Vector {
+pub(crate) fn area_vector(vertices: &[Point3]) -> Vector {
     if vertices.len() < 3 {
         return [0.0; 3];
     }
