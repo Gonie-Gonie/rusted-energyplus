@@ -12646,6 +12646,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-passive-psy/summary.json",
         "sha256": "b9143beff734c5494bddd2bf035e80e72ee67e6d2f64fb7283884bd7b6dfb118",
         "size_bytes": 15905
+      },
+      "actual_selected_design_day_same_input_psychrometric_replay": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/summary.json",
+        "sha256": "9c05e4d67cdb496520f08da544a7c704a7ef3359f4fba189e756516272f4edca",
+        "size_bytes": 423084
       }
     },
     {

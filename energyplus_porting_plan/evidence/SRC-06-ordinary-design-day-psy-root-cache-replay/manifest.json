@@ -1,0 +1,2553 @@
+{
+  "schema": "src06-passive-PSY-Rust-finite-evidence.v1",
+  "actual_operands": {
+    "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-publication-operands-Root-01.json",
+    "sha256": "daa883d6c1d9978fb5d8ec7835518a335f2f3e9237d7d7d6afec18a7fde4abb8",
+    "size_bytes": 3544
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/60/60019ac26f0f0a2731011613a72d287ff03f81185284b224ee1f2d83743ddf65",
+    "sha256": "60019ac26f0f0a2731011613a72d287ff03f81185284b224ee1f2d83743ddf65",
+    "size_bytes": 1674303
+  },
+  "Source_snapshot_archive_scope": "Index metadata only plus exactly seven selected file archives; other index rows are descriptors only.",
+  "artifacts": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/cumulative-manifest.json",
+      "sha256": "51d5df33dc5638290aa49a8bf7a625ecc650239e5d95b838483fc2465611fb26",
+      "size_bytes": 28998,
+      "roles": [
+        "final_cumulative_held_Source",
+        "historical_Source08_cumulative-manifest.json"
+      ],
+      "archive_member": "objects/51d5df33dc5638290aa49a8bf7a625ecc650239e5d95b838483fc2465611fb26"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-hooks-Source-review-08/review.json",
+      "sha256": "040540943f899d721c00040f582a7ac0533c6c6aeb05b41a2f325e1f2bf282c4",
+      "size_bytes": 3006,
+      "roles": [
+        "accepted_final_Source_review",
+        "historical_independent_Source_review_08"
+      ],
+      "archive_member": "objects/040540943f899d721c00040f582a7ac0533c6c6aeb05b41a2f325e1f2bf282c4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/actual-root-cache-inputs.json",
+      "sha256": "e7ba2e7ff8e2f9930b6116de5a5914e69756bb883642bf8e950b20f913ca6f64",
+      "size_bytes": 7806490,
+      "roles": [
+        "complete_authenticated_actual_root_cache_input",
+        "historical_Source03_prepared_actual_replay_inputs"
+      ],
+      "archive_member": "objects/e7ba2e7ff8e2f9930b6116de5a5914e69756bb883642bf8e950b20f913ca6f64"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/facts.json",
+      "sha256": "139dba2ce0204b4b55655b2b3c02a6fc5a8ee32ab6465e6a773aa7c726f8a562",
+      "size_bytes": 6110,
+      "roles": [
+        "accepted_historical_Native_facts_metadata",
+        "historical_Source03_actual_facts"
+      ],
+      "archive_member": "objects/139dba2ce0204b4b55655b2b3c02a6fc5a8ee32ab6465e6a773aa7c726f8a562"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/manifest.json",
+      "sha256": "a0a375a8784f081d6d481a5539ebe0ae257abbdabfa7783dce78ae181261e22c",
+      "size_bytes": 18127,
+      "roles": [
+        "final_actual_seven_file_assembly"
+      ],
+      "archive_member": "objects/a0a375a8784f081d6d481a5539ebe0ae257abbdabfa7783dce78ae181261e22c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-application-review-02/review.json",
+      "sha256": "01842051e31480e3da0fc9cabdb71a65ef3dcddbffcac9fe3c0c823fbb5d870e",
+      "size_bytes": 2711,
+      "roles": [
+        "accepted_actual_application_review"
+      ],
+      "archive_member": "objects/01842051e31480e3da0fc9cabdb71a65ef3dcddbffcac9fe3c0c823fbb5d870e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/proposed/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032",
+      "size_bytes": 42472,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source06_file_proposed"
+      ],
+      "archive_member": "objects/3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032",
+      "size_bytes": 42472,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "06f6b8db56a6f59a20ad33d27e1f7d304eb747d8326848254503565893fcd621",
+      "size_bytes": 249,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/06f6b8db56a6f59a20ad33d27e1f7d304eb747d8326848254503565893fcd621"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/proposed/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775",
+      "size_bytes": 22412,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source07_file_proposed"
+      ],
+      "archive_member": "objects/78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775",
+      "size_bytes": 22412,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "cd36e27a8347211645327795ab3e7b996e309a5ed708c99082246da7e0e5100c",
+      "size_bytes": 5384,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/cd36e27a8347211645327795ab3e7b996e309a5ed708c99082246da7e0e5100c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/proposed/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9",
+      "size_bytes": 8231,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source08_file_proposal"
+      ],
+      "archive_member": "objects/ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9",
+      "size_bytes": 8231,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "2e68d8cf7e351fdb37dc2fdc7ca16ddca188af14f10fce75829884ec20960879",
+      "size_bytes": 8639,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/2e68d8cf7e351fdb37dc2fdc7ca16ddca188af14f10fce75829884ec20960879"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71",
+      "size_bytes": 7772,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/proposed/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30",
+      "size_bytes": 7896,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source06_file_proposed"
+      ],
+      "archive_member": "objects/0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30",
+      "size_bytes": 7896,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "115d4fd8e805a2b7651a4c34bb29204d1be7d15df7ae0caf78a37e6f7ba10169",
+      "size_bytes": 279,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/115d4fd8e805a2b7651a4c34bb29204d1be7d15df7ae0caf78a37e6f7ba10169"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb",
+      "size_bytes": 11866,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/proposed/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd",
+      "size_bytes": 12381,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source06_file_proposed"
+      ],
+      "archive_member": "objects/d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd",
+      "size_bytes": 12381,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "a08bd6d49035c221f1fe7a342d813c9487b4db82d9f1989096be6bbdbd41dc25",
+      "size_bytes": 704,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/a08bd6d49035c221f1fe7a342d813c9487b4db82d9f1989096be6bbdbd41dc25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b",
+      "size_bytes": 20939,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "size_bytes": 21047,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "size_bytes": 21047,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "e75163e5cec9dae296675af3e0890572754b2e2474555f041bd9664dfb47e591",
+      "size_bytes": 585,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/e75163e5cec9dae296675af3e0890572754b2e2474555f041bd9664dfb47e591"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/before/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf",
+      "size_bytes": 12298,
+      "roles": [
+        "actual_assembly_accepted_proposal",
+        "historical_Source06_file_proposed"
+      ],
+      "archive_member": "objects/e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/after/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf",
+      "size_bytes": 12298,
+      "roles": [
+        "actual_assembly_after"
+      ],
+      "archive_member": "objects/e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "a4acd26fcc0e6dd669d148884f4e2a35d036c49a592d202eb19218a2bd6084ff",
+      "size_bytes": 12814,
+      "roles": [
+        "actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/a4acd26fcc0e6dd669d148884f4e2a35d036c49a592d202eb19218a2bd6084ff"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-02/apply.json",
+      "sha256": "99e24cb7d1bff19c401087f9b8ab6a977a4a254ba4d1e58ef70e0032105b0c57",
+      "size_bytes": 9602,
+      "roles": [
+        "final_actual_apply"
+      ],
+      "archive_member": "objects/99e24cb7d1bff19c401087f9b8ab6a977a4a254ba4d1e58ef70e0032105b0c57"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-02/receipt.json",
+      "sha256": "c301415e6c7a12812f448d23ced901204bccc76f123d33bbf3387637a430739c",
+      "size_bytes": 3607,
+      "roles": [
+        "final_actual_fmt"
+      ],
+      "archive_member": "objects/c301415e6c7a12812f448d23ced901204bccc76f123d33bbf3387637a430739c"
+    },
+    {
+      "path": ".runtime/porting/source-objects/60/60019ac26f0f0a2731011613a72d287ff03f81185284b224ee1f2d83743ddf65",
+      "sha256": "60019ac26f0f0a2731011613a72d287ff03f81185284b224ee1f2d83743ddf65",
+      "size_bytes": 1674303,
+      "roles": [
+        "actual_existing_body_command_Source_index_metadata_only",
+        "control_existing_body_command_Source_index_metadata_only",
+        "final_actual_clippy_Source_index_metadata_only",
+        "final_actual_fmt_Source_index_metadata_only",
+        "final_actual_quality_Source_index_metadata_only"
+      ],
+      "archive_member": "objects/60019ac26f0f0a2731011613a72d287ff03f81185284b224ee1f2d83743ddf65"
+    },
+    {
+      "path": ".runtime/porting/source-objects/36/3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032",
+      "sha256": "3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032",
+      "size_bytes": 42472,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032"
+    },
+    {
+      "path": ".runtime/porting/source-objects/78/78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775",
+      "sha256": "78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775",
+      "size_bytes": 22412,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775"
+    },
+    {
+      "path": ".runtime/porting/source-objects/ca/ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9",
+      "sha256": "ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9",
+      "size_bytes": 8231,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/ca27d766909509aba5e6851b0ff2fda832192b3b9c01005c2c472138bed6fbd9"
+    },
+    {
+      "path": ".runtime/porting/source-objects/00/0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30",
+      "sha256": "0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30",
+      "size_bytes": 7896,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30"
+    },
+    {
+      "path": ".runtime/porting/source-objects/d7/d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd",
+      "sha256": "d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd",
+      "size_bytes": 12381,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd"
+    },
+    {
+      "path": ".runtime/porting/source-objects/4a/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "size_bytes": 21047,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25"
+    },
+    {
+      "path": ".runtime/porting/source-objects/e9/e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf",
+      "sha256": "e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf",
+      "size_bytes": 12298,
+      "roles": [
+        "actual_existing_body_command_selected_seven_Source_archives",
+        "control_existing_body_command_selected_seven_Source_archives",
+        "final_actual_clippy_selected_seven_Source_archives",
+        "final_actual_fmt_selected_seven_Source_archives",
+        "final_actual_quality_selected_seven_Source_archives"
+      ],
+      "archive_member": "objects/e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "final_actual_fmt_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "final_actual_fmt_complete_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-02/receipt.json",
+      "sha256": "0d00ff36619cff6b143ecfcb4aa450f46c8d093567841c05371e1a863dce7fd3",
+      "size_bytes": 3657,
+      "roles": [
+        "final_actual_quality"
+      ],
+      "archive_member": "objects/0d00ff36619cff6b143ecfcb4aa450f46c8d093567841c05371e1a863dce7fd3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-02/stdout.log",
+      "sha256": "e1f8efb2f0606ec7a3759a7b8e10a3efa6998d461789ad3f6b0f8c1fd2235ba8",
+      "size_bytes": 82,
+      "roles": [
+        "final_actual_quality_complete_stdout"
+      ],
+      "archive_member": "objects/e1f8efb2f0606ec7a3759a7b8e10a3efa6998d461789ad3f6b0f8c1fd2235ba8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-02/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "final_actual_quality_complete_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-02/receipt.json",
+      "sha256": "f31ec8326cc546c3663aaeb942f0c094ee0017ded251c0f306ecdc478f245751",
+      "size_bytes": 3663,
+      "roles": [
+        "final_actual_clippy"
+      ],
+      "archive_member": "objects/f31ec8326cc546c3663aaeb942f0c094ee0017ded251c0f306ecdc478f245751"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "final_actual_clippy_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-02/stderr.log",
+      "sha256": "96b6747d41ae3efad4418944c4da151f136d45d309c690582a8d9f8e929bb0cb",
+      "size_bytes": 167,
+      "roles": [
+        "final_actual_clippy_complete_stderr"
+      ],
+      "archive_member": "objects/96b6747d41ae3efad4418944c4da151f136d45d309c690582a8d9f8e929bb0cb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-existing-body-launcher-prep-01/manifest.json",
+      "sha256": "2c145eae33dbc328bcad6ea60fbc2da649c8985ebb41e1341bf4b4004e480a17",
+      "size_bytes": 1486,
+      "roles": [
+        "accepted_existing_body_launcher_manifest",
+        "historical_existing_body_launcher_manifest"
+      ],
+      "archive_member": "objects/2c145eae33dbc328bcad6ea60fbc2da649c8985ebb41e1341bf4b4004e480a17"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-existing-body-launcher-prep-01/run_existing_body.py",
+      "sha256": "922903fcf031f62c76eeaea4547e379f14594f2bf12cdc66187ba37e2744eac2",
+      "size_bytes": 5228,
+      "roles": [
+        "executed_existing_body_launcher_Source",
+        "historical_existing_body_launcher_finite_Source"
+      ],
+      "archive_member": "objects/922903fcf031f62c76eeaea4547e379f14594f2bf12cdc66187ba37e2744eac2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-control-command-01/receipt.json",
+      "sha256": "a841a60e3a32d506874f612264edee290a6c30eb8d01ad74cad5dc978f106a75",
+      "size_bytes": 4282,
+      "roles": [
+        "control_existing_body_command"
+      ],
+      "archive_member": "objects/a841a60e3a32d506874f612264edee290a6c30eb8d01ad74cad5dc978f106a75"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-control-command-01/stdout.log",
+      "sha256": "e7e24e0b073200becdecdd07f25be3684de1188c383cf9fcf76b5a17049a1c50",
+      "size_bytes": 225,
+      "roles": [
+        "control_existing_body_command_complete_stdout"
+      ],
+      "archive_member": "objects/e7e24e0b073200becdecdd07f25be3684de1188c383cf9fcf76b5a17049a1c50"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-control-command-01/stderr.log",
+      "sha256": "c8c8ca51303791ad7030394c98b38c705f7bdfb3330eadef0d51202d3a2b4fb0",
+      "size_bytes": 2391,
+      "roles": [
+        "control_existing_body_command_complete_stderr"
+      ],
+      "archive_member": "objects/c8c8ca51303791ad7030394c98b38c705f7bdfb3330eadef0d51202d3a2b4fb0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-control-child-env-01/before.json",
+      "sha256": "b5569102828aeb741b5895982df0ae7de8f02143a2ab53da52e7c684708c45c2",
+      "size_bytes": 3566,
+      "roles": [
+        "control_child_env_before"
+      ],
+      "archive_member": "objects/b5569102828aeb741b5895982df0ae7de8f02143a2ab53da52e7c684708c45c2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-control-child-env-01/after.json",
+      "sha256": "d00754d4981fccca92fef38ad951fc2d1481974e3cd04000d03aca939f2375e2",
+      "size_bytes": 5994,
+      "roles": [
+        "control_child_env_after"
+      ],
+      "archive_member": "objects/d00754d4981fccca92fef38ad951fc2d1481974e3cd04000d03aca939f2375e2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-command-01/receipt.json",
+      "sha256": "ca9b2a9bf6dc0f58762780ff7f85a6a7bb08cdeb4ea7c14f3cbdcf0e3deb2793",
+      "size_bytes": 4280,
+      "roles": [
+        "actual_existing_body_command"
+      ],
+      "archive_member": "objects/ca9b2a9bf6dc0f58762780ff7f85a6a7bb08cdeb4ea7c14f3cbdcf0e3deb2793"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-command-01/stdout.log",
+      "sha256": "eb236bb78ab32243fdfd1e23d039ce6034680db4dc11e3757cd03dcfc2afc42c",
+      "size_bytes": 358,
+      "roles": [
+        "actual_existing_body_command_complete_stdout"
+      ],
+      "archive_member": "objects/eb236bb78ab32243fdfd1e23d039ce6034680db4dc11e3757cd03dcfc2afc42c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-command-01/stderr.log",
+      "sha256": "dfc148a59eb616a8147b244dcd2cb6f89e1e8070ed5e3fdb29a5c912045593ee",
+      "size_bytes": 6027955,
+      "roles": [
+        "actual_existing_body_command_complete_stderr"
+      ],
+      "archive_member": "objects/dfc148a59eb616a8147b244dcd2cb6f89e1e8070ed5e3fdb29a5c912045593ee"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-child-env-01/before.json",
+      "sha256": "c6d24c00cb72c8cf53480861392bea1732c9a795f9868b7c3967fdde291483fe",
+      "size_bytes": 3732,
+      "roles": [
+        "actual_child_env_before"
+      ],
+      "archive_member": "objects/c6d24c00cb72c8cf53480861392bea1732c9a795f9868b7c3967fdde291483fe"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-child-env-01/after.json",
+      "sha256": "7e8d2fdc9b72c55484c267aacd55043bf41caf88a3263a1d58892fde201134e8",
+      "size_bytes": 6162,
+      "roles": [
+        "actual_child_env_after"
+      ],
+      "archive_member": "objects/7e8d2fdc9b72c55484c267aacd55043bf41caf88a3263a1d58892fde201134e8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/finite-inventory.json",
+      "sha256": "b2481ac677843254a5d66650fc1e2f32769a637d9fff19a5b693ee86237bb2ea",
+      "size_bytes": 68608,
+      "roles": [
+        "closed_finite_Source_history_inventory"
+      ],
+      "archive_member": "objects/b2481ac677843254a5d66650fc1e2f32769a637d9fff19a5b693ee86237bb2ea"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/manifest.json",
+      "sha256": "cb23ecbc90254b002789c33af50881aa0756eb232c4eff83f1f30bba476aab7f",
+      "size_bytes": 15614,
+      "roles": [
+        "historical_Source03_manifest"
+      ],
+      "archive_member": "objects/cb23ecbc90254b002789c33af50881aa0756eb232c4eff83f1f30bba476aab7f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-03.py",
+      "sha256": "b6d7f57eaacffdc5c1b9e2d15bc867d21171c972bb2ef3eb0313b8e905e90370",
+      "size_bytes": 36050,
+      "roles": [
+        "historical_Source03_Source_author"
+      ],
+      "archive_member": "objects/b6d7f57eaacffdc5c1b9e2d15bc867d21171c972bb2ef3eb0313b8e905e90370"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-replay-plan-01/manifest.json",
+      "sha256": "bc5b7d25e18e155da32b268ae981055e6539dbec7d07fe381225bdab4f932f4f",
+      "size_bytes": 1453,
+      "roles": [
+        "historical_Source03_parent_plan"
+      ],
+      "archive_member": "objects/bc5b7d25e18e155da32b268ae981055e6539dbec7d07fe381225bdab4f932f4f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/actual-domain.json",
+      "sha256": "8e0451e5dada63a865f8720b1762600708a7591175b74893d9dfb1b36ab9e11e",
+      "size_bytes": 2071,
+      "roles": [
+        "historical_Source03_actual_domain"
+      ],
+      "archive_member": "objects/8e0451e5dada63a865f8720b1762600708a7591175b74893d9dfb1b36ab9e11e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/literal-edits.json",
+      "sha256": "a752a12946140e5739cef5e37745644148eb8ce407f86609b5158bd357961220",
+      "size_bytes": 11729,
+      "roles": [
+        "historical_Source03_literal_inverse_edits"
+      ],
+      "archive_member": "objects/a752a12946140e5739cef5e37745644148eb8ce407f86609b5158bd357961220"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/README.md",
+      "sha256": "bbc8e8fa836e533f2d1b45ec91ec089ad8895077fee52aded66bfc357b1ba5c1",
+      "size_bytes": 2713,
+      "roles": [
+        "historical_Source03_README"
+      ],
+      "archive_member": "objects/bbc8e8fa836e533f2d1b45ec91ec089ad8895077fee52aded66bfc357b1ba5c1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "e80e4278f2a78a9ee4b278049abc5e42e48f3b6e7141c9d3ae6803b0df46e1b5",
+      "size_bytes": 21994,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/e80e4278f2a78a9ee4b278049abc5e42e48f3b6e7141c9d3ae6803b0df46e1b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/psy02_state.rs.diff",
+      "sha256": "89f1aada0cc0afa5ff5b5b0ff68f35e88ba2f8ea9f91bef18a0b6a7ff9016c0d",
+      "size_bytes": 5313,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/89f1aada0cc0afa5ff5b5b0ff68f35e88ba2f8ea9f91bef18a0b6a7ff9016c0d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "152fbc0cba16df4c63196563daf904b5f669e8d897d7ec8856940b6221ecec53",
+      "size_bytes": 7180,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/152fbc0cba16df4c63196563daf904b5f669e8d897d7ec8856940b6221ecec53"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/observed_replay.rs.diff",
+      "sha256": "3feee61df0ed82dfd29bf69e5a412e07078acea5581cf5b27ca690d83021e254",
+      "size_bytes": 7653,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/3feee61df0ed82dfd29bf69e5a412e07078acea5581cf5b27ca690d83021e254"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "4b1fca6cbd5cebbab9f6fe87e3371c3db3ff6703a35f0883b97b669e921984a3",
+      "size_bytes": 42471,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/4b1fca6cbd5cebbab9f6fe87e3371c3db3ff6703a35f0883b97b669e921984a3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "3ce8085a26c5dc9b3008b982d04038ed3959da890dcf57d0d7c1dfde4ea35e82",
+      "size_bytes": 457,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/3ce8085a26c5dc9b3008b982d04038ed3959da890dcf57d0d7c1dfde4ea35e82"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71",
+      "size_bytes": 7772,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "23e83522cd5a437cbeae811b17c1ff73d5e6e34a964ac269b5d7eb50620bd876",
+      "size_bytes": 7888,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/23e83522cd5a437cbeae811b17c1ff73d5e6e34a964ac269b5d7eb50620bd876"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "35804130c2cd27f09205390ab7cbdec9621388b11fbc15461684ddfbff909276",
+      "size_bytes": 528,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/35804130c2cd27f09205390ab7cbdec9621388b11fbc15461684ddfbff909276"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb",
+      "size_bytes": 11866,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "f41b9b6618dbfb6e881b424ff7f8f00e4d071e5d73a0079aed470733f0ca888e",
+      "size_bytes": 12347,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/f41b9b6618dbfb6e881b424ff7f8f00e4d071e5d73a0079aed470733f0ca888e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "9f05ea25d7be92f2ba2a39a129b6cbbb34b80f8c1989cba4cf8cde0f77d8dd0c",
+      "size_bytes": 867,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/9f05ea25d7be92f2ba2a39a129b6cbbb34b80f8c1989cba4cf8cde0f77d8dd0c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b",
+      "size_bytes": 20939,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "size_bytes": 21047,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "cbc11ddee774abeb3963cc019bbc53dd81fbf2cefe4fe64970c577f82b723357",
+      "size_bytes": 751,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/cbc11ddee774abeb3963cc019bbc53dd81fbf2cefe4fe64970c577f82b723357"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/before/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source03_file_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "9190b31c32186500bbc6391cacb9a81a99a5b5a960a02eae3bb377c955c81747",
+      "size_bytes": 7963,
+      "roles": [
+        "historical_Source03_file_proposed"
+      ],
+      "archive_member": "objects/9190b31c32186500bbc6391cacb9a81a99a5b5a960a02eae3bb377c955c81747"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/diffs/passive_psy.rs.diff",
+      "sha256": "06b385a6289bfe6cdb42e17c8d816c3c59f0e328cb4191625611525acb086f65",
+      "size_bytes": 8418,
+      "roles": [
+        "historical_Source03_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/06b385a6289bfe6cdb42e17c8d816c3c59f0e328cb4191625611525acb086f65"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/PsychCacheData.hh.85-177.txt",
+      "sha256": "8b5d679a613ff09f188905b5a4447b93d62b382c2ff5ef0c546cfa9687ce7ca5",
+      "size_bytes": 1986,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/8b5d679a613ff09f188905b5a4447b93d62b382c2ff5ef0c546cfa9687ce7ca5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.cc.281-346.txt",
+      "sha256": "a42f34deb4b9bf78e28ddc27866e8ed312ce7b1b9e9ac146969d1c9aa1f02a64",
+      "size_bytes": 2810,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/a42f34deb4b9bf78e28ddc27866e8ed312ce7b1b9e9ac146969d1c9aa1f02a64"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.hh.1016-1061.txt",
+      "sha256": "c055422f5d2233fcd1fd5d3a7c01e6147dc917b77773f20a26137b299222efd0",
+      "size_bytes": 1964,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/c055422f5d2233fcd1fd5d3a7c01e6147dc917b77773f20a26137b299222efd0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.hh.1223-1270.txt",
+      "sha256": "ec044ae9de915792aa20d89e451a196d9624ccaf8d16f31b4bba1d153d74b9ca",
+      "size_bytes": 2108,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/ec044ae9de915792aa20d89e451a196d9624ccaf8d16f31b4bba1d153d74b9ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.hh.1281-1332.txt",
+      "sha256": "5932607dc5c1983b7cd46f6e6fad114d2d4c56623a29789606a0aedbf4ff3470",
+      "size_bytes": 2234,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/5932607dc5c1983b7cd46f6e6fad114d2d4c56623a29789606a0aedbf4ff3470"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.hh.1408-1467.txt",
+      "sha256": "0015d461c1cdd76cc960e9721e2d240527458d8387e2803a1ddbb287e65de43f",
+      "size_bytes": 2784,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/0015d461c1cdd76cc960e9721e2d240527458d8387e2803a1ddbb287e65de43f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.hh.1488-1553.txt",
+      "sha256": "e004965f4b2f501192cb541e57790237957b97d4e86d34589b7201bd3675ec1a",
+      "size_bytes": 2664,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/e004965f4b2f501192cb541e57790237957b97d4e86d34589b7201bd3675ec1a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/Psychrometrics.cc.1264-1450.txt",
+      "sha256": "1f65d45ce33ca93dc49ec26e21b3ec3b1e9c9ac833a08d6da764960555fce02f",
+      "size_bytes": 8365,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/1f65d45ce33ca93dc49ec26e21b3ec3b1e9c9ac833a08d6da764960555fce02f"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-03/Original/WeatherManager.cc.3494-3727.txt",
+      "sha256": "e4cf607934cf91d4665d6d9a88aa47f2a46c78ee1de501a7ef6c0e53178a1764",
+      "size_bytes": 13087,
+      "roles": [
+        "historical_Original_pinned_literal"
+      ],
+      "archive_member": "objects/e4cf607934cf91d4665d6d9a88aa47f2a46c78ee1de501a7ef6c0e53178a1764"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-author-failure-01.json",
+      "sha256": "97636a0a49209c5b26f6b26625b2960e21021a0ab99524911121394ef684d996",
+      "size_bytes": 669,
+      "roles": [
+        "historical_preserved_failed_preparer_record"
+      ],
+      "archive_member": "objects/97636a0a49209c5b26f6b26625b2960e21021a0ab99524911121394ef684d996"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-01.py",
+      "sha256": "5d85f061bb9471db5f8f65b4fca9ab51a8edf3c9402f7a595cf1c18dc8908f18",
+      "size_bytes": 35690,
+      "roles": [
+        "historical_preserved_failed_preparer_finite_Source"
+      ],
+      "archive_member": "objects/5d85f061bb9471db5f8f65b4fca9ab51a8edf3c9402f7a595cf1c18dc8908f18"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-author-failure-02.json",
+      "sha256": "0344044091814a8634f5036533cc982cf98a6c164dbf3e074bc126b37dcb61a9",
+      "size_bytes": 677,
+      "roles": [
+        "historical_preserved_failed_preparer_record"
+      ],
+      "archive_member": "objects/0344044091814a8634f5036533cc982cf98a6c164dbf3e074bc126b37dcb61a9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-02.py",
+      "sha256": "e91c2cd5260853ed05a845432c51ff3b3bf014edb49983feb3065e1429db0f8c",
+      "size_bytes": 35692,
+      "roles": [
+        "historical_preserved_failed_preparer_finite_Source"
+      ],
+      "archive_member": "objects/e91c2cd5260853ed05a845432c51ff3b3bf014edb49983feb3065e1429db0f8c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/manifest.json",
+      "sha256": "ba111abb8d3b2a8cfe0154a788d81184e57192a7fa9c74e7439d0b1345a59562",
+      "size_bytes": 19017,
+      "roles": [
+        "historical_Source04_manifest"
+      ],
+      "archive_member": "objects/ba111abb8d3b2a8cfe0154a788d81184e57192a7fa9c74e7439d0b1345a59562"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-format-Reviewer-04.py",
+      "sha256": "be1f7081a764ed5f050dd11eba60a991521e7b0af41c07c143c26be0a12ae1bf",
+      "size_bytes": 4382,
+      "roles": [
+        "historical_Source04_Source_author"
+      ],
+      "archive_member": "objects/be1f7081a764ed5f050dd11eba60a991521e7b0af41c07c143c26be0a12ae1bf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/README.md",
+      "sha256": "88e49e53aa7ffce5850844154429744231d919480f0c4de3e69ed1838d56384d",
+      "size_bytes": 3098,
+      "roles": [
+        "historical_Source04_README"
+      ],
+      "archive_member": "objects/88e49e53aa7ffce5850844154429744231d919480f0c4de3e69ed1838d56384d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/formatting-parent03-proof.json",
+      "sha256": "d3378fa0fcb373af81e5be8776409d5cd0c82b9814c923546c43e4b3702cde41",
+      "size_bytes": 7530,
+      "roles": [
+        "historical_Source04_formatting_parent03_proof"
+      ],
+      "archive_member": "objects/d3378fa0fcb373af81e5be8776409d5cd0c82b9814c923546c43e4b3702cde41"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/Source-format-preflight.json",
+      "sha256": "8c392308465111538acc2b1f7923ea8ff224ca0c9ba58389570f46c38be22d76",
+      "size_bytes": 2021,
+      "roles": [
+        "historical_Source04_Source_format_preflight"
+      ],
+      "archive_member": "objects/8c392308465111538acc2b1f7923ea8ff224ca0c9ba58389570f46c38be22d76"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "e80e4278f2a78a9ee4b278049abc5e42e48f3b6e7141c9d3ae6803b0df46e1b5",
+      "size_bytes": 21994,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/e80e4278f2a78a9ee4b278049abc5e42e48f3b6e7141c9d3ae6803b0df46e1b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "577ef521e93ad8b2507cb45ccbe1b20618ca835540a9c905736c07975ab6dff2",
+      "size_bytes": 5313,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/577ef521e93ad8b2507cb45ccbe1b20618ca835540a9c905736c07975ab6dff2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce",
+      "size_bytes": 8232,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "ead48d5de060bff18642498359bfcb4fe0ac7f318280ad4756c73f1ec8ea24aa",
+      "size_bytes": 8804,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/ead48d5de060bff18642498359bfcb4fe0ac7f318280ad4756c73f1ec8ea24aa"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "c42bbe3a3975f71895d380d506c1c88b955a7f4ce7640cbe339014d081970430",
+      "size_bytes": 12111,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/c42bbe3a3975f71895d380d506c1c88b955a7f4ce7640cbe339014d081970430"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "4b1fca6cbd5cebbab9f6fe87e3371c3db3ff6703a35f0883b97b669e921984a3",
+      "size_bytes": 42471,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/4b1fca6cbd5cebbab9f6fe87e3371c3db3ff6703a35f0883b97b669e921984a3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "df273264903a990ac0ea4fe0499e38f5833b69d6316a1c7d77d0fa7c167f018b",
+      "size_bytes": 457,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/df273264903a990ac0ea4fe0499e38f5833b69d6316a1c7d77d0fa7c167f018b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "73f0b100eb7dcd73c970be0946d6b2d8a4c38449637bf72916f043242cfd67f1",
+      "size_bytes": 7895,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/73f0b100eb7dcd73c970be0946d6b2d8a4c38449637bf72916f043242cfd67f1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "59897625d40a549db2d4d81a525cc4ae0e7e0860d26ef54b37caf9cc57db76ac",
+      "size_bytes": 538,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/59897625d40a549db2d4d81a525cc4ae0e7e0860d26ef54b37caf9cc57db76ac"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "3a325226546da14266e1012c08348b4b414df3fdef98334aeddfef25398471b3",
+      "size_bytes": 564,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/3a325226546da14266e1012c08348b4b414df3fdef98334aeddfef25398471b3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "cb6dca20d9408e4e3f4e3cb7c8c5da860e2471e761817012823eeec368e3700d",
+      "size_bytes": 12381,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/cb6dca20d9408e4e3f4e3cb7c8c5da860e2471e761817012823eeec368e3700d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "76837e14c6f90043c6e5c91efe7bee8cb1da6495c048de0f1e491247e5e03595",
+      "size_bytes": 910,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/76837e14c6f90043c6e5c91efe7bee8cb1da6495c048de0f1e491247e5e03595"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "5bc16cb0fe785661fe17f267c75beb3302e76dd2029db2017c28d5ad0f09cba0",
+      "size_bytes": 1315,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/5bc16cb0fe785661fe17f267c75beb3302e76dd2029db2017c28d5ad0f09cba0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "946f56fc451bd601349156746c703121b113c4a2d9403025a946fd0d223e1587",
+      "size_bytes": 751,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/946f56fc451bd601349156746c703121b113c4a2d9403025a946fd0d223e1587"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "dd81b1f9994d76c36f3c155bf254fc89c43d0637f393e6653619ff67912437d3",
+      "size_bytes": 9879,
+      "roles": [
+        "historical_Source04_file_proposed"
+      ],
+      "archive_member": "objects/dd81b1f9994d76c36f3c155bf254fc89c43d0637f393e6653619ff67912437d3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/diffs/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "2f4cd2b3c2c42e07f3db300f93174c521fe437227347f7e5030458558b735b26",
+      "size_bytes": 10482,
+      "roles": [
+        "historical_Source04_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/2f4cd2b3c2c42e07f3db300f93174c521fe437227347f7e5030458558b735b26"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-04/format-parent03-diffs/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "6b2dc38f0484a37c86db62a01f745f6dba3b489e67b32d9658c7ff1e8fbaed0c",
+      "size_bytes": 16952,
+      "roles": [
+        "historical_Source04_file_formatting_parent03_diff"
+      ],
+      "archive_member": "objects/6b2dc38f0484a37c86db62a01f745f6dba3b489e67b32d9658c7ff1e8fbaed0c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/manifest.json",
+      "sha256": "92da3dd517511dda41c56381c7bcd2d694fd8a25e4772ef668e3585ca46cae6b",
+      "size_bytes": 23576,
+      "roles": [
+        "historical_Source06_manifest"
+      ],
+      "archive_member": "objects/92da3dd517511dda41c56381c7bcd2d694fd8a25e4772ef668e3585ca46cae6b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-06.py",
+      "sha256": "385d7c833eeb6c71474a0fedb176d049396fa8974b631429e6faee4a804383a9",
+      "size_bytes": 14298,
+      "roles": [
+        "historical_Source06_Source_author"
+      ],
+      "archive_member": "objects/385d7c833eeb6c71474a0fedb176d049396fa8974b631429e6faee4a804383a9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/README.md",
+      "sha256": "51ff5b4acf7d230ba796fcae6d7f84630a5d6e528c374d6a1671024d87b5f312",
+      "size_bytes": 4028,
+      "roles": [
+        "historical_Source06_README"
+      ],
+      "archive_member": "objects/51ff5b4acf7d230ba796fcae6d7f84630a5d6e528c374d6a1671024d87b5f312"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/Source-format-preflight.json",
+      "sha256": "2b74eafe673ed879cf0ff1fe2f26d20101c255ea441ddf4d0a1c2c344b2c2138",
+      "size_bytes": 1400,
+      "roles": [
+        "historical_Source06_Source_format_preflight"
+      ],
+      "archive_member": "objects/2b74eafe673ed879cf0ff1fe2f26d20101c255ea441ddf4d0a1c2c344b2c2138"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-inverse-and-format-proof.json",
+      "sha256": "2ebfd3fa662cf8cd97a0c6892dedc6337eb732765a32b1369c3bcb26ddd1b4ee",
+      "size_bytes": 191402,
+      "roles": [
+        "historical_Source06_complete_parent04_inverse_and_format_proof"
+      ],
+      "archive_member": "objects/2ebfd3fa662cf8cd97a0c6892dedc6337eb732765a32b1369c3bcb26ddd1b4ee"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/production-quality-coverage-proof.json",
+      "sha256": "72919a51c11dafa1e14f132c91dfae8e5cf036c4a0ba0b5619d7a6d59701db0a",
+      "size_bytes": 3287,
+      "roles": [
+        "historical_Source06_production_quality_coverage_proof"
+      ],
+      "archive_member": "objects/72919a51c11dafa1e14f132c91dfae8e5cf036c4a0ba0b5619d7a6d59701db0a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/proposed/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "a7d25ccd241acfc636d53eb4ec7bdc56ec905467d89be680f0d6fbdfb668be72",
+      "size_bytes": 22089,
+      "roles": [
+        "historical_Source06_file_proposed"
+      ],
+      "archive_member": "objects/a7d25ccd241acfc636d53eb4ec7bdc56ec905467d89be680f0d6fbdfb668be72"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/diffs/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "6f4599fd0024d83101f3fcc99554684958632046fa6b86351ad3574c77848f6b",
+      "size_bytes": 5227,
+      "roles": [
+        "historical_Source06_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/6f4599fd0024d83101f3fcc99554684958632046fa6b86351ad3574c77848f6b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-diffs/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "028c7f782fc7758ea6f3a410acb8b6ebfbd6decc5aa9d4ce48bd233ce0eda093",
+      "size_bytes": 5490,
+      "roles": [
+        "historical_Source06_file_complete_parent04_diff"
+      ],
+      "archive_member": "objects/028c7f782fc7758ea6f3a410acb8b6ebfbd6decc5aa9d4ce48bd233ce0eda093"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/format-diffs/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "28093734aa4b59ddf02437c92d7728b0377f7c9d0b4096bd1afd766f56532407",
+      "size_bytes": 406,
+      "roles": [
+        "historical_Source06_file_formatting_after_literal_edits"
+      ],
+      "archive_member": "objects/28093734aa4b59ddf02437c92d7728b0377f7c9d0b4096bd1afd766f56532407"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "a84c31422a40f36deffe4e68f96e67177467aa4d6d8611ab2cc478445be5c1c6",
+      "size_bytes": 415,
+      "roles": [
+        "historical_Source06_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/a84c31422a40f36deffe4e68f96e67177467aa4d6d8611ab2cc478445be5c1c6"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "c3a6de8d76d3fec1e906b430ef5ec945c5dc4389f115e68c22764c0fdc1a2101",
+      "size_bytes": 620,
+      "roles": [
+        "historical_Source06_file_complete_parent04_diff"
+      ],
+      "archive_member": "objects/c3a6de8d76d3fec1e906b430ef5ec945c5dc4389f115e68c22764c0fdc1a2101"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/format-diffs/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source06_file_formatting_after_literal_edits"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "1969943612a66b61c1b73156c6cc190bcb60ca6f9d4af86a8883ce91f81aa2ff",
+      "size_bytes": 445,
+      "roles": [
+        "historical_Source06_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/1969943612a66b61c1b73156c6cc190bcb60ca6f9d4af86a8883ce91f81aa2ff"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "31bee732a8a0ae0d0d6a2433d1b69c4459acb02b51e8681d5ea9a37f1665c333",
+      "size_bytes": 715,
+      "roles": [
+        "historical_Source06_file_complete_parent04_diff"
+      ],
+      "archive_member": "objects/31bee732a8a0ae0d0d6a2433d1b69c4459acb02b51e8681d5ea9a37f1665c333"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/format-diffs/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_Source06_file_formatting_after_literal_edits"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "4cf4a3c114951f375a2f2e235d9b86b5117dac73ad1c24d1fe213b0496c565fc",
+      "size_bytes": 870,
+      "roles": [
+        "historical_Source06_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/4cf4a3c114951f375a2f2e235d9b86b5117dac73ad1c24d1fe213b0496c565fc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "06b802d1102ab3eaa623c09d28cba6e07f001e7b1e8d6150061b78dba9db65d1",
+      "size_bytes": 1494,
+      "roles": [
+        "historical_Source06_file_complete_parent04_diff"
+      ],
+      "archive_member": "objects/06b802d1102ab3eaa623c09d28cba6e07f001e7b1e8d6150061b78dba9db65d1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/format-diffs/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "36dcf24b631e0a9df39ffedc1a7055de138599b5683aca5c7f1d33756be24be7",
+      "size_bytes": 298,
+      "roles": [
+        "historical_Source06_file_formatting_after_literal_edits"
+      ],
+      "archive_member": "objects/36dcf24b631e0a9df39ffedc1a7055de138599b5683aca5c7f1d33756be24be7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/diffs/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "0297597bd97cc8264a962bb00bdff72a26eae28bcb543cf14c2290a1fc80d218",
+      "size_bytes": 12980,
+      "roles": [
+        "historical_Source06_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/0297597bd97cc8264a962bb00bdff72a26eae28bcb543cf14c2290a1fc80d218"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/parent04-diffs/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "0c0cbb3cd9655aabebd7cfcf0f3d3ed6ecd90b6de56eb6e65518d20a627f0502",
+      "size_bytes": 9182,
+      "roles": [
+        "historical_Source06_file_complete_parent04_diff"
+      ],
+      "archive_member": "objects/0c0cbb3cd9655aabebd7cfcf0f3d3ed6ecd90b6de56eb6e65518d20a627f0502"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-06/format-diffs/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "5ba4401b07f5bcee1496318c0944003b51d326e1de95339b586321f05b6ab2f1",
+      "size_bytes": 9660,
+      "roles": [
+        "historical_Source06_file_formatting_after_literal_edits"
+      ],
+      "archive_member": "objects/5ba4401b07f5bcee1496318c0944003b51d326e1de95339b586321f05b6ab2f1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/manifest.json",
+      "sha256": "7a205ce51461608d28f78843f793afbdb9f311940b6e862ff907b0684c44c246",
+      "size_bytes": 25609,
+      "roles": [
+        "historical_Source07_manifest"
+      ],
+      "archive_member": "objects/7a205ce51461608d28f78843f793afbdb9f311940b6e862ff907b0684c44c246"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-07.py",
+      "sha256": "2d05e10388030a3b548be51281256db06d29a34eb5a97a8aab41a952236c95e9",
+      "size_bytes": 5589,
+      "roles": [
+        "historical_Source07_Source_author"
+      ],
+      "archive_member": "objects/2d05e10388030a3b548be51281256db06d29a34eb5a97a8aab41a952236c95e9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/README.md",
+      "sha256": "4eb3d8e4bf29157ef3b172ba542f6b588499d4c47d9623b6062aca7b0eace730",
+      "size_bytes": 4647,
+      "roles": [
+        "historical_Source07_README"
+      ],
+      "archive_member": "objects/4eb3d8e4bf29157ef3b172ba542f6b588499d4c47d9623b6062aca7b0eace730"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/parent06.diff",
+      "sha256": "d3768afdc9c066d5debc10f179a61a974a9c9404311527b7d3dd07d9fbec68af",
+      "size_bytes": 5533,
+      "roles": [
+        "historical_Source07_complete_parent06_diff"
+      ],
+      "archive_member": "objects/d3768afdc9c066d5debc10f179a61a974a9c9404311527b7d3dd07d9fbec68af"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/literal-inverse.json",
+      "sha256": "c5df68b40f588c69fd74afdaf43614635443cdd34c3a19454feaf1c8346efa73",
+      "size_bytes": 843,
+      "roles": [
+        "historical_Source07_Source07_literal_inverse"
+      ],
+      "archive_member": "objects/c5df68b40f588c69fd74afdaf43614635443cdd34c3a19454feaf1c8346efa73"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/conditional-quality-preflight.json",
+      "sha256": "09129cd40c6f405960fa910f7de0a6ad0cc1becbcb3e6c0847b81061c145cb96",
+      "size_bytes": 1454,
+      "roles": [
+        "historical_Source07_Source07_conditional_quality_preflight"
+      ],
+      "archive_member": "objects/09129cd40c6f405960fa910f7de0a6ad0cc1becbcb3e6c0847b81061c145cb96"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-hooks-Source-review-06/review.json",
+      "sha256": "45e8e205a87b29dd5881bef498849e22b7109fe8cc926743454deca7f35073a1",
+      "size_bytes": 5712,
+      "roles": [
+        "historical_Source07_independent_parent06_review"
+      ],
+      "archive_member": "objects/45e8e205a87b29dd5881bef498849e22b7109fe8cc926743454deca7f35073a1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-07/diffs/psy02_state.rs.diff",
+      "sha256": "119405e9d8c094d49d5c34a611d985f5a3b99c483f8bbef6bbf5a0eea0fc5880",
+      "size_bytes": 5550,
+      "roles": [
+        "historical_Source07_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/119405e9d8c094d49d5c34a611d985f5a3b99c483f8bbef6bbf5a0eea0fc5880"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/manifest.json",
+      "sha256": "2c15f069dab8b612ff8dcb4cf4e96693d8d8a6e8c7e545f9641ec62ca7ad4c35",
+      "size_bytes": 7448,
+      "roles": [
+        "historical_Source08_manifest.json"
+      ],
+      "archive_member": "objects/2c15f069dab8b612ff8dcb4cf4e96693d8d8a6e8c7e545f9641ec62ca7ad4c35"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/manifest.json",
+      "sha256": "e9715e4c4d29a2d15843a389e621efcc9226c19a70f70889db3ecfb92fa57466",
+      "size_bytes": 16104,
+      "roles": [
+        "historical_Source08_prior_actual_assembly"
+      ],
+      "archive_member": "objects/e9715e4c4d29a2d15843a389e621efcc9226c19a70f70889db3ecfb92fa57466"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-hooks-Source-review-07/review.json",
+      "sha256": "b0334ed1586ce59d01440ffd4308a585f2fe4d4427965a9363244c70d6fef053",
+      "size_bytes": 2500,
+      "roles": [
+        "historical_Source08_parent_Source07_review"
+      ],
+      "archive_member": "objects/b0334ed1586ce59d01440ffd4308a585f2fe4d4427965a9363244c70d6fef053"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-application-review-01/review.json",
+      "sha256": "e473aec882dfe0071c78bcefd68b7c96ed7935b5629b801a1fcbaa8b4600b923",
+      "size_bytes": 3735,
+      "roles": [
+        "historical_Source08_parent_application_review"
+      ],
+      "archive_member": "objects/e473aec882dfe0071c78bcefd68b7c96ed7935b5629b801a1fcbaa8b4600b923"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-08.py",
+      "sha256": "ce8c7af71ddcfbe1bd94ef72f8c290a58245ef19e72b9a113e0ba4ba0c9faed2",
+      "size_bytes": 6924,
+      "roles": [
+        "historical_Source08_preparer_Source"
+      ],
+      "archive_member": "objects/ce8c7af71ddcfbe1bd94ef72f8c290a58245ef19e72b9a113e0ba4ba0c9faed2"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/mechanical-and-state-proof.json",
+      "sha256": "1e7e2c9ef903e3baf983f556bec44082f5e13e3adcc1d996da5dfdfc1e7ac40c",
+      "size_bytes": 4568,
+      "roles": [
+        "historical_Source08_mechanical_and_state_proof"
+      ],
+      "archive_member": "objects/1e7e2c9ef903e3baf983f556bec44082f5e13e3adcc1d996da5dfdfc1e7ac40c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/README.md",
+      "sha256": "6af87ead1f8ecd660ecfef8d63c109f61910f5fcc85965f4f7cda03434ce657b",
+      "size_bytes": 937,
+      "roles": [
+        "historical_Source08_README"
+      ],
+      "archive_member": "objects/6af87ead1f8ecd660ecfef8d63c109f61910f5fcc85965f4f7cda03434ce657b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/before.rs",
+      "sha256": "349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce",
+      "size_bytes": 8232,
+      "roles": [
+        "historical_Source08_file_before"
+      ],
+      "archive_member": "objects/349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/complete.diff",
+      "sha256": "899f87ce47e376004a4280c0027132b3432e4181d84cdf30ccf96d44ab9b8369",
+      "size_bytes": 592,
+      "roles": [
+        "historical_Source08_file_complete_diff"
+      ],
+      "archive_member": "objects/899f87ce47e376004a4280c0027132b3432e4181d84cdf30ccf96d44ab9b8369"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/literal-inverse.json",
+      "sha256": "85acfbc7d5326f1a6aed3d98635465327c1d36133fb584018a9dc53364ab5146",
+      "size_bytes": 964,
+      "roles": [
+        "historical_Source08_file_literal_inverse"
+      ],
+      "archive_member": "objects/85acfbc7d5326f1a6aed3d98635465327c1d36133fb584018a9dc53364ab5146"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-cumulative-Reviewer-08.py",
+      "sha256": "1df5d1a31a46823f95f1abb264877265105e0faba7b08504ddbea888a035ee14",
+      "size_bytes": 3140,
+      "roles": [
+        "historical_Source08_Source_author"
+      ],
+      "archive_member": "objects/1df5d1a31a46823f95f1abb264877265105e0faba7b08504ddbea888a035ee14"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-prep-08/direct-diffs/observed_replay.rs.diff",
+      "sha256": "3236cab0185bcad79473d53d1029e5cd83fe27a36c5ac0c8940a702d36a86cfc",
+      "size_bytes": 8805,
+      "roles": [
+        "historical_Source08_file_complete_direct_diff"
+      ],
+      "archive_member": "objects/3236cab0185bcad79473d53d1029e5cd83fe27a36c5ac0c8940a702d36a86cfc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-hooks-Source-review-04/review.json",
+      "sha256": "8a5eac33a49f2d7acd41d5b586cdcc22420f769cdd4b8c7e134064df440c7c9a",
+      "size_bytes": 4030,
+      "roles": [
+        "historical_independent_Source_review_04"
+      ],
+      "archive_member": "objects/8a5eac33a49f2d7acd41d5b586cdcc22420f769cdd4b8c7e134064df440c7c9a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda",
+      "size_bytes": 19925,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/5e7cfdfffb22b8442398916cf5397903346b9ae6787ea8af9f2aa3f09d228bda"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775",
+      "size_bytes": 22412,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/78c44ba5e1ab840fe43cfcf89cdd24b44f3729da7a9079b2b7418e2d80f19775"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "cd36e27a8347211645327795ab3e7b996e309a5ed708c99082246da7e0e5100c",
+      "size_bytes": 5384,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/cd36e27a8347211645327795ab3e7b996e309a5ed708c99082246da7e0e5100c"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/psychrometrics/psy02_state/observed_replay.rs",
+      "sha256": "349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce",
+      "size_bytes": 8232,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/349fac9d24949f2125a9dcd1a7947ed616922b36304bf18cec4073414ae01fce"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "9b17850474d571b07a1960d9ddb0404317b5c3c86c59bd4920967a0e18a85355",
+      "size_bytes": 8638,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/9b17850474d571b07a1960d9ddb0404317b5c3c86c59bd4920967a0e18a85355"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__psychrometrics__psy02_state__observed_replay.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d",
+      "size_bytes": 42413,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/a9eac5cc27cb7085312b666013cede3d6994754bb85d01ba1010a3c8c18f452d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032",
+      "size_bytes": 42472,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/3681be88b5f99ac4233db2bf1951080cafad681db5a1831779131cb10e22f032"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "06f6b8db56a6f59a20ad33d27e1f7d304eb747d8326848254503565893fcd621",
+      "size_bytes": 249,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/06f6b8db56a6f59a20ad33d27e1f7d304eb747d8326848254503565893fcd621"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__psychrometrics.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71",
+      "size_bytes": 7772,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/dfc02b15da598f95a0d72d026dedc97ef0f409aa4f11316f12d0141d9672bc71"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/weather_day/design_day.rs",
+      "sha256": "0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30",
+      "size_bytes": 7896,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/0025f0e52e9dca06b8373091aeb1afb8107adca71f6f2867291488f985191a30"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "115d4fd8e805a2b7651a4c34bb29204d1be7d15df7ae0caf78a37e6f7ba10169",
+      "size_bytes": 279,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/115d4fd8e805a2b7651a4c34bb29204d1be7d15df7ae0caf78a37e6f7ba10169"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb",
+      "size_bytes": 11866,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/482775bf3112bc5a8fde41b591f577bbfea90c133d7f1d73ae908a4a7323f2fb"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/weather_day/design_day/producer.rs",
+      "sha256": "d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd",
+      "size_bytes": 12381,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/d73ae8d6aa10b210f588dffb437df5b868a28a188c8ced02a0ece171d1587dcd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "a08bd6d49035c221f1fe7a342d813c9487b4db82d9f1989096be6bbdbd41dc25",
+      "size_bytes": 704,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/a08bd6d49035c221f1fe7a342d813c9487b4db82d9f1989096be6bbdbd41dc25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day__producer.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b",
+      "size_bytes": 20939,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/61373fddcf4110e6055b1e22e68870e81f380d7081f7eeff4c1d6a2b70a2088b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "size_bytes": 21047,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "e75163e5cec9dae296675af3e0890572754b2e2474555f041bd9664dfb47e591",
+      "size_bytes": 585,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/e75163e5cec9dae296675af3e0890572754b2e2474555f041bd9664dfb47e591"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/before/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_before"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/after/crates/ep_runtime/src/weather_day/design_day_native_tests/passive_psy.rs",
+      "sha256": "e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf",
+      "size_bytes": 12298,
+      "roles": [
+        "historical_initial_actual_assembly_after"
+      ],
+      "archive_member": "objects/e9bfe28ea5c853779fc3fc8d078e95108bd7bd9c1d63986fe9de860cc8a5ddbf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/complete_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "a4acd26fcc0e6dd669d148884f4e2a35d036c49a592d202eb19218a2bd6084ff",
+      "size_bytes": 12814,
+      "roles": [
+        "historical_initial_actual_assembly_complete_actual_diff"
+      ],
+      "archive_member": "objects/a4acd26fcc0e6dd669d148884f4e2a35d036c49a592d202eb19218a2bd6084ff"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/held_to_actual_diff/crates__ep_runtime__src__weather_day__design_day_native_tests__passive_psy.rs.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_initial_actual_assembly_held_to_actual_diff"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-assembly-01/apply.json",
+      "sha256": "67941c99c09cf0173199094d16d1b97e2619c92e9109c679932d9c7d4dc488fa",
+      "size_bytes": 8798,
+      "roles": [
+        "historical_initial_actual_apply"
+      ],
+      "archive_member": "objects/67941c99c09cf0173199094d16d1b97e2619c92e9109c679932d9c7d4dc488fa"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-01/receipt.json",
+      "sha256": "f59aeb98044ad1b3172c8260d7d6b3106205fef5c9aaf8ffb193feee6bc79fad",
+      "size_bytes": 2964,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/f59aeb98044ad1b3172c8260d7d6b3106205fef5c9aaf8ffb193feee6bc79fad"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-01/stderr.log",
+      "sha256": "3fef30ef21f3f61c3844309781b11b03cbf6c175ac6c1affbd86b0f8fb41755f",
+      "size_bytes": 420,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/3fef30ef21f3f61c3844309781b11b03cbf6c175ac6c1affbd86b0f8fb41755f"
+    },
+    {
+      "path": ".runtime/porting/source-objects/04/04bd56182cc9ba37e1a48991bef243fa7ebfb85151cb9f1571607cc05a80efcc",
+      "sha256": "04bd56182cc9ba37e1a48991bef243fa7ebfb85151cb9f1571607cc05a80efcc",
+      "size_bytes": 1673565,
+      "roles": [
+        "historical_historical_source_snapshot_metadata_only"
+      ],
+      "archive_member": "objects/04bd56182cc9ba37e1a48991bef243fa7ebfb85151cb9f1571607cc05a80efcc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/non_minimal_cfg_probe.rs",
+      "sha256": "9029495fd9c038c3df07f28f1a56ec5e6aae980ab21690f664f541410beeb6f9",
+      "size_bytes": 50,
+      "roles": [
+        "historical_historical_mechanical_probe_Source"
+      ],
+      "archive_member": "objects/9029495fd9c038c3df07f28f1a56ec5e6aae980ab21690f664f541410beeb6f9"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-02/receipt.json",
+      "sha256": "2123905d553a0ef7c22a880aaf4aad0b1da2eafbde47774610726047392908ca",
+      "size_bytes": 2955,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/2123905d553a0ef7c22a880aaf4aad0b1da2eafbde47774610726047392908ca"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-cfg-lint-probe-command-02/stderr.log",
+      "sha256": "1bee86bdcd9dff94210a5a3447bb5f8b3466a95822e9c079d7ad1fd78b6299dd",
+      "size_bytes": 489,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/1bee86bdcd9dff94210a5a3447bb5f8b3466a95822e9c079d7ad1fd78b6299dd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/non_minimal_cfg_probe_02.rs",
+      "sha256": "9d38d81f8f04367bc1d6cd5216e4c25aadf65507d4d141ce1f4e17ae0b84fdee",
+      "size_bytes": 181,
+      "roles": [
+        "historical_historical_mechanical_probe_Source"
+      ],
+      "archive_member": "objects/9d38d81f8f04367bc1d6cd5216e4c25aadf65507d4d141ce1f4e17ae0b84fdee"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-1-command-01/receipt.json",
+      "sha256": "eace6af77e7b437197cf63ce1e313281c1f5f11b5add67be7af7344bb58b0faf",
+      "size_bytes": 3896,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/eace6af77e7b437197cf63ce1e313281c1f5f11b5add67be7af7344bb58b0faf"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-1-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-1-command-01/stderr.log",
+      "sha256": "67d420e90f5ff1224c2d949ec1feafca0f4696767d079be4a4a3657752a75f98",
+      "size_bytes": 709,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/67d420e90f5ff1224c2d949ec1feafca0f4696767d079be4a4a3657752a75f98"
+    },
+    {
+      "path": ".runtime/porting/source-objects/e2/e24bbffd0a4fb4aec95251af344bff323ea3678c377a5c1dd45ed68850038488",
+      "sha256": "e24bbffd0a4fb4aec95251af344bff323ea3678c377a5c1dd45ed68850038488",
+      "size_bytes": 1674303,
+      "roles": [
+        "historical_historical_source_snapshot_metadata_only"
+      ],
+      "archive_member": "objects/e24bbffd0a4fb4aec95251af344bff323ea3678c377a5c1dd45ed68850038488"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-prep-01/old_inline.rs",
+      "sha256": "96f0d578529385e6005912827ed493e1a9ec80ed0f6ca5fab91ef5113bd5a53a",
+      "size_bytes": 454,
+      "roles": [
+        "historical_historical_mechanical_probe_Source"
+      ],
+      "archive_member": "objects/96f0d578529385e6005912827ed493e1a9ec80ed0f6ca5fab91ef5113bd5a53a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-2-command-01/receipt.json",
+      "sha256": "819b895436c18604b5e2aeae1728f3c62bb0797d3a9482b18e49bd4ad2528084",
+      "size_bytes": 3914,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/819b895436c18604b5e2aeae1728f3c62bb0797d3a9482b18e49bd4ad2528084"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-2-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-2-command-01/stderr.log",
+      "sha256": "dbf4b29e6235dc8429c2bd19c4253512f0c974992619cab67db5169cdad59f47",
+      "size_bytes": 659,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/dbf4b29e6235dc8429c2bd19c4253512f0c974992619cab67db5169cdad59f47"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-prep-01/qualified_multiline.rs",
+      "sha256": "86245451ef21856a6453f36f1db2c4453e1878ec8aff8d4e680a250c1fc28d37",
+      "size_bytes": 463,
+      "roles": [
+        "historical_historical_mechanical_probe_Source"
+      ],
+      "archive_member": "objects/86245451ef21856a6453f36f1db2c4453e1878ec8aff8d4e680a250c1fc28d37"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-3-command-01/receipt.json",
+      "sha256": "6f1a6ba62a33c44334fd30f51b5c0b5f0f826f40223e09e9a44da8f1a8b4093d",
+      "size_bytes": 3910,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/6f1a6ba62a33c44334fd30f51b5c0b5f0f826f40223e09e9a44da8f1a8b4093d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-3-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-3-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/passive-psy-active-mechanical-probe-prep-01/qualified_default.rs",
+      "sha256": "4ae77fa2b9fa5502589a878fbd673fb259b302085e5a7c8a9bc7f7b0bef04117",
+      "size_bytes": 453,
+      "roles": [
+        "historical_historical_mechanical_probe_Source"
+      ],
+      "archive_member": "objects/4ae77fa2b9fa5502589a878fbd673fb259b302085e5a7c8a9bc7f7b0bef04117"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-01/receipt.json",
+      "sha256": "5b0c209585d72d2d58ee80bb2b5cd2a4fe976338a127f00c8650e2882574eb67",
+      "size_bytes": 3608,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/5b0c209585d72d2d58ee80bb2b5cd2a4fe976338a127f00c8650e2882574eb67"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-fmt-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-01/receipt.json",
+      "sha256": "7765d4b71157a452486da9af514f797720840a42bdeff4e984be7ee34de20ce3",
+      "size_bytes": 3657,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/7765d4b71157a452486da9af514f797720840a42bdeff4e984be7ee34de20ce3"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-01/stdout.log",
+      "sha256": "e1f8efb2f0606ec7a3759a7b8e10a3efa6998d461789ad3f6b0f8c1fd2235ba8",
+      "size_bytes": 82,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e1f8efb2f0606ec7a3759a7b8e10a3efa6998d461789ad3f6b0f8c1fd2235ba8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-quality-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-01/receipt.json",
+      "sha256": "5065faae3afc55bfd0cd6e571592f32e01db14bd0d8a798130071e37e86db48b",
+      "size_bytes": 3665,
+      "roles": [
+        "historical_historical_actual_command_receipt"
+      ],
+      "archive_member": "objects/5065faae3afc55bfd0cd6e571592f32e01db14bd0d8a798130071e37e86db48b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "historical_historical_complete_stdout"
+      ],
+      "archive_member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-clippy-command-01/stderr.log",
+      "sha256": "1f4c67d5a4ab462c29cb13095bd78d4b1103e049ae3cf8db433b2e9669fdc497",
+      "size_bytes": 896,
+      "roles": [
+        "historical_historical_complete_stderr"
+      ],
+      "archive_member": "objects/1f4c67d5a4ab462c29cb13095bd78d4b1103e049ae3cf8db433b2e9669fdc497"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-hooks-author-failure-05.json",
+      "sha256": "7f7491b30fb4381b4c6464948479eedb28612a717aa17029ed5221e03f3cfd48",
+      "size_bytes": 701,
+      "roles": [
+        "historical_preserved_failed_Source05_author"
+      ],
+      "archive_member": "objects/7f7491b30fb4381b4c6464948479eedb28612a717aa17029ed5221e03f3cfd48"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-hooks-Reviewer-05.py",
+      "sha256": "77d04cf081ef34c8791252122ef0ba946e76230ee7eb6539a1c0b50feb94bb3d",
+      "size_bytes": 14190,
+      "roles": [
+        "historical_preserved_failed_Source05_author"
+      ],
+      "archive_member": "objects/77d04cf081ef34c8791252122ef0ba946e76230ee7eb6539a1c0b50feb94bb3d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-replay-plan-01/plan.json",
+      "sha256": "f6618d041f1c26a45702bb8c1c4cbca990f7fe1f1b7d7710bcfd7819c28a1866",
+      "size_bytes": 33242,
+      "roles": [
+        "historical_earlier_Rust_replay_plan_finite_operand"
+      ],
+      "archive_member": "objects/f6618d041f1c26a45702bb8c1c4cbca990f7fe1f1b7d7710bcfd7819c28a1866"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-replay-plan-01/README.md",
+      "sha256": "94181a752d8f381a3ba3a8762cf5c66f56ff1b0dd9c4ee3b936aee9279b22036",
+      "size_bytes": 1149,
+      "roles": [
+        "historical_earlier_Rust_replay_plan_finite_operand"
+      ],
+      "archive_member": "objects/94181a752d8f381a3ba3a8762cf5c66f56ff1b0dd9c4ee3b936aee9279b22036"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-design-day-passive-psy-Rust-replay-plan-Reviewer-01.py",
+      "sha256": "e0d23fbd8553fe38bdb82f42b268b8846ef9fc145626ced6e87c45ab407d632a",
+      "size_bytes": 18859,
+      "roles": [
+        "historical_earlier_Rust_replay_plan_finite_operand"
+      ],
+      "archive_member": "objects/e0d23fbd8553fe38bdb82f42b268b8846ef9fc145626ced6e87c45ab407d632a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-native-build-03/native-build.json",
+      "sha256": "2a821bc46e3b3823c65af2aeb6375f4bf2d332335e1ec98e80d8641246eab319",
+      "size_bytes": 76789,
+      "roles": [
+        "historical_earlier_Rust_replay_plan_finite_operand"
+      ],
+      "archive_member": "objects/2a821bc46e3b3823c65af2aeb6375f4bf2d332335e1ec98e80d8641246eab319"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-passive-psy-existing-body-launcher-Reviewer-01.py",
+      "sha256": "7585171816f7b1f3d523aeac89288e8875ebcdc610eba027024acb4a908fae78",
+      "size_bytes": 8303,
+      "roles": [
+        "historical_existing_body_launcher_finite_Source"
+      ],
+      "archive_member": "objects/7585171816f7b1f3d523aeac89288e8875ebcdc610eba027024acb4a908fae78"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-existing-body-launcher-prep-01/README.md",
+      "sha256": "a13326076228bf31751789e46c976126de6f7045d11f769c55ea917bc46b72cd",
+      "size_bytes": 1387,
+      "roles": [
+        "historical_existing_body_launcher_finite_Source"
+      ],
+      "archive_member": "objects/a13326076228bf31751789e46c976126de6f7045d11f769c55ea917bc46b72cd"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/windows.ndjson",
+      "sha256": "ded93d88d9134c995daa2558c10e5f71b79b82159101e9de505398ba4f33cfe1",
+      "size_bytes": 506,
+      "roles": [
+        "historical_authenticated_small_Native_facts_payload"
+      ],
+      "archive_member": "objects/ded93d88d9134c995daa2558c10e5f71b79b82159101e9de505398ba4f33cfe1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/slots.ndjson",
+      "sha256": "7ba3a88a471b269ddb04e94062596a157a4f2b5e394f5aa4b320ccd175f64fd4",
+      "size_bytes": 274333,
+      "roles": [
+        "historical_authenticated_small_Native_facts_payload"
+      ],
+      "archive_member": "objects/7ba3a88a471b269ddb04e94062596a157a4f2b5e394f5aa4b320ccd175f64fd4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/first-touch.ndjson",
+      "sha256": "59d4339ba2daef724dd3f0071d90b7e29c071bc5ab9e759215ae50951b69953e",
+      "size_bytes": 419291,
+      "roles": [
+        "historical_authenticated_small_Native_facts_payload"
+      ],
+      "archive_member": "objects/59d4339ba2daef724dd3f0071d90b7e29c071bc5ab9e759215ae50951b69953e"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-01/manifest.json",
+      "sha256": "da741f47bb4a5df7001280c946104176cc6905ff4e29010a37ef444dd56e3401",
+      "size_bytes": 1731,
+      "roles": [
+        "historical_superseded_publisher01_manifest"
+      ],
+      "archive_member": "objects/da741f47bb4a5df7001280c946104176cc6905ff4e29010a37ef444dd56e3401"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-01/publish.py",
+      "sha256": "7cb9b040fef2fff406d96c25791c5ed777109519dac42da42559ade0fbdf271a",
+      "size_bytes": 23160,
+      "roles": [
+        "historical_superseded_publisher01_Source"
+      ],
+      "archive_member": "objects/7cb9b040fef2fff406d96c25791c5ed777109519dac42da42559ade0fbdf271a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-passive-psy-Rust-publication-Reviewer-01.py",
+      "sha256": "fa84f6a03bbef92128f2da5e045cbf45e76171e21f842e0db98cab5f98cab0f7",
+      "size_bytes": 13133,
+      "roles": [
+        "historical_publisher01_Source_author"
+      ],
+      "archive_member": "objects/fa84f6a03bbef92128f2da5e045cbf45e76171e21f842e0db98cab5f98cab0f7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-01/README.md",
+      "sha256": "c6594ed23256240e3aae9a9bb78ab45006cb8afa004d261c6f9fbc819047d9b5",
+      "size_bytes": 2115,
+      "roles": [
+        "historical_publisher01_scope"
+      ],
+      "archive_member": "objects/c6594ed23256240e3aae9a9bb78ab45006cb8afa004d261c6f9fbc819047d9b5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-01/operand-contract.json",
+      "sha256": "a969188b54fcfb4b63acbb6e688dd363e65e7b6bca37a5f7acc1d2be9e1e74c0",
+      "size_bytes": 2559,
+      "roles": [
+        "actual_operand_contract",
+        "historical_publisher01_operand_contract"
+      ],
+      "archive_member": "objects/a969188b54fcfb4b63acbb6e688dd363e65e7b6bca37a5f7acc1d2be9e1e74c0"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-02/complete-parent01.diff",
+      "sha256": "6098cef36bd9df8f217befa32ea12fc240d5a8674df5fafb1cd5e22bf7c5243a",
+      "size_bytes": 955,
+      "roles": [
+        "historical_publisher02_exact_parent_delta"
+      ],
+      "archive_member": "objects/6098cef36bd9df8f217befa32ea12fc240d5a8674df5fafb1cd5e22bf7c5243a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-02/literal-inverse.json",
+      "sha256": "6e2d1c9c065be837ed080525ec0fcc6260435e984f14e49bda6713307311b24a",
+      "size_bytes": 978,
+      "roles": [
+        "historical_publisher02_exact_literal_inverse"
+      ],
+      "archive_member": "objects/6e2d1c9c065be837ed080525ec0fcc6260435e984f14e49bda6713307311b24a"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-02/manifest.json",
+      "sha256": "59eb4f7a9442818d2128e8c12fd297932a2eee39c7562324b22390a6c28ca887",
+      "size_bytes": 2624,
+      "roles": [
+        "historical_superseded_publisher02_manifest"
+      ],
+      "archive_member": "objects/59eb4f7a9442818d2128e8c12fd297932a2eee39c7562324b22390a6c28ca887"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-02/publish.py",
+      "sha256": "5ff29f79e3834043e934b6198ec1a861b9ecaf740c691362f00b3973df298da4",
+      "size_bytes": 23272,
+      "roles": [
+        "historical_superseded_publisher02_Source"
+      ],
+      "archive_member": "objects/5ff29f79e3834043e934b6198ec1a861b9ecaf740c691362f00b3973df298da4"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-passive-psy-Rust-publication-Reviewer-02.py",
+      "sha256": "1ab22558a9f9f58ea828b4d98b933f09bcbda40065e9270cce08566a9d172aa5",
+      "size_bytes": 3900,
+      "roles": [
+        "historical_publisher02_Source_author"
+      ],
+      "archive_member": "objects/1ab22558a9f9f58ea828b4d98b933f09bcbda40065e9270cce08566a9d172aa5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-02/README.md",
+      "sha256": "b91770279625f9c4a900c33e3c61b2fc93fc35ecf96733c30f8a4ff6a8755645",
+      "size_bytes": 2438,
+      "roles": [
+        "historical_publisher02_scope"
+      ],
+      "archive_member": "objects/b91770279625f9c4a900c33e3c61b2fc93fc35ecf96733c30f8a4ff6a8755645"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/complete-parent02.diff",
+      "sha256": "35e106dd9678dea6b76ea299e49f7fed6aef0cc6407a32bee1827e9683fce5ae",
+      "size_bytes": 1323,
+      "roles": [
+        "historical_publisher03_exact_parent_delta"
+      ],
+      "archive_member": "objects/35e106dd9678dea6b76ea299e49f7fed6aef0cc6407a32bee1827e9683fce5ae"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/literal-inverse.json",
+      "sha256": "e16cf3156e0c96af2fbb7f400b87b986e911e45a20b3e4af6e9bdd7eafe0660d",
+      "size_bytes": 1110,
+      "roles": [
+        "historical_publisher03_exact_literal_inverse"
+      ],
+      "archive_member": "objects/e16cf3156e0c96af2fbb7f400b87b986e911e45a20b3e4af6e9bdd7eafe0660d"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/actual-executable-identity-preflight.json",
+      "sha256": "b3887e0cea817f43c49c1d8158a6883da73a0bf80f5f4cc0709353aebfdf3ad7",
+      "size_bytes": 735,
+      "roles": [
+        "historical_publisher03_actual_path_identity_preflight"
+      ],
+      "archive_member": "objects/b3887e0cea817f43c49c1d8158a6883da73a0bf80f5f4cc0709353aebfdf3ad7"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/manifest.json",
+      "sha256": "bea4283c2134892c6d6396d3a52ffe99642bb3463ae2d29d9746b1b90df0b9f1",
+      "size_bytes": 3425,
+      "roles": [
+        "executed_publisher_preparation"
+      ],
+      "archive_member": "objects/bea4283c2134892c6d6396d3a52ffe99642bb3463ae2d29d9746b1b90df0b9f1"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/publish.py",
+      "sha256": "b0439df9bbf772577792ce096e517ab32b39857d54f18bbb595f1d08bf760994",
+      "size_bytes": 23357,
+      "roles": [
+        "executed_publisher_Source"
+      ],
+      "archive_member": "objects/b0439df9bbf772577792ce096e517ab32b39857d54f18bbb595f1d08bf760994"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-passive-psy-Rust-publication-Reviewer-03.py",
+      "sha256": "92c1814961b8f221f2c07c2cfc5b79d71100f723450d20c4836c7cf3a680b5cc",
+      "size_bytes": 5173,
+      "roles": [
+        "publisher_Source_author"
+      ],
+      "archive_member": "objects/92c1814961b8f221f2c07c2cfc5b79d71100f723450d20c4836c7cf3a680b5cc"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-publication-prep-03/README.md",
+      "sha256": "eec436b33e91aeb6da843e0d65cfa7b0a4df7a713ffe6fbfcbd380fcdcc325e5",
+      "size_bytes": 2903,
+      "roles": [
+        "publication_scope"
+      ],
+      "archive_member": "objects/eec436b33e91aeb6da843e0d65cfa7b0a4df7a713ffe6fbfcbd380fcdcc325e5"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-Rust-actual-publication-operands-Root-01.json",
+      "sha256": "daa883d6c1d9978fb5d8ec7835518a335f2f3e9237d7d7d6afec18a7fde4abb8",
+      "size_bytes": 3544,
+      "roles": [
+        "Root_actual_operands"
+      ],
+      "archive_member": "objects/daa883d6c1d9978fb5d8ec7835518a335f2f3e9237d7d7d6afec18a7fde4abb8"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-ordinary-design-day-passive-psy-Rust-publisher-Source-review-03/review.json",
+      "sha256": "d1c1f6bfeb08046b2fcc0f9467d1c0fb83c7ebec0ef19e75e2d14863511908c4",
+      "size_bytes": 4871,
+      "roles": [
+        "accepted_publisher_Source_review"
+      ],
+      "archive_member": "objects/d1c1f6bfeb08046b2fcc0f9467d1c0fb83c7ebec0ef19e75e2d14863511908c4"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/parsed-actual-result.json",
+      "sha256": "e1722984e45f65dabc1c30e6f0708e2733ea5e2e2359323903ba03cadf1e0233",
+      "size_bytes": 391636,
+      "roles": [
+        "independently_parsed_actual_result"
+      ],
+      "archive_member": "objects/e1722984e45f65dabc1c30e6f0708e2733ea5e2e2359323903ba03cadf1e0233"
+    }
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/evidence.zip",
+    "sha256": "af382f722a260ee3b698787986ce256a80bccc0ca674c5056e042c290d1b21b4",
+    "size_bytes": 1608807
+  },
+  "archive_member_count": 192,
+  "whole_archive_CRC_SHA_size_readback_passed": true,
+  "metadata_only": [
+    {
+      "descriptor": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-design-day-passive-psy-native-capture-01/A-24H.observation.json",
+        "sha256": "9e264b004624c6479350068c28ede312521ac6897adfb07264f935c3be2c3dc2",
+        "size_bytes": 128881930
+      },
+      "payload_archived": false,
+      "fresh_payload_SHA_verified_by_publisher": false,
+      "reason": "Native raw or event stream is historical metadata only; exact prepared fixture archived instead"
+    },
+    {
+      "descriptor": {
+        "path": ".runtime/porting/SRC-06/ordinary-design-day-passive-psy-facts-01/psy-events.ndjson",
+        "sha256": "c03b9ae258c346a3eee8413d4b02e555d82c53fc0e61bdd0a99eb330da2e81ba",
+        "size_bytes": 91624882
+      },
+      "payload_archived": false,
+      "fresh_payload_SHA_verified_by_publisher": false,
+      "reason": "Native raw or event stream is historical metadata only; exact prepared fixture archived instead"
+    },
+    {
+      "scope": "Historical and final all-Rust Source indexes",
+      "payload_archived": "index metadata plus only seven selected final Source archives",
+      "reason": "No recursive archive closure; other index rows remain metadata descriptors"
+    },
+    {
+      "scope": "Native helper/core/map/objects/DLLs/binary tools and native build/provider closure payloads",
+      "payload_archived": false,
+      "fresh_payload_SHA_verified_by_publisher": false,
+      "reason": "Not required for bounded Rust replay publication; existing Native facts publication retains historical custody"
+    }
+  ],
+  "recursive_ref_walk": false,
+  "new_tests_Native_Cargo_replay_executed_by_publisher": false,
+  "gates_updated": false
+}

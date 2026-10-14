@@ -11,8 +11,11 @@ use serde_json::Value;
 mod state;
 
 type TestResult = Result<(), Box<dyn std::error::Error>>;
+#[path = "design_day_native_tests/passive_psy.rs"]
+mod passive_psy;
 
 pub(crate) fn verify_actual_design_day_weather() -> TestResult {
+    passive_psy::verify_if_selected()?;
     NUMERICAL_ASSESSMENT.with_borrow_mut(|values| values.clear());
     let fixture: Value =
         serde_json::from_str(include_str!("fixtures/ordinary_design_day_native.json"))?;

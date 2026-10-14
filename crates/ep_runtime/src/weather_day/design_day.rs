@@ -198,3 +198,8 @@ impl DesignDayInput {
         Ok(())
     }
 }
+
+#[cfg(test)]
+pub(crate) use producer::{
+    replay_dew_point, replay_humidity_from_dew_point, replay_relative_humidity,
+};

@@ -276,3 +276,23 @@ impl WeatherSession {
         Ok(())
     }
 }
+
+#[cfg(test)]
+pub(crate) fn replay_humidity_from_dew_point(
+    temperature: f64,
+    pressure: f64,
+) -> Result<f64, WeatherDayError> {
+    humidity_from_dew_point(temperature, pressure)
+}
+#[cfg(test)]
+pub(crate) fn replay_dew_point(humidity: f64, pressure: f64) -> f64 {
+    dew_point(humidity, pressure)
+}
+#[cfg(test)]
+pub(crate) fn replay_relative_humidity(
+    temperature: f64,
+    humidity: f64,
+    pressure: f64,
+) -> Result<f64, WeatherDayError> {
+    relative_humidity(temperature, humidity, pressure)
+}

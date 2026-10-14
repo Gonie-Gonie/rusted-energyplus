@@ -1229,3 +1229,6 @@ mod water_density_sensible_enthalpy_tests;
 #[cfg(test)]
 #[path = "psychrometrics_spline_tests.rs"]
 mod spline_tests;
+
+#[cfg(test)]
+pub(crate) use psy02_state::observed_replay;

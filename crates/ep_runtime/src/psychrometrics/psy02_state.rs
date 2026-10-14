@@ -211,6 +211,10 @@ impl EnergyPlusPsychrometricsState {
         use EnergyPlusPsychrometricFunction as F;
         let state_before = self.state;
         let target = self.target(function, inputs);
+        #[cfg_attr(not(test), cfg(any()))]
+        if let Some((kind, index)) = target {
+            self.import_observed_before(kind, index);
+        }
         let cache_before = target.map(|(kind, index)| self.slot(kind, index));
         let result = match function {
             F::Psat => self.psat(inputs[0]),
@@ -274,13 +278,19 @@ impl EnergyPlusPsychrometricsState {
     fn psat(&mut self, t: f64) -> f64 {
         let tag = signed_tag(t, 28);
         let index = tag as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_before(1, index, observed_replay::CacheRequest::Psat(tag));
         let EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. } = self.slot(1, index)
         else {
             unreachable!()
         };
         if i_tdb == tag {
+            #[cfg_attr(not(test), cfg(any()))]
+            self.observe_cache_point(observed_replay::CacheStage::After, 1, index);
             return value;
         }
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::Miss, 1, index);
         self.slots[1].insert(
             index,
             EnergyPlusPsychrometricCacheSlot::Psat {
@@ -289,6 +299,8 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::TagWrite, 1, index);
         let value = energyplus_psy_psat_fn_temp_raw(representative(tag, 28));
         self.slots[1].insert(
             index,
@@ -298,12 +310,18 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::ValueWrite, 1, index);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::After, 1, index);
         value
     }
 
     fn tsat_pb(&mut self, p: f64) -> f64 {
         let tag = signed_tag(p, 28);
         let index = tag as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_before(2, index, observed_replay::CacheRequest::TsatPb(tag));
         let EnergyPlusPsychrometricCacheSlot::TsatPb {
             i_h, i_pb, value, ..
         } = self.slot(2, index)
@@ -311,8 +329,12 @@ impl EnergyPlusPsychrometricsState {
             unreachable!()
         };
         if i_pb == tag {
+            #[cfg_attr(not(test), cfg(any()))]
+            self.observe_cache_point(observed_replay::CacheStage::After, 2, index);
             return value;
         }
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::Miss, 2, index);
         self.slots[2].insert(
             index,
             EnergyPlusPsychrometricCacheSlot::TsatPb {
@@ -322,6 +344,8 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::TagWrite, 2, index);
         let value = self.tsat_pb_raw(p);
         self.slots[2].insert(
             index,
@@ -332,6 +356,10 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::ValueWrite, 2, index);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::After, 2, index);
         value
     }
 
@@ -439,6 +467,8 @@ impl EnergyPlusPsychrometricsState {
         let wt = w.to_bits() >> 32;
         let pt = p.to_bits() >> 32;
         let index = (tt ^ (wt ^ pt)) as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_before(0, index, observed_replay::CacheRequest::Twb(tt, wt, pt));
         let EnergyPlusPsychrometricCacheSlot::Twb {
             i_tdb,
             i_w,
@@ -450,8 +480,12 @@ impl EnergyPlusPsychrometricsState {
             unreachable!()
         };
         if i_tdb == tt && i_w == wt && i_pb == pt {
+            #[cfg_attr(not(test), cfg(any()))]
+            self.observe_cache_point(observed_replay::CacheStage::After, 0, index);
             return value;
         }
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::Miss, 0, index);
         self.slots[0].insert(
             index,
             EnergyPlusPsychrometricCacheSlot::Twb {
@@ -462,6 +496,8 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::TagWrite, 0, index);
         let value = self.twb_raw(
             f64::from_bits(tt << 32),
             f64::from_bits(wt << 32),
@@ -477,6 +513,10 @@ impl EnergyPlusPsychrometricsState {
                 value,
             },
         );
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::ValueWrite, 0, index);
+        #[cfg_attr(not(test), cfg(any()))]
+        self.observe_cache_point(observed_replay::CacheStage::After, 0, index);
         value
     }
 
@@ -643,3 +683,6 @@ pub(super) fn with_state<R>(execute: impl FnOnce(&mut EnergyPlusPsychrometricsSt
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+pub(crate) mod observed_replay;
