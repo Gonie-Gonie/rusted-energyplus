@@ -1,0 +1,114 @@
+{
+  "plan_key": "actual_selected_ordinary_setup_solar_material",
+  "status": "Actual strict retained Solar/material/Construction/nominal comparison PASS",
+  "comparison_scope": "Native actual outer GetBuildingData return before supplemental points versus actual Rust successful retained owners; no internal797 checkpoint/fullfunction claim",
+  "Source_observer_base": "0a47d23110e1fa589939d2bc391df9488ca4ebdc",
+  "Source_observer_committed_HEAD": "b8dd341b91354384317809e776e3f621d4bc7aa4",
+  "observer_only_No_scientific_producer_changes": true,
+  "no_new_test_body_or_binary": true,
+  "no_Native_expected_values_seeded": true,
+  "Source_input_stop_before_call": 316,
+  "all_prior_numerical_FAILs_and_gates_unchanged": true,
+  "Source_typo_history": "Immutable build-adapter01 used a Rust role label in provider contract; capture-only02 replaces it with genuine SetupEnclosuresAndAirBoundaries and authenticates the unchanged actual build01 Source.",
+  "historical_scopes": "Prior raw Solar/nominal/opaque UNPAIRED labels describe historical evidence only; new strict fields are exactly the comparator08 inventory. Unrepresented fields stay UNPAIRED.",
+  "historical_build_metadata_scope": "Exact three old live CMakeCache/compile_commands/build.ninja descriptors are metadata only, joined to actual configure98b immutable before aliases; current after metadata and accepted graph86a8 retain actual new-build authority. Whole compile graph payloads are not archived.",
+  "static_provider_scope": "15 actual Original providers plus static PE import search closure; no Native loaded-module trace/full OS forwarder graph or whole FP context.",
+  "unpaired": [
+    "Native MaterialBase separate Name/ROnly/Thickness/Conductivity/Resistance/*Input/allocation-pointer identity",
+    "Native LayerPoint allocated flag versus Rust fixed-array storage; common complete bounds/values are compared",
+    "late Solar F/ScriptF/SurfacePtr and InitSolar numerical arrays",
+    "actual800 temperature caller/current-weather equivalence",
+    "Native caller timestep4 versus prior Rust clock qualification; no timestep execution equivalence"
+  ],
+  "remaining": "Actual InitSolar316/late numeric Solar arrays and temperature800 caller are not paired; no whole GetHeatBalanceInput/Setup-HB/engine or gate completion.",
+  "replay_environment_guard": "Root attestation only; no independent process environment certificate inferred.",
+  "publication_Source_preflight": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-solar-material-publication-Source-preflight-01/review.json",
+    "sha256": "e87a5155e6dffbec2893252ca78230a3f1eb18c55b322fedfebcc231010c0885",
+    "size_bytes": 7418
+  },
+  "immutable_builder_output": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-solar-material-publication-inputs-Header-01.json",
+    "sha256": "24c339c014a9707cb3611ac035b4ffc394705097a79a0800b7288665db54a7fb",
+    "size_bytes": 112472
+  },
+  "schema": "src06-ordinary-setup-solar-material-summary.v1",
+  "outcome": "PASS",
+  "new_comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-setup-solar-material-comparison-01/summary.json",
+    "sha256": "81eb61f4e041a1e0c143f298a757f0d4c7a9febb1a4ee7c197db708c41092772",
+    "size_bytes": 14240
+  },
+  "actual_inventory": {
+    "producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 83
+    },
+    "construction": {
+      "binary64_scalars": 24,
+      "discrete_values": 156
+    },
+    "solar": {
+      "binary64_scalars": 3,
+      "discrete_values": 12
+    },
+    "nominal": {
+      "binary64_scalars": 12,
+      "discrete_values": 64
+    },
+    "materials": {
+      "binary64_scalars": 12,
+      "discrete_values": 6
+    }
+  },
+  "component_outcomes": {
+    "solar": "PASS",
+    "materials": "PASS",
+    "construction": "PASS",
+    "nominal": "PASS"
+  },
+  "differences": 0,
+  "unknowns": 0,
+  "Rust_execution_HEAD": "0a47d23110e1fa589939d2bc391df9488ca4ebdc",
+  "Native_execution_HEAD": "b8dd341b91354384317809e776e3f621d4bc7aa4",
+  "common_Rust_SourceSnapshot": {
+    "path": ".runtime/porting/source-objects/4a/4a2298a33fe3db81842cbc0ebae7633b0c3e0e228232dbbe7417c83a3956fc20",
+    "sha256": "4a2298a33fe3db81842cbc0ebae7633b0c3e0e228232dbbe7417c83a3956fc20"
+  },
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Peer-ordinary-setup-solar-material-Rust-observer-Source-review-01/review.json",
+    "sha256": "1e959e1f49ba29a185b713f4395791a358b9c3dbf61bd79a60213cb3db1f8bed",
+    "size_bytes": 35963
+  },
+  "actual_independent_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-setup-solar-material-Native-actual-review-01/review.json",
+    "sha256": "81e80b9d1a5d06817244adb6e46dd92e898435841262f1d35096bf6df885391d",
+    "size_bytes": 16805
+  },
+  "old_geometry_EIO_regression": "PASS (318 binary64/487 discrete and1115B literal EIO; unchanged scope)",
+  "tests": {
+    "selections": 1,
+    "distinct_bodies": 1,
+    "new_bodies_or_bins": 0,
+    "runtime_CI_backend_rerun": false
+  },
+  "actual_A": {
+    "hourly_samples": 24,
+    "series": 390,
+    "conformance_claim": false,
+    "result_store_whole_bytes_unchanged": true,
+    "EIO_whole_bytes_unchanged": true
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-material/manifest.json",
+    "sha256": "e78e355b919591b9612e78a216eca31b88efeb02591e6bbca0819319734de688",
+    "size_bytes": 214016
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-solar-material/evidence.zip",
+    "sha256": "828fcac9ff735e63661d23e5d0b3c0ff0a2471a89d71438edf10ba9ba36bbde4",
+    "size_bytes": 1572346
+  },
+  "whole_Setup_HB_or_engine_PASS_claimed": false,
+  "gates_updated": false
+}
