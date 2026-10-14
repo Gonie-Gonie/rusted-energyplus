@@ -219,8 +219,8 @@ impl CtfInitializationContext<'_> {
             .map_err(hb_input_error)?;
         state.bind_typed_surfaces(&owners).map_err(hb_input_error)?;
         state.bind_outdoor_geometry().map_err(hb_input_error)?;
-        // Do not clear SetupGeometry trig arrays here: Original310's caller
-        // boundary has not been reached by this bounded numerical-prefix port.
+        // Retain Zone trig arrays through this GetSurfaceData return. The
+        // separate Source Setup continuation owns actual310/311 deallocation.
         Ok(true)
     }
 

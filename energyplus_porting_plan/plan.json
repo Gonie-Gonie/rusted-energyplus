@@ -12651,6 +12651,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-design-day-psy-root-cache-replay/summary.json",
         "sha256": "9c05e4d67cdb496520f08da544a7c704a7ef3359f4fba189e756516272f4edca",
         "size_bytes": 423084
+      },
+      "actual_selected_ordinary_setup_zone_continuation": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-zone-continuation/summary.json",
+        "sha256": "c6d7f0a965cd195afadc9b9c7ccda3d57ae15ad430b1e13e8c8b8ba078f827a9",
+        "size_bytes": 15053
       }
     },
     {

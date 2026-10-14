@@ -27,6 +27,7 @@ mod opaque;
 mod parallel_arrays;
 mod raw;
 mod return_suffix;
+mod setup_continuation;
 mod vertices;
 mod volume_faces;
 mod window_arrays;
@@ -131,6 +132,9 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) total_oscm: i32,
     /// Actual TotExtVentCav constructor0 and reached count; only allocate(0) is represented.
     pub(crate) total_ext_vented_cavities: i32,
+    /// Actual DataSurface TotStormWin constructor0; positive writer stays excluded.
+    pub(crate) total_storm_windows: i32,
+    pub(crate) storm_windows: Option<Vec<std::convert::Infallible>>,
     /// Genuine DataSurface constructor0 and Ground8253/Local7972 count owners.
     pub(crate) total_surface_ground_properties: i32,
     pub(crate) total_surface_local_environments: i32,

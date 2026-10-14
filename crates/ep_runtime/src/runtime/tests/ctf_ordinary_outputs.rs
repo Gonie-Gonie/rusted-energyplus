@@ -224,13 +224,27 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         let space = &mut zones.spaces.as_mut().ok_or("authored actual Space allocation")?[0];
         space.typed_space_id = Some(model.typed.spaces[0].id);
         space.zone_num = 1;
-        let mut input = SelectedInputProcessor::from_admitted_input(vec![
+        let mut definitions = vec![
             crate::heat_balance::selected_input_processor::SourceObjectDefinition {
                 object_type: "SurfaceProperty:ExteriorNaturalVentedCavity".into(),
                 alpha_fields: 3, numeric_fields: 8, alpha_extensions: 1,
                 numeric_extensions: 0, extension: Some("surface".into()),
             },
-        ], std::collections::BTreeMap::new())?;
+        ];
+        for (name, a, n, ae, ne, extension) in [
+            ("NodeList", 1, 0, 1, 0, Some("nodes")),
+            ("ZoneHVAC:EquipmentList", 2, 0, 4, 2, Some("equipment")),
+            ("ZoneHVAC:EquipmentConnections", 8, 0, 0, 0, None),
+            ("SpaceHVAC:EquipmentConnections", 7, 0, 0, 0, None),
+            ("AirLoopHVAC:SupplyPath", 2, 0, 2, 0, Some("components")),
+            ("AirLoopHVAC:ReturnPath", 2, 0, 2, 0, Some("components")),
+        ] {
+            definitions.push(crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type: name.into(), alpha_fields: a, numeric_fields: n,
+                alpha_extensions: ae, numeric_extensions: ne, extension: extension.map(str::to_owned),
+            });
+        }
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, std::collections::BTreeMap::new())?;
         let mut shortcut = SourceInputProcessorShortCut::default();
         let mut control = SelectedHeatBalanceInputState { any_ctf: true, construction_order: vec![ConstructionId(0)],
             construction_usage: vec![Default::default()], ..Default::default() };
@@ -243,6 +257,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             globals: &globals, environment: &environment };
         let mut errors = false;
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
+        raw.initialize_coordinate_owners(&owners)?;
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors)?;
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()
@@ -340,6 +355,24 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
             .map(|surface| surface.representative_calc_surface_num).collect::<Vec<_>>(), (1..=i32::try_from(total)?).collect::<Vec<_>>());
         assert_eq!(raw.window_arrays.as_ref().ok_or("actual active Construction owner")?
             .surf_active_construction, vec![1; total]);
+        let mut failed_setup = raw.clone();
+        assert!(failed_setup.release_setup_coordinates_if_errors(true));
+        assert!(failed_setup.coordinate.cos_zone_relative.is_none() && failed_setup.coordinate.sin_zone_relative.is_none());
+        assert!(raw.coordinate.cos_zone_relative.is_some() && raw.coordinate.sin_zone_relative.is_some());
+        let clock = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_family_inventory([], model.typed.timestep.number_of_timesteps_per_hour as usize)?;
+        let mut equipment = crate::heat_balance::ordinary_equipment::OrdinaryEquipment::new_for_source(&model.typed, clock)?;
+        let space_controls = crate::heat_balance::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls::default();
+        let old_module = owners.shortcut.current_module_object.clone();
+        equipment.get_zone_equipment_source(owners.input, clock, space_controls.sizing, space_controls.simulation)?;
+        assert_eq!(owners.shortcut.current_module_object, old_module);
+        for family in ["NodeList", "ZoneHVAC:EquipmentList", "ZoneHVAC:EquipmentConnections", "SpaceHVAC:EquipmentConnections", "AirLoopHVAC:SupplyPath", "AirLoopHVAC:ReturnPath"] {
+            assert!(matches!(owners.input.find_exact_family(family), Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Null)));
+        }
+        raw.finish_zero_window_setup(owners.input, owners.shortcut, errors)?;
+        assert_eq!(owners.shortcut.current_module_object, "WindowProperty:StormWindow");
+        assert_eq!(raw.total_storm_windows, 0);
+        assert!(raw.storm_windows.is_none());
+        assert!(raw.coordinate.cos_zone_relative.is_none() && raw.coordinate.sin_zone_relative.is_none());
         raw.bind_typed_surfaces(&owners)?;
         assert!(!errors);
         assert!(raw.surface_tmp.is_none());

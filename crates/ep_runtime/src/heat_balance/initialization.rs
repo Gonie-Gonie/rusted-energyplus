@@ -99,6 +99,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             source.minutes,
             &mut *source.output_host,
         )?;
+        if selected_world_geometry {
+            actual.continue_selected_setup_zone_geometry(&model.typed, equipment_input)?;
+        }
     }
     if let Some(actual) = initialization.as_deref_mut() {
         actual.prepare_report_input_cache(&model.typed.report_inputs)?;
@@ -153,7 +156,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .collect::<Result<Vec<_>, _>>()
         })
         .transpose()?;
-    if source_input_reached {
+    // World GetSurfaceData already wrote the same IsUsedCTF owner through
+    // AssignHeatTransferAlgorithm before Setup298; retain the legacy mark route.
+    if source_input_reached && !selected_world_geometry {
         let layout =
             super::inside_convection_layout::InsideConvectionLayout::from_typed_model(&model.typed)
                 .map_err(|_| RuntimeError::WarmupUnavailable {
@@ -179,15 +184,19 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             }
         }
     }
-    let equipment = equipment_input
-        .map(|input| {
-            super::ordinary_equipment::OrdinaryEquipment::for_geometry(&model.typed, input).map_err(
-                |reason| RuntimeError::WarmupUnavailable {
-                    reason: format!("ordinary geometry equipment unavailable: {reason}"),
-                },
-            )
-        })
-        .transpose()?;
+    let equipment = if selected_world_geometry {
+        // Source298 already constructed the sole retained owner; no replay/projection.
+        None
+    } else {
+        equipment_input
+            .map(|input| {
+                super::ordinary_equipment::OrdinaryEquipment::for_geometry(&model.typed, input)
+                    .map_err(|reason| RuntimeError::WarmupUnavailable {
+                        reason: format!("ordinary geometry equipment unavailable: {reason}"),
+                    })
+            })
+            .transpose()?
+    };
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     let mut zone_geometry_returns = Vec::with_capacity(model.typed.zones.len());
@@ -530,6 +539,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         // Validate later sole-owner moves now; no guard failure follows the final move.
         if actual.reports.selected_heat_balance_globals.is_none()
             || actual.reports.selected_zone_input.is_none()
+            || (selected_world_geometry && actual.reports.source_zone_equipment.is_none())
         {
             return Err(RuntimeError::WarmupUnavailable {
                 reason: "source owners before outdoor handoff".into(),
@@ -660,6 +670,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 })?;
         if actual.reports.selected_heat_balance_globals.is_none()
             || actual.reports.selected_zone_input.is_none()
+            || (selected_world_geometry && actual.reports.source_zone_equipment.is_none())
         {
             return Err(RuntimeError::WarmupUnavailable {
                 reason: "missing source owners after geometry".into(),
@@ -667,8 +678,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         }
         state.selected_heat_balance_globals = actual.reports.selected_heat_balance_globals.take();
         state.selected_zone_input = actual.reports.selected_zone_input.take();
+        if selected_world_geometry {
+            state.ordinary_equipment = actual.reports.source_zone_equipment.take();
+        }
     }
-    state.ordinary_equipment = equipment;
+    if !selected_world_geometry {
+        state.ordinary_equipment = equipment;
+    }
     if radiation_input.is_some() {
         state.ordinary_solar_radiation =
             initialization.and_then(|actual| actual.reports.ordinary_solar_radiation.take());

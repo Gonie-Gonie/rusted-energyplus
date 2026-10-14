@@ -222,17 +222,29 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         assert_eq!(result.is_ok(), accepted, "{name}");
         if let Ok(input) = result {
             let mut branch = OrdinaryEquipment::new(input, &zones, &spaces)?;
-            let supplied = branch.input.families[5];
+            let supplied = branch
+                .input
+                .as_ref()
+                .ok_or("actual retained legacy equipment projection")?
+                .families[5];
             branch.get_zone_equipment(timesteps)?;
             assert_eq!(
-                branch.input.families[5],
+                branch
+                    .input
+                    .as_ref()
+                    .ok_or("actual retained legacy equipment projection")?
+                    .families[5],
                 match supplied {
                     FamilyShape::ObjectMap(count) => FamilyShape::ObjectMap(count),
                     _ => FamilyShape::Null,
                 }
             );
             assert!(
-                branch.input.families[6..]
+                branch
+                    .input
+                    .as_ref()
+                    .ok_or("actual retained legacy equipment projection")?
+                    .families[6..]
                     .iter()
                     .all(|shape| *shape == FamilyShape::Absent)
             );

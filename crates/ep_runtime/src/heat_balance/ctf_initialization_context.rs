@@ -16,6 +16,7 @@ use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
 use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
+mod setup_zone_geometry;
 mod world_surface_geometry;
 
 /// Full real registry/table/cache owners, retained even if initialization stops.
@@ -87,6 +88,8 @@ pub struct CtfInitializationReports {
     pub(crate) heat_balance_input_state:
         super::selected_heat_balance_input::SelectedHeatBalanceInputState,
     pub(crate) heat_balance_input_errors_found: bool,
+    /// Same actual Setup298 equipment owner, moved only on initializer success.
+    pub(crate) source_zone_equipment: Option<super::ordinary_equipment::OrdinaryEquipment>,
     /// Actual partial GetSurfaceData input state, retained across every failure.
     pub(crate) surface_geometry_input:
         super::selected_heat_balance_input::surface::SurfaceGeometryInputState,

@@ -1,4 +1,6 @@
 //! Actual geometry GetZoneEquipment subset; no HVAC or dispatcher activation.
+mod source_input;
+
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
 use crate::node::NodeStateStore;
 use ep_model::{SpaceId, ZoneId};
@@ -249,6 +251,10 @@ impl NodeOwner {
             self.node_lists = Some(Vec::new());
             self.get_input = false;
         }
+        self.begin_unique_check_context(context)
+    }
+
+    fn begin_unique_check_context(&mut self, context: &str) -> Result<(), Unavailable> {
         if !self.context_name.is_empty() {
             return Err(Unavailable::Fatal(format!(
                 "Init Uniqueness called for \"{}, but checks for \"{}\" was already in progress.",
@@ -290,9 +296,10 @@ impl NodeOwner {
 pub(crate) struct OrdinaryEquipment {
     zone_ids: Vec<ZoneId>,
     space_ids: Vec<SpaceId>,
-    input: EquipmentInputOwner,
+    input: Option<EquipmentInputOwner>,
     nodes: NodeOwner,
     internal_gains: InternalGainStorage,
+    unique_equipment_list_names: std::collections::HashSet<String>,
     get_equipment_input: bool,
     equipment_inputs_filled: bool,
     equipment_simulated_once: bool,
@@ -366,15 +373,24 @@ impl OrdinaryEquipment {
         zone_ids: &[ZoneId],
         space_ids: &[SpaceId],
     ) -> Result<Self, Unavailable> {
+        Self::new_owners(Some(EquipmentInputOwner::new(input)), zone_ids, space_ids)
+    }
+
+    fn new_owners(
+        input: Option<EquipmentInputOwner>,
+        zone_ids: &[ZoneId],
+        space_ids: &[SpaceId],
+    ) -> Result<Self, Unavailable> {
         if zone_ids.len() != 1 || space_ids.len() != 1 {
             return Err(Unavailable::GeometryOrTimestep);
         }
         Ok(Self {
             zone_ids: zone_ids.to_vec(),
             space_ids: space_ids.to_vec(),
-            input: EquipmentInputOwner::new(input),
+            input,
             nodes: NodeOwner::default(),
             internal_gains: InternalGainStorage::default(),
+            unique_equipment_list_names: std::collections::HashSet::new(),
             get_equipment_input: true,
             equipment_inputs_filled: false,
             equipment_simulated_once: false,
@@ -404,6 +420,10 @@ impl OrdinaryEquipment {
             return Ok(());
         }
         self.get_zone_equipment_data()?;
+        self.finish_get_zone_equipment(timesteps_per_hour)
+    }
+
+    fn finish_get_zone_equipment(&mut self, timesteps_per_hour: usize) -> Result<(), Unavailable> {
         self.get_equipment_input = false;
         self.equipment_inputs_filled = true;
         self.number_of_timesteps_in_day = timesteps_per_hour * 24;
@@ -431,21 +451,44 @@ impl OrdinaryEquipment {
 
     fn get_zone_equipment_data(&mut self) -> Result<(), Unavailable> {
         // Literal224-227: three count queries precede the six definitions.
-        let controlled_zones = self.input.count(0);
-        let controlled_spaces = self.input.count(1);
-        self.number_of_equipment_lists = self.input.count(2);
+        let controlled_zones = self
+            .input
+            .as_ref()
+            .ok_or(Unavailable::InconsistentOwner)?
+            .count(0);
+        let controlled_spaces = self
+            .input
+            .as_ref()
+            .ok_or(Unavailable::InconsistentOwner)?
+            .count(1);
+        self.number_of_equipment_lists = self
+            .input
+            .as_ref()
+            .ok_or(Unavailable::InconsistentOwner)?
+            .count(2);
         if controlled_zones != 0 || controlled_spaces != 0 || self.number_of_equipment_lists != 0 {
             return Err(Unavailable::InconsistentOwner);
         }
         for index in [5, 2, 0, 1, 3, 4] {
-            self.input.definition_lookup(index);
+            self.input
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
+                .definition_lookup(index);
         }
         if self.supply_paths.is_none() {
-            self.number_of_supply_paths = self.input.count(3);
+            self.number_of_supply_paths = self
+                .input
+                .as_ref()
+                .ok_or(Unavailable::InconsistentOwner)?
+                .count(3);
             self.supply_paths = Some(Vec::new());
         }
         if self.return_paths.is_none() {
-            self.number_of_return_paths = self.input.count(4);
+            self.number_of_return_paths = self
+                .input
+                .as_ref()
+                .ok_or(Unavailable::InconsistentOwner)?
+                .count(4);
             self.return_paths = Some(Vec::new());
         }
         self.internal_gains
@@ -453,8 +496,10 @@ impl OrdinaryEquipment {
         self.zone_config = Some(vec![EquipmentConfig::default(); self.zone_ids.len()]);
         self.equipment_lists = Some(vec![EquipmentList::default(); self.zone_ids.len()]);
         self.equipment_availability = Some(vec![0; self.zone_ids.len()]); // Avail::Status::NoAction
-        self.nodes
-            .init_unique_check("ZoneHVAC:EquipmentConnections", &mut self.input)?;
+        self.nodes.init_unique_check(
+            "ZoneHVAC:EquipmentConnections",
+            self.input.as_mut().ok_or(Unavailable::InconsistentOwner)?,
+        )?;
         let configs = self
             .zone_config
             .as_mut()
@@ -478,7 +523,13 @@ impl OrdinaryEquipment {
             .end_unique_check("ZoneHVAC:EquipmentConnections")?;
         // Three real .find operations, not three fabricated count queries.
         for index in [6, 7, 8] {
-            if self.input.find_size(index)?.is_some() {
+            if self
+                .input
+                .as_ref()
+                .ok_or(Unavailable::InconsistentOwner)?
+                .find_size(index)?
+                .is_some()
+            {
                 return Err(Unavailable::InconsistentOwner);
             }
         }
