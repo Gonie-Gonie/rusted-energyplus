@@ -12691,6 +12691,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-setup-zone-bounds-continuation/summary.json",
         "sha256": "7f41a1f19c3a5447a5219bc445ebe96576f20f66bcd1ab63b2dd0e488ab81ffe",
         "size_bytes": 10656
+      },
+      "actual_selected_ordinary_construction_nominal_owners": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-nominal-owners/summary.json",
+        "sha256": "e8c0c2c582c6e26c8ade880fba310c19f2e53a688faaf499e925e775d4776af8",
+        "size_bytes": 11479
       }
     },
     {

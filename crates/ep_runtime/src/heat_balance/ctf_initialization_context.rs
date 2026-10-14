@@ -500,6 +500,7 @@ impl CtfInitializationContext<'_> {
                 &mut reports.input_processor_shortcut,
                 &mut reports.heat_balance_current_module_object,
                 &mut self.backend,
+                &mut reports.heat_balance_input_errors_found,
             )
             .map_err(hb_input_error)
     }

@@ -21,6 +21,7 @@ impl SelectedHeatBalanceInputState {
         shortcut: &mut SourceInputProcessorShortCut,
         current_module_object: &mut String,
         backend: &mut SourceErrorBackend<'_>,
+        errors_found: &mut bool,
     ) -> Result<(), HeatBalanceInputError> {
         let model = materials.model;
         let materials = materials.data;
@@ -47,6 +48,10 @@ impl SelectedHeatBalanceInputState {
             ));
         }
         self.total_constructions = regular;
+        self.nominal_r_for_u = Some(vec![0.0; regular]);
+        self.nominal_u = Some(vec![0.0; regular]);
+        self.nominal_u_before_adjusted = Some(vec![0.0; regular]);
+        self.coefficient_adjustment_ratio = Some(vec![1.0; regular]);
         self.construction_usage = vec![super::SelectedConstructionUsage::default(); regular];
         shortcut.current_module_object = "Construction".into();
         for index in 0..regular {
@@ -133,16 +138,27 @@ impl SelectedHeatBalanceInputState {
                     HeatBalanceInputError::Unavailable("actual construction material"),
                 )?;
                 match material.kind() {
-                    MaterialKind::Mass => self.no_regular_materials_used = false,
-                    MaterialKind::NoMass => {}
+                    MaterialKind::Mass | MaterialKind::NoMass => {}
                     _ => {
                         return Err(HeatBalanceInputError::Unavailable(
                             "unadmitted construction material family",
                         ));
                     }
                 }
-                // The existing producer retains physical properties. This
-                // input hook does not recompute resistance or CTF caches.
+                let nominal_r = materials.nominal_r.get(material_index).copied().ok_or(
+                    HeatBalanceInputError::Unavailable("same MaterialNum NominalR owner"),
+                )?;
+                let construction_r = self
+                    .nominal_r_for_u
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(index))
+                    .ok_or(HeatBalanceInputError::Unavailable(
+                        "actual Construction nominal R allocation",
+                    ))?;
+                *construction_r += nominal_r; // Actual1504, before NoRegularMaterialsUsed.
+                if material.kind() == MaterialKind::Mass {
+                    self.no_regular_materials_used = false;
+                }
             }
         }
         *current_module_object = "ConstructionProperty:InternalHeatSource".into();
@@ -166,10 +182,45 @@ impl SelectedHeatBalanceInputState {
         *current_module_object = "Construction:WindowEquivalentLayer".into();
         *current_module_object = "Construction:WindowDataFile".into();
         // Both actual window loops are empty; WConstructNames is gone at1776.
-        // Target Type* writes occur at1795, after all regular input tails.
-        // This consumed subset is not the complete optical/property routine
-        // or the missing NominalU/error lifecycle at1786-1793.
-        for row in &mut self.construction_usage {
+        self.finish_selected_construction_nominal_u(materials, backend, errors_found)
+    }
+
+    /// Actual1779-1795 nominal reciprocal/error prefix before existing target Type* writes.
+    pub(crate) fn finish_selected_construction_nominal_u(
+        &mut self,
+        materials: &super::super::selected_material_data::SelectedMaterialData,
+        backend: &mut SourceErrorBackend<'_>,
+        errors_found: &mut bool,
+    ) -> Result<(), HeatBalanceInputError> {
+        for index in 0..self.total_constructions {
+            let row = self.construction_usage.get_mut(index).ok_or(
+                HeatBalanceInputError::Unavailable("actual nominal Construction association"),
+            )?;
+            if row.type_is_air_boundary {
+                continue;
+            }
+            let resistance = self
+                .nominal_r_for_u
+                .as_ref()
+                .and_then(|rows| rows.get(index))
+                .copied()
+                .ok_or(HeatBalanceInputError::Unavailable("actual nominal R slot"))?;
+            if resistance != 0.0 {
+                *self
+                    .nominal_u
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(index))
+                    .ok_or(HeatBalanceInputError::Unavailable("actual nominal U slot"))? =
+                    1.0 / resistance;
+            } else if !row.window_type_eql {
+                backend.show_severe_error(&format!(
+                    "Nominal U is zero, for construction={}",
+                    row.name
+                ))?;
+                *errors_found = true;
+            }
+            // This remains the existing bounded1795 target projection, not a
+            // claim of complete CheckAndSetConstructionProperties/optical work.
             row.write_selected_type_predicates(materials)?;
         }
         Ok(())

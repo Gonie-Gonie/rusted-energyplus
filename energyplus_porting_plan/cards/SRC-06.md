@@ -84,7 +84,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 ## 실제 증거와 검증 범위
 
-아래 39개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
+아래 40개 요약은 plan의 actual 항목 전부다. 색인/ZIP은 실제 존재하는 파일만 연결한다. QA는 각 단위의 당시 Source에서 수행한 기록이며 현재 전체 포팅의 수치 PASS를 대신하지 않는다.
 
 | 단위 | 실제 증거 | 확인된 범위와 제한 |
 | --- | --- | --- |
@@ -127,6 +127,7 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 | Setup 같은 Zone 높이·경고 순서 | [요약](../evidence/SRC-06-ordinary-setup-height-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-height-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-height-continuation/evidence.zip) | Source455–547의 실제 Space 범위 순회와 기존 높이 식을 연결했다. 자동 높이의 재계산을 제거해 입력 여부를 보존한다. 기존290/464와 새 높이1/입력 여부1을 합쳐291개 수치·465개 이산 검사에서 차이·UNKNOWN0. 기존 테스트3개·A24·정적 검사 통과; 경고 변형·전체 체적/Setup은 미확인. |
 | Setup 선택 닫힌 체적·Space 비율 | [요약](../evidence/SRC-06-ordinary-setup-volume-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-volume-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-volume-continuation/evidence.zip) | Source548의 선택 닫힌 여섯 면 계산과 같은 Zone/Space 체적·비율 쓰기를 연결하고 뒤의 재계산을 제거했다. 기존291/465와 새 체적·비율3/ErrCount5 1을 합쳐294개 수치·466개 이산 검사에서 차이·UNKNOWN0. 기존 선택 테스트4회·A24·정적 검사 통과. 최초 작성 fixture 실패도 보존하며 전체 체적 분기/Setup은 미확인. |
 | Setup 중심점·Zone 경계·인접·표면 수 | [요약](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/summary.json) · [색인](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-setup-zone-bounds-continuation/evidence.zip) | Source550–639의 같은 Zone 중심점·경계, 별도 SurfAdjacentZone 배열과 누적 표면 수를 연결했다. 실제 보존된 Surface 중심점18·Zone 경계6을 추가해318개 수치·487개 이산 검사에서 차이·UNKNOWN0. 기존 테스트3회·A24·정적 검사 통과. Native Zone 중심점·인접·표면 수와641 이후·전체 gate는 미확인. |
+| Material·Construction NominalR/U 소유자 | [요약](../evidence/SRC-06-ordinary-construction-nominal-owners/summary.json) · [색인](../evidence/SRC-06-ordinary-construction-nominal-owners/manifest.json) · [ZIP](../evidence/SRC-06-ordinary-construction-nominal-owners/evidence.zip) | 실제 재료 getter의 NominalR와 Construction 네 배열·층 합산·역수/오류 순서를 연결했다. 기존 테스트3회·A24·정적 검사와 기존318/487 기하 회귀 통과, 기하·결과 전체 bytes 동일. 최초 테스트 import 컴파일 실패·수정도 보존했다. 새 NominalR/U Native 대조와641 보고는 미검증. |
 
 기존 Weather03·absent site/station과 cold guard는 [SRC-05 실제 선택 비교](../evidence/SRC-05-weather-cold/summary.json)에 별도로 고정되어 있다. 이는 complete ordinary weather/inside 배열·reachability·handoff의 완료 증거가 아니다.
 
@@ -298,6 +299,16 @@ Source548의 선택 경로는 실제 Zone.AllSurfaceFirst..Last의 꼭짓점을 
 Source550–639는 실제 Zone→spaceIndexes→Space.AllSurfaceFirst..Last 순서로 final Surface.Centroid·GrossArea·Vertex를 사용한다. 중심점 초기화와 가중 합·나눗셈, 조건부 첫 꼭짓점 경계 초기화, 원본 min/max의 동률·부호 있는0 처리, IntMass skip과 severe 이전/이후 상태 순서를 유지한다. 별도 SurfAdjacentZone을 실제 TotSurfaces 크기의0 배열로 초기화한 뒤 양의 ExtBoundCond가 가리키는 표면의 Zone을 기록한다. shading 이름 비교가 숫자 Zone 불일치 skip보다 먼저이며, 세 표면 수는 원본처럼 초기화하지 않고 증가한다. 선택 World 경로의 뒤쪽 중심점 재계산을 제거했고 기존 legacy 계산은 유지했다.
 
 실제 A-24H는24표본·390계열이며 이전 결과147,618바이트와 전체 bytes가 같다. 원본에서 보존한 여섯 Surface.Centroid18개와 Zone 경계6개를 새로 대조했다. 기존294개 수치·466개 이산 검사와 새24개 수치·배열 길이21개를 합친 **318개 유한 수치 비트·487개 이산 검사에서 차이0·UNKNOWN0**이며, 앞선 모든 비교 조건도 유지한다. Native outer GetBuildingData와 Rust 성공 실행 후 보존된 값의 대조로, 내부 Setup639 checkpoint는 아니다. Native Zone.Centroid·인접 배열·세 표면 수는 기존 캡처에 없어 미대조이며 Rust fixture 검사로 대신 인증하지 않는다. 내부 질량만 있는 오류·air boundary 등 선택 밖 분기,641 이후 NominalU/보고·전체 Setup/HB와 기존 전체 수치 FAIL·네 gate·A/B 완료 수는 그대로다.
+
+## Material·Construction NominalR/U 소유자의 QA
+
+최종 Source `6de3ad2dc7932f107637c4b7a3c0f61c37bfb23c725bd6af7fc6c1bfa8f6d427`에서 fmt·source-quality·ep_runtime all-target Clippy와 기존 runtime1·일반 CLI1·실제 CI CLI1, **3 passed / 0 failed / 0 ignored**를 확인했다. 변경하지 않은 ep_run의 Clippy와 backend 테스트는 반복하지 않았다. 기존 runtime 본문에50줄을 추가해 작성한 NoMass 상류 소유자에서 실제 Construction getter가 반복된 두 층을 순서대로 더하고 역수를 기록하는지, 네 배열 초기값과 0 저항 severe 출력 실패 이전 상태를 보존하는지 검사했다. 새 테스트 본문·binary·Native 빌드·전체 workspace 반복은 없다.
+
+Material.cc219–220/308의 실제 raw 두께·전도율 나눗셈과 NoMass 인자 복사를 MaterialNum에 맞는 NominalR에 기록한다. 물리 재료 속성을 새 cache로 재구성하지 않는다. HeatBalanceManager1393–1396은 같은 HB 소유자의 R/U/U-before 배열을+0, 보정 비율을+1로 할당한다.1504의 실제 Material.NominalR 합산은 층 순서를 유지하며 NoRegularMaterialsUsed 쓰기보다 먼저다.1779–1795의 비영 저항 역수와 0 저항 severe→ErrorsFound→기존 선택 Type* 대입 순서를 보존한다. 오류 플래그는 GetHeatBalanceInput에서 재료·Construction·GetBuildingData가 공유하는 실제 소유자다. 전체 MaterialBase·CheckAndSetConstructionProperties나641 보고 완료를 뜻하지 않는다.
+
+실제 A-24H는24표본·390계열이며 기하 추적39,475바이트와 결과147,618바이트가 직전 bounds 단위와 전체 bytes 동일하다. 기존 **318개 유한 수치 비트·487개 이산 검사에서 차이0·UNKNOWN0**인 것은 기하 회귀 증거다. 새 Material.NominalR·Construction.NominalU와 새로운 오류 분기의 Native 직접 대조는 **UNPAIRED**이며 이를 새 수치 PASS로 확대하지 않는다. 전체 수치 FAIL·네 gate·A/B 완료 수는 그대로다.
+
+최초 Clippy는 테스트가 private 하위 모듈을 import해 E0603·exit101이었다. 기존 crate-visible 재노출 경로로 import 한 곳만 수정했으며 네 생산 파일의 bytes는 동일하다. 최초 fmt/quality 통과·실패 Source와 수정 diff를 최종 QA와 구분해 보존한다. Native 캡처 부재에 대한 앞선 표현은 selected_geometry의 원시 Zone 중심점·표면 수·인접 필드에 한정한다. 같은 캡처의 실제 EIO 문자열에는 반올림한 Zone 중심점과 정수 표면 수가 이미 있다. 이를 원시 binary64로 역산하지 않으며, 후속 보고 단계에서 실제 문자열 자체를 대조할 수 있다.
 
 ## 이력과 증거 보존
 

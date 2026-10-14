@@ -136,6 +136,11 @@ pub(crate) struct SelectedHeatBalanceInputState {
     pub(crate) construction_order: Vec<ConstructionId>,
     pub(crate) construction_usage: Vec<SelectedConstructionUsage>,
     pub(crate) total_constructions: usize,
+    /// Actual HeatBalance constructor-unallocated arrays, dimensioned at1393-1396.
+    pub(crate) nominal_r_for_u: Option<Vec<f64>>,
+    pub(crate) nominal_u: Option<Vec<f64>>,
+    pub(crate) nominal_u_before_adjusted: Option<Vec<f64>>,
+    pub(crate) coefficient_adjustment_ratio: Option<Vec<f64>>,
     pub(crate) any_internal_heat_source_in_input: bool,
     pub(crate) no_regular_materials_used: bool,
 }
@@ -176,6 +181,10 @@ impl Default for SelectedHeatBalanceInputState {
             construction_order: Vec::new(),
             construction_usage: Vec::new(),
             total_constructions: 0,
+            nominal_r_for_u: None,
+            nominal_u: None,
+            nominal_u_before_adjusted: None,
+            coefficient_adjustment_ratio: None,
             any_internal_heat_source_in_input: false,
             no_regular_materials_used: true,
         }
@@ -220,6 +229,8 @@ pub(crate) struct SelectedConstructionUsage {
     pub(crate) type_is_window: bool,
     /// ConstructionProps constructor false; actual positive AirBoundary getter stays excluded.
     pub(crate) type_is_air_boundary: bool,
+    /// Genuine ConstructionProps WindowTypeEQL constructorfalse; positive getter excluded.
+    pub(crate) window_type_eql: bool,
     pub(crate) type_is_eco_roof: bool,
     pub(crate) type_is_irt: bool,
     pub(crate) is_used: bool,

@@ -1,0 +1,251 @@
+{
+  "schema": "src06-ordinary-construction-nominal-owners-summary.v1",
+  "status": "Source nominal resistance/conductance owners connected; existing geometry regression PASS",
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-construction-nominal-Source-review-01/review.json",
+    "sha256": "93cd027c0745e9654ba059ac54957f8df0b4f0526a784a9c03d7d40d91027144",
+    "size_bytes": 21789
+  },
+  "actual_independent_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-construction-nominal-actual-review-01/review.json",
+    "sha256": "aff089d465393d074e536730a70a09b101e68d1bfdb3e421dae4860781cc4169",
+    "size_bytes": 18357
+  },
+  "Rust_files": 5,
+  "Source_interval": "Material.cc219-220/308; HeatBalanceManager.cc1393-1396,1504,1779-1795 selected nominal-owner operations",
+  "behavior": "Actual MaterialNum-aligned constructor-zero NominalR is written from raw getter operands. The same HB input owner dimensions four arrays, sums real Material.NominalR in layer order, and writes reciprocal or zero-resistance severe/ErrorsFound before existing selected type predicates. Setup641 is not activated.",
+  "pairing": {
+    "strict_finite_binary64_components": 318,
+    "discrete_checks": 487,
+    "differences": 0,
+    "unknowns": 0,
+    "new_nominal_comparisons": 0,
+    "role": "existing geometry regression only",
+    "signed_zero_preserved": true,
+    "tolerances_used": false
+  },
+  "QA": {
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-fmt-command-02/receipt.json",
+        "sha256": "c1dd5bbba09b24f3d64553b93450b87ac11ded7b371e6a4033420820297b3bec",
+        "size_bytes": 3451
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    "quality": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-quality-command-02/receipt.json",
+        "sha256": "e9e950ec7f67f8133c5be7395b5474a56f0cbdf9a3ffe066d2baddb0e2d2d80e",
+        "size_bytes": 3503
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ]
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-clippy-command-02/receipt.json",
+        "sha256": "6d9a83aed371733cd3a7459d54b93ed0cca91ee4c8e02633d1a125f66bd6c443",
+        "size_bytes": 3509
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    "runtime": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-runtime-tests-command-01/receipt.json",
+        "sha256": "7bc0a38a04f99a1989bed773917916c4d6382222f2860ffd5d1daf6369c9c447",
+        "size_bytes": 3597
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+        "--",
+        "--exact"
+      ]
+    },
+    "normalCLI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-cli-tests-command-01/receipt.json",
+        "sha256": "f1ca7025470757444bd73f6cc56e0b6a85fd3402088e895032471ad4fb5498c3",
+        "size_bytes": 3539
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ]
+    },
+    "CI": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-ci-timestep-tests-command-01/receipt.json",
+        "sha256": "17b6edad4f22942d05329eb07380da9739f6725c4b33e6809c8f51f3384352a4",
+        "size_bytes": 3542
+      },
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".runtime/porting/SRC-06/run-ci-force-time-step-Root-01.ps1"
+      ]
+    },
+    "A": {
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-A-24H-cli-command-01/receipt.json",
+        "sha256": "adc60188fcd68adb2b571437e02997aa7a6591f7fe10e65fa4cf8c56ebff8355",
+        "size_bytes": 3987
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ordinary-construction-nominal-A-24H-cli-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ]
+    }
+  },
+  "tests": {
+    "executions": 3,
+    "distinct_existing_bodies": 2,
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "added_existing_body_lines": 50,
+    "new_test_bodies": 0,
+    "new_binaries": 0,
+    "scope": "Existing runtime body once, existing CLI body under normal and CI settings; no new body or binary. Backend unchanged and not rerun."
+  },
+  "actual_A": {
+    "hourly_samples": 24,
+    "series": 390,
+    "result_store_whole_bytes_unchanged": true,
+    "source_timestep_conformance": false
+  },
+  "no_new_Native_build": true,
+  "no_kernel_replay": true,
+  "no_full_workspace_test_repeat": true,
+  "replay_environment_guard": "Root observed SRC06_SETUP_PROCESS_REFERENCE absent immediately before runtime launch; no independently captured process environment certificate is claimed.",
+  "remaining": "Native Material.NominalR/Construction.NominalU and new error variants remain UNPAIRED.641+ report/Setup/HB and whole-engine parity remain unverified; all prior numerical FAILs and gates/card counts remain unchanged.",
+  "gates_updated": false,
+  "centroid_and_bounds_scope_qualification": {
+    "paired": "Six actual final Surface.Centroid triples and same-owner Zone minX/maxX/minY/maxY/minZ/maxZ only; every earlier producer/Process/area/height/volume prerequisite remains mandatory.",
+    "Native_missing_fields": "UNPAIRED: Zone.Centroid, SurfAdjacentZone and Zone surface/subsurface/shading counts are absent from the reused Native capture and are neither inferred nor compared.",
+    "positive_error_and_unsupported_variants": "UNPAIRED: internal-mass-only errors, air-boundary/other unsupported positive variants and nonfinite/missing storage are not positive Native certificates.",
+    "boundary": "Native outer GetBuildingData retained values versus actual Rust successful simulation-retained owners; no internal Setup639 checkpoint or full Setup/HB claim."
+  },
+  "volume_scope_qualification": {
+    "paired": "Actual same-owner Zone.Volume, Space.Volume, Space.fracZoneVolume and SurfaceGeometry.ErrCount5 only; every earlier producer/Process/area/height prerequisite remains mandatory.",
+    "Native_closure_predicate": "UNPAIRED: Native isEnclosedVolume return is not dumped; enclosure is not inferred from matched retained values.",
+    "Native_warning_debug_and_fallback_variants": "UNPAIRED: positive SHOWZONESURFACES_DEBUG, warning/ErrCount5 increments, nonclosed repairs/fallbacks and nonpositive volume clamp variants are not paired by the reused A capture.",
+    "ShowZoneSurfaceHeaders_or_P0_context_compared": false,
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup548 checkpoint is claimed."
+  },
+  "height_scope_qualification": {
+    "paired": "Actual same-owner Zone.CeilingHeight and ceilingHeightEntered only; prior producer/area prerequisites remain mandatory.",
+    "Native_warning_variants": "UNPAIRED: Source455-547 entered-height warning/ErrCount/DisplayExtraWarnings variants are not paired by the reused A capture.",
+    "Space_height_or_550plus_bounds_compared": false,
+    "whole_CalculateZoneVolume_or_Setup_HB_proof": false,
+    "boundary": "Native outer GetBuildingData retained values and Rust successful simulation-retained owners; no internal Setup547 checkpoint is claimed."
+  },
+  "area_scope_qualification": {
+    "paired": "Six actual A Surface.Area inputs, outside/air-boundary operands, Zone multipliers/HasWindow and14 Zone/Space area values.",
+    "Native_TypeIsWindow_predicate": "UNPAIRED: not present in reused Native capture; no predicate is inferred from zero window outputs.",
+    "unpaired_positive_branches": [
+      "windows/frame areas",
+      "ground contacts",
+      "nonunit multipliers",
+      "DETAILEDWWR_DEBUG positive"
+    ],
+    "status_scope": "Area PASS certifies only declared actual A stored operands/outputs; missing declared fields remain mandatory UNKNOWN. Shared producer/Width prerequisites are retained."
+  },
+  "comparison_role": "Unchanged318 binary64 components/487 discrete checks are existing geometry regression only; no new nominal values are paired.",
+  "nominal_scope_qualification": {
+    "Native_Material_NominalR": "UNPAIRED",
+    "Native_Construction_NominalU": "UNPAIRED",
+    "Setup641_activated": false,
+    "new_Native_nominal_comparison_inventory_added": false
+  },
+  "geometry_capture_clarification": "Native selected_geometry lacks raw Zone centroid/count/adjacency fields. The same capture does contain formatted EIO Zone centroid and integer counts; prior absence wording is limited to raw owner fields. No rounded text is reconstructed into binary64 values.",
+  "first_failure": {
+    "clippy_exit_code": 101,
+    "reason": "E0603 test import into a private child module; fixed to existing crate-visible reexport. Four production Source files stayed byte-identical.",
+    "correction": {
+      "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-test-import-correction-Root-01/manifest.json",
+      "sha256": "cc674003c1685175e0e95078aa5a17057e90d1563c7568db8b534089e19dd483",
+      "size_bytes": 2714
+    }
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-nominal-owners/manifest.json",
+    "sha256": "cadc696c4bf20f6a17cffe0df56b6340d000c1aea00a2058da2ef7bca478492f",
+    "size_bytes": 80796
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-construction-nominal-owners/evidence.zip",
+    "sha256": "f66708be2bdfe22992fc84b39d6adb1e3e4e6e5f1f3b54f3cafa8bf6677b500f",
+    "size_bytes": 938006
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-construction-nominal-comparison-01/summary.json",
+    "sha256": "10d433ae16a761f6da5b333a490147b3e331b75a830ea65874beb91bcff89a38",
+    "size_bytes": 8489
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/6d/6de3ad2dc7932f107637c4b7a3c0f61c37bfb23c725bd6af7fc6c1bfa8f6d427",
+    "sha256": "6de3ad2dc7932f107637c4b7a3c0f61c37bfb23c725bd6af7fc6c1bfa8f6d427"
+  }
+}

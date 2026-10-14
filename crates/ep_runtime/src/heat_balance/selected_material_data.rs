@@ -32,6 +32,7 @@ pub(super) struct MaterialDataOwners<'a, 'b> {
     globals: &'a SelectedHeatBalanceGlobals,
     backend: &'a mut SourceErrorBackend<'b>,
     eio: &'a mut dyn Write,
+    errors_found: &'a mut bool,
 }
 
 // The selected FrameAndDivider domain has no elements. Keeping an empty
@@ -46,6 +47,8 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) material_map: BTreeMap<String, i32>,
     /// Same Material owner: group written by the actual input-family getter.
     pub(crate) material_groups: BTreeMap<MaterialId, SourceMaterialGroup>,
+    /// MaterialBase NominalR ctor0 and getter writes, aligned with actual MaterialNum.
+    pub(crate) nominal_r: Vec<f64>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -137,7 +140,7 @@ impl SelectedMaterialData {
         name: &str,
         id: MaterialId,
         group: SourceMaterialGroup,
-    ) -> Result<(), RuntimeError> {
+    ) -> Result<usize, RuntimeError> {
         let key = name.to_ascii_uppercase();
         if self.material_map.contains_key(&key) {
             return Err(unavailable(
@@ -148,10 +151,11 @@ impl SelectedMaterialData {
         // only binds the existing property owner; it does not infer group.
         self.material_groups.insert(id, group);
         self.materials.push(id);
+        self.nominal_r.push(0.0); // Material.hh239 constructor, before property reads.
         let number = i32::try_from(self.materials.len())
             .map_err(|_| unavailable("Material.Num int capacity"))?;
         self.material_map.insert(key, number);
-        Ok(())
+        Ok(self.materials.len() - 1)
     }
 
     fn get_material_data(
@@ -172,7 +176,8 @@ impl SelectedMaterialData {
             // Direct JSON markObjectAsUsed; none of the six arrays is an argument.
             o.input.mark_object_as_used("Material", &object.object_name);
             let id = typed_id(o.model, &object.object_name, false)?;
-            self.insert(&object.object_name, id, SourceMaterialGroup::Regular)?;
+            let material_index =
+                self.insert(&object.object_name, id, SourceMaterialGroup::Regular)?;
             let material = o
                 .model
                 .materials
@@ -185,9 +190,11 @@ impl SelectedMaterialData {
             if roughness(object)? != value.roughness {
                 return Err(unavailable("regular roughness/typed association"));
             }
+            let thickness = input::numeric(object, "thickness", None)?;
+            same(thickness, value.thickness_m)?;
+            let conductivity = input::numeric(object, "conductivity", None)?;
+            same(conductivity, value.conductivity_w_per_m_k)?;
             for (field, typed) in [
-                ("thickness", value.thickness_m),
-                ("conductivity", value.conductivity_w_per_m_k),
                 ("density", value.density_kg_per_m3),
                 ("specific_heat", value.specific_heat_j_per_kg_k),
             ] {
@@ -208,6 +215,19 @@ impl SelectedMaterialData {
             ] {
                 same(input::numeric(object, field, Some(default))?, typed)?;
             }
+            if conductivity > 0.0 {
+                self.nominal_r[material_index] = thickness / conductivity;
+            } else {
+                o.backend
+                    .show_severe_error(&format!(
+                        "Positive thermal conductivity required for material {}",
+                        object.object_name
+                    ))
+                    .map_err(|error| {
+                        RuntimeError::WarmupOutput(Box::new(WarmupOutputError::Backend(error)))
+                    })?;
+                *o.errors_found = true;
+            }
         }
         // Actual generated FC material branch is not admitted; do not synthesize it.
         require_zero(f_factor, "positive F-factor generated material")?;
@@ -220,7 +240,7 @@ impl SelectedMaterialData {
             let (_num_alphas, num_numbers) = raw.get_no_mass_item(object, o)?;
             let name = &o.shortcut.alpha_args[0];
             let id = typed_id(o.model, name, true)?;
-            self.insert(name, id, SourceMaterialGroup::Regular)?;
+            let material_index = self.insert(name, id, SourceMaterialGroup::Regular)?;
             let material = o
                 .model
                 .materials
@@ -251,6 +271,7 @@ impl SelectedMaterialData {
                     typed,
                 )?;
             }
+            self.nominal_r[material_index] = o.shortcut.numeric_args[0]; // Actual308.
         }
         o.shortcut.current_module_object = "Material:AirGap".into();
         require_zero(self.num_air_gaps, "positive Material:AirGap")?;
@@ -352,6 +373,7 @@ impl CtfInitializationContext<'_> {
             globals,
             backend: &mut self.backend,
             eio: self.eio,
+            errors_found: &mut reports.heat_balance_input_errors_found,
         };
         // HBM266: real zero-selected spectral getter, before GetMaterialData.
         owners.shortcut.current_module_object = "MaterialProperty:GlazingSpectralData".into();

@@ -642,6 +642,56 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert!(arrays.outdoor_to_model_swaps.is_empty());
         assert_eq!(context.reports.surface_geometry_input.final_surfaces.as_ref().ok_or("lost final Surface IDs")?
             .iter().map(|row| row.typed_id).collect::<Vec<_>>(), source_ids.iter().copied().map(Some).collect::<Vec<_>>());
+        // Authored reached Material:NoMass checkpoint, not Native R/U output.
+        // The actual Construction getter must accumulate both repeated layers.
+        use crate::heat_balance::selected_heat_balance_input::{
+            SelectedHeatBalanceInput, ConstructionMaterialOwners,
+        };
+        use crate::heat_balance::selected_material_data::{SelectedMaterialData, SourceMaterialGroup};
+        use crate::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue};
+        let materials = SelectedMaterialData { materials: vec![MaterialId(0)], nominal_r: vec![1.0],
+            material_map: std::collections::BTreeMap::from([("R1".into(), 1)]),
+            material_groups: std::collections::BTreeMap::from([(MaterialId(0), SourceMaterialGroup::Regular)]),
+            ..Default::default() };
+        let mut layered = model.typed.clone(); layered.constructions[0].layers.push(MaterialId(0));
+        let mut construction_input = SelectedInputProcessor::from_admitted_input(vec![
+            crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type: "Construction".into(), alpha_fields: 11, numeric_fields: 0,
+                alpha_extensions: 0, numeric_extensions: 0, extension: None,
+            }], std::collections::BTreeMap::from([("Construction".into(),
+                crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: "Wall".into(), field_sizes: Default::default(),
+                    }]))]))?;
+        let construction_raw = SelectedHeatBalanceInput { source_is_epjson: true,
+            objects: std::collections::BTreeMap::from([("Construction".into(), vec![ProjectInputObject {
+                object_name: "Wall".into(), idf_max_fields: None,
+                fields: std::collections::BTreeMap::from([("outside_layer".into(), ProjectInputValue::String("R1".into())),
+                    ("layer_2".into(), ProjectInputValue::String("R1".into()))]),
+            }])]), ..Default::default() };
+        let mut nominal = SelectedHeatBalanceInputState::default();
+        assert!(nominal.nominal_r_for_u.is_none() && nominal.nominal_u.is_none()
+            && nominal.nominal_u_before_adjusted.is_none() && nominal.coefficient_adjustment_ratio.is_none());
+        let mut construction_shortcut = SourceInputProcessorShortCut::default();
+        construction_shortcut.allocate_from_input(&construction_input)?;
+        nominal.read_regular_construction_arguments(&construction_raw,
+            ConstructionMaterialOwners { model: &layered, data: &materials }, &mut construction_input,
+            &mut construction_shortcut, &mut String::new(), &mut context.backend, &mut errors)?;
+        assert_eq!(nominal.nominal_r_for_u, Some(vec![2.0]));
+        assert_eq!(nominal.nominal_u, Some(vec![0.5]));
+        assert_eq!(nominal.nominal_u_before_adjusted.as_ref().ok_or("actual U-before dimension")?[0].to_bits(), 0.0_f64.to_bits());
+        assert_eq!(nominal.coefficient_adjustment_ratio, Some(vec![1.0]));
+        nominal.nominal_r_for_u = Some(vec![0.0]); nominal.construction_usage[0].type_is_window = true;
+        let retained = nominal.clone();
+        let (mut zero_state, mut zero_console, mut zero_failure) =
+            (ctf_ordinary_output_test_state(), Vec::new(), OrdinaryFailingEio);
+        let failure = nominal.finish_selected_construction_nominal_u(&materials,
+            &mut SourceErrorBackend { state: &mut zero_state, error_stream: Some(&mut zero_failure),
+                console: &mut zero_console, out_unit1: None, out_unit2: None, f_message: None,
+                message_callback: None, error_callback: None, sqlite: None }, &mut errors);
+        assert!(matches!(failure, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_))));
+        assert_eq!(nominal, retained, "zero-R failed severe precedes ErrorsFound and Type* writes");
+        assert!(!errors); assert_eq!(zero_state.tracking.total_severe_errors, 1);
         let reached_eio = String::from_utf8(eio)?;
         assert_eq!(reached_eio.matches("! <Surface Heat Transfer Algorithm>").count(), 1);
         assert!(reached_eio.contains("Surface Heat Transfer Algorithm, CTF - ConductionTransferFunction,200,0.10,1000.0\n"));
