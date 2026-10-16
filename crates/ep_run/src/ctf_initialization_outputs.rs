@@ -96,6 +96,8 @@ impl CtfRunOutputs {
                     mtr: output_dir.join("eplusrs.mtr"),
                     bnd: output_dir.join("eplusrs.bnd"),
                     dxf: output_dir.join("eplusrs.dxf"),
+                    rdd: output_dir.join("eplusrs.rdd"),
+                    mdd: output_dir.join("eplusrs.mdd"),
                     audit: output_dir.join("eplusrs.audit"),
                     debug: output_dir.join("eplusrs.dbg"),
                 },
@@ -261,6 +263,60 @@ impl CtfRunOutputs {
             mtd,
             &mut backend,
             shading_path,
+        )
+    }
+
+    /// Explicit Source continuation through Native primary564; production dispatch
+    /// and final566-620 processing remain separate caller work. The one outer PSY
+    /// scope from before input processing must remain active across this call.
+    pub(crate) fn source_simulation_through_primary(
+        &mut self,
+        weather: &ep_runtime::weather::day::ProductionWeatherTimestepSeries,
+        model: &ep_model::TypedModel,
+        reporting: &ep_runtime::HeatBalanceOrdinaryWarmupReportInputs,
+        shading_path: &Path,
+    ) -> Result<(), ep_runtime::RuntimeError> {
+        use ep_runtime::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
+        let missing = |name| {
+            ep_runtime::RuntimeError::HeatBalanceInput(Box::new(
+                HeatBalanceInputError::Unavailable(name),
+            ))
+        };
+        let files = self
+            .initialization_files
+            .as_mut()
+            .ok_or_else(|| missing("actual initialized Source files before continuation268"))?;
+        let mtd = self
+            .mtd
+            .as_mut()
+            .ok_or_else(|| missing("actual retained Source MTD before continuation268"))?;
+        let locals = self
+            .source_simulation_loop_locals
+            .as_mut()
+            .ok_or_else(|| missing("actual RunSimulation180 locals before continuation268"))?;
+        // Same concrete caller capability as source_ordinary_timestep: RunConfig
+        // owns these two real streams and exposes no callback/SQL/unit adapters.
+        let mut backend = SourceErrorBackend {
+            state: &mut self.state,
+            error_stream: Some(&mut self.error),
+            console: &mut self.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        files.source_simulation_through_primary(
+            &mut self.source_session,
+            &mut self.reports,
+            weather,
+            model,
+            reporting,
+            mtd,
+            &mut backend,
+            shading_path,
+            locals,
         )
     }
 

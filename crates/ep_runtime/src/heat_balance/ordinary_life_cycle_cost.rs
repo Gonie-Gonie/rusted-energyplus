@@ -1,6 +1,7 @@
 //! Genuine EconomicLifeCycleCost input wrapper on one retained native module slice.
 //! Positive object getters stop at their first actual unported operation.
 mod input;
+mod endrun;
 mod state;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;

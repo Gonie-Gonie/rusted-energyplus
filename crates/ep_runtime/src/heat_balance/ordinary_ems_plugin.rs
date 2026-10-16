@@ -4,6 +4,7 @@ use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 use super::selected_simulation_startup::SelectedRuntimeLanguage;
 use std::convert::Infallible;
+mod endrun;
 
 /// Actual EMSManager.hh calling points used by simulation, heat balance and weather.
 #[repr(i32)]

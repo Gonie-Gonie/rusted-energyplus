@@ -101,6 +101,7 @@ impl SelectedProjectData {
         )?;
         update("MinimalShadowing", &mut self.system.minimal_shadowing)?;
         update("TimingFlag", &mut self.system.timing_flag)?;
+        update("TRACK_AIRLOOP", &mut self.system.track_air_loop_env_flag)?;
         update("CI_FORCE_TIME_STEP", &mut self.system.ci_force_time_step)?;
         Ok(())
     }

@@ -1,5 +1,6 @@
 //! Genuine EconomicTariff219-256 on the admitted zero-tariff domain.
 //! Positive tariff construction and positive CurrencyType getter remain explicit.
+mod compute_tariff;
 use super::error_backend::SourceErrorBackend;
 use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};
@@ -404,6 +405,8 @@ impl SourceCostEstimateMonetary {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SourceEconomicTariff {
     pub(crate) update_get_input: bool,
+    /// Actual EconomicTariff.hh644 ctor0; positive econVar records stay unported.
+    pub(crate) number_economics_variables: i32,
     pub(crate) number_tariffs: i32,
     pub(crate) tariff_allocated: bool,
     pub(crate) tariffs: Vec<Infallible>,
@@ -412,6 +415,7 @@ impl Default for SourceEconomicTariff {
     fn default() -> Self {
         Self {
             update_get_input: true,
+            number_economics_variables: 0,
             number_tariffs: 0,
             tariff_allocated: false,
             tariffs: Vec::new(),

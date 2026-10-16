@@ -16,6 +16,10 @@ pub struct SourceInitializationFilePaths {
     pub bnd: PathBuf,
     /// Actual DXF drawing path; opened freshly at each reached DXF call.
     pub dxf: PathBuf,
+    /// Actual report-variable dictionary path.
+    pub rdd: PathBuf,
+    /// Actual meter dictionary path.
+    pub mdd: PathBuf,
     /// Actual Audit path, opened only at ProcessScheduleInput718.
     pub audit: PathBuf,
     /// Actual ManageSimulation185 debug path, opened before SQL/PostIP.
@@ -117,6 +121,8 @@ pub struct SourceInitializationFiles {
     debug: SourceOutputStream,
     // Native IOFilePath owns only the path, not a permanently opened stream.
     dxf: PathBuf,
+    // Native IOFiles.hh626-627 retained InputOutputFile objects.
+    dictionaries: [dictionaries::SourceDictionaryStream; 2],
 }
 impl SourceInitializationFiles {
     /// Retain genuine caller-selected paths without opening any stream early.
@@ -132,6 +138,10 @@ impl SourceInitializationFiles {
             audit: SourceOutputStream::new(paths.audit),
             debug: SourceOutputStream::new(paths.debug),
             dxf: paths.dxf,
+            dictionaries: [
+                dictionaries::SourceDictionaryStream::new(paths.rdd),
+                dictionaries::SourceDictionaryStream::new(paths.mdd),
+            ],
         }
     }
     pub(super) fn source_dxf_path(&self) -> &Path {
@@ -187,6 +197,11 @@ impl SourceInitializationFiles {
                 stream.flush()?;
             }
         }
+        for stream in &mut self.dictionaries {
+            if stream.is_open() {
+                stream.flush()?;
+            }
+        }
         if self.debug.file.is_some() {
             self.debug.flush()?;
         }
@@ -205,6 +220,7 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
     }
 }
 
+mod dictionaries;
 mod reporting;
 pub(crate) use reporting::{SourceRuntimeMeterStreams, SourceRuntimeReportStreams};
 

@@ -136,6 +136,11 @@ impl Default for SourceTabularReports {
     }
 }
 impl SourceTabularReports {
+    /// Borrow the sole actual OutputReportTabular WriteTabularFiles cell.
+    /// EconomicTariff writes this same field at its reached native positions.
+    pub(crate) fn source_write_tabular_files_mut(&mut self) -> &mut bool {
+        &mut self.input_state.write_tabular_files
+    }
     /// Actual UpdateTabularReports prefix. A positive unported child returns at
     /// its first real operation, after all preceding reached Source writes.
     pub(crate) fn update_source_tabular_reports(

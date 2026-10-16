@@ -82,6 +82,8 @@ pub(crate) struct ProjectSystemVariables {
     pub(crate) update_data_during_warmup_external_interface: bool,
     pub(crate) developer_flag: bool,
     pub(crate) timing_flag: bool,
+    /// Actual DataSystemVariables.hh120 ctorfalse, read from TRACK_AIRLOOP.
+    pub(crate) track_air_loop_env_flag: bool,
     pub(crate) report_detailed_warmup_convergence: bool,
     pub(crate) report_during_hvac_sizing_simulation: bool,
 }

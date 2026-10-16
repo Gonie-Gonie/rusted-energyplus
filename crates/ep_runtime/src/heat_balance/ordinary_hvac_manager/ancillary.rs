@@ -170,6 +170,7 @@ impl SourceIndoorGreen {
 /// Separate real module owners, retained once beside the actual HVACManager fields.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceHvacAncillaryModules {
+    pub(crate) dual_duct: crate::heat_balance::startup_integrity::SourceDualDuctData,
     pub(crate) branch_node_connections:
         crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
     pub(crate) mixed_air: crate::heat_balance::startup_integrity::SourceMixedAir,

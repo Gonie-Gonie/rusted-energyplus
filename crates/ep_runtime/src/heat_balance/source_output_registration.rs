@@ -137,6 +137,7 @@ pub(crate) use solar_target::{SourceCombinedOutputOwners, SourceSolarOutputField
 mod bound_integer;
 mod dictionary;
 mod meter_request_input;
+mod produce_dictionaries;
 pub(crate) use meter_request_input::{SourceMeterReportingHost, SourceMeterReportingOwners};
 mod host;
 mod integer;
@@ -285,6 +286,8 @@ pub(crate) struct SourceEndUseCategory {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceOutputRegistration {
+    // Native OutputProcessor.hh931: assigned only by actual ProduceRDDMDD.
+    produce_report_vdd: produce_dictionaries::SourceReportVdd,
     /// Actual OutputProcessor.hh932–948 constructor members, never seeded.
     pub(crate) number_hours_in_month: i32,
     pub(crate) number_hours_in_simulation: i32,
@@ -323,6 +326,7 @@ pub(crate) struct SourceOutputRegistration {
 impl Default for SourceOutputRegistration {
     fn default() -> Self {
         Self {
+            produce_report_vdd: produce_dictionaries::SourceReportVdd::No,
             number_hours_in_month: 0,
             number_hours_in_simulation: 0,
             meter_values: Vec::new(),

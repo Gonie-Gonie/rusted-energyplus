@@ -2,10 +2,15 @@
 //! The same caller ErrFound, native module counts, input, backend and BND are borrowed.
 mod air_path;
 mod branch;
+mod connection_reports;
 mod mixed_air;
 mod nodes;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 pub(crate) use air_path::test_source_air_path_integrity;
+pub(crate) use connection_reports::{
+    SourceDualDuctData, SourceLoopConnectionReportOwners, report_source_air_loop_connections,
+    report_source_loop_connections,
+};
 pub(crate) use mixed_air::SourceMixedAir;
 pub(crate) use nodes::SourceBranchNodeConnections;
 

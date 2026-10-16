@@ -414,15 +414,62 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
             .map_err(hb_input_error)
     }
     fn report_loop_connections(&mut self) -> Result<(), RuntimeError> {
-        Err(unavailable("actual ReportLoopConnections child"))
+        let session = required(
+            self.session.as_ref(),
+            "actual same connection/Plant/DualDuct owners before loop report",
+        )?;
+        let startup = required(
+            self.reports.selected_simulation_startup.as_ref(),
+            "actual same HVAC globals before loop report",
+        )?;
+        let owners = crate::heat_balance::startup_integrity::SourceLoopConnectionReportOwners {
+            connections: &session.hvac.ancillary.branch_node_connections,
+            outdoor_air_nodes: &session.hvac.ancillary.outdoor_air_nodes,
+            hvac: &startup.hvac_globals,
+            plant: &session.hvac.simulation.plant,
+            equipment: required(
+                self.reports.source_zone_equipment.as_ref(),
+                "actual same ZoneEquipConfig/Node owner before loop report",
+            )?,
+            globals: required(
+                self.reports.selected_heat_balance_globals.as_ref(),
+                "actual same DataGlobal before loop report",
+            )?,
+            dual_duct: &session.hvac.ancillary.dual_duct,
+        };
+        crate::heat_balance::startup_integrity::report_source_loop_connections(
+            &owners,
+            self.files.bnd_stream(),
+            self.backend,
+        )
+        .map_err(hb_input_error)
     }
     fn report_air_loop_connections(&mut self) -> Result<(), RuntimeError> {
-        Err(unavailable(
-            "actual SystemReports::ReportAirLoopConnections child",
-        ))
+        let startup = required(
+            self.reports.selected_simulation_startup.as_ref(),
+            "actual same HVAC globals before air loop report",
+        )?;
+        crate::heat_balance::startup_integrity::report_source_air_loop_connections(
+            &startup.hvac_globals,
+            self.files.bnd_stream(),
+        )
+        .map_err(hb_input_error)
     }
     fn report_node_connections(&mut self) -> Result<(), RuntimeError> {
-        Err(unavailable("actual ReportNodeConnections child"))
+        let session = required(
+            self.session.as_mut(),
+            "actual same BranchNodeConnections owner before node report",
+        )?;
+        let equipment = required(
+            self.reports.source_zone_equipment.as_ref(),
+            "actual same NodeOwner before node report",
+        )?;
+        session
+            .hvac
+            .ancillary
+            .branch_node_connections
+            .report_source_node_connections(equipment, self.files.bnd_stream())
+            .map_err(hb_input_error)
     }
     fn create_energy_report_structure(&mut self) -> Result<(), RuntimeError> {
         let session = required(
@@ -460,7 +507,8 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
             .map_err(hb_input_error)
     }
     fn produce_rdd_mdd(&mut self) -> Result<(), RuntimeError> {
-        Err(unavailable("actual ProduceRDDMDD child"))
+        self.reports
+            .produce_source_rdd_mdd(&self.model.report_inputs, self.files, self.backend)
     }
     fn show_fatal_error(&mut self, message: &str) -> Result<Infallible, RuntimeError> {
         self.backend

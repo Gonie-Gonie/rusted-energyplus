@@ -3,6 +3,7 @@
 use super::ordinary_air_heat_balance::predictor_corrector::SourceAirUpdate;
 use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 mod air_report;
+mod endrun;
 mod ancillary;
 pub(crate) mod heat_emission;
 pub(crate) mod non_zone_equipment;
@@ -16,7 +17,7 @@ mod simple_airflow;
 pub(crate) mod simulation;
 mod state;
 pub(crate) mod water_manager;
-pub(crate) use ancillary::SourceHvacAncillaryModules;
+pub(crate) use ancillary::{SourceHvacAncillaryModules, SourceOutdoorAirNodes};
 pub(crate) use owners::SourceHvacOwners;
 pub(crate) use providers::{SourceHvacChild, SourceHvacChildren};
 pub(crate) use state::SourceHvacManager;

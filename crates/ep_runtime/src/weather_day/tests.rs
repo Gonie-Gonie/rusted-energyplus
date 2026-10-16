@@ -218,6 +218,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             day_of_week_tomorrow: 112,
             holiday_index_tomorrow: 113,
             tot_des_days: 114,
+            tot_run_des_pers_days: 340,
             current_overall_sim_day: 330,
             total_overall_sim_days: 331,
             max_number_sim_years: 332,

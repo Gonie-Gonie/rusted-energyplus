@@ -21,6 +21,7 @@ mod files;
 mod kickoff_postlude;
 pub(crate) use kickoff_postlude::SourceFaultsManager;
 mod output_reporting;
+mod produce_dictionaries;
 mod simulation_parent;
 pub(crate) use output_reporting::SourceSqliteState;
 pub(crate) mod primary_startup_surfaces;

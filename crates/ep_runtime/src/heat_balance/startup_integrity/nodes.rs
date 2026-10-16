@@ -1,4 +1,5 @@
 //! Actual shared BranchNodeConnections module slice and two finite checks.
+mod reporting;
 use super::{Error, extent};
 use std::convert::Infallible;
 #[derive(Clone, Debug, PartialEq)]
@@ -8,6 +9,10 @@ pub(crate) struct SourceBranchNodeConnections {
     number_node_connections: i32,
     component_sets: Option<Vec<Infallible>>,
     node_connections: Option<Vec<Infallible>>,
+    /// Actual DataBranchNodeConnections.hh120 constructor0; reporting never resets it.
+    number_actual_parents: i32,
+    parent_node_list: Option<Vec<Infallible>>,
+    non_connected_nodes: Option<Vec<bool>>,
 }
 impl Default for SourceBranchNodeConnections {
     fn default() -> Self {
@@ -17,6 +22,9 @@ impl Default for SourceBranchNodeConnections {
             number_node_connections: 0,
             component_sets: None,
             node_connections: None,
+            number_actual_parents: 0,
+            parent_node_list: None,
+            non_connected_nodes: None,
         }
     }
 }

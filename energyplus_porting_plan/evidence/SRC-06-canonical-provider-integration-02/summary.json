@@ -1,0 +1,304 @@
+{
+  "schema": "src06-canonical-provider-source-integration.v2",
+  "status": "Reviewed report and finite endrun-library Source integrated; actual full production activation and Native parity pending",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "base_HEAD": "41c68bef4d7bc00529b34a1f148507c72bbbcbce",
+  "counts": {
+    "compiler_inputs": 4412,
+    "changed": 31,
+    "new": 11,
+    "existing": 20,
+    "existing_tests_passed": 27,
+    "failed": 0,
+    "ignored": 0
+  },
+  "promotion": {
+    "path": ".runtime/porting/SRC-06/reviewed-source-promotion-Root-02/promotion.json",
+    "sha256": "6ccbc024472b2d1bc9fdbae6b11161ebb721d9a94756614f9fa016e019979456",
+    "bytes": 1101844
+  },
+  "actual_commands": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-62/receipt.json",
+      "sha256": "0a499ec6cb6ba2a2d3a98654a828db268b58f7bd8a37946055ee408dd8ab7a81",
+      "bytes": 3063
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-existing-arbitrary-run-tests-62-8MiB/receipt.json",
+      "sha256": "431c3566aa59bc6de04bfcae41f7bd5bdbe2857eabf4834ee613681465403f20",
+      "bytes": 3347
+    }
+  ],
+  "independent_reviews": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union62-Source-review-01/review.json",
+      "sha256": "9dc11c96ec90c1a3b089a1677fdeb29a09814d7a13e43c294fc3644647331c2e",
+      "bytes": 7489
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union61-Source-review-01/review.json",
+      "sha256": "536e118f6e67169675c8c2021aea7f00f2af361a19696acabde37952da4d4770",
+      "bytes": 10583
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-outdoor-node-type-export-Source-review-01/review.json",
+      "sha256": "b0872bf8d37ac989e469f6f97d55bb0923edfdd8890f555234c0d206031e8bff",
+      "bytes": 2222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-produce-dictionaries-Source-review-03/review.json",
+      "sha256": "faf4084fd1f76f2cfa1ff87dc77fec57ed018d912181c7e1d2679d4951246343",
+      "bytes": 3144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-connection-exporters-Source-review-02/review.json",
+      "sha256": "cb6b214aa8ce11c0973d4ee3666c5ffc244a04ee596cbc2668ab52d866f15458",
+      "bytes": 3827
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-through-primary-Source-review-01/review.json",
+      "sha256": "0297bc8b34caa05af552f7c44d4948a7961779db8cbc486341ad792c6ee824ab",
+      "bytes": 6112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-prelude-report-wiring-Source-review-01/review.json",
+      "sha256": "9f04eb22eb53df474baee15ee82904cd1185f2fce308881e6edde3c0bb3e519a",
+      "bytes": 4600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-endrun-small-leaves-Source-review-02/review.json",
+      "sha256": "31c240e79571d198c451d2e6e272ec238b197d659761e36f67fca639990c9738",
+      "bytes": 9599
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-compute-tariff-prefix-Source-review-01/review.json",
+      "sha256": "82d3545a2dda6005ae3b96e67e57d7dc88a9ca597e3b241f68092d1307852b02",
+      "bytes": 6815
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-endrun-owner-prerequisites-Source-review-01/review.json",
+      "sha256": "376ad708434ab7afacb48132385aafa17f1c961fb0c0806e90ee1663d470550e",
+      "bytes": 7153
+    }
+  ],
+  "parent_public_checkpoint": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-provider-integration-01/summary.json",
+    "sha256": "8d0f467bc7ab9efcb658376f525dec6663409fa8cf2e39dcd788821295540f7a",
+    "bytes": 44137
+  },
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-provider-integration-02/evidence.zip",
+    "sha256": "0d2b013e6e8b0f64fa2ed175e3d235516b284eb1405cd5e425e6d74a42e011ee",
+    "bytes": 857185
+  },
+  "archive_files": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-compute-tariff-prefix-Source-review-01/review.json",
+      "sha256": "82d3545a2dda6005ae3b96e67e57d7dc88a9ca597e3b241f68092d1307852b02",
+      "bytes": 6815
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-endrun-owner-prerequisites-Source-review-01/review.json",
+      "sha256": "376ad708434ab7afacb48132385aafa17f1c961fb0c0806e90ee1663d470550e",
+      "bytes": 7153
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-prelude-report-wiring-Source-review-01/review.json",
+      "sha256": "9f04eb22eb53df474baee15ee82904cd1185f2fce308881e6edde3c0bb3e519a",
+      "bytes": 4600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union61-Source-review-01/review.json",
+      "sha256": "536e118f6e67169675c8c2021aea7f00f2af361a19696acabde37952da4d4770",
+      "bytes": 10583
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union61-Source-review-01/source-part.json",
+      "sha256": "477d3ff14eb0aefc34c4fbe01da90dd454faaf894cbccadb126653990e1ae71c",
+      "bytes": 21182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union62-Source-review-01/review.json",
+      "sha256": "9dc11c96ec90c1a3b089a1677fdeb29a09814d7a13e43c294fc3644647331c2e",
+      "bytes": 7489
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-provider-union62-Source-review-01/source-part.json",
+      "sha256": "ec437421b3d77bed27218f1b0ce34b5a5815d08d01b512003bf0b2d01ed5c593",
+      "bytes": 5927
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-through-primary-Source-review-01/review.json",
+      "sha256": "0297bc8b34caa05af552f7c44d4948a7961779db8cbc486341ad792c6ee824ab",
+      "bytes": 6112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-connection-exporters-Source-review-02/review.json",
+      "sha256": "cb6b214aa8ce11c0973d4ee3666c5ffc244a04ee596cbc2668ab52d866f15458",
+      "bytes": 3827
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-endrun-small-leaves-Source-review-02/review.json",
+      "sha256": "31c240e79571d198c451d2e6e272ec238b197d659761e36f67fca639990c9738",
+      "bytes": 9599
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-outdoor-node-type-export-Source-review-01/review.json",
+      "sha256": "b0872bf8d37ac989e469f6f97d55bb0923edfdd8890f555234c0d206031e8bff",
+      "bytes": 2222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-produce-dictionaries-Source-review-03/review.json",
+      "sha256": "faf4084fd1f76f2cfa1ff87dc77fec57ed018d912181c7e1d2679d4951246343",
+      "bytes": 3144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/integrate-reviewed-source-Root-02.py",
+      "sha256": "5be85d62610e34b3db9db25afad520668b825170d65d879f136f70056e5a951a",
+      "bytes": 10290
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-compute-tariff-prefix-held-Fix-04/manifest.json",
+      "sha256": "17b3cd51ad7cc85fd00c64ffab3e08681008b8995d6f48a7e627c865735d5cda",
+      "bytes": 42435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-connection-exporters-held-Audit-02/manifest.json",
+      "sha256": "0f6510e6d678ad7c090efcc599b5736cecde07a5d33672af070efd71f637ae8c",
+      "bytes": 39061
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-endrun-owner-prerequisites-held-Fix-01/manifest.json",
+      "sha256": "2251da67902587bd31547b8f2b5ddc61b5e533057a0b3fb69ae53f82613f69e4",
+      "bytes": 43143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-endrun-small-leaves-held-Reviewer-01/manifest.json",
+      "sha256": "b877ea2ee39d98178fee5d97a36739ee0aa6e138828432fbd248811e9afff4fb",
+      "bytes": 67327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-outdoor-node-type-export-held-Reviewer-02/manifest.json",
+      "sha256": "3d5f6a8d048b89d84be61a651771b6a4d7f7c98b33e6c2f1f2f1c4f4e8e5c9ae",
+      "bytes": 15672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-prelude-report-wiring-held-Fix-01/manifest.json",
+      "sha256": "c135ca988c578fb0c2c6d14d975f97cbc3ddeff1b4f816622c722be84cbd31a4",
+      "bytes": 8633
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-produce-dictionaries-held-Fix-02/manifest.json",
+      "sha256": "9bca4ff6401d3e8ffb7733fe327174aae682f1de6124a130505db88d30266092",
+      "bytes": 87585
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-61/manifest.json",
+      "sha256": "81e84b40181aa19af57fee7a7a39f390069c283ee5b21ca77fa8dde9197310a2",
+      "bytes": 110302
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-61/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-61/receipt.json",
+      "sha256": "0e034e373e80cd8d735dd3abad76342adb26797fd6720857c4def7f7d1827528",
+      "bytes": 3066
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-61/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-61/stderr.log",
+      "sha256": "53c2b22b1ec6323c4f59475dc70f73117a269476feb1d6091c07bc64d6af1ce0",
+      "bytes": 6620
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-61/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-61/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-61/workspace/.runtime/porting/source-objects/ac/acdab86ae5fde8240987ccf9744b494ba536e830752e6fa72cb6645d334fc7e9",
+      "sha256": "acdab86ae5fde8240987ccf9744b494ba536e830752e6fa72cb6645d334fc7e9",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/manifest.json",
+      "sha256": "1dbe6a5a4154a6093fc76c02bf1a46e6cbfe4d246fddc34278aa9d274f559703",
+      "bytes": 8922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-existing-arbitrary-run-tests-62-8MiB/receipt.json",
+      "sha256": "431c3566aa59bc6de04bfcae41f7bd5bdbe2857eabf4834ee613681465403f20",
+      "bytes": 3347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-existing-arbitrary-run-tests-62-8MiB/stderr.log",
+      "sha256": "fd914d5cfa409af0078a30218c71e0293241cd962a8d7c833b0aee6add521def",
+      "bytes": 31684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-existing-arbitrary-run-tests-62-8MiB/stdout.log",
+      "sha256": "2572e45edb322896e22251bbfdca55feecfbf0107d008142dbfd1790111af5ea",
+      "bytes": 2566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-62/receipt.json",
+      "sha256": "0a499ec6cb6ba2a2d3a98654a828db268b58f7bd8a37946055ee408dd8ab7a81",
+      "bytes": 3063
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-62/stderr.log",
+      "sha256": "d3baedb655ee0c6d1547b5217143dce5427c81a3e3cb9539b3f71f6d8c832945",
+      "bytes": 31752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/SRC-06/provider-assembly-typecheck-command-62/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-62/workspace/.runtime/porting/source-objects/63/63c8bfe5ae5cb76053900b5fe81d65cbd5eed6f1e015a63df280f51936f1bbf6",
+      "sha256": "63c8bfe5ae5cb76053900b5fe81d65cbd5eed6f1e015a63df280f51936f1bbf6",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-through-primary-held-Fix-02/manifest.json",
+      "sha256": "4451b29ee0e0442367cda73708f85f0ee8d47ef588ec6ea988b6578ed093202a",
+      "bytes": 27958
+    },
+    {
+      "path": ".runtime/porting/SRC-06/reviewed-source-promotion-Root-02/promotion.json",
+      "sha256": "6ccbc024472b2d1bc9fdbae6b11161ebb721d9a94756614f9fa016e019979456",
+      "bytes": 1101844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-with-explicit-test-stack-Root-01.py",
+      "sha256": "e007973795d1354a1b6f078ead2b86d729b94cf4839eb00724267fc8ba25b46e",
+      "bytes": 600
+    }
+  ],
+  "scope": [
+    "Three genuine connection exporters and RDD/MDD dictionaries wired into the existing pre-primary host.",
+    "One continuation over the retained original simulation locals, weather/session and reporting owners from kickoff268 through primary564.",
+    "Finite Plant/EMS/LCC endrun leaves, real tariff2665-2703 prefix, and actual weather-day and TRACK_AIRLOOP state prerequisites.",
+    "Narrow crate-private type reexport corrects the actual61 E0603 without changing implementation bodies."
+  ],
+  "remaining": [
+    "Canonical production dispatcher activation, full endrun566-620 and result export.",
+    "Remaining positive owner/physical-I/O failure domains and same-input/state Native A/B numeric comparison."
+  ],
+  "validation_scope": "Whole all-target compilation and existing27 arbitrary-run tests at original8MiB; no new tests. Prior60 full4985 tests/2ignored retained as historical parent, not rerun or claimed for62. Diagnostic pipeline and later endrun-prefix packets are not part of this canonical Source checkpoint.",
+  "reconstruction": "31 changed LF Rust files are held by canonical Git Source; archive binds exact4412 compiled inputs and actual logs/independent peers. Historical local payloads remain their existing custody; no new complete offline replay claim.",
+  "pipeline_activation": false,
+  "new_test_bodies": 0,
+  "whole_Native_numeric_PASS": false,
+  "gate_changes": false,
+  "A": "14/54",
+  "B": "14/64",
+  "retained_whole_old_comparison": {
+    "mismatches": 235456,
+    "required_unavailable_or_unpaired": 2754
+  },
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/integrate-reviewed-source-Root-02.py",
+    "sha256": "5be85d62610e34b3db9db25afad520668b825170d65d879f136f70056e5a951a",
+    "bytes": 10290
+  }
+}

@@ -226,6 +226,8 @@ pub struct WeatherEnvironmentState {
     pub holiday_index_tomorrow: i32,
     /// Number of design days.
     pub tot_des_days: i32,
+    /// Actual DataEnvironment.hh181 ctor0; distinct from number of design periods.
+    pub tot_run_des_pers_days: i32,
     /// Actual DataEnvironment.hh182-184 constructor0; first GetNext762-764 writes.
     pub current_overall_sim_day: i32,
     /// Actual total across the real Environment array, constructor0.
@@ -356,6 +358,7 @@ impl Default for WeatherEnvironmentState {
             day_of_week_tomorrow: 0,
             holiday_index_tomorrow: 0,
             tot_des_days: 0,
+            tot_run_des_pers_days: 0,
             current_overall_sim_day: 0,
             total_overall_sim_days: 0,
             max_number_sim_years: 0,

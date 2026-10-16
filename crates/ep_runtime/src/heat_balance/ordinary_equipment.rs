@@ -3,6 +3,7 @@ mod heat_to_return_air;
 pub(crate) mod management;
 mod node_reporting;
 mod source_input;
+mod source_endrun;
 mod source_marked_nodes;
 mod source_reset;
 mod source_setup_reporting;
@@ -399,6 +400,10 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    /// Actual ReportLoopConnections2656 allocated(ZoneEquipConfig), not an input-count inference.
+    pub(crate) fn source_zone_equipment_config_allocated(&self) -> bool {
+        self.zone_config.is_some()
+    }
     pub(crate) fn source_number_return_paths(&self) -> &usize {
         &self.number_of_return_paths
     }

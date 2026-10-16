@@ -80,6 +80,9 @@ impl Default for SourceOutputControl {
 /// existing owner; these options contain no second vector or scalar registry.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceResultsFrameworkOptions {
+    // Native ResultsFramework.hh433-434: distinct from outputVariables.
+    pub(crate) meter_data_dictionary: Vec<String>,
+    pub(crate) report_data_dictionary: Vec<String>,
     /// Same actual ResultsFramework.hh391 Meters frames, not gated by JSON output.
     pub(crate) meter_frames: [super::source_output_registration::SourceMeterDataFrame; 7],
     pub(crate) time_series_enabled: bool,
@@ -92,6 +95,8 @@ pub(crate) struct SourceResultsFrameworkOptions {
 impl Default for SourceResultsFrameworkOptions {
     fn default() -> Self {
         Self {
+            meter_data_dictionary: Vec::new(),
+            report_data_dictionary: Vec::new(),
             meter_frames: [
                 "Each Call",
                 "TimeStep",
