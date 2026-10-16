@@ -1,6 +1,11 @@
-//! Genuine report first-call writes and non-weather/zero-control return paths.
-//! Weather accumulation and report-period data children remain explicit boundaries.
+//! Genuine first-call reports and selected actual zero-People weather accumulation.
+//! Positive report-period, People and PierceSET branches remain explicit boundaries.
+mod thermal_weather;
 use super::*;
+use crate::heat_balance::ordinary_air_heat_balance::{
+    SourceAirHeatBalance, environment::SourceZoneFanHeatBalanceArrays,
+};
+use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_daylighting::SourceDaylighting;
@@ -9,6 +14,9 @@ use crate::weather::day::{WeatherGlobalState, WeatherOwnerState};
 
 pub(crate) struct SourceResilienceReportOwners<'a, 'backend> {
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) zones: &'a mut SelectedZoneInputOwners,
+    pub(crate) air: &'a SourceAirHeatBalance,
+    pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) weather: &'a WeatherOwnerState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
@@ -143,9 +151,7 @@ impl SourceSurfaceManagement {
             self.report_thermal_resilience_first_time = false;
         }
         if o.clock.kind_of_sim == 3 && !o.clock.warmup_flag {
-            return Err(Error::Unavailable(
-                "actual thermal weather accumulation5870-6386; before first PierceSET reset",
-            ));
+            self.report_source_thermal_weather(o)?;
         }
         Ok(())
     }

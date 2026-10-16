@@ -357,6 +357,9 @@ impl<'backend, H, D, A> SourceOrdinaryManageSurfaceHost<'_, '_, 'backend, H, D, 
         let o = &mut self.owners;
         super::SourceResilienceReportOwners {
             globals: o.globals,
+            zones: o.zones,
+            air: o.air,
+            fan: o.fan,
             clock: o.clock,
             weather: o.weather,
             control: o.control,
