@@ -41,8 +41,8 @@ const HEADERS: [(HeaderKind, &str); 8] = [
 
 /// Process one explicitly selected header, destructively consuming line/stream.
 ///
-/// Typical/Ground consumption is retained in `context`; their physical computed
-/// fields and the original global error manager's text are outside this owner.
+/// Typical/Ground token consumption is retained in `context`; the actual FC
+/// header array/flag are written on `state`. Native error-manager text remains separate.
 pub fn process_epw_header(
     kind: HeaderKind,
     line: &mut String,
@@ -62,7 +62,7 @@ pub fn process_epw_header(
         HeaderKind::HolidaysDst => holidays(line, errors, state, input, caller, context)?,
         HeaderKind::DataPeriods => periods(line, errors, state, input)?,
         HeaderKind::TypicalExtremePeriods => context.consume_typical(line, input, errors)?,
-        HeaderKind::GroundTemperatures => context.consume_ground(line)?,
+        HeaderKind::GroundTemperatures => context.consume_ground(line, state)?,
         HeaderKind::Comments1 | HeaderKind::Comments2 | HeaderKind::DesignConditions => {}
     }
     Ok(())

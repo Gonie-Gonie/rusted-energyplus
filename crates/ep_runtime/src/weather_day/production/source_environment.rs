@@ -47,6 +47,25 @@ impl ProductionWeatherTimestepSeries {
             .configuration
             .register_design_day_predefined_reports(context.reports)
             .map_err(CtfInitializationError::Owner)?;
+        // Actual ReadUserWeatherInput4820 precedes Station4828. The earlier
+        // raw cursor already processed actual EPW headers at GetNextEnvironment710.
+        session
+            .initialize_source_ground_temperatures(
+                context
+                    .reports
+                    .heat_balance_input
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual ground-model raw input"))?,
+                context
+                    .reports
+                    .selected_input_processor
+                    .as_mut()
+                    .ok_or_else(|| unavailable("actual ground-model InputProcessor"))?,
+                &mut context.reports.input_processor_shortcut,
+                &mut context.backend,
+                context.eio,
+            )
+            .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
         context
             .reports
             .input_processor_shortcut

@@ -148,6 +148,23 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "BuildingSurface:Detailed",
         name_field_index: 0,
     },
+    // Four actual unnamed Site factories use the same physical IDF metadata.
+    IdfOrderTarget {
+        object_type: "Site:GroundTemperature:BuildingSurface",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Site:GroundTemperature:FCfactorMethod",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Site:GroundTemperature:Shallow",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Site:GroundTemperature:Deep",
+        name_field_index: 0,
+    },
     // InternalHeatGains::GetInternalHeatGainsInput reads named OtherEquipment
     // in the same Source getObjectItem order and with real IDF field counts.
     IdfOrderTarget {
@@ -333,6 +350,10 @@ pub fn apply_idf_declaration_order(
                         "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
+                        "Site:GroundTemperature:BuildingSurface"
+                        | "Site:GroundTemperature:FCfactorMethod"
+                        | "Site:GroundTemperature:Shallow"
+                        | "Site:GroundTemperature:Deep" => idf_object.max_fields.max(12),
                         _ => idf_object.max_fields,
                     },
                     (target.object_type == "BuildingSurface:Detailed")
@@ -510,6 +531,10 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
             | "SurfaceConvectionAlgorithm:Inside"
             | "SurfaceConvectionAlgorithm:Outside"
             | "ZoneAirHeatBalanceAlgorithm"
+            | "Site:GroundTemperature:BuildingSurface"
+            | "Site:GroundTemperature:FCfactorMethod"
+            | "Site:GroundTemperature:Shallow"
+            | "Site:GroundTemperature:Deep"
             | "Output:Surfaces:List"
             | "Output:Surfaces:Drawing"
             | "Output:VariableDictionary"

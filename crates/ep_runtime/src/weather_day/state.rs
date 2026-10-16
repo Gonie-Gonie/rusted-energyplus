@@ -276,4 +276,6 @@ pub struct WeatherDayState {
     pub environment: WeatherEnvironmentState,
     /// Selected weather-owner flags, counters, and read context.
     pub weather: WeatherOwnerState,
+    /// Sole ground-model manager registry and WeatherManager client pointers.
+    pub(crate) ground_temperature_models: super::ground_temperature::SourceGroundTemperatureModels,
 }

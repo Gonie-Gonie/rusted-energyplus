@@ -1,11 +1,15 @@
 //! Finite literal field grammar for the ordinary equipment input resolver.
 use super::{blank, number, text_is};
 use ep_raw_model::{FieldName, RawValue};
+mod ground;
 
 // These literal matches are the finite 26.1 field grammar, not a runtime schema
 // engine. Existing compiler, geometry, schedules and thermal validation still
 // run. The Source-reviewed branch restrictions below are deliberately narrower.
 pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+    if let Some(admitted) = ground::admitted_field(family, name, value) {
+        return admitted;
+    }
     match (family, name) {
         // Actual parser metadata only, including the existing unnamed reports.
         (

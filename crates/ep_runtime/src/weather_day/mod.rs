@@ -8,6 +8,7 @@ mod configuration;
 mod current;
 mod design_day;
 mod error;
+pub(crate) mod ground_temperature;
 pub mod handoff;
 mod hourly;
 mod lifecycle;

@@ -26,6 +26,10 @@ pub(crate) fn resolve(
         "Construction",
         "Zone",
         "OtherEquipment",
+        "Site:GroundTemperature:BuildingSurface",
+        "Site:GroundTemperature:FCfactorMethod",
+        "Site:GroundTemperature:Shallow",
+        "Site:GroundTemperature:Deep",
     ] {
         let ordered = raw.ordered_instances(family).map_err(|e| e.to_string())?;
         if input.get_num_objects_found(family) != ordered.len() {

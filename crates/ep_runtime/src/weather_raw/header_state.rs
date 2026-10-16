@@ -177,6 +177,10 @@ pub struct RawEpwHeaderState {
     pub month_ends: [i32; 12],
     /// Raw parser's weather-code miss counter on this same owner.
     pub weather_code_missed_count: i32,
+    /// Sole WeatherManager.hh796 constructor12 positive zeros; ProcessEPWHeader writes this owner.
+    pub ground_temps_fc_from_epw_header: [f64; 12],
+    /// Actual WeatherManager.hh808 constructorfalse; only complete header sets true.
+    pub weather_file_fc_ground_temps: bool,
 }
 impl Default for RawEpwHeaderState {
     fn default() -> Self {
@@ -199,6 +203,8 @@ impl Default for RawEpwHeaderState {
             leap_year_add: 0,
             month_ends: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
             weather_code_missed_count: 0,
+            ground_temps_fc_from_epw_header: [0.0; 12],
+            weather_file_fc_ground_temps: false,
         }
     }
 }

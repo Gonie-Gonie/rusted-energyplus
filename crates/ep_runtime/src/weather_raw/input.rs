@@ -289,7 +289,11 @@ impl HeaderContextConsumption {
         Ok(())
     }
 
-    pub(super) fn consume_ground(&mut self, line: &mut String) -> Result<(), RawEpwHeaderError> {
+    pub(super) fn consume_ground(
+        &mut self,
+        line: &mut String,
+        state: &mut super::RawEpwHeaderState,
+    ) -> Result<(), RawEpwHeaderError> {
         if let Some(at) = line.find(',') {
             let (number, error) = number_with_error(&line[..at]);
             let count = to_source_int(number)?;
@@ -304,23 +308,28 @@ impl HeaderContextConsumption {
                         break;
                     }
                 }
-                for _ in 1..=12 {
+                state.ground_temps_fc_from_epw_header.fill(0.0);
+                let mut actual_count = 0;
+                for i in 0..12 {
                     if let Some(at) = line.find(',') {
-                        number_with_error(&line[..at]);
+                        state.ground_temps_fc_from_epw_header[i] = number_with_error(&line[..at]).0;
+                        actual_count += 1;
                         self.ground_consumed_fields.push(line[..at].to_owned());
                         erase_field(line, at);
                     } else {
                         if !line.is_empty() {
-                            number_with_error(line);
+                            state.ground_temps_fc_from_epw_header[i] = number_with_error(line).0;
+                            actual_count += 1;
                             self.ground_consumed_fields.push(line.clone());
                         }
                         break;
                     }
                 }
+                if actual_count == 12 {
+                    state.weather_file_fc_ground_temps = true;
+                }
             }
         }
-        self.unimplemented_computed_state
-            .push("GroundTempsFCFromEPWHeader and wthFCGroundTemps");
         Ok(())
     }
 }

@@ -123,6 +123,12 @@ pub struct WeatherEnvironmentState {
     pub current_weather: CurrentWeatherState,
     /// Actual InitSolarHeatGains environment owner (DataEnvironment.hh148).
     pub previous_sol_rad_positive: bool,
+    /// DataEnvironment.hh118 GroundTemp in BuildingSurface/Shallow/Deep/FC order.
+    pub ground_temp: [f64; 4],
+    /// Actual GroundTempKelvin constructor0, written immediately after BuildingSurface.
+    pub ground_temp_kelvin: f64,
+    /// Actual GroundTempInputs constructor4false; factories write the same flags.
+    pub ground_temp_inputs: [bool; 4],
     /// Source warning switch controlling hourly solar counts and negative sentinels.
     pub display_weather_missing_data_warnings: bool,
     /// Source override to suppress all hourly solar.
@@ -214,6 +220,9 @@ impl Default for WeatherEnvironmentState {
             force_begin_env_reset_suppress: false,
             current_weather: CurrentWeatherState::default(),
             previous_sol_rad_positive: false,
+            ground_temp: [0.0; 4],
+            ground_temp_kelvin: 0.0,
+            ground_temp_inputs: [false; 4],
             display_weather_missing_data_warnings: false,
             ignore_solar_radiation: false,
             ignore_beam_radiation: false,

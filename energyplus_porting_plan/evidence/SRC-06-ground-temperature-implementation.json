@@ -1,0 +1,484 @@
+{
+  "schema": "src06-ground-temperature-implementation-checkpoint.v1",
+  "base_HEAD": "5f96f15944707826cf00f6697a7e71ad4c033782",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "change": "Retain genuine EPW GroundFC header state, four cached monthly Ground models/client pointers, exact real input/factory/report effects and current-weather monthly writes. Connect four factories before Station and current writes before reflectance.",
+  "applied_Source": [
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_raw/header_state.rs",
+        "sha256": "239f85371c344479665551b63c5c723e2e822ca6d16ef81e1a25b7f6f4fbe6f9",
+        "bytes": 9582
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_raw/header_state.rs",
+        "sha256": "bada442e26a4b3ff5333c42967220ae823dea0aaba5d7f13c6fc82f33981bd0d",
+        "bytes": 9195
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_raw/header.rs",
+        "sha256": "3d80a43ce380556da8306bb1857261f8c60df4f65f20701aeb86ecf9feb3042e",
+        "bytes": 15051
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_raw/header.rs",
+        "sha256": "5e450aa8d8b4ff4606cd060116833f3de93c8f65bc35b523dfedc03e159a3d31",
+        "bytes": 15038
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_raw/input.rs",
+        "sha256": "234c6763d403650a4602b3f34cd2dfe392008e75e9880d612fe9ea2d8cb7da79",
+        "bytes": 11999
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_raw/input.rs",
+        "sha256": "b69ce6654d719e4f92e195ecd5f57416d72ec3f7cd1f505d9cbb5ef641dc01c0",
+        "bytes": 11635
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "c0b5ac77141576b82c0838e1e9bbfbcc412915eea83786086cb0cc2dd12eeb73",
+        "bytes": 1571
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "b5b96d34e9404aef11a1c00cad31d8e0aa44bb124f8f8a6599438301ba7e4248",
+        "bytes": 1536
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/state.rs",
+        "sha256": "88043f08fd8f79830fb15c1631e79b93067fc8ef6d972f978a1c3d95b3ad8fef",
+        "bytes": 9813
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/state.rs",
+        "sha256": "aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f",
+        "bytes": 9634
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "728005aae588a4e279647920f0c4a9d1fbe4f95e423e836ed01154f36cef5b64",
+        "bytes": 16561
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "057bee754fb84e4a040d90492e9fd91fbcc890e9a90fbd3a87fa536bcbf3dea0",
+        "bytes": 16087
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/ground_temperature.rs",
+        "sha256": "16c5e7ecae48e849cecfe36a12fe56a4237d8151802dfcb49b7422c12a75e4f1",
+        "bytes": 8716
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/ground_temperature.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "base_Git_absent": true
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/ground_temperature/factory.rs",
+        "sha256": "7b07dbaeed76b0d03f51905bbc579c26f95869d8634ce495a91d3e82364ca18a",
+        "bytes": 3517
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/ground_temperature/factory.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "base_Git_absent": true
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/ground_temperature/input.rs",
+        "sha256": "79626c5053ed0fda75e72efeb2070331a010ceba0e162857ad9be2352f544a78",
+        "bytes": 2665
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/ground_temperature/input.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "base_Git_absent": true
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/ground_temperature/output.rs",
+        "sha256": "b253db7e53c254c01238868d1d9533c0220ccdea5694f9d60e789362c6e4e862",
+        "bytes": 833
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/ground_temperature/output.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "base_Git_absent": true
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "81f43bca980aea257db7884e877c0bf2a7f821b4f4ddbbc508a19b472acaf2a9",
+        "bytes": 16066
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "2d048835f37cc4cfd4f8b630c0401dc4d0911e5b2580d2727505e56e93d31f13",
+        "bytes": 15500
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/production/source_environment.rs",
+        "sha256": "5ac4ec428cfb2cd8f0a716b19db16140c9a983940bb30318342f2e6b06fa1c63",
+        "bytes": 7970
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/production/source_environment.rs",
+        "sha256": "4585a9e43cb0a202e53e281a147147ad4ce31116af62558dea977aec3bef056f",
+        "bytes": 7093
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "67f3e4f7ff52ba1667f38640bdc2e48711170f0384344a4ae289593d39056baf",
+        "bytes": 19495
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "5ab1e0a163b003f32864fbeb1e312c5fb6f78d73119ef783d4e481965d3efddc",
+        "bytes": 19326
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_run/src/ordinary_heat_balance_input.rs",
+        "sha256": "7b3796258df8e237d687cfff82fdb69f6a70d0e599e6ea0501ea56bce47e1d14",
+        "bytes": 4016
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_run/src/ordinary_heat_balance_input.rs",
+        "sha256": "8136609fccbcf2a05029508d6548514ff8411aeb7c6a8a696c8392ed0dd88758",
+        "bytes": 3836
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+        "sha256": "fa7288304a7e9ddece78a2c5e4ce8aa7bf593f63937d6d4b30d04aa7bf761c7a",
+        "bytes": 7606
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_run/src/ordinary_input_processor/schema.rs",
+        "sha256": "ca32a23fcd8b6d77a869ab3f49c98cb9c00b56e17dda47a12a551003363b4615",
+        "bytes": 7342
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "9ab177c34ae6ca731ad3f07e6d746558d80797915140b9694ca2a1c8071232dc",
+        "bytes": 23224
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_run/src/ordinary_equipment_input.rs",
+        "sha256": "ed80fdc9334fe6c51f69f8387a28b49ed30b8d00932d9e0d0636e8f314aaacc0",
+        "bytes": 23008
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_run/src/ordinary_equipment_input/fields.rs",
+        "sha256": "dbb21e26321a13958f91c463e903a8250227ef0b12c48389a62bcb297e01edc3",
+        "bytes": 35443
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_run/src/ordinary_equipment_input/fields.rs",
+        "sha256": "3da27a302769cd3097c8b1a47edc89ef04fe3281300aa69301b97a329f767aad",
+        "bytes": 35326
+      },
+      "base_Git_absent": false
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_run/src/ordinary_equipment_input/fields/ground.rs",
+        "sha256": "e55fd7301d1eb3e84c8439bb580903a9c2a0eb65357187264fd43d7840de71f8",
+        "bytes": 1304
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_run/src/ordinary_equipment_input/fields/ground.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "base_Git_absent": true
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "e0a5447eb5504d0ba68ec23a2a9dd80fb78e083ad6bfac7f93630951a91b0b94",
+        "bytes": 43282
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/before/crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "91c064d88d5f1f1680afeab2a6fe74ae93ad27377b3ae935c38a0c3b796d8359",
+        "bytes": 42264
+      },
+      "base_Git_absent": false
+    }
+  ],
+  "accepted_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-03/manifest.json",
+    "sha256": "757be00d3ae5bbaeb347a916777943ba03351c189e254c531ca54c2953a04f5a",
+    "bytes": 67268
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-ground-temperature-Source-review-01/review.json",
+    "sha256": "e2528cee789f7ec761d0a74b9502fb64e2e43dec8209b1ce93eda77ca0fcc142",
+    "bytes": 4915
+  },
+  "preserved_preparation_parent": {
+    "path": ".runtime/porting/SRC-06/ordinary-ground-temperature-held-Audit-02/manifest.json",
+    "sha256": "2d1941c5b55d5868153acf7b1cb754b15939003197f7c2335c1c6d276700f0f2",
+    "bytes": 66525
+  },
+  "QA": [
+    {
+      "role": "clippy",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "-p",
+        "ep_raw_model",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-clippy-command-01/receipt.json",
+        "sha256": "5e0ed09dc3d72bbfe1820c6299ad40d06767f309af5d627f8049d53e74b3189c",
+        "bytes": 4727
+      }
+    },
+    {
+      "role": "fmt",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-fmt-command-01/receipt.json",
+        "sha256": "0720b0e61dc9d29651ec52030457250094a890fb523920d65c9eca0cae9b2b5d",
+        "bytes": 4600
+      }
+    },
+    {
+      "role": "quality",
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-quality-command-01/receipt.json",
+        "sha256": "743bc7b6be3221c8e2dde67bca60ddd37ffa6210ca2f576315357ebe6e06c47a",
+        "bytes": 4646
+      }
+    },
+    {
+      "role": "weather-tests",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "weather::day::tests::"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-weather-tests-command-01/receipt.json",
+        "sha256": "75cd533c5cbf84d3c933deb8bcf57deda5eb3c3e43b926062a4c9d0768c36c47",
+        "bytes": 4670
+      }
+    },
+    {
+      "role": "header-tests",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "weather::raw::cursor_tests::"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-header-tests-command-01/receipt.json",
+        "sha256": "a55332d01d812f8265f98df3a0bc19937ae0856309efc11dc9f082e2a3f1a93f",
+        "bytes": 4676
+      }
+    },
+    {
+      "role": "idf-tests",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_raw_model",
+        "--lib",
+        "twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-idf-tests-command-01/receipt.json",
+        "sha256": "c120bcb6794b29f446394b3f0d0b11b76ae0cec5292f35c31f27519eee6eedf3",
+        "bytes": 4711
+      }
+    },
+    {
+      "role": "A-24H",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/ground-temperature-A-24H-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "6faa1ad6f8b0fc9f68a4c505cd9fa51fe70f60d72df19775b8be7006ddf2f685",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/ground-temperature-A-24H-command-01/receipt.json",
+        "sha256": "a0f0e18c42a436664a1c93bce7a1eeefce8331fef7298257127a4c01f3b3a0f4",
+        "bytes": 5111
+      }
+    }
+  ],
+  "existing_tests_passed": 14,
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "actual_A_24H_regression": {
+    "samples": 24,
+    "series": 390,
+    "result_before": {
+      "path": ".runtime/porting/SRC-06/convexity-source-A-24H-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "bytes": 147618
+    },
+    "result_after": {
+      "path": ".runtime/porting/SRC-06/ground-temperature-A-24H-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "bytes": 147618
+    },
+    "whole_result_bytes_equal": true,
+    "EIO_before": {
+      "path": ".runtime/porting/SRC-06/convexity-source-A-24H-01/output/eplusrs.eio",
+      "sha256": "6cbd84466ddfc2eb96ec63998cd69f03caa90adf1c2cc73ed2b6eab234fc1e53",
+      "bytes": 10337
+    },
+    "EIO_after": {
+      "path": ".runtime/porting/SRC-06/ground-temperature-A-24H-01/output/eplusrs.eio",
+      "sha256": "18ee4c27c74ca340a1ad7510323dbc39300c58f9afb635eb77184cdd3ad5e134",
+      "bytes": 11349
+    },
+    "only_inserted_EIO_lines": 8,
+    "inserted_bytes": 1012,
+    "added_EIO": {
+      "path": ".runtime/porting/SRC-06/ground-canonical-checkpoint-Root-01/actual-added-EIO.txt",
+      "sha256": "95bf9db7eb96cca62f71d8eebd4b2b19e409bbb07911c27f728d67349daed4cf",
+      "bytes": 1012
+    },
+    "all_prior_EIO_bytes_retained_in_order": true
+  },
+  "limits": [
+    "Regression execution and Source review, not a Native pointwise comparison. Actual monthly state and positive model/error/EIO branches still need numerical comparison.",
+    "Whole ReadUserWeatherInput GroundReflectances/Snow/WaterMains children remain pending. Same Source Ground/FC history consumption is prepared separately; full surface/runtime activation remains pending.",
+    "Generic monthly input transport does not promote positive-object admission or any card gate."
+  ],
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "provenance_scope": "Implementation checkpoint. Tracked Source and local finite preparation/review/receipts; no standalone Native comparison package claim.",
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/seal-ground-canonical-checkpoint-Root-01.py",
+    "sha256": "662667a06eab1e6c79bc4c85f4f9e68132af652dd371397d9ae77cb7846e1dc2",
+    "bytes": 5214
+  }
+}

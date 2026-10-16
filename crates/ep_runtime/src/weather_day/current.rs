@@ -127,7 +127,10 @@ impl WeatherSession {
     /// EMS, optional ground/water models and daylight illuminance remain separate.
     pub fn set_current_weather(&mut self) -> Result<(), WeatherDayError> {
         let before = super::production_trace::snapshot(self);
-        let result = self.set_current_weather_inner();
+        // The real Source station-return route has already run GetGroundTemps.
+        // Legacy callers retain their separately bounded weather path.
+        let source_ground_models = self.state.environment.source_weather_station_initialized;
+        let result = self.set_current_weather_inner(source_ground_models);
         super::production_trace::record_operation(
             "SetCurrentWeather",
             before,
@@ -137,7 +140,10 @@ impl WeatherSession {
         result
     }
 
-    fn set_current_weather_inner(&mut self) -> Result<(), WeatherDayError> {
+    fn set_current_weather_inner(
+        &mut self,
+        source_ground_models: bool,
+    ) -> Result<(), WeatherDayError> {
         let state = &mut self.state;
         let hour = state.global.hour_of_day;
         let timestep = state.global.time_step;
@@ -171,6 +177,12 @@ impl WeatherSession {
             (hour - 1) as f64 + timestep as f64 * state.weather.time_step_fraction;
         state.global.sim_time_steps =
             (state.global.day_of_sim - 1) * 24 * steps + (hour - 1) * steps + timestep;
+        if source_ground_models {
+            // Actual2094-2102, before GndReflectance and before solar/weather reads.
+            state
+                .ground_temperature_models
+                .update_current(&mut state.environment)?;
+        }
         let month = usize::try_from(state.environment.month - 1)
             .ok()
             .filter(|&month| month < 12)

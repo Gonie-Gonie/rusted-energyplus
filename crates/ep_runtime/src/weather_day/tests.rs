@@ -97,6 +97,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
         },
         missed_counts: counts(800),
         out_of_range_counts: counts(900),
+        ground_temperature_models: Default::default(),
         global: WeatherGlobalState {
             begin_sim_flag: true,
             begin_envrn_flag: begin_envrn,
@@ -141,6 +142,9 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             source_site_atmosphere_initialized: true,
             force_begin_env_reset_suppress: true,
             previous_sol_rad_positive: true,
+            ground_temp: [0.0;4],
+            ground_temp_kelvin: 0.0,
+            ground_temp_inputs: [false;4],
             current_weather: super::CurrentWeatherState {
                 out_dry_bulb_temp: -0.0,
                 out_dew_point_temp: real(304, 0),
