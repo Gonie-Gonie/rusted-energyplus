@@ -15,13 +15,13 @@ mod escaped;
 /// The ordinal pointer array addresses these members; it is not keyed by format.
 #[derive(Debug, Default)]
 pub(super) struct SourceTabularOutputStreams {
-    streams: [SourceTabularOutputStream; 5],
+    pub(super) streams: [SourceTabularOutputStream; 5],
 }
 #[derive(Debug)]
-struct SourceTabularOutputStream {
+pub(super) struct SourceTabularOutputStream {
     file: Option<File>,
     failed: bool,
-    fill: u8,
+    pub(super) fill: u8,
 }
 impl Default for SourceTabularOutputStream {
     fn default() -> Self {
@@ -61,7 +61,7 @@ impl SourceTabularOutputStream {
         }
         Ok(())
     }
-    fn bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
+    pub(super) fn bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
         if self.failed {
             return Ok(());
         } // Native sentry rejects failed stream.
@@ -89,7 +89,7 @@ impl SourceTabularOutputStream {
         }
         Ok(())
     }
-    fn integer(&mut self, value: i32, width: usize) -> Result<(), Error> {
+    pub(super) fn integer(&mut self, value: i32, width: usize) -> Result<(), Error> {
         let value = value.to_string();
         for _ in value.len()..width {
             self.bytes(&[self.fill])?;
@@ -426,4 +426,9 @@ impl SourceInitializationFiles {
             self.open_source_output_tabular_file_on_session(session, reports, actual, backend)
         })
     }
+}
+
+// Same accepted Native ConvertToEscaped kernel; sibling writers borrow bytes.
+pub(super) fn escape(input: &[u8], xml: bool) -> Result<Vec<u8>, Error> {
+    escaped::convert_to_escaped(input, xml)
 }

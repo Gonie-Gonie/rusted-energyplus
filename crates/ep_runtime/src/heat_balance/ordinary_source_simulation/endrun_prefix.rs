@@ -155,7 +155,7 @@ impl SourceInitializationFiles {
             )
             .map_err(hb_input_error)?;
         self.open_source_output_tabular_file_on_session(session, reports, weather, backend)?;
-        self.write_source_tabular_reports_prefix_on_session(session, reports, weather)
+        self.write_source_tabular_reports_prefix_on_session(session, reports, weather, backend)
     }
 }
 
@@ -187,6 +187,7 @@ impl SourceInitializationFiles {
         session: &mut Option<OrdinarySourceSession>,
         reports: &mut CtfInitializationReports,
         weather: &WeatherSession,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), RuntimeError> {
         self.fill_source_weather_predefined_entries_on_session(session, reports)?;
         let session = required(session.as_mut(), "actual Source TAB before FillRemaining5213")?;
@@ -235,12 +236,61 @@ impl SourceInitializationFiles {
                 &reports.heat_balance_input_state,
             )
             .map_err(hb_input_error)?;
-        session
+        if session
             .tabular
             .continue_source_write_tabular_reports_after_predefined(
                 &reports.source_results_framework,
                 &reports.source_sqlite,
             )
-            .map_err(hb_input_error)
+        {
+            let globals = required(
+                reports.selected_heat_balance_globals.as_ref(),
+                "actual same Globals before BEPS5230",
+            )?;
+            let project = required(
+                reports.selected_project_data.as_ref(),
+                "actual same SysVars before BEPS5230 diagnostics",
+            )?;
+            session.tabular.write_source_beps_report(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceBepsReportOwners {
+                    registration: &reports.output_registration,
+                    zones: required(
+                        reports.selected_zone_input.as_ref(),
+                        "actual same Zones before BEPS5230",
+                    )?,
+                    globals,
+                    facility: required(
+                        reports.facility_electric_service.as_ref(),
+                        "actual same FacilityElectricService before BEPS5230",
+                    )?,
+                    water: &session.hvac.ancillary.water.data,
+                    hvac: &required(
+                        reports.selected_simulation_startup.as_ref(),
+                        "actual same HVAC globals before BEPS5230",
+                    )?.hvac_globals,
+                    predefined_summary: &session.comfort_summary,
+                    registry: &mut reports.registry,
+                    table: &mut reports.table,
+                    schedules: required(
+                        reports.selected_schedule_manager.as_ref(),
+                        "actual same schedules before BEPS5230",
+                    )?,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            return Err(unavailable("actual WriteTabularReports5231 WriteTableOfContents entry"));
+        }
+        Err(unavailable("actual WriteTabularReports5278 audit ensure_open entry"))
     }
 }

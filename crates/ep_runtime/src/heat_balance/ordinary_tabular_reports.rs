@@ -1,6 +1,7 @@
 //! Sole OutputReportTabular owner and genuine first-call input/initialization chain.
 //! Pollution factors borrow the same module that actual simulation startup uses.
 mod beps;
+mod beps_report;
 mod beps_gather;
 mod constants;
 mod date_time;
@@ -18,6 +19,7 @@ mod source_demand;
 mod state;
 mod style;
 mod style_passes;
+mod writers;
 mod summary;
 mod table_of_contents;
 mod unit_conversions;
@@ -263,3 +265,7 @@ impl SourceTabularReports {
         Ok(false)
     }
 }
+
+pub(crate) use writers::{SourceTabularBody, SourceTabularWriterOwners};
+
+pub(crate) use beps_report::SourceBepsReportOwners;

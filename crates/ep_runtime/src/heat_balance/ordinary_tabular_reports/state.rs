@@ -135,6 +135,12 @@ pub(super) struct SourceTabularInputState {
     pub(super) number_of_styles: i32,
     pub(super) table_styles: [i32; 5],
     pub(super) delimiters: [String; 5],
+    // Native OutputReportTabular.hh1290-1294 default-constructed char strings.
+    pub(super) active_sub_table_name: Vec<u8>,
+    pub(super) active_report_name_no_space: Vec<u8>,
+    pub(super) active_report_name: Vec<u8>,
+    pub(super) active_for_name: Vec<u8>,
+    pub(super) prev_report_name: Vec<u8>,
     pub(super) units_style_tabular: i32,
     pub(super) format_reals_tabular: bool,
     pub(super) units_style_sqlite: i32,
@@ -174,6 +180,19 @@ pub(super) struct SourceTabularInputState {
     pub(super) gather_demand_end_use_sub: SourceSolarArray<f64, 3>,
     pub(super) gather_demand_ind_end_use_sub: SourceSolarArray<f64, 3>,
     pub(super) gather_elapsed_time_beps: f64,
+    // Native OutputReportTabular.hh1199/1200/1210/1363-1369 ctor-zero cells.
+    pub(super) building_gross_floor_area: f64,
+    pub(super) building_conditioned_floor_area: f64,
+    pub(super) overall_net_energy_from_storage: f64,
+    pub(super) leed_site_int_lite: f64,
+    pub(super) leed_site_sp_heat: f64,
+    pub(super) leed_site_sp_cool: f64,
+    pub(super) leed_site_fan_int: f64,
+    pub(super) leed_site_srv_watr: f64,
+    pub(super) leed_site_recept: f64,
+    pub(super) leed_site_total: f64,
+    pub(super) need_other_row_leed45: SourceSolarArray<bool, 1>,
+    pub(super) need_other_row_end_use: SourceSolarArray<bool, 1>,
     /// Actual OutputReportTabular.hh1340-1361 constructor members, retained once.
     pub(super) total_volume: f64,
     pub(super) num_uncond_zones: i32,
@@ -304,6 +323,11 @@ impl Default for SourceTabularInputState {
             number_of_styles: 0,
             table_styles: [-1; 5],
             delimiters: std::array::from_fn(|_| String::new()),
+            active_sub_table_name: Vec::new(),
+            active_report_name_no_space: Vec::new(),
+            active_report_name: Vec::new(),
+            active_for_name: Vec::new(),
+            prev_report_name: Vec::new(),
             units_style_tabular: 0,
             format_reals_tabular: true,
             units_style_sqlite: 6,
@@ -343,6 +367,18 @@ impl Default for SourceTabularInputState {
             gather_demand_end_use_sub: Default::default(),
             gather_demand_ind_end_use_sub: Default::default(),
             gather_elapsed_time_beps: 0.0,
+            building_gross_floor_area: 0.0,
+            building_conditioned_floor_area: 0.0,
+            overall_net_energy_from_storage: 0.0,
+            leed_site_int_lite: 0.0,
+            leed_site_sp_heat: 0.0,
+            leed_site_sp_cool: 0.0,
+            leed_site_fan_int: 0.0,
+            leed_site_srv_watr: 0.0,
+            leed_site_recept: 0.0,
+            leed_site_total: 0.0,
+            need_other_row_leed45: SourceSolarArray { dimensions: Some([14]), values: vec![None;14] },
+            need_other_row_end_use: SourceSolarArray { dimensions: Some([14]), values: vec![None;14] },
             total_volume: 0.0,
             num_uncond_zones: 0,
             num_cond_zones: 0,
@@ -449,7 +485,7 @@ impl super::SourceTabularReports {
         &mut self,
         results: &crate::heat_balance::ordinary_output_control::SourceResultsFrameworkOptions,
         sqlite: &crate::heat_balance::source_initialization::SourceSqliteState,
-    ) -> Result<(), crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    ) -> bool {
         if self.input_state.units_style_sqlite == 6 {
             self.input_state.units_style_sqlite = self.input_state.units_style_tabular;
         }
@@ -458,12 +494,8 @@ impl super::SourceTabularReports {
         }
         if self.input_state.write_tabular_files {
             self.set_source_tabular_report_styles(results, sqlite);
-            return Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
-                "actual WriteTabularReports5230 WriteBEPSTable entry",
-            ));
+            return true;
         }
-        Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
-            "actual WriteTabularReports5278 audit ensure_open entry",
-        ))
+        false
     }
 }
