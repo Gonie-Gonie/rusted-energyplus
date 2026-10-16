@@ -12721,6 +12721,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-solar-initialization/summary.json",
         "sha256": "52bf160f80fa7b4bc9dc5dedcf2a2c789e6a6a43a61634f1ab2a7a264257ad05",
         "size_bytes": 5909
+      },
+      "actual_selected_ordinary_hb_internal_gains_input": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/summary.json",
+        "sha256": "1d246b4d57e5204d10cf14e315e83b4cc8ba866b5cb0e00c3e5d291f431a9b42",
+        "size_bytes": 47900
       }
     },
     {

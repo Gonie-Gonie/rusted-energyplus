@@ -1,0 +1,1425 @@
+{
+  "plan_key": "actual_selected_ordinary_hb_internal_gains_input",
+  "status": "Actual selected HB320 retained internal-gain input comparison PASS",
+  "card_summary_number": 46,
+  "comparison_scope": "Native actual nine-phase GetHeatBalanceInput parent return versus actual Rust successful retained selected HB320 input owners; no exact internal316/320 checkpoint, hourly gain driver, clock equivalence or whole parent/Setup proof",
+  "Source_base": "e6ea6ce846e4c288dee65c817ce0e0ff746a93d4",
+  "committed_Source_HEAD": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+  "actual_Source_QA_bridge": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-gains-QA-Git-bridge-Root-04.json",
+    "sha256": "aeadf78a99fbfb1d8f73fde9a9c7671e0458e5e5befded3f40f13625221aec63",
+    "size_bytes": 28429
+  },
+  "Native_execution_HEAD": "a8dc04fe36560c615fb11b49b7c5519f13ba7247",
+  "Source_contexts_explicit": true,
+  "no_new_test_body_or_binary": true,
+  "no_Native_expected_values_seeded": true,
+  "genuine_Rust_Source_call": 320,
+  "next_selected_Source_guard": 324,
+  "all_prior_numerical_FAILs_and_gates_unchanged": true,
+  "authentic_Native_boundary": "First eight genuine loader phases followed by one GetHeatBalanceInput parent call; no appended gain getter, schedule accessor, output callback or hourly gain driver.",
+  "historical_failure_scope": "Actual Clippy101 and both A24 exit6 receipts plus old successful QA snapshots retained separately; transport01/02/03 and all Source-only Native/adapter/provider successors preserved without assigning them scientific outcomes.",
+  "historical_build_metadata_scope": "Exactly three superseded live build descriptors join actual configure before/after aliases. Whole compile graphs/old outputs are not reopened.",
+  "historical_Rust_Source_scope": "Only exact Source packet-declared historical path/SHA/size aliases are bridged; arbitrary SHA mismatch is fatal.",
+  "static_provider_scope": "26 genuine Original providers and static PE import search closure; no Native loaded-module trace or complete OS forwarder graph.",
+  "EIO_scope": "Actual nominal gain block paired by comparator; complete prior/current EIO and uncapped literal diff retained without assuming a fixed number of changed lines.",
+  "unpaired": [
+    "Native gain-only EMS/DemandLimit/CO2DesignRate/fuel-string and Space.TotOccupants fields omitted by Rust",
+    "Native misc flags/nested EPVector allocation versus Rust Vec and EE dynamic allocation versus Rust fixed26 storage",
+    "Schedule type enum/Native pointer representation; common owned base members are compared",
+    "Global DD/OutVar storage sizes/counters/absolute indices/Next/keyOutVarNums and Native-only keyed OutVars/timeStepType; only selected subset/common attributes/no-link/empty-key semantics paired",
+    "Native60 SetupOutputVariable per-call key/order/history; retained deduplicated DD subset is not a call ledger",
+    "Six getter argument arrays/deallocated RepVarSet/per-query history and backend/fatal/positive unsupported family variants",
+    "Native MaterialBase separate Name/ROnly/Thickness/Conductivity/Resistance/*Input/allocation-pointer identity",
+    "Native LayerPoint allocated flag versus Rust fixed-array storage; common complete bounds/values are compared",
+    "ScriptF and later longwave/InitInteriorRadiation numeric owners",
+    "actual800 temperature caller/current-weather equivalence",
+    "parent local ErrorsFound, warning/fatal/zero-surface/repair/positive-user-F branches and backend timing",
+    "Native caller timestep4 versus prior Rust clock qualification; no timestep execution equivalence"
+  ],
+  "remaining": "Hourly gain execution, unsupported positive families, backend/fatal/warning variants, DD absolute global domains/unretained60-call history, ScriptF/later longwave, actual800 weather pairing and whole Setup/HB/engine remain unpaired.",
+  "replay_environment_guard": "Root launcher attestation only; no independent complete process-environment certificate.",
+  "schema": "src06-ordinary-hb-internal-gains-input-summary.v1",
+  "outcome": "PASS",
+  "new_comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-gains-comparison-01/summary.json",
+    "sha256": "7a366b8b38578db9cdf2234829946063d371b55c835b630260e10eb5d28305a7",
+    "size_bytes": 85069
+  },
+  "actual_inventory": {
+    "producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 141
+    },
+    "construction": {
+      "binary64_scalars": 24,
+      "discrete_values": 156
+    },
+    "solar": {
+      "binary64_scalars": 3,
+      "discrete_values": 12
+    },
+    "nominal": {
+      "binary64_scalars": 12,
+      "discrete_values": 64
+    },
+    "solar_initialization": {
+      "binary64_scalars": 60,
+      "discrete_values": 297
+    },
+    "materials": {
+      "binary64_scalars": 12,
+      "discrete_values": 6
+    },
+    "gains_producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 16
+    },
+    "gains_storage": {
+      "binary64_scalars": 1,
+      "discrete_values": 120
+    },
+    "gains_reports": {
+      "binary64_scalars": 155,
+      "discrete_values": 251
+    },
+    "gains_schedules": {
+      "binary64_scalars": 12,
+      "discrete_values": 35
+    },
+    "gains_equipment": {
+      "binary64_scalars": 42,
+      "discrete_values": 14
+    },
+    "gains_devices": {
+      "binary64_scalars": 16,
+      "discrete_values": 56
+    },
+    "gains_dictionary": {
+      "binary64_scalars": 0,
+      "discrete_values": 352
+    },
+    "gains_nominal_EIO": {
+      "binary64_scalars": 0,
+      "discrete_values": 23
+    }
+  },
+  "new_Solar_array_inventory": {
+    "binary64_scalars": 60,
+    "discrete_values": 297
+  },
+  "previous_Solar_comparison_inventory": {
+    "producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 141
+    },
+    "construction": {
+      "binary64_scalars": 24,
+      "discrete_values": 156
+    },
+    "solar": {
+      "binary64_scalars": 3,
+      "discrete_values": 12
+    },
+    "nominal": {
+      "binary64_scalars": 12,
+      "discrete_values": 64
+    },
+    "solar_initialization": {
+      "binary64_scalars": 60,
+      "discrete_values": 297
+    },
+    "materials": {
+      "binary64_scalars": 12,
+      "discrete_values": 6
+    }
+  },
+  "new_gain_comparison_inventory": {
+    "gains_producer": {
+      "binary64_scalars": 0,
+      "discrete_values": 16
+    },
+    "gains_storage": {
+      "binary64_scalars": 1,
+      "discrete_values": 120
+    },
+    "gains_reports": {
+      "binary64_scalars": 155,
+      "discrete_values": 251
+    },
+    "gains_schedules": {
+      "binary64_scalars": 12,
+      "discrete_values": 35
+    },
+    "gains_equipment": {
+      "binary64_scalars": 42,
+      "discrete_values": 14
+    },
+    "gains_devices": {
+      "binary64_scalars": 16,
+      "discrete_values": 56
+    },
+    "gains_dictionary": {
+      "binary64_scalars": 0,
+      "discrete_values": 352
+    },
+    "gains_nominal_EIO": {
+      "binary64_scalars": 0,
+      "discrete_values": 23
+    }
+  },
+  "gain_component_outcomes": {
+    "gains_storage": "PASS",
+    "gains_reports": "PASS",
+    "gains_equipment": "PASS",
+    "gains_devices": "PASS",
+    "gains_schedules": "PASS",
+    "gains_dictionary": "PASS",
+    "gains_nominal_EIO": "PASS"
+  },
+  "gain_nominal_EIO_literal_inventory": {
+    "Native": {
+      "headers": 2,
+      "rows": 3,
+      "literal_blocks": 1,
+      "bytes": 1576,
+      "sha256": "29039fae3561b65e303ee50a604d09b6bc2f8c935df0ebad1ed4fe044c6c5469",
+      "owner_derived_rows": {
+        "zones": 1,
+        "ZoneOtherEq": 2
+      }
+    },
+    "Rust": {
+      "headers": 2,
+      "rows": 3,
+      "literal_blocks": 1,
+      "bytes": 1576,
+      "sha256": "29039fae3561b65e303ee50a604d09b6bc2f8c935df0ebad1ed4fe044c6c5469",
+      "owner_derived_rows": {
+        "zones": 1,
+        "ZoneOtherEq": 2
+      }
+    }
+  },
+  "unpaired_observed_global_domains": {
+    "global_output_domains": {
+      "Native": {
+        "IHG_per_call_key_order_history": null,
+        "IHG_per_call_key_order_history_scope": "UNPAIRED; unrequested unmetered SetupOutputVariable returns without retaining keyed OutVar",
+        "ddOutVarMap": {
+          "ENCLOSURE MEAN RADIANT TEMPERATURE": 4,
+          "OTHER EQUIPMENT CONVECTIVE HEATING ENERGY": 27,
+          "OTHER EQUIPMENT CONVECTIVE HEATING RATE": 28,
+          "OTHER EQUIPMENT LATENT GAIN ENERGY": 29,
+          "OTHER EQUIPMENT LATENT GAIN RATE": 30,
+          "OTHER EQUIPMENT LOST HEAT ENERGY": 31,
+          "OTHER EQUIPMENT LOST HEAT RATE": 32,
+          "OTHER EQUIPMENT RADIANT HEATING ENERGY": 25,
+          "OTHER EQUIPMENT RADIANT HEATING RATE": 26,
+          "OTHER EQUIPMENT TOTAL HEATING ENERGY": 33,
+          "OTHER EQUIPMENT TOTAL HEATING RATE": 34,
+          "SPACE OTHER EQUIPMENT CONVECTIVE HEATING ENERGY": 47,
+          "SPACE OTHER EQUIPMENT CONVECTIVE HEATING RATE": 48,
+          "SPACE OTHER EQUIPMENT LATENT GAIN ENERGY": 49,
+          "SPACE OTHER EQUIPMENT LATENT GAIN RATE": 50,
+          "SPACE OTHER EQUIPMENT LOST HEAT ENERGY": 51,
+          "SPACE OTHER EQUIPMENT LOST HEAT RATE": 52,
+          "SPACE OTHER EQUIPMENT RADIANT HEATING ENERGY": 45,
+          "SPACE OTHER EQUIPMENT RADIANT HEATING RATE": 46,
+          "SPACE OTHER EQUIPMENT TOTAL HEATING ENERGY": 53,
+          "SPACE OTHER EQUIPMENT TOTAL HEATING RATE": 54,
+          "SPACE TOTAL INTERNAL CONVECTIVE HEATING ENERGY": 19,
+          "SPACE TOTAL INTERNAL CONVECTIVE HEATING RATE": 20,
+          "SPACE TOTAL INTERNAL LATENT GAIN ENERGY": 21,
+          "SPACE TOTAL INTERNAL LATENT GAIN RATE": 22,
+          "SPACE TOTAL INTERNAL RADIANT HEATING ENERGY": 15,
+          "SPACE TOTAL INTERNAL RADIANT HEATING RATE": 16,
+          "SPACE TOTAL INTERNAL TOTAL HEATING ENERGY": 23,
+          "SPACE TOTAL INTERNAL TOTAL HEATING RATE": 24,
+          "SPACE TOTAL INTERNAL VISIBLE RADIATION HEATING ENERGY": 17,
+          "SPACE TOTAL INTERNAL VISIBLE RADIATION HEATING RATE": 18,
+          "ZONE OTHER EQUIPMENT CONVECTIVE HEATING ENERGY": 37,
+          "ZONE OTHER EQUIPMENT CONVECTIVE HEATING RATE": 38,
+          "ZONE OTHER EQUIPMENT LATENT GAIN ENERGY": 39,
+          "ZONE OTHER EQUIPMENT LATENT GAIN RATE": 40,
+          "ZONE OTHER EQUIPMENT LOST HEAT ENERGY": 41,
+          "ZONE OTHER EQUIPMENT LOST HEAT RATE": 42,
+          "ZONE OTHER EQUIPMENT RADIANT HEATING ENERGY": 35,
+          "ZONE OTHER EQUIPMENT RADIANT HEATING RATE": 36,
+          "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY": 43,
+          "ZONE OTHER EQUIPMENT TOTAL HEATING RATE": 44,
+          "ZONE OUTDOOR AIR DRYBULB TEMPERATURE": 0,
+          "ZONE OUTDOOR AIR WETBULB TEMPERATURE": 1,
+          "ZONE OUTDOOR AIR WIND DIRECTION": 3,
+          "ZONE OUTDOOR AIR WIND SPEED": 2,
+          "ZONE TOTAL INTERNAL CONVECTIVE HEATING ENERGY": 9,
+          "ZONE TOTAL INTERNAL CONVECTIVE HEATING RATE": 10,
+          "ZONE TOTAL INTERNAL LATENT GAIN ENERGY": 11,
+          "ZONE TOTAL INTERNAL LATENT GAIN RATE": 12,
+          "ZONE TOTAL INTERNAL RADIANT HEATING ENERGY": 5,
+          "ZONE TOTAL INTERNAL RADIANT HEATING RATE": 6,
+          "ZONE TOTAL INTERNAL TOTAL HEATING ENERGY": 13,
+          "ZONE TOTAL INTERNAL TOTAL HEATING RATE": 14,
+          "ZONE TOTAL INTERNAL VISIBLE RADIATION HEATING ENERGY": 7,
+          "ZONE TOTAL INTERNAL VISIBLE RADIATION HEATING RATE": 8
+        },
+        "ddOutVars_null_indices": [],
+        "ddOutVars_storage_size": 55,
+        "dictionary_copy_scope": "actual retained subset/order, not60-call ledger",
+        "global_counters": {
+          "NumOfRVariable": 0,
+          "NumOfRVariable_Meter": 0,
+          "NumOfRVariable_Setup": 66,
+          "NumOfRVariable_Sum": 0,
+          "NumTotalRVariable": 66,
+          "NumVariablesForOutput": 0
+        },
+        "global_counters_IHG_only_pairing": "UNPAIRED; earlier/later parent producers share these owners",
+        "outVars_null_indices": [],
+        "outVars_storage_size": 0,
+        "selected_DD_entries": [
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Radiant Heating Energy",
+            "storage_index": 5,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Radiant Heating Rate",
+            "storage_index": 6,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Visible Radiation Heating Energy",
+            "storage_index": 7,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Visible Radiation Heating Rate",
+            "storage_index": 8,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Convective Heating Energy",
+            "storage_index": 9,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Convective Heating Rate",
+            "storage_index": 10,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Latent Gain Energy",
+            "storage_index": 11,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Latent Gain Rate",
+            "storage_index": 12,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Total Heating Energy",
+            "storage_index": 13,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Total Heating Rate",
+            "storage_index": 14,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Radiant Heating Energy",
+            "storage_index": 15,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Radiant Heating Rate",
+            "storage_index": 16,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Visible Radiation Heating Energy",
+            "storage_index": 17,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Visible Radiation Heating Rate",
+            "storage_index": 18,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Convective Heating Energy",
+            "storage_index": 19,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Convective Heating Rate",
+            "storage_index": 20,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Latent Gain Energy",
+            "storage_index": 21,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Latent Gain Rate",
+            "storage_index": 22,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Total Heating Energy",
+            "storage_index": 23,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Total Heating Rate",
+            "storage_index": 24,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Radiant Heating Energy",
+            "storage_index": 25,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Radiant Heating Rate",
+            "storage_index": 26,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Convective Heating Energy",
+            "storage_index": 27,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Convective Heating Rate",
+            "storage_index": 28,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Latent Gain Energy",
+            "storage_index": 29,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Latent Gain Rate",
+            "storage_index": 30,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Lost Heat Energy",
+            "storage_index": 31,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Lost Heat Rate",
+            "storage_index": 32,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Total Heating Energy",
+            "storage_index": 33,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Total Heating Rate",
+            "storage_index": 34,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Radiant Heating Energy",
+            "storage_index": 35,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Radiant Heating Rate",
+            "storage_index": 36,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Convective Heating Energy",
+            "storage_index": 37,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Convective Heating Rate",
+            "storage_index": 38,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Latent Gain Energy",
+            "storage_index": 39,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Latent Gain Rate",
+            "storage_index": 40,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Lost Heat Energy",
+            "storage_index": 41,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Lost Heat Rate",
+            "storage_index": 42,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Total Heating Energy",
+            "storage_index": 43,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Total Heating Rate",
+            "storage_index": 44,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Radiant Heating Energy",
+            "storage_index": 45,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Radiant Heating Rate",
+            "storage_index": 46,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Convective Heating Energy",
+            "storage_index": 47,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Convective Heating Rate",
+            "storage_index": 48,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Latent Gain Energy",
+            "storage_index": 49,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Latent Gain Rate",
+            "storage_index": 50,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Lost Heat Energy",
+            "storage_index": 51,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Lost Heat Rate",
+            "storage_index": 52,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Total Heating Energy",
+            "storage_index": 53,
+            "storeType": 1,
+            "timeStepType": 0,
+            "units": 9,
+            "variableType": 1
+          },
+          {
+            "Next": -1,
+            "ReportedOnDDFile": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Total Heating Rate",
+            "storage_index": 54,
+            "storeType": 0,
+            "timeStepType": 0,
+            "units": 8,
+            "variableType": 1
+          }
+        ],
+        "selected_keyed_OutVars": []
+      },
+      "Rust": {
+        "IHG_per_call_key_order_history": null,
+        "IHG_per_call_key_order_history_scope": "UNPAIRED; no retained call ledger",
+        "ddOutVars_storage_size": 55,
+        "dictionary_copy_scope": "actual retained subset/order; symbolic stored enums/Option Next, not60-call ledger",
+        "global_counters": {
+          "NumOfRVariable": 0,
+          "NumOfRVariable_Meter": 0,
+          "NumOfRVariable_Setup": 66,
+          "NumOfRVariable_Sum": 0,
+          "NumTotalRVariable": 66
+        },
+        "global_counters_IHG_only_pairing": "UNPAIRED; shared earlier/later producers",
+        "report_number_counter": 0,
+        "selected_DD_entries": [
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Radiant Heating Energy",
+            "storage_index": 5,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Radiant Heating Rate",
+            "storage_index": 6,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Visible Radiation Heating Energy",
+            "storage_index": 7,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Visible Radiation Heating Rate",
+            "storage_index": 8,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Convective Heating Energy",
+            "storage_index": 9,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Convective Heating Rate",
+            "storage_index": 10,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Latent Gain Energy",
+            "storage_index": 11,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Latent Gain Rate",
+            "storage_index": 12,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Total Heating Energy",
+            "storage_index": 13,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Total Internal Total Heating Rate",
+            "storage_index": 14,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Radiant Heating Energy",
+            "storage_index": 15,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Radiant Heating Rate",
+            "storage_index": 16,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Visible Radiation Heating Energy",
+            "storage_index": 17,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Visible Radiation Heating Rate",
+            "storage_index": 18,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Convective Heating Energy",
+            "storage_index": 19,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Convective Heating Rate",
+            "storage_index": 20,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Latent Gain Energy",
+            "storage_index": 21,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Latent Gain Rate",
+            "storage_index": 22,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Total Heating Energy",
+            "storage_index": 23,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Total Internal Total Heating Rate",
+            "storage_index": 24,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Radiant Heating Energy",
+            "storage_index": 25,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Radiant Heating Rate",
+            "storage_index": 26,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Convective Heating Energy",
+            "storage_index": 27,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Convective Heating Rate",
+            "storage_index": 28,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Latent Gain Energy",
+            "storage_index": 29,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Latent Gain Rate",
+            "storage_index": 30,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Lost Heat Energy",
+            "storage_index": 31,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Lost Heat Rate",
+            "storage_index": 32,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Total Heating Energy",
+            "storage_index": 33,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Other Equipment Total Heating Rate",
+            "storage_index": 34,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Radiant Heating Energy",
+            "storage_index": 35,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Radiant Heating Rate",
+            "storage_index": 36,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Convective Heating Energy",
+            "storage_index": 37,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Convective Heating Rate",
+            "storage_index": 38,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Latent Gain Energy",
+            "storage_index": 39,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Latent Gain Rate",
+            "storage_index": 40,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Lost Heat Energy",
+            "storage_index": 41,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Lost Heat Rate",
+            "storage_index": 42,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Total Heating Energy",
+            "storage_index": 43,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Zone Other Equipment Total Heating Rate",
+            "storage_index": 44,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Radiant Heating Energy",
+            "storage_index": 45,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Radiant Heating Rate",
+            "storage_index": 46,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Convective Heating Energy",
+            "storage_index": 47,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Convective Heating Rate",
+            "storage_index": 48,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Latent Gain Energy",
+            "storage_index": 49,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Latent Gain Rate",
+            "storage_index": 50,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Lost Heat Energy",
+            "storage_index": 51,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Lost Heat Rate",
+            "storage_index": 52,
+            "storeType": "Average",
+            "units": "W"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Total Heating Energy",
+            "storage_index": 53,
+            "storeType": "Sum",
+            "units": "J"
+          },
+          {
+            "Next": null,
+            "ReportedOnDDFile": false,
+            "integer": false,
+            "keyOutVarNums": [],
+            "name": "Space Other Equipment Total Heating Rate",
+            "storage_index": 54,
+            "storeType": "Average",
+            "units": "W"
+          }
+        ],
+        "selected_keyed_OutVars": null
+      },
+      "scope": "Raw global counters/storage sizes/absolute storage_index/Next/keyOutVarNums retained. No end-to-end global owner bijection; these absolute values and Native-only keyed OutVars/timeStepType remain UNPAIRED even when equal. Selected subset order/name/common attributes and semantic no-link/empty-key states only are paired."
+    }
+  },
+  "actual_total_binary64_scalars": 337,
+  "component_outcomes": {
+    "solar": "PASS",
+    "materials": "PASS",
+    "construction": "PASS",
+    "nominal": "PASS",
+    "solar_initialization": "PASS"
+  },
+  "differences": 0,
+  "unknowns": 0,
+  "Rust_execution_HEAD": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+  "Rust_QA_execution_HEADs": [
+    "a8dc04fe36560c615fb11b49b7c5519f13ba7247",
+    "bb10066854c423bfa5e31d77b436e218e6d38b41",
+    "e6ea6ce846e4c288dee65c817ce0e0ff746a93d4"
+  ],
+  "Rust_SourceSnapshot": {
+    "path": ".runtime/porting/source-objects/0d/0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104",
+    "sha256": "0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104",
+    "size_bytes": 1683100
+  },
+  "Native_recorded_Rust_SourceSnapshot": {
+    "path": ".runtime/porting/source-objects/6c/6c765686034dbf3ae048963beebbb231aa675fe2bd5a27726ce2d6cc788ff582",
+    "sha256": "6c765686034dbf3ae048963beebbb231aa675fe2bd5a27726ce2d6cc788ff582",
+    "size_bytes": 1683100
+  },
+  "Source_context_bridge": {
+    "path": ".runtime/porting/SRC-06/ordinary-hb-gains-metadata-Source-context-Root-04.json",
+    "sha256": "6ca287695634891258dcf93894ba50ad1ddc07a3dfb85092c07d076b879eaef9",
+    "size_bytes": 2207
+  },
+  "Source_approval": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-hb-gains-final-Source-review-04/review.json",
+    "sha256": "59eb72da0ec34fe2ec43f03dfc4be999108830f6d532897b44cb37ab102acb00",
+    "size_bytes": 62979
+  },
+  "actual_independent_review": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-hb-gains-actual-comparison-review-02/review.json",
+    "sha256": "b5142b6ef8c9798b0a938ae9984b02ec307c5341dc46c7d7796072ed98756431",
+    "size_bytes": 15975
+  },
+  "old_geometry_EIO_regression": "PASS (318 binary64/487 discrete and1115B literal EIO; unchanged scope)",
+  "tests": {
+    "final_selected_checks": 4,
+    "distinct_bodies": 3,
+    "current_revision_executions": 2,
+    "reused_prior_receipts": 2,
+    "new_bodies_or_bins": 0,
+    "backend_rerun": false
+  },
+  "actual_A": {
+    "hourly_samples": 24,
+    "series": 390,
+    "conformance_claim": false,
+    "result_store_whole_bytes_unchanged": true,
+    "EIO_whole_bytes_unchanged": false,
+    "complete_EIO_literal_change_ledger_preserved": true
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/manifest.json",
+    "sha256": "1ce960b1f46a275342fdab834b238b912e7a7358ab8356d146624fd47b7fd982",
+    "size_bytes": 655400
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/evidence.zip",
+    "sha256": "6410cca976b7a274f7f1b41c2302b02a34e5299d2b1423682418e67d94dc1362",
+    "size_bytes": 2602241
+  },
+  "whole_Setup_HB_or_engine_PASS_claimed": false,
+  "gates_updated": false
+}

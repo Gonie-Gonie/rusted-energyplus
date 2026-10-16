@@ -1,0 +1,284 @@
+{
+  "schema": "src06-HB320-publication-independent-readback-and-outer-records.v1",
+  "independent_readback_origin": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-hb-gains-publication-readback-02/review.json",
+    "sha256": "ee52063dda28eede42411ea6c605b984e0042aa7f7641bfa5b940b07e2e75e8e",
+    "size_bytes": 3483
+  },
+  "independent_readback": {
+    "schema": "src06-independent-full-finite-publication-readback.v1",
+    "accepted": true,
+    "public_summary": {
+      "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/summary.json",
+      "sha256": "1d246b4d57e5204d10cf14e315e83b4cc8ba866b5cb0e00c3e5d291f431a9b42",
+      "size_bytes": 47900
+    },
+    "public_manifest": {
+      "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/manifest.json",
+      "sha256": "1ce960b1f46a275342fdab834b238b912e7a7358ab8356d146624fd47b7fd982",
+      "size_bytes": 655400
+    },
+    "public_archive": {
+      "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/evidence.zip",
+      "sha256": "6410cca976b7a274f7f1b41c2302b02a34e5299d2b1423682418e67d94dc1362",
+      "size_bytes": 2602241
+    },
+    "publication_receipt": {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/receipt.json",
+      "sha256": "81bafd3c315780952afddbb6cc86df39b7766a61a46875684f1a38119e51472f",
+      "size_bytes": 3103
+    },
+    "supplied_config": {
+      "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-config-02.json",
+      "sha256": "ee67a4c6f8b506595df4303cd7aeaecbdfba813d5a73fc552f033b29d0afb44d",
+      "size_bytes": 352408
+    },
+    "accepted_config_census_review": {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-hb-gains-finite-config-review-02/review.json",
+      "sha256": "d0b40f981cf4c7ff4f7ab0b2ce86ff6627ac6edae9cdde07f9c2d082ac133355",
+      "size_bytes": 5047
+    },
+    "complete_ZIP_members": 554,
+    "complete_uncompressed_bytes": 15744064,
+    "whole_ZIP_CRC_SHA_size_and_literal_bytes_readback": true,
+    "exact_planned_member_set_preserved": true,
+    "Source_files": 20,
+    "commands": 22,
+    "current_QA_roles": 9,
+    "Native_command_receipts": 12,
+    "exact_compared_binary64": 337,
+    "exact_compared_discrete": 1543,
+    "new_gain_binary64": 226,
+    "new_gain_discrete": 867,
+    "gain_EIO_literal_bytes": 1576,
+    "comparison_differences": 0,
+    "comparison_unknowns": 0,
+    "findings": [],
+    "qualifications": [
+      "All554 ZIP members decompressed and CRC/SHA256/size checked, complete member set and every literal byte independently matched accepted prepublication census origins or exact regenerated20 Git diffs. Aggregate15744064B remains below16MiB.",
+      "All manifest artifact rows point to authenticated object members. Exact config02 metadata-only IDD/source/build aliases, all17 failure/history receipts and complete EIO ledger preserved; no executable/map/core/graph payload opened.",
+      "Public summary Source/context/QA/inventory/outcomes/limitations match actual comparison and accepted config. Whole engine/Setup claims and gates remain false; result-store remains unchanged, EIO includes exactly retained nominal gain additions.",
+      "Publisher inherited command role label comparator10 is cosmetic history; actual recorded command and pinned Source refer strict comparator11. No scientific command substitution inferred.",
+      "Earlier Root publisher01 wrong expected-HEAD invocation remains ignored historical failure, actual02 receipt0 is the publication authority; no rerun/overwrite performed by reviewer."
+    ],
+    "Native_Cargo_publisher_or_recorded_target_execution_by_reviewer": false,
+    "canonical_or_Git_mutations": false,
+    "reviewer_Source": {
+      "path": ".runtime/porting/SRC-06/readback-hb-gains-publication-Audit-02.py",
+      "sha256": "2aedda082eb13c01ad9676927ad1757cfc01441912fa783939c783849b0eb8b2",
+      "size_bytes": 9911
+    }
+  },
+  "actual_outer_publication_commands": [
+    {
+      "reference": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-01/receipt.json",
+        "sha256": "0dbef26bc277a7ffc55ffb372eaffce6065f3fd577f398da36451de3dc4ced19",
+        "size_bytes": 3022
+      },
+      "receipt": {
+        "schema": "recorded-porting-command.v1",
+        "command": [
+          "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          ".runtime/porting/SRC-06/publish-hb-gains-initialization-Reviewer-02.py",
+          "--config",
+          ".runtime/porting/SRC-06/ordinary-hb-gains-publication-config-02.json#ee67a4c6f8b506595df4303cd7aeaecbdfba813d5a73fc552f033b29d0afb44d",
+          "--expected-head",
+          "bb10066896e883deff7b4e5113e306def378809d"
+        ],
+        "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+        "exit_code": 1,
+        "launch_error": null,
+        "started_utc": "2026-10-16T01:42:14.607197+00:00",
+        "finished_utc": "2026-10-16T01:42:14.809665+00:00",
+        "elapsed_seconds": 0.20246409999981552,
+        "repository_before": {
+          "head": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+          "worktree_clean": true,
+          "porcelain_v1_nul_utf8": ""
+        },
+        "repository_after": {
+          "head": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+          "worktree_clean": true,
+          "porcelain_v1_nul_utf8": ""
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/0d/0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104",
+          "sha256": "0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104"
+        },
+        "source_bytes_match_before_and_after": true,
+        "executed_launcher": {
+          "historical_path": "tools/porting/record_command.py",
+          "archive": {
+            "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+            "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+          }
+        },
+        "python": {
+          "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+          "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+          "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+        },
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-01/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-01/stderr.log",
+          "sha256": "7fa00f0b56010d688c62c28929c3a0f9c77720377671c511a67a2f66006d744d"
+        },
+        "cargo_compiler_artifacts_capture": {
+          "requested": false,
+          "captured_utc": "2026-10-16T01:42:14.809665+00:00",
+          "status": "not_requested",
+          "rows": [],
+          "error": null
+        },
+        "launch_environment_selected": {
+          "RUSTFLAGS": null,
+          "CARGO_ENCODED_RUSTFLAGS": null,
+          "CARGO_BUILD_TARGET": null,
+          "CARGO_TARGET_DIR": null,
+          "RUSTUP_TOOLCHAIN": null,
+          "RUSTC": null,
+          "RUSTC_WRAPPER": null,
+          "RUSTC_WORKSPACE_WRAPPER": null,
+          "CARGO_HOME": null
+        },
+        "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+        "recorder_updates_gates": false,
+        "recorder_supplies_reference_answers": false
+      },
+      "complete_logs": {
+        "stdout": {
+          "reference": {
+            "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-01/stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          "literal_utf8": ""
+        },
+        "stderr": {
+          "reference": {
+            "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-01/stderr.log",
+            "sha256": "7fa00f0b56010d688c62c28929c3a0f9c77720377671c511a67a2f66006d744d",
+            "size_bytes": 627
+          },
+          "literal_utf8": "Traceback (most recent call last):\n  File \"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\publish-hb-gains-initialization-Reviewer-02.py\", line 297, in <module>\n    if __name__ == '__main__': main()\n                               ^^^^^^\n  File \"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\publish-hb-gains-initialization-Reviewer-02.py\", line 98, in main\n    assert re.fullmatch('[0-9a-f]{40}', args.expected_head) and head == args.expected_head\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+        }
+      }
+    },
+    {
+      "reference": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/receipt.json",
+        "sha256": "81bafd3c315780952afddbb6cc86df39b7766a61a46875684f1a38119e51472f",
+        "size_bytes": 3103
+      },
+      "receipt": {
+        "schema": "recorded-porting-command.v1",
+        "command": [
+          "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          ".runtime/porting/SRC-06/publish-hb-gains-initialization-Reviewer-02.py",
+          "--config",
+          ".runtime/porting/SRC-06/ordinary-hb-gains-publication-config-02.json#ee67a4c6f8b506595df4303cd7aeaecbdfba813d5a73fc552f033b29d0afb44d",
+          "--expected-head",
+          "bb10066854c423bfa5e31d77b436e218e6d38b41"
+        ],
+        "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+        "exit_code": 0,
+        "launch_error": null,
+        "started_utc": "2026-10-16T01:42:42.593691+00:00",
+        "finished_utc": "2026-10-16T01:42:47.960199+00:00",
+        "elapsed_seconds": 5.366205100000116,
+        "repository_before": {
+          "head": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+          "worktree_clean": true,
+          "porcelain_v1_nul_utf8": ""
+        },
+        "repository_after": {
+          "head": "bb10066854c423bfa5e31d77b436e218e6d38b41",
+          "worktree_clean": false,
+          "porcelain_v1_nul_utf8": "?? energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/\u0000"
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/0d/0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104",
+          "sha256": "0da66735c54d87232d53a99fedfcb7c4d2e43ebe9127692e2befb87646246104"
+        },
+        "source_bytes_match_before_and_after": true,
+        "executed_launcher": {
+          "historical_path": "tools/porting/record_command.py",
+          "archive": {
+            "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+            "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+          }
+        },
+        "python": {
+          "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+          "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+          "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+        },
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/stdout.log",
+          "sha256": "050e41a785e50a3d1d3e46dbc6eaf1738baef88dbb09e13fb5b2b50461a7ae85"
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "cargo_compiler_artifacts_capture": {
+          "requested": false,
+          "captured_utc": "2026-10-16T01:42:47.960199+00:00",
+          "status": "not_requested",
+          "rows": [],
+          "error": null
+        },
+        "launch_environment_selected": {
+          "RUSTFLAGS": null,
+          "CARGO_ENCODED_RUSTFLAGS": null,
+          "CARGO_BUILD_TARGET": null,
+          "CARGO_TARGET_DIR": null,
+          "RUSTUP_TOOLCHAIN": null,
+          "RUSTC": null,
+          "RUSTC_WRAPPER": null,
+          "RUSTC_WORKSPACE_WRAPPER": null,
+          "CARGO_HOME": null
+        },
+        "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+        "recorder_updates_gates": false,
+        "recorder_supplies_reference_answers": false
+      },
+      "complete_logs": {
+        "stdout": {
+          "reference": {
+            "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/stdout.log",
+            "sha256": "050e41a785e50a3d1d3e46dbc6eaf1738baef88dbb09e13fb5b2b50461a7ae85",
+            "size_bytes": 721
+          },
+          "literal_utf8": "{\n  \"summary.json\": {\n    \"path\": \"energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/summary.json\",\n    \"sha256\": \"1d246b4d57e5204d10cf14e315e83b4cc8ba866b5cb0e00c3e5d291f431a9b42\",\n    \"size_bytes\": 47900\n  },\n  \"manifest.json\": {\n    \"path\": \"energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/manifest.json\",\n    \"sha256\": \"1ce960b1f46a275342fdab834b238b912e7a7358ab8356d146624fd47b7fd982\",\n    \"size_bytes\": 655400\n  },\n  \"evidence.zip\": {\n    \"path\": \"energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/evidence.zip\",\n    \"sha256\": \"6410cca976b7a274f7f1b41c2302b02a34e5299d2b1423682418e67d94dc1362\",\n    \"size_bytes\": 2602241\n  }\n}\n"
+        },
+        "stderr": {
+          "reference": {
+            "path": ".runtime/porting/SRC-06/ordinary-hb-gains-publication-command-02/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          "literal_utf8": ""
+        }
+      }
+    }
+  ],
+  "first_failure": "Root supplied an incorrect full expected HEAD; publisher rejected it before output creation. Second command used actual git-derived HEAD.",
+  "scope": "Sidecar preserves post-publication independent whole ZIP readback and outer publication receipts; it is outside the immutable 554-member ZIP.",
+  "scientific_outcomes_changed": false,
+  "Root_sealer_Source": {
+    "path": ".runtime/porting/SRC-06/seal-HB320-publication-record-Root-01.py",
+    "sha256": "c92463ddd2371d5f8d7b433c0c05f4ca9636cdfbc6a0a8b51647930f7b45aad9",
+    "size_bytes": 2221
+  }
+}
