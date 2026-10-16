@@ -40,6 +40,10 @@ pub struct SourceErrorTracking {
     pub total_coincident_vertices: i32,
     /// Actual GetVertices degenerate counter, constructor zero.
     pub total_degenerate_surfaces: i32,
+    /// Actual non-convex receiving counter, DataErrorTracking.hh220 constructor0.
+    pub total_receiving_non_convex_surfaces: i32,
+    /// Actual non-convex casting counter, DataErrorTracking.hh221 constructor0.
+    pub total_casting_non_convex_surfaces: i32,
     /// Actual severe count read by the fatal summary; fatal does not increment it.
     pub total_severe_errors: i32,
     /// Actual severe warmup count, with the original warmup guards.

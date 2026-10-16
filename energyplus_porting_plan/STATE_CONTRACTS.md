@@ -55,6 +55,8 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 [Space 상태 참조 인터페이스](evidence/SRC-06-live-space-convection-interface.json)는 같은 대류 계산이 호출자 소유 MAT/ZT/ZTAV를 직접 빌려 읽도록 한다. 기존 호출자와 계산식은 유지하고 관련 기존 시험8개·Clippy·형식·소스 품질 검사를 통과했다. 실제 Source AirHB 생성·환경 초기화와 전체 표면 열수지 호출 연결은 계속 진행 중이며, 수치 비교 완료 건수와 카드 gate는 늘리지 않는다.
 
+[음영 진단 상태](evidence/SRC-06-shadow-diagnostic-owners.json)는 같은 ErrorTracking에 원본의 비볼록 수신·투사 표면 카운터2개와 실제 생성자 값0을 유지한다. 기존 생성자15곳만 확장하고 오류 처리 시험16개·runtime/CLI 전체 대상 Clippy·형식·소스 품질 검사를 통과했다. 음영 보고서와 전체 태양열 호출은 아직 활성화하지 않았으며, 이 생성자 확장으로 수치 비교나 카드 완료를 주장하지 않는다.
+
 ## SRC-06 ordinary opaque geometry owners
 
 [Actual producer comparison](evidence/SRC-06-ordinary-geometry/summary.json) binds complete physical input/Raw/typed identity before selected retained GEO03 returns, perimeter/dimensions, six bounds and exterior-area owners. The returned GEO03 object is moved once from its existing initializer call; no observer recomputes an owner. This prerequisite does not activate ordinary space air/reset, named inside-temperature arrays, post-radiation cadence or handoff, and does not expand historical Volume-only certification.

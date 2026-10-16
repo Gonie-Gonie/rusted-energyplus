@@ -139,6 +139,8 @@ impl Caller {
                     total_multiplied_windows: 0,
                     total_coincident_vertices: 0,
                     total_degenerate_surfaces: 0,
+                    total_receiving_non_convex_surfaces: 0,
+                    total_casting_non_convex_surfaces: 0,
                     match_counts: [0; 20],
                     abort_processing: false,
                     total_severe_errors: 0,

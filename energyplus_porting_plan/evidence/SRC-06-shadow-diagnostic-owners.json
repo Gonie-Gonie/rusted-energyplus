@@ -1,0 +1,257 @@
+{
+  "schema": "src06-shadow-diagnostic-owner-checkpoint.v1",
+  "base_HEAD": "024967d097ca4738b4235b2e68fad4125e11a9e2",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "Original_authority": {
+    "path": "src/EnergyPlus/DataErrorTracking.hh",
+    "lines": [
+      220,
+      221
+    ],
+    "fields": [
+      "TotalReceivingNonConvexSurfaces",
+      "TotalCastingNonConvexSurfaces"
+    ],
+    "constructor_values": [
+      0,
+      0
+    ]
+  },
+  "change": "Retain the two actual diagnostic counters in the sole SourceErrorTracking; extend all15 existing constructor/fixture sites with their genuine zero defaults.",
+  "applied_Source": [
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+        "sha256": "8e809ed2844d7c8445afbde3ff1aa6e504be34f188a4e245f9e824e5600aebb8",
+        "size_bytes": 20587
+      },
+      "before_sha256": "055165dac3939cd4d16fa1ba748d484f51d85d227a07724a2885060dd299a8bc"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+        "sha256": "a9972f82ea373dd815ba685f853dbe88c97f72218c30a67f5882bf65cd6aa56b",
+        "size_bytes": 14779
+      },
+      "before_sha256": "bcee30468e358d7755482b3752088eed94ce475f5b1d25c43afcb2f2202e5190"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/examples/src05_surface_cold_guard_main.rs",
+        "sha256": "76a1d51d5ec52ca14b27a7bb4536a67503845b6f3a1a658082d4899cf23ea5e2",
+        "size_bytes": 27421
+      },
+      "before_sha256": "e66d5e52b6624d93ee96c7f6a1a2860936505600a3000baa65ba4184d6b9d963"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "a3f1de4061b8d844c8c3595ee2225b78b27fdc56294f0b5f441473b7c90b9dcf",
+        "size_bytes": 26105
+      },
+      "before_sha256": "eed231c9ca04f552773568e99a99cefe4130b77c3715efaa1f1284987e2f5edb"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+        "sha256": "7be13fbaa7e3281cc089d755f93ba6600967a5994de5de9f65706ad81015c2a5",
+        "size_bytes": 22705
+      },
+      "before_sha256": "a8cfb788a0c3fd3688cdb96c166fe0e5bff3b39c26cde8f928b3dab0fff3338a"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+        "sha256": "6567c9a3bfa9a1b9629b566e58217f622f442c17ce0884c25616f42617352666",
+        "size_bytes": 18807
+      },
+      "before_sha256": "64554fca46be1c8a17f119e1301456ee48e1cc0aa2228069781c308be45b366b"
+    },
+    {
+      "after": {
+        "path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+        "sha256": "bd03bcde56fc70eee76ed937993ca39af6bfef69fdf10f8333b4ee4ef1c49be8",
+        "size_bytes": 22538
+      },
+      "before_sha256": "1f5a9a10c06eebb1f549ca82cc9dc7f8014fff3fbc70b20a9d7afcecc03c668c"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+        "sha256": "681414119aaf1120ea5c324b8529eea650a268e6390b6bae01a57b2f9a283743",
+        "size_bytes": 83139
+      },
+      "before_sha256": "e180749e68902d19e5681dcbb8d131450f8792afa1d026c369c7d649965332e0"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_direct_initialization_tests.rs",
+        "sha256": "7c134d9285ba87728ad688a889d6b3ba12fda41c0b7193d12412088c05f3efbf",
+        "size_bytes": 12556
+      },
+      "before_sha256": "705aaaceddb7e99ae23c20b5aff0de712127a803c0586f266dc0805b6421b2ad"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment/ordinary_tests.rs",
+        "sha256": "694ad6293e131e4beaaa2006cc96cfb4133cf727ee18bd9e0aec9f6541840327",
+        "size_bytes": 12029
+      },
+      "before_sha256": "10fa474a20b4d5287db89bd30ad2c232ed629a800dc28ba74c82691048d63041"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs",
+        "sha256": "e381b4ce74a135695c4717ce9efe3dba6bdddd3cc07f948a0475b6c90fdbcefe",
+        "size_bytes": 20764
+      },
+      "before_sha256": "34e1f6ac0607227ef39340b92bf7540b2061debc0d529413cf60f5da779a4fde"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_init_postlude_tests.rs",
+        "sha256": "941f76bce76e13c72ce43e6fe486b74f06fc3f5a05b4af2036320ed90fbfe28b",
+        "size_bytes": 14259
+      },
+      "before_sha256": "8071bf36743924aaab16ce95e70f686630e4817b18d2fcf0ea365841cecf5ef4"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics_tests.rs",
+        "sha256": "89e320bd090b2a3c3e4956a53b9216446cae439072e1367894ceec44781d9c3e",
+        "size_bytes": 6395
+      },
+      "before_sha256": "34d277d84fcd561af77892d08f127d7be1f88dde2e37ec2ef9b1bc33276add2c"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+        "sha256": "30bef87bddfcae64cf0a7a831eeb99a1a09d6362d075648ec95dd6b98961ba57",
+        "size_bytes": 22735
+      },
+      "before_sha256": "ea4402cbdc0fc3dc0d3e270489e0198281adc1ad6e412319a0e09d8b3c589f48"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "d0d810e692737707fb89b774b49a41f84b2f5a5082c029c4fc0e3fe1addba8bd",
+        "size_bytes": 22655
+      },
+      "before_sha256": "44b761de7098ed1549e6412870d4a5d44eadfbad1e0230be4d73f5e973da9c68"
+    },
+    {
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup_ordinary_tests.rs",
+        "sha256": "918557d116754d41aa5c2727277926f34515e2ccb9868889f8e81931d9a0155b",
+        "size_bytes": 7945
+      },
+      "before_sha256": "a9e426f0adf90d0aef110a91c9431d58495f2baf6daa9697df9198ad770d7ca3"
+    }
+  ],
+  "independently_reviewed_proposal": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-report-held-Root-02/manifest.json",
+    "sha256": "ba03955c224d02d980c531cc1620f747e8daef92aa63acbee7ba4e7054ea7d6d",
+    "size_bytes": 35975
+  },
+  "accepted_independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-solar-report-Source-review-02/review.json",
+    "sha256": "e84764df383ba88d0c7b2904d0313ad4a26fb3b616b064fc65ef29512dacebf5",
+    "size_bytes": 16224
+  },
+  "preserved_rejected_report_parent": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-report-held-Root-01/manifest.json",
+    "sha256": "30a2c4e499d0ad5105884e0824c563f87c7f90345d3ed7b1652a442d2f07f7b7",
+    "size_bytes": 35545
+  },
+  "QA": [
+    {
+      "role": "clippy",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "1049edfd4f819b170c7a9baaa2e5c4aa5c35a28d2dac919c789a8030e1191156",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/shadow-diagnostic-owners-clippy-command-01/receipt.json",
+        "sha256": "047ecc67cb5e67f5d80946e8f8d6817fa924d718ec74d0f80edb07a05996a39e",
+        "size_bytes": 5078
+      }
+    },
+    {
+      "role": "tests",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "heat_balance::error_backend::tests::"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "1049edfd4f819b170c7a9baaa2e5c4aa5c35a28d2dac919c789a8030e1191156",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/shadow-diagnostic-owners-tests-command-01/receipt.json",
+        "sha256": "cc6e39cc808ad20fcc7570198d64e28123ac251a5f28cac254f9a7071b5d150d",
+        "size_bytes": 5049
+      }
+    },
+    {
+      "role": "fmt",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "1049edfd4f819b170c7a9baaa2e5c4aa5c35a28d2dac919c789a8030e1191156",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/shadow-diagnostic-owners-fmt-command-01/receipt.json",
+        "sha256": "fe25b3c4a106ac68b18562ad338f54d6bb48dc38b55c0086592dd17decdf4cd5",
+        "size_bytes": 4980
+      }
+    },
+    {
+      "role": "quality",
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "1049edfd4f819b170c7a9baaa2e5c4aa5c35a28d2dac919c789a8030e1191156",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/shadow-diagnostic-owners-quality-command-01/receipt.json",
+        "sha256": "5e5bd708a9fbba930b0040931b9d4b0f193c94adfae5905b3231379fb35c3f79",
+        "size_bytes": 5026
+      }
+    }
+  ],
+  "existing_tests_passed": 16,
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "active_caller": "Existing error backend only. New SHD report child/stream is still HELD; Solar and full Source caller activation remain pending.",
+  "no_numerical_equivalence_claim": true,
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "provenance_scope": "Local preparation/review/receipt paths record audit custody. Applied Source is tracked in Git; this is an implementation checkpoint, not a Native comparison package."
+}

@@ -243,6 +243,8 @@ impl Fixture {
                 total_multiplied_windows: 0,
                 total_coincident_vertices: 0,
                 total_degenerate_surfaces: 0,
+                total_receiving_non_convex_surfaces: 0,
+                total_casting_non_convex_surfaces: 0,
                 match_counts,
                 abort_processing: boolean(&t["AbortProcessing"])?,
                 total_severe_errors: counter(&t["TotalSevereErrors"])?,

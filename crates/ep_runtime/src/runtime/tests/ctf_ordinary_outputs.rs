@@ -10,6 +10,8 @@ fn ctf_ordinary_output_test_state() -> crate::heat_balance::error_backend::Sourc
             total_multiplied_windows: 0,
             total_coincident_vertices: 0,
             total_degenerate_surfaces: 0,
+            total_receiving_non_convex_surfaces: 0,
+            total_casting_non_convex_surfaces: 0,
             match_counts:[0;20],abort_processing:false,total_severe_errors:0,last_severe_error:String::new(),
             total_severe_errors_during_warmup:0,total_severe_errors_during_sizing:0,
             total_warning_errors:0,total_warning_errors_during_warmup:0,total_warning_errors_during_sizing:0,
