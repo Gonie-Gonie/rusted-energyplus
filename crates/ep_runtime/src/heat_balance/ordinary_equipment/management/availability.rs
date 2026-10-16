@@ -243,3 +243,17 @@ impl SourceHvacManager {
         Ok(())
     }
 }
+
+impl SourceAvailability {
+    pub(crate) fn fill_source_predefined_availability_manager_tables(
+        &self,
+        hvac: &crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+    ) -> Result<(), Error> {
+        if hvac.number_of_primary_air_systems > 0 {
+            return Err(Error::Unavailable(
+                "actual FillPredefinedTablesForAvailManager first PriAirSysAvailMgr row",
+            ));
+        }
+        Ok(())
+    }
+}

@@ -90,7 +90,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
     assert_eq!(reports.table.num_table_entry, 1);
     assert_eq!(entries[0].index_column, column);
     assert_eq!(entries[0].object_name, "Wall");
-    assert_eq!(entries[0].char_entry, "R1");
+    assert_eq!(entries[0].char_entry.as_slice(), b"R1");
     assert!(error.is_empty());
     assert!(eio.is_empty());
     // Authored typed input: exercise the real optional Solar initializer,

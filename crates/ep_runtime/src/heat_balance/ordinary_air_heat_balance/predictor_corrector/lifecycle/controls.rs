@@ -49,9 +49,18 @@ impl Default for SourceZoneAirControls {
         }
     }
 }
+/// Complete actual ZoneTempPredictorCorrector.hh74-79 row constructor.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceZoneSetpointSchedule {
+    pub(crate) name: String,
+    pub(crate) heat_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) cool_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+}
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceZoneAirFlags {
     pub(crate) number_temperature_controls: [usize; 5],
+    /// Same native five Array1D owners default-unallocated; allocate only actual positive counts.
+    pub(crate) temperature_setpoint_schedules: [Option<Vec<SourceZoneSetpointSchedule>>; 5],
     pub(crate) number_comfort_controls: [usize; 5],
     pub(crate) number_stage_zones: i32,
     pub(crate) number_on_off_zones: i32,
@@ -65,6 +74,7 @@ impl Default for SourceZoneAirFlags {
     fn default() -> Self {
         Self {
             number_temperature_controls: [0; 5],
+            temperature_setpoint_schedules: std::array::from_fn(|_| None),
             number_comfort_controls: [0; 5],
             number_stage_zones: 0,
             number_on_off_zones: 0,

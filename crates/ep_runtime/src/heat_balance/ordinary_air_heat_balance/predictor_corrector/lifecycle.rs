@@ -6,6 +6,7 @@ mod environment;
 mod initialization;
 mod input;
 mod prediction;
+mod thermostat_predefined;
 pub(crate) use controls::{
     SourceAirThermostatArrays, SourceZoneAirControls, SourceZoneAirFlags,
     SourceZoneListGroupLoadReports,

@@ -226,7 +226,7 @@ fn genuine_loader_resistance_and_zero_nominal_u_are_not_replaced()
         .as_ref()
         .ok_or(CtfReportUnavailable::TableOwner)?;
     assert_eq!(rows[0].original_real_entry.to_bits(), 0.0_f64.to_bits());
-    assert_eq!(rows[0].char_entry, "      0.000");
+    assert_eq!(rows[0].char_entry.as_slice(), b"      0.000");
     Ok(())
 }
 

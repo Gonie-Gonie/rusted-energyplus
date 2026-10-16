@@ -148,12 +148,12 @@ fn model_case(root: &Path, row: &Value, initial: f64) -> Result<Value> {
     let simulation = SimulationModel::from_typed(typed);
     let mut caller = postlude_fields::Caller::new(&simulation.typed.version.to_string());
     let preparation = caller.prepare(&simulation.typed);
-    let before = caller.snapshot();
+    let before = caller.snapshot()?;
     if let Err(error) = preparation {
         out["selected_Init_postlude"] = json!({
             "protocol":"ctf10-actual-Rust-Init-postlude-observation.v1",
             "ordinary_initializer_invoked":false,"ordinary_initializer_invocation_count":0,
-            "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot(),
+            "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot()?,
             "input_report_cache_preparation":{"invoked":true,"status":"source-error-returned"},
             "public_owner":postlude_fields::unavailable("report-cache preparation stopped before ordinary initializer"),
             "error":postlude_fields::error(&error),"numerical_comparison_performed":false,"counted_as_PASS":false});
@@ -164,7 +164,7 @@ fn model_case(root: &Path, row: &Value, initial: f64) -> Result<Value> {
         "protocol":"ctf10-actual-Rust-Init-postlude-observation.v1",
         "ordinary_initializer_invoked":true,"ordinary_initializer_invocation_count":1,
         "input_report_cache_preparation":{"invoked":true,"status":"source-returned"},
-        "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot(),
+        "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot()?,
         "public_owner":postlude_fields::unavailable("actual State/public owner not yet returned"),
         "error":null,"Native_intermediate_registry_or_Init_snapshots_inferred":false,
         "Native_13_loader_calls_executed_by_Rust":false,"Native_direct_six_units_executed":false,

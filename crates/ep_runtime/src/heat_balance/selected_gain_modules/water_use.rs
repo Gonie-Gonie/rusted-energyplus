@@ -115,3 +115,19 @@ impl SourceWaterUseModule {
         Ok(())
     }
 }
+
+impl SourceWaterUseModule {
+    pub(crate) fn fill_source_predefined_water_equipment_tables(&self) -> Result<(), Error> {
+        if self
+            .equipment
+            .as_deref()
+            .and_then(|rows| rows.first())
+            .is_some()
+        {
+            return Err(Error::Unavailable(
+                "actual WaterEquipment first FillPredefinedTable child",
+            ));
+        }
+        Ok(())
+    }
+}

@@ -366,7 +366,13 @@ fn verify_reports(reports: &CtfInitializationReports, fixture: &Value) -> TestRe
     assert_eq!(entries.len(), rows.len());
     for (actual, row) in entries.iter().zip(rows) {
         let expected = &row["value"];
-        assert_eq!(actual.char_entry, expected["charEntry"]);
+        assert_eq!(
+            actual.char_entry.as_slice(),
+            expected["charEntry"]
+                .as_str()
+                .ok_or("Native charEntry string")?
+                .as_bytes()
+        );
         assert_eq!(actual.object_name, expected["objectName"]);
         assert_eq!(
             Some(i64::from(actual.index_column)),

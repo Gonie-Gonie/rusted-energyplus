@@ -189,3 +189,15 @@ impl SourceHvacManager {
         Ok(any)
     }
 }
+
+impl SourceHvacManager {
+    pub(crate) fn fill_source_plant_equipment_operation_load(&self) -> Result<(), Error> {
+        let _row = 0_i32;
+        if self.simulation.plant.total_loops > 0 {
+            return Err(Error::Unavailable(
+                "actual FillPlantEquipmentOperationLoad first PlantLoop(iLoop) row",
+            ));
+        }
+        Ok(())
+    }
+}

@@ -64,6 +64,8 @@ pub(crate) struct SourceAngleFactorData {
 /// Actual OutputReportPredefined scalar subset1685–1698, same retained owner.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceComfortPredefinedSummary {
+    /// OutputReportPredefined.hh1691 explicit0; only positive ventilation-sizing writer1889.
+    pub(crate) total_voz_max: f64,
     pub(crate) total_not_met_heating_occupied_for_abups: f64,
     pub(crate) total_not_met_cooling_occupied_for_abups: f64,
     pub(crate) total_not_met_occupied_for_abups: f64,

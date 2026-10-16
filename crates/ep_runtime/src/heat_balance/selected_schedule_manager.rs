@@ -4,6 +4,7 @@ use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
 mod accessors;
+mod annual;
 mod report;
 
 /// Actual source-ordered ScheduleTypeLimits getter values after raw admission.

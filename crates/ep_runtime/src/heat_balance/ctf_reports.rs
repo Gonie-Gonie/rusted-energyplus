@@ -82,7 +82,7 @@ impl std::error::Error for CtfReportError {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct PredefinedTableEntry {
     /// Actual charEntry.
-    pub char_entry: String,
+    pub char_entry: Vec<u8>,
     /// Actual objectName.
     pub object_name: String,
     /// Actual indexColumn, supplied by the real predefined column registry.
@@ -119,13 +119,24 @@ impl PredefinedStringTable {
         object: &str,
         text: &str,
     ) -> Result<(), CtfReportUnavailable> {
+        self.raw_byte_entry(column, object, text.as_bytes())
+    }
+
+    /// The same Native string overload with byte-preserving std::string storage.
+    /// STAT input can contain legacy non-UTF8 bytes; no decoding or mirror is used.
+    pub(crate) fn raw_byte_entry(
+        &mut self,
+        column: i32,
+        object: &str,
+        text: &[u8],
+    ) -> Result<(), CtfReportUnavailable> {
         let index = self.next_table_entry()?;
         let entry = self
             .entries
             .as_mut()
             .and_then(|entries| entries.get_mut(index))
             .ok_or(CtfReportUnavailable::TableOwner)?;
-        entry.char_entry = text.to_string();
+        entry.char_entry = text.to_vec();
         entry.object_name = object.to_string();
         entry.index_column = column;
         Ok(())
@@ -183,7 +194,7 @@ impl PredefinedStringTable {
             .as_mut()
             .and_then(|entries| entries.get_mut(index))
             .ok_or(CtfReportUnavailable::TableOwner)?;
-        entry.char_entry = format!("{value:12}");
+        entry.char_entry = format!("{value:12}").into_bytes();
         entry.object_name = object.to_string();
         entry.index_column = column;
         Ok(())
@@ -207,6 +218,26 @@ impl PredefinedStringTable {
         value: f64,
     ) -> Result<(), CtfReportUnavailable> {
         self.fixed_real_entry(column, object, value, 3)
+    }
+
+    /// Same genuine fixed-notation writer with explicit precision0.
+    pub(crate) fn fixed_real_entry_0(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: f64,
+    ) -> Result<(), CtfReportUnavailable> {
+        self.fixed_real_entry(column, object, value, 0)
+    }
+
+    /// Same genuine fixed-notation writer with explicit precision4.
+    pub(crate) fn fixed_real_entry_4(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: f64,
+    ) -> Result<(), CtfReportUnavailable> {
+        self.fixed_real_entry(column, object, value, 4)
     }
 
     fn fixed_real_entry(

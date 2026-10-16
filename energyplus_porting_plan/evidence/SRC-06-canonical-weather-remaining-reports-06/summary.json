@@ -1,0 +1,1417 @@
+{
+  "schema": "src06-canonical-weather-remaining-reports.v1",
+  "status": "Weather statistics, Remaining and Rainfall report prefix integrated; actual held run stops at true WriteBEPSTable5230 entry",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "base_HEAD": "a0d3403c15a8d5a5cddb177a90bab66c32b7f2d2",
+  "prepared_selective_promotion": {
+    "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/manifest.json",
+    "sha256": "31395e53c1038e64047efd3df39c6f8aa0628a5dc18f2e97a5567781c763f358",
+    "bytes": 95362
+  },
+  "independent_promotion_review": {
+    "path": ".runtime/porting/SRC-06/Root-canonical70-selective-promotion-review-01/review.json",
+    "sha256": "3a0413225818dda11a23de9a5af6dbf612e5b83f5ed9002ca26cf73026c8e776",
+    "bytes": 1132
+  },
+  "changed_Rust_files": 34,
+  "new_Rust_files": 7,
+  "existing_Rust_files": 27,
+  "compiler_inputs": 4428,
+  "canonical_exclusions": [
+    "Pipeline whole-byte unchanged from base HEAD; held Source dispatch excluded.",
+    "CtfRunOutputs exact STAT01 parent; readonly predefined snapshot excluded.",
+    "Future binary64 diagnostics, generic table writers and BEPS packets excluded."
+  ],
+  "canonical_inputs_exact_actual70": 4426,
+  "actual_commands": {
+    "all_targets": {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-all-targets-command-70/receipt.json",
+      "sha256": "6e79606b829a776f55f7e3e028a01126ac46686cf8977fce11069029256f4736",
+      "bytes": 3067
+    },
+    "existing19": {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-affected-report-tests-command-70-8MiB/receipt.json",
+      "sha256": "2b45012abc8893c70b4fe75185f57517dc6a744681120046a3696e4be4bbf5c1",
+      "bytes": 3815
+    },
+    "actual_A": {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-70/receipt.json",
+      "sha256": "36376f49c0cfade776fad278f340888210eace20e87b33900b84a09953b625c4",
+      "bytes": 3773
+    }
+  },
+  "independent_Source_and_actual_peer": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-provider-union70-Source-review-01/review.json",
+    "sha256": "ea960416aa3b8df6597c90951c65b32d418a0b62d304c2f018be1387465df46d",
+    "bytes": 15879
+  },
+  "canonical_existing_tests": {
+    "path": ".runtime/porting/SRC-06/canonical-source70-existing-arbitrary-run-tests-Root-06-8MiB/receipt.json",
+    "sha256": "cc4f29fb1a1c31d67a2a8305452197b28c6f1822a8d5bb6110d875f0bc23a75a",
+    "bytes": 8503
+  },
+  "affected_existing_tests_passed": 19,
+  "canonical_existing_tests_passed": 27,
+  "test_stack_bytes": 8388608,
+  "new_test_bodies": 0,
+  "full_suite_rerun": false,
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-weather-remaining-reports-06/evidence.zip",
+    "sha256": "4142afced6de1e56e73343a5cd0c5bc2f6c1caa94cc0d5f3f1e82ba761265f4a",
+    "bytes": 1613680
+  },
+  "archive_files": [
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportPredefined.cc-1837-1875.txt",
+      "sha256": "89456c808223c56df2bea8926dd2dfa7d3aad2ea40cc32f666b86ebae2d51792",
+      "bytes": 1294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportPredefined.cc-1955-1976.txt",
+      "sha256": "168e64e87a83ccb2ddb10d2a64bf0f90dff777225cad43f2627ff1b12e7ca7c9",
+      "bytes": 1075
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-13986-14029.txt",
+      "sha256": "de1266193c93ae29454cdc28f599f301e8f6d002090fd332fe7702b1b43a2da8",
+      "bytes": 2772
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-14104-14166.txt",
+      "sha256": "f0eaf1470cbddf9de45bb5080a9288b26312ad4c84654d1d7087f726d48dcffa",
+      "bytes": 5136
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-17565-17585.txt",
+      "sha256": "2c48b0e88397ec49826ce17bc0947a74d4c6668616e7d268a76dfc6750e6899b",
+      "bytes": 1139
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-17869-17915.txt",
+      "sha256": "a458b7584337cdfbc8044363378150c5fe00d6109956e9136d50524412e2209a",
+      "bytes": 1449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-5210-5268.txt",
+      "sha256": "6cd668d467d0e49155528d4c8277a3a48899d598cb885f1ad6324dd8f432e8bf",
+      "bytes": 2986
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-6968-6976.txt",
+      "sha256": "6afd5036f8be52c32682de29e4b8fb3ada69146af4e330c8c79594708120bcf0",
+      "bytes": 420
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/OutputReportTabular.cc-8522-8542.txt",
+      "sha256": "37d7370fbcd63e2e09a10b4aa68392e64a72cd94f67ee0ab7e7fc2b0a270dfa3",
+      "bytes": 1014
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/Original/string.functions.cc-261-277.txt",
+      "sha256": "cb9b75e0e34d92b29841f049fd160cb8a26e675af90d05ac0b91f62ed8cc574f",
+      "bytes": 525
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/all-cell-ledger.json",
+      "sha256": "891a9c5a1be48f6fd4f2c00d69167158be119e7ea42763cc0de148a6fa805802",
+      "bytes": 274538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/comparison.json",
+      "sha256": "a469b0047b59e7b494134e4b70eab9dd1b01deb4482bdbc8fb2f9faaa5cbf842",
+      "bytes": 15784
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-provider-union70-Source-review-01/review.json",
+      "sha256": "ea960416aa3b8df6597c90951c65b32d418a0b62d304c2f018be1387465df46d",
+      "bytes": 15879
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Reviewer-ordinary-provider-union70-Source-review-01/source-part.json",
+      "sha256": "801eef0e790960486b58f25782ad761baf9b0198c129a98ef2329ab0fae39456",
+      "bytes": 68046
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-canonical70-selective-promotion-review-01/review.json",
+      "sha256": "3a0413225818dda11a23de9a5af6dbf612e5b83f5ed9002ca26cf73026c8e776",
+      "bytes": 1132
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-predefined-table-comparison-70-review-03/review.json",
+      "sha256": "f0275a63f27d780c01cbb843ee11c037b53e84c2e8079e86654a47d00f8ed189",
+      "bytes": 1746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-existing-arbitrary-run-tests-Root-06-8MiB/receipt.json",
+      "sha256": "cc4f29fb1a1c31d67a2a8305452197b28c6f1822a8d5bb6110d875f0bc23a75a",
+      "bytes": 8503
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-existing-arbitrary-run-tests-Root-06-8MiB/stderr.log",
+      "sha256": "7ce7d929785c5045f62c4012c6fe14d332ea559b0a0d7b9e8fada45ec021bc98",
+      "bytes": 34273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-existing-arbitrary-run-tests-Root-06-8MiB/stdout.log",
+      "sha256": "d8002f8f0770567a82e7f6651d249c462392b3cf797800e7fcd2f9fbd4c62d28",
+      "bytes": 2497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/apply-source70.py",
+      "sha256": "569dffac213c50cbaf441e15850c1e07c255ff5e1f57909adc0e725aeb4a04ea",
+      "bytes": 2333
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "sha256": "e25c2e066f8c11079740d1796dbf0444a0e1a6bd77a4a308ffd28a74d97969b3",
+      "bytes": 21723
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "sha256": "de3ab9c8931d7f421cbb11903a448dd4e5f10181ef47b1b1a621c8d916dce720",
+      "bytes": 27432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "sha256": "a4245a93be118913337a7529638900acac43081222209bab67ec428d377739ba",
+      "bytes": 26269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+      "sha256": "1944b086cba631b1a30b45bb1fde426cf3f54f6e500910d6c5ea3916598a6972",
+      "bytes": 14943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+      "sha256": "5c928d2e733ffb7c7601a62bafea7e7844eb97344e870e9e7d553a03f7585e7b",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+      "sha256": "05f22f0e4f32e05b367e2a39b9085a95e39591f318d1fdb5000a58e8a2dfae06",
+      "bytes": 22869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "3c2785b685d3e57a0a8ee3fd6908b70ec91ff5be65c558daddba9550d4c1294f",
+      "bytes": 29851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs",
+      "sha256": "1e0968682ed60c61661a956230113e98de95956ee8818542610658740af4a9c9",
+      "bytes": 20904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "39ed1ac8dbaba46faaac547d6c0baf9ac1af426ad64c25688b6e410fc63fe7ad",
+      "bytes": 19547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "773888d469697ab73fd8d8c799233fb7f07684861b82c6f5b6047e549926582e",
+      "bytes": 9356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle.rs",
+      "sha256": "aeb7fcfc7ef2c3ccca48f7c7fd85c4fb8a3113253da5b36958171d56b4cae943",
+      "bytes": 4193
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/controls.rs",
+      "sha256": "901e61a2db009786fa4d06b908cacd9cdf3ca12011df1bcf41de5e724a3c8343",
+      "bytes": 4594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "30db304508e8c2337fd92ac02b8f0dead35984b34f7965351caacd96e4f9f67d",
+      "bytes": 9571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/thermostat_predefined.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "669c6737df704adebd4822d8424f5c40eb953861009f7366e47df5e6c37b334a",
+      "bytes": 9699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use.rs",
+      "sha256": "1556641debc775062ff9915646225a96f33026fce1e9021dd4ec875e5fce5a6e",
+      "bytes": 4310
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/plant.rs",
+      "sha256": "0662e9072e9fd7f47b887321b53aecd5ba210b6aec5b28b766326c8abb1ed5e8",
+      "bytes": 7347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/setpoints.rs",
+      "sha256": "3f4acae120f7de742459ab836c64ff15ce5ba31bc8bdd6b2aa45744ee31ee42f",
+      "bytes": 5346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "62ae48520d40872ff6859d2cacc46b10ef078271453179887ddab3bc9581f543",
+      "bytes": 7216
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports.rs",
+      "sha256": "d97efab954ffad63523592738e6a0dad0c795ee53dbf11eb565b42cb4965a7f6",
+      "bytes": 12609
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/state.rs",
+      "sha256": "a403878616ff12acc6701aa946c957a57251a2f0c74e529a399ccddcfa19d6d0",
+      "bytes": 16517
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/style_passes.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/input.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/parser.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/ordinary_thermal_comfort/state.rs",
+      "sha256": "93c976b2caf6049a4e7b74110d92efce03724948081eab15b3e6ae1e71f0d00c",
+      "bytes": 8471
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/selected_gain_modules/water_use.rs",
+      "sha256": "cef2d0784826bee70b2c68216a8f5d5f2a1ac5f792bb66540fc12af5b070488f",
+      "bytes": 4334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "e4bf61854d45ff4dd411463ed49245fc1be5321850951ba71ea73c9413ba1089",
+      "bytes": 17542
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "7b679fc0274e8cb061cb623ed6282b85c1de57d95abf6b3687b9843e1ec493b3",
+      "bytes": 15625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "53a04f79428fc8daf7a939225edfea0f6beaa6068064048e2ee628ee93cd6254",
+      "bytes": 8314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "d1b04cbc9242e0abab66ccd73752d28dba4b4391a6fcafc8d73c93fd263f5828",
+      "bytes": 106245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/before/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "bytes": 21047
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/complete-compiler-Source-plan.json",
+      "sha256": "df3c24b94e4b29e3d8f6cc9d447bcaa94502f44eec6dd508872256e4d68b3d96",
+      "bytes": 2568534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/01-forward.diff",
+      "sha256": "7e31e828f87b3a65d88ae8e3ab3c379e449a1c63311809cb47b261fa63918782",
+      "bytes": 4371
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/01-inverse.diff",
+      "sha256": "54b8379dc0c189a3ed4b050c675a87b90be541dfee450d5c4474b31d3dee3004",
+      "bytes": 4371
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/02-forward.diff",
+      "sha256": "6d30d8a89343173066e1b3cbc6c75b428f552e62b881a8ff163ab8720207a7c6",
+      "bytes": 2006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/02-inverse.diff",
+      "sha256": "b7035bbccd0b63f1e9fea9785ee5bacb677e8433dbecb1c659ab70e9946853b2",
+      "bytes": 2006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/03-forward.diff",
+      "sha256": "63cf7400de4d13a79acf742619e0496bf4eb353cc81377933ca4ab5451c35a7e",
+      "bytes": 4558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/03-inverse.diff",
+      "sha256": "14de61a75ee07a7d6e9648a2572db12d57ffc7ca52fd4ff365444ce0fcd8faf3",
+      "bytes": 4558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/04-forward.diff",
+      "sha256": "9b647e158c913b2e43c835f6fe2f30c14a599f55ff241d8282673fc6be34ca3d",
+      "bytes": 4428
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/04-inverse.diff",
+      "sha256": "92e63f25de853e928f6b9b0d8877702f6777ee2f953efa35ca83380d682ff0aa",
+      "bytes": 4428
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/05-forward.diff",
+      "sha256": "537d7f8024de8a228e4035e593afcd9b3cb6ccd2cb1a8d624b5ac94026a76771",
+      "bytes": 1048
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/05-inverse.diff",
+      "sha256": "8834956fa8cce81f07e669c0e181e28963bf7c4f9af6b650260cbb5af304c346",
+      "bytes": 1048
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/06-forward.diff",
+      "sha256": "c2e8acbe2c4034eab88e4fe2b759c50219567f0085456db6d2d6b7ed6a6ecb75",
+      "bytes": 4410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/06-inverse.diff",
+      "sha256": "63a18a251ab8caa98c0562b976a196b5c298571378dace9fae111777e2c2696c",
+      "bytes": 4410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/07-forward.diff",
+      "sha256": "c3f5370c5b9743a5a566306be5169c224a67e3e514f7be17409bce953cb40bfe",
+      "bytes": 839
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/07-inverse.diff",
+      "sha256": "5c8c122e2a2574c91f56730ca749047769f2ed941921e9526ce82a1536721373",
+      "bytes": 839
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/08-forward.diff",
+      "sha256": "7d2ffbb6568289f05e58aeb1cc96ada22c1ac3b56a744783e7e175bd7b2c4460",
+      "bytes": 450
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/08-inverse.diff",
+      "sha256": "80560c7288c60fadc16c65f85fd995bb02d11c27bbac81513721f2d5ddb571ea",
+      "bytes": 450
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/09-forward.diff",
+      "sha256": "7998bfb8b05d88425292521af4ee6aea935f344ee2f675865c9ab23c79c17206",
+      "bytes": 2547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/09-inverse.diff",
+      "sha256": "e52c215b4865cd01d8bdc89c14f25718d1197416b019e6de6911d40f6956145f",
+      "bytes": 2547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/10-forward.diff",
+      "sha256": "ff0bee1e882a0ebbbe0beb68beaba0d6afdb56968fa66404a8da7e8d38ae28a3",
+      "bytes": 902
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/10-inverse.diff",
+      "sha256": "7f9cb29fc76d943bebc324593dc06b6389376f07ffd0f3069b92eca7512ba429",
+      "bytes": 902
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/11-forward.diff",
+      "sha256": "903c685bbcecfc473b73ec8bd71edc63988190687bd968eb771ad3c274a603ba",
+      "bytes": 443
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/11-inverse.diff",
+      "sha256": "08ce4348e44c91cce0b13abca1bcc41f7727389d4e282a51d4177eef283b13e4",
+      "bytes": 443
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/12-forward.diff",
+      "sha256": "bcc597fb9f1bc54d3ae4e16507caa005d5ac4652545ecce3e3ac33becb4a9ada",
+      "bytes": 1452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/12-inverse.diff",
+      "sha256": "0659c9c0c4bb0f3e56f1c0919b889c921f6d5011a852a90eb1671e0efadb7870",
+      "bytes": 1452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/13-forward.diff",
+      "sha256": "c59e09a4a4356ffcc8cf3c7b61e99e496e9080d64ee9f4345433aabbd5245e5e",
+      "bytes": 1834
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/13-inverse.diff",
+      "sha256": "73f855b27981e9dae8d3d598630db53efab357da5fc5a4b4cfc3b9919468bf7c",
+      "bytes": 1834
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/14-forward.diff",
+      "sha256": "38bfce6d49f46394ef4c65373c5937060fa3445f75dc3f116e6a1a5658966ed2",
+      "bytes": 3519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/14-inverse.diff",
+      "sha256": "f1066e9c4bcb0ebaddf9d3c2ccbea01d508e2160d8da95d0925f1211985784a7",
+      "bytes": 3519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/15-forward.diff",
+      "sha256": "0c9075a40a234ca89ee5f6f441bfc6bb114ca0dfaee00365be10ec86f8e86482",
+      "bytes": 705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/15-inverse.diff",
+      "sha256": "b14219d8ff5c9cf8064dff70ff6d94964e2f44877711ea8d6c635fc29f359d36",
+      "bytes": 705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/16-forward.diff",
+      "sha256": "634f7088c1d19a49b42bac4c6cb73ef53514d95a3e48068b18abd691a6b11251",
+      "bytes": 1449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/16-inverse.diff",
+      "sha256": "fe81a1438955bb19d5d66c19beedb09735c5364e92a955d99b5486ac28592690",
+      "bytes": 1449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/17-forward.diff",
+      "sha256": "2b97533482b9d54d47ddf739ac14bdf7938af5bda388f81533b15c4e59a4722f",
+      "bytes": 606
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/17-inverse.diff",
+      "sha256": "ceb29e4bcaa327e616e832fb2ee444f9363dffe7ac8329d9375db52ff55d71fa",
+      "bytes": 606
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/18-forward.diff",
+      "sha256": "4ef27f9e2be2e5714365bcec9890fa108ab8c1f5cd40ea9fceec424bf3da923f",
+      "bytes": 735
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/18-inverse.diff",
+      "sha256": "1ec4fac50908e535517f4d46e7ac4afabbcc5cda7177be18d3796a0aa9373083",
+      "bytes": 735
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/19-forward.diff",
+      "sha256": "a8a633239d9c2e0e7330044e41ba4bf92bd5fdbd8a19f5725d8a97abc9004d9c",
+      "bytes": 5533
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/19-inverse.diff",
+      "sha256": "32926db09ad7ff2332da59683df6b89063926a56c494a0f458a0cdc9f7f1169b",
+      "bytes": 5533
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/20-forward.diff",
+      "sha256": "18f513be7150de5a102880d5f1e898aea9c4b08467ab4a4dc47d534f5cd0ffea",
+      "bytes": 396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/20-inverse.diff",
+      "sha256": "149096f62e025b491177f40787f350bc6384427bc8fc4ddb119b7f4b226e8e84",
+      "bytes": 396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/21-forward.diff",
+      "sha256": "202f9b590d297bf4ec7793e483d84af4897f74905f4f5e5c3cf16ca49c9cf607",
+      "bytes": 49248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/21-inverse.diff",
+      "sha256": "c782a466508976f62364069e43ed81eb3d8d0734b46e9576864a670d0c187ea5",
+      "bytes": 49248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/22-forward.diff",
+      "sha256": "75aa86a4b0ff2be0fea8555fda959ed4421613b64a91f8b42a5599b44f933f46",
+      "bytes": 5150
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/22-inverse.diff",
+      "sha256": "d0bc5184f53ac60bad9160e423efbda052340ea9e10abbe46029c6390403ba10",
+      "bytes": 5150
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/23-forward.diff",
+      "sha256": "439ee89360d5f2151de6da24b39bc44a6b2d5beec8122c345b87d5c2e795114e",
+      "bytes": 3967
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/23-inverse.diff",
+      "sha256": "655bccf451fcf6eb32b141d56f2a43fcbe8872789b9d52075989bb19a6bd6871",
+      "bytes": 3967
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/24-forward.diff",
+      "sha256": "fc0569dac64281931480b239d0eee21828fb9ff670af2e860f7df65eed95a156",
+      "bytes": 24603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/24-inverse.diff",
+      "sha256": "e72e1339905d803f0dfa1db4d414a44ca6da08316395efba4199f776f2484b74",
+      "bytes": 24603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/25-forward.diff",
+      "sha256": "6cc4481d3f2fc04954e4ec14118263a4446287fa7e4a8c3901a40b6fe3c63ecf",
+      "bytes": 2752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/25-inverse.diff",
+      "sha256": "5719ae0e96f4501e0e995f647589f119eabba457bbf0de421e89e4a9e58f913b",
+      "bytes": 2752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/26-forward.diff",
+      "sha256": "0ced85ad70846fa4e20158e60e2608a5d53692180dd13e52bd399c4fe45cc85f",
+      "bytes": 8220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/26-inverse.diff",
+      "sha256": "706995f57d2d0dc4976bbcaeab63ddb9e4faad2da91bbe993eae7d2eeceebd5f",
+      "bytes": 8220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/27-forward.diff",
+      "sha256": "46f2d0a3caaf495b5d0427c0788df353f38400e8bcbe272f2c52999a5fdaaf27",
+      "bytes": 668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/27-inverse.diff",
+      "sha256": "74d2206233ce23e05cd264f746090b05420d40fd5518af180ea32c0cd44cc2da",
+      "bytes": 668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/28-forward.diff",
+      "sha256": "637e7e9efbc04b8869ebfa0c6be38da3a52b9eef7d89008e7b696a83deaea9e3",
+      "bytes": 651
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/28-inverse.diff",
+      "sha256": "165dfb8d65ec31becbf3cb40bfdca2b4abadef1d4487a5d48ae2d20c9ce3a78a",
+      "bytes": 651
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/29-forward.diff",
+      "sha256": "9ab7589c36e88f24206763b32b8e779e40255a03e1f885ff3245b41a008e1ec2",
+      "bytes": 356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/29-inverse.diff",
+      "sha256": "6654de6a46b5c757bd1697c2d58c0eb500eb1960c80d79ef4243f311510e458c",
+      "bytes": 356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/30-forward.diff",
+      "sha256": "fc854760ef4f388f4c8286e41993c305a4868b1e7430e1cb098a81376a54d4f4",
+      "bytes": 2578
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/30-inverse.diff",
+      "sha256": "d4b5be4c9d8410f63ca2915f736354c41ddd190734e85c8109e12effcf49049e",
+      "bytes": 2578
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/31-forward.diff",
+      "sha256": "fe24bdcf8468cc008d1fe69c215f45bff39bdedd1a1f95afc9a1a5ab88e25dee",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/31-inverse.diff",
+      "sha256": "3f6ca7ce5fba87103171d8c102cc88bafb679a751020cdc1f4c4577d8188d1c0",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/32-forward.diff",
+      "sha256": "736b72c8f47c1b642a13edcecaa570f5af4c1f52f2d3751257a38d4a61af27b2",
+      "bytes": 1562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/32-inverse.diff",
+      "sha256": "a0b5cd5d48987aeb92ea5051a8f6bb1de31ccfcc0f8d07b49fe550d811f99482",
+      "bytes": 1562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/33-forward.diff",
+      "sha256": "cdf780acd9de2c30305c19ddc71a909ab9563b015888661c954964fd9868c1a7",
+      "bytes": 551
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/33-inverse.diff",
+      "sha256": "bce7c1a00be196372178ef57fc114acbd8bd08f162ec3567fc2081ad61d095a3",
+      "bytes": 551
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/34-forward.diff",
+      "sha256": "1a9398b8bb4f88c087df599f7ef4567095e6e6fa456e7d4f6a3174d63c8df74f",
+      "bytes": 719
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/diffs/34-inverse.diff",
+      "sha256": "96e1b9a9ed9461a22ef9f669200225362b5347584bd3457de1f4690ba6529227",
+      "bytes": 719
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "sha256": "e25c2e066f8c11079740d1796dbf0444a0e1a6bd77a4a308ffd28a74d97969b3",
+      "bytes": 21723
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "sha256": "de3ab9c8931d7f421cbb11903a448dd4e5f10181ef47b1b1a621c8d916dce720",
+      "bytes": 27432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "sha256": "a4245a93be118913337a7529638900acac43081222209bab67ec428d377739ba",
+      "bytes": 26269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+      "sha256": "1944b086cba631b1a30b45bb1fde426cf3f54f6e500910d6c5ea3916598a6972",
+      "bytes": 14943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+      "sha256": "5c928d2e733ffb7c7601a62bafea7e7844eb97344e870e9e7d553a03f7585e7b",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+      "sha256": "05f22f0e4f32e05b367e2a39b9085a95e39591f318d1fdb5000a58e8a2dfae06",
+      "bytes": 22869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "3c2785b685d3e57a0a8ee3fd6908b70ec91ff5be65c558daddba9550d4c1294f",
+      "bytes": 29851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs",
+      "sha256": "1e0968682ed60c61661a956230113e98de95956ee8818542610658740af4a9c9",
+      "bytes": 20904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "39ed1ac8dbaba46faaac547d6c0baf9ac1af426ad64c25688b6e410fc63fe7ad",
+      "bytes": 19547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "773888d469697ab73fd8d8c799233fb7f07684861b82c6f5b6047e549926582e",
+      "bytes": 9356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle.rs",
+      "sha256": "aeb7fcfc7ef2c3ccca48f7c7fd85c4fb8a3113253da5b36958171d56b4cae943",
+      "bytes": 4193
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/controls.rs",
+      "sha256": "901e61a2db009786fa4d06b908cacd9cdf3ca12011df1bcf41de5e724a3c8343",
+      "bytes": 4594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "30db304508e8c2337fd92ac02b8f0dead35984b34f7965351caacd96e4f9f67d",
+      "bytes": 9571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/thermostat_predefined.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "669c6737df704adebd4822d8424f5c40eb953861009f7366e47df5e6c37b334a",
+      "bytes": 9699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use.rs",
+      "sha256": "1556641debc775062ff9915646225a96f33026fce1e9021dd4ec875e5fce5a6e",
+      "bytes": 4310
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/plant.rs",
+      "sha256": "0662e9072e9fd7f47b887321b53aecd5ba210b6aec5b28b766326c8abb1ed5e8",
+      "bytes": 7347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/setpoints.rs",
+      "sha256": "3f4acae120f7de742459ab836c64ff15ce5ba31bc8bdd6b2aa45744ee31ee42f",
+      "bytes": 5346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "62ae48520d40872ff6859d2cacc46b10ef078271453179887ddab3bc9581f543",
+      "bytes": 7216
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports.rs",
+      "sha256": "d97efab954ffad63523592738e6a0dad0c795ee53dbf11eb565b42cb4965a7f6",
+      "bytes": 12609
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/state.rs",
+      "sha256": "a403878616ff12acc6701aa946c957a57251a2f0c74e529a399ccddcfa19d6d0",
+      "bytes": 16517
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/style_passes.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/input.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/parser.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_thermal_comfort/state.rs",
+      "sha256": "93c976b2caf6049a4e7b74110d92efce03724948081eab15b3e6ae1e71f0d00c",
+      "bytes": 8471
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/selected_gain_modules/water_use.rs",
+      "sha256": "cef2d0784826bee70b2c68216a8f5d5f2a1ac5f792bb66540fc12af5b070488f",
+      "bytes": 4334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "e4bf61854d45ff4dd411463ed49245fc1be5321850951ba71ea73c9413ba1089",
+      "bytes": 17542
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "7b679fc0274e8cb061cb623ed6282b85c1de57d95abf6b3687b9843e1ec493b3",
+      "bytes": 15625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "53a04f79428fc8daf7a939225edfea0f6beaa6068064048e2ee628ee93cd6254",
+      "bytes": 8314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "d1b04cbc9242e0abab66ccd73752d28dba4b4391a6fcafc8d73c93fd263f5828",
+      "bytes": 106245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/literal-inverse/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "4a25748328401314b238ecb26ee724501454ec5b528e1c433c246e56fe790e25",
+      "bytes": 21047
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/manifest.json",
+      "sha256": "31395e53c1038e64047efd3df39c6f8aa0628a5dc18f2e97a5567781c763f358",
+      "bytes": 95362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "sha256": "d11a95eda337ea03e5473e63b1549c62098cd8e29a0bd14a82d281e3c085117b",
+      "bytes": 21735
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "sha256": "8d622f4d8cf11e169cb1524bdf94147ff4b6d5fcd8fbeff05fc907e847ba2169",
+      "bytes": 27435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "sha256": "61c5822ca2da53ec42e6e9096c0d2a09a39afc991fee8cabb94a263bdbb94cce",
+      "bytes": 27014
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+      "sha256": "4989c9fb14bb0a069dfa786771a38eef94863c396d86e9d946a6fdf603291953",
+      "bytes": 15688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+      "sha256": "fb7209f19162a6923ff0656f64fcb3ce119fa49081f856c958cfcd0f609bad66",
+      "bytes": 16686
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+      "sha256": "124956f5076109d6a21c0c00519fa0f86021edc49d4cfe856e88fdf6da59c874",
+      "bytes": 23614
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "5ee46cd9fb0219cfda631fe519564cb3eb5e31e89dc95dfbc61815bc06b82137",
+      "bytes": 30091
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs",
+      "sha256": "4202711532495f4b1df448ccbe5b6ac7195fc0cbcf636fdaf27be9ead7a06eaa",
+      "bytes": 20916
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "9d6fb70dd70b8bac4ebe2956a14633dcb119c26061abc5de39042f789a1ba69b",
+      "bytes": 20546
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "3517cd095c082cd20e57ea38326a0e08d7b2fdeca2165a13b877bc5e893e8c36",
+      "bytes": 9380
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle.rs",
+      "sha256": "49f28536e7df409410cd024770274eccf06be3ed8e168fb450e9b8b59c8b71f4",
+      "bytes": 4220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/controls.rs",
+      "sha256": "937628b4baeedd3ff23713611049fca8ce07d72d5cf2462e58ff6274c316c1ff",
+      "bytes": 5269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "35f7fab0b7b3c6910d8ad604b2eb53f20294d425a5e5fc926233a89020eff548",
+      "bytes": 10132
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/thermostat_predefined.rs",
+      "sha256": "ca2b655f50bd40e8538fe2c20ace73d84f45ade66790b0ef586c51d9108aa79e",
+      "bytes": 3185
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "51b7d48881fde74753b8057882e782f2bb5d312b3aee405add1ca3c227aaa3a8",
+      "bytes": 10160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use.rs",
+      "sha256": "f1f48cd5590d9a8a366cfb893419a94628e2ed567599472b5c12c13c675abb29",
+      "bytes": 5456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/plant.rs",
+      "sha256": "1935aa029b6387445b15e6d3158c19e5f15010d0ab1536e2f1c392447f499329",
+      "bytes": 7718
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/setpoints.rs",
+      "sha256": "7f0fd692bd0df3c8b8dfa97d681d396079068fedb0b1dd404063ad0701c4d957",
+      "bytes": 5833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "6ba6cb095eb6d0be30cc825343e0493dff71d746d8cdd6bea53e73bd98690b17",
+      "bytes": 10255
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports.rs",
+      "sha256": "80d150c62c6769c8bb7bd89947bc34444aeb7b6f3a8061100c1c3691582b43e6",
+      "bytes": 12671
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "75a9c1e3e89abb4bcbfd47c80080d016fb5167a0133349f655ea18bed066eafc",
+      "bytes": 47556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/state.rs",
+      "sha256": "ccc892c71d78b496899c04368c607dbcfe0a0962addf38557db953c51423b4cf",
+      "bytes": 20108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/style_passes.rs",
+      "sha256": "ba59e26e02bd30da57f9e17001001784c32380c383916dba137522c419d8388a",
+      "bytes": 3685
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat.rs",
+      "sha256": "b4b2ba1149c7b175a7d343f307a2a5102345a5c74943c355c9491748f2f0ec7d",
+      "bytes": 23869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/input.rs",
+      "sha256": "e909c20634e4cd211a032f26734784314d623d729c72c3e4ce9720c0f18701ea",
+      "bytes": 2477
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/parser.rs",
+      "sha256": "7c1e9a87116fa1579991105350f20afd97429af3bd3c48eb49e918a6d6a27752",
+      "bytes": 7754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_thermal_comfort/state.rs",
+      "sha256": "3499c50e3b0ccf867d66d2e4820904b4ccc20a0c146cae77b827c3e7d5c473f0",
+      "bytes": 8600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/selected_gain_modules/water_use.rs",
+      "sha256": "63a32639c67e6755703c92f8e4b1f3affa0c701211d8ff53b19bab3507758d0c",
+      "bytes": 4761
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "4209a3b466d8dd6d26b3739a9d8b024c1799fa0f903ed6f060e2d6d40cd77120",
+      "bytes": 17554
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "0653bcf88f106628cf57d78691c175d80a72da5ebfa86789f52687cd80c59b5f",
+      "bytes": 2334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "11d658ccce75c75b31ee528e4a7ac8ca15999ad41df12599ae6bb8c81a56e75e",
+      "bytes": 15836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "9a628fb600cf0899102831049206c39b7cd8318fcef53eaf7fc7dfe59066bfee",
+      "bytes": 8662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "7f64207dcc466426be9a23658a4bd5dd1d724f7e1fd61c683ca6fea181fd975a",
+      "bytes": 106257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source70-selective-promotion-prepared-Fix-01/proposed/crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "a1be79a1db9f6a8eca15d9f10f94058f2cc301e08cef730aaeeedc75844a4567",
+      "bytes": 21197
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compare-predefined-table70-Reviewer-01.py",
+      "sha256": "3b5b76b083afa3c759bf06f6bf18d7b2c3b596ca444e4fd1ac3d9734f1b2a62d",
+      "bytes": 14038
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-A-24H-Root-67/output/energyplustbl.csv",
+      "sha256": "f53d9677c158144dca4f35b08cd69c9666c205b1a8e86dc4bfec98940b17c99b",
+      "bytes": 84703
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-A-24H-command-Root-67/receipt.json",
+      "sha256": "66dce9a44c5aa366719a44dec194656aeac174e88f17b05599c4248abd2b20b4",
+      "bytes": 3158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-version-Root-67/receipt.json",
+      "sha256": "caf4530dbb186fed594184cc880172aaee5084351c98629fda6f3bfe315a7191",
+      "bytes": 2711
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-predefined-table-observer-held-Fix-01/manifest.json",
+      "sha256": "62a1e87bc542b2fafb906500798f518a128aeb44714faca4429fbb2c41d50b78",
+      "bytes": 9617
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/manifest.json",
+      "sha256": "dfd2cadc876377f7e7523891b3f65e3ea474e1c8d808b09ecfcdfd7095c26514",
+      "bytes": 221866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-affected-report-tests-command-70-8MiB/receipt.json",
+      "sha256": "2b45012abc8893c70b4fe75185f57517dc6a744681120046a3696e4be4bbf5c1",
+      "bytes": 3815
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-affected-report-tests-command-70-8MiB/stderr.log",
+      "sha256": "2f9a8b08333d839b3f60676e2526f24c91cf381a584d0e6729de7a3468fd02f8",
+      "bytes": 32655
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-affected-report-tests-command-70-8MiB/stdout.log",
+      "sha256": "83b2d3ae9ab28e3976dabfaff9113fc66159771158fe36e2a81bd0147a3a3097",
+      "bytes": 3038
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-all-targets-command-70/receipt.json",
+      "sha256": "6e79606b829a776f55f7e3e028a01126ac46686cf8977fce11069029256f4736",
+      "bytes": 3067
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-all-targets-command-70/stderr.log",
+      "sha256": "d859f737935ca2858ed1e0e08498ad643ce0d4012ec014ed147dd2ea3ffda680",
+      "bytes": 33880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-all-targets-command-70/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-70/receipt.json",
+      "sha256": "36376f49c0cfade776fad278f340888210eace20e87b33900b84a09953b625c4",
+      "bytes": 3773
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-70/stderr.log",
+      "sha256": "d2baf1485fbc8b60fb274785e0899f3c60584d633c6a97ca3f8cf1ae48916348",
+      "bytes": 35261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-70/stdout.log",
+      "sha256": "ac611576a07c0119c0cc6ce4445207756fdc4b00a31c56e85f2c6a2fa0bbc74c",
+      "bytes": 744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-70/workspace/.runtime/porting/source-objects/85/853ad26349d473354b059d4ac3ce8461555b92ceb56690c461dbbb6602bb7d1f",
+      "sha256": "853ad26349d473354b059d4ac3ce8461555b92ceb56690c461dbbb6602bb7d1f",
+      "bytes": 1818562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-weather-stat-held-Audit-01/manifest.json",
+      "sha256": "99578bb99487d0da2231751426ed2b99ea701e05c1729221834bbf2b76c9d806",
+      "bytes": 83795
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-canonical-source70-promotion-Fix-01.py",
+      "sha256": "f81471afb9a03fb3f663fa28cc89226347682a5849474b068fd1a0308bdccf2c",
+      "bytes": 12156
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-weather-remaining-reports-Root-06.py",
+      "sha256": "cc0f0779613a0c513b2c4785d9acc587cedb55326aea8d7cddc18f43576b815f",
+      "bytes": 10201
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-canonical70-selective-promotion-Root-01.py",
+      "sha256": "17ef09aabd616e8305fd8fa5d0752812e121056abc3b6d024615f027ba67dc46",
+      "bytes": 4366
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-predefined-table-comparison-Root-70-03.py",
+      "sha256": "f5c3eb37ca65538fefd3220eadc97d9db45ad5e2169d4a05f7ee43e3d76c65c4",
+      "bytes": 5634
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-union70-final-Reviewer-02.py",
+      "sha256": "882706bbc43aa08593bea9a4dadb78b62ab50533d6bf2453d0717623292ac222",
+      "bytes": 6898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-with-explicit-test-stack-Root-01.py",
+      "sha256": "e007973795d1354a1b6f078ead2b86d729b94cf4839eb00724267fc8ba25b46e",
+      "bytes": 600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/diagnostics.json",
+      "sha256": "1afc2dfed800cfc1a0922837893262d63d9c8e2f883016859dded8b57087a5da",
+      "bytes": 6547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplusrs.ctf.log",
+      "sha256": "a60bed4789e4c8a7ead18e92629fa6714074f014f8f470be184b9cee7fc08cda",
+      "bytes": 1808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplusrs.eio",
+      "sha256": "759eb01df8002e7da562190fe1e2a1d266ef2050583903acdc028ce21474c06e",
+      "bytes": 14834
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplustbl.csv",
+      "sha256": "15a14d4de70b9b3a58234d0d4d83f0ace9d5c2f24fc2968610e8c98fcb802f6c",
+      "bytes": 215
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplustbl.htm",
+      "sha256": "54e73abb4513c0b02a6d6a193f8392cbebb63ca9a213a46f0c66693b5233ec53",
+      "bytes": 774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplustbl.tab",
+      "sha256": "8a4853492fd9a6e0dd57c30ba91695c9687d61a1f95fd990da2a60490c941a67",
+      "bytes": 212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplustbl.txt",
+      "sha256": "e82ed6d3524077cd781c97e7ae44dc709e6fda01958b84339ebe0c55cb25538d",
+      "bytes": 226
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/eplustbl.xml",
+      "sha256": "54d29a33ce3c6b8afb502b8d8d6c9d78276168057470a9a7dae54696e86fc737",
+      "bytes": 474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/logs/source-input-statistics.json",
+      "sha256": "00c15267536a9378085cf296afefcd49eaf6da5a02b823b45fc3bb793899cde3",
+      "bytes": 686
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/logs/source-predefined-table.json",
+      "sha256": "582a5658ab647432ce54417bab9659bddbe9f864ed38b5f988c64c065b64d03f",
+      "bytes": 670704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-70/output/run-summary.json",
+      "sha256": "fa01955e5b6527f64c046df0d52a78d34ad0024b72ba2eff1c296d29168bc0a8",
+      "bytes": 10211
+    },
+    {
+      "path": ".runtime/porting/source-objects/88/88df00acb586512ec21b824311046e4e1c31a334491ab3e3118deea9178701f1",
+      "sha256": "88df00acb586512ec21b824311046e4e1c31a334491ab3e3118deea9178701f1",
+      "bytes": 1818562
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "sha256": "d11a95eda337ea03e5473e63b1549c62098cd8e29a0bd14a82d281e3c085117b",
+      "bytes": 21735
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "sha256": "8d622f4d8cf11e169cb1524bdf94147ff4b6d5fcd8fbeff05fc907e847ba2169",
+      "bytes": 27435
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "sha256": "61c5822ca2da53ec42e6e9096c0d2a09a39afc991fee8cabb94a263bdbb94cce",
+      "bytes": 27014
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+      "sha256": "4989c9fb14bb0a069dfa786771a38eef94863c396d86e9d946a6fdf603291953",
+      "bytes": 15688
+    },
+    {
+      "path": "crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+      "sha256": "fb7209f19162a6923ff0656f64fcb3ce119fa49081f856c958cfcd0f609bad66",
+      "bytes": 16686
+    },
+    {
+      "path": "crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+      "sha256": "124956f5076109d6a21c0c00519fa0f86021edc49d4cfe856e88fdf6da59c874",
+      "bytes": 23614
+    },
+    {
+      "path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "5ee46cd9fb0219cfda631fe519564cb3eb5e31e89dc95dfbc61815bc06b82137",
+      "bytes": 30091
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs",
+      "sha256": "4202711532495f4b1df448ccbe5b6ac7195fc0cbcf636fdaf27be9ead7a06eaa",
+      "bytes": 20916
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "9d6fb70dd70b8bac4ebe2956a14633dcb119c26061abc5de39042f789a1ba69b",
+      "bytes": 20546
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "3517cd095c082cd20e57ea38326a0e08d7b2fdeca2165a13b877bc5e893e8c36",
+      "bytes": 9380
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle.rs",
+      "sha256": "49f28536e7df409410cd024770274eccf06be3ed8e168fb450e9b8b59c8b71f4",
+      "bytes": 4220
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/controls.rs",
+      "sha256": "937628b4baeedd3ff23713611049fca8ce07d72d5cf2462e58ff6274c316c1ff",
+      "bytes": 5269
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "35f7fab0b7b3c6910d8ad604b2eb53f20294d425a5e5fc926233a89020eff548",
+      "bytes": 10132
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/thermostat_predefined.rs",
+      "sha256": "ca2b655f50bd40e8538fe2c20ace73d84f45ade66790b0ef586c51d9108aa79e",
+      "bytes": 3185
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "51b7d48881fde74753b8057882e782f2bb5d312b3aee405add1ca3c227aaa3a8",
+      "bytes": 10160
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use.rs",
+      "sha256": "f1f48cd5590d9a8a366cfb893419a94628e2ed567599472b5c12c13c675abb29",
+      "bytes": 5456
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/plant.rs",
+      "sha256": "1935aa029b6387445b15e6d3158c19e5f15010d0ab1536e2f1c392447f499329",
+      "bytes": 7718
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/setpoints.rs",
+      "sha256": "7f0fd692bd0df3c8b8dfa97d681d396079068fedb0b1dd404063ad0701c4d957",
+      "bytes": 5833
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "6ba6cb095eb6d0be30cc825343e0493dff71d746d8cdd6bea53e73bd98690b17",
+      "bytes": 10255
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports.rs",
+      "sha256": "80d150c62c6769c8bb7bd89947bc34444aeb7b6f3a8061100c1c3691582b43e6",
+      "bytes": 12671
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "75a9c1e3e89abb4bcbfd47c80080d016fb5167a0133349f655ea18bed066eafc",
+      "bytes": 47556
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/state.rs",
+      "sha256": "ccc892c71d78b496899c04368c607dbcfe0a0962addf38557db953c51423b4cf",
+      "bytes": 20108
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/style_passes.rs",
+      "sha256": "ba59e26e02bd30da57f9e17001001784c32380c383916dba137522c419d8388a",
+      "bytes": 3685
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat.rs",
+      "sha256": "b4b2ba1149c7b175a7d343f307a2a5102345a5c74943c355c9491748f2f0ec7d",
+      "bytes": 23869
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/input.rs",
+      "sha256": "e909c20634e4cd211a032f26734784314d623d729c72c3e4ce9720c0f18701ea",
+      "bytes": 2477
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/weather_stat/parser.rs",
+      "sha256": "7c1e9a87116fa1579991105350f20afd97429af3bd3c48eb49e918a6d6a27752",
+      "bytes": 7754
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_thermal_comfort/state.rs",
+      "sha256": "3499c50e3b0ccf867d66d2e4820904b4ccc20a0c146cae77b827c3e7d5c473f0",
+      "bytes": 8600
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_gain_modules/water_use.rs",
+      "sha256": "63a32639c67e6755703c92f8e4b1f3affa0c701211d8ff53b19bab3507758d0c",
+      "bytes": 4761
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "4209a3b466d8dd6d26b3739a9d8b024c1799fa0f903ed6f060e2d6d40cd77120",
+      "bytes": 17554
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "0653bcf88f106628cf57d78691c175d80a72da5ebfa86789f52687cd80c59b5f",
+      "bytes": 2334
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "11d658ccce75c75b31ee528e4a7ac8ca15999ad41df12599ae6bb8c81a56e75e",
+      "bytes": 15836
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "9a628fb600cf0899102831049206c39b7cd8318fcef53eaf7fc7dfe59066bfee",
+      "bytes": 8662
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "7f64207dcc466426be9a23658a4bd5dd1d724f7e1fd61c683ca6fea181fd975a",
+      "bytes": 106257
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/design_day_native_tests.rs",
+      "sha256": "a1be79a1db9f6a8eca15d9f10f94058f2cc301e08cef730aaeeedc75844a4567",
+      "bytes": 21197
+    }
+  ],
+  "finite_predefined_report_comparison": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-predefined-table-byte-comparison-70-01/comparison.json",
+    "sha256": "a469b0047b59e7b494134e4b70eab9dd1b01deb4482bdbc8fb2f9faaa5cbf842",
+    "bytes": 15784
+  },
+  "independent_byte_comparison_review": {
+    "path": ".runtime/porting/SRC-06/Root-predefined-table-comparison-70-review-03/review.json",
+    "sha256": "f0275a63f27d780c01cbb843ee11c037b53e84c2e8079e86654a47d00f8ed189",
+    "bytes": 1746
+  },
+  "selected_report_entries": 219,
+  "exact_projected_reported_bytes": 218,
+  "unpaired_late_Native_writer": 1,
+  "scope": [
+    "Native raw weather STAT bytes, real registry columns and actual same-session report owners are used.",
+    "Actual held Source executes FillWeather5212, Remaining5213, Rainfall5214, unit reconciliation and style passes before BEPS5230.",
+    "Source predefined table contains505 active entries. Selected219 positions287-505 independently recomputed:218 exact reported bytes.",
+    "Remaining6974 writes a literal gross-floor-area placeholder; Native BEPS later appends its value. Position481 is an unpaired phase, not an equality claim.",
+    "Five existing assertions in four test files now compare raw byte char entries; no added test bodies or expanded full-suite run."
+  ],
+  "numeric_observation": "Actual70 ESO/MTR/EIO remain whole-byte identical to69/67. Existing reported comparison retains3536/5280 unequal ESO parsed binary64 values and72 exact MTR values. No tolerance change or numerical PASS.",
+  "previous_checkpoint": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-input-statistics-tabular-05/summary.json",
+    "sha256": "a67277ec8bfe9c8d9f4605cb143698a5692cd862ac0f004cf6a6fdbc207b15bf",
+    "bytes": 43617
+  },
+  "remaining": [
+    "BEPS body and later actual report/close/endrun sequence.",
+    "Completed Source exporter, genuine default dispatcher activation, raw numerical parity and remaining A/B domains."
+  ],
+  "reconstruction": "Git retains all34 canonical Sources. Compact archive binds complete proposals/diffs/compiler hash census, actual command/output observations and independent reviews. No new complete offline replay claim.",
+  "completed_Source_run_or_export": false,
+  "whole_Native_numeric_PASS": false,
+  "pipeline_activation": false,
+  "gate_changes": false,
+  "A": "14/54",
+  "B": "14/64",
+  "retained_whole_old_comparison": {
+    "mismatches": 235456,
+    "required_unavailable_or_unpaired": 2754
+  },
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/publish-weather-remaining-reports-Root-06.py",
+    "sha256": "cc0f0779613a0c513b2c4785d9acc587cedb55326aea8d7cddc18f43576b815f",
+    "bytes": 10201
+  }
+}

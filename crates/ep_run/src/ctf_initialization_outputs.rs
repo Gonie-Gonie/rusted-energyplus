@@ -88,9 +88,13 @@ impl CtfRunOutputs {
                     output_dir.join("eplusrs.mtd"),
                 ),
             );
+            // Actual CLI583-584: copy the supplied EPW path, then replace its extension.
+            let mut stat_input = input.input_weather_file_path.clone();
+            stat_input.set_extension("stat");
             self.reports.source_initialization_input = Some(input);
             self.initialization_files = Some(SourceInitializationFiles::new(
                 SourceInitializationFilePaths {
+                    stat_input,
                     eso: output_dir.join("eplusrs.eso"),
                     eio: output_dir.join("eplusrs.eio"),
                     mtr: output_dir.join("eplusrs.mtr"),

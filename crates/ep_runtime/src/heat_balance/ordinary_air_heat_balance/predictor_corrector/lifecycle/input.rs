@@ -34,13 +34,21 @@ impl SourceZoneAirPredictorCorrector {
             self.flags.number_temperature_controls[kind] =
                 owners.input.get_num_objects_found(family);
             if self.flags.number_temperature_controls[kind] > 0 {
+                i32::try_from(self.flags.number_temperature_controls[kind]).map_err(|_| {
+                    Error::Unavailable("actual positive thermostat allocation native int count domain")
+                })?;
+                self.flags.temperature_setpoint_schedules[kind] = Some(vec![
+                    controls::SourceZoneSetpointSchedule::default();
+                    self.flags.number_temperature_controls[kind]
+                ]);
                 return Err(Error::Unavailable(match line {
-                    525 => "positive singleHeat schedule allocation525",
-                    561 => "positive singleCool schedule allocation561",
-                    597 => "positive singleHeatCool schedule allocation597",
-                    _ => "positive dual schedule allocation633",
+                    525 => "actual positive singleHeat first getObjectItem529",
+                    561 => "actual positive singleCool first getObjectItem565",
+                    597 => "actual positive singleHeatCool first getObjectItem601",
+                    _ => "actual positive dual first getObjectItem637",
                 }));
             }
+            // Native false count leaves the real Array1D unallocated; no zero resize.
         }
         owners.shortcut.current_module_object = "ZoneControl:Humidistat".into();
         self.controls.number_humidity_zones = i32::try_from(

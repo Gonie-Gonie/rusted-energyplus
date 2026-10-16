@@ -374,7 +374,7 @@ fn main() -> Result<()> {
         if let Some(typed) = compiled.model {
             result["typed_geometry_inputs"] = fields::typed(&typed);
             let mut caller = fields::Caller::new(&typed.version.to_string());
-            result["caller_before"] = caller.snapshot();
+            result["caller_before"] = caller.snapshot()?;
             let model = SimulationModel::from_typed(typed);
             result["actual_calls"]["initialize_heat_balance_state_with_initialization_context"] =
                 json!(1);
@@ -392,7 +392,7 @@ fn main() -> Result<()> {
                     exit_code = 2;
                 }
             }
-            result["caller_after"] = caller.snapshot();
+            result["caller_after"] = caller.snapshot()?;
         } else {
             result["initializer_result"] = json!({"returned":false,"reason":"compiler returned no TypedModel","counted_as_PASS":false});
             exit_code = 2;

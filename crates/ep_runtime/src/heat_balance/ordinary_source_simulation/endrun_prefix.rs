@@ -1,4 +1,4 @@
-//! Genuine ManageSimulation566-594; completion stops before WriteTabularReports596.
+//! Genuine ManageSimulation566-596 prefix; later tabular report children remain bounded.
 use crate::RuntimeError;
 use crate::heat_balance::ctf_initialization_context::{CtfInitializationReports, hb_input_error};
 use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
@@ -40,7 +40,7 @@ fn warning(
         .map_err(hb_input_error)
 }
 impl SourceInitializationFiles {
-    /// Continue on the original owners after Primary564, through actual594.
+    /// Continue on the original owners after Primary564, through the actual596 predefined prefix.
     /// Does not replay the primary Warmup=false writer, construct/reset a PSY
     /// scope or local owner, or close any file. Actual594 opens the same TAB files.
     /// The caller retains the same
@@ -48,8 +48,8 @@ impl SourceInitializationFiles {
     ///
     /// # Errors
     /// Preserves each typed child cause and all preceding effects. Positive SQL
-    /// sqliteBegin582 remains unavailable; after actual594 the genuine next
-    /// WriteTabularReports596 entry before FillWeather remains unavailable.
+    /// sqliteBegin582 remains unavailable. Actual596 preserves each genuine child
+    /// cause and stops at the next unported operation in Source order.
     pub fn source_simulation_endrun_prefix_on_session(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,
@@ -155,7 +155,7 @@ impl SourceInitializationFiles {
             )
             .map_err(hb_input_error)?;
         self.open_source_output_tabular_file_on_session(session, reports, weather, backend)?;
-        Err(unavailable("actual endrun WriteTabularReports596 entry before FillWeather"))
+        self.write_source_tabular_reports_prefix_on_session(session, reports, weather)
     }
 }
 
@@ -165,7 +165,7 @@ impl SourceInitializationFiles {
     /// No simulation local, clock or first-call flag is initialized or reset here.
     ///
     /// # Errors
-    /// Returns the actual typed prefix child failure, including the next596 boundary.
+    /// Returns the actual typed prefix child failure, including the actual next tabular child boundary.
     pub fn source_simulation_endrun_prefix(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,
@@ -176,5 +176,71 @@ impl SourceInitializationFiles {
         weather.with_source_weather_session_mut(|actual| {
             self.source_simulation_endrun_prefix_on_session(session, reports, actual, backend)
         })
+    }
+}
+
+impl SourceInitializationFiles {
+    // Actual WriteTabularReports5212-5227 on the same retained owners. The
+    // existing outer on-session call already holds the single weather borrow.
+    fn write_source_tabular_reports_prefix_on_session(
+        &self,
+        session: &mut Option<OrdinarySourceSession>,
+        reports: &mut CtfInitializationReports,
+        weather: &WeatherSession,
+    ) -> Result<(), RuntimeError> {
+        self.fill_source_weather_predefined_entries_on_session(session, reports)?;
+        let session = required(session.as_mut(), "actual Source TAB before FillRemaining5213")?;
+        session
+            .tabular
+            .fill_source_remaining_predefined_entries(
+                &mut crate::heat_balance::ordinary_tabular_reports::remaining::SourceRemainingPredefinedOwners {
+                    hvac: &mut required(
+                        reports.selected_simulation_startup.as_mut(),
+                        "actual same HVAC globals before FillRemaining5213",
+                    )?.hvac_globals,
+                    prescan: &reports.output_prescan,
+                    environment: &weather.state.environment,
+                    gains: &reports.selected_internal_heat_gains,
+                    exterior: &session.exterior,
+                    schedules: required(
+                        reports.selected_schedule_manager.as_ref(),
+                        "actual same schedules before FillRemaining5213",
+                    )?,
+                    globals: required(
+                        reports.selected_heat_balance_globals.as_ref(),
+                        "actual same Globals before FillRemaining5213",
+                    )?,
+                    zones: required(
+                        reports.selected_zone_input.as_mut(),
+                        "actual same ZonePreDefRep owner before FillRemaining5213",
+                    )?,
+                    controller: &session.controller,
+                    predefined_summary: &session.comfort_summary,
+                    zone_plenum: &session.hvac.ancillary.zone_plenum,
+                    hvac_manager: &session.hvac,
+                    gain_modules: &session.gain_modules,
+                    weather_file_location_title: &weather.cursor.header().weather_location_title,
+                    registry: &reports.registry,
+                    table: &mut reports.table,
+                },
+            )
+            .map_err(hb_input_error)?;
+        session
+            .hvac
+            .ancillary
+            .water
+            .report_source_rainfall(
+                &reports.registry,
+                &mut reports.table,
+                &reports.heat_balance_input_state,
+            )
+            .map_err(hb_input_error)?;
+        session
+            .tabular
+            .continue_source_write_tabular_reports_after_predefined(
+                &reports.source_results_framework,
+                &reports.source_sqlite,
+            )
+            .map_err(hb_input_error)
     }
 }

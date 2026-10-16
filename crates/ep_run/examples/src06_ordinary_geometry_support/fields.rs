@@ -60,12 +60,30 @@ fn bytes(owner: &[u8]) -> Value {
     json!({"size_bytes":owner.len(),"hex":owner.iter().map(|v|format!("{v:02x}")).collect::<String>(),
         "utf8":std::str::from_utf8(owner).ok()})
 }
-fn reports(source: &CtfInitializationReports) -> Value {
+fn table_entries(
+    owner: &Option<Vec<ep_runtime::heat_balance::ctf_reports::PredefinedTableEntry>>,
+) -> Result<Value, std::str::Utf8Error> {
+    match owner {
+        None => Ok(json!({"allocated":false,"length":null,"values":null})),
+        Some(values) => {
+            let rows = values.iter().enumerate().map(|(index, v)| {
+                let char_entry = std::str::from_utf8(&v.char_entry)?;
+                Ok(json!({"vector_index":index,"source_one_based_index":index+1,
+                    "value":json!({"char_entry":char_entry,
+            "object_name":v.object_name,"index_column":v.index_column,"sub_table_index":v.sub_table_index,
+            "unique_object_name":v.unique_object_name,"original_real_entry":scalar(v.original_real_entry),
+            "significant_digits":v.significant_digits,"original_entry_is_real":v.original_entry_is_real})}))
+            }).collect::<Result<Vec<_>, std::str::Utf8Error>>()?;
+            Ok(json!({"allocated":true,"length":values.len(),"values":rows}))
+        }
+    }
+}
+fn reports(source: &CtfInitializationReports) -> Result<Value, std::str::Utf8Error> {
     let registry = &source.registry;
     let table = &source.table;
     let scan = &source.scan;
     let progress = &source.progress;
-    json!({"registry":{
+    Ok(json!({"registry":{
         "named_indices":registry.named_indices.iter().map(|(name,value)|json!({"name":name,"value":value})).collect::<Vec<_>>(),
         "declared_named_indices":NATIVE_INDEX_NAMES.iter().enumerate().map(|(index,name)|json!({
             "declaration_index":index,"name":name,"value":registry.named_indices.get(*name)
@@ -79,10 +97,7 @@ fn reports(source: &CtfInitializationReports) -> Value {
         "column_capacity":registry.column_capacity,"column_count":registry.column_count,
         "opaque_layer_columns":registry.opaque_layer_columns,
         "unrelated_Native_aggregate_owners_available":false},
-        "table":{"entries":allocated(&table.entries,|v|json!({"char_entry":v.char_entry,
-            "object_name":v.object_name,"index_column":v.index_column,"sub_table_index":v.sub_table_index,
-            "unique_object_name":v.unique_object_name,"original_real_entry":scalar(v.original_real_entry),
-            "significant_digits":v.significant_digits,"original_entry_is_real":v.original_entry_is_real})),
+        "table":{"entries":table_entries(&table.entries)?,
             "size_table_entry":table.size_table_entry,"num_table_entry":table.num_table_entry},
         "scan":{"get_report_input":scan.get_report_input,"surface_vertices":scan.surface_vertices,
             "surface_details":scan.surface_details,"surface_details_with_vertices":scan.surface_details_with_vertices,
@@ -100,7 +115,7 @@ fn reports(source: &CtfInitializationReports) -> Value {
             "construction_scan_result":progress.construction_scan_result,
             "report_headers_written":progress.report_headers_written,
             "coefficient_report_declared_indices":progress.coefficient_report_declared_indices,
-            "final_fatal_invoked":progress.final_fatal_invoked,"postlude_returned":progress.postlude_returned}})
+            "final_fatal_invoked":progress.final_fatal_invoked,"postlude_returned":progress.postlude_returned}}))
 }
 fn backend(source: &SourceErrorState) -> Value {
     let t = &source.tracking;
@@ -168,10 +183,10 @@ impl Caller {
             eio: Vec::new(),
         }
     }
-    pub(super) fn snapshot(&self) -> Value {
-        json!({"reports":reports(&self.reports),"backend":backend(&self.state),
+    pub(super) fn snapshot(&self) -> Result<Value, std::str::Utf8Error> {
+        Ok(json!({"reports":reports(&self.reports)?,"backend":backend(&self.state),
             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
-            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false})
+            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false}))
     }
     fn context(&mut self) -> CtfInitializationContext<'_> {
         CtfInitializationContext {

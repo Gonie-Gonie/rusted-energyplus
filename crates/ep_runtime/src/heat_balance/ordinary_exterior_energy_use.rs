@@ -106,3 +106,41 @@ impl SourceExteriorEnergyUse {
             .ok_or(Error::Unavailable("actual ExteriorLights allocated row"))
     }
 }
+
+/// Per-call borrowed view of the same private ExteriorLights row.
+pub(crate) struct SourceExteriorLightReportRef<'a> {
+    row: &'a SourceExteriorLightUsage,
+}
+impl SourceExteriorLightReportRef<'_> {
+    pub(crate) fn name(&self) -> &str {
+        &self.row.name
+    }
+    pub(crate) fn is_schedule_only(&self) -> bool {
+        self.row.control == SourceLightControlType::ScheduleOnly
+    }
+    pub(crate) fn schedule(&self) -> &Option<SourceScheduleIndex> {
+        &self.row.schedule
+    }
+    pub(crate) fn design_level(&self) -> &f64 {
+        &self.row.design_level
+    }
+    pub(crate) fn sum_consumption(&self) -> &f64 {
+        &self.row.sum_consumption
+    }
+    pub(crate) fn sum_time_not_zero_consumption(&self) -> &f64 {
+        &self.row.sum_time_not_zero_consumption
+    }
+}
+impl SourceExteriorEnergyUse {
+    pub(crate) fn source_number_lights(&self) -> &i32 {
+        &self.number_lights
+    }
+    pub(crate) fn source_light_report(
+        &self,
+        number: i32,
+    ) -> Result<SourceExteriorLightReportRef<'_>, Error> {
+        Ok(SourceExteriorLightReportRef {
+            row: self.light(number)?,
+        })
+    }
+}

@@ -129,29 +129,29 @@ fn direct_case(root: &Path, row: &Value, idf: &Value, epjson: &Value) -> Result<
     let inputs = &prepared.reports;
     out["typed_report_inputs"] = fields::typed_report_inputs(inputs);
     let mut caller = fields::Caller::new();
-    let preparation_before = caller.snapshot();
+    let preparation_before = caller.snapshot()?;
     match caller.prepare(&prepared) {
         Ok(assigned) => {
             out["preparation"] = json!({"invoked":true,"status":"source-returned",
             "source_order":["SimulationManager::OpenOutputFiles","SimulationManager::GetProjectData","EMSManager::CheckIfAnyEMS -> ScanForReports(EnergyManagementSystem)"],
             "actual_TimeStepsInHour":prepared.time_steps_in_hour,"actual_TimeStepZone":fields::scalar(prepared.time_step_zone()),
-            "assigned_EMS_report":assigned,"caller_before":preparation_before,"caller_after":caller.snapshot()})
+            "assigned_EMS_report":assigned,"caller_before":preparation_before,"caller_after":caller.snapshot()?})
         }
         Err(error) => {
             out["preparation"] = json!({"invoked":true,"status":"source-error-returned","error":fields::setup_error(&error),
-                "caller_before":preparation_before,"caller_after":caller.snapshot()});
+                "caller_before":preparation_before,"caller_after":caller.snapshot()?});
             return Ok(out);
         }
     }
-    let registry_before = caller.snapshot();
+    let registry_before = caller.snapshot()?;
     match caller.setup("SetPredefinedTables", inputs) {
         Ok(assigned) => {
             out["initial_registry"] = json!({"invoked":true,"status":"source-returned","assigned_report":assigned,
-            "caller_before":registry_before,"caller_after":caller.snapshot()})
+            "caller_before":registry_before,"caller_after":caller.snapshot()?})
         }
         Err(error) => {
             out["initial_registry"] = json!({"invoked":true,"status":"source-error-returned","error":fields::setup_error(&error),
-            "caller_before":registry_before,"caller_after":caller.snapshot()});
+            "caller_before":registry_before,"caller_after":caller.snapshot()?});
             return Ok(out);
         }
     }
@@ -191,19 +191,19 @@ fn direct_case(root: &Path, row: &Value, idf: &Value, epjson: &Value) -> Result<
     let mut setup = Vec::new();
     for action in rows(&row["setup_calls"])? {
         let action = text(action)?;
-        let before = caller.snapshot();
+        let before = caller.snapshot()?;
         match caller.setup(action,inputs) {
             Ok(assigned)=>setup.push(json!({"action":action,"actual_source_invoked":true,"status":"source-returned","assigned_report":assigned,
-                "caller_before":before,"caller_after":caller.snapshot()})),
+                "caller_before":before,"caller_after":caller.snapshot()?})),
             Err(error)=>{
                 setup.push(json!({"action":action,"actual_source_invoked":true,"status":"source-error-returned","error":fields::setup_error(&error),
-                    "caller_before":before,"caller_after":caller.snapshot()}));out["setup_calls"]=json!(setup);
-                out["direct_state_after_return_or_error"]=fields::direct_state(&state);out["caller_after_return_or_error"]=caller.snapshot();return Ok(out);
+                    "caller_before":before,"caller_after":caller.snapshot()?}));out["setup_calls"]=json!(setup);
+                out["direct_state_after_return_or_error"]=fields::direct_state(&state);out["caller_after_return_or_error"]=caller.snapshot()?;return Ok(out);
             },
         }
     }
     out["setup_calls"] = json!(setup);
-    out["caller_before_initializer"] = caller.snapshot();
+    out["caller_before_initializer"] = caller.snapshot()?;
     out["direct_state_before_initializer"] = fields::direct_state(&state);
     out["direct_initializer_invoked"] = json!(true);
     out["direct_initializer_invocation_count"] = json!(1);
@@ -214,7 +214,7 @@ fn direct_case(root: &Path, row: &Value, idf: &Value, epjson: &Value) -> Result<
             json!({"invoked":true,"status":"source-error-returned","error":fields::error(&error)})
         }
     };
-    out["caller_after_return_or_error"] = caller.snapshot();
+    out["caller_after_return_or_error"] = caller.snapshot()?;
     out["direct_state_after_return_or_error"] = fields::direct_state(&state);
     Ok(out)
 }

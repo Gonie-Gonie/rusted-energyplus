@@ -90,7 +90,7 @@ fn string_table_allocates100_then_doubles_and_keeps_untouched_members()
         .as_ref()
         .ok_or(CtfReportUnavailable::TableOwner)?;
     assert_eq!(entries.len(), 200);
-    assert_eq!(entries[0].char_entry, "layer 1");
+    assert_eq!(entries[0].char_entry.as_slice(), b"layer 1");
     assert_eq!(entries[0].index_column, 42);
     assert_eq!(
         entries[1].original_real_entry.to_bits(),
@@ -123,7 +123,7 @@ fn layer_reporting_uses_real_columns_and_empty_registry_has_no_effect()
     assert_eq!(entries[0].index_column, 81);
     assert_eq!(entries[1].index_column, 93);
     assert_eq!(entries[0].object_name, "DECLARED NINTH");
-    assert_eq!(entries[1].char_entry, "SECOND");
+    assert_eq!(entries[1].char_entry.as_slice(), b"SECOND");
     let mut partial = PredefinedStringTable::default();
     assert_eq!(
         report_ctf_layers(&report, &[81], &mut partial),

@@ -12761,6 +12761,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-input-statistics-tabular-05/summary.json",
         "sha256": "a67277ec8bfe9c8d9f4605cb143698a5692cd862ac0f004cf6a6fdbc207b15bf",
         "size_bytes": 43617
+      },
+      "canonical_weather_remaining_reports_06": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-weather-remaining-reports-06/summary.json",
+        "sha256": "48d740822a3ab681a90ac5861cb349c73c3f1fe66ec749fadd59ae50374cb705",
+        "size_bytes": 72729
       }
     },
     {

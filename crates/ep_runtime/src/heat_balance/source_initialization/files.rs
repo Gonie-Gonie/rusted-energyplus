@@ -6,6 +6,8 @@ use std::path::{Path, PathBuf};
 /// Explicit selected output paths; no Native path is inferred from a fixture.
 #[derive(Debug)]
 pub struct SourceInitializationFilePaths {
+    /// Actual weather STAT path produced by CommandLineInterface583-584.
+    pub stat_input: PathBuf,
     /// Actual ESO output path.
     pub eso: PathBuf,
     /// Actual EIO output path, reused by later HB initialization.
@@ -122,6 +124,8 @@ pub(crate) trait ScheduleAuditFileHost {
 /// Non-Clone retained source output files, independent of Runtime Result.
 #[derive(Debug)]
 pub struct SourceInitializationFiles {
+    // Native InputFilePath owns this path; each FillWeather call opens a local stream.
+    stat_input: PathBuf,
     outputs: [SourceOutputStream; 4],
     audit: SourceOutputStream,
     debug: SourceOutputStream,
@@ -136,6 +140,7 @@ impl SourceInitializationFiles {
     #[must_use]
     pub fn new(paths: SourceInitializationFilePaths) -> Self {
         Self {
+            stat_input: paths.stat_input,
             outputs: [
                 SourceOutputStream::new(paths.eso),
                 SourceOutputStream::new(paths.eio),
@@ -155,6 +160,9 @@ impl SourceInitializationFiles {
     /// Native format chooses a path; the separate TAB stream is ordinal-indexed.
     pub(crate) fn source_tabular_output_path(&self, style: i32) -> &Path {
         &self.tabular_paths[match style { 0 => 0, 1 => 1, 3 => 3, 4 => 4, _ => 2 }]
+    }
+    pub(crate) fn source_stat_input_path(&self) -> &Path {
+        &self.stat_input
     }
     pub(super) fn source_dxf_path(&self) -> &Path {
         &self.dxf

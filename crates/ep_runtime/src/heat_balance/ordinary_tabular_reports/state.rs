@@ -137,6 +137,11 @@ pub(super) struct SourceTabularInputState {
     pub(super) delimiters: [String; 5],
     pub(super) units_style_tabular: i32,
     pub(super) format_reals_tabular: bool,
+    pub(super) units_style_sqlite: i32,
+    pub(super) units_style_json: i32,
+    pub(super) format_reals_json: bool,
+    pub(super) format_reals_sqlite: bool,
+    pub(super) tabular_report_passes: Vec<super::style_passes::SourceTabularReportStyle>,
     pub(super) time_in_year: f64,
     pub(super) annual_tables: Vec<Infallible>,
     pub(super) named_monthly: Option<Vec<SourceNamedMonthly>>,
@@ -169,6 +174,30 @@ pub(super) struct SourceTabularInputState {
     pub(super) gather_demand_end_use_sub: SourceSolarArray<f64, 3>,
     pub(super) gather_demand_ind_end_use_sub: SourceSolarArray<f64, 3>,
     pub(super) gather_elapsed_time_beps: f64,
+    /// Actual OutputReportTabular.hh1340-1361 constructor members, retained once.
+    pub(super) total_volume: f64,
+    pub(super) num_uncond_zones: i32,
+    pub(super) num_cond_zones: i32,
+    pub(super) total_zone_eq_ht: f64,
+    pub(super) total_zone_eq_cl: f64,
+    pub(super) total_hvac_atu_ht: f64,
+    pub(super) total_hvac_atu_cl: f64,
+    pub(super) total_surf_ht: f64,
+    pub(super) total_surf_cl: f64,
+    pub(super) total_peopl_add: f64,
+    pub(super) total_lite_add: f64,
+    pub(super) total_equip_add: f64,
+    pub(super) total_wind_add: f64,
+    pub(super) total_iza_add: f64,
+    pub(super) total_infil_add: f64,
+    pub(super) total_other_add: f64,
+    pub(super) total_equip_rem: f64,
+    pub(super) total_wind_rem: f64,
+    pub(super) total_iza_rem: f64,
+    pub(super) total_infil_rem: f64,
+    pub(super) total_other_rem: f64,
+    /// Actual OutputReportTabular.hh1343 HrsPerWeek constructor0, not a call reset.
+    pub(super) hrs_per_week: f64,
     pub(super) meter_num_power_fuel_fire_gen: i32,
     pub(super) meter_num_power_pv: i32,
     pub(super) meter_num_power_wind: i32,
@@ -277,6 +306,11 @@ impl Default for SourceTabularInputState {
             delimiters: std::array::from_fn(|_| String::new()),
             units_style_tabular: 0,
             format_reals_tabular: true,
+            units_style_sqlite: 6,
+            units_style_json: 6,
+            format_reals_json: true,
+            format_reals_sqlite: true,
+            tabular_report_passes: Vec::new(),
             time_in_year: 0.0,
             annual_tables: Vec::new(),
             named_monthly: None,
@@ -309,6 +343,28 @@ impl Default for SourceTabularInputState {
             gather_demand_end_use_sub: Default::default(),
             gather_demand_ind_end_use_sub: Default::default(),
             gather_elapsed_time_beps: 0.0,
+            total_volume: 0.0,
+            num_uncond_zones: 0,
+            num_cond_zones: 0,
+            total_zone_eq_ht: 0.0,
+            total_zone_eq_cl: 0.0,
+            total_hvac_atu_ht: 0.0,
+            total_hvac_atu_cl: 0.0,
+            total_surf_ht: 0.0,
+            total_surf_cl: 0.0,
+            total_peopl_add: 0.0,
+            total_lite_add: 0.0,
+            total_equip_add: 0.0,
+            total_wind_add: 0.0,
+            total_iza_add: 0.0,
+            total_infil_add: 0.0,
+            total_other_add: 0.0,
+            total_equip_rem: 0.0,
+            total_wind_rem: 0.0,
+            total_iza_rem: 0.0,
+            total_infil_rem: 0.0,
+            total_other_rem: 0.0,
+            hrs_per_week: 0.0,
             meter_num_power_fuel_fire_gen: 0,
             meter_num_power_pv: 0,
             meter_num_power_wind: 0,
@@ -382,5 +438,32 @@ fn fixed<T: Copy, const N: usize>(dimensions: [usize; N], value: T) -> SourceSol
     SourceSolarArray {
         dimensions: Some(dimensions),
         values: vec![Some(value); dimensions.iter().product()],
+    }
+}
+
+impl super::SourceTabularReports {
+    // Native5218/5221 resolve only actual NotFound values, after all three
+    // predefined children. Positive earlier JSON/SQLite getters remain bounded
+    // before their genuine units-style writers in their existing Source paths.
+    pub(crate) fn continue_source_write_tabular_reports_after_predefined(
+        &mut self,
+        results: &crate::heat_balance::ordinary_output_control::SourceResultsFrameworkOptions,
+        sqlite: &crate::heat_balance::source_initialization::SourceSqliteState,
+    ) -> Result<(), crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+        if self.input_state.units_style_sqlite == 6 {
+            self.input_state.units_style_sqlite = self.input_state.units_style_tabular;
+        }
+        if self.input_state.units_style_json == 6 {
+            self.input_state.units_style_json = self.input_state.units_style_tabular;
+        }
+        if self.input_state.write_tabular_files {
+            self.set_source_tabular_report_styles(results, sqlite);
+            return Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                "actual WriteTabularReports5230 WriteBEPSTable entry",
+            ));
+        }
+        Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+            "actual WriteTabularReports5278 audit ensure_open entry",
+        ))
     }
 }

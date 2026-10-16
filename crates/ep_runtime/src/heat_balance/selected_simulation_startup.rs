@@ -72,6 +72,9 @@ pub(crate) struct SelectedRuntimeLanguage {
 pub(crate) struct SelectedHvacGlobals {
     /// DataHVACGlobals507 constructor; not DataSizing/NumAirLoops or a raw recount.
     pub(crate) number_of_primary_air_systems: i32,
+    /// DataHVACGlobals.hh520/524 explicitfalse, same real module flags.
+    pub(crate) turn_fans_on: bool,
+    pub(crate) night_vent_on: bool,
     /// Actual DataHVACGlobals.hh530/532 constructor false, genuine child writers.
     pub(crate) air_loop_init: bool,
     pub(crate) get_air_path_data_done: bool,
@@ -107,6 +110,8 @@ impl Default for SelectedHvacGlobals {
     fn default() -> Self {
         Self {
             number_of_primary_air_systems: 0,
+            turn_fans_on: false,
+            night_vent_on: false,
             air_loop_init: false,
             get_air_path_data_done: false,
             zone_mass_balance_hvac_resim: false,

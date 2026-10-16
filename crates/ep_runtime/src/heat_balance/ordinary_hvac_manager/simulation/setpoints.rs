@@ -113,3 +113,21 @@ impl SourceHvacManager {
         Ok(())
     }
 }
+
+impl SourceHvacManager {
+    pub(crate) fn fill_source_predefined_setpoint_manager_tables(&self) -> Result<(), Error> {
+        if self
+            .simulation
+            .setpoints
+            .managers
+            .as_deref()
+            .and_then(|rows| rows.first())
+            .is_some()
+        {
+            return Err(Error::Unavailable(
+                "actual FillPredefinedTablesForSetPointManagers first spm->type switch",
+            ));
+        }
+        Ok(())
+    }
+}
