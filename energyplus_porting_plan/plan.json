@@ -12728,14 +12728,14 @@
         "size_bytes": 47900
       },
       "held_provider_compilation_checkpoint": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-provider-integration-checkpoint-04/summary.json",
+        "sha256": "e1a20c2c59bf80eebf3e6ecaf7270e099bbd909785298fafeb40db00167126bd",
+        "size_bytes": 15903
+      },
+      "held_provider_compilation_checkpoint_previous": {
         "path": "energyplus_porting_plan/evidence/SRC-06-provider-integration-checkpoint-03/summary.json",
         "sha256": "818dc5a25f24fbf1ea7419f104c6db57524bc2bbace62b1856565fe00ff63055",
         "size_bytes": 12434
-      },
-      "held_provider_compilation_checkpoint_previous": {
-        "path": "energyplus_porting_plan/evidence/SRC-06-provider-integration-checkpoint-02/summary.json",
-        "sha256": "19b395209eb41adf19e14a4d86a8ae9ed501adedc1d3b2b97a77b3440cf98b18",
-        "size_bytes": 9508
       }
     },
     {
