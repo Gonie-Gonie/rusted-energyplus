@@ -12746,6 +12746,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-provider-integration-02/summary.json",
         "sha256": "2be5fa3631ecf1f383d03931ce74833ee01e861b912df8d3ac5cafbb7adc5fbb",
         "size_bytes": 14449
+      },
+      "canonical_weather_idf_metadata_03": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-weather-idf-metadata-03/summary.json",
+        "sha256": "f828e38d96c71cb0658e9739300aaa1e5f63e87ae6b82568b020d78ad64740fe",
+        "size_bytes": 24762
       }
     },
     {

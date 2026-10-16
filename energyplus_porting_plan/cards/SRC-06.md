@@ -389,3 +389,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [보고서 및 종료 함수 Source 적용](../evidence/SRC-06-canonical-provider-integration-02/summary.json). 연결 보고서 3종과 RDD/MDD를 실제 pre-primary host에 연결하고, 같은 날씨·세션·원래 지역 상태를 사용하는 kickoff부터 primary까지의 호출 함수를 적용했습니다. 종료 단계의 작은 함수, 실제 요금 계산 진입 순서와 상태 필드도 포함합니다. 전체 타깃 컴파일 및 기존 실행 테스트 27개가 원래 8MiB 스택에서 통과했습니다. 새 테스트를 추가하지 않았고 전체 테스트는 반복하지 않았습니다. 실제 기본 파이프라인 전환·전체 종료 처리·Native 수치 비교는 미완료이며 A14/54·B14/64와 기존 FAIL을 유지합니다. 별도 실험용 파이프라인과 이후 종료 prefix는 이 적용에 포함하지 않습니다.
+
+
+[날씨 입력 메타데이터 수정과 실제 실행 기록](../evidence/SRC-06-canonical-weather-idf-metadata-03/summary.json). Site:Location·RunPeriod·SizingPeriod:DesignDay의 실제 IDF 필드 수 전달을 수정했습니다. 선택 필드의 전체 용량으로 입력 개수를 대체하지 않으며, RunPeriod와 DesignDay의 세미콜론 없는 EOF 입력은 정확한 메타데이터를 보장할 수 없어 명시적으로 미지원 처리합니다. 기존 raw-model 테스트 16개와 기본 실행 경로 A-24H 회귀 실행이 통과했습니다. 새 테스트 본문과 전체 테스트 반복은 없습니다. 별도 실제 Source 경로는 세 입력 오류를 넘고 20일 워밍업 후 본 기상 실행에 진입했으며, 첫 열적 복원력 누적 보고에서 미지원으로 종료합니다. 실제 Source 24시간 완료·기본 파이프라인 전환·Native 수치 동등성을 뜻하지 않습니다. A14/54·B14/64와 기존 전체 FAIL을 유지합니다.

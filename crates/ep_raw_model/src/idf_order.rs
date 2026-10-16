@@ -157,6 +157,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneProperty:LocalEnvironment",
         name_field_index: 0,
     },
+    // Actual named RunPeriod getter uses staged declaration order/field bounds.
+    IdfOrderTarget {
+        object_type: "RunPeriod",
+        name_field_index: 0,
+    },
     // WeatherManager::GetDesignDayData calls getObjectItem in input order;
     // ReverseDD remaps the first two owners only after this effective ordering.
     IdfOrderTarget {
@@ -378,6 +383,8 @@ pub fn apply_idf_declaration_order(
                         | "OtherEquipment"
                         | "Exterior:Lights"
                         | "Site:Location"
+                        | "RunPeriod"
+                        | "SizingPeriod:DesignDay"
                 )
             {
                 report_field_counts.push((
@@ -388,6 +395,7 @@ pub fn apply_idf_declaration_order(
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
                         "Site:Location" => idf_object.max_fields.max(5),
+                        "RunPeriod" => idf_object.max_fields.max(7),
                         "Site:GroundTemperature:BuildingSurface"
                         | "Site:GroundTemperature:FCfactorMethod"
                         | "Site:GroundTemperature:Shallow"
@@ -551,6 +559,21 @@ fn scan_target_objects(
         idf_order = idf_order
             .checked_add(1)
             .ok_or_else(|| IdfOrderError::new("IDF declaration-order counter exceeded u32"))?;
+        // Native EOF returns without advancing the final field or min-padding.
+        // These metadata targets require a semicolon; all other EOF targets
+        // retain their existing ordering behavior. DD ordering-only EOF input
+        // is now explicitly outside this newly required metadata domain.
+        if let Some(object_type) = fields.first()
+            && (object_type.eq_ignore_ascii_case("RunPeriod")
+                || object_type.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
+            && targets
+                .iter()
+                .any(|target| target.object_type.eq_ignore_ascii_case(object_type))
+        {
+            return Err(IdfOrderError::new(format!(
+                "staged {object_type} requires a terminating semicolon for exact IDF field metadata",
+            )));
+        }
         record_object(
             &fields,
             (start_line, start_column),
@@ -828,7 +851,20 @@ mod tests {
             assert!(staged.has_idf_declaration_order(object_type));
             assert!(!direct.has_idf_declaration_order(object_type));
         }
-        assert_eq!(staged.objects, direct.objects);
+        // The two physical DD rows each contain Name and Month. Preserve the
+        // complete direct object tree while expecting only those real bounds.
+        let mut expected = direct.objects.clone();
+        for object in expected
+            .get_mut(&crate::ObjectType("SizingPeriod:DesignDay".into()))
+            .ok_or("existing named DesignDay fixture objects")?
+            .values_mut()
+        {
+            object.fields.insert(
+                FieldName("idf_max_fields".into()),
+                RawValue::Number("2".into()),
+            );
+        }
+        assert_eq!(staged.objects, expected);
         Ok(())
     }
 
@@ -1146,6 +1182,16 @@ mod unnamed_report_order_tests {
                 "OtherEquipment,Z,None,Zone,Schedule,EquipmentLevel,-3;OtherEquipment,A,None,Zone,Schedule,EquipmentLevel,7,,,,,,,MixedCase;",
                 Some([11, 13]),
             ),
+            (
+                "RunPeriod",
+                "RunPeriod,Z,1,1,,1,1;RunPeriod,A,1,1,2013,1,2,2013,Tuesday,,,No,Yes,Yes,,Hour24;",
+                Some([7, 15]),
+            ),
+            (
+                "SizingPeriod:DesignDay",
+                "SizingPeriod:DesignDay,Z,12;SizingPeriod:DesignDay,A,7,,SummerDesignDay;",
+                Some([2, 4]),
+            ),
         ] {
             let epjson = format!("{{\"{family}\":{{\"A\":{{}},\"Z\":{{}}}}}}");
             let raw = parse_epjson_str_with_idf_order(&epjson, idf)?;
@@ -1205,6 +1251,29 @@ mod unnamed_report_order_tests {
             rows[0].1.fields.get(&FieldName("idf_max_fields".into())),
             Some(&RawValue::Number("8".into()))
         );
+        // EOF-only Native counters do not have the semicolon min-field pad.
+        // The bounded metadata route must fail before publishing any overlay.
+        let mut eof_run_period = parse_epjson_str(r#"{"RunPeriod":{"A":{}}}"#)?;
+        for idf in ["RunPeriod,A,1,1,,1,1", "RunPeriod,A,1,1,,1,1,"] {
+            let before_eof = eof_run_period.clone();
+            let error = apply_idf_declaration_order(&mut eof_run_period, idf, IDF_ORDER_TARGETS)
+                .err()
+                .ok_or("unterminated RunPeriod must remain unavailable")?;
+            assert!(error.to_string().contains("terminating semicolon"));
+            assert_eq!(eof_run_period, before_eof);
+        }
+        let mut eof_design_day = parse_epjson_str(r#"{"SizingPeriod:DesignDay":{"A":{}}}"#)?;
+        for idf in [
+            "sizingperiod:designday,a,7,21",
+            "SizingPeriod:DesignDay,A,7,21,",
+        ] {
+            let before_eof = eof_design_day.clone();
+            let error = apply_idf_declaration_order(&mut eof_design_day, idf, IDF_ORDER_TARGETS)
+                .err()
+                .ok_or("unterminated DesignDay must remain unavailable")?;
+            assert!(error.to_string().contains("terminating semicolon"));
+            assert_eq!(eof_design_day, before_eof);
+        }
         Ok(())
     }
 }

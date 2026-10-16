@@ -1,0 +1,496 @@
+{
+  "schema": "src06-canonical-weather-idf-metadata.v1",
+  "status": "Reviewed weather IDF metadata corrected; genuine Source diagnostic reaches first normal-weather report; whole port and Native parity pending",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "base_HEAD": "b6bf54c615449e0d6ebd0b7b127bc4b50a0119cd",
+  "changed_Rust_files": 2,
+  "new_test_bodies": 0,
+  "promotion": {
+    "path": ".runtime/porting/SRC-06/reviewed-weather-metadata-promotion-Root-03/promotion.json",
+    "sha256": "aeebe32949a644945b71c1d83ce24d6976af6c1846131f2d18b6c87e1709c0af",
+    "bytes": 3513
+  },
+  "actual_genuine_Source_failure_prefix_commands": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-63/receipt.json",
+      "sha256": "c71873035af4f1b4b9002e4c1b316a8d7da3c18810f7522973c86ada726f042c",
+      "bytes": 9098
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-64/receipt.json",
+      "sha256": "f5808e561eb380c0b5098488efa91d37cf49202d3666871c9c85b5b329c28a62",
+      "bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-65/receipt.json",
+      "sha256": "cb0a8564e313af3f3be1a0a50739fecc3c0aa60ddffb5f9450269aa8ceed5b46",
+      "bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-66/receipt.json",
+      "sha256": "87185c964a74e68abd5c0c6ee2514c4b5cad07d30863bcfa7971e6cf8bebd92c",
+      "bytes": 3774
+    }
+  ],
+  "existing_raw_package_tests": {
+    "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-existing-raw-model-tests-66/receipt.json",
+    "sha256": "1de0c2d214d0ebdac47f307526bf5a6db107cb7dd5994d1c54ad1d0ff5a2cb9d",
+    "bytes": 3067
+  },
+  "existing_raw_tests_passed": 16,
+  "canonical_legacy_A24H_regression": {
+    "path": ".runtime/porting/SRC-06/canonical-existing-A-24H-metadata-regression-Root-03/receipt.json",
+    "sha256": "8d64fa17b706a364bd24422b07766c3836600a68ee8d5bf2a36c7a5091b12f6f",
+    "bytes": 3856
+  },
+  "independent_reviews": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-location-idf-metadata-admission-Source-review-01/review.json",
+      "sha256": "a2012f6ce6bdb05c1cf92f897e6e552ee42b38f33204220f6baf3b0dd6772a3a",
+      "bytes": 6327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-run-period-idf-metadata-Source-review-01/review.json",
+      "sha256": "764b3b9100b6943a6eb2626f66bfe030a75fb160a15004fcd97dcd735d4be29c",
+      "bytes": 3993
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-run-period-idf-metadata-Source-review-02/review.json",
+      "sha256": "e49a5370fee6e9ec7bb83549e2b853632de803b695e86ef16357665e4706fe4f",
+      "bytes": 7206
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-design-day-idf-metadata-Source-review-01/review.json",
+      "sha256": "f6f15fcd6d94f5187c31715457b1f2e6dfdd3cfedfa2f2fb6473bc0cf76dbf8e",
+      "bytes": 8264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union63-diagnostic-Source-review-02/review.json",
+      "sha256": "197b5d1745853ac2225d9a9b7bb825ea01a867a83bd9d0bcf2e5309e826e465d",
+      "bytes": 3882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union64-Source-review-01/review.json",
+      "sha256": "2d218155014abb95d348d316b048c8b9ec850666e729b74ff3e4e184e9357462",
+      "bytes": 2346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union65-Source-review-01/review.json",
+      "sha256": "5ceb82400b8733dd523b6bcdc24db8b4de525e43ed5b4bcfba3c9b2b4ccf3b7b",
+      "bytes": 2603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union66-Source-review-02/review.json",
+      "sha256": "f1b9ac9df02a6ca0111c134927840e37c71cf847fd5612a701ab8fe470afa2dc",
+      "bytes": 3343
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union63-A-24H-first-frontier-review-02/review.json",
+      "sha256": "f921b06d929b7032bc08b9a44e6beee37b24422ef51f2d6387454f59680ebbcb",
+      "bytes": 23224
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union64-A-24H-first-frontier-review-01/review.json",
+      "sha256": "a9f5a06dce80747c2c9341b07fb64a2d74e369a0b9968c382912d96e12b32f18",
+      "bytes": 14981
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union65-A-24H-first-frontier-review-01/review.json",
+      "sha256": "766479c630dcad74712fb8041e141a6d92888e7671141e163bfeba77a5900617",
+      "bytes": 15765
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union66-A-24H-first-frontier-review-03/review.json",
+      "sha256": "dd90c945509f93743d72618e883e05f77fd485f8065430940936738bc665caf6",
+      "bytes": 37915
+    }
+  ],
+  "evidence_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-weather-idf-metadata-03/evidence.zip",
+    "sha256": "18270094bdd4572093ee89c7f65c3e549b2ced3637426f8a1645711cfbfb7085",
+    "bytes": 1406986
+  },
+  "archive_files": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-design-day-idf-metadata-Source-review-01/review.json",
+      "sha256": "f6f15fcd6d94f5187c31715457b1f2e6dfdd3cfedfa2f2fb6473bc0cf76dbf8e",
+      "bytes": 8264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-location-idf-metadata-admission-Source-review-01/review.json",
+      "sha256": "a2012f6ce6bdb05c1cf92f897e6e552ee42b38f33204220f6baf3b0dd6772a3a",
+      "bytes": 6327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-run-period-idf-metadata-Source-review-01/review.json",
+      "sha256": "764b3b9100b6943a6eb2626f66bfe030a75fb160a15004fcd97dcd735d4be29c",
+      "bytes": 3993
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-ordinary-run-period-idf-metadata-Source-review-02/review.json",
+      "sha256": "e49a5370fee6e9ec7bb83549e2b853632de803b695e86ef16357665e4706fe4f",
+      "bytes": 7206
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union63-A-24H-first-frontier-review-02/review.json",
+      "sha256": "f921b06d929b7032bc08b9a44e6beee37b24422ef51f2d6387454f59680ebbcb",
+      "bytes": 23224
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union63-diagnostic-Source-review-02/review.json",
+      "sha256": "197b5d1745853ac2225d9a9b7bb825ea01a867a83bd9d0bcf2e5309e826e465d",
+      "bytes": 3882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union64-A-24H-first-frontier-review-01/review.json",
+      "sha256": "a9f5a06dce80747c2c9341b07fb64a2d74e369a0b9968c382912d96e12b32f18",
+      "bytes": 14981
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union64-Source-review-01/review.json",
+      "sha256": "2d218155014abb95d348d316b048c8b9ec850666e729b74ff3e4e184e9357462",
+      "bytes": 2346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union65-A-24H-first-frontier-review-01/review.json",
+      "sha256": "766479c630dcad74712fb8041e141a6d92888e7671141e163bfeba77a5900617",
+      "bytes": 15765
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union65-Source-review-01/review.json",
+      "sha256": "5ceb82400b8733dd523b6bcdc24db8b4de525e43ed5b4bcfba3c9b2b4ccf3b7b",
+      "bytes": 2603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union66-A-24H-first-frontier-review-03/review.json",
+      "sha256": "dd90c945509f93743d72618e883e05f77fd485f8065430940936738bc665caf6",
+      "bytes": 37915
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Fix-ordinary-provider-union66-Source-review-02/review.json",
+      "sha256": "f1b9ac9df02a6ca0111c134927840e37c71cf847fd5612a701ab8fe470afa2dc",
+      "bytes": 3343
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-A-24H-metadata-regression-Root-03/output/diagnostics.json",
+      "sha256": "41d82d8c8414eb99a1533a03355bc911415253cd0cf2c3f374cfb4459bc15189",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-A-24H-metadata-regression-Root-03/output/input/input-hashes.json",
+      "sha256": "6cd9996761c0979b1b15c0a1369866017b57acdf5f94965bb9b2bd64fffa4278",
+      "bytes": 733
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-A-24H-metadata-regression-Root-03/output/run-summary.json",
+      "sha256": "27013dc0f87f389df68ff72cddd07c7cbfabe0b1324bfd5d9db888fc675c919e",
+      "bytes": 28932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-existing-A-24H-metadata-regression-Root-03/receipt.json",
+      "sha256": "8d64fa17b706a364bd24422b07766c3836600a68ee8d5bf2a36c7a5091b12f6f",
+      "bytes": 3856
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-existing-A-24H-metadata-regression-Root-03/stderr.log",
+      "sha256": "c93d6c06391b469ea00ffde019ea23569163ab8ae91c078bed32d8455b9af32d",
+      "bytes": 32312
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-existing-A-24H-metadata-regression-Root-03/stdout.log",
+      "sha256": "2a7571084451e4b188888d9596c9c000cc0195bcc779efb41acc623cc31a5a29",
+      "bytes": 756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-design-day-idf-metadata-held-Reviewer-01/manifest.json",
+      "sha256": "aaeebc48bdb8b0c41539d2365792226495f6aff5102bcbb2eb474c9ec2cbf3b5",
+      "bytes": 18393
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-location-idf-metadata-admission-held-Reviewer-01/manifest.json",
+      "sha256": "01419e1246932b8caf36178238e6890b186f53c010003172d5991fe388d72773",
+      "bytes": 11087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/manifest.json",
+      "sha256": "ddff1ec6153b68575b8fddb69ff028840f9ff11a2cd17cb53b6ccaf1310d7e84",
+      "bytes": 5250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-63/receipt.json",
+      "sha256": "c71873035af4f1b4b9002e4c1b316a8d7da3c18810f7522973c86ada726f042c",
+      "bytes": 9098
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-63/stderr.log",
+      "sha256": "23394fa6578bd10acced94d649f96685cfb989a25eef29e1e30aa918ad030580",
+      "bytes": 32456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-63/stdout.log",
+      "sha256": "d830abb7c73e123dc0953af6dd7d9c2243b772418b3fbaa26f705111f178227b",
+      "bytes": 744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-63/workspace/.runtime/porting/source-objects/e3/e3299ff53769f2648bba8ec374ac0a2ce7e09ddb1d2042a270c47c8363b7893f",
+      "sha256": "e3299ff53769f2648bba8ec374ac0a2ce7e09ddb1d2042a270c47c8363b7893f",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/manifest.json",
+      "sha256": "e92326715f1cb30262ec54c5bc068d434719f5bc52b84ac694d150c608ade5a5",
+      "bytes": 5424
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-64/receipt.json",
+      "sha256": "f5808e561eb380c0b5098488efa91d37cf49202d3666871c9c85b5b329c28a62",
+      "bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-64/stderr.log",
+      "sha256": "7c77286f9c4427af0584c81af8eecfbf6263e8ba0b7b53bf3aa8f8ba0df3b7c8",
+      "bytes": 32456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-64/stdout.log",
+      "sha256": "b5872645c260ec4a7bc251fdf8868a76ee60f9825cfdea4f6dc9e5a8cd8d5b1c",
+      "bytes": 744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-64/workspace/.runtime/porting/source-objects/a9/a9b4e26b074c4e1c7cdd7bba7989dac2106075bbbe87ebf2b1d918f3e4da39c3",
+      "sha256": "a9b4e26b074c4e1c7cdd7bba7989dac2106075bbbe87ebf2b1d918f3e4da39c3",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/manifest.json",
+      "sha256": "4a65d54285b1086b0529a082994debf8b4b81ca3ade6468b4d7230f74ad824ea",
+      "bytes": 8739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-65/receipt.json",
+      "sha256": "cb0a8564e313af3f3be1a0a50739fecc3c0aa60ddffb5f9450269aa8ceed5b46",
+      "bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-65/stderr.log",
+      "sha256": "f7da379cbf4a1d47d2eea14fce07d4c5270ea92b9d0eb2e922865b968d25367f",
+      "bytes": 32812
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-65/stdout.log",
+      "sha256": "e65acb46c39e2cfa602a1b229176b2d88d2f7d1f4bfa8230b4de379776e55682",
+      "bytes": 744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-65/workspace/.runtime/porting/source-objects/1d/1d56647dca9bdf2ede7d6aaf838fc99c1183f9584bfd2886b53e5a19d37d602a",
+      "sha256": "1d56647dca9bdf2ede7d6aaf838fc99c1183f9584bfd2886b53e5a19d37d602a",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/manifest.json",
+      "sha256": "a7b3c8c70a4dd21cce8e85f9a6886394f74e5b3bb3cfb7af8c723b66f4bc029b",
+      "bytes": 8939
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-existing-raw-model-tests-66/receipt.json",
+      "sha256": "1de0c2d214d0ebdac47f307526bf5a6db107cb7dd5994d1c54ad1d0ff5a2cb9d",
+      "bytes": 3067
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-existing-raw-model-tests-66/stderr.log",
+      "sha256": "d5b946a00ac2f0bd4851dbe2c11a5abed59d9aef8e39e6a797f1532a865c921c",
+      "bytes": 497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-existing-raw-model-tests-66/stdout.log",
+      "sha256": "35b6857d5cbe89f38b339b94b06ac6015e7f125f0b5cbfdcdba4d6e23201a772",
+      "bytes": 1532
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-66/receipt.json",
+      "sha256": "87185c964a74e68abd5c0c6ee2514c4b5cad07d30863bcfa7971e6cf8bebd92c",
+      "bytes": 3774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-66/stderr.log",
+      "sha256": "6d601b6edaac4a5eb28e6403343785b3a5fced82c1efd45b2a57d5e0fb31e2e4",
+      "bytes": 32812
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/SRC-06/provider-assembly-through-primary-A-24H-command-66/stdout.log",
+      "sha256": "1205fe7b8fc3483b6272e590d6d0f60978a94dfa98e16856bdcaf3e406855362",
+      "bytes": 744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-66/workspace/.runtime/porting/source-objects/de/deb60b5b65e85996253bc90a2eb80f2d0db0dbd103f42431542932cceea4e711",
+      "sha256": "deb60b5b65e85996253bc90a2eb80f2d0db0dbd103f42431542932cceea4e711",
+      "bytes": 1812475
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-run-period-idf-metadata-held-Reviewer-02/manifest.json",
+      "sha256": "48c133348893820d6ff56116e29010f8f1d20d963376fcc45e1ac21fc0245ba7",
+      "bytes": 19812
+    },
+    {
+      "path": ".runtime/porting/SRC-06/promote-weather-idf-metadata-Root-03.py",
+      "sha256": "5abac4e66775303aabe308a6d88d0e34b071f97f753b410aa9959a9a766542ae",
+      "bytes": 4342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-weather-idf-metadata-Root-03.py",
+      "sha256": "0a378fdf2224ebd23dc6961a036a088dc4ff944092b7952b38d7f8337cf7d131",
+      "bytes": 9821
+    },
+    {
+      "path": ".runtime/porting/SRC-06/reviewed-weather-metadata-promotion-Root-03/promotion.json",
+      "sha256": "aeebe32949a644945b71c1d83ce24d6976af6c1846131f2d18b6c87e1709c0af",
+      "bytes": 3513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/clk03-weather-day-production-trace.json",
+      "sha256": "5cd14a26539fd685bebc54ff6ccb839ea52b76cb376f8964ccf55d059fb99a26",
+      "bytes": 991
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/clock-calls.json",
+      "sha256": "014d85b8861b6fd18d8c7ae2a6df13bb5ef29048b8095a9c6ceec174840191e0",
+      "bytes": 1114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/diagnostics.json",
+      "sha256": "73bd05405ddc9aa66a00d6b9295fbb800cb54bb7d8ce63e3a03c7440abe184aa",
+      "bytes": 6570
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.audit",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "bytes": 77
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.bnd",
+      "sha256": "838f6ecfe5bf8cd5939de8a12dac6e755cd2fd54f67c9accf7852854cf265fd9",
+      "bytes": 6251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.ctf.log",
+      "sha256": "348d698c1ed6f21e368aab2434a0067753c5457b0ddf3f7c3e6cc1f2a996ed23",
+      "bytes": 1534
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.dxf",
+      "sha256": "ad463f2e8fa5e87affe71ef56d0bc6dd9c3061f61f7f20694afe48b97e32cc85",
+      "bytes": 5392
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.eio",
+      "sha256": "6f31a5ac295383d8742a080abc55de7ea02466c23ccb77bd3fc22e163a007c8b",
+      "bytes": 14310
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.err",
+      "sha256": "1e74be8c20ecdf94566ec821578f83b53c8137a67c511d4a8e7c6dd2bedba918",
+      "bytes": 2714
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.eso",
+      "sha256": "e8ca6bb20a68a1e55ec507fb0d38b8bce970ab05918040d6856a77cc6c864c3c",
+      "bytes": 4800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.mdd",
+      "sha256": "6863483ad38fd937068cc44773c44158dff696ddf55a339626c51628a6295a62",
+      "bytes": 3788
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.mtd",
+      "sha256": "d66e7e246cd5333997aeccfa85c9c4754410b521c108f24e3e72bd8c28be9e4f",
+      "bytes": 7395
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.mtr",
+      "sha256": "8001298ffcc7e37c4fd5480890c7cb9208f1da3781678e772279b9e494261a61",
+      "bytes": 766
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.rdd",
+      "sha256": "a09f30a711e8bdf3a9b70423cb82673687363bc6fbd5414497e2991d25007477",
+      "bytes": 30234
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/input/input-hashes.json",
+      "sha256": "9d1f18587556d89ae9d34edaf5aa65110826be40b2ec5b1cb351f3ac437fefc0",
+      "bytes": 727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/input/original.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "bytes": 9275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/logs/source-order-stage-state-snapshots.json",
+      "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577",
+      "bytes": 9007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/through-primary-diagnostic-A-24H-Root-66/output/run-summary.json",
+      "sha256": "bbeb3a429ada4c57fa02b4373709555d4c43642a0958b4a2de4c9a43d062aebf",
+      "bytes": 10201
+    },
+    {
+      "path": ".runtime/porting/source-objects/fb/fb0d1146fc7dee3382a4b0d8d54050d429064ea874c824bd8d285c2233940398",
+      "sha256": "fb0d1146fc7dee3382a4b0d8d54050d429064ea874c824bd8d285c2233940398",
+      "bytes": 1812475
+    }
+  ],
+  "scope": [
+    "Site:Location accepts only its actually staged and validated IDF field count.",
+    "RunPeriod stages the actual positional field count with Native minimum7; SizingPeriod:DesignDay stages the actual positional count with minimum0. Optional field capacity is not used as a substitute for input field count.",
+    "RunPeriod and SizingPeriod:DesignDay require semicolon termination for exact metadata; their EOF-only domain is explicitly unavailable. Other family EOF behavior is unchanged.",
+    "Two existing test bodies were extended; the existing raw-model package16 tests pass without new test bodies.",
+    "The genuine Source diagnostic passed the three prior input gates, completed warmup20 and entered Primary weather simulation. It stops at actual thermal weather accumulation5870-6386 before the first PierceSET reset."
+  ],
+  "validation_scope": "Canonical unchanged legacy dispatcher A-24H succeeds after the two input corrections. This is a regression check only. Genuine Source A-24H still exits6 at its first unsupported thermal report; no genuine Source24h completion or Native numeric PASS is asserted. Full workspace tests were not repeated for these two metadata files.",
+  "coverage_limit": "Existing clock/day observers record zero for the genuine Source path and generic stage snapshots describe metadata only; actual CTF LOG/EIO and the independently reviewed caller chain establish Source entry. Broader observer coverage remains pending.",
+  "reconstruction": "Canonical Git holds both changed LF Rust files. Compact archive binds actual receipts/logs, compiled input hash censuses, packet manifests and independent reviews. It adds no complete offline replay claim and omits the734MB legacy fulltrace.",
+  "pipeline_activation": false,
+  "canonical_pipeline": {
+    "path": "crates/ep_run/src/pipeline.rs",
+    "sha256": "ac7b5dd54b6ecfb421c1965510b2d696a4594e5ae7a3e88a90e03b63f980831b",
+    "bytes": 830773
+  },
+  "whole_Native_numeric_PASS": false,
+  "full_suite_rerun": false,
+  "gate_changes": false,
+  "A": "14/54",
+  "B": "14/64",
+  "retained_whole_old_comparison": {
+    "mismatches": 235456,
+    "required_unavailable_or_unpaired": 2754
+  },
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/publish-weather-idf-metadata-Root-03.py",
+    "sha256": "0a378fdf2224ebd23dc6961a036a088dc4ff944092b7952b38d7f8337cf7d131",
+    "bytes": 9821
+  }
+}
