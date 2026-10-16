@@ -51,19 +51,13 @@ impl SurfaceGeometryInputState {
                 let surface = surfaces
                     .get(index(number)?)
                     .ok_or(Error::Unavailable("Space HT floor range"))?;
-                let area = surface
-                    .row
-                    .vertex_progress
-                    .properties
-                    .ok_or(Error::Unavailable("retained Surface.Area"))?
-                    .area_m2;
                 if surface.row.class == SurfaceClass::Floor {
                     zone.has_floor = true;
                     space.has_floor = true;
-                    calculated += area;
+                    calculated += surface.row.area;
                 }
                 if surface.row.class == SurfaceClass::Roof {
-                    zone.ceiling_area += area;
+                    zone.ceiling_area += surface.row.area;
                     zone.has_roof = true;
                 }
             }

@@ -296,12 +296,7 @@ impl SurfaceGeometryInputState {
             .as_mut()
             .ok_or(Error::Unavailable("final Surface before area checks"))?;
         for surface in rows.iter() {
-            let area = surface
-                .row
-                .vertex_progress
-                .normal_area
-                .ok_or(Error::Unavailable("actual stored Surface area"))?
-                .gross_area_m2;
+            let area = surface.row.area;
             if area < 1.0e-6 {
                 backend.show_severe_error(&format!(
                     "GetSurfaceData: Zero or negative surface area[{}], Surface={}",
@@ -339,12 +334,7 @@ impl SurfaceGeometryInputState {
         let mut negative = 0_i32;
         for surface in rows {
             let points = vertices(&surface.row)?;
-            let quantities = surface
-                .row
-                .vertex_progress
-                .properties
-                .ok_or(Error::Unavailable("actual GetVertices quantity return"))?;
-            if points.len() == 4 && quantities.gross_area_m2 <= 0.0 {
+            if points.len() == 4 && surface.row.gross_area <= 0.0 {
                 self.centroid_scratch.triangle1 =
                     [Some(points[0]), Some(points[1]), Some(points[2])];
                 self.centroid_scratch.triangle2 =
@@ -357,7 +347,7 @@ impl SurfaceGeometryInputState {
             }
             let centroid = crate::geometry::source_surface_centroid(
                 &points,
-                quantities.gross_area_m2,
+                surface.row.gross_area,
                 &mut self.centroid_scratch,
             );
             surface.centroid = [centroid.x_m, centroid.y_m, centroid.z_m]; // actual14635, before warning suffix.

@@ -26,12 +26,7 @@ impl SurfaceGeometryInputState {
             .as_mut()
             .and_then(|rows| rows.get_mut(slot))
             .ok_or(Error::Unavailable("actual post-GetVertices SurfaceTmp"))?;
-        let area = row
-            .vertex_progress
-            .properties
-            .as_ref()
-            .ok_or(Error::Unavailable("actual GetVertices Area write"))?
-            .area_m2;
+        let area = row.area;
         if area <= 0.0 {
             backend.show_severe_error(&format!(
                 "{}=\"{}\", Surface Area <= 0.0; Entered Area={}",

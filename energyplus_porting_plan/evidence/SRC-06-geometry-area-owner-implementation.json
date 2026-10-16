@@ -1,0 +1,293 @@
+{
+  "schema": "src06-active-geometry-real-Surface-area-implementation.v1",
+  "base_HEAD": "7553ed463666fc7596a94d85a4719e87bed565ff",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "change": "Three genuine mutable Surface area cells with ctor0/GetVertices Gross\u2192Area\u2192Net writes; eight active geometry consumer files now read actual Area or GrossArea at the correct operations.",
+  "application": {
+    "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-application-Root-01/manifest.json",
+    "sha256": "a2e966ca3b9e6d5756d7ed8b3bb54bc435d39c1d974feb070cc1547b2549582b",
+    "bytes": 10693
+  },
+  "applied_Source": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "783270145bcfd26e8ccd2b3420baf3c0fef03e9f1ffea0071dc16bd847753dec",
+        "bytes": 20254
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "d6750336376fdb8f9ad2996e573972c0a33e9cef2681ff18f90dae0457955c71",
+        "bytes": 20543
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "d6750336376fdb8f9ad2996e573972c0a33e9cef2681ff18f90dae0457955c71",
+        "bytes": 20543
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/vertices.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/vertices.rs",
+        "sha256": "0412435dcefe0aaa6c06b523c0d2bf48a54bca4b649b7b38ac9a0684daa85d75",
+        "bytes": 14633
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/vertices.rs",
+        "sha256": "20e2e79e938f6f1b87725edd9b17c573a0a3ce6872c1f5bfa09c780af82d0ccf",
+        "bytes": 14856
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/vertices.rs",
+        "sha256": "20e2e79e938f6f1b87725edd9b17c573a0a3ce6872c1f5bfa09c780af82d0ccf",
+        "bytes": 14856
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "f4c87eb78536ef8ab530ef4d2d79335a0b6f0ad4f1c535eb7df6f1bd89a5df73",
+        "bytes": 11794
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "3cc39df6cf2443712af736e1b3d554407d2e184a49b789c73ee4929c31e48758",
+        "bytes": 11630
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "3cc39df6cf2443712af736e1b3d554407d2e184a49b789c73ee4929c31e48758",
+        "bytes": 11630
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "723c3d7e0acf2467028097f083fa91b7834c5b54ec8c6307a2f68f96bad44722",
+        "bytes": 8922
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "e21b4f7c14243ce1974a6c6615f5b3b5919f744f6c0e86817d4b2f94c2b185e9",
+        "bytes": 8714
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/floor_areas.rs",
+        "sha256": "e21b4f7c14243ce1974a6c6615f5b3b5919f744f6c0e86817d4b2f94c2b185e9",
+        "bytes": 8714
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_area.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_area.rs",
+        "sha256": "893805af1e32035871f16afe3a7f5bad2b65177fa6e724495eafe1729d85c427",
+        "bytes": 5248
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_area.rs",
+        "sha256": "a81c251189ce82e89e026d5383c0b659b6c5aadea3d465153e09b498ba252e6d",
+        "bytes": 4914
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_area.rs",
+        "sha256": "a81c251189ce82e89e026d5383c0b659b6c5aadea3d465153e09b498ba252e6d",
+        "bytes": 4914
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_height.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_height.rs",
+        "sha256": "2bab5ff75b4a0f28ef33a25229d10dca2b97c0cb01881faf4d87c453695624f2",
+        "bytes": 7657
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_height.rs",
+        "sha256": "2cfaeedf840bc1ab2a1a4fa41ce3f318c61a30def1caab81174069de0bc86460",
+        "bytes": 7502
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_height.rs",
+        "sha256": "2cfaeedf840bc1ab2a1a4fa41ce3f318c61a30def1caab81174069de0bc86460",
+        "bytes": 7502
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "9ff74bfc703f32ddd0b58c940880ee3706602bb54ff39b090c05036aad73f113",
+        "bytes": 3375
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "c920e55030fdf4a3d03f98973d685ad087ebe908dd3bcae17b92688b76d623d1",
+        "bytes": 3355
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/volume_faces.rs",
+        "sha256": "c920e55030fdf4a3d03f98973d685ad087ebe908dd3bcae17b92688b76d623d1",
+        "bytes": 3355
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_process.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_process.rs",
+        "sha256": "21fcd1a297b28b413dc8bf18bff8daeec95dec2d3567736cbbcdb15ed19c2ede",
+        "bytes": 10846
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_process.rs",
+        "sha256": "61ed65e74d6aad6148ffafb93bc5cdd96473959ac8ee8ae5ac1fecae53f6c496",
+        "bytes": 10708
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_process.rs",
+        "sha256": "61ed65e74d6aad6148ffafb93bc5cdd96473959ac8ee8ae5ac1fecae53f6c496",
+        "bytes": 10708
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_zone_bounds.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_zone_bounds.rs",
+        "sha256": "d4032aa88d1f8bbea6d054d52021ccd9d772d0d2eb44afa7561434af3bcc3cf1",
+        "bytes": 8961
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_zone_bounds.rs",
+        "sha256": "de95e17fba00695a14111cda3ac5ce42a3797fb8d5fbb7c697c46316ea5beb17",
+        "bytes": 8750
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_zone_bounds.rs",
+        "sha256": "de95e17fba00695a14111cda3ac5ce42a3797fb8d5fbb7c697c46316ea5beb17",
+        "bytes": 8750
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "413aa66a09dcc274103b83fa6039224a2c8c4f5df941ff22a49ee1cd9e1200a2",
+        "bytes": 21274
+      },
+      "applied": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "b89bc6c527668261f636e529e2e832c33cfce0aa3b5351f9db0593f5e932c7a2",
+        "bytes": 20889
+      },
+      "Source": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_mapping.rs",
+        "sha256": "b89bc6c527668261f636e529e2e832c33cfce0aa3b5351f9db0593f5e932c7a2",
+        "bytes": 20889
+      }
+    }
+  ],
+  "accepted_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-area-owner-held-Root-01/manifest.json",
+    "sha256": "3756e77b334499808510e38719ae1af1eee279fad9e244a26dea0c730a0b8274",
+    "bytes": 25208
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Fix-ordinary-geometry-area-owner-Source-review-01/review.json",
+    "sha256": "f4f1e066e0c2c4633f26e2157de0223bb7f4d2615529cd5f09cb17c717e00279",
+    "bytes": 30862
+  },
+  "QA": [
+    {
+      "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-clippy-Root-01/receipt.json",
+      "sha256": "b8d50d3de1a7cc7d26c38b4a8c0aab9291592d02a3607fa2280b43e806057f83",
+      "bytes": 4694
+    },
+    {
+      "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-fmt-Root-01/receipt.json",
+      "sha256": "b9c481fddc22b9b6fc87298494bdf96f002c561c97f0e2bbda07180d7cf2dd50",
+      "bytes": 4573
+    },
+    {
+      "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-quality-Root-01/receipt.json",
+      "sha256": "1e9d612eaf002b734f2a06f343904eac1dfc6196727f9906b75a9eef62dfa7a8",
+      "bytes": 4619
+    },
+    {
+      "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-A24-Root-01/receipt.json",
+      "sha256": "b4953f8b03ebc25bcf9fcd77d09a8ab5ee740f9e3ada5ee16e838ef22b20e52a",
+      "bytes": 5110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-docs-Root-01/receipt.json",
+      "sha256": "85433b54b28f5ee6084b4714a95fd6db5c19614a1de8360291dac37fa7b5e880",
+      "bytes": 4882
+    }
+  ],
+  "shared_QA_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/69/69ae97840698abcc2dd57d0cdf9098fff31345863eed7238a756d6cc6a37f9c1",
+    "sha256": "69ae97840698abcc2dd57d0cdf9098fff31345863eed7238a756d6cc6a37f9c1"
+  },
+  "actual_A_24H_regression": {
+    "result": {
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-A-24H-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "bytes": 147618
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-A24-Root-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "bytes": 147618
+      },
+      "whole_bytes_equal": true
+    },
+    "EIO": {
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-A-24H-01/output/eplusrs.eio",
+        "sha256": "423e8dcd56082605e2a4153d8182826fb1f8d8402d261d4ba877498f5e14469a",
+        "bytes": 12614
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-A24-Root-01/output/eplusrs.eio",
+        "sha256": "423e8dcd56082605e2a4153d8182826fb1f8d8402d261d4ba877498f5e14469a",
+        "bytes": 12614
+      },
+      "whole_bytes_equal": true
+    },
+    "samples": 24,
+    "series": 390
+  },
+  "findings_closed": [
+    "Area validation2459 previously read geometric GrossArea instead of actual mutable Area.",
+    "Centroid/height/geometry totals and Process read actual GrossArea rather than a retained geometric stand-in.",
+    "Floor/ceiling and TotalSurfArea consume actual mutable Area; orientation/Newell/tilt numeric cores and typed geometric APIs remain unchanged."
+  ],
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "limits": [
+    "Regression QA confirms the existing A24 compatibility result and EIO byte-for-byte; it is not a new Native scientific comparison.",
+    "Whole Source heat-balance/Air/HVAC/warmup/report runtime activation remains ongoing.",
+    "Unsupported positive window/subsurface mutations and broader finite cases require their genuine input/driver work; no gate is promoted here."
+  ],
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/finish-geometry-area-canonical-checkpoint-Root-02.py",
+    "sha256": "01b73f53efc787c5bad051d71e325936423aef98b92019c731101dba9b6d064a",
+    "bytes": 1183
+  },
+  "checkpoint_builder": {
+    "path": ".runtime/porting/SRC-06/seal-geometry-area-canonical-checkpoint-Root-01.py",
+    "sha256": "414029229fc124eda298950601e1f9e451abe5ac825857e9bd5fe52da91c4c63",
+    "bytes": 3289
+  },
+  "prior_public_before_docs": {
+    "path": ".runtime/porting/SRC-06/geometry-area-owner-canonical-application-Root-01/public-before-docs.json",
+    "sha256": "1f2e30a9ffb43b43efe73c40ee12977d4bef3b4c960788f48b989c1eff5651e8",
+    "bytes": 14347
+  }
+}

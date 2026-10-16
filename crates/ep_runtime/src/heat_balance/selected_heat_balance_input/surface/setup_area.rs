@@ -56,22 +56,12 @@ impl SurfaceGeometryInputState {
             if space.zone_num != row.zone {
                 return Err(Error::Unavailable("same area Zone/Space association"));
             }
-            let area = row
-                .vertex_progress
-                .properties
-                .ok_or(Error::Unavailable("actual retained Surface.Area"))?
-                .area_m2;
-            zone.total_surface_area += area;
-            space.total_surface_area += area;
-            let gross_area = row
-                .vertex_progress
-                .normal_area
-                .ok_or(Error::Unavailable("actual retained Surface.GrossArea"))?
-                .gross_area_m2;
+            zone.total_surface_area += row.area;
+            space.total_surface_area += row.area;
             if row.class == SurfaceClass::Roof {
-                zone.geometric_ceiling_area += gross_area;
+                zone.geometric_ceiling_area += row.gross_area;
             } else if row.class == SurfaceClass::Floor {
-                zone.geometric_floor_area += gross_area;
+                zone.geometric_floor_area += row.gross_area;
             }
             // Original392 reaches Construction only after the preceding writes.
             let construction = control
@@ -82,14 +72,15 @@ impl SurfaceGeometryInputState {
                 return Err(Error::Unavailable("positive area window/frame branch"));
             }
             if row.exterior_boundary == 0 {
-                zone.exterior_total_surface_area += gross_area;
-                space.exterior_total_surface_area += gross_area;
+                zone.exterior_total_surface_area += row.gross_area;
+                space.exterior_total_surface_area += row.gross_area;
                 if row.class == SurfaceClass::Wall {
-                    zone.exterior_net_wall_area += area;
-                    zone.exterior_gross_wall_area += gross_area;
-                    space.exterior_gross_wall_area += gross_area;
-                    zone.exterior_gross_wall_area_multiplied +=
-                        gross_area * f64::from(zone.multiplier) * f64::from(zone.list_multiplier);
+                    zone.exterior_net_wall_area += row.area;
+                    zone.exterior_gross_wall_area += row.gross_area;
+                    space.exterior_gross_wall_area += row.gross_area;
+                    zone.exterior_gross_wall_area_multiplied += row.gross_area
+                        * f64::from(zone.multiplier)
+                        * f64::from(zone.list_multiplier);
                     zone.exterior_perimeter += row.vertex_progress.width;
                     space.exterior_perimeter += row.vertex_progress.width;
                 }

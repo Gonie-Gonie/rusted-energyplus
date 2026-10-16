@@ -67,8 +67,8 @@ impl SurfaceGeometryInputState {
                 name: row.name.clone(),
                 surface_type,
                 vertices: points,
-                area_m2: properties.area_m2,
-                gross_area_m2: properties.gross_area_m2,
+                area_m2: row.area,
+                gross_area_m2: row.gross_area,
                 newell_area_vector_m2,
                 tilt_deg: properties.tilt_deg,
             });

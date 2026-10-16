@@ -140,11 +140,7 @@ fn process_base_surface(
         SourceProcessShape::Polygonal
     };
     if sides > 4 {
-        let gross_area = row
-            .vertex_progress
-            .normal_area
-            .ok_or(Error::Unavailable("actual Process GrossArea"))?
-            .gross_area_m2;
+        let gross_area = row.gross_area;
         if (row.vertex_progress.height * row.vertex_progress.width - gross_area).abs() > 0.001 {
             row.vertex_progress.width = gross_area.sqrt();
             row.vertex_progress.height = row.vertex_progress.width;

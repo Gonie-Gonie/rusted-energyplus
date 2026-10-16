@@ -84,11 +84,7 @@ impl SurfaceGeometryInputState {
                         row.class,
                         SurfaceClass::Wall | SurfaceClass::Roof | SurfaceClass::Floor
                     ) {
-                        let gross_area = row
-                            .vertex_progress
-                            .normal_area
-                            .ok_or(Error::Unavailable("actual centroid Surface.GrossArea"))?
-                            .gross_area_m2;
+                        let gross_area = row.gross_area;
                         centroid[0] += surface.centroid[0] * gross_area;
                         centroid[1] += surface.centroid[1] * gross_area;
                         centroid[2] += surface.centroid[2] * gross_area;

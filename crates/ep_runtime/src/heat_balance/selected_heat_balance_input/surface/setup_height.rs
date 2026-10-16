@@ -46,12 +46,8 @@ fn retained_height_face(surface: &FinalSurface) -> Result<ZoneVolumeFace, Error>
                 Ok(Point3 { x_m, y_m, z_m })
             })
             .collect::<Result<_, Error>>()?,
-        area_m2: properties.area_m2,
-        gross_area_m2: row
-            .vertex_progress
-            .normal_area
-            .ok_or(Error::Unavailable("actual height Surface.GrossArea"))?
-            .gross_area_m2,
+        area_m2: row.area,
+        gross_area_m2: row.gross_area,
         newell_area_vector_m2: properties.newell_area_vector_m2,
         tilt_deg: properties.tilt_deg,
     })

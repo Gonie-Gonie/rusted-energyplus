@@ -307,6 +307,9 @@ impl SurfaceGeometryInputState {
         let points: Vec<_> = vertices.iter().copied().map(point).collect();
         let normal_area = crate::geometry::source_normal_area(&points);
         row.vertex_progress.normal_area = Some(normal_area); // Actual9383-9388 retained before warning failures.
+        row.gross_area = normal_area.gross_area_m2; // Original9387
+        row.area = row.gross_area; //9388 same mutable SurfaceData member
+        row.net_area_shadow_calc = row.area; //9389, before orientation/warnings
         let orientation =
             crate::geometry::orientation_from_normal(&points, normal_area.newell_normal);
         row.vertex_progress.orientation_return = Some(orientation); // actual local angles + owner local axes.

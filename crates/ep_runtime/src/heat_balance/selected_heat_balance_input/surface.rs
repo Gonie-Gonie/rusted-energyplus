@@ -125,6 +125,10 @@ pub(crate) struct SurfaceTmpInput {
     /// Actual SurfaceData constructor841 and default std::vector795.
     pub(crate) has_shade_control: bool,
     pub(crate) window_shading_control_list: Vec<i32>,
+    /// Actual DataSurfaces.hh712–714 mutable areas, ctor0; GetVertices9387–9389 writes each.
+    pub(crate) area: f64,
+    pub(crate) gross_area: f64,
+    pub(crate) net_area_shadow_calc: f64,
     pub(crate) view_factor_ground: f64,
     pub(crate) sides: i32,
     // Objexx Vector's default elements are not initialized numeric triples.
@@ -165,6 +169,9 @@ impl Default for SurfaceTmpInput {
             y_shift: Default::default(),
             has_shade_control: Default::default(),
             window_shading_control_list: Default::default(),
+            area: 0.0,
+            gross_area: 0.0,
+            net_area_shadow_calc: 0.0,
             view_factor_ground: Default::default(),
             sides: Default::default(),
             vertex: Default::default(),
