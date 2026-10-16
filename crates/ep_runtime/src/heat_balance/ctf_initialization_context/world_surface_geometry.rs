@@ -119,9 +119,25 @@ impl CtfInitializationContext<'_> {
                 .map_err(hb_input_error)?
             {
                 SurfaceRowPrefix::Continue => {}
-                SurfaceRowPrefix::BeforeVertices { slot, sides } => state
-                    .get_world_vertices(slot, sides, &mut owners, &mut self.backend)
-                    .map_err(hb_input_error)?,
+                SurfaceRowPrefix::BeforeVertices { slot, sides } => {
+                    state
+                        .get_world_vertices(slot, sides, &mut owners, &mut self.backend)
+                        .map_err(hb_input_error)?;
+                    // Actual GetHTSurfaceData4339-4359, before the next raw row.
+                    state
+                        .finish_opaque_world_row_after_vertices(
+                            slot,
+                            &owners,
+                            reports
+                                .selected_project_data
+                                .as_ref()
+                                .map(|p| &p.system.shadowing_clipping),
+                            reports.shadowing_input.as_ref(),
+                            &mut self.backend,
+                            &mut reports.heat_balance_input_errors_found,
+                        )
+                        .map_err(hb_input_error)?;
+                }
             }
         }
         state

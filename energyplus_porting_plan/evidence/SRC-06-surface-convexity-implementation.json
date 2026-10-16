@@ -1,0 +1,335 @@
+{
+  "schema": "src06-surface-convexity-implementation-checkpoint.v1",
+  "base_HEAD": "ba63d458887167994dca18b661a8c4d1b0893b84",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "change": "Actual CheckConvexity after GetVertices and Area diagnostics; real IsConvex=true constructor, persistent scratch, strict turn/collinear checks and original diagnostics/counts. Sole scoped lint expectation preserves strict clamp branch order.",
+  "applied_Source": [
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "783270145bcfd26e8ccd2b3420baf3c0fef03e9f1ffea0071dc16bd847753dec",
+        "bytes": 20254
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "35a2afe1ffc5a6aceb0c49ee44e81a6e6d7f5db47eb8f080f363e45cdc40ea80",
+        "bytes": 18300
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "783270145bcfd26e8ccd2b3420baf3c0fef03e9f1ffea0071dc16bd847753dec",
+        "bytes": 20254
+      },
+      "complete_forward_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.diff",
+        "sha256": "de893675928367de910edaac53bf7447a7cabb8eacfbdfbdd6a5a8882f308ba9",
+        "bytes": 3624
+      },
+      "complete_inverse_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs.inverse.diff",
+        "sha256": "d5acfbaee6f1fa67f46c5c7afb619f24c4ab5db1a8416a9dfb988a92aa865673",
+        "bytes": 3624
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "9df0872f8a5e558dc1fd2fa0078a78299201122f681ad56bff9c8ec01cc7b2bd",
+        "bytes": 12559
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "0d3da2368b19753901153ae55989edb92a8834e5adaef3f3fa1b5c7cfb87c12e",
+        "bytes": 11802
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/after/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs",
+        "sha256": "9df0872f8a5e558dc1fd2fa0078a78299201122f681ad56bff9c8ec01cc7b2bd",
+        "bytes": 12559
+      },
+      "complete_forward_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs.diff",
+        "sha256": "921b89faabf89f7c04de0cac4fd916598a8c25f9f6f07c756df5629ed29858e1",
+        "bytes": 1549
+      },
+      "complete_inverse_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs.inverse.diff",
+        "sha256": "9bd3b7e9cfe19706397d50557cf69c08d139f62b788afb1ed621f9d17f28ff3c",
+        "bytes": 1549
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "f4c87eb78536ef8ab530ef4d2d79335a0b6f0ad4f1c535eb7df6f1bd89a5df73",
+        "bytes": 11794
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs",
+        "sha256": "f4c87eb78536ef8ab530ef4d2d79335a0b6f0ad4f1c535eb7df6f1bd89a5df73",
+        "bytes": 11794
+      },
+      "complete_forward_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs.diff",
+        "sha256": "d19ad79dc45edeb6c5bb92ecfa925e7a54bc6fc14adcc048c3240e5b54b45c48",
+        "bytes": 12282
+      },
+      "complete_inverse_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity.rs.inverse.diff",
+        "sha256": "010c29630656356358d65e3b852cd47b06ad5e45f1eef4db11d6d8e2f59a0677",
+        "bytes": 12282
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/state.rs",
+        "sha256": "0364d784ad06f2a411e229b21e3415b64f6e8d7873dcc63f66dea760f5e3bd6b",
+        "bytes": 3752
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/state.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/state.rs",
+        "sha256": "0364d784ad06f2a411e229b21e3415b64f6e8d7873dcc63f66dea760f5e3bd6b",
+        "bytes": 3752
+      },
+      "complete_forward_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/state.rs.diff",
+        "sha256": "ff5a1c6032d9da23b764ed4f35eb471039c2dc6f86e268058ff79d0d36189bad",
+        "bytes": 4085
+      },
+      "complete_inverse_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/state.rs.inverse.diff",
+        "sha256": "25b9a7ed2fc49cf8518ed1e6db30f5ae7f43fda19ca4336aa983bb64a4f92542",
+        "bytes": 4085
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/diagnostics.rs",
+        "sha256": "a7f68ab1e6737b55002d9aea0a5849d807265fb6e3d381fc880615255334043b",
+        "bytes": 3294
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/diagnostics.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/after/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/diagnostics.rs",
+        "sha256": "a7f68ab1e6737b55002d9aea0a5849d807265fb6e3d381fc880615255334043b",
+        "bytes": 3294
+      },
+      "complete_forward_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/diagnostics.rs.diff",
+        "sha256": "bf7f14a4d75678e26453f9b149f700fc34c1cf3389ed438543192bb1491df12d",
+        "bytes": 3608
+      },
+      "complete_inverse_diff": {
+        "path": ".runtime/porting/SRC-06/convexity-canonical-checkpoint-Root-01/diffs/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/convexity/diagnostics.rs.inverse.diff",
+        "sha256": "2b3ce4a6dff1a4a88e59a241a98eef77217e4193ff6065c41c161cee7a589296",
+        "bytes": 3608
+      }
+    }
+  ],
+  "accepted_narrow_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-convexity-checkpoint-held-Root-02/manifest.json",
+    "sha256": "d1e24e3e7327be9b0be53771cb725d7aa2fc1a5007d16949a931c5a4238ba5a8",
+    "bytes": 23732
+  },
+  "independent_narrow_Source_review": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-convexity-checkpoint-review-01/review.json",
+    "sha256": "62c5c515a9e469e4c4a8cd57cacb42452a8806047cc6734cbb0852125b5c4600",
+    "bytes": 13659
+  },
+  "independent_actual_canonical_readback": {
+    "path": ".runtime/porting/SRC-06/Audit-ordinary-convexity-canonical-readback-01/review.json",
+    "sha256": "c188236758d5cae792a201c62a24e57d34275a5e7d3a60adf542e58df38e5bfc",
+    "bytes": 4408
+  },
+  "QA": [
+    {
+      "role": "clippy",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "8c3c7a17e846612ed014ec740c02a261d54f9e5c3ed05e3ec4c5e7198f1552a5",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/convexity-actual-caller-clippy-command-02/receipt.json",
+        "sha256": "341f90ebe50e2113a5c94b4e27c191beec77c3214bb5a30ccc5486a55c0375c1",
+        "bytes": 3516
+      }
+    },
+    {
+      "role": "fmt",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "8c3c7a17e846612ed014ec740c02a261d54f9e5c3ed05e3ec4c5e7198f1552a5",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/convexity-actual-caller-fmt-command-01/receipt.json",
+        "sha256": "6d143b6a34d622b132274df602202dc11a2f1f9010965318802acafa319e1d42",
+        "bytes": 3420
+      }
+    },
+    {
+      "role": "quality",
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "8c3c7a17e846612ed014ec740c02a261d54f9e5c3ed05e3ec4c5e7198f1552a5",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/convexity-actual-caller-quality-command-01/receipt.json",
+        "sha256": "d1e3a7f439ded7296e1e2903fa8950401fbfb9d9b79875bfe91cb75eb8b2340b",
+        "bytes": 3464
+      }
+    },
+    {
+      "role": "existing-cli-test",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "ep_run",
+        "--test",
+        "arbitrary_run",
+        "one_zone_runtime_writes_stable_output_layout"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "8c3c7a17e846612ed014ec740c02a261d54f9e5c3ed05e3ec4c5e7198f1552a5",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/convexity-actual-caller-cli-test-command-01/receipt.json",
+        "sha256": "1c7efb54558d36821cf4320725500bda968a379c3c767f6971db605599bb16bc",
+        "bytes": 3503
+      }
+    },
+    {
+      "role": "actual-A-24H",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/convexity-source-A-24H-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "8c3c7a17e846612ed014ec740c02a261d54f9e5c3ed05e3ec4c5e7198f1552a5",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/convexity-source-A-24H-command-01/receipt.json",
+        "sha256": "ec93ba80ebecdc69ef5a29f9459197700c17bfa4bd0d801607719faa5d627352",
+        "bytes": 3913
+      }
+    }
+  ],
+  "preserved_initial_lint_failure": {
+    "path": ".runtime/porting/SRC-06/convexity-actual-caller-clippy-command-01/receipt.json",
+    "sha256": "b3adbbdd7a30a057f6cf966ece19fdd4f422dd5836680ad9cdfcfb94d29528f7",
+    "bytes": 3517
+  },
+  "regression": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-gains-source-A-24H-03/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "bytes": 147618
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-source-A-24H-01/output/results/result-store.json",
+        "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+        "bytes": 147618
+      },
+      "whole_bytes_equal": true
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-hb-gains-source-A-24H-03/output/eplusrs.eio",
+        "sha256": "6cbd84466ddfc2eb96ec63998cd69f03caa90adf1c2cc73ed2b6eab234fc1e53",
+        "bytes": 10337
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/convexity-source-A-24H-01/output/eplusrs.eio",
+        "sha256": "6cbd84466ddfc2eb96ec63998cd69f03caa90adf1c2cc73ed2b6eab234fc1e53",
+        "bytes": 10337
+      },
+      "whole_bytes_equal": true
+    }
+  ],
+  "existing_tests_passed": 1,
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "active_caller": "Actual existing ordinary geometry GetHTSurfaceData path. Four future Solar/InitSurface constructor flags remain deferred until the full owner is composed.",
+  "limits": "Existing A-24H regression only: 24 samples/390 series and whole result/EIO bytes unchanged. No new Native convexity comparison, full InitSurface/inside-convergence activation or whole engine equivalence is claimed.",
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "provenance_scope": "Tracked Source plus finite local preparation/review/receipt custody; implementation checkpoint, not a standalone Native comparison package.",
+  "preserved_prevalidation_failure": {
+    "script": {
+      "path": ".runtime/porting/SRC-06/seal-convexity-canonical-checkpoint-Root-01.py",
+      "sha256": "e3970a04411f2344a94eb983c5489272f398c68030f2ca49499a599287566d60",
+      "bytes": 5322
+    },
+    "reason": "Exact lint-only delta assertion used wrong indentation and stopped before any archive/public output.02 matches independently reviewed actual block; Source unchanged."
+  },
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/seal-convexity-canonical-checkpoint-Root-02.py",
+    "sha256": "53bb00f77c2b7805134c7cf8d4344d2e1b591c268e39ef52d3f2b63854368bf4",
+    "bytes": 5662
+  }
+}

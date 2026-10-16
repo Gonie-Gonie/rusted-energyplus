@@ -14,6 +14,7 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod boundary_inputs;
+mod convexity;
 mod derived_arrays;
 mod diagnostics;
 mod empty_subsurfaces;
@@ -86,7 +87,7 @@ pub(crate) enum SurfaceClass {
 
 /// Selected actual SurfaceData members reached by the bounded raw/final prefix.
 /// No full Native SurfaceData storage/copy or geometry-success claim follows.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SurfaceTmpInput {
     pub(crate) name: String,
     pub(crate) class: SurfaceClass,
@@ -107,6 +108,8 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) exterior_boundary_name: String,
     pub(crate) exterior_boundary: i32,
     pub(crate) exterior_solar: bool,
+    /// Actual SurfaceData.hh837 constructor true; CheckConvexity only writes false.
+    pub(crate) is_convex: bool,
     pub(crate) exterior_wind: bool,
     /// Genuine SurfaceData constructor0; positive window getter remains excluded.
     pub(crate) frame_divider: i32,
@@ -128,6 +131,47 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) vertex: Option<Vec<Option<[f64; 3]>>>,
     pub(crate) new_vertex: Option<Vec<Option<[f64; 3]>>>,
     pub(crate) vertex_progress: vertices::VertexProgress,
+}
+impl Default for SurfaceTmpInput {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            class: Default::default(),
+            construction: Default::default(),
+            construction_stored_input: Default::default(),
+            heat_transfer_surface: Default::default(),
+            heat_transfer_algorithm: Default::default(),
+            solar_encl_surface_index: Default::default(),
+            solar_encl_index: Default::default(),
+            rad_encl_index: Default::default(),
+            base_surface: Default::default(),
+            base_surface_name: Default::default(),
+            zone_name: Default::default(),
+            zone: Default::default(),
+            space: Default::default(),
+            exterior_boundary_name: Default::default(),
+            exterior_boundary: Default::default(),
+            exterior_solar: Default::default(),
+            is_convex: true,
+            exterior_wind: Default::default(),
+            frame_divider: Default::default(),
+            mirrored_surface: Default::default(),
+            is_air_boundary_surface: Default::default(),
+            is_shadow_possible_obstruction: Default::default(),
+            is_shadowing: Default::default(),
+            shape: Default::default(),
+            vertices_processed: Default::default(),
+            x_shift: Default::default(),
+            y_shift: Default::default(),
+            has_shade_control: Default::default(),
+            window_shading_control_list: Default::default(),
+            view_factor_ground: Default::default(),
+            sides: Default::default(),
+            vertex: Default::default(),
+            new_vertex: Default::default(),
+            vertex_progress: Default::default(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -187,6 +231,7 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) oscm: Option<Vec<std::convert::Infallible>>,
     pub(crate) foundation: foundation::FoundationInput,
     pub(crate) coordinate: vertices::CoordinateOwner,
+    pub(crate) check_convexity: convexity::SourceConvexityState,
     pub(crate) process_vertices_scratch: setup_process::ProcessVerticesScratch,
     pub(crate) setup_shading: setup_process::SetupShadingCounters,
     pub(crate) final_surfaces: Option<Vec<final_mapping::FinalSurface>>,

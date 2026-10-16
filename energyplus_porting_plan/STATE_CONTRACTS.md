@@ -59,4 +59,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 ## SRC-06 ordinary opaque geometry owners
 
+[실제 표면 볼록성 검사 연결](evidence/SRC-06-surface-convexity-implementation.json)은 GetVertices·면적 진단 다음에 원본 CheckConvexity를 호출하고 같은 표면의 IsConvex와 지속 scratch·진단 상태를 유지한다. 기존 CLI 시험1개와 A-24H 실행을 통과했으며, 이전 실행과 결과147,618바이트·EIO10,337바이트가 모두 일치했다. 이는 기존 실행의 회귀 확인이며 새로운 Native 수치 비교나 전체 InitSurface 완료 판정은 아니다. 새 시험은 추가하지 않았고 카드 gate는 유지한다.
+
 [Actual producer comparison](evidence/SRC-06-ordinary-geometry/summary.json) binds complete physical input/Raw/typed identity before selected retained GEO03 returns, perimeter/dimensions, six bounds and exterior-area owners. The returned GEO03 object is moved once from its existing initializer call; no observer recomputes an owner. This prerequisite does not activate ordinary space air/reset, named inside-temperature arrays, post-radiation cadence or handoff, and does not expand historical Volume-only certification.
