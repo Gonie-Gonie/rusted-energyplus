@@ -166,6 +166,10 @@ impl WeatherSession {
             "{:02}/{:02}",
             state.environment.month, state.environment.day_of_month
         );
+        state.environment.current_month_day_year = format!(
+            "{:02}/{:02}/{:04}",
+            state.environment.month, state.environment.day_of_month, state.global.calendar_year
+        );
         state.global.weight_now = *state
             .weather
             .interpolation
@@ -195,6 +199,10 @@ impl WeatherSession {
             .environment
             .current_weather
             .gnd_reflectance_for_daylighting = state.environment.current_weather.gnd_reflectance;
+        super::auxiliary_input::calculate_water_mains_temperature(
+            &state.weather,
+            &mut state.environment,
+        )?;
         determine_sun_up_down(state);
         if state.environment.current_weather.sun_is_up && state.weather.solar_altitude_angle < 0.0 {
             return Err(WeatherDayError::source_fatal(format!(

@@ -129,6 +129,8 @@ pub struct WeatherEnvironmentState {
     pub ground_temp_kelvin: f64,
     /// Actual GroundTempInputs constructor4false; factories write the same flags.
     pub ground_temp_inputs: [bool; 4],
+    /// Actual DataEnvironment.hh155 constructor0; CalcWaterMainsTemp writes it.
+    pub water_mains_temperature: f64,
     /// Source warning switch controlling hourly solar counts and negative sentinels.
     pub display_weather_missing_data_warnings: bool,
     /// Source override to suppress all hourly solar.
@@ -195,6 +197,8 @@ pub struct WeatherEnvironmentState {
     pub environment_name: String,
     /// Actual CurMnDy formatting owner, written by DD setup and current weather.
     pub current_month_day: String,
+    /// Actual CurMnDyYr owner, assigned immediately after CurMnDy.
+    pub current_month_day_year: String,
     /// Actual EnvironmentStartEnd adaptive-report formatting carrier.
     pub environment_start_end: String,
     /// Actual retained RunPeriodEnvironment, assigned by the environment getter.
@@ -223,6 +227,7 @@ impl Default for WeatherEnvironmentState {
             ground_temp: [0.0; 4],
             ground_temp_kelvin: 0.0,
             ground_temp_inputs: [false; 4],
+            water_mains_temperature: 0.0,
             display_weather_missing_data_warnings: false,
             ignore_solar_radiation: false,
             ignore_beam_radiation: false,
@@ -256,6 +261,7 @@ impl Default for WeatherEnvironmentState {
             std_baro_press: 101325.0,
             environment_name: String::new(),
             current_month_day: String::new(),
+            current_month_day_year: String::new(),
             environment_start_end: String::new(),
             run_period_environment: false,
             end_month_flag: false,
@@ -363,6 +369,16 @@ pub struct WeatherOwnerState {
     pub snow_ground_reflectance_modifier: f64,
     /// Actual SnowGndRefModifierForDayltg constructor default.
     pub snow_ground_reflectance_for_daylighting_modifier: f64,
+    /// Actual Weather.hh98-106 enum representation; FixedDefault is3.
+    pub water_mains_temperature_method: i32,
+    /// Actual Weather.hh804 constructor0; positive correlation getter is separate.
+    pub water_mains_annual_average_air_temperature: f64,
+    /// Actual Weather.hh805 constructor0.
+    pub water_mains_maximum_air_temperature_difference: f64,
+    /// Actual Weather.hh806 constructor1.
+    pub water_mains_temperature_multiplier: f64,
+    /// Actual Weather.hh807 constructor0.
+    pub water_mains_temperature_offset: f64,
     /// Selected environment's rain-indicator control.
     pub use_rain_values: bool,
     /// Selected environment's snow-indicator control.
@@ -412,6 +428,11 @@ impl Default for WeatherOwnerState {
             ground_reflectances: [0.2; 12],
             snow_ground_reflectance_modifier: 1.0,
             snow_ground_reflectance_for_daylighting_modifier: 1.0,
+            water_mains_temperature_method: 3,
+            water_mains_annual_average_air_temperature: 0.0,
+            water_mains_maximum_air_temperature_difference: 0.0,
+            water_mains_temperature_multiplier: 1.0,
+            water_mains_temperature_offset: 0.0,
             use_rain_values: true,
             use_snow_values: true,
         }

@@ -66,6 +66,22 @@ impl ProductionWeatherTimestepSeries {
                 context.eio,
             )
             .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+        // Actual4822/4824/4826, borrowing the SAME partial-reader local and
+        // actual IP/shortcut/backend/EIO; full ReadUserWeatherInput is separate.
+        let mut errors_found = false;
+        session
+            .initialize_source_weather_auxiliary_inputs(
+                context
+                    .reports
+                    .selected_input_processor
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual auxiliary weather InputProcessor"))?,
+                &mut context.reports.input_processor_shortcut,
+                &mut context.backend,
+                context.eio,
+                &mut errors_found,
+            )
+            .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
         context
             .reports
             .input_processor_shortcut
@@ -88,6 +104,14 @@ impl ProductionWeatherTimestepSeries {
             .outdoor_environment_parameters
             .initialize_absent_weather_station(context.eio)
             .map_err(output_error)?;
+        if errors_found {
+            // Keep all actual severe/EIO/Station prefix effects. The omitted
+            // SetupEnvironmentTypes/GetWeatherProperties/fatal suffix must
+            // consume this real accumulated error before any successful return.
+            return Err(unavailable(
+                "actual ReadUserWeatherInput accumulated ErrorsFound continuation",
+            ));
+        }
         // These are Rust return witnesses, never substitutes for Source flags.
         // Assignment follows the real coefficient/header/row operation return.
         session.state.environment.source_weather_station_initialized = true;

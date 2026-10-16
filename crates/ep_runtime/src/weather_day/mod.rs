@@ -4,6 +4,7 @@
 //! processing, default ClarkAllen sky, solar interpolation and current weather
 //! use source-owned state. Alternative sky and current-solar models are separate.
 
+mod auxiliary_input;
 mod configuration;
 mod current;
 mod design_day;

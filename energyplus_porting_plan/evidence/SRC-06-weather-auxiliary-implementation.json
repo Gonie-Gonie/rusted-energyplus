@@ -1,0 +1,328 @@
+{
+  "schema": "src06-weather-auxiliary-implementation-checkpoint.v1",
+  "base_HEAD": "b9712dbed33b4788be4ca31daad020d7b8b8f460",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "change": "Connect actual zero-object GroundReflectance/SnowModifier/WaterMains children after Ground and before Station. Retain actual date and WaterMains constructor/current state, genuine EIO prefix and accumulated severe errors.",
+  "application": {
+    "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/manifest.json",
+    "sha256": "fe555b081a62bc43432f956428e0461622ad4467a139b413600f5f5d596b4493",
+    "bytes": 6212
+  },
+  "applied_Source": [
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "5fe1877b197206cea7b99a9d380364628a2856dfa2777a61bf6e9a2db3ef1210",
+        "bytes": 17697
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/context.rs",
+        "sha256": "728005aae588a4e279647920f0c4a9d1fbe4f95e423e836ed01154f36cef5b64",
+        "bytes": 16561
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/01.diff",
+        "sha256": "1d779fbee0758856da3f50527872f93c31a4418e6310beeba9716bca2bcb3931",
+        "bytes": 3190
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "487513b9a815927fe6267a4509a40590ac3e140545597ea64c79bc30faa45f27",
+        "bytes": 16409
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "81f43bca980aea257db7884e877c0bf2a7f821b4f4ddbbc508a19b472acaf2a9",
+        "bytes": 16066
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/02.diff",
+        "sha256": "75311ec2cf7f90a5b0e8554718eba5cb1d5a5e7647d0167b698acc5cea67da1d",
+        "bytes": 1064
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "db44f3efb399b28828d1d00fcaf834f77e64f206b2722ad91a5d63d164000ae6",
+        "bytes": 19935
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/tests.rs",
+        "sha256": "67f3e4f7ff52ba1667f38640bdc2e48711170f0384344a4ae289593d39056baf",
+        "bytes": 19495
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/03.diff",
+        "sha256": "c9e6bebcba6e4def7494f631be083e6d217e9367aca9a30c870e7f1a704dd1f3",
+        "bytes": 1485
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "af7a0fb89e6b5b21c2a1817bd2d44147702a9942f970f41bd7b9b85306dbe2d1",
+        "bytes": 1592
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "c0b5ac77141576b82c0838e1e9bbfbcc412915eea83786086cb0cc2dd12eeb73",
+        "bytes": 1571
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/04.diff",
+        "sha256": "50abeaa83883d86b8939bcdabd473b83c161cb8a35129b253f049519b7daf018",
+        "bytes": 359
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/production/source_environment.rs",
+        "sha256": "383bfb418324829b8e67461556ad3f42148718f6af70e45a9286d78e55b7e6a8",
+        "bytes": 9128
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/production/source_environment.rs",
+        "sha256": "5ac4ec428cfb2cd8f0a716b19db16140c9a983940bb30318342f2e6b06fa1c63",
+        "bytes": 7970
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/05.diff",
+        "sha256": "3d309149cc1016b00ca2b32c34134e3c5ce64eca66c9bffda0ef42f65dbf73d6",
+        "bytes": 1964
+      }
+    },
+    {
+      "canonical_after": {
+        "path": "crates/ep_runtime/src/weather_day/auxiliary_input.rs",
+        "sha256": "26751646515f0d60a44ffda8a03c102b92605aa17e02c9f6d9056978dcd17d21",
+        "bytes": 8518
+      },
+      "before": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/before/crates/ep_runtime/src/weather_day/auxiliary_input.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "diff": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-application-Root-01/06.diff",
+        "sha256": "5acbc41fba33d7539826c8c483a9cd7d94b94eccecb737d72ee4bfc49f207a97",
+        "bytes": 8884
+      }
+    }
+  ],
+  "accepted_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-weather-auxiliary-held-Fix-02/manifest.json",
+    "sha256": "09cc51cdb24c9cd500641bfb39420088920680104e228f3539cebae552f0607d",
+    "bytes": 55415
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-weather-auxiliary-Source-review-02/review.json",
+    "sha256": "0b816dc781d819c7db6ce3754e73cba036e11c1d84d6f6d7f1844d40d09136bd",
+    "bytes": 2617
+  },
+  "Source_date_parent": {
+    "path": ".runtime/porting/SRC-06/ordinary-solar-provider-held-Root-01/manifest.json",
+    "sha256": "27b0a3cf835d49e348a9beb7075aadcd84869a0ea176888a5c9d834d38bd11ae",
+    "bytes": 15917
+  },
+  "Source_date_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-solar-provider-Source-review-01/review.json",
+    "sha256": "be401fff3c91433cba74e02ed7766799ea535234bf0c1439e944dedf71338ce2",
+    "bytes": 2944
+  },
+  "preserved_rejected_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-weather-auxiliary-held-Fix-01/manifest.json",
+    "sha256": "2b645841a9d9d39229a19969b73cfaea40496a8303edfb3845716263dfb205fc",
+    "bytes": 47860
+  },
+  "preserved_rejected_review": {
+    "path": ".runtime/porting/SRC-06/Reviewer-ordinary-weather-auxiliary-Source-review-01/review.json",
+    "sha256": "203087064eb3f147c089e4a87ffc013a9314711015545fa7f809aa9d36774d3c",
+    "bytes": 3702
+  },
+  "correction": "Rejected HELD01 mistakenly selected std min ordering. Corrected02 uses the real imported ObjexxFCL double overload. Existing canonical Current snow comparisons were already correct and retain their exact science body.",
+  "QA": [
+    {
+      "role": "clippy",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-clippy-command-01/receipt.json",
+        "sha256": "4845c1e8c0a65b033fdf255bee2c993205071ac6f8ecf9abb1bbdb69919f7cf4",
+        "bytes": 3492
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "-p",
+        "ep_cli",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "source_snapshot_sha256": "9b69b0d03923f0ee50e24e80435be25d159b298e92a5da36529ef689a3c5b6bd",
+      "exit_code": 0,
+      "Source_bytes_unchanged": true
+    },
+    {
+      "role": "fmt",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-fmt-command-01/receipt.json",
+        "sha256": "2908a92c0cb6e186b73e904d1487d4a10f5028818ad4b2d93150cf1587613672",
+        "bytes": 3371
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "source_snapshot_sha256": "9b69b0d03923f0ee50e24e80435be25d159b298e92a5da36529ef689a3c5b6bd",
+      "exit_code": 0,
+      "Source_bytes_unchanged": true
+    },
+    {
+      "role": "quality",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-quality-command-02/receipt.json",
+        "sha256": "a3d0a11d53166c0f30620cc9b57e11e20abc747536e513992de674b244b27d27",
+        "bytes": 3416
+      },
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "source_snapshot_sha256": "9b69b0d03923f0ee50e24e80435be25d159b298e92a5da36529ef689a3c5b6bd",
+      "exit_code": 0,
+      "Source_bytes_unchanged": true
+    },
+    {
+      "role": "weather-tests",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-weather-tests-command-01/receipt.json",
+        "sha256": "3ea9e980c393cebcf541422240e57c3cba62136f6dc65330bbcef81899f79dce",
+        "bytes": 3440
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "weather::day::tests::"
+      ],
+      "source_snapshot_sha256": "9b69b0d03923f0ee50e24e80435be25d159b298e92a5da36529ef689a3c5b6bd",
+      "exit_code": 0,
+      "Source_bytes_unchanged": true
+    },
+    {
+      "role": "A-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/weather-auxiliary-A-24H-command-01/receipt.json",
+        "sha256": "aaf97aedde13a3b21829d76cf7f9ca4e397dc00fd1b6f1805f9533e9eb636d3b",
+        "bytes": 3896
+      },
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "run",
+        "--locked",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "--",
+        "run",
+        "energyplus_porting_plan/cases/A-24H/input.idf",
+        "--weather",
+        ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        ".runtime/porting/SRC-06/weather-auxiliary-A-24H-01/output",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--porting-scope",
+        "A",
+        "--format",
+        "rust-native",
+        "--hours",
+        "24",
+        "--keep-intermediate",
+        "--trace-level",
+        "surface",
+        "--json"
+      ],
+      "source_snapshot_sha256": "9b69b0d03923f0ee50e24e80435be25d159b298e92a5da36529ef689a3c5b6bd",
+      "exit_code": 0,
+      "Source_bytes_unchanged": true
+    }
+  ],
+  "existing_tests_passed": 4,
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "actual_A_24H_regression": {
+    "samples": 24,
+    "series": 390,
+    "result_before": {
+      "path": ".runtime/porting/SRC-06/ground-temperature-A-24H-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "bytes": 147618
+    },
+    "result_after": {
+      "path": ".runtime/porting/SRC-06/weather-auxiliary-A-24H-01/output/results/result-store.json",
+      "sha256": "71901773cf049a4b23586aebf30602ae02a5d878986d928a0d3b074a96381609",
+      "bytes": 147618
+    },
+    "whole_result_bytes_equal": true,
+    "EIO_before": {
+      "path": ".runtime/porting/SRC-06/ground-temperature-A-24H-01/output/eplusrs.eio",
+      "sha256": "18ee4c27c74ca340a1ad7510323dbc39300c58f9afb635eb77184cdd3ad5e134",
+      "bytes": 11349
+    },
+    "EIO_after": {
+      "path": ".runtime/porting/SRC-06/weather-auxiliary-A-24H-01/output/eplusrs.eio",
+      "sha256": "423e8dcd56082605e2a4153d8182826fb1f8d8402d261d4ba877498f5e14469a",
+      "bytes": 12614
+    },
+    "only_inserted_EIO_lines": 8,
+    "inserted_bytes": 1265,
+    "added_EIO": {
+      "path": ".runtime/porting/SRC-06/weather-auxiliary-canonical-checkpoint-Root-01/actual-added-EIO.txt",
+      "sha256": "121bf38c338dbf8e41f58130bdc60516e625a1dbd5a28d17136df0cc915ae131",
+      "bytes": 1265
+    },
+    "all_prior_EIO_bytes_retained_in_order": true
+  },
+  "preserved_command_error": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/weather-auxiliary-quality-command-01/receipt.json",
+      "sha256": "c0548c1b2ac2af572050bcbf8b9477eb86c6010bcf4d3bca83339205ac29e2ac",
+      "bytes": 3428
+    },
+    "reason": "Root supplied a nonexistent quality script name; command failed before quality execution.02 names the actual existing source-quality-gate.ps1 and passed, with no Source workaround."
+  },
+  "limits": [
+    "Implementation/whole-result regression only; no new Native pointwise comparison.",
+    "Positive optional object getters, schedule/correlation WaterMains branches and full ReadUserWeatherInput orchestration remain explicit pending boundaries.",
+    "Joined surface/HB compilation is separately recorded; live solver/warmup/air runtime attachment and four card gates remain pending."
+  ],
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/seal-weather-auxiliary-canonical-checkpoint-Root-01.py",
+    "sha256": "232fab34a74cf2aaea7b0ab46ff2f9d596e053674cb20eaa279d3cf6960985ac",
+    "bytes": 5045
+  }
+}
