@@ -124,10 +124,91 @@ pub struct SpaceAirTemperature {
     pub ztav: f64,
 }
 
+/// One live borrowed Space air record. Temperature values remain in the sole
+/// caller owner; this view retains references rather than numeric copies.
+#[derive(Clone, Copy, Debug)]
+pub struct SpaceAirTemperatureBorrow<'a> {
+    /// Actual Space identity from the same Source metadata owner.
+    pub space_id: SpaceId,
+    /// Actual owning Zone identity.
+    pub zone_id: ZoneId,
+    /// Actual MAT member, borrowed through the next scalar coefficient read.
+    pub mat: &'a f64,
+    /// Actual independent ZT member.
+    pub zt: &'a f64,
+    /// Actual independent ZTAV member.
+    pub ztav: &'a f64,
+}
+
+/// Source-connected and existing callers share the same convection body while
+/// retaining their own actual live storage. No mutable temperature copy exists.
+pub trait SpaceAirTemperatureOwners {
+    /// Actual allocated Space row count, or unavailable before allocation.
+    fn allocated_space_count(&self) -> Result<usize, InsideConvectionUnavailable>;
+    /// Borrow one actual row in the retained Space array order.
+    fn borrow_space_at(
+        &self,
+        index: usize,
+    ) -> Result<SpaceAirTemperatureBorrow<'_>, InsideConvectionUnavailable>;
+
+    /// Validate the same complete ordered identity closure used by this entry.
+    fn validate_space_layout(
+        &self,
+        layout: &InsideConvectionLayout,
+    ) -> Result<(), InsideConvectionUnavailable> {
+        if self.allocated_space_count()? != layout.spaces().len() {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        for (index, &(space, zone)) in layout.spaces().iter().enumerate() {
+            let row = self.borrow_space_at(index)?;
+            if (row.space_id, row.zone_id) != (space, zone) {
+                return Err(InsideConvectionUnavailable::Association);
+            }
+        }
+        Ok(())
+    }
+
+    /// Resolve one actual retained identity without a numeric registry/cache.
+    fn borrow_space_for_ids(
+        &self,
+        space: SpaceId,
+        zone: ZoneId,
+    ) -> Result<SpaceAirTemperatureBorrow<'_>, InsideConvectionUnavailable> {
+        for index in 0..self.allocated_space_count()? {
+            let row = self.borrow_space_at(index)?;
+            if (row.space_id, row.zone_id) == (space, zone) {
+                return Ok(row);
+            }
+        }
+        Err(InsideConvectionUnavailable::Association)
+    }
+}
+
 /// Persistent selected space-air owner with strict full-array correspondence.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpaceAirTemperatures {
     rows: Vec<SpaceAirTemperature>,
+}
+impl SpaceAirTemperatureOwners for SpaceAirTemperatures {
+    fn allocated_space_count(&self) -> Result<usize, InsideConvectionUnavailable> {
+        Ok(self.rows.len())
+    }
+    fn borrow_space_at(
+        &self,
+        index: usize,
+    ) -> Result<SpaceAirTemperatureBorrow<'_>, InsideConvectionUnavailable> {
+        let row = self
+            .rows
+            .get(index)
+            .ok_or(InsideConvectionUnavailable::Association)?;
+        Ok(SpaceAirTemperatureBorrow {
+            space_id: row.space_id,
+            zone_id: row.zone_id,
+            mat: &row.mat,
+            zt: &row.zt,
+            ztav: &row.ztav,
+        })
+    }
 }
 impl SpaceAirTemperatures {
     /// Real selected constructor values; not a zone-temperature fallback.
@@ -527,17 +608,21 @@ pub struct InsideConvectionReadiness {
     pub equipment_simulated_once: bool,
 }
 
-fn validate<C: ZoneEquipmentActiveElements + ?Sized, H: InsideConvectionCoefficients + ?Sized>(
+fn validate<
+    C: ZoneEquipmentActiveElements + ?Sized,
+    H: InsideConvectionCoefficients + ?Sized,
+    S: SpaceAirTemperatureOwners + ?Sized,
+>(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
     surfaces: &[InsideConvectionSurface],
     state: &InsideConvectionState,
     zone_equipment: &C,
     coefficients: &H,
-    space_air: &SpaceAirTemperatures,
+    space_air: &S,
     temperatures: InsideSurfaceTemperatures<'_>,
 ) -> Result<(), InsideConvectionUnavailable> {
-    space_air.validate(layout)?;
+    space_air.validate_space_layout(layout)?;
     if state.layout != *layout
         || coefficients.surface_count() != layout.surfaces().len()
         || layout
@@ -745,6 +830,7 @@ fn setup_static(
 pub fn initialize_inside_convection<
     C: ZoneEquipmentActiveElements + ?Sized,
     H: InsideConvectionCoefficients + ?Sized,
+    S: SpaceAirTemperatureOwners + ?Sized,
 >(
     layout: &InsideConvectionLayout,
     zones: &[InsideConvectionZone],
@@ -753,7 +839,7 @@ pub fn initialize_inside_convection<
     state: &mut InsideConvectionState,
     zone_equipment: &mut C,
     coefficients: &mut H,
-    space_air: &SpaceAirTemperatures,
+    space_air: &S,
     temperatures: InsideSurfaceTemperatures<'_>,
     readiness: InsideConvectionReadiness,
     actual_low_limit: f64,
@@ -858,11 +944,8 @@ pub fn initialize_inside_convection<
         state.my_environment = true;
     }
     for group in layout.groups() {
-        let mat = space_air
-            .rows
-            .iter()
-            .find(|r| r.space_id == group.space_id)
-            .ok_or(InsideConvectionUnavailable::Association)?
+        let mat = *space_air
+            .borrow_space_for_ids(group.space_id, group.zone_id)?
             .mat;
         for id in &group.surfaces {
             let index = state

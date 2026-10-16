@@ -1,0 +1,112 @@
+{
+  "schema": "src06-live-space-convection-interface-checkpoint.v1",
+  "base_HEAD": "24f737cfa50823f47499d0b107372ab8026e58e3",
+  "Original_pinned_HEAD": "6f2e40d10250a105b49966baa24d843711e61048",
+  "applied_Source": {
+    "path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+    "sha256": "9c6caacd92bea849c27d7d35eb96b6147f022e36fa66859f4eb057addf8e4f64",
+    "size_bytes": 36734
+  },
+  "before_Source_sha256": "05c58a7e87bf57f0df9a0709a73ba010bebff7c5fa731c9a926957b032ecf5de",
+  "independently_reviewed_proposal": {
+    "path": ".runtime/porting/SRC-06/ordinary-air-heat-balance-held-Reviewer-02/manifest.json",
+    "sha256": "723c1680275e6b88bf9de7825e17ca8f1e02452fd721423405dfe04ff6f7c0be",
+    "size_bytes": 13151
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/Root-ordinary-air-owners-Source-review-01/review.json",
+    "sha256": "937e2fc45fa1a591f2cc525ae5ac51afb5334a90f04c435ee8b311feabcd7ba5",
+    "size_bytes": 11469
+  },
+  "change": "InitIntConvCoeff accepts a live borrowed Space owner interface; MAT/ZT/ZTAV remain distinct references. The existing SpaceAirTemperatures adapter uses the same unchanged convection formula and traversal.",
+  "QA": [
+    {
+      "role": "clippy",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "clippy",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "62c71a2c687ba20f5510ddd556d3241dc12a9663fb561fec47d60087c00c7146",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/live-space-convection-clippy-command-01/receipt.json",
+        "sha256": "261e97650077e500e72c8149d09856ba004c85cd0101fadcea2024c3d0712da6",
+        "size_bytes": 2909
+      }
+    },
+    {
+      "role": "tests",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "test",
+        "--locked",
+        "-p",
+        "ep_runtime",
+        "--lib",
+        "heat_balance::inside_convection_dispatcher::tests::"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "62c71a2c687ba20f5510ddd556d3241dc12a9663fb561fec47d60087c00c7146",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/live-space-convection-tests-command-01/receipt.json",
+        "sha256": "7a3166510f953e694670b8aa78148666c306c7fd72958c6dd4ee973a55630545",
+        "size_bytes": 2928
+      }
+    },
+    {
+      "role": "fmt",
+      "command": [
+        "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "62c71a2c687ba20f5510ddd556d3241dc12a9663fb561fec47d60087c00c7146",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/live-space-convection-fmt-command-01/receipt.json",
+        "sha256": "6baeb5c7c8a98097dfa5c8e9dfcd00c57db58fcfeff60cbde6eebe12f145a2b1",
+        "size_bytes": 2845
+      }
+    },
+    {
+      "role": "quality",
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/source-quality-gate.ps1"
+      ],
+      "exit_code": 0,
+      "source_snapshot_sha256": "62c71a2c687ba20f5510ddd556d3241dc12a9663fb561fec47d60087c00c7146",
+      "Source_bytes_unchanged_during_command": true,
+      "local_receipt": {
+        "path": ".runtime/porting/SRC-06/live-space-convection-quality-command-01/receipt.json",
+        "sha256": "e9e97ca6d9bca354921f47327caad308d8a2e7023c04837673947a3b7a34d328",
+        "size_bytes": 2889
+      }
+    }
+  ],
+  "existing_tests_passed": 8,
+  "new_test_bodies": 0,
+  "full_workspace_tests_run": false,
+  "active_caller": "Existing caller and existing SpaceAirTemperatures storage; the new complete Source AirHB owner and full Source manager are not activated by this change.",
+  "no_numerical_equivalence_claim": true,
+  "no_new_SRC06_numerical_summary": true,
+  "task_gates_unchanged": true,
+  "remaining": "Actual Source AirHB producer/reset, full InitSurface, Solar/gain/convection cadence, inside iteration, reporting and Native comparison remain pending.",
+  "provenance_scope": "Local preparation/review/receipt paths record audit custody. Applied Source is tracked in Git. This implementation checkpoint is not a self-contained Native comparison package."
+}
