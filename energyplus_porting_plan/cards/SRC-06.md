@@ -377,3 +377,9 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 반복된 착수 전 산문과 당시 미완료 목록은 현재 범위와 위 표로 통합했다. 원본 범위·적용/formatter diff·실패/중단 명령·실제 QA·선택 입력과 uncapped ledger는 기존 요약/색인/ZIP에 그대로 남긴다. 초기 입력/transport/compile/Clippy 실패를 나중 성공 로그로 바꾸지 않는다. 과거 global file-size 실패와 구조적 부채도 현재 통과로 다시 쓰지 않는다.
 
 대형 Native 실행 파일·core·map·provider와 whole Source는 각 단위의 기존 provenance 범위다. 이 문서 정리는 payload 재검증이나 transitive build/replay 보장을 추가하지 않는다. Native endpoint는 생산 입력으로 주입하지 않으며, 실제 BEFORE 값을 쓰는 bounded replay는 테스트 범위로만 해석한다. 모든 gate와 A/B 완료 수는 그대로다.
+
+
+## 제안 호출 연결의 전체 대상 컴파일 체크포인트
+
+
+[호출 연결 중간 체크포인트](../evidence/SRC-06-provider-integration-checkpoint/summary.json)는 검토된 제안 코드를 재현용 ZIP에 보존한다. 같은 동결 소스에서 runtime·run·CLI 전체 대상 컴파일을 통과했고 기존 시험 호출 두 곳의 실제 bounds 인자를 보완했다. 새 시험 본문·시험 실행·Native 실행·수치 비교는 없다. 현재 일반 생산 경로의 활성화와 전체 A/B 검증은 미완료이며 네 gate·A14/54·B14/64 및 기존 수치 FAIL는 유지한다.

@@ -68,3 +68,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 [실제 표면 볼록성 검사 연결](evidence/SRC-06-surface-convexity-implementation.json)은 GetVertices·면적 진단 다음에 원본 CheckConvexity를 호출하고 같은 표면의 IsConvex와 지속 scratch·진단 상태를 유지한다. 기존 CLI 시험1개와 A-24H 실행을 통과했으며, 이전 실행과 결과147,618바이트·EIO10,337바이트가 모두 일치했다. 이는 기존 실행의 회귀 확인이며 새로운 Native 수치 비교나 전체 InitSurface 완료 판정은 아니다. 새 시험은 추가하지 않았고 카드 gate는 유지한다.
 
 [Actual producer comparison](evidence/SRC-06-ordinary-geometry/summary.json) binds complete physical input/Raw/typed identity before selected retained GEO03 returns, perimeter/dimensions, six bounds and exterior-area owners. The returned GEO03 object is moved once from its existing initializer call; no observer recomputes an owner. This prerequisite does not activate ordinary space air/reset, named inside-temperature arrays, post-radiation cadence or handoff, and does not expand historical Volume-only certification.
+
+
+[호출 연결 중간 체크포인트](evidence/SRC-06-provider-integration-checkpoint/summary.json)는 검토된 제안 코드를 재현용 ZIP에 보존한다. 같은 동결 소스에서 runtime·run·CLI 전체 대상 컴파일을 통과했고 기존 시험 호출 두 곳의 실제 bounds 인자를 보완했다. 새 시험 본문·시험 실행·Native 실행·수치 비교는 없다. 현재 일반 생산 경로의 활성화와 전체 A/B 검증은 미완료이며 네 gate·A14/54·B14/64 및 기존 수치 FAIL는 유지한다.

@@ -12726,6 +12726,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-hb-internal-gains-input/summary.json",
         "sha256": "1d246b4d57e5204d10cf14e315e83b4cc8ba866b5cb0e00c3e5d291f431a9b42",
         "size_bytes": 47900
+      },
+      "held_provider_compilation_checkpoint": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-provider-integration-checkpoint/summary.json",
+        "sha256": "a7b15af9da8c49b515211c460117873928dbe15a18410d640cf7b91ede2126d0",
+        "size_bytes": 5110
       }
     },
     {
