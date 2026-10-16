@@ -254,6 +254,7 @@ fn complex_fenestration_states_materialize_after_air_with_ordered_layers_and_dep
 fn staged_idf_overlay_preserves_complex_state_declaration_order()
 -> Result<(), Box<dyn std::error::Error>> {
     let idf = r#"
+        Material:NoMass, Opaque Layer, Rough, 1.0;
         Construction, Ordinary;
         Construction:FfactorGroundFloor, F Ground;
         Construction:CfactorUndergroundWall, C Ground;
