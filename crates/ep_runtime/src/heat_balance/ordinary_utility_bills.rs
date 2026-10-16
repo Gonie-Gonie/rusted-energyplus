@@ -514,3 +514,8 @@ impl SourceCostEstimateMonetary {
         Ok(())
     }
 }
+
+impl SourceCostEstimateMonetary {
+    // Actual DoCostEstimate operand read by WriteTableOfContents3278.
+    pub(crate) fn source_do_cost_estimate(&self) -> &bool { &self.do_cost_estimate }
+}

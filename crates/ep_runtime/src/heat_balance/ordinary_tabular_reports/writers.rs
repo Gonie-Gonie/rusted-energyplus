@@ -174,3 +174,19 @@ impl SourceTabularReports {
         Ok(())
     }
 }
+
+// Same accepted MakeAnchorName17818-17867 byte kernel, shared by TOC.
+pub(super) fn source_anchor(report: &[u8], object: &[u8]) -> Vec<u8> {
+    anchor(report, object)
+}
+
+// Native stripped byte-string helper; no UTF8 re-encoding or numeric copy.
+pub(super) fn source_stripped_report_text(text: &[u8]) -> &[u8] { bytes::strip(text) }
+
+// Actual FillRowHead18171-18183 shared with BEPS/Demand temporary text rows.
+pub(super) fn source_fill_row_head(rows: &mut [Vec<u8>]) {
+    let mut current = Vec::new();
+    for row in rows {
+        if row.is_empty() { *row = current.clone(); } else { current = row.clone(); }
+    }
+}

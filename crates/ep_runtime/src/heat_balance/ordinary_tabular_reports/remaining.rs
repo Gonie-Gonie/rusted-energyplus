@@ -115,7 +115,7 @@ fn text(
         .string_entry(column(registry, name)?, object, value)
         .map_err(Error::from)
 }
-fn source_date_to_string(coded_date: i32) -> Result<String, Error> {
+pub(super) fn source_date_to_string(coded_date: i32) -> Result<String, Error> {
     const MONTHS: [&str; 12] = [
         "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
     ];

@@ -257,14 +257,7 @@ impl SourceTabularReports {
                 )?;
             }
             let mut row_temp = rows.clone();
-            let mut current = Vec::new();
-            for row in &mut row_temp {
-                if row.is_empty() {
-                    *row = current.clone();
-                } else {
-                    current = row.clone();
-                }
-            }
+            super::super::writers::source_fill_row_head(&mut row_temp);
             for row in 1..=num_rows {
                 row_temp[row - 1].push(b':');
                 row_temp[row - 1].extend_from_slice(body.at(1, row)?);

@@ -35,6 +35,9 @@ pub(crate) struct SelectedZoneData {
     pub(crate) exterior_total_surface_area: f64,
     pub(crate) exterior_perimeter: f64,
     pub(crate) exterior_gross_wall_area_multiplied: f64,
+    // Actual ZoneData.hh600-601, sole ground writer remains behind Setup435 positive boundary.
+    pub(crate) exterior_gross_ground_wall_area: f64,
+    pub(crate) exterior_gross_ground_wall_area_multiplied: f64,
     /// ZoneData explicitly constructs Centroid(0.0, 0.0, 0.0).
     /// The completed geometry return later overwrites that same live owner.
     pub(crate) centroid_m: Option<[f64; 3]>,
@@ -121,6 +124,8 @@ impl Default for SelectedZoneData {
             exterior_total_surface_area: 0.0,
             exterior_perimeter: 0.0,
             exterior_gross_wall_area_multiplied: 0.0,
+            exterior_gross_ground_wall_area: 0.0,
+            exterior_gross_ground_wall_area_multiplied: 0.0,
             centroid_m: Some([0.0; 3]),
             bounds_m: [0.0; 6],
             num_surfaces: 0,

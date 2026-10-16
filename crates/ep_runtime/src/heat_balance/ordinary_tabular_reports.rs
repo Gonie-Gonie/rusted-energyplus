@@ -269,3 +269,14 @@ impl SourceTabularReports {
 pub(crate) use writers::{SourceTabularBody, SourceTabularWriterOwners};
 
 pub(crate) use beps_report::SourceBepsReportOwners;
+
+mod report_toc;
+pub(crate) use report_toc::SourceTabularTocOwners;
+
+mod veri_sum;
+pub(crate) use veri_sum::SourceVeriSumOwners;
+
+mod demand_summary;
+pub(crate) use demand_summary::SourceDemandReportOwners;
+
+mod source_energy_summary;

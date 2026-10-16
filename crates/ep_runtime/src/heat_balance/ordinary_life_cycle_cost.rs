@@ -65,3 +65,8 @@ impl SourceEconomicLifeCycleCost {
         Ok(())
     }
 }
+
+impl SourceEconomicLifeCycleCost {
+    // Actual LCCparamPresent operand read by WriteTableOfContents3251.
+    pub(crate) fn source_parameters_present(&self) -> &bool { &self.parameters_present }
+}

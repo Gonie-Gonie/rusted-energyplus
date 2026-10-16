@@ -289,7 +289,114 @@ impl SourceInitializationFiles {
                     },
                 },
             ).map_err(hb_input_error)?;
-            return Err(unavailable("actual WriteTabularReports5231 WriteTableOfContents entry"));
+            session.tabular.write_source_table_of_contents(
+                &crate::heat_balance::ordinary_tabular_reports::SourceTabularTocOwners {
+                    registry: &reports.registry,
+                    life_cycle_cost: &reports.source_life_cycle_cost,
+                    monetary: &reports.cost_estimate_monetary,
+                    clock: &weather.state.global,
+                    weather: &weather.state.weather,
+                    schedules: required(
+                        reports.selected_schedule_manager.as_ref(),
+                        "actual same schedules before TOC5231",
+                    )?,
+                },
+            ).map_err(hb_input_error)?;
+            session.tabular.write_source_verification_summary(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceVeriSumOwners {
+                    globals,
+                    environment: &weather.state.environment,
+                    weather_file_location_title: &weather.cursor.header().weather_location_title,
+                    control: &reports.heat_balance_input_state,
+                    geometry: &reports.surface_geometry_input,
+                    zones: required(
+                        reports.selected_zone_input.as_ref(),
+                        "actual same Zones before VeriSum5232",
+                    )?,
+                    gains: &reports.selected_internal_heat_gains,
+                    controller: &session.controller,
+                    radiation: required(
+                        reports.ordinary_solar_radiation.as_ref(),
+                        "actual same Solar enclosure owner before VeriSum5232",
+                    )?,
+                    input: required(
+                        reports.selected_input_processor.as_ref(),
+                        "actual same IP before VeriSum5232",
+                    )?,
+                    registry: &reports.registry,
+                    table: &mut reports.table,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            session.tabular.write_source_demand_end_use_summary(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceDemandReportOwners {
+                    registration: &reports.output_registration,
+                    registry: &reports.registry,
+                    table: &mut reports.table,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            session.tabular.write_source_energy_end_use_summary(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceBepsReportOwners {
+                    registration: &reports.output_registration,
+                    zones: required(
+                        reports.selected_zone_input.as_ref(),
+                        "actual same Zones before SourceEnergy5234",
+                    )?,
+                    globals,
+                    facility: required(
+                        reports.facility_electric_service.as_ref(),
+                        "actual same FacilityElectricService before SourceEnergy5234",
+                    )?,
+                    water: &session.hvac.ancillary.water.data,
+                    hvac: &required(
+                        reports.selected_simulation_startup.as_ref(),
+                        "actual same HVAC globals before SourceEnergy5234",
+                    )?.hvac_globals,
+                    predefined_summary: &session.comfort_summary,
+                    registry: &mut reports.registry,
+                    table: &mut reports.table,
+                    schedules: required(
+                        reports.selected_schedule_manager.as_ref(),
+                        "actual same schedules before SourceEnergy5234",
+                    )?,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            return Err(unavailable("actual WriteTabularReports5235 WriteComponentSizing entry"));
         }
         Err(unavailable("actual WriteTabularReports5278 audit ensure_open entry"))
     }

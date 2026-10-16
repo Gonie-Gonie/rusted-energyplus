@@ -145,11 +145,19 @@ impl SourceTabularReports {
         &mut self,
         o: &SourceBepsReportOwners<'_, '_>,
     ) -> Result<(), Error> {
+        self.determine_source_building_floor_area_from_owners(o.globals, o.zones)
+    }
+
+    // One actual DetermineBuildingFloorArea18104-18169 body, shared callers.
+    pub(super) fn determine_source_building_floor_area_from_owners(
+        &mut self,
+        globals: &SelectedHeatBalanceGlobals,
+        zones: &SelectedZoneInputOwners,
+    ) -> Result<(), Error> {
         self.input_state.building_gross_floor_area = 0.0;
         self.input_state.building_conditioned_floor_area = 0.0;
-        for zone_number in 1..=o.globals.num_of_zones {
-            let zone = o
-                .zones
+        for zone_number in 1..=globals.num_of_zones {
+            let zone = zones
                 .zones
                 .as_ref()
                 .and_then(|zones| zones.get((zone_number - 1) as usize))
@@ -167,4 +175,9 @@ impl SourceTabularReports {
         }
         Ok(())
     }
+}
+
+// Same accepted Actual RealToStr18578-18624 kernel shared with VeriSum.
+pub(super) fn source_report_real(formatted: bool, value: f64, digits: i32) -> Result<Vec<u8>, Error> {
+    helpers::real(formatted, value, digits)
 }
