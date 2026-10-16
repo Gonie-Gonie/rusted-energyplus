@@ -110,6 +110,12 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             )?;
             actual.continue_selected_heat_balance_input_before_solar()?;
             actual.initialize_selected_solar_view_factors(&model.typed)?;
+            actual.manage_selected_internal_heat_gains_input(
+                &model.typed,
+                source.minutes,
+                &mut *source.output_host,
+            )?;
+            actual.check_selected_kiva_input_guard()?;
         }
     }
     if let Some(actual) = initialization.as_deref_mut() {

@@ -16,11 +16,18 @@ use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
 use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
+mod internal_heat_gains_input;
 mod ordinary_surface_geometry;
 mod post_building_input;
 mod setup_geometry_reports;
 mod setup_zone_geometry;
 mod world_surface_geometry;
+pub use internal_heat_gains_input::observation::{
+    OrdinaryGainDevice, OrdinaryGainDeviceStorage, OrdinaryGainDictionaryEntry,
+    OrdinaryGainMiscObject, OrdinaryGainOutputRegistration, OrdinaryGainRateTarget,
+    OrdinaryGainReport, OrdinaryGainSchedule, OrdinaryGainSchedules, OrdinaryGainSpace,
+    OrdinaryGainZone, OrdinaryInternalGains, OrdinaryOtherEquipment,
+};
 pub use ordinary_surface_geometry::{
     OrdinaryGeometryConstruction, OrdinaryGeometryMaterial, OrdinaryGeometryProcess,
     OrdinaryGeometryShadeVertices, OrdinaryGeometrySpace, OrdinaryGeometrySurface,
@@ -69,6 +76,8 @@ pub struct CtfInitializationReports {
     /// Sole Fluid constructor/constant/input owner.
     pub(crate) selected_fluid_properties:
         Option<super::selected_fluid_properties::SelectedFluidProperties>,
+    /// Actual InternalHeatGains constructor and reached input collections.
+    pub(crate) selected_internal_heat_gains: internal_heat_gains_input::SelectedInternalHeatGains,
     /// Sole real built-in and selected constant schedules.
     pub(crate) selected_schedule_manager:
         Option<super::selected_schedule_manager::SelectedScheduleManager>,

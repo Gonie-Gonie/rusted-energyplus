@@ -176,6 +176,87 @@ const F5: &[Field] = &[
         retain_case: false,
     },
 ];
+// OtherEquipment IDD22738-22829: same local getter, not a new count owner.
+const OTHER: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "fuel_type",
+        legacy: "Fuel Type",
+        default: DefaultValue::Alpha("None"),
+        retain_case: false,
+    },
+    Field {
+        json: "zone_or_zonelist_or_space_or_spacelist_name",
+        legacy: "Zone or ZoneList or Space or SpaceList Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "schedule_name",
+        legacy: "Schedule Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "design_level_calculation_method",
+        legacy: "Design Level Calculation Method",
+        default: DefaultValue::Alpha("EquipmentLevel"),
+        retain_case: false,
+    },
+    Field {
+        json: "design_level",
+        legacy: "Design Level",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "power_per_floor_area",
+        legacy: "Power per Floor Area",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "power_per_person",
+        legacy: "Power per Person",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_latent",
+        legacy: "Fraction Latent",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_radiant",
+        legacy: "Fraction Radiant",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_lost",
+        legacy: "Fraction Lost",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "carbon_dioxide_generation_rate",
+        legacy: "Carbon Dioxide Generation Rate",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "end_use_subcategory",
+        legacy: "End-Use Subcategory",
+        default: DefaultValue::Alpha("General"),
+        retain_case: true,
+    },
+];
 pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
     match family {
         "Building" => Some((F0, 8, true)),
@@ -184,6 +265,7 @@ pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
         "HeatBalanceAlgorithm" => Some((F3, 0, false)),
         "ZoneAirHeatBalanceAlgorithm" => Some((F4, 2, false)),
         "Construction" => Some((F5, 0, true)),
+        "OtherEquipment" => Some((OTHER, 11, true)),
         _ => None,
     }
 }

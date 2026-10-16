@@ -26,14 +26,14 @@ pub(super) struct Field {
     pub(super) retain_case: bool,
 }
 mod schema;
-pub(super) struct GetterValues<const A: usize, const N: usize> {
-    pub(super) alphas: [String; A],
-    pub(super) numbers: [f64; N],
-    pub(super) num_alphas: usize,
-    pub(super) num_numbers: usize,
+pub(crate) struct GetterValues<const A: usize, const N: usize> {
+    pub(crate) alphas: [String; A],
+    pub(crate) numbers: [f64; N],
+    pub(crate) num_alphas: usize,
+    pub(crate) num_numbers: usize,
 }
 impl SelectedHeatBalanceInput {
-    pub(super) fn get_object_item<const A: usize, const N: usize>(
+    pub(crate) fn get_object_item<const A: usize, const N: usize>(
         &self,
         family: &str,
         index: usize,

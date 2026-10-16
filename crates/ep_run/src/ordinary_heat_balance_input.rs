@@ -25,6 +25,7 @@ pub(crate) fn resolve(
         "ZoneAirHeatBalanceAlgorithm",
         "Construction",
         "Zone",
+        "OtherEquipment",
     ] {
         let ordered = raw.ordered_instances(family).map_err(|e| e.to_string())?;
         if input.get_num_objects_found(family) != ordered.len() {

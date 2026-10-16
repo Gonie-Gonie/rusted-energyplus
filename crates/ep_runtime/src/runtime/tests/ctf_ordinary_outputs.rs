@@ -858,6 +858,83 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle() -> 
         assert_eq!(row.f, retained_f, "late physical join preserves Source numeric writes");
         assert_eq!(row.f.as_ptr(), retained_f_allocation, "late join retains the reached repeated-call F allocation");
         assert_eq!(row.surface_ptr, source_ids);
+        // Authored real-getter checkpoint, not a Native/World producer fixture.
+        // Built-in Constant schedule is created by its genuine Source producer.
+        let mut gains_schedule = crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+        gains_schedule.init_constant_state(4)?;
+        parent.reports.selected_schedule_manager = Some(gains_schedule);
+        parent.reports.selected_project_data.get_or_insert_with(Default::default);
+        let zone_name = &mut parent.reports.selected_zone_input.as_mut().and_then(|o| o.zones.as_mut())
+            .ok_or("actual gain Zone")?[0].name;
+        zone_name.make_ascii_uppercase(); let zone_name = zone_name.clone();
+        let gain_objects = [7.0, -3.0].into_iter().enumerate().map(|(i, level)| ProjectInputObject {
+            object_name: format!("Authored gain {i}"), idf_max_fields: None,
+            fields: std::collections::BTreeMap::from([
+                ("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(zone_name.clone())),
+                ("schedule_name".into(), ProjectInputValue::String("Constant-1.0".into())),
+                ("design_level".into(), ProjectInputValue::Number(level)),
+                ("fraction_latent".into(), ProjectInputValue::Number(0.1)),
+                ("fraction_radiant".into(), ProjectInputValue::Number(0.2)),
+                ("fraction_lost".into(), ProjectInputValue::Number(0.3)),
+                ("end_use_subcategory".into(), ProjectInputValue::String("Mixed Case".into())),
+            ]),
+        }).collect::<Vec<_>>();
+        let definitions = [("People",21,8),("Lights",8,9),("ElectricEquipment",5,6),("GasEquipment",5,7),
+            ("HotWaterEquipment",5,6),("SteamEquipment",5,6),("OtherEquipment",6,7),
+            ("ElectricEquipment:ITE:AirCooled",21,11),("ZoneBaseboard:OutdoorTemperatureControlled",4,5),
+            ("ZoneContaminantSourceAndSink:CarbonDioxide",3,1)]
+            .into_iter().map(|(name,a,n)| crate::heat_balance::selected_input_processor::SourceObjectDefinition {
+                object_type:name.into(),alpha_fields:a,numeric_fields:n,alpha_extensions:0,numeric_extensions:0,extension:None,
+            }).collect();
+        parent.reports.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(definitions,
+            std::collections::BTreeMap::from([("OtherEquipment".into(),
+                crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(gain_objects.iter().map(|o|
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name:o.object_name.clone(),field_sizes:Default::default(),
+                    }).collect()))]))?);
+        let raw = parent.reports.heat_balance_input.get_or_insert_with(Default::default);
+        raw.source_is_epjson = true; raw.objects.insert("OtherEquipment".into(),gain_objects);
+        let mut failed_gains = parent.reports.clone();
+        let shared_before = parent.reports.input_processor_shortcut.clone();
+        let registrations_before = parent.reports.output_registration.num_real_variables_setup;
+        let mut gain_host = EnclosureTestHost { calls:0,fail:false };
+        parent.manage_selected_internal_heat_gains_input(&model.typed,15,&mut gain_host)?;
+        parent.check_selected_kiva_input_guard()?;
+        let gains = &parent.reports.selected_internal_heat_gains;
+        assert!(!gains.get_input_flag); assert!(!gains.errors_found); assert_eq!(gains.totals[6],2);
+        assert!(gains.lights_objects.as_ref().is_some_and(Vec::is_empty));
+        assert!(gains.allocations.co2_generation.as_ref().is_some_and(Vec::is_empty));
+        let equipment = gains.allocations.other_equipment.as_ref().ok_or("same gain rows")?;
+        assert_eq!(equipment.iter().map(|r| r.design_level).collect::<Vec<_>>(),[7.0,-3.0]);
+        assert!(equipment.iter().all(|r| r.fraction_convected.to_bits() == (1.0_f64-(0.1+0.2+0.3)).to_bits()
+            && r.end_use_subcategory == "Mixed Case" && r.nominal_min_design_level.to_bits() == r.design_level.to_bits()));
+        assert_ne!(equipment[0].fraction_convected.to_bits(),(1.0_f64-0.1-0.2-0.3).to_bits(),"Source grouping differs from unchanged hourly sequential subtraction");
+        let devices = &gains.allocations.space_devices.as_ref().ok_or("actual gain devices")?[0];
+        assert_eq!((devices.number_of_devices,devices.max_number_of_devices),(2,100));
+        let slots = devices.devices.as_ref().ok_or("actual100slots")?; assert_eq!(slots.len(),100);
+        assert_ne!(slots[0].targets[0],slots[1].targets[0]); assert_ne!(slots[0].targets[0],slots[0].targets[2]);
+        assert_eq!(slots[0].targets[1],slots[0].targets[4]); assert!(slots[0].targets.iter().all(Option::is_some));
+        assert!(slots.iter().all(|row| row.cached_rates == [0.0;7]));
+        assert_eq!(parent.reports.selected_zone_input.as_ref().and_then(|o| o.zones.as_ref()).ok_or("same gain Zone")?[0].internal_heat_gains.to_bits(),4.0_f64.to_bits());
+        assert_eq!(parent.reports.output_registration.num_real_variables_setup-registrations_before,60);
+        assert_eq!(parent.reports.input_processor_shortcut,shared_before,"IHG has six LOCAL arrays");
+        let retained_gains = gains.clone(); let retained_registration = parent.reports.output_registration.clone();
+        parent.manage_selected_internal_heat_gains_input(&model.typed,15,&mut gain_host)?;
+        assert_eq!(parent.reports.selected_internal_heat_gains,retained_gains);
+        assert_eq!(parent.reports.output_registration,retained_registration,"InitOnly repeats skip getter");
+        failed_gains.heat_balance_input.as_mut().ok_or("failed raw gain owner")?.objects.get_mut("OtherEquipment")
+            .ok_or("failed raw gain rows")?[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(),ProjectInputValue::String("MISSING ZONE".into()));
+        let (mut gain_state,mut gain_console,mut gain_eio,mut gain_error) =
+            (ctf_ordinary_output_test_state(),Vec::new(),Vec::new(),OrdinaryFailingEio);
+        let failure = CtfInitializationContext { reports:&mut failed_gains,eio:&mut gain_eio,
+            backend:SourceErrorBackend { state:&mut gain_state,error_stream:Some(&mut gain_error),console:&mut gain_console,
+                out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None } }
+            .manage_selected_internal_heat_gains_input(&model.typed,15,&mut gain_host);
+        assert!(matches!(failure,Err(crate::RuntimeError::WarmupOutput(error)) if matches!(*error,crate::error::WarmupOutputError::Backend(_))));
+        assert!(failed_gains.selected_internal_heat_gains.get_input_flag);
+        assert!(!failed_gains.selected_internal_heat_gains.errors_found,"failed severe precedes ErrorsFound");
+        assert!(failed_gains.selected_internal_heat_gains.allocations.zone_report.is_some());
+        assert!(failed_gains.selected_internal_heat_gains.allocations.other_equipment.is_none());
         // One malformed definition earns the real ErrorsFound write, then
         // reaches the parent fatal only after all preceding selected helpers.
         scheduled_definition.alpha_fields = 3;

@@ -113,10 +113,13 @@ pub(crate) enum SourceOutputUnits {
     C,
     MPerS,
     Deg,
+    W,
+    J,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceOutputStoreType {
     Average,
+    Sum,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SourceReportFrequency {

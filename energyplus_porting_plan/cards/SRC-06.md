@@ -361,6 +361,12 @@ Rust 관측 QA는 Source `4a2298a33fe3db81842cbc0ebae7633b0c3e0e228232dbbe7417c8
 
 Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7파일 Git bytes와 같은 SourceSnapshot으로 연결했으며 같은 실행 커밋으로 기록하지 않았다. 대조 경계는 후속 내부발열 입력까지 포함한 Native 부모 반환과 Rust의 살아 있는 선택 상태다. 내부316의 정확한 checkpoint·parent local ErrorsFound·전체 GetHeatBalanceInput 완료를 인증하지 않는다. HB320 입력, ScriptF/후속 장파 복사, 실제800 기상 상태, 양의 입력·경고·fatal·보정 분기 및 전체 Setup/HB/engine은 남아 있다. 네 gate·A14/54·B14/64와 기존 전체 수치 FAIL는 그대로다. 위45개 actual 요약과1,480,963바이트 ZIP에 증거를 보존한다.
 
+## 진행 중인 HB320 내부발열 입력 연결
+
+같은 입력 처리기·Zone/Space·스케줄·출력 등록 소유자를 사용하는 `ManageInternalHeatGains(initOnly=true)` 선택 경로를 연결했다. `OtherEquipment`의 `None` 연료·`EquipmentLevel` 입력, 실제 배열 할당·장비 연결·보고 등록·nominal EIO와 반복 입력 생략을 구현하고, 같은 상태를 읽는 관찰 경로를 추가했다. 양의 미지원 장비·목록·EMS·출력 요청·Kiva 분기는 해당 원본 연산 전에 unavailable을 반환한다. 기존 hourly 소비자와 지원 범위는 유지한다.
+
+코드 검증과 새 부모 호출 Native 대조를 진행 중이다. 최초 Clippy의 헤더 줄바꿈 오류 2건은 출력 bytes를 유지하는 `writeln!` 수정 후 재검사에서 통과했다. 최초 A24는 실제 IDF 필드 수 전달 누락으로 exit6이었으며, `OtherEquipment`의 실제 선언 순서·필드 수를 복원하고 원본 파서의 최소 11필드 규칙을 연결했다. 두 실패 기록을 보존하고, 수정된 19파일의 포맷·품질·Clippy와 기존 입력 전달·런타임·일반 CLI·CI CLI 본문을 확인한다. 새 A24·Native 수치 PASS나 카드 완료를 아직 주장하지 않으며, actual 요약 45개·네 gate·A/B 완료 수는 그대로다.
+
 ## 이력과 증거 보존
 
 반복된 착수 전 산문과 당시 미완료 목록은 현재 범위와 위 표로 통합했다. 원본 범위·적용/formatter diff·실패/중단 명령·실제 QA·선택 입력과 uncapped ledger는 기존 요약/색인/ZIP에 그대로 남긴다. 초기 입력/transport/compile/Clippy 실패를 나중 성공 로그로 바꾸지 않는다. 과거 global file-size 실패와 구조적 부채도 현재 통과로 다시 쓰지 않는다.

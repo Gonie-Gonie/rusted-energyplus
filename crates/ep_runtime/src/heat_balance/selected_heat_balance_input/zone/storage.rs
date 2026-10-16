@@ -46,6 +46,10 @@ pub(crate) struct SelectedZoneData {
     pub(crate) num_shading_surfaces: i32,
     pub(crate) inside_algorithm: Inside,
     pub(crate) outside_algorithm: Outside,
+    /// ZoneSpaceData constructor-zero total design occupants.
+    pub(crate) total_occupants: f64,
+    /// ZoneData constructor-zero nominal load, written by IHG input EIO.
+    pub(crate) internal_heat_gains: f64,
     pub(crate) is_part_of_total_area: bool,
     pub(crate) is_nominal_controlled: bool,
     pub(crate) linked_outdoor_air_node: i32,
@@ -102,6 +106,8 @@ impl Default for SelectedZoneData {
             num_shading_surfaces: 0,
             inside_algorithm: Inside::Simple,
             outside_algorithm: Outside::SimpleCombined,
+            total_occupants: 0.0,
+            internal_heat_gains: 0.0,
             is_part_of_total_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: 0,

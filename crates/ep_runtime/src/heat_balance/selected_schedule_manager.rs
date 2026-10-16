@@ -3,6 +3,7 @@ use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnava
 use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
+mod accessors;
 
 /// Actual source-ordered ScheduleTypeLimits getter values after raw admission.
 #[derive(Clone, Debug, PartialEq)]

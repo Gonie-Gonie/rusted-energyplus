@@ -7,6 +7,7 @@ use ep_runtime::heat_balance::HeatBalanceState;
 use serde_json::{Value, json};
 use std::io::{BufWriter, Write};
 
+mod internal_gains;
 mod ordinary_source;
 
 const SELECTED_OBJECTS: &[&str] = &[
@@ -209,6 +210,11 @@ pub(crate) fn runtime_projection_with_source(
         .ordinary_surface_geometry(state, model)
         .map_err(|error| error.to_string())?
         .map(ordinary_source::projection)
+        .unwrap_or(Value::Null);
+    artifact["ordinary_source_internal_gains"] = reports
+        .ordinary_internal_gains(state)
+        .map_err(|error| error.to_string())?
+        .map(internal_gains::projection)
         .unwrap_or(Value::Null);
     Ok(artifact)
 }

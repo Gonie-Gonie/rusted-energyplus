@@ -148,6 +148,12 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "BuildingSurface:Detailed",
         name_field_index: 0,
     },
+    // InternalHeatGains::GetInternalHeatGainsInput reads named OtherEquipment
+    // in the same Source getObjectItem order and with real IDF field counts.
+    IdfOrderTarget {
+        object_type: "OtherEquipment",
+        name_field_index: 0,
+    },
     // ScheduleManager uses getObjectItem's preserved IDF order within these
     // families. Cross-family registration order remains the compiler's owner.
     IdfOrderTarget {
@@ -317,15 +323,17 @@ pub fn apply_idf_declaration_order(
                         | "Construction"
                         | "Zone"
                         | "BuildingSurface:Detailed"
+                        | "OtherEquipment"
                 )
             {
                 report_field_counts.push((
                     actual_type.clone(),
                     actual_name.clone(),
-                    if target.object_type == "BuildingSurface:Detailed" {
-                        idf_object.max_fields.max(20)
-                    } else {
-                        idf_object.max_fields
+                    match target.object_type {
+                        "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
+                        // IdfParser::parse_object pads IDF counts to schema min_fields.
+                        "OtherEquipment" => idf_object.max_fields.max(11),
+                        _ => idf_object.max_fields,
                     },
                     (target.object_type == "BuildingSurface:Detailed")
                         .then_some(idf_object.max_fields.saturating_sub(11)),
@@ -1058,6 +1066,11 @@ mod unnamed_report_order_tests {
                 "Construction",
                 "Construction,Z,Layer;Construction,A,Layer1,Layer2;",
                 Some([2, 3]),
+            ),
+            (
+                "OtherEquipment",
+                "OtherEquipment,Z,None,Zone,Schedule,EquipmentLevel,-3;OtherEquipment,A,None,Zone,Schedule,EquipmentLevel,7,,,,,,,MixedCase;",
+                Some([11, 13]),
             ),
         ] {
             let epjson = format!("{{\"{family}\":{{\"A\":{{}},\"Z\":{{}}}}}}");
