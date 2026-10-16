@@ -3714,7 +3714,7 @@ fn execute_rust_runtime(
             if let Some(input) = runtime_inputs.selected_input_processor.take() {
                 initialization
                     .reports
-                    .initialize_input_processor(input)
+                    .initialize_source_input_processor(input)
                     .map_err(|error| error.to_string())?;
             }
             initialization.reports.heat_balance_input = runtime_inputs.heat_balance_input.take();

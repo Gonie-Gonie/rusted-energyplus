@@ -115,6 +115,7 @@ pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRe
 mod instant_meter;
 mod meter_reporting;
 mod milo_dtoa;
+mod report_for_tabular;
 mod report_streams;
 mod report_writers;
 mod results_meter;

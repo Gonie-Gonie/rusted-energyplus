@@ -2,6 +2,8 @@
 //! Schema metadata is projected from the pinned IDD after ordinary raw admission.
 
 use std::collections::{BTreeMap, BTreeSet};
+mod input_statistics;
+pub use input_statistics::{SourceInputStatisticsFields, SourceInputStatisticsInput, SourceInputStatisticsValue};
 
 /// Literal legacy_idd field counts; not an object-admission allowlist.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -45,6 +47,8 @@ pub struct SelectedInputProcessor {
     families: BTreeMap<String, SourceInputFamily>,
     // Source initializeMaps/ObjectInfo lexicographic exact-case identity owner.
     unused_inputs: BTreeSet<(String, String)>,
+    // Same original epJSON operands, not computed statistics or a readiness flag.
+    statistics_input: Option<SourceInputStatisticsInput>,
 }
 
 /// Independent Original alpha/numeric argument counts.
@@ -123,6 +127,7 @@ impl SelectedInputProcessor {
             definitions: by_name,
             families,
             unused_inputs,
+            statistics_input: None,
         })
     }
 

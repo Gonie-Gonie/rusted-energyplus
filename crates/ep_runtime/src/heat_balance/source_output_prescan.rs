@@ -63,6 +63,20 @@ pub struct SourceOutputPreScan {
     pub max_considered_output_variables: i32,
     /// Original increments on every call, including duplicate emplace attempts.
     pub num_considered_output_variables: i32,
+    /// Actual OutputsData.iNumberOfRecords, constructor zero; Native322 produces it.
+    pub number_input_records: i32,
+    /// Actual OutputsData.iNumberOfDefaultedFields, constructor zero; Native322 produces it.
+    pub number_defaulted_fields: i32,
+    /// Actual OutputsData.iTotalFieldsWithDefaults, constructor zero; Native322 produces it.
+    pub total_fields_with_defaults: i32,
+    /// Actual OutputsData.iNumberOfAutoSizedFields, constructor zero; Native322 produces it.
+    pub number_autosized_fields: i32,
+    /// Actual OutputsData.iTotalAutoSizableFields, constructor zero; Native322 produces it.
+    pub total_autosizable_fields: i32,
+    /// Actual OutputsData.iNumberOfAutoCalcedFields, constructor zero; Native322 produces it.
+    pub number_autocalculated_fields: i32,
+    /// Actual OutputsData.iTotalAutoCalculatableFields, constructor zero; Native322 produces it.
+    pub total_autocalculatable_fields: i32,
     /// ASCII-folded lookup names; values preserve the first outer spelling.
     pub output_variables_for_simulation: BTreeMap<String, SourceOutputVariableKeys>,
 }

@@ -11,6 +11,7 @@ mod heat_emission_gather;
 mod heat_gain;
 mod input;
 mod monthly_initialization;
+mod output_files;
 mod source_demand;
 mod state;
 mod style;
@@ -76,7 +77,7 @@ pub(crate) struct SourceTabularInputOwners<'a, 'backend> {
     pub(crate) surface_averages:
         &'a super::ordinary_surface_source_averages::SourceFinalSurfaceHeatBalance,
 }
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug)]
 pub(crate) struct SourceTabularReports {
     pub(crate) display_tabular_beps: bool,
     pub(crate) display_leed_summary: bool,
@@ -103,6 +104,7 @@ pub(crate) struct SourceTabularReports {
     pub(crate) display_visual_resilience_summary_explicitly: bool,
     pub(crate) update_tabular_reports_get_input: bool,
     input_state: state::SourceTabularInputState,
+    output_streams: output_files::SourceTabularOutputStreams,
 }
 impl Default for SourceTabularReports {
     fn default() -> Self {
@@ -132,6 +134,7 @@ impl Default for SourceTabularReports {
             display_visual_resilience_summary_explicitly: false,
             update_tabular_reports_get_input: true,
             input_state: state::SourceTabularInputState::default(),
+            output_streams: output_files::SourceTabularOutputStreams::default(),
         }
     }
 }

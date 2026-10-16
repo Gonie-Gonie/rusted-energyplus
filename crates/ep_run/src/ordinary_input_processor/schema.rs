@@ -290,7 +290,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("SurfaceConvectionAlgorithm:Outside", 1, 0, 0, 0, None),
         ("NodeList", 1, 0, 1, 0, Some("nodes")),
         ("OutdoorAir:Node", 8, 1, 0, 0, None),
-        ("OutdoorAir:NodeList", 1, 0, 1, 0, Some("nodes")),
+        ("OutdoorAir:NodeList", 0, 0, 1, 0, Some("nodes")),
         ("ZoneCoolTower:Shower", 6, 8, 0, 0, None),
         ("ZoneHVAC:EquipmentList", 2, 0, 4, 2, Some("equipment")),
         ("ZoneHVAC:EquipmentConnections", 8, 0, 0, 0, None),

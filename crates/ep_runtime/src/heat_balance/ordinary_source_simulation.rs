@@ -6,6 +6,7 @@ mod prelude_host;
 pub(crate) mod setup;
 mod setup_host;
 mod through_primary;
+mod endrun_prefix;
 
 /// Actual ManageSimulation180 locals retained across setup and the primary loop.
 ///

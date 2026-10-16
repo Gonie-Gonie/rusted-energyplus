@@ -24,6 +24,12 @@ pub struct SourceInitializationFilePaths {
     pub audit: PathBuf,
     /// Actual ManageSimulation185 debug path, opened before SQL/PostIP.
     pub debug: PathBuf,
+    /// Actual caller-selected paths for Native DataStringGlobals five table formats.
+    pub tabular_csv: PathBuf,
+    pub tabular_tab: PathBuf,
+    pub tabular_fixed: PathBuf,
+    pub tabular_html: PathBuf,
+    pub tabular_xml: PathBuf,
 }
 
 #[derive(Debug)]
@@ -121,6 +127,7 @@ pub struct SourceInitializationFiles {
     debug: SourceOutputStream,
     // Native IOFilePath owns only the path, not a permanently opened stream.
     dxf: PathBuf,
+    tabular_paths: [PathBuf; 5],
     // Native IOFiles.hh626-627 retained InputOutputFile objects.
     dictionaries: [dictionaries::SourceDictionaryStream; 2],
 }
@@ -138,11 +145,16 @@ impl SourceInitializationFiles {
             audit: SourceOutputStream::new(paths.audit),
             debug: SourceOutputStream::new(paths.debug),
             dxf: paths.dxf,
+            tabular_paths: [paths.tabular_csv, paths.tabular_tab, paths.tabular_fixed, paths.tabular_html, paths.tabular_xml],
             dictionaries: [
                 dictionaries::SourceDictionaryStream::new(paths.rdd),
                 dictionaries::SourceDictionaryStream::new(paths.mdd),
             ],
         }
+    }
+    /// Native format chooses a path; the separate TAB stream is ordinal-indexed.
+    pub(crate) fn source_tabular_output_path(&self, style: i32) -> &Path {
+        &self.tabular_paths[match style { 0 => 0, 1 => 1, 3 => 3, 4 => 4, _ => 2 }]
     }
     pub(super) fn source_dxf_path(&self) -> &Path {
         &self.dxf

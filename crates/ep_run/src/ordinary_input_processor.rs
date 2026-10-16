@@ -6,6 +6,7 @@ use ep_runtime::heat_balance::selected_input_processor::{
 };
 use std::collections::BTreeMap;
 
+mod input_statistics;
 mod reporting_prescan;
 mod schema;
 pub(crate) use reporting_prescan::resolve as resolve_reporting_prescan;
@@ -39,8 +40,11 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedInputProcessor, String> 
             (family.0.clone(), SourceInputFamily::Objects(shapes))
         })
         .collect();
-    SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
-        .map_err(|error| error.to_string())
+    let mut input = SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
+        .map_err(|error| error.to_string())?;
+    input.retain_source_input_statistics(input_statistics::resolve(raw))
+        .map_err(|error| error.to_string())?;
+    Ok(input)
 }
 
 #[cfg(test)]

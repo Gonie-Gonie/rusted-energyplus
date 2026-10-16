@@ -1,5 +1,6 @@
 //! Actual WaterManager zero-object getter, manager and timestep initialization.
 //! DataWater and WaterManager remain distinct from WaterUse and water-heater owners.
+mod rainfall_report;
 use super::Error;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;

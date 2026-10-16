@@ -191,6 +191,24 @@ impl CtfInitializationReports {
             .ok_or(super::selected_input_processor::SelectedInputUnavailable::Association)?;
         self.input_processor_shortcut.allocate_from_input(input)
     }
+
+    /// Full genuine process_idf315-322 handoff on the same IP and DataOutputs.
+    /// The existing prefix-only method remains unchanged for explicit legacy
+    /// callers; this production entry also performs the actual statistics child.
+    ///
+    /// # Errors
+    /// Retains the moved IP, all reached shared allocations and every actual
+    /// counter reset/increment before a typed child/domain failure.
+    pub fn initialize_source_input_processor(
+        &mut self,
+        input: super::selected_input_processor::SelectedInputProcessor,
+    ) -> Result<(), super::selected_input_processor::SelectedInputUnavailable> {
+        self.initialize_input_processor(input)?;
+        self.selected_input_processor
+            .as_ref()
+            .ok_or(super::selected_input_processor::SelectedInputUnavailable::Association)?
+            .report_source_idf_records_stats(&mut self.output_prescan)
+    }
 }
 
 /// Distinct actual initialization failures, retaining the original backend errors.

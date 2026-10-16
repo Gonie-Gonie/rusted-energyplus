@@ -100,6 +100,11 @@ impl CtfRunOutputs {
                     mdd: output_dir.join("eplusrs.mdd"),
                     audit: output_dir.join("eplusrs.audit"),
                     debug: output_dir.join("eplusrs.dbg"),
+                    tabular_csv: output_dir.join("eplustbl.csv"),
+                    tabular_tab: output_dir.join("eplustbl.tab"),
+                    tabular_fixed: output_dir.join("eplustbl.txt"),
+                    tabular_html: output_dir.join("eplustbl.htm"),
+                    tabular_xml: output_dir.join("eplustbl.xml"),
                 },
             ));
         }
@@ -317,6 +322,37 @@ impl CtfRunOutputs {
             &mut backend,
             shading_path,
             locals,
+        )
+    }
+
+    /// Same-owner genuine endrun566-590 after the primary continuation returns.
+    /// The existing outer PSY scope remains active; no run owner is recreated.
+    pub(crate) fn source_simulation_endrun_prefix(
+        &mut self,
+        weather: &ep_runtime::weather::day::ProductionWeatherTimestepSeries,
+    ) -> Result<(), ep_runtime::RuntimeError> {
+        use ep_runtime::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
+        let files = self.initialization_files.as_mut().ok_or_else(|| {
+            ep_runtime::RuntimeError::HeatBalanceInput(Box::new(
+                HeatBalanceInputError::Unavailable("actual retained Source files before endrun566"),
+            ))
+        })?;
+        let mut backend = SourceErrorBackend {
+            state: &mut self.state,
+            error_stream: Some(&mut self.error),
+            console: &mut self.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        files.source_simulation_endrun_prefix(
+            &mut self.source_session,
+            &mut self.reports,
+            weather,
+            &mut backend,
         )
     }
 
