@@ -3625,6 +3625,12 @@ fn prepare_runtime_inputs(
                     )?,
                     schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
                     sizing: crate::ordinary_sizing_input::resolve(raw_model)?,
+                    tabular: crate::ordinary_tabular_input::resolve(
+                        raw_model,
+                        selected_input_processor
+                            .as_ref()
+                            .ok_or("missing real IP projection")?,
+                    )?,
                     input_weather_file_path: config
                         .weather_path
                         .clone()
@@ -3715,11 +3721,9 @@ fn execute_rust_runtime(
             initialization.reports.selected_material_input = runtime_inputs.material_input.take();
             if let Some(raw) = runtime_inputs.reporting_prescan_input.take() {
                 initialization.reports.reporting_prescan_input = Some(raw);
-                initialization
-                    .post_input_processing()
-                    .map_err(|error| error.to_string())?;
             }
         }
+        ctf_outputs.initialize_source_reporting_and_post_input()?;
         {
             ctf_outputs.initialize_source_state(&model.typed.report_inputs)?;
             ctf_outputs.initialize_source_run_prefix(&model.typed.report_inputs)?;

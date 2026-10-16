@@ -50,9 +50,31 @@ pub(crate) struct SelectedZoneData {
     pub(crate) total_occupants: f64,
     /// ZoneData constructor-zero nominal load, written by IHG input EIO.
     pub(crate) internal_heat_gains: f64,
+    /// Actual ZoneData ctor-zero nominal flow totals, written by Air input4157/4158.
+    pub(crate) nominal_infiltration_ventilation: f64,
+    pub(crate) nominal_mixing: f64,
     pub(crate) is_part_of_total_area: bool,
     pub(crate) is_nominal_controlled: bool,
+    pub(crate) has_adjusted_return_temperature_by_ite: bool,
+    pub(crate) has_lights_return_air_gain: bool,
+    pub(crate) has_airflow_window_return: bool,
+    /// Actual constructor-empty ordered Source fuel vector; None is not appended.
+    pub(crate) other_equipment_fuels: Vec<i32>,
     pub(crate) linked_outdoor_air_node: i32,
+    /// Same genuine Zone/ZoneSpace fields consumed by ThirdOrder and real HVAC.
+    pub(crate) system_zone_node_number: i32,
+    pub(crate) is_controlled: bool,
+    pub(crate) is_supply_plenum: bool,
+    pub(crate) is_return_plenum: bool,
+    pub(crate) leakage_parallel_piu_numbers: Vec<f64>,
+    pub(crate) no_heat_to_return_air: bool,
+    pub(crate) adjusted_return_temperature_by_ite: f64,
+    pub(crate) sensible_capacity_multiplier: f64,
+    pub(crate) moisture_capacity_multiplier: f64,
+    pub(crate) carbon_dioxide_capacity_multiplier: f64,
+    pub(crate) generic_contaminant_capacity_multiplier: f64,
+    pub(crate) humidity_control_zone_index: i32,
+    pub(crate) air_heat_balance_imbalance_error_index: i32,
     pub(crate) space_indexes: Vec<i32>,
     pub(crate) num_spaces: i32,
     /// Actual Zone constructor-empty vectors; populated at SurfaceGeometry2652+.
@@ -108,9 +130,28 @@ impl Default for SelectedZoneData {
             outside_algorithm: Outside::SimpleCombined,
             total_occupants: 0.0,
             internal_heat_gains: 0.0,
+            nominal_infiltration_ventilation: 0.0,
+            nominal_mixing: 0.0,
             is_part_of_total_area: true,
             is_nominal_controlled: false,
+            has_adjusted_return_temperature_by_ite: false,
+            has_lights_return_air_gain: false,
+            has_airflow_window_return: false,
+            other_equipment_fuels: Vec::new(),
             linked_outdoor_air_node: 0,
+            system_zone_node_number: 0,
+            is_controlled: false,
+            is_supply_plenum: false,
+            is_return_plenum: false,
+            leakage_parallel_piu_numbers: Vec::new(),
+            no_heat_to_return_air: false,
+            adjusted_return_temperature_by_ite: 0.0,
+            sensible_capacity_multiplier: 1.0,
+            moisture_capacity_multiplier: 1.0,
+            carbon_dioxide_capacity_multiplier: 1.0,
+            generic_contaminant_capacity_multiplier: 1.0,
+            humidity_control_zone_index: 0,
+            air_heat_balance_imbalance_error_index: 0,
             space_indexes: Vec::new(),
             num_spaces: 0,
             ht_surface_list: Vec::new(),
@@ -131,9 +172,13 @@ impl Default for SelectedZoneData {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedSpaceData {
+    pub(crate) system_zone_node_number: i32,
+    pub(crate) is_controlled: bool,
     pub(crate) typed_space_id: Option<SpaceId>,
     pub(crate) name: String,
     pub(crate) zone_num: i32,
+    /// Actual SpaceData constructor-empty ordered Source fuel vector.
+    pub(crate) other_equipment_fuels: Vec<i32>,
     pub(crate) ceiling_height: f64,
     pub(crate) volume: f64,
     /// SpaceData fracZoneVolume constructor0, written at CalculateZoneVolume12262.
@@ -172,9 +217,12 @@ pub(crate) struct SelectedSpaceData {
 impl Default for SelectedSpaceData {
     fn default() -> Self {
         Self {
+            system_zone_node_number: 0,
+            is_controlled: false,
             typed_space_id: None,
             name: String::new(),
             zone_num: 0,
+            other_equipment_fuels: Vec::new(),
             ceiling_height: -99999.0,
             volume: -99999.0,
             fraction_zone_volume: 0.0,
@@ -221,6 +269,8 @@ pub(crate) struct SelectedZoneInputOwners {
     pub(crate) zone_daylight: Option<Vec<ZoneDaylight>>,
     pub(crate) resilience: Option<Vec<ZoneResilience>>,
     pub(crate) zone_predefined: Option<Vec<ZonePredefined>>,
+    /// Native DataHeatBalance.hh1998: distinct BuildingPreDefRep, actual constructor once.
+    pub(crate) building_predefined: ZonePredefined,
     pub(crate) spaces: Option<Vec<SelectedSpaceData>>,
     pub(crate) space_types: Option<Vec<String>>,
     pub(crate) space_lists: Option<Vec<std::convert::Infallible>>,

@@ -78,15 +78,35 @@ pub(crate) struct ProjectSystemVariables {
     pub(crate) dd_only: bool,
     pub(crate) full_annual_run: bool,
     pub(crate) report_during_warmup: bool,
+    /// Actual DataSystemVariables.hh130 constructor false.
+    pub(crate) update_data_during_warmup_external_interface: bool,
     pub(crate) developer_flag: bool,
     pub(crate) timing_flag: bool,
     pub(crate) report_detailed_warmup_convergence: bool,
     pub(crate) report_during_hvac_sizing_simulation: bool,
 }
 
+/// Actual DataConvergParams.hh111-123; positive Node histories remain unwritten until Source allocation/write.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceZoneInletConvergence {
+    pub(crate) zone_name: String,
+    pub(crate) number_inlet_nodes: i32,
+    pub(crate) inlet_nodes: Option<Vec<SourceNodeConvergenceLog>>,
+}
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceNodeConvergenceLog {
+    pub(crate) node_number: i32,
+    pub(crate) humidity_ratio: [Option<f64>; 10],
+    pub(crate) mass_flow_rate: [Option<f64>; 10],
+    pub(crate) temperature: [Option<f64>; 10],
+}
+
 /// Actual DataConvergParams constructor; absence writes the four getter defaults.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct ProjectConvergence {
+    /// DataConvergParams.hh183 actual EPVector; GetAirPath400 allocates it.
+    pub(crate) air_loop_convergence: Option<Vec<std::convert::Infallible>>,
+    pub(crate) zone_inlet_convergence: Option<Vec<SourceZoneInletConvergence>>,
     pub(crate) min_time_step_sys: f64,
     pub(crate) max_iter: i32,
     pub(crate) min_plant_sub_iterations: i32,
@@ -96,6 +116,8 @@ pub(crate) struct ProjectConvergence {
 impl Default for ProjectConvergence {
     fn default() -> Self {
         Self {
+            air_loop_convergence: None,
+            zone_inlet_convergence: None,
             min_time_step_sys: 1.0 / 60.0,
             max_iter: 20,
             min_plant_sub_iterations: 2,

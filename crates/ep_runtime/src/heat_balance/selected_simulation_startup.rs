@@ -7,6 +7,8 @@ use super::report_scan::{
 use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};
 use ep_model::ReportInputs;
+mod hvac_sizing;
+pub(crate) use hvac_sizing::SourceHvacSizingSimulationData;
 #[derive(Debug)]
 pub(crate) enum StartupError {
     Backend(SourceErrorBackendFailure),
@@ -60,6 +62,8 @@ pub(crate) struct SelectedRuntimeLanguage {
     pub(crate) number_of_fmu_import_actuators: usize,
     pub(crate) number_of_fmu_export_actuators: usize,
     pub(crate) number_of_ems_construction_indices: usize,
+    /// Actual DataRuntimeLanguage.hh765 ctor0; CheckIfAnyEMS does not write it.
+    pub(crate) number_of_erl_trend_variables: i32,
     pub(crate) output_edd_file: bool,
 }
 
@@ -68,8 +72,33 @@ pub(crate) struct SelectedRuntimeLanguage {
 pub(crate) struct SelectedHvacGlobals {
     /// DataHVACGlobals507 constructor; not DataSizing/NumAirLoops or a raw recount.
     pub(crate) number_of_primary_air_systems: i32,
+    /// Actual DataHVACGlobals.hh530/532 constructor false, genuine child writers.
+    pub(crate) air_loop_init: bool,
+    pub(crate) get_air_path_data_done: bool,
+    pub(crate) zone_mass_balance_hvac_resim: bool,
+    pub(crate) sim_air_loops: bool,
+    pub(crate) sim_electric_circuits: bool,
+    pub(crate) sim_plant_loops: bool,
+    pub(crate) sim_zone_equipment: bool,
+    pub(crate) sim_non_zone_equipment: bool,
+    pub(crate) minimum_air_loop_iterations_after_first: i32,
+    pub(crate) number_plant_loops: i32,
+    pub(crate) number_condenser_loops: i32,
+    pub(crate) setpoint_error_flag: bool,
+    pub(crate) do_setpoint_test: bool,
     pub(crate) time_step_sys: f64,
     pub(crate) time_step_sys_seconds: f64,
+    pub(crate) previous_time_step: f64,
+    /// Actual DataHVACGlobals.hh502/531 constructor true/false.
+    pub(crate) use_zone_time_step_history: bool,
+    pub(crate) air_loops_sim_once: bool,
+    pub(crate) shorten_time_step_sys_room_air: bool,
+    pub(crate) first_time_step_sys: bool,
+    pub(crate) system_time_elapsed: f64,
+    pub(crate) fraction_time_step_zone: f64,
+    pub(crate) shorten_time_step_sys: bool,
+    pub(crate) number_system_time_steps: i32,
+    pub(crate) number_system_time_steps_last_zone: i32,
     pub(crate) limit_num_sys_steps: i32,
     pub(crate) deviation_from_setpoint_heating: f64,
     pub(crate) deviation_from_setpoint_cooling: f64,
@@ -78,8 +107,31 @@ impl Default for SelectedHvacGlobals {
     fn default() -> Self {
         Self {
             number_of_primary_air_systems: 0,
+            air_loop_init: false,
+            get_air_path_data_done: false,
+            zone_mass_balance_hvac_resim: false,
+            sim_air_loops: false,
+            sim_electric_circuits: false,
+            sim_plant_loops: false,
+            sim_zone_equipment: false,
+            sim_non_zone_equipment: false,
+            minimum_air_loop_iterations_after_first: 1,
+            number_plant_loops: 0,
+            number_condenser_loops: 0,
+            setpoint_error_flag: false,
+            do_setpoint_test: false,
             time_step_sys: 0.0,
             time_step_sys_seconds: 0.0,
+            previous_time_step: 0.0,
+            use_zone_time_step_history: true,
+            air_loops_sim_once: false,
+            shorten_time_step_sys_room_air: false,
+            first_time_step_sys: false,
+            system_time_elapsed: 0.0,
+            fraction_time_step_zone: 0.0,
+            shorten_time_step_sys: false,
+            number_system_time_steps: 1,
+            number_system_time_steps_last_zone: 1,
             limit_num_sys_steps: 0,
             deviation_from_setpoint_heating: -0.2,
             deviation_from_setpoint_cooling: 0.2,
@@ -131,6 +183,8 @@ pub(crate) struct SelectedSimulationStartup {
     /// Actual SimulationManager205 result, written before either init guard.
     pub(crate) run_periods_in_input: bool,
     pub(crate) hvac_globals: SelectedHvacGlobals,
+    /// Sole actual HVACSizingSimMgrData retained nullable pointer, genuine constructor null.
+    pub(crate) hvac_sizing_simulation: SourceHvacSizingSimulationData,
 }
 impl SelectedSimulationStartup {
     pub(crate) fn check_if_any_ems(

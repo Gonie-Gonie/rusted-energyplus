@@ -65,6 +65,10 @@ pub struct HeatBalanceState {
     /// Present only for the explicitly admitted ordinary A temperature route.
     pub(crate) ordinary_inside_temperatures:
         Option<super::ordinary_inside_temperatures::OrdinaryInsideTemperatures>,
+    /// Sole genuine InitSurface manager and Source surface-array owner.
+    /// Its shared firstTime is independent of the radiant child constructor.
+    pub(crate) ordinary_surface_initialization:
+        Option<Box<super::ordinary_surface_initialization::OrdinarySurfaceInitialization>>,
     /// Persistent selected global BeginEnvrn guard shared by all zone owners.
     pub zone_air_environment_guard: ZoneAirEnvironmentGuard,
     /// Per-surface heat-balance state.

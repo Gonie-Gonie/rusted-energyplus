@@ -288,7 +288,7 @@ pub(super) fn finish_period(
     Ok(())
 }
 
-fn setup_weekdays(
+pub(super) fn setup_weekdays(
     start_month: i32,
     start_day: i32,
     start_weekday: i32,

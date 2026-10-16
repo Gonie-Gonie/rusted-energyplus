@@ -707,6 +707,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         }
         state.selected_heat_balance_globals = actual.reports.selected_heat_balance_globals.take();
         state.selected_zone_input = actual.reports.selected_zone_input.take();
+        state.ordinary_surface_initialization = Some(Default::default());
         if selected_world_geometry {
             state.ordinary_equipment = actual.reports.source_zone_equipment.take();
         }

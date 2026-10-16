@@ -25,13 +25,20 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             | "Building"
             | "Construction"
             | "OtherEquipment"
+            | "Exterior:Lights"
             | "SurfaceConvectionAlgorithm:Inside"
             | "SurfaceConvectionAlgorithm:Outside"
             | "ZoneAirHeatBalanceAlgorithm"
             | "Output:VariableDictionary"
             | "Output:Surfaces:Drawing"
             | "Output:Constructions"
-            | "Output:Variable",
+            | "Output:Variable"
+            | "Output:Meter"
+            | "Output:Meter:MeterFileOnly"
+            | "Output:Meter:Cumulative"
+            | "Output:Meter:Cumulative:MeterFileOnly"
+            | "OutputControl:Table:Style"
+            | "Output:Table:SummaryReports",
             "idf_order" | "idf_max_fields" | "idf_max_extensible_fields",
         ) => {
             matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())

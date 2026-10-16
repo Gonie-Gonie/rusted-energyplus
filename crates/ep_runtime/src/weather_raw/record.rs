@@ -52,6 +52,21 @@ pub fn interpret_weather_data_line(
     line: &str,
     outputs: &mut RawEpwOutputs,
 ) -> Result<(), RawRecordFailure> {
+    interpret_weather_data_line_with_live_counter(
+        &owner.end_day_of_month,
+        &mut owner.weather_code_missed_count,
+        line,
+        outputs,
+    )
+}
+
+/// Same genuine parser body, with the actual caller's single mutable counter.
+pub(crate) fn interpret_weather_data_line_with_live_counter(
+    end_day_of_month: &[i32; 12],
+    weather_code_missed_count: &mut i32,
+    line: &str,
+    outputs: &mut RawEpwOutputs,
+) -> Result<(), RawRecordFailure> {
     outputs.error_found = false;
     if !line.is_ascii() {
         return Err(RawRecordFailure::OutsideBoundedDomain(
@@ -75,7 +90,7 @@ pub fn interpret_weather_data_line(
     if !(1..=12).contains(&month) {
         return Err(RawRecordFailure::SourceFatalDateAdmission);
     }
-    let max_day = owner.end_day_of_month[(month - 1) as usize]
+    let max_day = end_day_of_month[(month - 1) as usize]
         .checked_add(i32::from(month == 2))
         .ok_or(RawRecordFailure::OutsideBoundedDomain(
             "bounded month-end addition",
@@ -147,10 +162,9 @@ pub fn interpret_weather_data_line(
                 };
             }
         } else {
-            owner.weather_code_missed_count =
-                owner.weather_code_missed_count.checked_add(1).ok_or(
-                    RawRecordFailure::OutsideBoundedDomain("bounded counter increment"),
-                )?;
+            *weather_code_missed_count = weather_code_missed_count.checked_add(1).ok_or(
+                RawRecordFailure::OutsideBoundedDomain("bounded counter increment"),
+            )?;
             outputs.weather_codes.fill(9);
         }
     } else {

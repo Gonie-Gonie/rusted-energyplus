@@ -31,7 +31,20 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedSizingInput, String> {
             .push(SelectedSummaryReportInput {
                 object_name: name.0.clone(),
                 reports: values,
+                idf_max_fields: metadata(object, "idf_max_fields")?,
+                idf_max_extensible_fields: metadata(object, "idf_max_extensible_fields")?,
             });
     }
     Ok(result)
+}
+
+fn metadata(object: &ep_raw_model::RawObject, field: &str) -> Result<Option<usize>, String> {
+    match object.fields.get(&FieldName(field.into())) {
+        None => Ok(None),
+        Some(RawValue::Number(value)) => value
+            .parse::<usize>()
+            .map(Some)
+            .map_err(|_| format!("actual SummaryReports {field} integer")),
+        _ => Err(format!("actual SummaryReports {field} JSON shape")),
+    }
 }

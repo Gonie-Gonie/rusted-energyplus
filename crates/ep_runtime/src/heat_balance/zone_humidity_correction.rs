@@ -298,10 +298,12 @@ pub fn correct_selected_zone_humidity_ratio(
         + sources.m_dot_oa;
     let c = rho_air * context.volume * context.moisture_capacitance_multiplier
         / context.time_step_sys_seconds;
-    state.air_hum_rat_temp = (b + c
-        * (3.0 * state.w_prev_zone_ts_temp[0] - (3.0 / 2.0) * state.w_prev_zone_ts_temp[1]
-            + (1.0 / 3.0) * state.w_prev_zone_ts_temp[2]))
-        / ((11.0 / 6.0) * c + a);
+    state.air_hum_rat_temp = super::zone_predictor_corrector::source_third_order_air_value(
+        b,
+        c,
+        &state.w_prev_zone_ts_temp,
+        a,
+    );
     if state.air_hum_rat_temp < 0.0 {
         state.air_hum_rat_temp = 0.0;
     }

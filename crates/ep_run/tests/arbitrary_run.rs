@@ -31,7 +31,7 @@ use fixtures::*;
 mod output_manifest;
 
 use output_manifest::{
-    BLOCKED_AFTER_SUPPORT_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_ordinary_output_manifest,
+    BLOCKED_AFTER_SUPPORT_MANIFEST, assert_ordinary_output_manifest,
     assert_output_manifest,
 };
 
@@ -733,7 +733,7 @@ fn partial_output_request_runs_when_allowed() -> Result<(), Box<dyn std::error::
         RunResultState::PartialSupportedRun
     );
     assert_output_layout(&output_dir, true)?;
-    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
+    assert_ordinary_output_manifest(&output_dir)?;
 
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(summary["status"], "success");

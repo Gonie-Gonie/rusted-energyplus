@@ -1,7 +1,7 @@
 //! Literal CalculateDailySolarCoeffs4128-4234 and selected sun-z calculation.
 
 #[derive(Clone, Copy)]
-pub(super) struct Coefficients {
+pub(in super::super) struct Coefficients {
     pub a: f64,
     pub b: f64,
     pub c: f64,
@@ -32,6 +32,29 @@ fn series(coefficients: [f64; 9], sine: f64, cosine: f64) -> f64 {
 }
 
 pub(super) fn daily_coefficients(day: i32, latitude: f64) -> Coefficients {
+    calculate_daily_coefficients(day, latitude, |_, _| {})
+}
+#[derive(Clone, Copy)]
+enum DailySolarField {
+    SineDeclination,
+    CosineDeclination,
+    EquationOfTime,
+}
+pub(in super::super) fn source_daily_coefficients(
+    day: &mut super::super::DailyWeatherVariables,
+    latitude: f64,
+) -> Coefficients {
+    calculate_daily_coefficients(day.day_of_year, latitude, |field, value| match field {
+        DailySolarField::SineDeclination => day.sin_solar_declin_angle = value,
+        DailySolarField::CosineDeclination => day.cos_solar_declin_angle = value,
+        DailySolarField::EquationOfTime => day.equation_of_time = value,
+    })
+}
+fn calculate_daily_coefficients(
+    day: i32,
+    latitude: f64,
+    mut write_field: impl FnMut(DailySolarField, f64),
+) -> Coefficients {
     const DECLINATION: [f64; 9] = [
         0.00561800,
         0.0657911,
@@ -84,8 +107,11 @@ pub(super) fn daily_coefficients(day: i32, latitude: f64) -> Coefficients {
     let mut sine = angle.sin();
     let mut cosine = angle.cos();
     let sin_declination = series(DECLINATION, sine, cosine);
+    write_field(DailySolarField::SineDeclination, sin_declination);
     let cos_declination = (1.0 - sin_declination * sin_declination).sqrt();
+    write_field(DailySolarField::CosineDeclination, cos_declination);
     let equation_of_time = series(EQUATION, sine, cosine);
+    write_field(DailySolarField::EquationOfTime, equation_of_time);
     let annual_variation = 1.000047 + 0.000352615 * sine + 0.0334454 * cosine;
     let a = series(A, sine, cosine);
     if latitude < 0.0 {
@@ -124,7 +150,7 @@ pub(super) fn cosine_zenith(
         + coefficients.cos_declination * latitude.cos() * hour_angle.cos()
 }
 
-pub(super) fn clear_sky_radiation(
+pub(in super::super) fn clear_sky_radiation(
     cosine_zenith: f64,
     sky_clear: f64,
     coefficients: Coefficients,

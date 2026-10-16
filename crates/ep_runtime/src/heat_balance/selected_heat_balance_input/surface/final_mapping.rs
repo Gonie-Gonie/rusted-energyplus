@@ -15,20 +15,47 @@ use ep_model::{
 pub(crate) struct FinalSurface {
     pub(crate) row: SurfaceTmpInput,
     pub(crate) original_class: SurfaceClass,
+    /// Actual SurfaceData ctor Invalid/zero plane/default Surface2D, written at ManageHB183.
+    pub(crate) shape_cat: super::computed_geometry::SourceComputedShapeCategory,
+    pub(crate) plane: [f64; 4],
+    pub(crate) surface_2d: super::computed_geometry::SourceComputedSurface2D,
     /// Genuine SurfaceData constructor -1; actual2882 writes this same final owner.
     pub(crate) representative_calc_surface_num: i32,
     // SurfaceData constructor explicitly initializes Centroid(0,0,0).
     pub(crate) centroid: [f64; 3],
     pub(crate) typed_id: Option<SurfaceId>,
+    /// Actual SurfaceData ctor839/844; positive multiplier/local getters excluded.
+    pub(crate) has_incident_solar_multiplier: bool,
+    pub(crate) incident_solar_multiplier: f64,
+    pub(crate) use_ground_surface_reflectance: bool,
+    pub(crate) ground_reflected_solar_radiation: f64,
+    pub(crate) has_surrounding_surface_property: bool,
+    pub(crate) surrounding_surface_view_factor: f64,
+    /// Actual SurfaceData.hh840/843/844 constructor fields.
+    pub(crate) oscm_ptr: i32,
+    pub(crate) is_ground_surface_property_defined: bool,
+    pub(crate) use_ground_surface_temperature: bool,
 }
 impl Default for FinalSurface {
     fn default() -> Self {
         Self {
             row: SurfaceTmpInput::default(),
             original_class: SurfaceClass::default(),
+            shape_cat: super::computed_geometry::SourceComputedShapeCategory::Invalid,
+            plane: [0.0; 4],
+            surface_2d: super::computed_geometry::SourceComputedSurface2D::default(),
             representative_calc_surface_num: -1,
             centroid: [0.0; 3],
             typed_id: None,
+            has_incident_solar_multiplier: false,
+            incident_solar_multiplier: 1.0,
+            use_ground_surface_reflectance: false,
+            ground_reflected_solar_radiation: 0.0,
+            has_surrounding_surface_property: false,
+            surrounding_surface_view_factor: 0.0,
+            oscm_ptr: 0,
+            is_ground_surface_property_defined: false,
+            use_ground_surface_temperature: false,
         }
     }
 }

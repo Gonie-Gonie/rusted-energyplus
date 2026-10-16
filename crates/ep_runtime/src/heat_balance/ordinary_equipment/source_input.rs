@@ -1,6 +1,8 @@
 //! Source GetZoneEquipment over the same retained InputProcessor.
 //! Local getter arrays do not overwrite the unrelated shared IP shortcut.
 use super::*;
+use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_input_processor::{SelectedInputProcessor, SourceArgumentCounts};
 
 fn definition(
@@ -36,6 +38,8 @@ impl OrdinaryEquipment {
         clock: OrdinaryEquipmentInput,
         space_sizing: bool,
         space_simulation: bool,
+        globals: &SelectedHeatBalanceGlobals,
+        gains: &mut SelectedInternalHeatGains,
     ) -> Result<(), Unavailable> {
         if self.input.is_some()
             || clock.timesteps_per_hour == 0
@@ -47,9 +51,13 @@ impl OrdinaryEquipment {
         if !self.get_equipment_input {
             return Ok(());
         }
-        self.get_zone_equipment_data_source(input, space_sizing, space_simulation)?;
+        self.get_zone_equipment_data_source(input, space_sizing, space_simulation, globals, gains)?;
         self.finish_get_zone_equipment(clock.timesteps_per_hour)?;
-        self.validate_initialized(&self.zone_ids.clone(), &self.space_ids.clone())
+        self.validate_initialized_storage(
+            &self.zone_ids.clone(),
+            &self.space_ids.clone(),
+            Some(gains),
+        )
     }
 
     fn get_zone_equipment_data_source(
@@ -57,6 +65,8 @@ impl OrdinaryEquipment {
         input: &mut SelectedInputProcessor,
         space_sizing: bool,
         space_simulation: bool,
+        globals: &SelectedHeatBalanceGlobals,
+        gains: &mut SelectedInternalHeatGains,
     ) -> Result<(), Unavailable> {
         // Original224-227: the real three counts precede all definitions.
         let controlled_zones = input.get_num_objects_found("ZoneHVAC:EquipmentConnections");
@@ -103,8 +113,11 @@ impl OrdinaryEquipment {
             }
             self.return_paths = Some(Vec::new());
         }
-        self.internal_gains
-            .allocate_if_zone_unallocated(self.zone_ids.len(), self.space_ids.len());
+        let num_zones =
+            usize::try_from(globals.num_of_zones).map_err(|_| Unavailable::InconsistentOwner)?;
+        let num_spaces =
+            usize::try_from(globals.num_spaces).map_err(|_| Unavailable::InconsistentOwner)?;
+        gains.allocate_source_internal_gains_if_unallocated(num_zones, num_spaces);
         self.zone_config = Some(vec![EquipmentConfig::default(); self.zone_ids.len()]);
         if space_sizing || space_simulation {
             return Err(Unavailable::Input(

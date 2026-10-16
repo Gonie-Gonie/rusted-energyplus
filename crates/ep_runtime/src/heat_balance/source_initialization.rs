@@ -18,8 +18,17 @@ use ep_model::ReportInputs;
 use std::io;
 
 mod files;
+mod kickoff_postlude;
+pub(crate) use kickoff_postlude::SourceFaultsManager;
+mod output_reporting;
+mod simulation_parent;
+pub(crate) use output_reporting::SourceSqliteState;
+pub(crate) mod primary_startup_surfaces;
 mod run_prefix;
-pub(crate) use files::ScheduleAuditFileHost;
+mod unopened_weather;
+pub(crate) use files::{
+    ScheduleAuditFileHost, SourceRuntimeMeterStreams, SourceRuntimeReportStreams,
+};
 pub use files::{SourceInitializationFilePaths, SourceInitializationFiles};
 
 /// Actual raw operands supplied after the same ordinary input admission.
@@ -31,6 +40,8 @@ pub struct SourceInitializationInput {
     pub schedules: super::selected_schedule_manager::SelectedScheduleInput,
     /// Actual ordered SummaryReports inputs for ManageSizing234.
     pub sizing: super::selected_sizing::SelectedSizingInput,
+    /// Actual ordered Table:Style operands admitted by the same input processor.
+    pub tabular: super::ordinary_tabular_reports::SelectedTabularInput,
     /// Caller-supplied genuine weather path for CheckEnvironment213 fileExists.
     pub input_weather_file_path: std::path::PathBuf,
     /// Genuine command-line DesignDay-only request, separate from process settings.
@@ -76,6 +87,37 @@ pub enum SourceInitializationError {
     /// Later weather allocation failed while the same pre-weather state is retained.
     Weather(WeatherDayError),
 }
+// RuntimeError's established PartialEq API needs an explicit rule for this new
+// typed branch. Defined value variants compare values; opaque/resource causes
+// compare their actual identities. No error is formatted or replaced for equality.
+impl PartialEq for SourceInitializationError {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Association(a), Self::Association(b)) => a == b,
+            (Self::Weather(a), Self::Weather(b)) => a == b,
+            (
+                Self::Project(ProjectDataError::Unavailable(a)),
+                Self::Project(ProjectDataError::Unavailable(b)),
+            ) => a == b,
+            (
+                Self::Project(ProjectDataError::Format(a)),
+                Self::Project(ProjectDataError::Format(b)),
+            ) => a == b,
+            (Self::Project(a), Self::Project(b)) => std::ptr::eq(a, b),
+            (Self::Io(a), Self::Io(b)) => std::ptr::eq(a, b),
+            (
+                Self::Handler { handler: a, source: x },
+                Self::Handler { handler: b, source: y },
+            ) => a == b && std::ptr::eq(x.as_ref(), y.as_ref()),
+            (
+                Self::Fatal { source: a, stop: x },
+                Self::Fatal { source: b, stop: y },
+            ) => std::ptr::eq(a, b) && std::ptr::eq(x, y),
+            _ => false,
+        }
+    }
+}
+
 macro_rules! from_error {
     ($source:ty, $variant:ident) => {
         impl From<$source> for SourceInitializationError {
@@ -150,7 +192,7 @@ impl std::error::Error for SourceInitializationError {
 fn open_output_files(
     files: &mut SourceInitializationFiles,
     backend: &mut SourceErrorBackend<'_>,
-    record_count: &mut i32,
+    record_count: &mut i64,
 ) -> Result<(), SourceInitializationError> {
     *record_count = 0; // SimulationManager1747, before the first ensure_open.
     for index in 0..4 {
@@ -220,8 +262,6 @@ impl CtfInitializationReports {
             raw.reverse_design_days,
         )?;
         backend.state.developer_flag = project.system.developer_flag;
-        weather.global.begin_sim_flag = true;
-        weather.global.do_output_reporting = false;
         Ok(())
     }
 
@@ -299,6 +339,7 @@ impl CtfInitializationReports {
             startup.run_periods_in_input = input.get_num_objects_found("RunPeriod") > 0
                 || input.get_num_objects_found("RunPeriod:CustomRange") > 0
                 || project.system.full_annual_run;
+            backend.state.tracking.ask_for_connections_report = false; // Actual208.
         }
         if !self.source_initialization_guards.init_constant_state_called {
             self.source_initialization_guards.init_constant_state_called = true;

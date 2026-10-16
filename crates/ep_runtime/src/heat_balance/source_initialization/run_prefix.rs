@@ -144,6 +144,7 @@ impl CtfInitializationReports {
                 backend,
             )
             .map_err(|e| failure("ManageSizing234", e))?;
+        self.source_run_sims_done = Some(false); // Actual caller local236.
         if weather.global.do_des_day_sim
             || weather.global.do_weath_sim
             || globals.do_hvac_sizing_simulation

@@ -62,9 +62,34 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "SimulationControl",
         name_field_index: 0,
     },
+    // Actual TAB style/summary getters require real staged field counts.
+    IdfOrderTarget {
+        object_type: "OutputControl:Table:Style",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Table:SummaryReports",
+        name_field_index: 0,
+    },
     // OutputProcessor's actual getter requires the same unnamed-object order.
     IdfOrderTarget {
         object_type: "Output:Variable",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Meter",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Meter:MeterFileOnly",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Meter:Cumulative",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Meter:Cumulative:MeterFileOnly",
         name_field_index: 0,
     },
     // IdfParser.cc277-301 generates these unnamed keys from the per-type count.
@@ -163,6 +188,16 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
     },
     IdfOrderTarget {
         object_type: "Site:GroundTemperature:Deep",
+        name_field_index: 0,
+    },
+    // Actual GetLocationInfo uses the named Site:Location's IDF metadata.
+    IdfOrderTarget {
+        object_type: "Site:Location",
+        name_field_index: 0,
+    },
+    // Actual Exterior getter reads named lights in staged IDF declaration order.
+    IdfOrderTarget {
+        object_type: "Exterior:Lights",
         name_field_index: 0,
     },
     // InternalHeatGains::GetInternalHeatGainsInput reads named OtherEquipment
@@ -341,6 +376,8 @@ pub fn apply_idf_declaration_order(
                         | "Zone"
                         | "BuildingSurface:Detailed"
                         | "OtherEquipment"
+                        | "Exterior:Lights"
+                        | "Site:Location"
                 )
             {
                 report_field_counts.push((
@@ -350,14 +387,20 @@ pub fn apply_idf_declaration_order(
                         "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
+                        "Site:Location" => idf_object.max_fields.max(5),
                         "Site:GroundTemperature:BuildingSurface"
                         | "Site:GroundTemperature:FCfactorMethod"
                         | "Site:GroundTemperature:Shallow"
                         | "Site:GroundTemperature:Deep" => idf_object.max_fields.max(12),
                         _ => idf_object.max_fields,
                     },
-                    (target.object_type == "BuildingSurface:Detailed")
-                        .then_some(idf_object.max_fields.saturating_sub(11)),
+                    match target.object_type {
+                        "BuildingSurface:Detailed" => {
+                            Some(idf_object.max_fields.saturating_sub(11))
+                        }
+                        "Output:Table:SummaryReports" => Some(idf_object.max_fields),
+                        _ => None,
+                    },
                 ));
             }
             ordered_names.push(actual_name);
@@ -541,6 +584,12 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
             | "Output:Constructions"
             | "Output:EnergyManagementSystem"
             | "Output:Variable"
+            | "Output:Meter"
+            | "Output:Meter:MeterFileOnly"
+            | "Output:Meter:Cumulative"
+            | "Output:Meter:Cumulative:MeterFileOnly"
+            | "OutputControl:Table:Style"
+            | "Output:Table:SummaryReports"
     )
 }
 

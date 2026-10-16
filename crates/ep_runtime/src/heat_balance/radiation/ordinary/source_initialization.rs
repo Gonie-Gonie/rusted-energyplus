@@ -84,6 +84,7 @@ impl OrdinarySolarRadiation {
                 }
             })?
         };
+        self.radiant_exchange.view_factor_report = report;
         if report {
             // The first unported operation is the actual824 full-report header.
             return Err(unavailable(OrdinaryRadiationUnavailable::ViewFactorReport));
@@ -250,15 +251,15 @@ impl OrdinarySolarRadiation {
                     .get(index(surface_number)?)
                     .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::EnclosureDomain))?
                     .row;
-                let properties = row
-                    .vertex_progress
-                    .properties
-                    .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::EnclosureDomain))?;
-                enclosure.area[position] = properties.area_m2;
+                enclosure.area[position] = row.area;
                 enclosure.absorptance[position] = constructions
                     .get(index(row.construction)?)
                     .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::EnclosureDomain))?
                     .inside_absorp_solar;
+                let properties = row
+                    .vertex_progress
+                    .properties
+                    .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::EnclosureDomain))?;
                 enclosure.azimuth[position] = properties.azimuth_deg;
                 enclosure.tilt[position] = properties.tilt_deg;
             }

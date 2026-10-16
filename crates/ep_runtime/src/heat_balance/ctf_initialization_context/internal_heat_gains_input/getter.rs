@@ -65,14 +65,8 @@ impl SelectedInternalHeatGains {
                 "same actual internal-gain Zone/Space count association",
             ));
         }
+        self.allocate_source_internal_gains_if_unallocated(nz, ns);
         let alloc = &mut self.allocations;
-        if alloc.zone_int_gain.is_none() {
-            // DataHeatBalance1044-1047: each is the same retained collection.
-            alloc.zone_int_gain = Some(vec![[0.0; 2]; nz]);
-            alloc.space_int_gain = Some(vec![[0.0; 2]; ns]);
-            alloc.space_devices = Some(vec![Default::default(); ns]);
-            alloc.space_power_reduction_factor = Some(vec![1.0; ns]);
-        }
         alloc.zone_report = Some(vec![SourceGainReport::default(); nz]);
         alloc.space_report = Some(vec![SourceGainReport::default(); ns]);
         alloc.zone_electric_end_use = Some(vec![[[0.0; 26]; 4]; nz]);

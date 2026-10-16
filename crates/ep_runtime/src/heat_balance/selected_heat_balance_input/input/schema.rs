@@ -257,6 +257,186 @@ const OTHER: &[Field] = &[
         retain_case: true,
     },
 ];
+// Genuine Exterior:Lights IDD27346-27372: actual 4alpha/1number order.
+const EXTERIOR_LIGHTS: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "schedule_name",
+        legacy: "Schedule Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "design_level",
+        legacy: "Design Level",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "control_option",
+        legacy: "Control Option",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "end_use_subcategory",
+        legacy: "End-Use Subcategory",
+        default: DefaultValue::Alpha("General"),
+        retain_case: true,
+    },
+];
+// Literal Site:Location IDD995?1035, min_fields5, 2alpha4number.
+const SITE_LOCATION: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "latitude",
+        legacy: "Latitude",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "longitude",
+        legacy: "Longitude",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "time_zone",
+        legacy: "Time Zone",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "elevation",
+        legacy: "Elevation",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "keep_site_location_information",
+        legacy: "Keep Site Location Information",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+];
+// Actual unnamed Output:Meter four-family IDD108387-108495; default Hourly.
+const OUTPUT_METER: &[Field] = &[
+    Field {
+        json: "key_name",
+        legacy: "Key Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "reporting_frequency",
+        legacy: "Reporting Frequency",
+        default: DefaultValue::Alpha("Hourly"),
+        retain_case: false,
+    },
+];
+// Actual RunPeriod IDD1398–1487,9alpha6numeric,min_fields7; no new query owner.
+const RUN_PERIOD: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "begin_month",
+        legacy: "Begin Month",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "begin_day_of_month",
+        legacy: "Begin Day of Month",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "begin_year",
+        legacy: "Begin Year",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "end_month",
+        legacy: "End Month",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "end_day_of_month",
+        legacy: "End Day of Month",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "end_year",
+        legacy: "End Year",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "day_of_week_for_start_day",
+        legacy: "Day of Week for Start Day",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "use_weather_file_holidays_and_special_days",
+        legacy: "Use Weather File Holidays and Special Days",
+        default: DefaultValue::Alpha("Yes"),
+        retain_case: false,
+    },
+    Field {
+        json: "use_weather_file_daylight_saving_period",
+        legacy: "Use Weather File Daylight Saving Period",
+        default: DefaultValue::Alpha("Yes"),
+        retain_case: false,
+    },
+    Field {
+        json: "apply_weekend_holiday_rule",
+        legacy: "Apply Weekend Holiday Rule",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+    Field {
+        json: "use_weather_file_rain_indicators",
+        legacy: "Use Weather File Rain Indicators",
+        default: DefaultValue::Alpha("Yes"),
+        retain_case: false,
+    },
+    Field {
+        json: "use_weather_file_snow_indicators",
+        legacy: "Use Weather File Snow Indicators",
+        default: DefaultValue::Alpha("Yes"),
+        retain_case: false,
+    },
+    Field {
+        json: "treat_weather_as_actual",
+        legacy: "Treat Weather as Actual",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+    Field {
+        json: "first_hour_interpolation_starting_values",
+        legacy: "First Hour Interpolation Starting Values",
+        default: DefaultValue::Alpha("Hour24"),
+        retain_case: false,
+    },
+];
 pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
     match family {
         "Building" => Some((F0, 8, true)),
@@ -266,6 +446,14 @@ pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
         "ZoneAirHeatBalanceAlgorithm" => Some((F4, 2, false)),
         "Construction" => Some((F5, 0, true)),
         "OtherEquipment" => Some((OTHER, 11, true)),
+        "Exterior:Lights" => Some((EXTERIOR_LIGHTS, 0, true)),
+        "Site:Location" => Some((SITE_LOCATION, 5, true)),
+        "RunPeriod" => Some((RUN_PERIOD, 7, true)),
+        "SizingPeriod:DesignDay" => Some((super::design_day_schema::DESIGN_DAY, 0, true)),
+        "Output:Meter"
+        | "Output:Meter:MeterFileOnly"
+        | "Output:Meter:Cumulative"
+        | "Output:Meter:Cumulative:MeterFileOnly" => Some((OUTPUT_METER, 0, false)),
         _ => None,
     }
 }

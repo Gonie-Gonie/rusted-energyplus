@@ -25,7 +25,11 @@ pub(super) struct Field {
     pub(super) default: DefaultValue,
     pub(super) retain_case: bool,
 }
+mod design_day_schema;
+pub(crate) mod local_getter;
+mod mixed_getter;
 mod schema;
+mod shared_getter;
 pub(crate) struct GetterValues<const A: usize, const N: usize> {
     pub(crate) alphas: [String; A],
     pub(crate) numbers: [f64; N],

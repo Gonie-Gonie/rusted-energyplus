@@ -1,5 +1,11 @@
 //! Actual geometry GetZoneEquipment subset; no HVAC or dispatcher activation.
+mod heat_to_return_air;
+pub(crate) mod management;
+mod node_reporting;
 mod source_input;
+mod source_marked_nodes;
+mod source_reset;
+mod source_setup_reporting;
 
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
 use crate::node::NodeStateStore;
@@ -141,6 +147,8 @@ struct EquipmentConfig {
     exhaust_nodes: usize,
     return_nodes: usize,
     is_controlled: bool,
+    /// Actual DataZoneEquipment EquipConfiguration constructorfalse; genuine HVAC writer.
+    zonal_system_only: bool,
     in_floor_active_element: bool,
     in_wall_active_element: bool,
     in_ceiling_active_element: bool,
@@ -157,6 +165,7 @@ impl Default for EquipmentConfig {
             exhaust_nodes: 0,
             return_nodes: 0,
             is_controlled: false,
+            zonal_system_only: false,
             in_floor_active_element: false,
             in_wall_active_element: false,
             in_ceiling_active_element: false,
@@ -218,6 +227,11 @@ struct NodeOwner {
     context_name: String,
     number_of_check_nodes: usize,
     max_check_nodes: usize,
+    reporting: node_reporting::SourceNodeReporting,
+    node_variables_setup: bool,
+    more_node_info: Option<Vec<source_setup_reporting::SourceMoreNodeData>>,
+    marked_nodes: Option<Vec<source_marked_nodes::SourceMarkedNode>>,
+    node_references: Option<Vec<i32>>,
 }
 
 impl Default for NodeOwner {
@@ -233,6 +247,11 @@ impl Default for NodeOwner {
             context_name: String::new(),
             number_of_check_nodes: 0,
             max_check_nodes: 0,
+            reporting: node_reporting::SourceNodeReporting::default(),
+            node_variables_setup: false,
+            more_node_info: None,
+            marked_nodes: None,
+            node_references: None,
         }
     }
 }
@@ -303,6 +322,20 @@ pub(crate) struct OrdinaryEquipment {
     get_equipment_input: bool,
     equipment_inputs_filled: bool,
     equipment_simulated_once: bool,
+    management_modules: management::SourceEquipmentManagementModules,
+    zone_equipment_mixers: Vec<std::convert::Infallible>,
+    zone_return_mixers: Vec<std::convert::Infallible>,
+    init_equipment_one_time_flag: bool,
+    init_equipment_environment_flag: bool,
+    first_pass_zone_equipment_flag: bool,
+    space_config: Option<Vec<EquipmentConfig>>,
+    /// Same native DataDefineEquip.AirDistUnit; constructor-unallocated, positive rows unported.
+    air_distribution_units: Option<Vec<std::convert::Infallible>>,
+    /// Actual DataZoneEquipment.hh634–635 counts and arrays; native default0/None.
+    number_exhaust_air_systems: i32,
+    number_zone_exhaust_controls: i32,
+    exhaust_air_systems: Option<Vec<std::convert::Infallible>>,
+    zone_exhaust_controls: Option<Vec<std::convert::Infallible>>,
     equipment_data_errors_found: bool,
     equipment_data_found: usize,
     number_of_equipment_lists: usize,
@@ -315,6 +348,25 @@ pub(crate) struct OrdinaryEquipment {
     equipment_lists: Option<Vec<EquipmentList>>,
     equipment_availability: Option<Vec<i32>>,
     priority_simulation_order: Option<Vec<()>>,
+}
+
+/// Borrowed actual DataZoneEquip Config record, with no copied scalar flags.
+pub(crate) struct SourceZoneEquipmentConfigRef<'a> {
+    row: &'a EquipmentConfig,
+}
+impl SourceZoneEquipmentConfigRef<'_> {
+    pub(crate) fn is_controlled(&self) -> &bool {
+        &self.row.is_controlled
+    }
+    pub(crate) fn number_inlet_nodes(&self) -> &usize {
+        &self.row.inlet_nodes
+    }
+    pub(crate) fn number_exhaust_nodes(&self) -> &usize {
+        &self.row.exhaust_nodes
+    }
+    pub(crate) fn number_return_nodes(&self) -> &usize {
+        &self.row.return_nodes
+    }
 }
 
 /// A borrow of actual Config storage, never a flags projection or snapshot.
@@ -347,6 +399,77 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    pub(crate) fn source_number_return_paths(&self) -> &usize {
+        &self.number_of_return_paths
+    }
+    pub(crate) fn source_number_supply_paths(&self) -> &usize {
+        &self.number_of_supply_paths
+    }
+    pub(crate) fn source_air_distribution_units(&self) -> Option<&[std::convert::Infallible]> {
+        self.air_distribution_units.as_deref()
+    }
+    pub(crate) fn source_zone_equipment_config(
+        &self,
+        ordinal: i32,
+    ) -> Result<
+        SourceZoneEquipmentConfigRef<'_>,
+        super::selected_heat_balance_input::HeatBalanceInputError,
+    > {
+        let at = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual ZoneEquipConfig Source ordinal",
+                ),
+            )?;
+        let row = self
+            .zone_config
+            .as_deref()
+            .and_then(|rows| rows.get(at))
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual same ZoneEquipConfig allocation",
+                ),
+            )?;
+        Ok(SourceZoneEquipmentConfigRef { row })
+    }
+    /// Same genuine DataZoneEquipment.NumExhaustAirSystems; no Plant/Node inference.
+    pub(crate) fn source_number_exhaust_air_systems(&self) -> &i32 {
+        &self.number_exhaust_air_systems
+    }
+
+    /// Same actual DataZoneEquip spaceEquipConfig; no synthesized uncontrolled row.
+    pub(crate) fn source_space_equipment_config(
+        &self,
+        ordinal: i32,
+    ) -> Result<
+        SourceZoneEquipmentConfigRef<'_>,
+        super::selected_heat_balance_input::HeatBalanceInputError,
+    > {
+        let at = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual spaceEquipConfig Source ordinal",
+                ),
+            )?;
+        let row = self
+            .space_config
+            .as_deref()
+            .and_then(|rows| rows.get(at))
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual same spaceEquipConfig allocation",
+                ),
+            )?;
+        Ok(SourceZoneEquipmentConfigRef { row })
+    }
+    /// Same independent DataLoopNode.NumOfNodes owner; no physical-array length inference.
+    pub(crate) fn source_number_of_nodes(&self) -> &usize {
+        &self.nodes.number_of_nodes
+    }
     pub(crate) fn for_geometry(
         model: &ep_model::TypedModel,
         input: OrdinaryEquipmentInput,
@@ -394,6 +517,18 @@ impl OrdinaryEquipment {
             get_equipment_input: true,
             equipment_inputs_filled: false,
             equipment_simulated_once: false,
+            management_modules: Default::default(),
+            zone_equipment_mixers: Vec::new(),
+            zone_return_mixers: Vec::new(),
+            init_equipment_one_time_flag: true,
+            init_equipment_environment_flag: true,
+            first_pass_zone_equipment_flag: true,
+            space_config: None,
+            air_distribution_units: None,
+            number_exhaust_air_systems: 0,
+            number_zone_exhaust_controls: 0,
+            exhaust_air_systems: None,
+            zone_exhaust_controls: None,
             equipment_data_errors_found: false,
             equipment_data_found: 0,
             number_of_equipment_lists: 0,
@@ -562,11 +697,25 @@ impl OrdinaryEquipment {
         zones: &[ZoneId],
         spaces: &[SpaceId],
     ) -> Result<(), Unavailable> {
+        self.validate_initialized_storage(zones, spaces, None)
+    }
+
+    /// Direct read of the sole Source GetZoneEquipment169-197 scalar owner.
+    pub(crate) fn source_equipment_inputs_filled(&self) -> &bool {
+        &self.equipment_inputs_filled
+    }
+
+    fn validate_initialized_storage(
+        &mut self,
+        zones: &[ZoneId],
+        spaces: &[SpaceId],
+        source_gains:Option<&crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains>,
+    ) -> Result<(), Unavailable> {
         if self.zone_ids != zones
             || self.space_ids != spaces
             || self.get_equipment_input
             || !self.equipment_inputs_filled
-            || self.equipment_simulated_once
+            || (source_gains.is_none() && self.equipment_simulated_once)
             || self.equipment_data_errors_found
             || self.equipment_data_found != 1
             || self.number_of_equipment_lists != 0
@@ -611,30 +760,47 @@ impl OrdinaryEquipment {
         {
             return Err(Unavailable::InconsistentOwner);
         }
-        for rows in [&self.internal_gains.zone, &self.internal_gains.space] {
-            if rows
-                .as_ref()
-                .is_none_or(|rows| rows.len() != 1 || rows[0] != SpaceZoneGain::default())
+        if let Some(gains) = source_gains {
+            // Actual Source route never allocates a second legacy gain collection.
+            if self.internal_gains.zone.is_some()
+                || self.internal_gains.space.is_some()
+                || self.internal_gains.devices.is_some()
+                || self
+                    .internal_gains
+                    .daylight_power_reduction_factor
+                    .is_some()
             {
                 return Err(Unavailable::InconsistentOwner);
             }
-        }
-        let devices = self
-            .internal_gains
-            .devices
-            .as_ref()
-            .ok_or(Unavailable::InconsistentOwner)?;
-        if devices.len() != 1
-            || devices[0].number_of_devices != 0
-            || devices[0].max_number_of_devices != 0
-            || devices[0].devices.is_some()
-            || self
+            gains
+                .validate_source_initial_gain_allocations(zones.len(), spaces.len())
+                .map_err(|_| Unavailable::InconsistentOwner)?;
+        } else {
+            for rows in [&self.internal_gains.zone, &self.internal_gains.space] {
+                if rows
+                    .as_ref()
+                    .is_none_or(|rows| rows.len() != 1 || rows[0] != SpaceZoneGain::default())
+                {
+                    return Err(Unavailable::InconsistentOwner);
+                }
+            }
+            let devices = self
                 .internal_gains
-                .daylight_power_reduction_factor
+                .devices
                 .as_ref()
-                .is_none_or(|rows| rows.as_slice() != [1.0])
-        {
-            return Err(Unavailable::InconsistentOwner);
+                .ok_or(Unavailable::InconsistentOwner)?;
+            if devices.len() != 1
+                || devices[0].number_of_devices != 0
+                || devices[0].max_number_of_devices != 0
+                || devices[0].devices.is_some()
+                || self
+                    .internal_gains
+                    .daylight_power_reduction_factor
+                    .as_ref()
+                    .is_none_or(|rows| rows.as_slice() != [1.0])
+            {
+                return Err(Unavailable::InconsistentOwner);
+            }
         }
         let configs = self
             .zone_config
@@ -667,3 +833,62 @@ impl OrdinaryEquipment {
 #[cfg(test)]
 #[path = "ordinary_equipment_tests.rs"]
 mod tests;
+
+/// A temporary borrow of the actual optional ZoneEquipConfig allocation.
+/// InitIntConvCoeff does not require this allocation before ActiveSurfaceCheck.
+pub(crate) struct SourceConvectionEquipment<'a> {
+    zone_ids: &'a [ZoneId],
+    configs: &'a mut [EquipmentConfig],
+}
+impl ZoneEquipmentActiveElements for SourceConvectionEquipment<'_> {
+    fn zone_count(&self) -> usize {
+        self.configs.len()
+    }
+    fn zone_id(&self, index: usize) -> ZoneId {
+        self.zone_ids[index]
+    }
+    fn active_elements(&self, index: usize) -> [bool; 3] {
+        let row = &self.configs[index];
+        [
+            row.in_wall_active_element,
+            row.in_ceiling_active_element,
+            row.in_floor_active_element,
+        ]
+    }
+    fn set_active_elements(&mut self, index: usize, flags: [bool; 3]) {
+        let row = &mut self.configs[index];
+        row.in_wall_active_element = flags[0];
+        row.in_ceiling_active_element = flags[1];
+        row.in_floor_active_element = flags[2];
+    }
+}
+impl OrdinaryEquipment {
+    /// Read genuine module and Node allocation flags; no getter/cadence is run.
+    pub(crate) fn source_convection_readiness(
+        &self,
+        begin_environment: bool,
+        system_sizing: bool,
+        zone_sizing: bool,
+    ) -> super::inside_convection_dispatcher::InsideConvectionReadiness {
+        super::inside_convection_dispatcher::InsideConvectionReadiness {
+            begin_environment,
+            system_sizing,
+            zone_sizing,
+            equipment_inputs_filled: self.equipment_inputs_filled,
+            nodes_allocated: self.nodes.physical.is_some(),
+            equipment_simulated_once: self.equipment_simulated_once,
+        }
+    }
+    /// No allocation or numeric projection: retain the real optional Config.
+    pub(crate) fn source_convection_equipment(&mut self) -> SourceConvectionEquipment<'_> {
+        SourceConvectionEquipment {
+            zone_ids: &self.zone_ids,
+            configs: match self.zone_config.as_deref_mut() {
+                Some(rows) => rows,
+                // The actual allocation remains None. The empty view cannot
+                // pass the reached Config cardinality guard for a real Zone.
+                None => &mut [],
+            },
+        }
+    }
+}

@@ -3,6 +3,10 @@
 mod cursor;
 mod dates;
 mod day_read;
+mod source_day_read;
+pub(crate) use source_day_read::{
+    SourceRawDayReadCallbacks, SourceRawDayReadClock, SourceRawDayReadFailure,
+};
 mod header;
 mod header_state;
 mod input;
@@ -10,6 +14,12 @@ mod lexical;
 mod loader;
 mod record;
 mod record_types;
+mod source_header;
+mod source_open;
+mod source_typical;
+mod source_user_input;
+pub(crate) use source_header::source_julian_date;
+pub(crate) use source_typical::source_ordinal_day;
 
 #[cfg(test)]
 mod cursor_tests;
@@ -27,7 +37,8 @@ pub use day_read::{
 pub use header::{HeaderKind, open_epw_header, process_epw_header};
 pub use header_state::{
     AllocatedValues, DataPeriod, DateType, DstPeriod, HeaderCallerPreparation,
-    HeaderContextConsumption, RawEpwHeaderError, RawEpwHeaderState, SpecialDay,
+    HeaderContextConsumption, RawEpwHeaderError, RawEpwHeaderState, SourceTypicalExtremeData,
+    SpecialDay,
 };
 pub use input::{RawEpwInput, RawEpwLineRead, RawEpwStreamState};
 pub(crate) use loader::project_record;

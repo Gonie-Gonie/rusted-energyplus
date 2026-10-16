@@ -7,6 +7,10 @@ use std::convert::Infallible;
 use std::fmt::{Display, Formatter};
 use std::io::{self, Write};
 
+mod live_flags;
+mod scoped;
+pub(crate) use live_flags::SourceDiagnosticFlags;
+
 /// Selected source error callback values, preserving api/TypeDefs.h identities.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(i32)]
@@ -26,10 +30,16 @@ pub enum SourceErrorLevel {
 /// Caller-owned ErrorTracking members read/written by these selected routines.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SourceErrorTracking {
+    /// DataErrorTracking.hh226 constructorfalse; actual first Plant pass enables abort checking.
+    pub ask_for_plant_check_on_abort: bool,
+    /// DataErrorTracking.hh227 constructorfalse; primary409 writes the same cell.
+    pub exit_during_simulations: bool,
     /// MatchCounts(1..20), in the original source search order.
     pub match_counts: [i32; 20],
     /// Actual AbortProcessing flag.
     pub abort_processing: bool,
+    /// DataErrorTracking.hh224 constructorfalse; actual SimulationManager208/278 writers.
+    pub ask_for_connections_report: bool,
     /// Actual deferred surface-report request; GetSurfaceData sets it before
     /// row processing and ReportSurfaces clears it before report scanning.
     /// The selected ShowFatalError API does not implement AbortEnergyPlus.
@@ -255,33 +265,65 @@ const MESSAGE_SEARCH: [&str; 20] = [
 impl SourceErrorBackend<'_> {
     /// Literal ShowErrorMessage stream/header/input-processing/optional-output order.
     pub fn show_error_message(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
-        if self.state.output_error_header {
-            if let Some(stream) = self.error_stream.as_deref_mut() {
+        Self::write_error_message(
+            self.state,
+            self.error_stream.as_deref_mut(),
+            self.console,
+            self.out_unit1.as_deref_mut(),
+            self.out_unit2.as_deref_mut(),
+            message,
+        )
+    }
+
+    /// Per-call optional OutputFile arguments replace the invocation arguments.
+    /// Weather's explicit ESO argument is present even when its stream is not good.
+    fn show_error_message_to_output(
+        &mut self,
+        message: &str,
+        output: &mut dyn Write,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        Self::write_error_message(
+            self.state,
+            self.error_stream.as_deref_mut(),
+            self.console,
+            Some(output),
+            None,
+            message,
+        )
+    }
+
+    fn write_error_message<'error_object, 'output1_object, 'output2_object>(
+        state: &mut SourceErrorState,
+        mut error_stream: Option<&mut (dyn Write + 'error_object)>,
+        console: &mut dyn Write,
+        out_unit1: Option<&mut (dyn Write + 'output1_object)>,
+        out_unit2: Option<&mut (dyn Write + 'output2_object)>,
+        message: &str,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        if state.output_error_header {
+            if let Some(stream) = error_stream.as_deref_mut() {
                 effect(
                     "error header",
                     writeln!(
                         stream,
                         "Program Version,{},{}",
-                        self.state.version_string, self.state.idd_version_string
+                        state.version_string, state.idd_version_string
                     ),
                 )?;
-                self.state.output_error_header = false;
+                state.output_error_header = false;
             }
         }
-        if !self.state.doing_input_processing {
-            if let Some(stream) = self.error_stream.as_deref_mut() {
+        if !state.doing_input_processing {
+            if let Some(stream) = error_stream.as_deref_mut() {
                 effect("error message", writeln!(stream, "  {message}"))?;
             }
-        } else if self.state.print_console_output {
-            effect(
-                "input-processing console",
-                writeln!(self.console, "{message}"),
-            )?;
+        } else if state.print_console_output {
+            effect("input-processing console", writeln!(console, "{message}"))?;
         }
-        if let Some(stream) = self.out_unit1.as_deref_mut() {
+        if let Some(stream) = out_unit1 {
             effect("optional output1", write!(stream, "  {message}"))?;
         }
-        if let Some(stream) = self.out_unit2.as_deref_mut() {
+        if let Some(stream) = out_unit2 {
             effect("optional output2", write!(stream, "  {message}"))?;
         }
         Ok(())
@@ -302,14 +344,30 @@ impl SourceErrorBackend<'_> {
         if let Some(callback) = self.message_callback.as_deref_mut() {
             callback(self.state, callback_message);
         }
-        if self.state.kickoff_simulation && !self.state.developer_flag {
+        Self::write_display_console(
+            self.console,
+            message,
+            &self.state.kickoff_simulation,
+            &self.state.developer_flag,
+            &self.state.print_console_output,
+        )
+    }
+
+    fn write_display_console(
+        console: &mut dyn Write,
+        message: &str,
+        kickoff: &bool,
+        developer: &bool,
+        print_console_output: &bool,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        if *kickoff && !*developer {
             return Ok(());
         }
-        if !self.state.print_console_output {
+        if !*print_console_output {
             return Ok(());
         }
-        effect("display console", writeln!(self.console, "{message}"))?;
-        effect("display console flush", self.console.flush())
+        effect("display console", writeln!(console, "{message}"))?;
+        effect("display console flush", console.flush())
     }
 
     /// Literal ShowMessage: output, optional SQLite info record and callback.
@@ -381,34 +439,49 @@ impl SourceErrorBackend<'_> {
 
     /// Genuine warning counters, output, optional SQLite and final callback.
     pub fn show_warning_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
-        for (&needle, count) in MESSAGE_SEARCH
-            .iter()
-            .zip(&mut self.state.tracking.match_counts)
-        {
+        Self::count_warning_error(
+            &mut self.state.tracking,
+            message,
+            &self.state.warmup_flag,
+            &self.state.doing_sizing,
+            &self.state.kickoff_simulation,
+        )?;
+        self.write_warning_error(message)?;
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Warning, message);
+        }
+        Ok(())
+    }
+
+    fn count_warning_error(
+        tracking: &mut SourceErrorTracking,
+        message: &str,
+        warmup: &bool,
+        doing_sizing: &bool,
+        kickoff: &bool,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        for (&needle, count) in MESSAGE_SEARCH.iter().zip(&mut tracking.match_counts) {
             if message.contains(needle) {
                 increment(count, "MatchCounts")?;
             }
         }
-        increment(
-            &mut self.state.tracking.total_warning_errors,
-            "TotalWarningErrors",
-        )?;
-        if self.state.warmup_flag
-            && !self.state.doing_sizing
-            && !self.state.kickoff_simulation
-            && !self.state.tracking.abort_processing
-        {
+        increment(&mut tracking.total_warning_errors, "TotalWarningErrors")?;
+        if *warmup && !*doing_sizing && !*kickoff && !tracking.abort_processing {
             increment(
-                &mut self.state.tracking.total_warning_errors_during_warmup,
+                &mut tracking.total_warning_errors_during_warmup,
                 "TotalWarningErrorsDuringWarmup",
             )?;
         }
-        if self.state.doing_sizing {
+        if *doing_sizing {
             increment(
-                &mut self.state.tracking.total_warning_errors_during_sizing,
+                &mut tracking.total_warning_errors_during_sizing,
                 "TotalWarningErrorsDuringSizing",
             )?;
         }
+        Ok(())
+    }
+
+    fn write_warning_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
         self.show_error_message(&format!(" ** Warning ** {message}"))?;
         if let Some(sqlite) = self.sqlite.as_deref_mut() {
             effect(
@@ -416,52 +489,83 @@ impl SourceErrorBackend<'_> {
                 sqlite.create_error_record(1, 0, message, 1),
             )?;
         }
-        if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Warning, message);
-        }
         Ok(())
     }
 
     /// Literal ShowSevereError counters/output/last text/SQLite/callback order.
     pub fn show_severe_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
-        for (&needle, count) in MESSAGE_SEARCH
-            .iter()
-            .zip(&mut self.state.tracking.match_counts)
-        {
+        self.show_severe_error_using(message, Self::show_error_message)
+    }
+
+    pub(crate) fn show_severe_error_to_output(
+        &mut self,
+        message: &str,
+        output: &mut dyn Write,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        self.show_severe_error_using(message, |backend, text| {
+            backend.show_error_message_to_output(text, output)
+        })
+    }
+
+    fn show_severe_error_using(
+        &mut self,
+        message: &str,
+        write_message: impl FnMut(&mut Self, &str) -> Result<(), SourceErrorBackendFailure>,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        Self::count_severe_error(
+            &mut self.state.tracking,
+            message,
+            &self.state.warmup_flag,
+            &self.state.doing_sizing,
+            &self.state.kickoff_simulation,
+        )?;
+        self.write_severe_error_using(message, write_message)?;
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Severe, message);
+        }
+        Ok(())
+    }
+
+    fn count_severe_error(
+        tracking: &mut SourceErrorTracking,
+        message: &str,
+        warmup: &bool,
+        doing_sizing: &bool,
+        kickoff: &bool,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        for (&needle, count) in MESSAGE_SEARCH.iter().zip(&mut tracking.match_counts) {
             if message.contains(needle) {
                 increment(count, "MatchCounts")?;
             }
         }
-        increment(
-            &mut self.state.tracking.total_severe_errors,
-            "TotalSevereErrors",
-        )?;
-        if self.state.warmup_flag
-            && !self.state.doing_sizing
-            && !self.state.kickoff_simulation
-            && !self.state.tracking.abort_processing
-        {
+        increment(&mut tracking.total_severe_errors, "TotalSevereErrors")?;
+        if *warmup && !*doing_sizing && !*kickoff && !tracking.abort_processing {
             increment(
-                &mut self.state.tracking.total_severe_errors_during_warmup,
+                &mut tracking.total_severe_errors_during_warmup,
                 "TotalSevereErrorsDuringWarmup",
             )?;
         }
-        if self.state.doing_sizing {
+        if *doing_sizing {
             increment(
-                &mut self.state.tracking.total_severe_errors_during_sizing,
+                &mut tracking.total_severe_errors_during_sizing,
                 "TotalSevereErrorsDuringSizing",
             )?;
         }
-        self.show_error_message(&format!(" ** Severe  ** {message}"))?;
+        Ok(())
+    }
+
+    fn write_severe_error_using(
+        &mut self,
+        message: &str,
+        mut write_message: impl FnMut(&mut Self, &str) -> Result<(), SourceErrorBackendFailure>,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        write_message(self, &format!(" ** Severe  ** {message}"))?;
         self.state.tracking.last_severe_error = message.to_owned();
         if let Some(sqlite) = self.sqlite.as_deref_mut() {
             effect(
                 "SQLite create severe",
                 sqlite.create_error_record(1, 1, message, 1),
             )?;
-        }
-        if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Severe, message);
         }
         Ok(())
     }
@@ -484,17 +588,40 @@ impl SourceErrorBackend<'_> {
     /// Performs real fatal effects in source order, then returns typed termination.
     /// It cannot return successful function completion or increment severe totals.
     pub fn show_fatal_error(&mut self, message: &str) -> Result<Infallible, SourceFatalStop> {
-        self.show_error_message(&format!(" **  Fatal  ** {message}"))?;
+        self.show_fatal_error_using(message, Self::show_error_message)
+    }
+
+    pub(crate) fn show_fatal_error_to_output(
+        &mut self,
+        message: &str,
+        output: &mut dyn Write,
+    ) -> Result<Infallible, SourceFatalStop> {
+        self.show_fatal_error_using(message, |backend, text| {
+            backend.show_error_message_to_output(text, output)
+        })
+    }
+
+    fn show_fatal_error_using(
+        &mut self,
+        message: &str,
+        mut write_message: impl FnMut(&mut Self, &str) -> Result<(), SourceErrorBackendFailure>,
+    ) -> Result<Infallible, SourceFatalStop> {
+        write_message(self, &format!(" **  Fatal  ** {message}"))?;
         self.display_string(&format!("**FATAL:{message}"))?;
-        self.show_error_message(" ...Summary of Errors that led to program termination:")?;
-        self.show_error_message(&format!(
+        write_message(
+            self,
+            " ...Summary of Errors that led to program termination:",
+        )?;
+        let reference_count_message = format!(
             " ..... Reference severe error count={}",
             self.state.tracking.total_severe_errors
-        ))?;
-        self.show_error_message(&format!(
+        );
+        write_message(self, &reference_count_message)?;
+        let last_severe_message = format!(
             " ..... Last severe error={}",
             self.state.tracking.last_severe_error
-        ))?;
+        );
+        write_message(self, &last_severe_message)?;
         if let Some(sqlite) = self.sqlite.as_deref_mut() {
             effect(
                 "SQLite create fatal",

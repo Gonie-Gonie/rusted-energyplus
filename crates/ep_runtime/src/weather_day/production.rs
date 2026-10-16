@@ -13,6 +13,7 @@ use std::cell::{Cell, RefCell};
 
 mod setup;
 mod source_environment;
+mod source_first_weather;
 pub use setup::{SetupSimulationCall, SetupSimulationControls, SetupSimulationRole};
 
 /// Explicit caller phase; repeated warmup days retain independent call identities.

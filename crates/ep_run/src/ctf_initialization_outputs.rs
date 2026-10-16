@@ -15,20 +15,22 @@ use ep_runtime::heat_balance::source_initialization::{
 use std::path::Path;
 
 pub(crate) struct CtfRunOutputs {
-    reports: CtfInitializationReports,
+    reports: Box<CtfInitializationReports>,
     state: SourceErrorState,
     error: Vec<u8>,
     console: Vec<u8>,
     eio: Vec<u8>,
     reached: bool,
     initialization_files: Option<SourceInitializationFiles>,
+    source_session: Option<ep_runtime::heat_balance::OrdinarySourceSession>,
+    source_simulation_loop_locals: Option<ep_runtime::heat_balance::SourceSimulationLoopLocals>,
     mtd: Option<ep_runtime::heat_balance::source_output_registration::SourceMtdFileHost>,
 }
 
 impl CtfRunOutputs {
     pub(crate) fn new(typed_input_version: &str) -> Self {
         Self {
-            reports: CtfInitializationReports::default(),
+            reports: Box::default(),
             state: SourceErrorState {
                 output_error_header: true,
                 version_string: concat!("rusted-energyplus ", env!("CARGO_PKG_VERSION")).into(),
@@ -42,6 +44,9 @@ impl CtfRunOutputs {
                 warmup_flag: false,
                 doing_sizing: false,
                 tracking: SourceErrorTracking {
+                    ask_for_plant_check_on_abort: false,
+                    exit_during_simulations: false,
+                    ask_for_connections_report: false,
                     ask_for_surfaces_report: false,
                     total_multiplied_windows: 0,
                     total_coincident_vertices: 0,
@@ -64,6 +69,8 @@ impl CtfRunOutputs {
             eio: Vec::new(),
             reached: false,
             initialization_files: None,
+            source_session: None,
+            source_simulation_loop_locals: None,
             mtd: None,
         }
     }
@@ -88,7 +95,9 @@ impl CtfRunOutputs {
                     eio: output_dir.join("eplusrs.eio"),
                     mtr: output_dir.join("eplusrs.mtr"),
                     bnd: output_dir.join("eplusrs.bnd"),
+                    dxf: output_dir.join("eplusrs.dxf"),
                     audit: output_dir.join("eplusrs.audit"),
+                    debug: output_dir.join("eplusrs.dbg"),
                 },
             ));
         }
@@ -109,6 +118,24 @@ impl CtfRunOutputs {
                 .map_err(|e| e.to_string())?;
         }
         Ok(())
+    }
+
+    pub(crate) fn initialize_source_reporting_and_post_input(&mut self) -> Result<(), String> {
+        let files = self
+            .initialization_files
+            .as_mut()
+            .ok_or("actual initialization files missing before ManageSimulation183")?;
+        self.source_simulation_loop_locals =
+            Some(ep_runtime::heat_balance::SourceSimulationLoopLocals::at_simulation_prologue());
+        self.reports
+            .prepare_source_reporting_prefix(files)
+            .map_err(|e| e.to_string())?;
+        self.context()
+            .post_input_processing()
+            .map_err(|e| e.to_string())?;
+        self.reports
+            .begin_source_simulation_after_post_input_processing()
+            .map_err(|e| e.to_string())
     }
 
     pub(crate) fn initialize_source_state(
@@ -178,6 +205,63 @@ impl CtfRunOutputs {
         self.reports
             .initialize_source_weather(bytes, configuration)
             .map_err(|e| e.to_string())
+    }
+
+    /// Genuine unopened Source weather attachment; old pipeline entry remains separate.
+    pub(crate) fn initialize_unopened_source_weather(
+        &mut self,
+        bytes: Vec<u8>,
+        configuration: ep_runtime::weather::day::WeatherEnvironmentConfiguration,
+    ) -> Result<ep_runtime::weather::day::ProductionWeatherTimestepSeries, String> {
+        self.reports
+            .initialize_unopened_source_weather(bytes, configuration)
+            .map_err(|e| e.to_string())
+    }
+
+    /// Explicit genuine Source entry; legacy pipeline does not invoke it yet.
+    pub(crate) fn source_ordinary_timestep(
+        &mut self,
+        weather: &ep_runtime::weather::day::ProductionWeatherTimestepSeries,
+        model: &ep_model::TypedModel,
+        reporting: &ep_runtime::HeatBalanceOrdinaryWarmupReportInputs,
+        shading_path: &Path,
+    ) -> Result<(), ep_runtime::RuntimeError> {
+        use ep_runtime::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
+        let missing = |name| {
+            ep_runtime::RuntimeError::HeatBalanceInput(Box::new(
+                HeatBalanceInputError::Unavailable(name),
+            ))
+        };
+        let files = self
+            .initialization_files
+            .as_mut()
+            .ok_or_else(|| missing("actual initialized Source files before genuine timestep"))?;
+        let mtd = self
+            .mtd
+            .as_mut()
+            .ok_or_else(|| missing("actual retained MTD before genuine timestep"))?;
+        self.reached = true;
+        let mut backend = SourceErrorBackend {
+            state: &mut self.state,
+            error_stream: Some(&mut self.error),
+            console: &mut self.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        files.source_ordinary_timestep(
+            &mut self.source_session,
+            &mut self.reports,
+            weather,
+            model,
+            reporting,
+            mtd,
+            &mut backend,
+            shading_path,
+        )
     }
 
     pub(crate) fn reports(&self) -> &CtfInitializationReports {

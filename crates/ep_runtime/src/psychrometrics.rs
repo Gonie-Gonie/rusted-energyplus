@@ -2,6 +2,8 @@
 
 mod cp_cache;
 mod psy02_state;
+mod source_access;
+pub(crate) use source_access::SourcePsychrometricAccess;
 
 pub use psy02_state::{
     ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,

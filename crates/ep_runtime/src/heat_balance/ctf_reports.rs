@@ -9,7 +9,7 @@ use ep_model::{
 use std::io::{self, Write};
 
 #[path = "ctf_reports_format.rs"]
-mod formatting;
+pub(super) mod formatting;
 
 /// Honest scope/representation boundaries; none is an inferred Native guard.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -119,6 +119,20 @@ impl PredefinedStringTable {
         object: &str,
         text: &str,
     ) -> Result<(), CtfReportUnavailable> {
+        let index = self.next_table_entry()?;
+        let entry = self
+            .entries
+            .as_mut()
+            .and_then(|entries| entries.get_mut(index))
+            .ok_or(CtfReportUnavailable::TableOwner)?;
+        entry.char_entry = text.to_string();
+        entry.object_name = object.to_string();
+        entry.index_column = column;
+        Ok(())
+    }
+
+    /// Literal shared OutputReportPredefined incrementTableEntry owner.
+    fn next_table_entry(&mut self) -> Result<usize, CtfReportUnavailable> {
         let index = if let Some(entries) = &mut self.entries {
             let size = usize::try_from(self.size_table_entry)
                 .map_err(|_| CtfReportUnavailable::TableOwner)?;
@@ -152,12 +166,24 @@ impl PredefinedStringTable {
             self.num_table_entry = 1;
             0
         };
+        Ok(index)
+    }
+
+    /// Genuine Integer PreDefTableEntry1877-1915. Formatting follows the actual
+    /// counter/allocation prefix and preserves all unrelated retained fields.
+    pub(crate) fn integer_entry(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: i32,
+    ) -> Result<(), CtfReportUnavailable> {
+        let index = self.next_table_entry()?;
         let entry = self
             .entries
             .as_mut()
             .and_then(|entries| entries.get_mut(index))
             .ok_or(CtfReportUnavailable::TableOwner)?;
-        entry.char_entry = text.to_string();
+        entry.char_entry = format!("{value:12}");
         entry.object_name = object.to_string();
         entry.index_column = column;
         Ok(())
@@ -483,3 +509,11 @@ pub fn report_ctf_transfer_function(
 #[cfg(test)]
 #[path = "ctf_reports_tests.rs"]
 mod tests;
+
+// Public typed leaf for generic predefined reporting; all scientific bodies above unchanged.
+impl std::fmt::Display for CtfReportUnavailable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "predefined report unavailable: {self:?}")
+    }
+}
+impl std::error::Error for CtfReportUnavailable {}

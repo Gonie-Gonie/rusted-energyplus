@@ -3,7 +3,7 @@
 
 mod producer;
 mod reports;
-mod solar;
+pub(super) mod solar;
 
 use super::{DailyWeatherVariables, WeatherDayError, WeatherDayState};
 

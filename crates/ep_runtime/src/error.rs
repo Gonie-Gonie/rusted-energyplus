@@ -11,6 +11,8 @@ pub enum RuntimeError {
     HeatBalanceInput(Box<crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>),
     /// Actual ordinary initialization owner/backend/fatal stop, with its original error retained.
     CtfInitialization(Box<crate::heat_balance::ctf_initialization_context::CtfInitializationError>),
+    /// Actual SimulationManager initialization cause, retained without string conversion.
+    SourceInitialization(Box<crate::heat_balance::source_initialization::SourceInitializationError>),
     /// Actual selected public/history lifecycle stopped; no fallback or Native fatal is inferred.
     CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
     /// Reached ordinary warmup output or backend stop with the original cause.
@@ -134,6 +136,7 @@ impl Display for RuntimeError {
             Self::HeatBalanceInput(error) => Display::fmt(error, formatter),
             Self::OrdinaryRadiation(error) => Display::fmt(error, formatter),
             Self::CtfInitialization(error) => Display::fmt(error, formatter),
+            Self::SourceInitialization(error) => Display::fmt(error, formatter),
             Self::WarmupOutput(error) => Display::fmt(error, formatter),
             Self::SurfaceOutdoorEnvironment(error) => Display::fmt(error, formatter),
             Self::CtfSurfaceLifecycle(error) => write!(
@@ -250,6 +253,7 @@ impl std::error::Error for RuntimeError {
             Self::HeatBalanceInput(error) => Some(error.as_ref()),
             Self::OrdinaryRadiation(error) => Some(error.as_ref()),
             Self::CtfInitialization(error) => Some(error.as_ref()),
+            Self::SourceInitialization(error) => Some(error.as_ref()),
             Self::WarmupOutput(error) => Some(error.as_ref()),
             Self::SurfaceOutdoorEnvironment(error) => Some(error.as_ref()),
             _ => None,
@@ -263,6 +267,12 @@ impl From<crate::heat_balance::ctf_initialization_context::CtfInitializationErro
         error: crate::heat_balance::ctf_initialization_context::CtfInitializationError,
     ) -> Self {
         Self::CtfInitialization(Box::new(error))
+    }
+}
+
+impl From<crate::heat_balance::source_initialization::SourceInitializationError> for RuntimeError {
+    fn from(error: crate::heat_balance::source_initialization::SourceInitializationError) -> Self {
+        Self::SourceInitialization(Box::new(error))
     }
 }
 

@@ -1,15 +1,23 @@
-//! Actual selected ManageInternalHeatGains(initOnly=true) input owners.
-//! Hourly Init/ReportInternalHeatGains and positive Kiva remain separate.
+//! Actual selected ManageInternalHeatGains input and timestep owners.
+//! Genuine timestep producers retain explicit unported provider boundaries.
 use super::{CtfInitializationContext, hb_input_error};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 use ep_model::TypedModel;
 
+mod allocations;
+mod comfort_people;
+pub(crate) use comfort_people::SourcePeopleArray;
 mod devices;
 mod getter;
 mod nominal;
 pub(super) mod observation;
 mod output;
+mod timestep;
+pub(crate) use timestep::{
+    SourceGainLatentOwners, SourceGainModule, SourceGainModuleProvider, SourceGainRadiationOwners,
+    SourceGainStepOwners, SourceZoneGenericGainAllocation,
+};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[repr(i32)]
@@ -28,6 +36,9 @@ pub(crate) struct SourceOtherEquipment {
     pub(crate) schedule: Option<SourceScheduleIndex>,
     pub(crate) fuel: SourceOtherFuel,
     pub(crate) design_level: f64,
+    /// Actual ZoneEquipData constructorfalse/zero; written only by genuine EMS.
+    pub(crate) ems_zone_equipment_override_on: bool,
+    pub(crate) ems_equipment_power: f64,
     pub(crate) nominal_min_design_level: f64,
     pub(crate) nominal_max_design_level: f64,
     pub(crate) fraction_latent: f64,
@@ -40,7 +51,7 @@ pub(crate) struct SourceOtherEquipment {
     // LatGainRate, LostRate, TotGainRate, CO2GainRate.
     pub(crate) rates: [f64; 7],
     // Consumption, RadGainEnergy, ConGainEnergy, LatGainEnergy,
-    // LostEnergy, TotGainEnergy. No hourly producer has written them here.
+    // LostEnergy, TotGainEnergy; constructorzero, then the genuine report writer.
     pub(crate) energies: [f64; 6],
 }
 
@@ -52,6 +63,91 @@ pub(crate) struct SourceGainReport {
     pub(crate) total: [f64; 10],
     // Other equipment: Radiant, Convective, Latent, Lost, Total.
     pub(crate) other: [f64; 10],
+    // Reached ZoneReportVars fields omitted by the input-only observation.
+    pub(crate) people_rad_gain: f64,         // PeopleRadGain
+    pub(crate) people_con_gain: f64,         // PeopleConGain
+    pub(crate) people_sen_gain: f64,         // PeopleSenGain
+    pub(crate) people_num_occ: f64,          // PeopleNumOcc
+    pub(crate) people_lat_gain: f64,         // PeopleLatGain
+    pub(crate) people_tot_gain: f64,         // PeopleTotGain
+    pub(crate) people_rad_gain_rate: f64,    // PeopleRadGainRate
+    pub(crate) people_con_gain_rate: f64,    // PeopleConGainRate
+    pub(crate) people_sen_gain_rate: f64,    // PeopleSenGainRate
+    pub(crate) people_lat_gain_rate: f64,    // PeopleLatGainRate
+    pub(crate) people_tot_gain_rate: f64,    // PeopleTotGainRate
+    pub(crate) lts_power: f64,               // LtsPower
+    pub(crate) lts_elec_consump: f64,        // LtsElecConsump
+    pub(crate) lts_rad_gain: f64,            // LtsRadGain
+    pub(crate) lts_vis_gain: f64,            // LtsVisGain
+    pub(crate) lts_con_gain: f64,            // LtsConGain
+    pub(crate) lts_ret_air_gain: f64,        // LtsRetAirGain
+    pub(crate) lts_tot_gain: f64,            // LtsTotGain
+    pub(crate) lts_rad_gain_rate: f64,       // LtsRadGainRate
+    pub(crate) lts_vis_gain_rate: f64,       // LtsVisGainRate
+    pub(crate) lts_con_gain_rate: f64,       // LtsConGainRate
+    pub(crate) lts_ret_air_gain_rate: f64,   // LtsRetAirGainRate
+    pub(crate) lts_tot_gain_rate: f64,       // LtsTotGainRate
+    pub(crate) base_heat_power: f64,         // BaseHeatPower
+    pub(crate) base_heat_elec_cons: f64,     // BaseHeatElecCons
+    pub(crate) base_heat_rad_gain: f64,      // BaseHeatRadGain
+    pub(crate) base_heat_con_gain: f64,      // BaseHeatConGain
+    pub(crate) base_heat_tot_gain: f64,      // BaseHeatTotGain
+    pub(crate) base_heat_rad_gain_rate: f64, // BaseHeatRadGainRate
+    pub(crate) base_heat_con_gain_rate: f64, // BaseHeatConGainRate
+    pub(crate) base_heat_tot_gain_rate: f64, // BaseHeatTotGainRate
+    pub(crate) elec_power: f64,              // ElecPower
+    pub(crate) elec_consump: f64,            // ElecConsump
+    pub(crate) elec_rad_gain: f64,           // ElecRadGain
+    pub(crate) elec_con_gain: f64,           // ElecConGain
+    pub(crate) elec_lat_gain: f64,           // ElecLatGain
+    pub(crate) elec_lost: f64,               // ElecLost
+    pub(crate) elec_tot_gain: f64,           // ElecTotGain
+    pub(crate) elec_rad_gain_rate: f64,      // ElecRadGainRate
+    pub(crate) elec_con_gain_rate: f64,      // ElecConGainRate
+    pub(crate) elec_lat_gain_rate: f64,      // ElecLatGainRate
+    pub(crate) elec_lost_rate: f64,          // ElecLostRate
+    pub(crate) elec_tot_gain_rate: f64,      // ElecTotGainRate
+    pub(crate) gas_power: f64,               // GasPower
+    pub(crate) gas_consump: f64,             // GasConsump
+    pub(crate) gas_rad_gain: f64,            // GasRadGain
+    pub(crate) gas_con_gain: f64,            // GasConGain
+    pub(crate) gas_lat_gain: f64,            // GasLatGain
+    pub(crate) gas_lost: f64,                // GasLost
+    pub(crate) gas_tot_gain: f64,            // GasTotGain
+    pub(crate) gas_rad_gain_rate: f64,       // GasRadGainRate
+    pub(crate) gas_con_gain_rate: f64,       // GasConGainRate
+    pub(crate) gas_lat_gain_rate: f64,       // GasLatGainRate
+    pub(crate) gas_lost_rate: f64,           // GasLostRate
+    pub(crate) gas_tot_gain_rate: f64,       // GasTotGainRate
+    pub(crate) hw_power: f64,                // HWPower
+    pub(crate) hw_consump: f64,              // HWConsump
+    pub(crate) hw_rad_gain: f64,             // HWRadGain
+    pub(crate) hw_con_gain: f64,             // HWConGain
+    pub(crate) hw_lat_gain: f64,             // HWLatGain
+    pub(crate) hw_lost: f64,                 // HWLost
+    pub(crate) hw_tot_gain: f64,             // HWTotGain
+    pub(crate) hw_rad_gain_rate: f64,        // HWRadGainRate
+    pub(crate) hw_con_gain_rate: f64,        // HWConGainRate
+    pub(crate) hw_lat_gain_rate: f64,        // HWLatGainRate
+    pub(crate) hw_lost_rate: f64,            // HWLostRate
+    pub(crate) hw_tot_gain_rate: f64,        // HWTotGainRate
+    pub(crate) steam_power: f64,             // SteamPower
+    pub(crate) steam_consump: f64,           // SteamConsump
+    pub(crate) steam_rad_gain: f64,          // SteamRadGain
+    pub(crate) steam_con_gain: f64,          // SteamConGain
+    pub(crate) steam_lat_gain: f64,          // SteamLatGain
+    pub(crate) steam_lost: f64,              // SteamLost
+    pub(crate) steam_tot_gain: f64,          // SteamTotGain
+    pub(crate) steam_rad_gain_rate: f64,     // SteamRadGainRate
+    pub(crate) steam_con_gain_rate: f64,     // SteamConGainRate
+    pub(crate) steam_lat_gain_rate: f64,     // SteamLatGainRate
+    pub(crate) steam_lost_rate: f64,         // SteamLostRate
+    pub(crate) steam_tot_gain_rate: f64,     // SteamTotGainRate
+    pub(crate) co2_rate: f64,                // CO2Rate
+    pub(crate) gc_rate: f64,                 // GCRate
+    // Source eFuel::Num15 storage, reset in Source order before timestep reads.
+    pub(crate) other_power: [f64; 15],
+    pub(crate) other_consumption: [f64; 15],
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -66,6 +162,8 @@ pub(crate) struct SourceMiscGainObject {
 /// Actual reached collection allocations; None differs from allocated length0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceGainAllocations {
+    /// Native DataHeatBalance.People EPVector constructor empty; positive allocation is guarded IHG361.
+    pub(crate) people: SourcePeopleArray,
     // SpaceZoneSimData ctor NOFOCC/QLTSW.
     pub(crate) zone_int_gain: Option<Vec<[f64; 2]>>,
     pub(crate) space_int_gain: Option<Vec<[f64; 2]>>,

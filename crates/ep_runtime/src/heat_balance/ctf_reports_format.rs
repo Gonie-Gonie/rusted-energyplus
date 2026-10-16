@@ -17,7 +17,7 @@ fn padded(text: String, width: usize) -> String {
     format!("{text:>width$}")
 }
 
-pub(super) fn fixed(value: f64, width: usize, precision: usize) -> String {
+pub(crate) fn fixed(value: f64, width: usize, precision: usize) -> String {
     let text = if value.is_finite() {
         format!("{value:.precision$}")
     } else {

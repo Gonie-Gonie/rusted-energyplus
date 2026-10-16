@@ -333,7 +333,7 @@ impl OrderedCtfPublicInitialization {
     }
 }
 
-fn initialize_public_suffix(
+pub(crate) fn initialize_public_suffix(
     construction: &Construction,
     preprocessing: &ConstructionCtfLayerPreprocessing,
     initial: Option<&ConstructionCtfInitialDiscretization>,

@@ -110,6 +110,8 @@ impl CtfInitializationContext<'_> {
                 clock,
                 reports.heat_balance_space_controls.sizing,
                 reports.heat_balance_space_controls.simulation,
+                globals,
+                &mut reports.selected_internal_heat_gains,
             )
             .map_err(|error| equipment_error(error, &mut self.backend))?;
         reports

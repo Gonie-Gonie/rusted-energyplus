@@ -6,6 +6,8 @@ use super::selected_input_processor::{
     SelectedInputProcessor, SelectedInputUnavailable, SourceArgumentCounts,
 };
 
+mod plugin_output;
+
 #[derive(Debug)]
 pub(crate) enum SelectedRunInputError {
     Input(SelectedInputUnavailable),

@@ -306,14 +306,26 @@ impl WeatherSession {
         if current.out_dew_point_temp > current.out_wet_bulb_temp {
             current.out_dew_point_temp = current.out_wet_bulb_temp;
         }
-        state.weather.rpt_is_rain = if current.is_rain { 1 } else { 0 };
-        state.weather.rpt_is_snow = if current.is_snow { 1 } else { 0 };
+        if source_ground_models {
+            // Actual SetCurrentWeather2260 before the Rain/Snow report writes.
+            state.environment.calculate_source_exterior_daylight()?;
+        }
+        state.weather.rpt_is_rain = if state.environment.current_weather.is_rain {
+            1
+        } else {
+            0
+        };
+        state.weather.rpt_is_snow = if state.environment.current_weather.is_snow {
+            1
+        } else {
+            0
+        };
         Ok(())
     }
 }
 
 /// Literal DetermineSunUpDown; the daily and location operands have real owners.
-fn determine_sun_up_down(state: &mut WeatherDayState) {
+pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) {
     const DEG_TO_RAD: f64 = std::f64::consts::PI / 180.0;
     let env = &mut state.environment;
     let daily = &state.today_variables;

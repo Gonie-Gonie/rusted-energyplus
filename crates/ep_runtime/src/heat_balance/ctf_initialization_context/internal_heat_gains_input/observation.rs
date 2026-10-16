@@ -5,7 +5,7 @@ use super::{SourceMiscGainObject, SourceOtherEquipment};
 use crate::heat_balance::HeatBalanceState;
 use crate::heat_balance::ctf_initialization_context::CtfInitializationReports;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
-use crate::heat_balance::source_output_registration::{SourceOutputStoreType, SourceOutputUnits};
+use crate::heat_balance::source_output_registration::SourceOutputStoreType;
 
 /// A symbolic identity of the actual stored rate target; no pointer is dereferenced.
 #[derive(Clone, Copy, Debug)]
@@ -432,13 +432,7 @@ impl CtfInitializationReports {
                     .map(|(index, row)| OrdinaryGainDictionaryEntry {
                         storage_index: index,
                         name: &row.name,
-                        units: match row.units {
-                            SourceOutputUnits::C => "C",
-                            SourceOutputUnits::MPerS => "m/s",
-                            SourceOutputUnits::Deg => "deg",
-                            SourceOutputUnits::W => "W",
-                            SourceOutputUnits::J => "J",
-                        },
+                        units: row.units.symbol(),
                         store_type: match row.store_type {
                             SourceOutputStoreType::Average => "Average",
                             SourceOutputStoreType::Sum => "Sum",

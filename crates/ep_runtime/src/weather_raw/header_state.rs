@@ -138,9 +138,45 @@ impl Default for DataPeriod {
     }
 }
 
+/// Actual WeatherManager.hh398-414 TypicalExtremeData value constructor.
+/// Six strings construct empty and all seven integer members construct zero.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct SourceTypicalExtremeData {
+    /// Actual environment Title.
+    pub title: String,
+    /// Actual ShortTitle derived from the original prefix branches.
+    pub short_title: String,
+    /// Primary source period-selection match.
+    pub match_value: String,
+    /// First actual source synonym; left constructor-empty when not written.
+    pub match_value1: String,
+    /// Second actual source synonym; left constructor-empty when not written.
+    pub match_value2: String,
+    /// Original Typical/Extreme classification text.
+    pub te_type: String,
+    /// Actual selected period span.
+    pub total_days: i32,
+    /// Actual ordinal start day, written by the two genuine parent passes.
+    pub start_julian_day: i32,
+    /// Source start month.
+    pub start_month: i32,
+    /// Source start day.
+    pub start_day: i32,
+    /// Source end month.
+    pub end_month: i32,
+    /// Source end day.
+    pub end_day: i32,
+    /// Actual ordinal end day.
+    pub end_julian_day: i32,
+}
+
 /// Selected raw header state, before physical weather and calendar projection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RawEpwHeaderState {
+    /// Native WeatherData.hh837 count constructor0, written by actual Typical header.
+    pub number_typical_extreme_sets: i32,
+    /// Native WeatherData.hh900 constructor-unallocated same retained EPVector.
+    pub typical_extreme_periods: AllocatedValues<SourceTypicalExtremeData>,
     /// WeatherManager's destructively assembled EPWHeaderTitle.
     pub header_title: String,
     /// Separate DataEnvironment title copied after LOCATION completes.
@@ -161,6 +197,10 @@ pub struct RawEpwHeaderState {
     pub epw_dst: DstPeriod,
     /// Distinct copied active DST object.
     pub dst: DstPeriod,
+    /// Distinct genuine IDFDST constructor, consumed only by actual getter/override.
+    pub idf_dst: DstPeriod,
+    /// Native WeatherManager.hh831 IDFDaylightSaving constructorfalse.
+    pub idf_daylight_saving: bool,
     /// Weather-file holidays plus explicit InputProcessor special-day count.
     pub number_special_days: i32,
     /// Allocated special-day storage and ordered values.
@@ -185,6 +225,8 @@ pub struct RawEpwHeaderState {
 impl Default for RawEpwHeaderState {
     fn default() -> Self {
         Self {
+            number_typical_extreme_sets: 0,
+            typical_extreme_periods: AllocatedValues::default(),
             header_title: String::new(),
             weather_location_title: String::new(),
             latitude: 0.0,
@@ -195,6 +237,8 @@ impl Default for RawEpwHeaderState {
             epw_daylight_saving: false,
             epw_dst: DstPeriod::default(),
             dst: DstPeriod::default(),
+            idf_dst: DstPeriod::default(),
+            idf_daylight_saving: false,
             number_special_days: 0,
             special_days: AllocatedValues::default(),
             number_data_periods: 0,

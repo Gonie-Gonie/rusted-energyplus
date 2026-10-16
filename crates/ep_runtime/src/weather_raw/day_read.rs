@@ -184,77 +184,12 @@ impl RawEpwCursorOwner {
         backspace_after_read: bool,
         callbacks: &mut impl RawDayReadCallbacks,
     ) -> Result<RawWeatherDay, RawDayFailure> {
-        self.admit_day_read(selection)?;
-        if mode == RawDayReadMode::FirstDay {
-            let selected = self.search_first_day(selection, state)?;
-            callbacks
-                .first_day_selected(state, &selected)
-                .map_err(RawDayFailure::Upstream)?;
-        }
-        let mut hours = Vec::with_capacity(24);
-        for hour in 1..=24 {
-            callbacks
-                .clear_source_interval(hour, 1)
-                .map_err(RawDayFailure::Upstream)?;
-            let mut read = self.input.read_line()?;
-            if !read.read_good {
-                read.data.clear();
-            }
-            if read.data.is_empty() {
-                if hour == 1 {
-                    read.eof = true;
-                }
-                read.read_good = false;
-            }
-            if read.read_good {
-                self.interpret(&read)?;
-            } else if read.eof && self.header.number_data_periods == 1 {
-                if self.header.data_periods.values[0].number_days >= selection.days_in_year {
-                    self.rewind_and_skip_header()?;
-                    read.update(self.input.read_line()?);
-                    // Source calls Interpret before testing this replacement read.
-                    self.interpret(&read)?;
-                } else {
-                    return Err(RawDayFailure::SourceFatal(
-                        RawDaySourceFatal::PartialPeriodEof,
-                    ));
-                }
-            } else {
-                return Err(RawDayFailure::SourceFatal(
-                    RawDaySourceFatal::UnexpectedRead,
-                ));
-            }
-            if self.arguments.dates[3] != hour as i32 {
-                return Err(RawDayFailure::SourceFatal(
-                    RawDaySourceFatal::UnexpectedHour {
-                        expected: hour as i32,
-                        actual: self.arguments.dates[3],
-                    },
-                ));
-            }
-            let slot = self.slot(&read);
-            // Feb29 retry/physical processing is outside this frozen nonleap
-            // domain. Do not turn that native skip branch into a source fatal.
-            if hour == 1 && slot.raw.dates[1..3] == [2, 29] {
-                return Err(RawDayFailure::OutsideBoundedDomain(
-                    "February 29 daily retry",
-                ));
-            }
-            callbacks
-                .parsed_hour(state, hour, &slot)
-                .map_err(RawDayFailure::Upstream)?;
-            hours.push(slot);
-        }
-        if backspace_after_read {
-            self.backspace_record()?;
-        }
-        let day = RawWeatherDay {
-            hours,
-            final_stream: self.stream_state(),
-        };
-        callbacks
-            .complete_day(state, &day)
-            .map_err(RawDayFailure::Upstream)?;
-        Ok(day)
+        use super::source_day_read::{LegacyDayReadCallbacks, SourceRawDayReadFailure};
+        let mut live = LegacyDayReadCallbacks { state, callbacks };
+        self.read_day_with_live_source_state(selection, mode, backspace_after_read, &mut live)
+            .map_err(|failure| match failure {
+                SourceRawDayReadFailure::Native(error) => error,
+                SourceRawDayReadFailure::Callback(error) => RawDayFailure::Upstream(error),
+            })
     }
 }

@@ -137,7 +137,7 @@ impl SurfaceOutdoorEnvironmentState {
 }
 
 // Literal ObjexxFCL min(double,double,double), including NaNs and tie direction.
-fn minimum_three(a: f64, b: f64, c: f64) -> f64 {
+pub(crate) fn minimum_three(a: f64, b: f64, c: f64) -> f64 {
     if a < b {
         if a < c { a } else { c }
     } else if b < c {
@@ -162,7 +162,7 @@ pub fn check_surface_out_bulb_temperatures<'a>(
 }
 
 // Both Original bulk guards invoke the same DataEnvironment error routine.
-fn check_out_bulb_temperatures<'a>(
+pub(crate) fn check_out_bulb_temperatures<'a>(
     kind: &str,
     rows: impl IntoIterator<Item = (f64, f64, f64, &'a str)>,
     backend: &mut SourceErrorBackend<'_>,

@@ -718,8 +718,26 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
     view_factors: &[f64],
     emissivities: &mut [f64],
 ) -> Option<Vec<f64>> {
+    // Preserve the existing warning-free primitive admission and no-write stop.
+    if emissivities.iter().any(|value| !value.is_finite() || *value < 0.0 || *value > 0.99999) {
+        return None;
+    }
+    match energyplus_scriptf_from_view_factors_with_warning(
+        areas, view_factors, emissivities, || Ok::<(), std::convert::Infallible>(()),
+    ) {
+        Ok(value) => value.filter(|values| values.iter().all(|value| value.is_finite())),
+        Err(never) => match never {},
+    }
+}
+
+pub(crate) fn energyplus_scriptf_from_view_factors_with_warning<E>(
+    areas: &[f64],
+    view_factors: &[f64],
+    emissivities: &mut [f64],
+    mut warning: impl FnMut() -> Result<(), E>,
+) -> Result<Option<Vec<f64>>, E> {
     let surface_count = areas.len();
-    let extent = surface_count.checked_mul(surface_count)?;
+    let Some(extent) = surface_count.checked_mul(surface_count) else { return Ok(None); };
     if surface_count == 0
         || view_factors.len() != extent
         || emissivities.len() != surface_count
@@ -727,9 +745,9 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
         || view_factors.iter().any(|value| !value.is_finite())
         || emissivities
             .iter()
-            .any(|value| !value.is_finite() || *value < 0.0 || *value > 0.99999)
+            .any(|value| !value.is_finite() || *value < 0.0)
     {
-        return None;
+        return Ok(None);
     }
     let mut coefficient_matrix = vec![0.0; extent];
     let mut offset = 0;
@@ -742,13 +760,18 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
     let mut excitation = vec![0.0; surface_count];
     offset = 0;
     for i in 0..surface_count {
-        let emissivity = emissivities[i];
+        let mut emissivity = emissivities[i];
+        if emissivity > 0.99999 {
+            emissivity = 0.99999;
+            emissivities[i] = emissivity;
+            warning()?;
+        }
         let factor = areas[i] / (1.0 - emissivity);
         excitation[i] = -emissivity * factor;
         coefficient_matrix[offset] -= factor;
         offset += surface_count + 1;
     }
-    let mut inverse = invert_square_matrix(&mut coefficient_matrix, surface_count)?;
+    let Some(mut inverse) = invert_square_matrix(&mut coefficient_matrix, surface_count) else { return Ok(None); };
     offset = 0;
     for excite in excitation {
         for _i in 0..surface_count {
@@ -771,10 +794,7 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
             output_offset += 1;
         }
     }
-    if script_f.iter().any(|value| !value.is_finite()) {
-        return None;
-    }
-    Some(script_f)
+    Ok(Some(script_f))
 }
 
 fn invert_square_matrix(matrix: &mut [f64], dimension: usize) -> Option<Vec<f64>> {

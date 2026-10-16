@@ -1,12 +1,12 @@
 //! Live header, raw-parser and byte-cursor owner for source-order day reads.
 
 use super::day_read::{
-    RawDayFailure, RawDayReadSelection, RawDayReadState, RawDaySourceFatal, RawReadProvenance,
-    RawWeatherSlot,
+    RawDayFailure, RawDayReadSelection, RawDaySourceFatal, RawReadProvenance, RawWeatherSlot,
 };
 use super::header_state::{strip_ascii_spaces, to_source_int};
 use super::input::erase_field;
 use super::lexical::{process_number, read_int};
+use super::source_day_read::SourceRawDayReadClock;
 use super::{
     HeaderCallerPreparation, HeaderContextConsumption, RawEpwHeaderState, RawEpwInput,
     RawEpwLineRead, RawEpwOutputs, RawEpwParserState, RawEpwStreamState,
@@ -14,16 +14,16 @@ use super::{
 };
 
 /// A live stream. Selected day values are produced only by actual reads.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct RawEpwCursorOwner {
     pub(super) input: RawEpwInput,
     pub(super) header: RawEpwHeaderState,
-    parser: RawEpwParserState,
+    pub(super) parser: RawEpwParserState,
     /// Explicit Rust reference-argument storage, not a native constructor claim.
     pub(super) arguments: RawEpwOutputs,
     header_errors: bool,
-    header_context: HeaderContextConsumption,
-    stream_after_header: RawEpwStreamState,
+    pub(super) header_context: HeaderContextConsumption,
+    pub(super) stream_after_header: RawEpwStreamState,
     interpret_count: usize,
 }
 
@@ -75,6 +75,10 @@ impl RawEpwCursorOwner {
     /// Actual header state, including the shared parser miss counter.
     pub fn header(&self) -> &RawEpwHeaderState {
         &self.header
+    }
+    /// Borrow the sole real calendar/header owner for genuine later caller writes.
+    pub(crate) fn source_header_mut(&mut self) -> &mut RawEpwHeaderState {
+        &mut self.header
     }
     /// Nonfatal ErrorsFound returned by the actual opening header operation.
     pub fn header_errors(&self) -> bool {
@@ -262,19 +266,44 @@ impl RawEpwCursorOwner {
         result.map_err(RawDayFailure::Record)
     }
 
+    /// Genuine Source parser view: actual Header.EndDayOfMonth and the SAME
+    /// WeatherDayState.missed_counts.weath_codes mutable field. Legacy parser
+    /// counter/header snapshot is never synchronized or read by this route.
+    pub(crate) fn interpret_with_live_source_counter(
+        &mut self,
+        read: &RawEpwLineRead,
+        weather_code_missed_count: &mut i32,
+    ) -> Result<(), RawDayFailure> {
+        self.interpret_count =
+            self.interpret_count
+                .checked_add(1)
+                .ok_or(RawDayFailure::OutsideBoundedDomain(
+                    "raw parser invocation count overflow",
+                ))?;
+        super::record::interpret_weather_data_line_with_live_counter(
+            &self.header.month_ends,
+            weather_code_missed_count,
+            &read.data,
+            &mut self.arguments,
+        )
+        .map_err(RawDayFailure::Record)
+    }
+
     pub(super) fn search_first_day(
         &mut self,
         selection: RawDayReadSelection,
-        state: &mut RawDayReadState,
+        state: &mut impl SourceRawDayReadClock,
     ) -> Result<RawWeatherSlot, RawDayFailure> {
-        state.read_time = 1.0 / f64::from(self.header.intervals_per_hour);
-        state.current_day_of_week = self.header.data_periods.values[0]
-            .weekday
-            .checked_sub(1)
-            .ok_or(RawDayFailure::OutsideBoundedDomain(
-                "initial weekday subtraction overflow",
-            ))?;
-        state.last_hour_set = false;
+        state.set_read_time(1.0 / f64::from(self.header.intervals_per_hour));
+        state.set_current_day_of_week(
+            self.header.data_periods.values[0]
+                .weekday
+                .checked_sub(1)
+                .ok_or(RawDayFailure::OutsideBoundedDomain(
+                    "initial weekday subtraction overflow",
+                ))?,
+        );
+        state.set_last_hour_set(false);
         self.arguments.dates = [0; 5];
         let mut read = RawEpwLineRead {
             data: String::new(),
@@ -287,26 +316,26 @@ impl RawEpwCursorOwner {
         loop {
             read.update(self.input.read_line()?);
             if read.read_good {
-                self.interpret(&read)?;
+                state.interpret_record(self, &read)?;
             } else if read.eof && rewinds == 0 {
                 self.rewind_and_skip_header()?;
                 rewinds += 1;
                 read.update(self.input.read_line()?);
                 // The source interprets even a failed replacement extraction.
-                self.interpret(&read)?;
+                state.interpret_record(self, &read)?;
             }
             if !read.read_good {
                 return Err(RawDayFailure::SourceFatal(RawDaySourceFatal::SearchRead));
             }
-            if state.current_day_of_week <= 7 {
-                state.current_day_of_week = state.current_day_of_week % 7 + 1;
+            if state.current_day_of_week() <= 7 {
+                state.set_current_day_of_week(state.current_day_of_week() % 7 + 1);
             }
             let date = self.arguments.dates;
             if date[1] == selection.start_month && date[2] == selection.start_day {
                 let selected = self.slot(&read);
                 self.backspace_record()?;
-                if state.current_day_of_week <= 7 {
-                    state.current_day_of_week -= 1;
+                if state.current_day_of_week() <= 7 {
+                    state.set_current_day_of_week(state.current_day_of_week() - 1);
                 }
                 // Initial physical range diagnostics are owned by the producer;
                 // their source severe errors do not terminate this search.

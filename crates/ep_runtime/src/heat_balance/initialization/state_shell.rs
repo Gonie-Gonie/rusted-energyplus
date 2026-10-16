@@ -21,6 +21,7 @@ pub(super) fn finish_heat_balance_state(
         initialized_geometry,
         warmup_convergence: None,
         ordinary_inside_temperatures: None,
+        ordinary_surface_initialization: None,
         ordinary_equipment: None,
         ordinary_solar_radiation: None,
         zone_air_environment_guard: Default::default(),

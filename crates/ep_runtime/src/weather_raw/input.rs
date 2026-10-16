@@ -5,13 +5,25 @@ use super::header_state::{
     to_source_int,
 };
 
+/// The actual allocated fstream object, including a retained failed-open object.
+#[derive(Debug)]
+struct SourcePhysicalInputStream {
+    handle: Option<std::io::BufReader<std::fs::File>>,
+}
+
 /// A supplied-byte EPW stream retaining its actual cursor across header and records.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct RawEpwInput {
+    /// Actual IOFiles.hh InputFile.filePath, constructed empty.
+    pub(crate) source_file_path: std::path::PathBuf,
+    /// Actual IOFiles.hh file_size, constructed positive zero.
+    pub(crate) source_file_size: u64,
+    /// The actual binary Source input stream, constructed absent and closed by close.
+    source_stream: Option<SourcePhysicalInputStream>,
     bytes: Vec<u8>,
     /// Byte cursor, including consumed LF bytes.
     pub byte_cursor: usize,
-    /// Whether this supplied-byte stream is open.
+    /// Actual InputFile::is_open observation; a failed nonnull fstream reports true.
     pub opened: bool,
     /// End-of-file flag, separate from a read's successful data extraction.
     pub eof: bool,
@@ -69,10 +81,16 @@ impl RawEpwLineRead {
     }
 }
 
+#[path = "source_input.rs"]
+mod source_input;
+
 impl RawEpwInput {
     /// Construct the closed supplied-byte owner used before explicit opening.
     pub fn new_unopened(bytes: Vec<u8>) -> Self {
         Self {
+            source_file_path: std::path::PathBuf::new(),
+            source_file_size: 0,
+            source_stream: None,
             bytes,
             byte_cursor: 0,
             opened: false,
@@ -96,6 +114,7 @@ impl RawEpwInput {
     /// Supplied bytes and Rust read-attempt bookkeeping remain available for a
     /// later open, but no native closed-stream position is claimed.
     pub fn close(&mut self) {
+        self.source_stream = None;
         self.opened = false;
         self.eof = false;
         self.failed = false;
@@ -105,6 +124,10 @@ impl RawEpwInput {
     /// InputFile::rewind clears flags and seeks to zero on an open owner only.
     /// It retains the actual line-attempt count and does not reopen the stream.
     pub fn rewind(&mut self) {
+        if self.source_stream.is_some() {
+            self.rewind_source_stream();
+            return;
+        }
         if self.opened {
             self.eof = false;
             self.failed = false;
@@ -116,6 +139,9 @@ impl RawEpwInput {
     /// Literal InputFile::backspace scan, including its cursor-one edge case.
     /// This is a byte operation, rather than a saved previous-line position.
     pub fn backspace(&mut self) -> Result<(), RawEpwHeaderError> {
+        if self.source_stream.is_some() {
+            return self.backspace_source_stream();
+        }
         if !self.opened {
             return Ok(());
         }
@@ -169,6 +195,9 @@ impl RawEpwInput {
         };
         if !self.opened {
             return Ok(empty(true));
+        }
+        if self.source_stream.is_some() {
+            return self.read_source_stream_line(start);
         }
         if start > self.bytes.len() {
             return Err(RawEpwHeaderError::OutsideBoundedDomain(

@@ -33,6 +33,11 @@ pub(crate) struct SurfaceLists {
     pub(crate) all_exterior_solar_window: Vec<i32>,
     pub(crate) all_exterior_solar_window_with_frame: Vec<i32>,
     pub(crate) all_ht_kiva: Vec<i32>,
+    /// DataSurfaces.hh1530-1533 constructor-empty lists. Real positive input/HVAC writers remain separate.
+    pub(crate) all_vary_absorptance_opaque: Vec<i32>,
+    pub(crate) all_inside_source: Vec<i32>,
+    pub(crate) all_outside_source: Vec<i32>,
+    pub(crate) all_gets_radiant_heat: Vec<i32>,
     pub(crate) filters: [Vec<i32>; 11],
 }
 

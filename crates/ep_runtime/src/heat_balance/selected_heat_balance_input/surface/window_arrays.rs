@@ -6,6 +6,88 @@ use super::Error;
 #[allow(dead_code)]
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SurfaceWindowArrays {
+    /// SolarShading.cc937: SurfSunCosHourly, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_sun_cos_hourly: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<[f64; 3], 1>,
+    /// SolarShading.cc941: SurfSunlitArea, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_sunlit_area: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc942: SurfSunlitFrac, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_sunlit_frac: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc945: SurfBmToBmReflFacObs, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_bm_to_bm_refl_fac_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc946: SurfBmToDiffReflFacObs, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_bm_to_diff_refl_fac_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc947: SurfBmToDiffReflFacGnd, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_bm_to_diff_refl_fac_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc948: SurfSkyDiffReflFacGnd, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_sky_diff_refl_fac_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc949: SurfOpaqAI, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_opaq_ai: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc950: SurfOpaqAO, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_opaq_ao: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc951: SurfWinTransSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_trans_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc952: SurfWinBmSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc953: SurfWinBmBmSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_bm_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc954: SurfWinBmDifSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_dif_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc955: SurfWinDifSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_dif_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc956: SurfWinHeatGain, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_gain: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc957: SurfWinHeatGainRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_gain_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc958: SurfWinHeatLossRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_loss_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc959: SurfWinGainConvGlazToZoneRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gain_conv_glaz_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc960: SurfWinGainIRGlazToZoneRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gain_ir_glaz_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc961: SurfWinLossSWZoneToOutWinRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_loss_sw_zone_to_out_win_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc962: SurfWinGainFrameDividerToZoneRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gain_frame_divider_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc963: SurfWinGainConvShadeToZoneRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gain_conv_shade_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc964: SurfWinGainIRShadeToZoneRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gain_ir_shade_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc965: SurfWinGapConvHtFlowRep, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gap_conv_ht_flow_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc966: SurfWinShadingAbsorbedSolar, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_shading_absorbed_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc967: SurfWinSysSolTransmittance, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_sys_sol_transmittance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc968: SurfWinSysSolReflectance, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_sys_sol_reflectance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc969: SurfWinSysSolAbsorptance, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_sys_sol_absorptance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc970: SurfWinInsideGlassCondensationFlag, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_inside_glass_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<i32, 1>,
+    /// SolarShading.cc971: SurfWinInsideFrameCondensationFlag, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_inside_frame_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<i32, 1>,
+    /// SolarShading.cc972: SurfWinInsideDividerCondensationFlag, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_inside_divider_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<i32, 1>,
+    /// SolarShading.cc1037: SurfWinTransSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_trans_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1038: SurfWinBmSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1039: SurfWinBmBmSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_bm_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1040: SurfWinBmDifSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_bm_dif_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1042: SurfWinDifSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_dif_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1043: SurfWinHeatGainRepEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_gain_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1044: SurfWinHeatLossRepEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_loss_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1045: SurfWinGapConvHtFlowRepEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_gap_conv_ht_flow_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1046: SurfWinHeatTransferRepEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_heat_transfer_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    /// SolarShading.cc1047: SurfWinShadingAbsorbedSolarEnergy, unallocated until Solar AllocateModuleArrays.
+    pub(crate) surf_win_shading_absorbed_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
     pub(crate) rows: usize,
     pub(crate) equivalent_layer_columns: usize,
     pub(crate) solid_window_columns: usize,
@@ -153,6 +235,47 @@ impl SurfaceWindowArrays {
                 "Source solid-window matrix storage size",
             ))?;
         Ok(Self {
+            surf_sun_cos_hourly: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_sunlit_area: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_sunlit_frac: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_bm_to_bm_refl_fac_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_bm_to_diff_refl_fac_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_bm_to_diff_refl_fac_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_sky_diff_refl_fac_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_opaq_ai: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_opaq_ao: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_trans_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_bm_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_dif_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_dif_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_gain: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_gain_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_loss_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gain_conv_glaz_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gain_ir_glaz_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_loss_sw_zone_to_out_win_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gain_frame_divider_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gain_conv_shade_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gain_ir_shade_to_zone_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gap_conv_ht_flow_rep: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_shading_absorbed_solar: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_sys_sol_transmittance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_sys_sol_reflectance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_sys_sol_absorptance: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_inside_glass_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_inside_frame_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_inside_divider_condensation_flag: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_trans_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_bm_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_bm_dif_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_dif_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_gain_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_loss_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_gap_conv_ht_flow_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_heat_transfer_rep_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_win_shading_absorbed_solar_energy: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
             rows,
             equivalent_layer_columns,
             solid_window_columns,

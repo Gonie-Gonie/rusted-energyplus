@@ -27,6 +27,7 @@ mod ordinary_material_input;
 mod ordinary_project_data;
 mod ordinary_schedule_input;
 mod ordinary_sizing_input;
+mod ordinary_tabular_input;
 mod outputs;
 mod pipeline;
 mod porting_scope;

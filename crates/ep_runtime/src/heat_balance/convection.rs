@@ -95,7 +95,7 @@ pub fn energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
     h_n + h_f
 }
 
-fn energyplus_surface_is_windward(
+pub(crate) fn energyplus_surface_is_windward(
     cos_tilt: f64,
     surface_azimuth_deg: f64,
     wind_direction_deg: f64,
@@ -149,7 +149,7 @@ fn energyplus_mowitt_forced_leeward_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
     3.55 * wind_speed_m_per_s.max(0.0).powf(0.617)
 }
 
-fn energyplus_roughness_multiplier(roughness: MaterialSurfaceRoughness) -> f64 {
+pub(crate) fn energyplus_roughness_multiplier(roughness: MaterialSurfaceRoughness) -> f64 {
     match roughness {
         MaterialSurfaceRoughness::VeryRough => 2.17,
         MaterialSurfaceRoughness::Rough => 1.67,

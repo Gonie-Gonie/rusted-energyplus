@@ -28,7 +28,7 @@ pub enum HeaderKind {
     DataPeriods = 7,
 }
 
-const HEADERS: [(HeaderKind, &str); 8] = [
+pub(super) const HEADERS: [(HeaderKind, &str); 8] = [
     (HeaderKind::Location, "LOCATION"),
     (HeaderKind::DesignConditions, "DESIGN CONDITIONS"),
     (HeaderKind::TypicalExtremePeriods, "TYPICAL/EXTREME PERIODS"),
@@ -68,7 +68,7 @@ pub fn process_epw_header(
     Ok(())
 }
 
-fn location(
+pub(super) fn location(
     line: &mut String,
     state: &mut RawEpwHeaderState,
     input: &mut RawEpwInput,

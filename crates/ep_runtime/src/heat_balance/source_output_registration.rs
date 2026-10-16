@@ -1,5 +1,5 @@
-//! Sole reached OutputProcessor time bindings, before any variable registration.
-//! Future requested-variable/dictionary storage extends this same owner.
+//! Sole reached OutputProcessor time bindings and Source variable registrations.
+//! Requested real variables retain stable identities resolved against live owners.
 use super::error_backend::SourceErrorBackend;
 use super::selected_simulation_startup::{SelectedHvacGlobals, StartupError};
 use crate::weather::day::WeatherGlobalState;
@@ -98,9 +98,63 @@ use super::radiation::ordinary::{OrdinaryRadiationError, OrdinaryRadiationUnavai
 use super::source_output_prescan::SourceOutputPreScan;
 use crate::error::WarmupOutputError;
 use std::collections::BTreeMap;
+mod air_target;
+mod system_target;
+pub(crate) use system_target::{SourceAllIntegerOutputOwners, SourceHvacRealOutputField};
+mod bound_real;
+mod exterior_light_target;
+mod facility_target;
+mod system_reports_target;
+pub(crate) use exterior_light_target::SourceExteriorLightOutputField;
+pub(crate) use system_reports_target::SourceSystemReportsOutputField;
+mod general_real;
+mod meters;
+mod weather_target;
+pub(crate) use facility_target::{SourceFacilityOutputField, SourceNonFacilityOutputOwners};
+pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRealOutputField};
+mod instant_meter;
+mod meter_reporting;
+mod milo_dtoa;
+mod report_streams;
+mod report_writers;
+mod results_meter;
+mod update_data;
+mod update_meters;
+pub(crate) use report_streams::SourceOutputReportStreams;
+pub(crate) use results_meter::{SourceMeterDataFrame, add_source_report_meter};
+pub(crate) use update_data::{SourceOutputUpdateEnvironment, SourceOutputUpdateOwners};
+mod pollution_target;
+pub(crate) use air_target::{
+    SourceAirOutputField, SourceAllOutputOwners, SourceComfortOutputField,
+};
+pub(crate) use general_real::{
+    SourceGeneralRealRegistrationOptions, SourceRealRegistrationOptions,
+};
+pub(crate) use meters::{SourceEnergyTransferMeterArguments, SourceMeterEndUse};
+pub(crate) use meters::{SourceGeneralMeterArguments, SourceMeterGroup, SourceMeterResource};
+mod solar_target;
+pub(crate) use solar_target::{SourceCombinedOutputOwners, SourceSolarOutputField};
+mod bound_integer;
+mod dictionary;
+mod meter_request_input;
+pub(crate) use meter_request_input::{SourceMeterReportingHost, SourceMeterReportingOwners};
 mod host;
+mod integer;
+mod oscillation_target;
 mod requested_input;
+pub(crate) use bound_integer::{
+    SourceIntegerOutputBinding, SourceIntegerOutputOwners, SourceIntegerOutputTarget,
+    SourceRequestedIntegerValue,
+};
+pub(crate) use bound_real::{
+    SourceOutVarReal, SourceRealOutputBinding, SourceRealOutputOwners, SourceRealOutputTarget,
+    SourceRequestedRealValue, SourceSurfaceOutputField,
+};
+pub(crate) use dictionary::{SourceOutputDictionaryHost, SourceOutputDictionaryStreams};
 pub use host::SourceMtdFileHost;
+pub(crate) use integer::SourceIntegerOutputDeclaration;
+pub(crate) use oscillation_target::SourceOscillationOutputField;
+pub(crate) use pollution_target::SourceCarbonEquivalentField;
 pub(crate) use requested_input::SourceReportVariableInput;
 
 /// Actual output file/system host, supplied by the real Setup route.
@@ -110,11 +164,55 @@ pub(crate) trait SourceOutputFileHost {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceOutputUnits {
+    Invalid,
+    Dimensionless,
+    Percentage,
+    KgWaterPerSecond,
+    Pa,
+    M,
+    KgPerM3,
+    Lux,
+    LumPerW,
+    KgWaterPerKgDryAir,
+    JPerKg,
+    Hr,
     C,
     MPerS,
     Deg,
+    M2,
+    Rad,
     W,
     J,
+    Kg,
+    WPerM2,
+    WPerM2K,
+}
+impl SourceOutputUnits {
+    pub(crate) fn symbol(self) -> &'static str {
+        match self {
+            Self::Invalid | Self::Dimensionless => "",
+            Self::C => "C",
+            Self::Pa => "Pa",
+            Self::M => "m",
+            Self::KgPerM3 => "kg/m3",
+            Self::Lux => "lux",
+            Self::LumPerW => "lum/W",
+            Self::Percentage => "%",
+            Self::Hr => "hr",
+            Self::KgWaterPerSecond => "kgWater/s",
+            Self::KgWaterPerKgDryAir => "kgWater/kgDryAir",
+            Self::JPerKg => "J/kg",
+            Self::MPerS => "m/s",
+            Self::Deg => "deg",
+            Self::M2 => "m2",
+            Self::Rad => "rad",
+            Self::W => "W",
+            Self::J => "J",
+            Self::Kg => "kg",
+            Self::WPerM2 => "W/m2",
+            Self::WPerM2K => "W/m2-K",
+        }
+    }
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceOutputStoreType {
@@ -143,6 +241,7 @@ pub(crate) struct SourceRealOutputDeclaration<'a> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SourceDictionaryVariable {
     pub(crate) integer: bool,
+    pub(crate) time_step_type: TimeStepKind,
     pub(crate) name: String,
     pub(crate) units: SourceOutputUnits,
     pub(crate) store_type: SourceOutputStoreType,
@@ -186,6 +285,16 @@ pub(crate) struct SourceEndUseCategory {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceOutputRegistration {
+    /// Actual OutputProcessor.hh932–948 constructor members, never seeded.
+    pub(crate) number_hours_in_month: i32,
+    pub(crate) number_hours_in_simulation: i32,
+    pub(crate) meter_values: Vec<f64>,
+    pub(crate) frequency_stamp_report_numbers: [i32; 7],
+    pub(crate) errors_logged: bool,
+    pub(crate) is_final_year: bool,
+    pub(crate) last_hour_printed: i32,
+    pub(crate) last_start_minute: f64,
+    pub(crate) last_end_minute: f64,
     pub(crate) time_pointers: SelectedOutputTimePointers,
     pub(crate) output_initialized: bool,
     pub(crate) get_output_input: bool,
@@ -194,6 +303,9 @@ pub(crate) struct SourceOutputRegistration {
     pub(crate) end_use_categories: Option<Vec<SourceEndUseCategory>>,
     pub(crate) requested_variables: Vec<SourceRequestedVariable>,
     pub(crate) dictionary_variables: Vec<SourceDictionaryVariable>,
+    pub(crate) out_vars: Vec<SourceOutVarReal>,
+    pub(crate) meters: meters::SourceMeters,
+    pub(crate) frequency_tracking_variables: [bool; 7],
     dictionary_by_name: BTreeMap<String, usize>,
     pub(crate) num_total_real_variables: i32,
     pub(crate) num_real_variables: i32,
@@ -206,10 +318,20 @@ pub(crate) struct SourceOutputRegistration {
     pub(crate) num_real_variables_meter: i32,
     pub(crate) report_number_counter: i32,
     pub(crate) max_num_subcategories: i32,
+    pub(crate) max_num_end_use_space_types: i32, // Native OutputProcessor.hh968
 }
 impl Default for SourceOutputRegistration {
     fn default() -> Self {
         Self {
+            number_hours_in_month: 0,
+            number_hours_in_simulation: 0,
+            meter_values: Vec::new(),
+            frequency_stamp_report_numbers: [-1; 7],
+            errors_logged: false,
+            is_final_year: false,
+            last_hour_printed: -1,
+            last_start_minute: -1.0,
+            last_end_minute: -1.0,
             time_pointers: SelectedOutputTimePointers::default(),
             output_initialized: false,
             get_output_input: true,
@@ -218,6 +340,9 @@ impl Default for SourceOutputRegistration {
             end_use_categories: None,
             requested_variables: Vec::new(),
             dictionary_variables: Vec::new(),
+            out_vars: Vec::new(),
+            meters: meters::SourceMeters::default(),
+            frequency_tracking_variables: [false; 7],
             dictionary_by_name: BTreeMap::new(),
             num_total_real_variables: 0,
             num_real_variables: 0,
@@ -230,8 +355,15 @@ impl Default for SourceOutputRegistration {
             num_real_variables_meter: 0,
             report_number_counter: 0,
             max_num_subcategories: 1,
+            max_num_end_use_space_types: 1,
         }
     }
+}
+
+struct SourceRealRegistrationSelection {
+    request_indexes: Vec<usize>,
+    dictionary_number: usize,
+    on_the_list: bool,
 }
 
 impl SourceOutputRegistration {
@@ -289,13 +421,18 @@ impl SourceOutputRegistration {
             .map_err(|error| OrdinaryRadiationError::Output(WarmupOutputError::Io(error)))
     }
 
-    fn add_dictionary_variable(&mut self, declaration: SourceRealOutputDeclaration<'_>) -> usize {
-        self.add_typed_dictionary_variable(declaration, false)
-    }
     fn add_typed_dictionary_variable(
         &mut self,
         declaration: SourceRealOutputDeclaration<'_>,
         integer: bool,
+    ) -> usize {
+        self.add_typed_dictionary_variable_at(declaration, integer, TimeStepKind::Zone)
+    }
+    fn add_typed_dictionary_variable_at(
+        &mut self,
+        declaration: SourceRealOutputDeclaration<'_>,
+        integer: bool,
+        time_step_type: TimeStepKind,
     ) -> usize {
         let name_upper = declaration.name.to_ascii_uppercase();
         if let Some(&first) = self.dictionary_by_name.get(&name_upper) {
@@ -320,6 +457,7 @@ impl SourceOutputRegistration {
         let index = self.dictionary_variables.len();
         self.dictionary_variables.push(SourceDictionaryVariable {
             integer,
+            time_step_type,
             name: declaration.name.into(),
             units: declaration.units,
             store_type: declaration.store_type,
@@ -330,24 +468,12 @@ impl SourceOutputRegistration {
         index
     }
 
-    pub(crate) fn prepare_real_registration(
-        &mut self,
-        input: &mut SourceReportVariableInput<'_>,
-        prescan: &SourceOutputPreScan,
-        declaration: SourceRealOutputDeclaration<'_>,
-        minutes_in_time_step: i32,
-        host: &mut impl SourceOutputFileHost,
-        eio: &mut dyn std::io::Write,
-    ) -> Result<bool, OrdinaryRadiationError> {
-        if !self.output_initialized {
-            self.initialize_output(minutes_in_time_step, host)?;
-        }
-        self.get_report_variable_input(input, host, eio)?;
+    fn match_report_variables(&mut self, name: &str, key: &str) -> Vec<usize> {
         let mut request_indexes: Vec<usize> = Vec::new();
         for index in 0..self.requested_variables.len() {
             let request = &mut self.requested_variables[index];
-            if !request.name.eq_ignore_ascii_case(declaration.name)
-                || !(request.key.is_empty() || request.key.eq_ignore_ascii_case(declaration.key))
+            if !request.name.eq_ignore_ascii_case(name)
+                || !(request.key.is_empty() || request.key.eq_ignore_ascii_case(key))
             {
                 continue;
             }
@@ -361,8 +487,59 @@ impl SourceOutputRegistration {
                 request_indexes.push(index);
             }
         }
+        request_indexes
+    }
+
+    fn prepare_real_registration_details(
+        &mut self,
+        input: &mut SourceReportVariableInput<'_>,
+        prescan: &SourceOutputPreScan,
+        declaration: SourceRealOutputDeclaration<'_>,
+        minutes_in_time_step: i32,
+        host: &mut impl SourceOutputFileHost,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<SourceRealRegistrationSelection, OrdinaryRadiationError> {
+        let (request_indexes, this_one_on_the_list) = self.prepare_real_registration_front(
+            input,
+            prescan,
+            declaration,
+            minutes_in_time_step,
+            host,
+            eio,
+        )?;
+        self.finish_real_registration_prefix(
+            declaration,
+            TimeStepKind::Zone,
+            request_indexes,
+            this_one_on_the_list,
+        )
+    }
+    fn prepare_real_registration_front(
+        &mut self,
+        input: &mut SourceReportVariableInput<'_>,
+        prescan: &SourceOutputPreScan,
+        declaration: SourceRealOutputDeclaration<'_>,
+        minutes_in_time_step: i32,
+        host: &mut impl SourceOutputFileHost,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<(Vec<usize>, bool), OrdinaryRadiationError> {
+        if !self.output_initialized {
+            self.initialize_output(minutes_in_time_step, host)?;
+        }
+        self.get_report_variable_input(input, host, eio)?;
+        let request_indexes = self.match_report_variables(declaration.name, declaration.key);
         let this_one_on_the_list = prescan.find_item(declaration.key, declaration.name);
-        self.add_dictionary_variable(declaration);
+        Ok((request_indexes, this_one_on_the_list))
+    }
+    fn finish_real_registration_prefix(
+        &mut self,
+        declaration: SourceRealOutputDeclaration<'_>,
+        time_step_type: TimeStepKind,
+        request_indexes: Vec<usize>,
+        this_one_on_the_list: bool,
+    ) -> Result<SourceRealRegistrationSelection, OrdinaryRadiationError> {
+        let dictionary_number =
+            self.add_typed_dictionary_variable_at(declaration, false, time_step_type);
         self.num_real_variables_setup = self
             .num_real_variables_setup
             .checked_add(1)
@@ -374,7 +551,31 @@ impl SourceOutputRegistration {
                     .map_err(|_| OrdinaryRadiationUnavailable::StorageDomain)?,
             )
             .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
-        Ok(this_one_on_the_list)
+        Ok(SourceRealRegistrationSelection {
+            request_indexes,
+            dictionary_number,
+            on_the_list: this_one_on_the_list,
+        })
+    }
+
+    pub(crate) fn prepare_real_registration(
+        &mut self,
+        input: &mut SourceReportVariableInput<'_>,
+        prescan: &SourceOutputPreScan,
+        declaration: SourceRealOutputDeclaration<'_>,
+        minutes_in_time_step: i32,
+        host: &mut impl SourceOutputFileHost,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<bool, OrdinaryRadiationError> {
+        self.prepare_real_registration_details(
+            input,
+            prescan,
+            declaration,
+            minutes_in_time_step,
+            host,
+            eio,
+        )
+        .map(|selected| selected.on_the_list)
     }
 
     /// Literal no-meter return: dictionary/setup/total writes still occur.

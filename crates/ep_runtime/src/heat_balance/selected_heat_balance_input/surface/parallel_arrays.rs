@@ -316,3 +316,67 @@ impl SurfaceGeometryInputState {
         }
     }
 }
+
+impl SurfaceGeometryInputState {
+    /// Move the sole actual AllocateSurfaceArrays outdoor allocation without
+    /// constructing the old physical CTF/temperature/cache state. Numeric rows
+    /// stay in actual final Surface order and are never cloned or initialized here.
+    pub(crate) fn take_source_outdoor_in_surface_order(
+        &mut self,
+    ) -> Result<Vec<crate::heat_balance::convection::surface_environment::source_rows::SourceSurfaceOutdoorState>, Error>{
+        use crate::heat_balance::convection::surface_environment::source_rows::SourceSurfaceOutdoorState;
+        let final_rows = self.final_surfaces.as_ref().ok_or(Error::Unavailable(
+            "actual final Surface before Source outdoor move",
+        ))?;
+        let total = usize::try_from(self.total_surfaces)
+            .map_err(|_| Error::Unavailable("actual Source outdoor total"))?;
+        let arrays = self.parallel_arrays.as_mut().ok_or(Error::Unavailable(
+            "actual AllocateSurfaceArrays before Source outdoor move",
+        ))?;
+        let source = arrays.outdoor.as_ref().ok_or(Error::Unavailable(
+            "sole Source outdoor owners already moved",
+        ))?;
+        if final_rows.len() != total
+            || source.len() != total
+            || !arrays.outdoor_to_model_swaps.is_empty()
+        {
+            return Err(Error::Unavailable(
+                "actual Source outdoor order/shape before sole move",
+            ));
+        }
+        let ids = final_rows
+            .iter()
+            .map(|row| {
+                row.typed_id.ok_or(Error::Unavailable(
+                    "actual final Surface identity before Source outdoor move",
+                ))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        if ids
+            .iter()
+            .copied()
+            .collect::<std::collections::BTreeSet<_>>()
+            .len()
+            != total
+        {
+            return Err(Error::Unavailable(
+                "actual unique full Source Surface identity",
+            ));
+        }
+        // All fallible association checks precede the sole ownership transfer.
+        let source = arrays
+            .outdoor
+            .take()
+            .ok_or(Error::Unavailable("sole Source outdoor allocation custody"))?;
+        Ok(ids
+            .into_iter()
+            .zip(source)
+            .map(
+                |(surface_id, outdoor_environment)| SourceSurfaceOutdoorState {
+                    surface_id,
+                    outdoor_environment,
+                },
+            )
+            .collect())
+    }
+}

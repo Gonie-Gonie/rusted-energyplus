@@ -27,6 +27,10 @@ pub struct SelectedSummaryReportInput {
     pub object_name: String,
     /// Actual report strings, including explicit blank fields.
     pub reports: Vec<String>,
+    /// Actual staged Native IDF parser count, absent for direct epJSON.
+    pub idf_max_fields: Option<usize>,
+    /// Actual staged extensible report count; never inferred from Native answers.
+    pub idf_max_extensible_fields: Option<usize>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -72,10 +76,48 @@ impl Default for SelectedOARequirement {
     }
 }
 
+/// Exact DataSizing.hh708–764 ZoneEqSizingData defaults; both array members stay unallocated.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceZoneEquipmentSizing {
+    pub(crate) air__vol__flow: f64,                   // Native AirVolFlow
+    pub(crate) max_hw_vol__flow: f64,                 // Native MaxHWVolFlow
+    pub(crate) max_cw_vol__flow: f64,                 // Native MaxCWVolFlow
+    pub(crate) oa_vol__flow: f64,                     // Native OAVolFlow
+    pub(crate) at_mixer__vol__flow: f64,              // Native ATMixerVolFlow
+    pub(crate) at_mixer__cool__pri__dry__bulb: f64,   // Native ATMixerCoolPriDryBulb
+    pub(crate) at_mixer__cool__pri__hum__rat: f64,    // Native ATMixerCoolPriHumRat
+    pub(crate) at_mixer__heat__pri__dry__bulb: f64,   // Native ATMixerHeatPriDryBulb
+    pub(crate) at_mixer__heat__pri__hum__rat: f64,    // Native ATMixerHeatPriHumRat
+    pub(crate) des__cooling__load: f64,               // Native DesCoolingLoad
+    pub(crate) des__heating__load: f64,               // Native DesHeatingLoad
+    pub(crate) cooling__air__vol__flow: f64,          // Native CoolingAirVolFlow
+    pub(crate) heating__air__vol__flow: f64,          // Native HeatingAirVolFlow
+    pub(crate) system__air__vol__flow: f64,           // Native SystemAirVolFlow
+    pub(crate) air__flow: bool,                       // Native AirFlow
+    pub(crate) cooling__air__flow: bool,              // Native CoolingAirFlow
+    pub(crate) heating__air__flow: bool,              // Native HeatingAirFlow
+    pub(crate) system__air__flow: bool,               // Native SystemAirFlow
+    pub(crate) capacity: bool,                        // Native Capacity
+    pub(crate) cooling__capacity: bool,               // Native CoolingCapacity
+    pub(crate) heating__capacity: bool,               // Native HeatingCapacity
+    pub(crate) system__capacity: bool,                // Native SystemCapacity
+    pub(crate) design__size__from__parent: bool,      // Native DesignSizeFromParent
+    pub(crate) hvac_sizing__index: i32,               // Native HVACSizingIndex
+    pub(crate) sizing__method: Option<Vec<i32>>,      // Native SizingMethod
+    pub(crate) cap__sizing__method: Option<Vec<i32>>, // Native CapSizingMethod
+}
+
 /// Selected actual DataSizing/SizingManager storage, retained before and after sizing.
 /// Unsupported positive array element types are not represented by this empty path.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedSizingManager {
+    pub(crate) zone_equipment_sizing: Option<Vec<SourceZoneEquipmentSizing>>,
+    /// Same DataSizing.hh1368 OASysEqSizing EPVector, constructor-unallocated.
+    pub(crate) outside_air_system_equipment_sizing: Option<Vec<SourceZoneEquipmentSizing>>,
+    pub(crate) unitary_system_equipment_sizing: Option<Vec<SourceZoneEquipmentSizing>>,
+    pub(crate) current_system_number: i32,
+    pub(crate) current_zone_equipment_number: i32,
+    pub(crate) current_terminal_unit_sizing_number: i32,
     pub(crate) system_sizing_run_done: bool,
     pub(crate) zone_sizing_run_done: bool,
     pub(crate) number_of_oa_requirements: usize,
@@ -98,6 +140,12 @@ pub(crate) struct SelectedSizingManager {
 impl Default for SelectedSizingManager {
     fn default() -> Self {
         Self {
+            zone_equipment_sizing: None,
+            outside_air_system_equipment_sizing: None,
+            unitary_system_equipment_sizing: None,
+            current_system_number: 0,
+            current_zone_equipment_number: 0,
+            current_terminal_unit_sizing_number: 0,
             system_sizing_run_done: false,
             zone_sizing_run_done: false,
             number_of_oa_requirements: 0,

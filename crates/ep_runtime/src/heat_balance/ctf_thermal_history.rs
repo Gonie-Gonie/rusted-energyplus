@@ -80,6 +80,32 @@ pub struct CtfThermalHistoryState {
     pub flux_reports: CtfThermalHistoryFluxReports,
 }
 
+impl CtfThermalHistoryState {
+    /// Genuine empty DataHeatBalSurface arrays and HeatBalSurfMgr first-time flag.
+    /// IDs are caller metadata from the completed actual GetSurfaceData order.
+    /// Numerical dimensions/values are assigned ONLY by the real Source allocator.
+    pub(crate) fn new_source_unallocated(surface_ids: Vec<SurfaceId>) -> Self {
+        Self {
+            surface_ids,
+            normal: CtfThermalHistoryArrays {
+                inside_temperature: std::array::from_fn(|_| Vec::new()),
+                outside_temperature: std::array::from_fn(|_| Vec::new()),
+                inside_flux: std::array::from_fn(|_| Vec::new()),
+                outside_flux: std::array::from_fn(|_| Vec::new()),
+            },
+            masters: None,
+            scratch: None,
+            update_first_time: true,
+            flux_reports: CtfThermalHistoryFluxReports {
+                inside_conduction: Vec::new(),
+                inside_flux: Vec::new(),
+                outside_flux: Vec::new(),
+                outside_conduction: Vec::new(),
+            },
+        }
+    }
+}
+
 /// Actual selected surface heat-transfer algorithm, not coefficient inference.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CtfThermalHistoryAlgorithm {
@@ -201,8 +227,17 @@ fn prepare(
     surfaces: &[CtfThermalHistorySurface<'_>],
     context: CtfThermalHistoryContext<'_>,
 ) -> Result<Orders, CtfThermalHistoryUnavailable> {
+    prepare_with_scope(state, surfaces, context, true)
+}
+
+fn prepare_with_scope(
+    state: &CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+    selected_scope: bool,
+) -> Result<Orders, CtfThermalHistoryUnavailable> {
     use CtfThermalHistoryUnavailable as Error;
-    if context.any_internal_heat_source {
+    if selected_scope && context.any_internal_heat_source {
         return Err(Error::UnsupportedScope);
     }
     let global_last =
@@ -244,13 +279,14 @@ fn prepare(
         {
             return Err(Error::Association);
         }
-        if !surface.ordinary_opaque
-            || surface.source_sink_present
-            || surface.algorithm == CtfThermalHistoryAlgorithm::Other
-            || !matches!(
-                surface.outside_boundary,
-                OutsideBoundaryCondition::Outdoors | OutsideBoundaryCondition::Adiabatic
-            )
+        if selected_scope
+            && (!surface.ordinary_opaque
+                || surface.source_sink_present
+                || surface.algorithm == CtfThermalHistoryAlgorithm::Other
+                || !matches!(
+                    surface.outside_boundary,
+                    OutsideBoundaryCondition::Outdoors | OutsideBoundaryCondition::Adiabatic
+                ))
         {
             return Err(Error::UnsupportedScope);
         }
@@ -290,7 +326,7 @@ fn prepare(
     let opaque_flat: Vec<_> = opaque.iter().flatten().copied().collect();
     let expected: BTreeSet<_> = input.keys().copied().collect();
     if unique(&ht_flat)? != expected
-        || unique(&opaque_flat)? != expected
+        || (selected_scope && unique(&opaque_flat)? != expected)
         || unique(&all)? != expected
     {
         return Err(Error::Association);
@@ -329,6 +365,23 @@ pub fn initialize_selected_ctf_thermal_histories(
     if master_selected {
         masters_match(state)?;
     }
+    initialize_history_bulk_from_orders(state, &orders, master_selected);
+    initialize_history_boundary_flux_from_orders(state, surfaces, &orders, None)?;
+    initialize_history_master_boundary_from_orders(
+        state,
+        surfaces,
+        &orders,
+        master_selected,
+        None,
+    )?;
+    Ok(())
+}
+
+fn initialize_history_bulk_from_orders(
+    state: &mut CtfThermalHistoryState,
+    orders: &Orders,
+    master_selected: bool,
+) {
     for group in &orders.heat_transfer {
         for term in 0..CTF_COEFFICIENT_SLOTS {
             for &surface in group {
@@ -358,11 +411,46 @@ pub fn initialize_selected_ctf_thermal_histories(
             }
         }
     }
+}
+
+/// Temporary actual Source selector view and the same live Weather GroundTemp.
+/// Only IDs/boundary codes are projected; no ground temperature is copied or retained.
+#[derive(Clone, Copy)]
+pub(crate) struct SourceCtfGroundTemperatures<'a> {
+    pub(crate) surface_boundary_codes: &'a [(SurfaceId, i32)],
+    pub(crate) ground_temp: &'a [f64; 4],
+}
+impl SourceCtfGroundTemperatures<'_> {
+    fn borrow_temperature(&self, surface: SurfaceId) -> Result<&f64, CtfThermalHistoryUnavailable> {
+        let code = self
+            .surface_boundary_codes
+            .iter()
+            .find(|(id, _)| *id == surface)
+            .map(|(_, code)| *code)
+            .ok_or(CtfThermalHistoryUnavailable::Association)?;
+        match code {
+            -1 => Ok(&self.ground_temp[0]), // DataEnvironment::GroundTempType::BuildingSurface
+            -5 => Ok(&self.ground_temp[3]), // DataEnvironment::GroundTempType::FCFactorMethod
+            _ => Err(CtfThermalHistoryUnavailable::UnsupportedScope),
+        }
+    }
+}
+
+fn initialize_history_boundary_flux_from_orders(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    orders: &Orders,
+    source_ground: Option<SourceCtfGroundTemperatures<'_>>,
+) -> Result<(), CtfThermalHistoryUnavailable> {
     for term in 0..=orders.global_last {
         for &surface in &orders.all {
             let input = &surfaces[orders.input[&surface]];
             if input.outside_boundary == OutsideBoundaryCondition::Outdoors {
                 state.normal.outside_temperature[term][surface] = input.outside_dry_bulb;
+            } else if input.outside_boundary == OutsideBoundaryCondition::Ground {
+                state.normal.outside_temperature[term][surface] = *source_ground
+                    .ok_or(CtfThermalHistoryUnavailable::UnsupportedScope)?
+                    .borrow_temperature(input.surface_id)?;
             }
             state.normal.outside_flux[term][surface] = input.coefficients.u_value
                 * (state.normal.outside_temperature[0][surface]
@@ -370,6 +458,16 @@ pub fn initialize_selected_ctf_thermal_histories(
             state.normal.inside_flux[term][surface] = state.normal.outside_flux[1][surface];
         }
     }
+    Ok(())
+}
+
+fn initialize_history_master_boundary_from_orders(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    orders: &Orders,
+    master_selected: bool,
+    source_ground: Option<SourceCtfGroundTemperatures<'_>>,
+) -> Result<(), CtfThermalHistoryUnavailable> {
     if master_selected {
         if let Some(masters) = state.masters.as_mut() {
             for &surface in &orders.all {
@@ -377,6 +475,12 @@ pub fn initialize_selected_ctf_thermal_histories(
                 if input.outside_boundary == OutsideBoundaryCondition::Outdoors {
                     for term in 0..CTF_COEFFICIENT_SLOTS {
                         masters.arrays.outside_temperature[term][surface] = input.outside_dry_bulb;
+                    }
+                } else if input.outside_boundary == OutsideBoundaryCondition::Ground {
+                    for term in 0..CTF_COEFFICIENT_SLOTS {
+                        masters.arrays.outside_temperature[term][surface] = *source_ground
+                            .ok_or(CtfThermalHistoryUnavailable::UnsupportedScope)?
+                            .borrow_temperature(input.surface_id)?;
                     }
                 }
                 for term in 1..=orders.terms[&surface] {
@@ -391,6 +495,53 @@ pub fn initialize_selected_ctf_thermal_histories(
     Ok(())
 }
 
+/// Genuine Source initialization bulk stage; caller supplies real intervening operations.
+pub(crate) fn initialize_source_ctf_history_bulk(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+) -> Result<(), CtfThermalHistoryUnavailable> {
+    let orders = prepare_with_scope(state, surfaces, context, false)?;
+    let master_selected = !context.simple_ctf_only || context.any_ems_in_model;
+    if master_selected {
+        masters_match(state)?;
+    }
+    initialize_history_bulk_from_orders(state, &orders, master_selected);
+    Ok(())
+}
+
+/// Genuine Source initialization boundary_flux stage; caller supplies real intervening operations.
+pub(crate) fn initialize_source_ctf_history_boundary_flux(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+    source_ground: SourceCtfGroundTemperatures<'_>,
+) -> Result<(), CtfThermalHistoryUnavailable> {
+    let orders = prepare_with_scope(state, surfaces, context, false)?;
+    initialize_history_boundary_flux_from_orders(state, surfaces, &orders, Some(source_ground))
+}
+
+/// Genuine Source initialization master_boundary stage; caller supplies real intervening operations.
+pub(crate) fn initialize_source_ctf_history_master_boundary(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+    source_ground: SourceCtfGroundTemperatures<'_>,
+) -> Result<(), CtfThermalHistoryUnavailable> {
+    let orders = prepare_with_scope(state, surfaces, context, false)?;
+    let master_selected = !context.simple_ctf_only || context.any_ems_in_model;
+    if master_selected {
+        masters_match(state)?;
+    }
+    initialize_history_master_boundary_from_orders(
+        state,
+        surfaces,
+        &orders,
+        master_selected,
+        Some(source_ground),
+    )
+}
+
 /// Literal selected no-source Update5245–5496. Current term1 temperatures and
 /// true surface balance constants must already exist. No clock advance, history
 /// term/count inference, boundary solve or report-finalization is performed here.
@@ -399,8 +550,45 @@ pub fn update_selected_ctf_thermal_histories(
     surfaces: &[CtfThermalHistorySurface<'_>],
     context: CtfThermalHistoryContext<'_>,
 ) -> Result<CtfThermalHistoryUpdateRoute, CtfThermalHistoryUnavailable> {
-    use CtfThermalHistoryUnavailable as Error;
     let orders = prepare(state, surfaces, context)?;
+    update_ctf_thermal_histories_from_orders(state, surfaces, context, orders)
+}
+
+/// Genuine Source Update does not read outside-boundary or outdoor operands.
+/// Retain the same no-source/opaque/algorithm/shape/association scope while
+/// allowing the actual Ground/FC/interzone selector to remain truthful.
+pub(crate) fn update_source_ctf_thermal_histories(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+) -> Result<CtfThermalHistoryUpdateRoute, CtfThermalHistoryUnavailable> {
+    use CtfThermalHistoryUnavailable as Error;
+    let orders = prepare_with_scope(state, surfaces, context, false)?;
+    if context.any_internal_heat_source
+        || surfaces.iter().any(|surface| {
+            !surface.ordinary_opaque
+                || surface.source_sink_present
+                || surface.algorithm == CtfThermalHistoryAlgorithm::Other
+        })
+    {
+        return Err(Error::UnsupportedScope);
+    }
+    let opaque: Vec<_> = orders.opaque.iter().flatten().copied().collect();
+    let unique: BTreeSet<_> = opaque.iter().copied().collect();
+    let expected: BTreeSet<_> = orders.input.keys().copied().collect();
+    if unique.len() != opaque.len() || unique != expected {
+        return Err(Error::Association);
+    }
+    update_ctf_thermal_histories_from_orders(state, surfaces, context, orders)
+}
+
+fn update_ctf_thermal_histories_from_orders(
+    state: &mut CtfThermalHistoryState,
+    surfaces: &[CtfThermalHistorySurface<'_>],
+    context: CtfThermalHistoryContext<'_>,
+    orders: Orders,
+) -> Result<CtfThermalHistoryUpdateRoute, CtfThermalHistoryUnavailable> {
+    use CtfThermalHistoryUnavailable as Error;
     let simple = context.simple_ctf_only && !context.any_construction_overrides;
     if simple && orders.global_last == 0 && !state.surface_ids.is_empty() {
         return Err(Error::SimpleCurrentRowMove);
@@ -594,6 +782,16 @@ pub fn update_selected_ctf_thermal_histories(
     }
     Ok(CtfThermalHistoryUpdateRoute::MasterHistories)
 }
+
+impl std::fmt::Display for CtfThermalHistoryUnavailable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "selected CTF thermal-history scope unavailable: {self:?}"
+        )
+    }
+}
+impl std::error::Error for CtfThermalHistoryUnavailable {}
 
 #[cfg(test)]
 #[path = "ctf_thermal_history_tests.rs"]

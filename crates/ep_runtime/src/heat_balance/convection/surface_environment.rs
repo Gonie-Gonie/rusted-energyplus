@@ -7,6 +7,7 @@ use ep_model::Terrain;
 mod initialization;
 pub use initialization::SurfaceOutdoorInitializationError;
 pub(crate) mod ordinary;
+pub(crate) mod source_rows;
 pub use ordinary::{
     SurfaceOutdoorEnvironmentError, SurfaceOutdoorEnvironmentState,
     check_surface_out_bulb_temperatures,
@@ -115,6 +116,25 @@ pub struct SurfaceOutdoorEnvironmentRow {
     pub wind_direction_deg: f64,
 }
 
+// Both routes use the same numerical body. Source rows borrow actual live
+// centroid/ExtWind fields; legacy/direct rows retain their established carrier.
+trait SurfaceOutdoorSetterRow {
+    fn centroid_height_m(&self) -> f64;
+    fn wind_exposed(&self) -> bool;
+    fn fields(&mut self) -> &mut SurfaceOutdoorEnvironmentRow;
+}
+impl SurfaceOutdoorSetterRow for &mut SurfaceOutdoorEnvironmentRow {
+    fn centroid_height_m(&self) -> f64 {
+        self.centroid_height_m
+    }
+    fn wind_exposed(&self) -> bool {
+        self.wind_exposed
+    }
+    fn fields(&mut self) -> &mut SurfaceOutdoorEnvironmentRow {
+        self
+    }
+}
+
 /// SetSurfaceOutBulbTempAt: all TotSurfaces rows, dry then wet writes.
 pub fn set_surface_out_bulb_temperatures(
     parameters: SurfaceOutdoorEnvironmentParameters,
@@ -124,32 +144,34 @@ pub fn set_surface_out_bulb_temperatures(
     set_surface_out_bulb_temperature_rows(parameters, weather, rows.iter_mut());
 }
 
-fn set_surface_out_bulb_temperature_rows<'a>(
+fn set_surface_out_bulb_temperature_rows<R: SurfaceOutdoorSetterRow>(
     parameters: SurfaceOutdoorEnvironmentParameters,
     weather: SurfaceOutdoorWeather,
-    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+    rows: impl Iterator<Item = R>,
 ) {
     if parameters.site_temperature_gradient_k_per_m == 0.0 {
-        for row in rows {
-            row.dry_bulb_c = weather.dry_bulb_c;
-            row.wet_bulb_c = weather.wet_bulb_c;
+        for mut row in rows {
+            row.fields().dry_bulb_c = weather.dry_bulb_c;
+            row.fields().wet_bulb_c = weather.wet_bulb_c;
         }
     } else {
         let base_dry_temperature_c =
             weather.dry_bulb_c + parameters.weather_file_temperature_modifier_c;
         let base_wet_temperature_c =
             weather.wet_bulb_c + parameters.weather_file_temperature_modifier_c;
-        for row in rows {
-            if row.centroid_height_m <= 0.0 {
-                row.dry_bulb_c = base_dry_temperature_c;
-                row.wet_bulb_c = base_wet_temperature_c;
+        for mut row in rows {
+            let height_m = row.centroid_height_m();
+            if height_m <= 0.0 {
+                row.fields().dry_bulb_c = base_dry_temperature_c;
+                row.fields().wet_bulb_c = base_wet_temperature_c;
             } else {
-                let gradient_dividend = parameters.site_temperature_gradient_k_per_m
-                    * EARTH_RADIUS_M
-                    * row.centroid_height_m;
-                let gradient_divisor = EARTH_RADIUS_M + row.centroid_height_m;
-                row.dry_bulb_c = base_dry_temperature_c - gradient_dividend / gradient_divisor;
-                row.wet_bulb_c = base_wet_temperature_c - gradient_dividend / gradient_divisor;
+                let gradient_dividend =
+                    parameters.site_temperature_gradient_k_per_m * EARTH_RADIUS_M * height_m;
+                let gradient_divisor = EARTH_RADIUS_M + height_m;
+                row.fields().dry_bulb_c =
+                    base_dry_temperature_c - gradient_dividend / gradient_divisor;
+                row.fields().wet_bulb_c =
+                    base_wet_temperature_c - gradient_dividend / gradient_divisor;
             }
         }
     }
@@ -165,10 +187,10 @@ pub fn set_surface_wind_speeds(
     set_surface_wind_speed_rows(parameters, wind_speed_m_per_s, rows.iter_mut());
 }
 
-fn set_surface_wind_speed_rows<'a>(
+fn set_surface_wind_speed_rows<R: SurfaceOutdoorSetterRow>(
     parameters: SurfaceOutdoorEnvironmentParameters,
     wind_speed_m_per_s: f64,
-    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+    rows: impl Iterator<Item = R>,
 ) {
     let factor = wind_speed_m_per_s
         * parameters.weather_file_wind_modifier
@@ -176,19 +198,20 @@ fn set_surface_wind_speed_rows<'a>(
             .site_wind_boundary_layer_height_m
             .powf(-parameters.site_wind_exponent);
     if parameters.site_wind_exponent == 0.0 {
-        for row in rows {
-            row.wind_speed_m_per_s = wind_speed_m_per_s;
+        for mut row in rows {
+            row.fields().wind_speed_m_per_s = wind_speed_m_per_s;
         }
     } else {
-        for row in rows {
-            if !row.wind_exposed {
+        for mut row in rows {
+            if !row.wind_exposed() {
                 continue;
             }
-            if row.centroid_height_m <= 0.0 {
-                row.wind_speed_m_per_s = 0.0;
+            let height_m = row.centroid_height_m();
+            if height_m <= 0.0 {
+                row.fields().wind_speed_m_per_s = 0.0;
             } else {
-                row.wind_speed_m_per_s =
-                    factor * row.centroid_height_m.powf(parameters.site_wind_exponent);
+                row.fields().wind_speed_m_per_s =
+                    factor * height_m.powf(parameters.site_wind_exponent);
             }
         }
     }
@@ -202,12 +225,12 @@ pub fn set_surface_wind_directions(
     set_surface_wind_direction_rows(wind_direction_deg, rows.iter_mut());
 }
 
-fn set_surface_wind_direction_rows<'a>(
+fn set_surface_wind_direction_rows<R: SurfaceOutdoorSetterRow>(
     wind_direction_deg: f64,
-    rows: impl Iterator<Item = &'a mut SurfaceOutdoorEnvironmentRow>,
+    rows: impl Iterator<Item = R>,
 ) {
-    for row in rows {
-        row.wind_direction_deg = wind_direction_deg;
+    for mut row in rows {
+        row.fields().wind_direction_deg = wind_direction_deg;
     }
 }
 

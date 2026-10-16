@@ -1,4 +1,4 @@
-//! Actual consumed CurveManager input-state slice; Cost/Fault remain held.
+//! Same retained CurveManager input state and genuine empty-array report traversal.
 use super::selected_input_processor::SelectedInputProcessor;
 use std::collections::BTreeMap;
 const CURVE_FAMILIES: [&str; 22] = [
@@ -44,12 +44,70 @@ pub(crate) struct SelectedBtwxtManager {
     table_files: BTreeMap<std::path::PathBuf, ()>,
 }
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedCurves {
+    curve_value_my_begin_time_step_flag: bool,
+    friction_factor_error_has_occurred: bool,
+    show_fallback_message: bool,
+    curves: Option<Vec<std::convert::Infallible>>,
+    curve_map: BTreeMap<String, i32>,
     btwxt: SelectedBtwxtManager,
     pressure_curves: Option<Vec<()>>,
 }
+impl Default for SelectedCurves {
+    fn default() -> Self {
+        Self {
+            curve_value_my_begin_time_step_flag: false,
+            friction_factor_error_has_occurred: false,
+            show_fallback_message: true,
+            curves: None,
+            curve_map: BTreeMap::new(),
+            btwxt: SelectedBtwxtManager::default(),
+            pressure_curves: None,
+        }
+    }
+}
 impl SelectedCurves {
+    pub(crate) fn initialize_source_curve_reporting(
+        &self,
+        globals: &super::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+    ) -> Result<(), SelectedSetupServiceError> {
+        // Native2856: actual constructor-unallocated curves have zero iterations.
+        // Positive record constructors/getters remain unavailable, not unit records.
+        if self.curves.as_ref().is_some_and(|rows| !rows.is_empty()) {
+            return Err(SelectedSetupServiceError::Positive(
+                "InitCurveReporting2857 curve numDims",
+            ));
+        }
+        // Native2877 independently iterates the same actual PressureCurve array.
+        if self
+            .pressure_curves
+            .as_ref()
+            .is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(SelectedSetupServiceError::Positive(
+                "InitCurveReporting2878 pressure output",
+            ));
+        }
+        if globals.any_energy_management_system_in_model
+            && self.curves.as_ref().is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(SelectedSetupServiceError::Positive(
+                "InitCurveReporting2910 curve actuator",
+            ));
+        }
+        if globals.any_energy_management_system_in_model
+            && self
+                .pressure_curves
+                .as_ref()
+                .is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(SelectedSetupServiceError::Positive(
+                "InitCurveReporting2916 pressure actuator",
+            ));
+        }
+        Ok(())
+    }
     fn get_curve_input(
         &mut self,
         input: &SelectedInputProcessor,

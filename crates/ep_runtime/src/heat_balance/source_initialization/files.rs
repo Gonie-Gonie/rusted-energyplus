@@ -14,8 +14,12 @@ pub struct SourceInitializationFilePaths {
     pub mtr: PathBuf,
     /// Actual branch/node output path.
     pub bnd: PathBuf,
+    /// Actual DXF drawing path; opened freshly at each reached DXF call.
+    pub dxf: PathBuf,
     /// Actual Audit path, opened only at ProcessScheduleInput718.
     pub audit: PathBuf,
+    /// Actual ManageSimulation185 debug path, opened before SQL/PostIP.
+    pub debug: PathBuf,
 }
 
 #[derive(Debug)]
@@ -110,6 +114,9 @@ pub(crate) trait ScheduleAuditFileHost {
 pub struct SourceInitializationFiles {
     outputs: [SourceOutputStream; 4],
     audit: SourceOutputStream,
+    debug: SourceOutputStream,
+    // Native IOFilePath owns only the path, not a permanently opened stream.
+    dxf: PathBuf,
 }
 impl SourceInitializationFiles {
     /// Retain genuine caller-selected paths without opening any stream early.
@@ -123,13 +130,30 @@ impl SourceInitializationFiles {
                 SourceOutputStream::new(paths.bnd),
             ],
             audit: SourceOutputStream::new(paths.audit),
+            debug: SourceOutputStream::new(paths.debug),
+            dxf: paths.dxf,
         }
+    }
+    pub(super) fn source_dxf_path(&self) -> &Path {
+        &self.dxf
+    }
+    pub(super) fn open_source_dxf(&self) -> io::Result<File> {
+        // IOFiles.hh498-505 creates a fresh InputOutputFile for each call.
+        OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(&self.dxf)
     }
     pub(super) fn output_path(&self, index: usize) -> &Path {
         &self.outputs[index].path
     }
     pub(super) fn ensure_output_open(&mut self, index: usize) -> io::Result<&mut dyn Write> {
         Ok(self.outputs[index].ensure_open()?)
+    }
+    pub(super) fn ensure_debug_open(&mut self) -> io::Result<()> {
+        self.debug.ensure_open().map(|_| ())
     }
     /// Borrow the already-open actual EIO for subsequent reached producers.
     ///
@@ -149,6 +173,10 @@ impl SourceInitializationFiles {
     pub fn eio_stream(&mut self) -> &mut dyn Write {
         &mut self.outputs[1]
     }
+    /// Same already-open physical BND, without opening or replacing the stream.
+    pub(crate) fn bnd_stream(&mut self) -> &mut dyn Write {
+        &mut self.outputs[3]
+    }
     /// Flush every actually opened stream without opening an unreached output.
     ///
     /// # Errors
@@ -158,6 +186,9 @@ impl SourceInitializationFiles {
             if stream.file.is_some() {
                 stream.flush()?;
             }
+        }
+        if self.debug.file.is_some() {
+            self.debug.flush()?;
         }
         if self.audit.file.is_some() {
             self.audit.flush()?;
@@ -171,5 +202,14 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
     }
     fn ensure_audit_open(&mut self) -> io::Result<&mut dyn Write> {
         Ok(self.audit.ensure_open()?)
+    }
+}
+
+mod reporting;
+pub(crate) use reporting::{SourceRuntimeMeterStreams, SourceRuntimeReportStreams};
+
+impl crate::weather::day::source_weather_initialization::SourceWeatherEio for SourceOutputStream {
+    fn good(&self) -> bool {
+        self.file.is_some() && !self.failed
     }
 }

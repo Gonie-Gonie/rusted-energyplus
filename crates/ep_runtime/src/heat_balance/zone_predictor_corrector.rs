@@ -254,6 +254,19 @@ pub fn energyplus_third_order_zone_air_temperature_c(
     )
 }
 
+/// Literal ZTPC4067/4542 ThirdOrder expression, without legacy fallback.
+/// The numerator operand order is independent + capacity * history.
+pub(crate) fn source_third_order_air_value(
+    independent: f64,
+    capacity: f64,
+    history: &[f64; 4],
+    dependent: f64,
+) -> f64 {
+    (independent
+        + capacity * (3.0 * history[0] - (3.0 / 2.0) * history[1] + (1.0 / 3.0) * history[2]))
+        / ((11.0 / 6.0) * capacity + dependent)
+}
+
 pub(crate) fn energyplus_third_order_zone_air_temperature_from_coefficients(
     previous_temperature_c: f64,
     coefficients: ZoneAirTemperatureCoefficients,

@@ -135,6 +135,9 @@ impl Caller {
                 warmup_flag: super::boolean(&context["warmup_flag"])?,
                 doing_sizing: super::boolean(&context["doing_sizing"])?,
                 tracking: SourceErrorTracking {
+                    ask_for_plant_check_on_abort: false,
+                    exit_during_simulations: false,
+                    ask_for_connections_report: false,
                     ask_for_surfaces_report: false,
                     total_multiplied_windows: 0,
                     total_coincident_vertices: 0,

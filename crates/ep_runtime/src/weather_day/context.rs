@@ -4,6 +4,13 @@
 //! this is selected storage, not a complete EnergyPlus state constructor.
 
 use super::super::CurrentWeatherState;
+use super::super::source_environment_data::SourceEnvironmentData;
+use super::super::source_primary::SourceUnderwaterBoundary;
+use super::super::{
+    DailyWeatherVariables, source_run_period::SourceRunPeriodData,
+    source_user_input::SourceWeatherProperty,
+};
+use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 
 /// Selected global caller flags and clocks, including fields the handoff preserves.
 #[derive(Clone, Debug, PartialEq)]
@@ -46,6 +53,8 @@ pub struct WeatherGlobalState {
     pub kind_of_sim: i32,
     /// Source weather-simulation switch.
     pub do_weath_sim: bool,
+    /// Actual DataGlobals.hh127 WeathSimReq constructorfalse, written by ReadUser.
+    pub weather_simulation_requested: bool,
     /// Source design-day-simulation switch.
     pub do_des_day_sim: bool,
     /// Source reporting switch.
@@ -92,6 +101,7 @@ impl Default for WeatherGlobalState {
             time_step: 0,
             kind_of_sim: -1,
             do_weath_sim: false,
+            weather_simulation_requested: false,
             do_des_day_sim: false,
             do_output_reporting: false,
             time_step_zone: 0.0,
@@ -119,8 +129,53 @@ pub struct WeatherEnvironmentState {
     pub(crate) source_site_atmosphere_initialized: bool,
     /// Actual DataEnvironment constructor false; GetProjectData may override it.
     pub force_begin_env_reset_suppress: bool,
+    /// Actual DataEnvironment.hh130 EMS control, constructorfalse.
+    pub ems_out_dry_bulb_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_out_dry_bulb_override_value: f64,
+    /// Actual DataEnvironment.hh142 EMS control, constructorfalse.
+    pub ems_out_dew_point_temp_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_out_dew_point_temp_override_value: f64,
+    /// Actual DataEnvironment.hh135 EMS control, constructorfalse.
+    pub ems_out_rel_hum_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_out_rel_hum_override_value: f64,
+    /// Actual DataEnvironment.hh153 EMS control, constructorfalse.
+    pub ems_wind_speed_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_wind_speed_override_value: f64,
+    /// Actual DataEnvironment.hh150 EMS control, constructorfalse.
+    pub ems_wind_dir_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_wind_dir_override_value: f64,
+    /// Actual DataEnvironment.hh108 EMS control, constructorfalse.
+    pub ems_dif_solar_rad_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_dif_solar_rad_override_value: f64,
+    /// Actual DataEnvironment.hh99 EMS control, constructorfalse.
+    pub ems_beam_solar_rad_override_on: bool,
+    /// Actual same EMS override value, constructor0.
+    pub ems_beam_solar_rad_override_value: f64,
     /// Selected mutable environment after SetCurrentWeather.
     pub current_weather: CurrentWeatherState,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub cloud_fraction: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub exterior_horizontal_sky_illuminance: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub exterior_horizontal_beam_illuminance: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub exterior_beam_normal_illuminance: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub direct_solar_luminous_efficacy: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub diffuse_solar_luminous_efficacy: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub daylighting_sky_clearness: f64,
+    /// Actual DataEnvironment159?166 constructor0; DayltgCurrent writes the same field.
+    pub daylighting_sky_brightness: f64,
+
     /// Actual InitSolarHeatGains environment owner (DataEnvironment.hh148).
     pub previous_sol_rad_positive: bool,
     /// DataEnvironment.hh118 GroundTemp in BuildingSurface/Shallow/Deep/FC order.
@@ -139,6 +194,10 @@ pub struct WeatherEnvironmentState {
     pub ignore_beam_radiation: bool,
     /// Source override to suppress hourly diffuse solar.
     pub ignore_diffuse_radiation: bool,
+    /// Actual DataEnvironment.hh204 constructor false, shared with HVAC warmup reports.
+    pub print_environment_stamp_warmup: bool,
+    /// Actual DataEnvironment.hh205 constructor false, set/cleared by genuine callers.
+    pub print_environment_stamp_warmup_printed: bool,
     /// Current weather ordinal.
     pub day_of_year: i32,
     /// Schedule ordinal; pure UpdateWeatherData does not write this member.
@@ -167,6 +226,18 @@ pub struct WeatherEnvironmentState {
     pub holiday_index_tomorrow: i32,
     /// Number of design days.
     pub tot_des_days: i32,
+    /// Actual DataEnvironment.hh182-184 constructor0; first GetNext762-764 writes.
+    pub current_overall_sim_day: i32,
+    /// Actual total across the real Environment array, constructor0.
+    pub total_overall_sim_days: i32,
+    /// Actual maximum requested run years, constructor0 (first caller writes1).
+    pub max_number_sim_years: i32,
+    /// Actual DataEnvironment.hh207 constructor0.
+    pub start_year: i32,
+    /// Actual DataEnvironment.hh208 constructor0.
+    pub end_year: i32,
+    /// Actual DataEnvironment.hh210-211 constructorfalse.
+    pub current_year_is_leap_year: bool,
     /// Current native environment number.
     pub cur_envir_num: i32,
     /// Run-period start weekday.
@@ -181,6 +252,16 @@ pub struct WeatherEnvironmentState {
     pub latitude: f64,
     /// Selected site longitude.
     pub longitude: f64,
+    /// Actual DataEnvironment TimeZoneNumber constructor0, written by Location.
+    pub time_zone_number: f64,
+    /// Actual DataEnvironment rhoAirSTP constructor0, written at GetNext708.
+    pub rho_air_stp: f64,
+    /// Actual Site:VariableLocation schedule pointer constructors nullptr.
+    pub(crate) varying_location_latitude_schedule: Option<SourceScheduleIndex>,
+    /// Actual longitude schedule pointer, independent of latitude pointer.
+    pub(crate) varying_location_longitude_schedule: Option<SourceScheduleIndex>,
+    /// Actual DataEnvironment.hh214 varyingOrientationSched constructor nullptr.
+    pub(crate) varying_orientation_schedule: Option<SourceScheduleIndex>,
     /// Actual standard time-zone meridian from ResolveLocationInformation.
     pub time_zone_meridian: f64,
     /// Actual stored sine and cosine of site latitude.
@@ -193,10 +274,14 @@ pub struct WeatherEnvironmentState {
     pub elevation: f64,
     /// Source standard barometric pressure; constructor is sea-level 101325.0.
     pub std_baro_press: f64,
+    /// Actual DataEnvironment.hh170 ctor0; ResolveLocationInformation4477 writer.
+    pub std_rho_air: f64,
     /// Source environment name.
     pub environment_name: String,
     /// Actual CurMnDy formatting owner, written by DD setup and current weather.
     pub current_month_day: String,
+    /// Actual CurMnDyHr string, constructor empty; SetCurrentWeather2082 writes it.
+    pub current_month_day_hour: String,
     /// Actual CurMnDyYr owner, assigned immediately after CurMnDy.
     pub current_month_day_year: String,
     /// Actual EnvironmentStartEnd adaptive-report formatting carrier.
@@ -222,7 +307,30 @@ impl Default for WeatherEnvironmentState {
             source_weather_station_initialized: false,
             source_site_atmosphere_initialized: false,
             force_begin_env_reset_suppress: false,
+            ems_out_dry_bulb_override_on: false,
+            ems_out_dry_bulb_override_value: 0.0,
+            ems_out_dew_point_temp_override_on: false,
+            ems_out_dew_point_temp_override_value: 0.0,
+            ems_out_rel_hum_override_on: false,
+            ems_out_rel_hum_override_value: 0.0,
+            ems_wind_speed_override_on: false,
+            ems_wind_speed_override_value: 0.0,
+            ems_wind_dir_override_on: false,
+            ems_wind_dir_override_value: 0.0,
+            ems_dif_solar_rad_override_on: false,
+            ems_dif_solar_rad_override_value: 0.0,
+            ems_beam_solar_rad_override_on: false,
+            ems_beam_solar_rad_override_value: 0.0,
             current_weather: CurrentWeatherState::default(),
+            cloud_fraction: 0.0,
+            exterior_horizontal_sky_illuminance: 0.0,
+            exterior_horizontal_beam_illuminance: 0.0,
+            exterior_beam_normal_illuminance: 0.0,
+            direct_solar_luminous_efficacy: 0.0,
+            diffuse_solar_luminous_efficacy: 0.0,
+            daylighting_sky_clearness: 0.0,
+            daylighting_sky_brightness: 0.0,
+
             previous_sol_rad_positive: false,
             ground_temp: [0.0; 4],
             ground_temp_kelvin: 0.0,
@@ -232,6 +340,8 @@ impl Default for WeatherEnvironmentState {
             ignore_solar_radiation: false,
             ignore_beam_radiation: false,
             ignore_diffuse_radiation: false,
+            print_environment_stamp_warmup: false,
+            print_environment_stamp_warmup_printed: false,
             day_of_year: 0,
             day_of_year_schedule: 0,
             year: 0,
@@ -246,6 +356,12 @@ impl Default for WeatherEnvironmentState {
             day_of_week_tomorrow: 0,
             holiday_index_tomorrow: 0,
             tot_des_days: 0,
+            current_overall_sim_day: 0,
+            total_overall_sim_days: 0,
+            max_number_sim_years: 0,
+            start_year: 0,
+            end_year: 0,
+            current_year_is_leap_year: false,
             cur_envir_num: 0,
             run_period_start_day_of_week: 0,
             sin_solar_declin_angle: 0.0,
@@ -253,14 +369,21 @@ impl Default for WeatherEnvironmentState {
             equation_of_time: 0.0,
             latitude: 0.0,
             longitude: 0.0,
+            time_zone_number: 0.0,
+            rho_air_stp: 0.0,
+            varying_location_latitude_schedule: None,
+            varying_location_longitude_schedule: None,
+            varying_orientation_schedule: None,
             time_zone_meridian: 0.0,
             sin_latitude: 0.0,
             cos_latitude: 0.0,
             one_step_solar_time_offset: -0.5,
             elevation: 0.0,
             std_baro_press: 101325.0,
+            std_rho_air: 0.0,
             environment_name: String::new(),
             current_month_day: String::new(),
+            current_month_day_hour: String::new(),
             current_month_day_year: String::new(),
             environment_start_end: String::new(),
             run_period_environment: false,
@@ -289,6 +412,30 @@ impl WeatherEnvironmentState {
 /// Selected WeatherManager controls and counters, separate from raw parser storage.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WeatherOwnerState {
+    /// Actual WeatherManager LocationTitle string constructor.
+    pub location_title: String,
+    /// Actual LocationGathered constructorfalse.
+    pub location_gathered: bool,
+    /// Actual Keep Site Location Information constructorfalse.
+    pub keep_user_site_location_definition: bool,
+    /// Actual EnvironmentReportNbr constructor0, assigned by ReportOutputFileHeaders.
+    pub environment_report_number: i32,
+    /// Actual EnvironmentReportChr string constructor.
+    pub environment_report_character: String,
+    /// Sole native Environment array, unallocated until ReadUserWeatherInput4767.
+    pub source_environments: Option<Vec<SourceEnvironmentData>>,
+    /// Native DesignDay EPVector, allocated at ReadUser4766 only.
+    pub source_design_day_weather: Option<Vec<DailyWeatherVariables>>,
+    /// Sole genuine DesDayInput/desDayMods/SPSiteSchedules compartment; ctor-unallocated.
+    pub(crate) source_design_day_input: super::super::source_design_day::SourceDesignDayInputState,
+    /// Native RunPeriodInput Array1D, allocated by actual GetRunPeriodData5031.
+    pub source_run_period_input: Option<Vec<SourceRunPeriodData>>,
+    /// Actual WeatherManager.hh913 persistent vector, native constructor-empty.
+    pub(crate) underwater_boundaries: Vec<SourceUnderwaterBoundary>,
+    /// Native WPSkyTemperature EPVector, allocated by actual weather-property getter.
+    pub source_weather_properties: Option<Vec<SourceWeatherProperty>>,
+    /// Native WeatherManager.hh838 constructor0; actual getter writes this count.
+    pub number_weather_properties: i32,
     /// Current native environment ordinal.
     pub envrn: i32,
     /// Number of native environments.
@@ -297,6 +444,14 @@ pub struct WeatherOwnerState {
     pub tot_run_pers: i32,
     /// Number of design run periods.
     pub tot_run_des_pers: i32,
+    /// Actual WeatherManager812 total; writer remains ReadUserWeatherInput4756.
+    pub tot_report_periods: i32,
+    /// Actual WeatherManager813–815 report-period constructor counts.
+    pub tot_thermal_report_periods: i32,
+    /// Actual WeatherManager814 CO2 report-period constructor count.
+    pub tot_co2_report_periods: i32,
+    /// Actual WeatherManager815 visual report-period constructor count.
+    pub tot_visual_report_periods: i32,
     /// Source number of data periods, synchronized by the actual header caller.
     pub num_data_periods: i32,
     /// Source weather intervals per hour; constructor is one.
@@ -317,8 +472,22 @@ pub struct WeatherOwnerState {
     pub get_environment_first_call: bool,
     /// Native first weather-manager call flag.
     pub first_call: bool,
+    /// Actual WeatherManager.hh782 constructor1, incremented only at Source1831.
+    pub year_of_sim: i32,
+    /// Actual WeatherManager.hh783 constructor365, read by Source EOF2663.
+    pub number_days_in_year: i32,
     /// Actual PrintDDHeader constructor and BeginSim SetUpDesignDay owner.
     pub print_design_day_header: bool,
+    /// Actual WeatherManager.hh776 constructortrue; report850-859 consumes it.
+    pub print_environment_headers: bool,
+    /// Actual WeatherManager.hh819 constructor366 zeros; GetNext1085 resets.
+    pub weekday_types: [i32; 366],
+    /// Actual WeatherManager.hh818 constructor366 zeros; SetSpecialDayDates1645 resets.
+    pub special_day_types: [i32; 366],
+    /// Actual WeatherManager.hh820 constructor366 zeros; genuine DST child writes.
+    pub dst_index: [i32; 366],
+    /// Actual WeatherManager.hh862-863 distinct twelve-element native calendar.
+    pub end_day_of_month_with_leap_day: [i32; 12],
     /// Native water-mains reporting flag.
     pub water_mains_parameter_report: bool,
     /// Whether the first-hour cache has been seeded.
@@ -388,10 +557,26 @@ pub struct WeatherOwnerState {
 impl Default for WeatherOwnerState {
     fn default() -> Self {
         Self {
+            location_title: String::new(),
+            location_gathered: false,
+            keep_user_site_location_definition: false,
+            environment_report_number: 0,
+            environment_report_character: String::new(),
+            source_environments: None,
+            source_design_day_weather: None,
+            source_design_day_input: Default::default(),
+            source_run_period_input: None,
+            underwater_boundaries: Vec::new(),
+            source_weather_properties: None,
+            number_weather_properties: 0,
             envrn: 0,
             num_of_envrn: 0,
             tot_run_pers: 0,
             tot_run_des_pers: 0,
+            tot_report_periods: 0,
+            tot_thermal_report_periods: 0,
+            tot_co2_report_periods: 0,
+            tot_visual_report_periods: 0,
             num_data_periods: 0,
             num_intervals_per_hour: 1,
             num_special_days: 0,
@@ -402,7 +587,14 @@ impl Default for WeatherOwnerState {
             get_branch_input_one_time_flag: true,
             get_environment_first_call: true,
             first_call: true,
+            year_of_sim: 1,
+            number_days_in_year: 365,
             print_design_day_header: true,
+            print_environment_headers: true,
+            weekday_types: [0; 366],
+            special_day_types: [0; 366],
+            dst_index: [0; 366],
+            end_day_of_month_with_leap_day: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
             water_mains_parameter_report: true,
             last_hour_set: false,
             weather_file_exists: false,

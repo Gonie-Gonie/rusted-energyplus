@@ -14,6 +14,7 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod boundary_inputs;
+pub(crate) mod computed_geometry;
 mod convexity;
 mod derived_arrays;
 mod diagnostics;
@@ -256,6 +257,12 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) centroid_scratch: crate::geometry::SourceCentroidScratch,
     pub(crate) use_representative_surface_calculations: bool,
     pub(crate) any_kiva: bool,
+    /// DataSurfaces.hh1504/1507/1508 constructor flags, read by genuine InitSurface.
+    pub(crate) airflow_windows: bool,
+    pub(crate) any_movable_insulation: bool,
+    pub(crate) any_movable_slat: bool,
+    /// Actual DataSurface.hh1505 constructorfalse; no positive selected shading writer.
+    pub(crate) shading_transmittance_varies: bool,
     pub(crate) surface_error: bool,
     pub(crate) surfaces_read: usize,
     pub(crate) next_object: usize,

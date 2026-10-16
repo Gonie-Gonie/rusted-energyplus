@@ -16,11 +16,12 @@ use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
 use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
-mod internal_heat_gains_input;
+pub(crate) mod internal_heat_gains_input;
 mod ordinary_surface_geometry;
 mod post_building_input;
 mod setup_geometry_reports;
 mod setup_zone_geometry;
+mod source_heat_balance_input;
 mod world_surface_geometry;
 pub use internal_heat_gains_input::observation::{
     OrdinaryGainDevice, OrdinaryGainDeviceStorage, OrdinaryGainDictionaryEntry,
@@ -45,6 +46,12 @@ pub struct CtfInitializationReports {
     /// Actual RunSimulation249 local, None before that assignment is reached.
     /// Retained across a later error; this is not weather/Setup readiness.
     pub source_run_available: Option<bool>,
+    /// Actual RunSimulation236 caller local; None before that reached assignment.
+    /// The primary loop writes true at410 and never resets it at368.
+    pub source_run_sims_done: Option<bool>,
+    /// Sole actual ExternalInterfaceData module; genuine native scalar constructors.
+    pub(crate) source_external_interface:
+        super::ordinary_external_interface::SourceExternalInterface,
     /// Sole actual raw/schema input owner, retained across runtime success and failure.
     /// Legacy callers that supply no raw projection retain None.
     pub selected_input_processor: Option<super::selected_input_processor::SelectedInputProcessor>,
@@ -64,7 +71,27 @@ pub struct CtfInitializationReports {
     /// Sole pre-weather owner, moved into the real session after successful allocation.
     pub(crate) source_initialization_weather: Option<crate::weather::day::WeatherDayState>,
     /// Actual StdOutputRecordCount reset at OpenOutputFiles1747.
-    pub source_standard_output_record_count: i32,
+    pub source_standard_output_record_count: i64,
+    /// Actual DataGlobals.hh116 Int64 constructor0; OpenOutputFiles does not reset it.
+    pub source_standard_meter_record_count: i64,
+    /// Sole actual partial IOFiles output-control owner, excluding existing SHD cell.
+    pub(crate) source_output_control: super::ordinary_output_control::SourceOutputControl,
+    /// Same ResultsFramework constructor/options and genuine report frames.
+    pub(crate) source_results_framework:
+        super::ordinary_output_control::SourceResultsFrameworkOptions,
+    /// Sole ResultsFramework outputVariables metadata (no numerical snapshots).
+    pub(crate) source_results_output_variables: Vec<String>,
+    /// Sole actual nullable SQLite pointer; positive database construction unavailable.
+    pub(crate) source_sqlite: super::source_initialization::SourceSqliteState,
+    /// Sole actual DataReportingFlags subset shared by weather, solar and simulation.
+    pub(crate) source_report_flags:
+        super::radiation::ordinary::source_children::SourceSolarReportFlags,
+    /// Sole genuine EconomicTariff subset, retaining first-call state across reports.
+    pub(crate) economic_tariff: super::ordinary_utility_bills::SourceEconomicTariff,
+    /// Sole actual CostEstimate monetary array and selected currency member.
+    pub(crate) cost_estimate_monetary: super::ordinary_utility_bills::SourceCostEstimateMonetary,
+    /// Sole genuine EconomicLifeCycleCostData input flags, counts and collections.
+    pub(crate) source_life_cycle_cost: super::ordinary_life_cycle_cost::SourceEconomicLifeCycleCost,
     /// Same DataGlobal owner later moved into the first genuine HeatBalanceState.
     pub(crate) selected_heat_balance_globals:
         Option<super::selected_heat_balance_globals::SelectedHeatBalanceGlobals>,
@@ -90,6 +117,8 @@ pub struct CtfInitializationReports {
     pub(crate) coil_selection_report: Option<super::run_input_prefix::SelectedCoilSelectionReport>,
     /// Actual227/228 BranchInputManager owner, retaining failed getter prefixes.
     pub(crate) selected_branches: super::run_input_prefix::SelectedBranches,
+    /// Sole actual DataPluginManager trends vector, distinct from pluginManager ptr.
+    pub(crate) source_plugin_data: super::ordinary_ems_plugin::SourcePluginData,
     /// Actual231 PluginManager constructor result, retained for the run.
     pub(crate) selected_plugin_manager: Option<super::run_input_prefix::SelectedPluginManager>,
     /// Same DataSizing/SizingManager owner through234 and later consumers.
@@ -97,6 +126,8 @@ pub struct CtfInitializationReports {
     /// Same three DataHeatBalance space-control fields before and after241.
     pub(crate) heat_balance_space_controls:
         super::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls,
+    /// Sole actual FaultsManager constructor, retaining getter counts and once flag.
+    pub(crate) source_faults_manager: super::source_initialization::SourceFaultsManager,
     /// Sole selected CurveManager retained collections.
     pub(crate) selected_curves: Option<super::setup_postludes::SelectedCurves>,
     /// Raw HB getter operands from the same admitted source model.
@@ -113,6 +144,10 @@ pub struct CtfInitializationReports {
     /// Raw Material operands, retaining original loader format/order.
     pub selected_material_input: Option<super::selected_material_data::SelectedMaterialInput>,
     pub(crate) selected_material_data: super::selected_material_data::SelectedMaterialData,
+    /// Same selected WindowManager constructor/once/report owner, retained on error.
+    /// The real State assembly must move this owner, never reconstruct its flags.
+    pub(crate) window_optical_initialization:
+        super::ordinary_window_optical_initialization::SourceWindowOpticalInitialization,
     /// Rust failure custody after the Source-connected State has been moved.
     /// On a later outdoor/runtime error the actual State moves here without
     /// cloning its Zone/global/Solar owners; this is not an Original flag.
@@ -129,6 +164,9 @@ pub struct CtfInitializationReports {
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.
     pub scan: ReportScanState,
+    /// Sole SurfaceColorData constructor colors used by actual surface drawings.
+    pub(crate) source_surface_colors:
+        super::source_initialization::primary_startup_surfaces::SourceSurfaceColors,
     /// Reached ordinary postlude writes and return boundaries.
     pub progress: CtfInitPostludeProgress,
     /// Actual reached InitSolar prefix on failure; moved into State on success.
@@ -507,6 +545,13 @@ impl CtfInitializationContext<'_> {
                 super::selected_heat_balance_input::ConstructionMaterialOwners {
                     model,
                     data: &reports.selected_material_data,
+                    bounds: &reports
+                        .selected_simulation_startup
+                        .as_ref()
+                        .ok_or_else(|| {
+                            hb_input_error(E::Unavailable("actual preconstruction window bound"))
+                        })?
+                        .construction_bounds,
                 },
                 input,
                 &mut reports.input_processor_shortcut,
@@ -517,7 +562,7 @@ impl CtfInitializationContext<'_> {
             .map_err(hb_input_error)
     }
 }
-fn hb_input_error(
+pub(crate) fn hb_input_error(
     error: super::selected_heat_balance_input::HeatBalanceInputError,
 ) -> crate::error::RuntimeError {
     use super::selected_heat_balance_input::HeatBalanceInputError as E;
@@ -525,6 +570,19 @@ fn hb_input_error(
     let output = match error {
         E::Backend(e) => WarmupOutputError::Backend(e),
         E::Fatal(e) => return RuntimeError::HeatBalanceInput(Box::new(E::Fatal(e))),
+        E::CtfInitialization(e) => {
+            return RuntimeError::HeatBalanceInput(Box::new(E::CtfInitialization(e)));
+        }
+        E::ThermalHistory(e) => {
+            return RuntimeError::HeatBalanceInput(Box::new(E::ThermalHistory(e)));
+        }
+        E::SurfaceInitialization(e) => {
+            return RuntimeError::HeatBalanceInput(Box::new(E::SurfaceInitialization(e)));
+        }
+        E::PredefinedReport(e) => {
+            return RuntimeError::HeatBalanceInput(Box::new(E::PredefinedReport(e)));
+        }
+        E::SourceInput(e) => return *e,
         E::Io(e) => WarmupOutputError::Io(e),
         E::Output(e) => return e.into(),
         E::Unavailable(e) => WarmupOutputError::Unavailable(format!("GetHeatBalanceInput: {e}")),

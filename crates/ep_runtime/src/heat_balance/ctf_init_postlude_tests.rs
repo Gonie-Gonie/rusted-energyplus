@@ -112,6 +112,9 @@ fn error_state() -> SourceErrorState {
         warmup_flag: false,
         doing_sizing: false,
         tracking: SourceErrorTracking {
+            ask_for_plant_check_on_abort: false,
+            exit_during_simulations: false,
+            ask_for_connections_report: false,
             ask_for_surfaces_report: false,
             total_multiplied_windows: 0,
             total_coincident_vertices: 0,

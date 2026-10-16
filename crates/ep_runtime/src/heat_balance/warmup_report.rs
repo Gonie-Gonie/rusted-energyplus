@@ -51,6 +51,9 @@ pub(crate) struct WarmupReportState {
     pub warmup_convergence_warning: bool,
     pub sizing_warmup_convergence_warning: bool,
     pub last_local_summaries: Vec<WarmupReportSummary>,
+    /// Actual Source allocation availability: diff2, matrix3, scratch2.
+    /// None identifies the existing fully allocated legacy constructor only.
+    pub(crate) source_allocations: Option<[bool; 7]>,
 }
 
 #[derive(Debug)]
@@ -98,6 +101,33 @@ fn pass_fail(flag: u8) -> Result<&'static str, WarmupReportError> {
 }
 
 impl WarmupReportState {
+    /// Same retained report owner, with genuine HeatBalanceMgr constructor
+    /// flags and unallocated arrays. Actual dimensions occur in HB2893–2920.
+    /// Configuration/name views are report metadata, never scientific seeds.
+    pub(crate) fn new_source_unallocated(
+        zone_names: Vec<String>,
+        configuration: WarmupReportConfiguration,
+    ) -> Self {
+        Self {
+            zone_names,
+            configuration,
+            points_per_day: 0,
+            count: 0,
+            temperature_difference: Vec::new(),
+            load_difference: Vec::new(),
+            temperature: Vec::new(),
+            load: Vec::new(),
+            maximum_load: Vec::new(),
+            temperature_stddev: Vec::new(),
+            load_stddev: Vec::new(),
+            first_detailed_write: true,
+            first_summary_write: true,
+            warmup_convergence_warning: false,
+            sizing_warmup_convergence_warning: false,
+            last_local_summaries: Vec::new(),
+            source_allocations: Some([false; 7]),
+        }
+    }
     pub fn new(
         zone_names: Vec<String>,
         time_steps_in_hour: u32,
@@ -126,6 +156,7 @@ impl WarmupReportState {
             warmup_convergence_warning: false,
             sizing_warmup_convergence_warning: false,
             last_local_summaries: Vec::new(),
+            source_allocations: None,
         })
     }
 
@@ -148,6 +179,14 @@ impl WarmupReportState {
     }
 
     fn validate_layout(&self) -> Result<(), WarmupReportError> {
+        if self
+            .source_allocations
+            .is_some_and(|fields| fields != [true; 7])
+        {
+            return Err(WarmupReportError::Unavailable(
+                "actual Source report allocation incomplete",
+            ));
+        }
         let zones = self.zone_names.len();
         let matrices = [&self.temperature, &self.load, &self.maximum_load];
         if self.points_per_day == 0

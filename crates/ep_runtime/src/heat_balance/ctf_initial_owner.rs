@@ -75,6 +75,43 @@ pub fn initialize_construction_ctf_initial(
     context: CtfLayerContext,
     time_step_zone_hours: f64,
 ) -> ConstructionCtfInitialDiscretization {
+    let previous = previous_constructions
+        .iter()
+        .map(|row| CtfSourcePriorConstruction {
+            construction_id: row.id,
+            layer_ids: row.effective_layers(),
+            is_used_ctf: used_ctf_constructions.contains(&row.id.0),
+        })
+        .collect::<Vec<_>>();
+    initialize_construction_ctf_initial_from_source(
+        construction,
+        &previous,
+        preprocessing,
+        context,
+        time_step_zone_hours,
+    )
+}
+/// Borrowed original construction prefix; no numerical coefficients or new model.
+pub struct CtfSourcePriorConstruction<'a> {
+    /// Actual original construction identity.
+    pub construction_id: ConstructionId,
+    /// Borrowed actual original LayerPoint-to-Material-ID view.
+    pub layer_ids: &'a [ep_model::MaterialId],
+    /// Actual Source IsUsedCTF, independent of surface/model recounts.
+    pub is_used_ctf: bool,
+}
+/// Same selected initial body, accepting the actual Source declaration prefix.
+#[allow(
+    clippy::nonminimal_bool,
+    reason = "Preserve pinned Construction.cc405 predicate."
+)]
+pub fn initialize_construction_ctf_initial_from_source(
+    construction: &Construction,
+    previous_constructions: &[CtfSourcePriorConstruction<'_>],
+    preprocessing: &ConstructionCtfLayerPreprocessing,
+    context: CtfLayerContext,
+    time_step_zone_hours: f64,
+) -> ConstructionCtfInitialDiscretization {
     use CtfInitialUnavailable as Unavailable;
 
     let result = (|| {
@@ -110,13 +147,13 @@ pub fn initialize_construction_ctf_initial(
         // never merged layers, coefficient values, or numerical similarity.
         let layers = construction.effective_layers();
         for previous in previous_constructions {
-            let other = previous.effective_layers();
+            let other = previous.layer_ids;
             if layers.len() == other.len()
                 && layers.iter().eq(other.iter().rev())
-                && used_ctf_constructions.contains(&previous.id.0)
+                && previous.is_used_ctf
             {
                 return Err(Unavailable::ReverseConstruction {
-                    construction_id: previous.id,
+                    construction_id: previous.construction_id,
                 });
             }
         }

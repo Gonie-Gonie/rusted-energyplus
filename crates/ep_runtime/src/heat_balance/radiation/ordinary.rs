@@ -5,8 +5,17 @@
 
 mod enclosure_setup;
 mod initialization;
+mod radiant_exchange;
+pub(crate) mod shading_report;
+pub(crate) mod solar_output_registration;
+pub(crate) mod solar_timestep;
+pub(crate) mod source_children;
 mod source_initialization;
 pub(crate) use enclosure_setup::EnclosureOutputOwners;
+pub use radiant_exchange::OrdinaryRadiantExchangeState;
+pub(crate) use radiant_exchange::{
+    RadiantExchangeCall, RadiantExchangeSource, RadiantInitializationOutput,
+};
 
 use crate::error::{RuntimeError, WarmupOutputError};
 use crate::heat_balance::inside_convection_layout::InsideConvectionLayout;
@@ -97,12 +106,15 @@ pub enum OrdinaryRadiationError {
     Unavailable(OrdinaryRadiationUnavailable),
     /// Reuse the existing OS/backend error carrier; no warmup call is inferred.
     Output(WarmupOutputError),
+    /// The genuine selected Source fatal, preserving its original backend cause.
+    Input(Box<crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>),
 }
 impl std::fmt::Display for OrdinaryRadiationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Unavailable(error) => std::fmt::Display::fmt(error, f),
             Self::Output(error) => write!(f, "ordinary radiation output stopped: {error}"),
+            Self::Input(error) => std::fmt::Display::fmt(error, f),
         }
     }
 }
@@ -111,6 +123,7 @@ impl std::error::Error for OrdinaryRadiationError {
         match self {
             Self::Unavailable(error) => Some(error),
             Self::Output(error) => Some(error),
+            Self::Input(error) => Some(error.as_ref()),
         }
     }
 }
@@ -131,7 +144,7 @@ impl From<OrdinaryRadiationError> for RuntimeError {
 }
 
 /// Actual radiant enclosure fields written/read by geometry setup2857.
-/// Later InitInterior must extend this same owner; no F/ScriptF storage is inferred.
+/// The actual radiant initializer and exchange consumer extend this same owner.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct RadiantRadiationEnclosure {
     /// Actual Enclosure.Name, initially empty.
@@ -146,12 +159,42 @@ pub struct RadiantRadiationEnclosure {
     pub exterior_window_area: f64,
     /// Actual TotalSurfArea; radiant normal branch leaves constructor zero.
     pub total_surface_area: f64,
-    /// Actual MRT output field, constructor zero; no MRT numerical updater claimed.
+    /// Actual MRT output field, constructor zero; CalculateZoneMRT writes this same owner.
     pub mean_radiant_temperature: f64,
+    /// Actual Enclosure.sumAE constructor0, first MRT computes the surface sum.
+    pub sum_ae: f64,
+    /// Actual Enclosure.sumAET constructor0; native zone/enclosure update order retained.
+    pub sum_aet: f64,
+    /// Actual Enclosure.reCalcMRT constructorfalse; actual MRT marks applicable enclosures.
+    pub recalculate_mrt: bool,
+    /// Actual constructor0 and InitInterior count.
+    pub num_surfaces: i32,
+    /// Actual unallocated/dimensioned Source radiant arrays, distinct from Solar.
+    pub f: Option<Vec<f64>>,
+    /// Dimensionless at InitInterior; later recalculated/scaled and diagonal-mutated.
+    pub script_f: Option<Vec<f64>>,
+    /// Actual reached Area dimension and ordered values.
+    pub area: Option<Vec<f64>>,
+    /// Actual mutable EMISS owner, including Source high-emissivity limit writes.
+    pub emissivity: Option<Vec<f64>>,
+    /// Actual azimuth array.
+    pub azimuth: Option<Vec<f64>>,
+    /// Actual tilt array.
+    pub tilt: Option<Vec<f64>>,
+    /// Actual one-based Source SurfacePtr, unallocated before InitInterior.
+    pub source_surface_ptr: Option<Vec<i32>>,
+    /// Actual appended one-based enclosure report positions.
+    pub source_surface_report_nums: Vec<i32>,
+    /// Actual radReCalc constructorfalse; the genuine shading caller writes it.
+    pub rad_recalc: bool,
+    /// Actual radQThermalRad constructor0; InitInternalHeatGains writes this owner.
+    pub rad_q_thermal_rad: f64,
+    /// Actual radThermAbsMult constructor0 and thermal absorption reciprocal.
+    pub rad_therm_abs_mult: f64,
 }
 
 /// Actual selected solar enclosure, available through immutable owner inspection.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct SolarRadiationEnclosure {
     /// One-based Rust association, assigned by the later physical binder.
     pub id: usize,
@@ -171,6 +214,8 @@ pub struct SolarRadiationEnclosure {
     pub num_surfaces: i32,
     /// Genuine constructor false; InitSolar890-893 only assigns true.
     pub has_interzone_window: bool,
+    /// Actual EnclosureViewFactorInformation.hh85 constructor zero.
+    pub(crate) total_enclosure_daylight_reference_points: i32,
     /// Sole Source Array1D_int pointer, unallocated until actual InitSolar874.
     pub source_surface_ptr: Option<Vec<i32>>,
     /// One-based Source enclosure positions, appended in actual report order.
@@ -199,10 +244,50 @@ pub struct SolarRadiationEnclosure {
     /// Actual approximate or successfully fixed F prefix in flat Original order.
     pub f: Vec<f64>,
     fix: Option<super::FixedViewFactors>,
+    /// Actual radReCalc constructorfalse, written by the same shading caller.
+    pub rad_recalc: bool,
+    /// Actual solVMULT constructor0 and shortwave reciprocal.
+    pub sol_vmult: f64,
+    /// Actual solAbsFirstCalc constructortrue, cleared after successful warning.
+    pub sol_abs_first_calc: bool,
+}
+
+impl Default for SolarRadiationEnclosure {
+    fn default() -> Self {
+        Self {
+            id: 0,
+            name: String::new(),
+            space_names: Vec::new(),
+            space_nums: Vec::new(),
+            floor_area: 0.0,
+            exterior_window_area: 0.0,
+            total_surface_area: 0.0,
+            num_surfaces: 0,
+            has_interzone_window: false,
+            total_enclosure_daylight_reference_points: 0,
+            source_surface_ptr: None,
+            source_surface_report_nums: Vec::new(),
+            source_array_allocated: [false; 5],
+            zone_id: None,
+            space_ids: Vec::new(),
+            surface_ptr: Vec::new(),
+            surface_indexes: Vec::new(),
+            surface_report_nums: Vec::new(),
+            area: Vec::new(),
+            absorptance: Vec::new(),
+            azimuth: Vec::new(),
+            tilt: Vec::new(),
+            f: Vec::new(),
+            fix: None,
+            rad_recalc: false,
+            sol_vmult: 0.0,
+            sol_abs_first_calc: true,
+        }
+    }
 }
 
 /// Sole radiation container retained from early geometry/radiant setup through
-/// the later Solar prefix, then moved into State. No radiant numeric cache is inferred.
+/// the later Solar/radiant producers and consumers, then moved into State.
 #[derive(Clone, Debug, PartialEq)]
 pub struct OrdinarySolarRadiation {
     input: OrdinaryRadiationInput,
@@ -215,6 +300,8 @@ pub struct OrdinarySolarRadiation {
     // Original InitSolar writes these associations even before radiant init.
     back_pointers: Vec<(usize, usize, usize)>,
     solar_initialized: bool,
+    radiant_exchange: OrdinaryRadiantExchangeState,
+    pub(crate) solar_timestep: Box<solar_timestep::SourceSolarTimestepState>,
 }
 
 impl OrdinarySolarRadiation {
@@ -229,6 +316,8 @@ impl OrdinarySolarRadiation {
             num_solar_enclosures: 0,
             back_pointers: Vec::new(),
             solar_initialized: false,
+            radiant_exchange: OrdinaryRadiantExchangeState::default(),
+            solar_timestep: Box::default(),
         }
     }
 
@@ -236,6 +325,20 @@ impl OrdinarySolarRadiation {
     #[must_use]
     pub fn radiant_enclosures(&self) -> &[RadiantRadiationEnclosure] {
         &self.radiant
+    }
+
+    /// Actual passive view of Source radiation module state and scratch masks.
+    #[must_use]
+    pub fn radiant_exchange_state(&self) -> &OrdinaryRadiantExchangeState {
+        &self.radiant_exchange
+    }
+
+    pub(crate) fn source_radiant_enclosures_mut(&mut self) -> &mut [RadiantRadiationEnclosure] {
+        &mut self.radiant
+    }
+
+    pub(crate) fn source_solar_enclosures_mut(&mut self) -> Option<&mut [SolarRadiationEnclosure]> {
+        self.solar.as_deref_mut()
     }
 
     /// Actual NumOfRadiantEnclosures, separate from the allocated row count.

@@ -18,7 +18,7 @@ use std::io::Write;
 
 mod input;
 mod storage;
-pub(crate) use storage::{SelectedZoneData, SelectedZoneInputOwners};
+pub(crate) use storage::{SelectedZoneData, SelectedZoneInputOwners, ZonePredefined};
 
 /// The wrapper forwards to the genuine filesystem/process host; no default sink.
 pub(crate) struct ZoneOutputHost<'a>(pub(crate) &'a mut dyn SourceOutputFileHost);

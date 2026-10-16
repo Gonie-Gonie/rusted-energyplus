@@ -10,6 +10,7 @@ use ep_model::{MaterialKind, TypedModel};
 pub(crate) struct ConstructionMaterialOwners<'a> {
     pub(crate) model: &'a TypedModel,
     pub(crate) data: &'a super::super::selected_material_data::SelectedMaterialData,
+    pub(crate) bounds: &'a super::super::selected_simulation_startup::SelectedConstructionBounds,
 }
 
 impl SelectedHeatBalanceInputState {
@@ -23,6 +24,8 @@ impl SelectedHeatBalanceInputState {
         backend: &mut SourceErrorBackend<'_>,
         errors_found: &mut bool,
     ) -> Result<(), HeatBalanceInputError> {
+        let bounds = materials.bounds;
+        let max_solid_window_layers = bounds.max_solid_window_layers;
         let model = materials.model;
         let materials = materials.data;
         // Original1341 returns before ANY count or scratch operation.
@@ -38,7 +41,13 @@ impl SelectedHeatBalanceInputState {
             "Construction:WindowDataFile",
             "Construction:WindowEquivalentLayer",
         ] {
-            if input.get_num_objects_found(family) != 0 {
+            let count = input.get_num_objects_found(family);
+            if family == "Construction:WindowEquivalentLayer" {
+                self.total_equivalent_layer_constructions = i32::try_from(count).map_err(|_| {
+                    HeatBalanceInputError::Unavailable("actual equivalent layer construction count")
+                })?;
+            }
+            if count != 0 {
                 return Err(HeatBalanceInputError::Unavailable(family));
             }
         }
@@ -53,6 +62,27 @@ impl SelectedHeatBalanceInputState {
         self.nominal_u_before_adjusted = Some(vec![0.0; regular]);
         self.coefficient_adjustment_ratio = Some(vec![1.0; regular]);
         self.construction_usage = vec![super::SelectedConstructionUsage::default(); regular];
+        self.source_ctf_coefficients=vec![Some(super::super::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage::reset());regular];
+        // GetConstructData1403-1419: same already allocated Construction rows.
+        for (index, row) in self.construction_usage.iter_mut().enumerate() {
+            let storage = self
+                .source_ctf_coefficients
+                .get_mut(index)
+                .and_then(Option::as_mut)
+                .ok_or(HeatBalanceInputError::Unavailable(
+                    "actual constructed CTF coefficient allocation",
+                ))?;
+            storage.num_ctf_terms = 0;
+            storage.num_histories = 0;
+            row.source_sink_present = false;
+            row.solution_dimensions = 1;
+            row.source_after_layer = 0;
+            row.temperature_after_layer = 0;
+            row.thickness_perpendicular = 0.0;
+            row.w5_frame_divider = 0;
+            row.from_window5_data_file = false;
+            row.window_arrays.allocate_source(max_solid_window_layers)?;
+        }
         shortcut.current_module_object = "Construction".into();
         for index in 0..regular {
             // Original local ConstructAlphas lower bound is zero. Our [0] is
@@ -180,12 +210,15 @@ impl SelectedHeatBalanceInputState {
             backend.show_continue_error("Use Material object for all opaque material definitions except very light insulation layers.")?;
         }
         *current_module_object = "Construction:WindowEquivalentLayer".into();
+        let equivalent_construction_num = 0; // Original1627 admitted empty loop.
+        self.total_equivalent_layer_constructions = equivalent_construction_num; //1711
         *current_module_object = "Construction:WindowDataFile".into();
         // Both actual window loops are empty; WConstructNames is gone at1776.
         self.finish_selected_construction_nominal_u(
             ConstructionMaterialOwners {
                 model,
                 data: materials,
+                bounds,
             },
             backend,
             errors_found,

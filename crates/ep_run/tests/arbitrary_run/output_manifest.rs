@@ -86,6 +86,7 @@ pub(crate) fn assert_ordinary_output_manifest(
     expected.extend([
         "eplusrs.audit",
         "eplusrs.bnd",
+        "eplusrs.dbg",
         "eplusrs.eso",
         "eplusrs.mtr",
         "eplusrs.mtd",
