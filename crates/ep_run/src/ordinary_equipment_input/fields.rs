@@ -20,6 +20,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             | "SimulationControl"
             | "Building"
             | "Construction"
+            | "OtherEquipment"
             | "SurfaceConvectionAlgorithm:Inside"
             | "SurfaceConvectionAlgorithm:Outside"
             | "ZoneAirHeatBalanceAlgorithm"

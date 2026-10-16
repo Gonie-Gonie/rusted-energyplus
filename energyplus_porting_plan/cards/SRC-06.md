@@ -365,7 +365,7 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 같은 입력 처리기·Zone/Space·스케줄·출력 등록 소유자를 사용하는 `ManageInternalHeatGains(initOnly=true)` 선택 경로를 연결했다. `OtherEquipment`의 `None` 연료·`EquipmentLevel` 입력, 실제 배열 할당·장비 연결·보고 등록·nominal EIO와 반복 입력 생략을 구현하고, 같은 상태를 읽는 관찰 경로를 추가했다. 양의 미지원 장비·목록·EMS·출력 요청·Kiva 분기는 해당 원본 연산 전에 unavailable을 반환한다. 기존 hourly 소비자와 지원 범위는 유지한다.
 
-코드 검증과 새 부모 호출 Native 대조를 진행 중이다. 최초 Clippy의 헤더 줄바꿈 오류 2건은 출력 bytes를 유지하는 `writeln!` 수정 후 재검사에서 통과했다. 최초 A24는 실제 IDF 필드 수 전달 누락으로 exit6이었으며, `OtherEquipment`의 실제 선언 순서·필드 수를 복원하고 원본 파서의 최소 11필드 규칙을 연결했다. 두 실패 기록을 보존하고, 수정된 19파일의 포맷·품질·Clippy와 기존 입력 전달·런타임·일반 CLI·CI CLI 본문을 확인한다. 새 A24·Native 수치 PASS나 카드 완료를 아직 주장하지 않으며, actual 요약 45개·네 gate·A/B 완료 수는 그대로다.
+코드 검증과 새 부모 호출 Native 대조를 진행 중이다. 최초 Clippy의 헤더 줄바꿈 오류 2건은 출력 bytes를 유지하는 `writeln!` 수정 후 재검사에서 통과했다. 최초 A24는 실제 IDF 필드 수 전달 누락으로 exit6이었으며, `OtherEquipment`의 실제 선언 순서·필드 수를 복원하고 원본 파서의 최소 11필드 규칙을 연결했다. 두 번째 A24도 exit6이었고, 기존 장비 입력 검증의 메타데이터 허용 목록에 같은 객체가 빠진 것이 원인이었다. 목록 한 줄만 추가한 최종 20파일은 독립 소스 검토를 통과했다. 수정 후 포맷·품질·ep_run all-target Clippy와 기존 CLI 본문의 일반·실제 CI 설정 실행이 모두 통과했다. 변경 없는 raw-model·runtime 검사는 이전 성공 결과를 재사용하고, 전체 소스 색인에서 유일한 차이가 이 ep_run 한 줄임을 확인했다. 실제 부모 호출 Native 캡처는 완료했지만 새 A24·Native 수치 PASS나 카드 완료를 아직 주장하지 않는다. 실제 Clippy101·A24 exit6 두 건은 보존하며, actual 요약 45개·네 gate·A/B 완료 수는 그대로다.
 
 ## 이력과 증거 보존
 
