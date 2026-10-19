@@ -249,3 +249,60 @@ impl crate::weather::day::source_weather_initialization::SourceWeatherEio for So
         self.file.is_some() && !self.failed
     }
 }
+
+
+impl SourceInitializationFiles {
+    /// Native InputOutputFile::getLines296-316 on the same physical EIO handle.
+    /// Flushes, saves/restores its position, and never opens a second stream.
+    pub(crate) fn source_eio_lines(
+        &mut self,
+    ) -> Result<Vec<Vec<u8>>, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+        use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
+        use std::io::{Read, Seek, SeekFrom};
+        let stream = &mut self.outputs[1];
+        if stream.failed {
+            return Err(Error::Unavailable(
+                "actual EIO getLines300 failed-stream flush/tellg domain",
+            ));
+        }
+        if stream.file.is_none() {
+            // Actual os==nullptr returns an empty vector at Native315.
+            return Ok(Vec::new());
+        }
+        stream.flush()?;
+        let file = stream.file.as_mut().ok_or(Error::Unavailable(
+            "actual EIO getLines same nonnull stream owner",
+        ))?;
+        let last_position = file.stream_position()?;
+        let mut line = Vec::new();
+        let mut lines = Vec::new();
+        file.seek(SeekFrom::Start(0))?;
+        let mut byte = [0u8; 1];
+        loop {
+            if file.read(&mut byte)? == 0 {
+                if !line.is_empty() {
+                    lines.push(line);
+                }
+                break;
+            }
+            if byte[0] == 0x1a {
+                return Err(Error::Unavailable(
+                    "actual EIO getLines306 Windows text CTRL-Z input domain",
+                ));
+            }
+            if byte[0] == b'\n' {
+                // Same Windows text-mode CRLF translation as Native fstream.
+                if line.last() == Some(&b'\r') {
+                    line.pop();
+                }
+                lines.push(std::mem::take(&mut line));
+            } else {
+                line.push(byte[0]);
+            }
+        }
+        // Native clears getline eof/fail, then seekg(last_pos). Rust reads do
+        // not retain those transient bits; same saved position is restored.
+        file.seek(SeekFrom::Start(last_position))?;
+        Ok(lines)
+    }
+}

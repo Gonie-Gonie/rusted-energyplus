@@ -280,3 +280,9 @@ mod demand_summary;
 pub(crate) use demand_summary::SourceDemandReportOwners;
 
 mod source_energy_summary;
+
+mod post_summary;
+pub(crate) use post_summary::SourceSurfaceShadowingReportOwners;
+
+mod post_summary_next;
+pub(crate) use post_summary_next::SourcePostSummaryReportOwners;

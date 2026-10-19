@@ -39,6 +39,14 @@ pub struct PredefinedColumn {
     pub subtable_index: i32,
 }
 
+/// Actual ShadowRelateType three-int default constructor (Native148-159).
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub(crate) struct SourcePredefinedShadowRelation {
+    pub(crate) cast_surface: i32,
+    pub(crate) receiving_surface: i32,
+    pub(crate) receiving_kind: i32,
+}
+
 /// Actual allocated registry arrays, counters, named indices and layer vector.
 ///
 /// Full allocated vectors include unoccupied slots. Each occupied index is
@@ -63,6 +71,19 @@ pub struct PredefinedRegistry {
     pub column_capacity: i32,
     /// Actual numColumnTag.
     pub column_count: i32,
+    /// Actual CompSizeTableEntry Array1D constructor-unallocated; positive records
+    /// are unrepresented in the admitted empty-sizing Source domain.
+    pub(crate) component_sizing_entries: Option<Vec<std::convert::Infallible>>,
+    /// Actual sizeCompSizeTableEntry constructor0.
+    pub(crate) component_sizing_capacity: i32,
+    /// Actual numCompSizeTableEntry constructor0.
+    pub(crate) component_sizing_count: i32,
+    /// Actual ShadowRelate allocation, written by WriteSurfaceShadowing.
+    pub(crate) shadow_relations: Option<Vec<SourcePredefinedShadowRelation>>,
+    /// Actual sizeShadowRelate constructor0; direct report allocate does not set it.
+    pub(crate) shadow_relation_capacity: i32,
+    /// Actual numShadowRelate, reset after the direct report allocation.
+    pub(crate) shadow_relation_count: i32,
     /// All 1,301 declared named IDs, using their exact Source member names.
     pub named_indices: BTreeMap<String, i32>,
     /// Actual retained pdchOpqConsLayCol; Set appends ten entries each visit.
@@ -83,6 +104,12 @@ impl Default for PredefinedRegistry {
             columns: None,
             column_capacity: 0,
             column_count: 0,
+            component_sizing_entries: None,
+            component_sizing_capacity: 0,
+            component_sizing_count: 0,
+            shadow_relations: None,
+            shadow_relation_capacity: 0,
+            shadow_relation_count: 0,
             named_indices: NATIVE_INDEX_NAMES
                 .iter()
                 .map(|name| ((*name).to_owned(), 0))

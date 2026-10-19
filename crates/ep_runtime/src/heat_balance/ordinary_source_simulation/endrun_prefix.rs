@@ -183,7 +183,7 @@ impl SourceInitializationFiles {
     // Actual WriteTabularReports5212-5227 on the same retained owners. The
     // existing outer on-session call already holds the single weather borrow.
     fn write_source_tabular_reports_prefix_on_session(
-        &self,
+        &mut self,
         session: &mut Option<OrdinarySourceSession>,
         reports: &mut CtfInitializationReports,
         weather: &WeatherSession,
@@ -396,7 +396,69 @@ impl SourceInitializationFiles {
                     },
                 },
             ).map_err(hb_input_error)?;
-            return Err(unavailable("actual WriteTabularReports5235 WriteComponentSizing entry"));
+            session.tabular.write_source_component_sizing(&mut reports.registry)
+                .map_err(hb_input_error)?;
+            session.tabular.write_source_surface_shadowing(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceSurfaceShadowingReportOwners {
+                    geometry: &reports.surface_geometry_input,
+                    radiation: required(
+                        reports.ordinary_solar_radiation.as_ref(),
+                        "actual same ShadowComb owner before SurfaceShadowing5236",
+                    )?,
+                    registry: &mut reports.registry,
+                    sqlite: &reports.source_sqlite,
+                    results: &reports.source_results_framework,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            session.tabular.write_source_component_cost_table(&reports.cost_estimate_monetary)
+                .map_err(hb_input_error)?;
+            session.tabular.write_source_adaptive_comfort_table(&reports.selected_internal_heat_gains)
+                .map_err(hb_input_error)?;
+            {
+                let mut next_owners = crate::heat_balance::ordinary_tabular_reports::SourcePostSummaryReportOwners {
+                    globals,
+                    zones: required(
+                        reports.selected_zone_input.as_ref(),
+                        "actual same BuildingPreDefRep before EIO5239",
+                    )?,
+                    hvac: &required(
+                        reports.selected_simulation_startup.as_ref(),
+                        "actual same HVAC globals before EIO5239",
+                    )?.hvac_globals,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                };
+                session.tabular.write_source_eio_tables(self, &mut next_owners)
+                    .map_err(hb_input_error)?;
+                session.tabular.write_source_load_component_summary(&next_owners)
+                    .map_err(hb_input_error)?;
+                session.tabular.write_source_heat_emission_table(&mut next_owners)
+                    .map_err(hb_input_error)?;
+            }
+            if session.tabular.display_thermal_resilience_summary && !globals.do_pure_load_calc {
+                return Err(unavailable("actual WriteTabularReports5244 WriteThermalResilienceTables entry"));
+            }
+            return Err(unavailable("actual WriteTabularReports5246 CO2Resilience conditional entry"));
         }
         Err(unavailable("actual WriteTabularReports5278 audit ensure_open entry"))
     }

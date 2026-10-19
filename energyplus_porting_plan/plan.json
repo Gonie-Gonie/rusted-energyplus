@@ -12776,6 +12776,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-tabular-report-core-08/summary.json",
         "sha256": "d31bfe47322829f207652a47dcf54f89e643f21be60da093e3ff054009704c92",
         "size_bytes": 70564
+      },
+      "canonical_post_summary_core_09": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-post-summary-core-09/summary.json",
+        "sha256": "8acca551e7c71d6fd303cb6725d5170008189658ae33d9f492433eb1217440ef",
+        "size_bytes": 48724
       }
     },
     {
