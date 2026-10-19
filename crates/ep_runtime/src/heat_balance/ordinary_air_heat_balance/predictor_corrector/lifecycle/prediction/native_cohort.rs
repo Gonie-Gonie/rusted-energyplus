@@ -656,3 +656,11 @@ impl SourceZoneAirPredictorCorrector {
         all_native_b_prediction_entries_match_source_rollback_and_sensible_bits()
     }
 }
+
+// One consolidated target; the original complete air cohort above is unchanged.
+mod report_cohort;
+impl SourceZoneAirPredictorCorrector {
+    pub(crate) fn run_native_system_report_cohort() -> Result<(usize,usize,usize)> {
+        report_cohort::run()
+    }
+}

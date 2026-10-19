@@ -185,3 +185,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source41 node setpoint endrun](evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). NodeSetpointCheck의 기존 선택적 저장소와 실제 노드별 플래그를 그대로 사용한다. 필요한 플래그를 먼저 지운 뒤 9개 제어의 복합 OR 순서를 보존하며, 같은 NodeID와 RuntimeLanguage를 빌린다. 대체 노드 목록이나 임의 초기값은 추가하지 않는다.
+
+
+[Source40 Native report cohort](evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 실제 입력 getter가 만든 Config·List·물리 Node와 기존 수요·공기·보고·누적 사전정의 소유자에 관측된 함수 진입 피연산자만 복원합니다. 보고 20항목·시설 7항목·요약 7항목·사전정의 24항목 및 소비된 읽기값을 대조하며, 엔진 수명과 매번 새로 생성되는 Native 단위 입력의 주소 수명을 구분합니다.

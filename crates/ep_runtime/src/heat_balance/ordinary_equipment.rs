@@ -1227,3 +1227,54 @@ impl OrdinaryEquipment {
         Ok(())
     }
 }
+
+// Only genuine captured/unit-variant report-entry operands; no production API.
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl OrdinaryEquipment {
+    pub(crate) fn restore_native_report_config(&mut self, zone:i32, name:&str,
+        controlled:bool, inlets:Option<&[i32]>, reporting_indices:Option<(i32,i32,i32)>)
+        -> Result<usize, super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let index=zone.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort Config ordinal"))?;
+        let row=self.zone_config.as_mut().and_then(|rows|rows.get_mut(index)).ok_or(E::Unavailable("report cohort getter-created Config"))?;
+        if row.zone_name!=name {return Err(E::Unavailable("report cohort actual Zone identity"));}
+        if controlled { match (row.inlet_node_air_loop_numbers.as_mut(),inlets) {
+            (Some(actual),Some(captured)) if actual.len()==captured.len() && row.inlet_nodes==captured.len()=>actual.copy_from_slice(captured),
+            (None,None) if row.inlet_nodes==0=>{},
+            _=>return Err(E::Unavailable("report cohort actual inlet allocation/extent")),
+        }}
+        row.is_controlled=controlled;
+        if let Some((list,dsoa,distribution))=reporting_indices {
+            let at=list.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort captured List ordinal"))?;
+            let actual=self.equipment_lists.as_ref().and_then(|rows|rows.get(at)).ok_or(E::Unavailable("report cohort getter-created List"))?;
+            if actual.name!=row.equipment_list_name {return Err(E::Unavailable("report cohort actual Config/List name association"));}
+            row.equipment_list_index=usize::try_from(list).map_err(|_|E::Unavailable("report cohort List integer"))?;
+            row.zone_design_specification_outdoor_air_index=dsoa;row.zone_air_distribution_index=distribution;
+        }
+        Ok(std::ptr::from_ref(row) as usize)
+    }
+    pub(crate) fn restore_native_report_equipment_index(&mut self,list:i32,pointer:i32,kind:i32,index:i32)
+        -> Result<usize,super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let at=|n:i32|n.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort equipment ordinal"));
+        let row=self.equipment_lists.as_mut().and_then(|rows|rows.get_mut(at(list).ok()?)).ok_or(E::Unavailable("report cohort genuine equipment List"))?;
+        let i=at(pointer)?;
+        if row.equipment_types.as_ref().and_then(|rows|rows.get(i))!=Some(&kind) {return Err(E::Unavailable("report cohort getter-created equipment type"));}
+        *row.equipment_indices.as_mut().and_then(|rows|rows.get_mut(i)).ok_or(E::Unavailable("report cohort actual EquipIndex cell"))?=index;
+        Ok(std::ptr::from_ref(row) as usize)
+    }
+    pub(crate) fn restore_native_report_node(&mut self,ordinal:i32,name:&str,
+        temperature:Option<f64>,humidity_ratio:Option<f64>,mass_flow_rate:Option<f64>)
+        -> Result<usize,super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let n=usize::try_from(ordinal).map_err(|_|E::Unavailable("report cohort Node ordinal"))?;
+        let at=n.checked_sub(1).ok_or(E::Unavailable("report cohort positive Node"))?;
+        if self.nodes.node_ids.as_ref().and_then(|rows|rows.get(n)).map(String::as_str)!=Some(name) {return Err(E::Unavailable("report cohort NativeBND/genuine getter NodeID"));}
+        let row=self.nodes.physical.as_mut().and_then(|rows|rows.get_mut(at)).ok_or(E::Unavailable("report cohort physical Node"))?;
+        if let Some(v)=temperature {row.temperature=v;}
+        if let Some(v)=humidity_ratio {row.humidity_ratio=v;}
+        if let Some(v)=mass_flow_rate {row.mass_flow_rate=v;}
+        // A stable real field identifies this physical Node through the borrowed view.
+        Ok(std::ptr::from_ref(&row.temperature) as usize)
+    }
+}

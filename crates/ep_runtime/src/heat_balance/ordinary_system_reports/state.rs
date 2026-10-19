@@ -1,4 +1,4 @@
-//! Complete actual SystemReports module constructors; positive report rows remain explicit boundaries.
+//! Complete actual SystemReports constructors; positive primary rows remain explicit boundaries.
 use std::convert::Infallible;
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceCompTypeError {

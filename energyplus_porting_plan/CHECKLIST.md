@@ -328,3 +328,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source41 node setpoint endrun](evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). 노드 setpoint 종료 검사를 기존 Rust 파일 2개로 연결하고 실제 B/A24 실행 결과를 기록한다. 추가 테스트 없이 기존 게이트 수를 유지하며 별도 보고 수치 검증을 완료로 표시하지 않는다. 최초 A24의 빌드 경로 오류 기록은 보존하고, 교정된 A24-02를 승인된 결과로 사용한다.
+
+
+[Source40 Native report cohort](evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 보고 전용 단일 코호트에 471회 Native 대조를 통합했습니다. 실행 범위 선택은 CONTRIBUTING.md에 정리했으며 카드·게이트 수는 유지합니다.

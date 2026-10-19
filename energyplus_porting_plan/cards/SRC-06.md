@@ -497,3 +497,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source41 node setpoint endrun](../evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). 같은 노드 검사 상태와 RuntimeLanguage를 사용해 종료 시 setpoint 검사의 전체 정상 순회를 연결했다. 실제로 요청된 제어만 순서대로 검사하고, 미구현 액추에이터·경고·최종 오류는 해당 연산 경계로 남긴다. B 실행 결과: `GetHeatBalanceInput: actual FillRemaining controlled ZoneEquipConfig.NumInletNodes6370`. A24의 기존 5,352개 보고값 증거를 이어받으며 새 테스트나 수치 계산 변경은 없다.
+
+
+[Source40 Native report cohort](../evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 기존 프로세스 메인 코호트의 보고 전용 선택으로 실제 엔진 306회와 전체 Native 함수의 별도 입력 변형 165회, 총 471회 보고 호출을 비트 단위로 대조했습니다. 비영 부하 8분류와 인접 이진64 경계를 포함하며, 기존 예측·보정 1,168쌍은 수정 없이 이번 실행에서 제외했습니다. 양의 1차 공조·DSOA 및 전체 B 완료는 주장하지 않습니다. 관측 입력 배열 복원 누락으로 실패한 첫 실행과 수정 후 성공 실행을 함께 보존합니다.

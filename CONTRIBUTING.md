@@ -48,19 +48,27 @@ an error. Listing tests with `-List` does not count as executing them. Inspect
 the printed scope before relying on a quick check; a package test does not
 exercise every consumer of its public API.
 
-The controlled-air Native cohort uses one dedicated process-main target:
+The Native comparison cohort uses one dedicated process-main target:
 
 ```powershell
 cargo test --locked -p ep_runtime --features native-controlled-air-cohort --test native_controlled_air_cohort
 ```
 
-It checks all 1,168 predictor entries and 1,168 whole-corrector entries, including
-810 positive inlet-flow cases. On Windows GNU, a libtest worker has a different
-x87 precision setting from process main; the dedicated target preserves the
-Native comparison context without changing floating-point controls or assertions.
-Its required feature excludes the large fixture from ordinary library tests.
-Run it when changing these calculations or their consumed state, and before
-closing their integration gates.
+The default runs all 1,168 predictor entries, 1,168 whole-corrector entries
+(810 positive inlet-flow cases), and 471 system-report cases. For changes to
+energy or ventilation reporting and its consumed state, select reports only:
+
+```powershell
+cargo test --locked -p ep_runtime --features native-controlled-air-cohort --test native_controlled_air_cohort -- --report-only
+```
+
+This runs 306 engine-origin report calls and 165 separate full-Native-function
+unit input variants, including nonzero loads and adjacent binary64 boundaries.
+It skips the unchanged predictor/corrector cases. Run the full target when those
+calculations or their consumed state change, and before closing integration gates.
+On Windows GNU, process main preserves the Native comparison context without
+changing floating-point controls or assertions. Without its explicit required
+feature, ordinary library tests exclude these large cohort fixtures.
 
 Keep one behavioral regression for each distinct failure or contract. Cover
 parallel input cases in a named table where their setup and assertions match.

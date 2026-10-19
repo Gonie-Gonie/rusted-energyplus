@@ -1,0 +1,761 @@
+{
+  "schema": "src06-canonical40-finite-Native-report-cohort-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-system-report-native-cohort-40/evidence.zip",
+    "sha256": "fc240613e54294b0dc1c1a2a8ed8dc2658b3a2064b8b0d2fb7997704ba5196a7",
+    "bytes": 2944446
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-system-report-Native-extension-Source-review-39/review.json",
+      "sha256": "92f0b40bd224cd60cefa8569aafefb8fcf4e2140813b80bf16584d409fc5cd58",
+      "bytes": 4676
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-system-report-Native-unit-Source-review-40/review.json",
+      "sha256": "f4c46f734cd75421e9b01e131857c22ba8dfdb18cd94e7646ca1d474cf4bcf08",
+      "bytes": 77886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-system-report-cohort-Source-review-40-02/review.json",
+      "sha256": "ca58f3b800101c08759dde13ae9bab86cd2043b6ac24580104e63746a66c0e98",
+      "bytes": 14195
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-system-report-cohort-deadband-fix-Source-review-40-03/review.json",
+      "sha256": "a45769c6aa1b2d37ce3e3dc0672e8d5be82bb783bd91ff68972b67bc27cb740c",
+      "bytes": 8799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/review.json",
+      "sha256": "574277c9e4ca17c9007371f482ef7c02b3b38656a96ea394f3a8e21022e4e001",
+      "bytes": 20808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-system-report-cohort-actual-review-40-02/review.json",
+      "sha256": "fb60c1444896085f7f0a65aefc38221919931235343844010700d86934da95e7",
+      "bytes": 12568
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-system-report-cohort-application-40-02/receipt.json",
+      "sha256": "12e298449ff147cd91845268bd4cd9da01eea17efcfc7595ad13831730e9802a",
+      "bytes": 22327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-system-report-cohort-application-40/receipt.json",
+      "sha256": "e02ddc5c41f7a16367e13042f7877e2d7ff82cabbf69034cce27e59743a81abf",
+      "bytes": 21420
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-system-report-cohort-Root-40-02.py",
+      "sha256": "4a27d1a0ddc850bb2c68d90d237b6e638bfc2bdb4751d08a7359a81bfc87af2a",
+      "bytes": 6343
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-system-report-cohort-Root-40.py",
+      "sha256": "0f0b3c468e9d8d7c4c961a1557506563ab92daddce4c734f33d7d051158f0633",
+      "bytes": 7452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-system-report-cohort-Audit-40.py",
+      "sha256": "958df95f0bb6a3538858035d58ae1ba850cc7ff369df1e4b4aacc881c0edb3fd",
+      "bytes": 37780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/build-system-report-Native-unit-Peer-40-02.py",
+      "sha256": "196b3fc8f46a4422b54d258dc1a5d5580d7f780cbcead412c2d42863d51b20c9",
+      "bytes": 7432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40-02/receipt.json",
+      "sha256": "768b38cc20a6bf9c0ac70d5935d27b79831e1b22f0119e03595ed803386f18f3",
+      "bytes": 4276
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40-02/stderr.log",
+      "sha256": "4d185d79b8e41812a0a85b761018e8a0d8fd861876ce2ac7a7bba1a17795e4fe",
+      "bytes": 1496514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40-02/stdout.log",
+      "sha256": "18f324fe6fa4c740f07d627e56049d3c6893364f8c7bee8e0f73d8d5f4ae1d1e",
+      "bytes": 212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40/receipt.json",
+      "sha256": "a40d40d92b92d1c0649c82b718622569b0bcc09637a3bc0f23260b7610b2fb3d",
+      "bytes": 4269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40/stderr.log",
+      "sha256": "040e481b69ff7ef0cd6a7fc9014e193c09f0e45a03049e4fb6474d2fe9313fd4",
+      "bytes": 1496950
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40/stdout.log",
+      "sha256": "83252041fe70e4231fd374e69f66b4e2682495da0537d61b9e9fca08f6e472ab",
+      "bytes": 54
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-system-report-cohort-actual-Root-40-02.py",
+      "sha256": "c210dce4be77e89292f77bf1856cb00485f95ad1d9bba2a79af204891d0ea95b",
+      "bytes": 8496
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-system-report-cohort-actual-Root-40.py",
+      "sha256": "3f685b88446fd88c75c5571910d1476872a20f8fb711baa6ec7d78e48af068e6",
+      "bytes": 7344
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compose-system-report-cohort-correction-Audit-40-02.py",
+      "sha256": "5573d2f3c350e8a77090c01be5b127c0ef58a6af925316dd0b263f6cbe8d3eb2",
+      "bytes": 6333
+    },
+    {
+      "path": ".runtime/porting/SRC-06/correct-system-report-cohort-deadband-Audit-40-02.py",
+      "sha256": "f8f71dab7927b9ba0f1526deda930f92a9a1ee566def883f25c19ffc1e292651",
+      "bytes": 7790
+    },
+    {
+      "path": ".runtime/porting/SRC-06/finalize-system-report-cohort-publication-Audit-40-03.py",
+      "sha256": "ec064ae2cfd4125dababee53b0e9880bcbf0d1776d9693f43444ae5bf4efdeb2",
+      "bytes": 5265
+    },
+    {
+      "path": ".runtime/porting/SRC-06/finish-system-report-cohort-Audit-40-04.py",
+      "sha256": "3afbdec935ab3ac844a9f34905f49c7eb7e6023f76b781683f2f8cace71dc5bd",
+      "bytes": 14607
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-system-report-cohort-Root-40-02.py",
+      "sha256": "630628660ba295bfc378bf95aae9c66b3dfd53aa300602d7daecdb2b340dc593",
+      "bytes": 1137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-system-report-cohort-Root-40.py",
+      "sha256": "7d1fcccda8a33418d49bb6b368fb9ee714f700e55442f8a7f8c5e19fdcf3896b",
+      "bytes": 1137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-system-report-Native-unit-Peer-40.py",
+      "sha256": "7aab5847c4d4aa988f997228c44c642f21562c69e31c2e8e31b28206090079b0",
+      "bytes": 9624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-system-report-cohort-correction-helpers-Audit-40-02.py",
+      "sha256": "2244a9fe9bfa952b8430ee8dee0e7fc7638921c9bc6f9b868150bfb01b0670b3",
+      "bytes": 9151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-system-report-cohort-publication-Audit-40.py",
+      "sha256": "9ac2b9e8021c7ddadf3d712240c028a772d23fc7c24ba6573312d946a8c3447e",
+      "bytes": 18393
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-controlled-system-report-checkpoint-Audit-39.py",
+      "sha256": "969710d9e05cb140a56e99e4cda4e786cfb3ee64a1accdb285300acb919e2e43",
+      "bytes": 10583
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-system-report-cohort-checkpoint-Audit-40-02.py",
+      "sha256": "4d0edaeec107e576c542289aef0e284d98b898c0cb7293b9a1d40cf3f4a78ea8",
+      "bytes": 12613
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-system-report-cohort-checkpoint-Audit-40-03.py",
+      "sha256": "f621f6dcf49864c9c6a870e50db13703d01e31a82206f6622c326f67bfacbd46",
+      "bytes": 12692
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-system-report-cohort-checkpoint-Audit-40.py",
+      "sha256": "987033162a80b31273efb6f76c1992ef1df0d99c6b052809fb6e6c96ec36128f",
+      "bytes": 11245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/refine-system-report-cohort-Audit-40-02.py",
+      "sha256": "1c7c48c5c6fa107274443f981db24c156c442e99580437e41bab43b9e64e26fd",
+      "bytes": 7898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/refine-system-report-cohort-Audit-40-03.py",
+      "sha256": "bd6bc970392f7e919f46d1024c0b16886da62a0b3dc4363cdda8986f89ffa4b4",
+      "bytes": 10813
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-meter-final-predefined-Root-01.py",
+      "sha256": "e5aa0bb38df690b77f53b2ef63ec4083dca5a500b745881a2dd8d4b831515256",
+      "bytes": 6086
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-system-report-Native-unit-Peer-40.py",
+      "sha256": "f8ddaccce62864dcbb8e3a7b588506f84b18b945855ea9e63cb7fd45f03d23c8",
+      "bytes": 12784
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-system-report-cohort-Audit-40.py",
+      "sha256": "2fb84e2c0ce97c900be94ee2b3d8a17b938b6c1af627aefc180aacdd49e8fcd1",
+      "bytes": 14205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-node-setpoint-endrun-held-Outer-41/complete-final-compiler-Source-plan.json",
+      "sha256": "112bcb894bf62b6e3d4cff07a8ef74f98cba6d9b4b39b7a7e4904095037e10f6",
+      "bytes": 2635390
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-node-setpoint-endrun-held-Outer-41/manifest.json",
+      "sha256": "403299c451635cb22c1896d06a4904be6e364037242f663732eb0b1dfc228d93",
+      "bytes": 19213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/Native/extents/DataZoneEnergyDemands.hh.165-180.txt",
+      "sha256": "4d5f27e06dbe9c8bec72363c5a3542d72fc26795715d36313f9a20b9d4c4422b",
+      "bytes": 922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/Native/extents/ZoneTempPredictorCorrector.cc.2380-2392.txt",
+      "sha256": "24b78cb75a0e2b6f63e553cc18a030c01665c9af14a4e75233c6f4edc9c9ab1f",
+      "bytes": 816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/Native/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "bytes": 12483
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/Native/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "bytes": 404705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/Source-context/initialization.rs",
+      "sha256": "93f65155ab338b7ccedad761d1833d024891be4d3b9282f477ee7bc96cf0e62d",
+      "bytes": 8406
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "8a5b4ca4aa7efa09f557fb4a2d4782ae82b6e587f6b9ff1bca7164355c0d5ae8",
+      "bytes": 27482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/diffs/01.forward.diff",
+      "sha256": "516617a3a98f9c19802093871eb4a9f976cc7d40027a8f6170d4d46ed4ad2dc5",
+      "bytes": 2129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/diffs/01.inverse.diff",
+      "sha256": "7313e8b757128b9af9d3339304811afe2d863377f7366296903744868819c1d8",
+      "bytes": 2129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "8a5b4ca4aa7efa09f557fb4a2d4782ae82b6e587f6b9ff1bca7164355c0d5ae8",
+      "bytes": 27482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/manifest.json",
+      "sha256": "a6a67f90046295bb66a02bb8e7c8124f3e519f58c9d08a9975607fa005c68237",
+      "bytes": 9881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "ebf2992e90f1a8fc769fe3927ed2faf32dc41d86a1a019aefd5d17bf79ecd83e",
+      "bytes": 28102
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-draft-Audit-40-04/Native-unit-projection-proof.json",
+      "sha256": "9d5abae182f1b63e18a2985d1fc8a9d9ae327d6b4ac569d8dac1bb6ae7f69d90",
+      "bytes": 5067
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-draft-Audit-40-04/draft.json",
+      "sha256": "f7f845bc777b2a7431dde1832222aba57a52cda220b4107c705e5d72a2c2bc79",
+      "bytes": 26491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/complete-final-compiler-Source-plan.json",
+      "sha256": "ddb9ed4a1357ea234499b13ba7924ed6bf6e0a71ad12b24d3f8517ebcaece426",
+      "bytes": 2636925
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/diffs/04.forward.diff",
+      "sha256": "2b589f4c2c98dc4945fa6c198324b8007f86034ae79307b216271294ec839959",
+      "bytes": 28657
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/diffs/04.inverse.diff",
+      "sha256": "ae89de04efc129fc75de66a487b2c2df3c6be64c6d320f1d4571f101dc9c4aa8",
+      "bytes": 28657
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/manifest.json",
+      "sha256": "970cc54e3b740597a62d2ac7207ab6a7e3c718c9609a6cfdad80fec709fb1460",
+      "bytes": 34912
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "ebf2992e90f1a8fc769fe3927ed2faf32dc41d86a1a019aefd5d17bf79ecd83e",
+      "bytes": 28102
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_system_report_b.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "2148fec1b68dd41f1201f44b62bf2392f1ddf33051bfa93beb308005102bb6d8",
+      "bytes": 45571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fffbb401cc6e67d4d2b01e513e55f369dffe5b66bec872e69ce1b4809249b803",
+      "bytes": 51244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_system_reports.rs",
+      "sha256": "70c7d12dde1daddd8445a186c705f873913eabf5096ecb8362b3761ecf8433ed",
+      "bytes": 1547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/heat_balance/ordinary_system_reports/state.rs",
+      "sha256": "ac200f5994acf36869c9b1131108d7c130c8c3a5cb8b92734595378d75ad84c1",
+      "bytes": 5998
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/before/crates/ep_runtime/src/lib.rs",
+      "sha256": "cd28fb288cd1db3dc7bc1d903b7690950417b711575a0673eaee081219616f12",
+      "bytes": 1497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/complete-final-compiler-Source-plan.json",
+      "sha256": "7524f393b05a36adaccba78115a6893f725277a798f5cc7c4e308dd127c2fefa",
+      "bytes": 2636984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/01.forward.diff",
+      "sha256": "75603936bd32c79a2509cb41328af4a3148e883a727d23f44350dee6898f0f2e",
+      "bytes": 4388
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/01.inverse.diff",
+      "sha256": "0b4f495eafaca292cbe7dd5a6caac91959fb6908119ac71be3c18c934a073bbe",
+      "bytes": 4388
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/02.forward.diff",
+      "sha256": "75446d4f8a4546b7e0952ae55d688ee275d6e337a1bec5e81059dc6a265ab6f0",
+      "bytes": 3342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/02.inverse.diff",
+      "sha256": "6c4bcb96c61d1e1ec0817714925008100c8ba1b93b4c9a2a1e344ce260a168df",
+      "bytes": 3342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/03.forward.diff",
+      "sha256": "e85ff2890f3319b72e6f48da86d5782a34997139561886a2dfe8405ef9588191",
+      "bytes": 497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/03.inverse.diff",
+      "sha256": "0fbb337ec8793f0695a61829a6fdc9da0a93564dc24ab43d700a3db8d5244e92",
+      "bytes": 497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/04.forward.diff",
+      "sha256": "328427d148a819f3d1b84d672c05be285f8b084cd54d138ee75d66435b14c679",
+      "bytes": 28031
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/04.inverse.diff",
+      "sha256": "225c1870f7e72adff53a7a05ee12c830218a3fa673028e641adeedac9019e351",
+      "bytes": 28031
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/05.forward.diff",
+      "sha256": "94b608d52779d466b7b16e36f182281a19e2380c71a863af39da3e1a7dbb77e3",
+      "bytes": 646
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/05.inverse.diff",
+      "sha256": "9aabe3636627fa011db6c48056f577e7450dae58ed8d0f2f09902b424d969e1e",
+      "bytes": 646
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/06.forward.diff",
+      "sha256": "1470e59791b1df6cffeff04ff669ddab013affd836e47f5fca37be5964dad556",
+      "bytes": 1793
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/06.inverse.diff",
+      "sha256": "27fd667382e815275d31b8409742e377673888acfcafa609bdfbf87dabf5ebc7",
+      "bytes": 1793
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/07.forward.diff",
+      "sha256": "e0695a0b05d514d9d630a5c41768d44eb98272c820e887316bb965020f1db05b",
+      "bytes": 5133258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/diffs/07.inverse.diff",
+      "sha256": "d05d51d9613d6228eff5b61194673ce456205f9d3968bbe8b85a8e5ebad44e4a",
+      "bytes": 5133258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/finite-Native/engine-observation.json",
+      "sha256": "5d4659dfc09426bca4411f33cf4efc49e0c73a07253b9edfa8798c6dc996533e",
+      "bytes": 3123176
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/finite-Native/full-unit-output.json",
+      "sha256": "79476768b5c24f47b2ef8a5a39c87464567309189cbc83766e2dc55ecf673848",
+      "bytes": 5968281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/full-parent-readback.json",
+      "sha256": "a908e6b93cc3fc8f1f0994242dcd991544400cfc1efac51c688e5bb5d95518d0",
+      "bytes": 3490362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_system_report_b.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "2148fec1b68dd41f1201f44b62bf2392f1ddf33051bfa93beb308005102bb6d8",
+      "bytes": 45571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fffbb401cc6e67d4d2b01e513e55f369dffe5b66bec872e69ce1b4809249b803",
+      "bytes": 51244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_system_reports.rs",
+      "sha256": "70c7d12dde1daddd8445a186c705f873913eabf5096ecb8362b3761ecf8433ed",
+      "bytes": 1547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_system_reports/state.rs",
+      "sha256": "ac200f5994acf36869c9b1131108d7c130c8c3a5cb8b92734595378d75ad84c1",
+      "bytes": 5998
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/literal-inverse/crates/ep_runtime/src/lib.rs",
+      "sha256": "cd28fb288cd1db3dc7bc1d903b7690950417b711575a0673eaee081219616f12",
+      "bytes": 1497
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/manifest.json",
+      "sha256": "1a14003b55fccf5381cc0ded3e2fa23a55fd8a8eb6f809828803202d7955a220",
+      "bytes": 31907
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/06.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/parse/07.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_system_report_b.rs",
+      "sha256": "1ac08f8645aa2c6d5c9c110c3f2d8a55832ec04a7ff35714db04ac9512548a24",
+      "bytes": 5132942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "9d99166974fdb5b11a2d5e18345018deafe1f8dec4bf26c7c38bb6c548f04235",
+      "bytes": 45833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "8a5b4ca4aa7efa09f557fb4a2d4782ae82b6e587f6b9ff1bca7164355c0d5ae8",
+      "bytes": 27482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fc73eab3de7b11b2bf1b8ea034db530f2a208c6d278b679aa9add158290c1ed0",
+      "bytes": 55394
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_system_reports.rs",
+      "sha256": "14c3775181d5c63bc68c3201a94848d5f66c040d64d4ac029d511d2b8df93f40",
+      "bytes": 4317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/heat_balance/ordinary_system_reports/state.rs",
+      "sha256": "3150f55e6faaee4d06aefbc544ba5f139829ba9832932d01344138dead516efb",
+      "bytes": 5992
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/lib.rs",
+      "sha256": "393357fae48ef60e5dc8f7586dfe3dc14c2acb0cc5e5f454e8877ab39bb4d8e9",
+      "bytes": 2544
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/whole-crates-final-API-census.json",
+      "sha256": "213d5264cd5433fea2a4b886c455ef87b8ee8fd55c3423404a5b29c3e7007e64",
+      "bytes": 13342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-READY-Audit-40-03/publication-template.json",
+      "sha256": "50d0d3f7a94c85ccea9d66a05dec938c435788d573af2c5bda5ee126067b562a",
+      "bytes": 37947
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-READY-Audit-40-03/publisher-forward.diff",
+      "sha256": "176e4c1b7ba8f9b63d126f96f84317c40a89e3e706f9e73d788ef3bd5daf8d58",
+      "bytes": 3924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-READY-Audit-40-03/publisher-inverse.diff",
+      "sha256": "c9786e506689db90a674f68c866563eb8c76a7abcce5e6a4f63c13a1af9a3fa9",
+      "bytes": 3924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40-02/checker-forward.diff",
+      "sha256": "21ea078d12029c6967845850c2eef855a1b0df4a10f7ba8d8ab328f6396ec813",
+      "bytes": 9891
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40-02/publication-template.json",
+      "sha256": "106fd55853ff66464be5cd4c7b29ff60aa71b9090eda00c455c8a7d71194db71",
+      "bytes": 35228
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40-02/publisher-forward.diff",
+      "sha256": "c74f7e3e1bf59874fcf54bd1305ce753d6619d04c19ab625ca9310e873082501",
+      "bytes": 9934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40-02/publisher-inverse.diff",
+      "sha256": "77fbacf94beb32a5db70b6c0c9c9e1a4981814da48459be4a609301ba01ddcf4",
+      "bytes": 9934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/CONTRIBUTING-after.md",
+      "sha256": "9e96f61ed5594d6d74a1b09f72f31f6a7f41d2dd924f07ac51b1165e1d0d35be",
+      "bytes": 5175
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/CONTRIBUTING-before.md",
+      "sha256": "decfa38a7aa9125f1a708ebac54fb560ff68d52fcb41be79c583f78b56880daa",
+      "bytes": 4763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/CONTRIBUTING-forward.diff",
+      "sha256": "36bf89af1b1c8e95019e73e2af8bbb263e83404da55498f6b68d259caee3ea38",
+      "bytes": 2087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/CONTRIBUTING-inverse.diff",
+      "sha256": "48a09853cc2fe90f50c22ce5fda983ede867f876f094f729d411a747a092b10e",
+      "bytes": 2087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/publisher-forward.diff",
+      "sha256": "85147babf723a205e4f4966028d0b93967761af99c25585464fb85f386a77de7",
+      "bytes": 17372
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-cohort-publication-prepared-Audit-40/publisher-inverse.diff",
+      "sha256": "fb5e9215c085cb30fcdc6fa3f080454e6d20918b4111004c86c1c4f0796cca60",
+      "bytes": 17372
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-capture-Root-39/capture.json",
+      "sha256": "0737360b8f1759af3a3fd427b18d72f1b884f7222ad56ac8952858c299a67fed",
+      "bytes": 15339
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-draft-Peer-39/field-ledger.json",
+      "sha256": "1b97939698aea156d2db046b755f88539fce5e17e016e12bd40a408d3551b379",
+      "bytes": 3193
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-draft-Peer-39/system_report_observer.cc",
+      "sha256": "0cdb7d5087da39b57f0a5efc40525ea067559669f403e3d41ba6b0df775f7d8b",
+      "bytes": 22236
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/compile-receipt.json",
+      "sha256": "f663332d3531933db32cd546624755f5635a44ea0881c55685c261a4836e7ccf",
+      "bytes": 7218
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/compile.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/compile.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/link-receipt.json",
+      "sha256": "230cc1ce6292aeb312192fde580b76aa4e8c992df6e68834f0463de638eb444a",
+      "bytes": 2628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/link.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/link.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-build-Root-40/native-build.json",
+      "sha256": "26dbef4ad1263d568ee8796a7c437b4445cce0c127b50483d54f8eeb4d2f2c49",
+      "bytes": 4651
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-draft-Peer-40/draft.json",
+      "sha256": "61227bd85cd33334f9990f368117264100ad512792c0f5030049289f903edd3d",
+      "bytes": 52787
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-draft-Peer-40/system_report_unit_main.cpp",
+      "sha256": "187d7691014b096baddf4134df77fb790659b06466c7de5bd087dc7ded61352b",
+      "bytes": 27072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-run-Root-40/actual-child-modules.json",
+      "sha256": "34c6196e7b97e048f4e4fe3c4c2ec573455dd8231adb273354583d045eda6d52",
+      "bytes": 4314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-run-Root-40/receipt.json",
+      "sha256": "635f9c1037e5073a9e415b707518342d36847d2deed44469a3ae717a60d723ea",
+      "bytes": 8228
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-run-Root-40/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-native-unit-run-Root-40/stdout.log",
+      "sha256": "fb69ebf91216ed4be278d83d68662e1319dfcf8a25fe99e76160c924ae957b70",
+      "bytes": 89
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-unit-author-Peer-40/system_report_unit_main.cpp.in",
+      "sha256": "ae397a0410301a25246954ec6f11d9fb04caea521e3d3374088a43ddaf3fdf5b",
+      "bytes": 19497
+    },
+    {
+      "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "bytes": 8557
+    },
+    {
+      "path": ".runtime/porting/source-objects/28/28d408874bcc0ce50e593b6444a6b46d474f0f2b2ce03445d373caaed85a3317",
+      "sha256": "28d408874bcc0ce50e593b6444a6b46d474f0f2b2ce03445d373caaed85a3317",
+      "bytes": 1849775
+    },
+    {
+      "path": ".runtime/porting/source-objects/2f/2fd5ba611b674aa6ca7280e9ec20bb9c9904482f49677df9073111578ac93c24",
+      "sha256": "2fd5ba611b674aa6ca7280e9ec20bb9c9904482f49677df9073111578ac93c24",
+      "bytes": 1849775
+    },
+    {
+      "path": ".runtime/porting/source-objects/8a/8a5b4ca4aa7efa09f557fb4a2d4782ae82b6e587f6b9ff1bca7164355c0d5ae8",
+      "sha256": "8a5b4ca4aa7efa09f557fb4a2d4782ae82b6e587f6b9ff1bca7164355c0d5ae8",
+      "bytes": 27482
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_system_report_b.rs",
+      "sha256": "1ac08f8645aa2c6d5c9c110c3f2d8a55832ec04a7ff35714db04ac9512548a24",
+      "bytes": 5132942
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "9d99166974fdb5b11a2d5e18345018deafe1f8dec4bf26c7c38bb6c548f04235",
+      "bytes": 45833
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/report_cohort.rs",
+      "sha256": "ebf2992e90f1a8fc769fe3927ed2faf32dc41d86a1a019aefd5d17bf79ecd83e",
+      "bytes": 28102
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fc73eab3de7b11b2bf1b8ea034db530f2a208c6d278b679aa9add158290c1ed0",
+      "bytes": 55394
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_system_reports.rs",
+      "sha256": "14c3775181d5c63bc68c3201a94848d5f66c040d64d4ac029d511d2b8df93f40",
+      "bytes": 4317
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_system_reports/state.rs",
+      "sha256": "3150f55e6faaee4d06aefbc544ba5f139829ba9832932d01344138dead516efb",
+      "bytes": 5992
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "393357fae48ef60e5dc8f7586dfe3dc14c2acb0cc5e5f454e8877ab39bb4d8e9",
+      "bytes": 2544
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json",
+      "sha256": "b53b61f21d550acceabde113cbd02a770f39b63133deef5c02ce1d7ef8064278",
+      "bytes": 6841
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "bytes": 8557
+    }
+  ],
+  "scope": "Seven test-only Sources and one existing safe-main target; two actual report-only invocations (first input-setup failure retained, second successful 471 calls). Exact306 actual Engine report cases and165 separate full-Native-function unit input variants; every recorded field/raw-bit result retained. Direct Native39 raw3MB, full Native unit6MB and5MB fixture plus producer/projector/proof/receipts. No old20MBAirfixture, recursive ZIPs, explicit environment, executables/providers/core/map or unrelated annual payload."
+}

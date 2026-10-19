@@ -1,0 +1,146 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "tolerance_policy_changes": false,
+  "report_only_existing_target": true,
+  "engine_origin_report_calls": 306,
+  "separate_Native_full_function_unit_input_variants": 165,
+  "total_report_function_calls": 471,
+  "report_method_counts": {
+    "ReportSystemEnergyUse": 153,
+    "ReportVentilationLoads": 318
+  },
+  "all_observed_output_and_consumed_readonly_bits_exact": true,
+  "eight_thermal_classifications_have_nonzero_Source_Native_pairs": true,
+  "scope": "Normal controlled PurchasedAir report domain with primary/DSOA/distribution0. TargetVoz/TimeBelow/TimeAt nonzero and other positive report children remain unexercised. No all-case/full-engine/card completion claim.",
+  "production_scope": "Actual41 production5352 proof is inherited after test/feature exclusion; historical CLI did not execute current test-only compiler snapshot.",
+  "unchanged_original_Air_cohort_reexecuted": false,
+  "new_test_bodies": 0,
+  "existing_cohort_body_extended": 1,
+  "actual_focused_invocations": 2,
+  "successful_report_only_invocations": 1,
+  "failed_report_only_invocations": 1,
+  "correction": "Only observed DeadBand array allocation/extent was missing in the first test-entry loader. Native2390 dimension(false) then actual incoming0/1 restored on same existing owner; formulas/assertions/fixture unchanged.",
+  "actual_test_bodies_executed": 2,
+  "total_source_focused_invocations": 2,
+  "first_failed_invocation_preserved": true,
+  "Source471_report_function_calls_exact": true,
+  "all8_thermal_classifications_nonzero_Native_pairs": true,
+  "schema": "src06-canonical-system-report-Native-cohort40.v1",
+  "status": "PASS: one existing safe process-main report-only cohort, all471 genuine Native-paired calls exact",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/manifest.json",
+    "sha256": "970cc54e3b740597a62d2ac7207ab6a7e3c718c9609a6cfdad80fec709fb1460",
+    "bytes": 34912
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-system-report-cohort-Source-review-40-02/review.json",
+    "sha256": "ca58f3b800101c08759dde13ae9bab86cd2043b6ac24580104e63746a66c0e98",
+    "bytes": 14195
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/complete-final-compiler-Source-plan.json",
+    "sha256": "ddb9ed4a1357ea234499b13ba7924ed6bf6e0a71ad12b24d3f8517ebcaece426",
+    "bytes": 2636925
+  },
+  "accepted_parent_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/review.json",
+    "sha256": "574277c9e4ca17c9007371f482ef7c02b3b38656a96ea394f3a8e21022e4e001",
+    "bytes": 20808
+  },
+  "accepted_parent_plan": {
+    "path": ".runtime/porting/SRC-06/source-node-setpoint-endrun-held-Outer-41/complete-final-compiler-Source-plan.json",
+    "sha256": "112bcb894bf62b6e3d4cff07a8ef74f98cba6d9b4b39b7a7e4904095037e10f6",
+    "bytes": 2635390
+  },
+  "actual_focused_test": {
+    "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40-02/receipt.json",
+    "sha256": "768b38cc20a6bf9c0ac70d5935d27b79831e1b22f0119e03595ed803386f18f3",
+    "bytes": 4276
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-system-report-cohort-actual-review-40-02/review.json",
+    "sha256": "fb60c1444896085f7f0a65aefc38221919931235343844010700d86934da95e7",
+    "bytes": 12568
+  },
+  "actual_Native_engine_capture": {
+    "path": ".runtime/porting/SRC-06/system-report-native-capture-Root-39/capture.json",
+    "sha256": "0737360b8f1759af3a3fd427b18d72f1b884f7222ad56ac8952858c299a67fed",
+    "bytes": 15339
+  },
+  "actual_Native_full_function_unit": {
+    "path": ".runtime/porting/SRC-06/system-report-native-unit-run-Root-40/receipt.json",
+    "sha256": "635f9c1037e5073a9e415b707518342d36847d2deed44469a3ae717a60d723ea",
+    "bytes": 8228
+  },
+  "Source_fixture_projector": {
+    "path": ".runtime/porting/SRC-06/finish-system-report-cohort-Audit-40-04.py",
+    "sha256": "3afbdec935ab3ac844a9f34905f49c7eb7e6023f76b781683f2f8cace71dc5bd",
+    "bytes": 14607
+  },
+  "strict_fixture_projection_proof": {
+    "path": ".runtime/porting/SRC-06/source-system-report-cohort-draft-Audit-40-04/Native-unit-projection-proof.json",
+    "sha256": "9d5abae182f1b63e18a2985d1fc8a9d9ae327d6b4ac569d8dac1bb6ae7f69d90",
+    "bytes": 5067
+  },
+  "actual_Native_thermal8_nonzero_counts": {
+    "CoolingLoadMetByVent": 3,
+    "CoolingLoadAddedByVent": 3,
+    "OvercoolingByVent": 2,
+    "HeatingLoadMetByVent": 3,
+    "HeatingLoadAddedByVent": 3,
+    "OverheatingByVent": 2,
+    "NoLoadHeatingByVent": 43,
+    "NoLoadCoolingByVent": 37
+  },
+  "preserved_failed_focused_executions": [
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-system-report-cohort-Root-40/receipt.json",
+      "sha256": "a40d40d92b92d1c0649c82b718622569b0bcc09637a3bc0f23260b7610b2fb3d",
+      "bytes": 4269
+    }
+  ],
+  "original_application": {
+    "path": ".runtime/porting/SRC-06/Root-system-report-cohort-application-40/receipt.json",
+    "sha256": "e02ddc5c41f7a16367e13042f7877e2d7ff82cabbf69034cce27e59743a81abf",
+    "bytes": 21420
+  },
+  "raw_deadband_correction": {
+    "path": ".runtime/porting/SRC-06/source-system-report-cohort-deadband-fix-held-Audit-40-02/manifest.json",
+    "sha256": "a6a67f90046295bb66a02bb8e7c8124f3e519f58c9d08a9975607fa005c68237",
+    "bytes": 9881
+  },
+  "independent_correction_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-system-report-cohort-deadband-fix-Source-review-40-03/review.json",
+    "sha256": "a45769c6aa1b2d37ce3e3dc0672e8d5be82bb783bd91ff68972b67bc27cb740c",
+    "bytes": 8799
+  },
+  "unchanged_Air_cases_reexecuted": 0,
+  "inherited_production5352_proof": {
+    "actual41": {
+      "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/review.json",
+      "sha256": "574277c9e4ca17c9007371f482ef7c02b3b38656a96ea394f3a8e21022e4e001",
+      "bytes": 20808
+    },
+    "series": 58,
+    "samples": 5352,
+    "qualification": "Inherited actual41 production CLI after test/feature exclusion; historical CLI did not execute current test snapshot."
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-system-report-native-cohort-40/evidence.zip",
+    "sha256": "fc240613e54294b0dc1c1a2a8ed8dc2658b3a2064b8b0d2fb7997704ba5196a7",
+    "bytes": 2944446
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-system-report-native-cohort-40/manifest.json",
+    "sha256": "91adaf619101556a620c71b7357168ffa9e5898bde026e15557fa9b829a789e1",
+    "bytes": 36175
+  },
+  "archive_entries": 150,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-system-report-cohort-checkpoint-Audit-40-03.py",
+    "sha256": "f621f6dcf49864c9c6a870e50db13703d01e31a82206f6622c326f67bfacbd46",
+    "bytes": 12692
+  }
+}
