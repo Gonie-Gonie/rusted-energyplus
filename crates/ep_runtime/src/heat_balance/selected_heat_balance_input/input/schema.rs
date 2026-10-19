@@ -437,9 +437,72 @@ const RUN_PERIOD: &[Field] = &[
         retain_case: false,
     },
 ];
+const SHADOW_CALCULATION: &[Field] = &[
+    Field {
+        json: "shading_calculation_method",
+        legacy: "Shading Calculation Method",
+        default: DefaultValue::Alpha("PolygonClipping"),
+        retain_case: false,
+    },
+    Field {
+        json: "shading_calculation_update_frequency_method",
+        legacy: "Shading Calculation Update Frequency Method",
+        default: DefaultValue::Alpha("Periodic"),
+        retain_case: false,
+    },
+    Field {
+        json: "shading_calculation_update_frequency",
+        legacy: "Shading Calculation Update Frequency",
+        default: DefaultValue::Numeric(20.0),
+        retain_case: false,
+    },
+    Field {
+        json: "maximum_figures_in_shadow_overlap_calculations",
+        legacy: "Maximum Figures in Shadow Overlap Calculations",
+        default: DefaultValue::Numeric(15000.0),
+        retain_case: false,
+    },
+    Field {
+        json: "polygon_clipping_algorithm",
+        legacy: "Polygon Clipping Algorithm",
+        default: DefaultValue::Alpha("SutherlandHodgman"),
+        retain_case: false,
+    },
+    Field {
+        json: "pixel_counting_resolution",
+        legacy: "Pixel Counting Resolution",
+        default: DefaultValue::Numeric(512.0),
+        retain_case: false,
+    },
+    Field {
+        json: "sky_diffuse_modeling_algorithm",
+        legacy: "Sky Diffuse Modeling Algorithm",
+        default: DefaultValue::Alpha("SimpleSkyDiffuseModeling"),
+        retain_case: false,
+    },
+    Field {
+        json: "output_external_shading_calculation_results",
+        legacy: "Output External Shading Calculation Results",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+    Field {
+        json: "disable_self_shading_within_shading_zone_groups",
+        legacy: "Disable Self-Shading Within Shading Zone Groups",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+    Field {
+        json: "disable_self_shading_from_shading_zone_groups_to_other_zones",
+        legacy: "Disable Self-Shading From Shading Zone Groups to Other Zones",
+        default: DefaultValue::Alpha("No"),
+        retain_case: false,
+    },
+];
 pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
     match family {
         "Building" => Some((F0, 8, true)),
+        "ShadowCalculation" => Some((SHADOW_CALCULATION, 0, false)),
         "SurfaceConvectionAlgorithm:Inside" => Some((F1, 0, false)),
         "SurfaceConvectionAlgorithm:Outside" => Some((F2, 0, false)),
         "HeatBalanceAlgorithm" => Some((F3, 0, false)),

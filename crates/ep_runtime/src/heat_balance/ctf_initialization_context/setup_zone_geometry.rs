@@ -237,15 +237,9 @@ impl CtfInitializationContext<'_> {
                 .setup_solar_enclosures(&reports.surface_geometry_input, &mut owners, &mut output)
                 .map_err(hb_input_error)?;
         }
-        // Existing returned getters witness the actual Site/Station operands;
-        // their absence cannot silently substitute constructor parameters.
-        if !environment.source_weather_station_initialized
-            || !environment.source_site_atmosphere_initialized
-        {
-            return Err(hb_input_error(E::Unavailable(
-                "actual returned Site/Station before Setup800",
-            )));
-        }
+        // Original797-801 consumes the same live DataEnvironment directly.
+        // A direct GetHeatBalanceInput caller can still have constructor-cold
+        // station operands; no Station return or fabricated witness is required.
         let zones = reports
             .selected_zone_input
             .as_mut()

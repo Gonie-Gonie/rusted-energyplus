@@ -274,21 +274,16 @@ impl SourceAirHeatBalance {
     ) -> Result<(), Error> {
         let zones = usize::try_from(globals.num_of_zones)
             .map_err(|_| Error::Unavailable("actual NumOfZones for AirHB allocation"))?;
-        if self.zones.is_some() {
-            return Err(Error::Unavailable(
-                "actual zoneHeatBalance allocate requires unallocated owner",
-            ));
-        }
-        self.zones = Some(vec![SourceZoneHeatBalanceData::default(); zones]);
+        // EPVector::allocate resets every class row, including existing rows.
+        let rows = self.zones.get_or_insert_with(Vec::new);
+        rows.resize(zones, SourceZoneHeatBalanceData::default());
+        rows.fill(SourceZoneHeatBalanceData::default());
         let spaces = usize::try_from(globals.num_spaces)
             .map_err(|_| Error::Unavailable("actual numSpaces for AirHB allocation"))?;
-        if self.spaces.is_some() {
-            return Err(Error::Unavailable(
-                "actual spaceHeatBalance allocate requires unallocated owner",
-            ));
-        }
-        // Always allocated independently, including when doSpaceHeatBalance=false.
-        self.spaces = Some(vec![SourceSpaceHeatBalanceData::default(); spaces]);
+        // EPVector::allocate resets every class row, including existing rows.
+        let rows = self.spaces.get_or_insert_with(Vec::new);
+        rows.resize(spaces, SourceSpaceHeatBalanceData::default());
+        rows.fill(SourceSpaceHeatBalanceData::default());
         Ok(())
     }
 

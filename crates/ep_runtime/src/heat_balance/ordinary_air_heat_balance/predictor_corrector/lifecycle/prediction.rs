@@ -400,3 +400,15 @@ impl SourceZoneAirPredictorCorrector {
 
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_cohort;
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl SourceZoneSpaceHeatBalanceData {
+    /// Caller bridge only; the original full member body above owns all math.
+    pub(crate) fn predict_native_multiplier_cohort(
+        &mut self, number: i32, shorten: bool, use_zone_history: bool,
+        prior_step: f64, controller: &mut SourceZoneAirPredictorCorrector,
+        owners: &mut SourceZoneAirOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        self.predict_source_system_load(number, shorten, use_zone_history, prior_step, controller, owners)
+    }
+}

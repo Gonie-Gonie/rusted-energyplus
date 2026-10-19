@@ -1,6 +1,7 @@
 //! Genuine Tmp / iteration SurfTempIn entry, borrowing the sole Source owners.
 //! Static scalar views are temporary; no mutable Surface convection metadata,
 //! temperature, Space air, equipment flag, or HConv mirror is retained here.
+mod cold_external;
 use super::{
     ConvectionEntry, InsideConvectionCoefficients, InsideConvectionError, InsideConvectionLayout,
     InsideConvectionModel, InsideConvectionState, InsideConvectionSurface,
@@ -266,12 +267,8 @@ fn source_layout(
     .map_err(|_| Error::Unavailable("actual full Source convection traversal"))
 }
 
-fn static_views(
-    geometry: &SurfaceGeometryInputState,
-    owners: &SelectedZoneInputOwners,
-    control: &SelectedHeatBalanceInputState,
-) -> Result<(Vec<InsideConvectionZone>, Vec<InsideConvectionSurface>), Error> {
-    let zones = owners
+fn static_zone_views(owners: &SelectedZoneInputOwners) -> Result<Vec<InsideConvectionZone>, Error> {
+    owners
         .zones
         .as_ref()
         .ok_or(Error::Unavailable("actual convection static Zones"))?
@@ -297,7 +294,15 @@ fn static_views(
                 list_multiplier: zone.list_multiplier,
             })
         })
-        .collect::<Result<Vec<_>, Error>>()?;
+        .collect::<Result<Vec<_>, Error>>()
+}
+
+fn static_views(
+    geometry: &SurfaceGeometryInputState,
+    owners: &SelectedZoneInputOwners,
+    control: &SelectedHeatBalanceInputState,
+) -> Result<(Vec<InsideConvectionZone>, Vec<InsideConvectionSurface>), Error> {
+    let zones = static_zone_views(owners)?;
     let source = geometry
         .final_surfaces
         .as_ref()
@@ -373,7 +378,10 @@ impl SourceInsideConvection {
         geometry: &SurfaceGeometryInputState,
         zones: &SelectedZoneInputOwners,
     ) -> Result<Self, Error> {
-        let layout = source_layout(geometry, zones)?;
+        let layout = match cold_external::layout(geometry, zones)? {
+            Some(layout) => layout,
+            None => source_layout(geometry, zones)?,
+        };
         Ok(Self {
             state: InsideConvectionState::new_source_control(&layout),
             actual_no_user_input: None,
@@ -455,6 +463,9 @@ impl SourceInsideConvection {
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
         if !self.state.get_user_input {
+            return Ok(());
+        }
+        if self.prepare_cold_external_convection(geometry, zones, input, reports, scan, backend)? {
             return Ok(());
         }
         let layout = source_layout(geometry, zones)?;
@@ -578,3 +589,6 @@ impl SourceInsideConvection {
 
 mod exterior;
 pub(crate) use exterior::{SourceExternalConvectionCall, SourceExternalConvectionOwners};
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;

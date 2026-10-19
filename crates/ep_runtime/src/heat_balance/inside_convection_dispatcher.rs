@@ -896,17 +896,20 @@ fn setup_static<M: InsideConvectionSurfaceMetadata + ?Sized>(
     metadata: &mut M,
 ) -> Result<(), InsideConvectionUnavailable> {
     let mut building_volume = 0.0;
+    // Native declares this one local before the entire Zone loop. If neither
+    // branch assigns it, keep its previous value (or genuinely unrepresented).
+    let mut diameter = None;
     for zone in zones {
         building_volume +=
             zone.volume * f64::from(zone.multiplier) * f64::from(zone.list_multiplier);
         let mut perimeter = 0.0;
         let [xmin, xmax, ymin, ymax] = zone.xy_bounds;
         let simple_perimeter = 2.0 * (ymax - ymin) + 2.0 * (xmax - xmin);
-        let diameter = if simple_perimeter > 0.0 {
-            4.0 * zone.floor_area / simple_perimeter
-        } else {
-            zone.floor_area.sqrt()
-        };
+        if simple_perimeter > 0.0 {
+            diameter = Some(4.0 * zone.floor_area / simple_perimeter);
+        } else if zone.floor_area > 0.0 {
+            diameter = Some(zone.floor_area.sqrt());
+        }
         let ratio = if zone.exterior_gross_wall_area > 0.0 {
             zone.exterior_window_area / zone.exterior_gross_wall_area
         } else {
@@ -932,7 +935,12 @@ fn setup_static<M: InsideConvectionSurfaceMetadata + ?Sized>(
                     .ok_or(InsideConvectionUnavailable::Association)?;
                 metadata.set_interior_geometry(
                     index,
-                    [zone.ceiling_height, perimeter, diameter, ratio],
+                    [
+                        zone.ceiling_height,
+                        perimeter,
+                        diameter.ok_or(InsideConvectionUnavailable::Geometry)?,
+                        ratio,
+                    ],
                 )?;
             }
         }

@@ -230,3 +230,11 @@ pub(super) fn write(
     }
     Ok(())
 }
+
+// Reuse the actual production CalculateSunDirectionCosines body; no test math.
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl crate::weather::day::WeatherDayState {
+    pub(crate) fn native_gap_sun_direction_cosines(&self, time: f64) -> [f64; 3] {
+        sun_direction_cosines(time, &self.today_variables, &self.environment)
+    }
+}

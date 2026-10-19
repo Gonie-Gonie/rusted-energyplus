@@ -397,7 +397,7 @@ impl CtfInitializationReports {
             fluid.get_fluid_properties_data(input)?;
             let steps = usize::try_from(weather.global.time_steps_in_hour)
                 .map_err(|_| SourceInitializationError::Association("effective timestep"))?;
-            match schedules.process_schedule_input(input, &raw.schedules, steps, files) {
+            match schedules.process_schedule_input_with_backend(input, &raw.schedules, steps, files, backend) {
                 Err(SelectedScheduleError::AuditOpen { path, source }) => {
                     let message = format!(
                         "ProcessScheduleInput: Could not open file {} for output (write).",

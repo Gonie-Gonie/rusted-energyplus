@@ -172,14 +172,15 @@ impl ProductionWeatherTimestepSeries {
 
 impl CtfInitializationContext<'_> {
     /// Genuine selected GetSiteAtmosphereData264, after ProjectControl terrain.
-    /// Uses the already reached station and sole HBM string/IP/EIO owners.
+    /// Uses the same live environment and sole HBM string/IP/EIO owners.
     pub(crate) fn initialize_source_site_atmosphere(
         &mut self,
         environment: &mut WeatherEnvironmentState,
     ) -> Result<(), RuntimeError> {
-        if !environment.source_weather_station_initialized
-            || environment.source_site_atmosphere_initialized
-        {
+        // GetSiteAtmosphereData has no GetWeatherStation prerequisite. A direct
+        // HB caller legitimately retains the actual DataEnvironment constructor
+        // weather-file modifiers while this same zero-object getter executes.
+        if environment.source_site_atmosphere_initialized {
             return Err(unavailable("actual station/site getter call order"));
         }
         self.reports.heat_balance_current_module_object = "Site:HeightVariation".into();

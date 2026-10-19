@@ -182,3 +182,13 @@ pub(in super::super) fn clear_sky_radiation(
     beam = if 0.0 < beam { beam } else { 0.0 };
     (beam, diffuse)
 }
+
+// Narrow cfg-only transport to the actual full Source daily function.
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl crate::weather::day::WeatherDayState {
+    pub(crate) fn native_gap_daily_solar_coefficients(&mut self, day: i32) -> [f64; 7] {
+        self.today_variables.day_of_year = day;
+        let v = source_daily_coefficients(&mut self.today_variables, self.environment.latitude);
+        [v.a, v.b, v.c, v.annual_variation, v.equation_of_time, v.sin_declination, v.cos_declination]
+    }
+}

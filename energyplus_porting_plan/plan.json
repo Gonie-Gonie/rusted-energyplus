@@ -12981,6 +12981,32 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-output-processor-air-history-54/summary.json",
         "sha256": "36616c52bf717d4c20be44ee9a1e705a0589a701f7d018bb75b71b21e4bb41bc",
         "size_bytes": 11200
+      },
+      "canonical_warmup_multiplier_exterior_55": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json",
+        "sha256": "cd1fe8fa57ed636db4c3bd66e382cc695aa8dd85bc20c4621dc9b35743ecc0c4",
+        "size_bytes": 29003,
+        "current_facts": {
+          "warmup": {
+            "persistent_calls": 69,
+            "strict_state_raw_fields": 45072
+          },
+          "multiplier_two": {
+            "persistent_calls": 21,
+            "strict_state_and_return_raw_fields": 17893
+          },
+          "Exterior": {
+            "admitted_records": 170,
+            "previous_ordered_prefix_records": 137,
+            "later_successful_category_records": 33,
+            "Native_retained_records": 179,
+            "outside_fixed_scope_excluded_records": 9
+          },
+          "snapshot_qualification": "각 실제 실행 단계와 변경되지 않은 본문·readset 연결 근거를 유지한다. 단일 성공 170개 실행이나 전 범주의 동일 snapshot·binary를 주장하지 않는다.",
+          "remaining": "같은 최종 Source의 15개 일반 실행·전체 JSON/CSV·부수 출력, 실제 Surface cadence와 warmup→RunPeriod MAT·W·CTF 인계는 별도 검증한다.",
+          "gate_changes": 0,
+          "workspace_quality": "cargo test --workspace --locked는 통과하지 않았다. 관측된 arbitrary_run.rs:102 audit 두 줄의 CRLF/LF 기대값 차이를 다음 통합에서 수정해야 하며, 이번 단위 증거와 전체 workspace 통과를 구분한다."
+        }
       }
     },
     {

@@ -1,0 +1,631 @@
+{
+  "accepted": true,
+  "findings": [],
+  "compiler_inputs": 4556,
+  "Rust_sources": 4542,
+  "selected_Source_files": 53,
+  "existing": 35,
+  "new": 18,
+  "total_admitted_record_units": 260,
+  "record_unit_qualification": "260 admitted record units, not260 full function calls: Weather47 records include101 phase checks; paired-call and unit records retain their own Native/Source definitions.",
+  "known_strict_raw_fields_warmup_and_multiplier": 62965,
+  "Exterior_admitted_records": 170,
+  "Exterior_ordered_inferred_prefix_records": 137,
+  "Exterior_direct_new_milestone_records": 33,
+  "Exterior_Native_retained_records": 179,
+  "Exterior_excluded_records": 9,
+  "Exterior_raw_bit_denominator_unclaimed": true,
+  "actual_groups": [
+    {
+      "group": "warmup",
+      "actual_stage": "55-02",
+      "Source_compared_call_records": 69,
+      "Source_strict_state_and_return_raw_fields": 45072,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-warmup-Root-55-02/receipt.json",
+        "sha256": "fa05f8d1cc510e086dbb804832fbe2546fce48f2e25cf9f3e8b51c8abe38fcb1",
+        "bytes": 8794
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Exterior-warmup-multiplier-correction-Outer-55-02/complete-proposed-compiler-Source-plan.json",
+        "sha256": "e03b18045df29d27499c12cc238a8ca8e91e6b15a1f883df0f3be90682b43970",
+        "bytes": 2595504
+      },
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/7d/7d6aad3ba83d49a89e659e8be876462e13aa75ff3cc2ae2ea02b5171b70824f8",
+        "sha256": "7d6aad3ba83d49a89e659e8be876462e13aa75ff3cc2ae2ea02b5171b70824f8",
+        "bytes": 1866617
+      },
+      "all_stage_archived_compiler_inputs_exact": true,
+      "external_fixture": {
+        "path": ".runtime/porting/SRC-06/source-warmup-runtime-fixture-Audit-01/fixture.json",
+        "sha256": "6ae0c0472c66375639369f1a3ce833f4c4a01d980e24e65558c979491d5d1bc1",
+        "bytes": 9995417
+      },
+      "fixture_projection": {
+        "path": ".runtime/porting/SRC-06/source-warmup-runtime-fixture-Audit-01/projection.json",
+        "sha256": "1462a29dac02956cac7d968d213198035a85d31b067b19bd56854db6fafc7f10",
+        "bytes": 4287
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-warmup-guard-55-02/before.json",
+          "sha256": "50331944f61af498019296c43d4f1428391305af665964f2afce85bbb502bd78",
+          "bytes": 13660
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-warmup-guard-55-02/after.json",
+          "sha256": "f89ca15f072d1e42339aa47009288a245e7cb783464eeb577ec8c1636d504f23",
+          "bytes": 25614
+        }
+      ],
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-warmup-Root-55-02/stdout.log",
+          "sha256": "49c2b0a7113d8ca23a680008c3b222ce4d56c20b1e38162d9c78aeb33eaede5e",
+          "bytes": 325
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-warmup-Root-55-02/stderr.log",
+          "sha256": "2a88baaedcc29500595014c2ec87e38bcae277d9db17bc79007f739c562b3721",
+          "bytes": 1508650
+        }
+      },
+      "launch_Source": {
+        "path": ".runtime/porting/SRC-06/launch-warmup-multiplier-Exterior-Root-55-02.py",
+        "sha256": "b384e072975a789d27c7c4baf29d3725f9f64e7d9bda4f7b9b7d6c04d323c925",
+        "bytes": 3529
+      }
+    },
+    {
+      "group": "multiplier_predictor",
+      "actual_stage": "55-03",
+      "Source_compared_call_records": 21,
+      "Source_strict_state_and_return_raw_fields": 17893,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-multiplier_predictor-Root-55-03/receipt.json",
+        "sha256": "93306e4fa26f09ec040ceb229ad1d1bbfe788034abe4a0046d7d2abb904d3f87",
+        "bytes": 8838
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-two-cfg-observer-path-corrections-Peer-55-03-02/complete-proposed-compiler-Source-plan.json",
+        "sha256": "c4ec1a248703cceca65d61bfc0fee8c03b6df8ef4af533389a32f57a00d0bdc1",
+        "bytes": 2595690
+      },
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/c0/c0c9205bf11f9cabdb2a88ad6c41edda5d3dd3fefbf8cf9d5088c4f5cb4b8501",
+        "sha256": "c0c9205bf11f9cabdb2a88ad6c41edda5d3dd3fefbf8cf9d5088c4f5cb4b8501",
+        "bytes": 1866617
+      },
+      "all_stage_archived_compiler_inputs_exact": true,
+      "external_fixture": {
+        "path": ".runtime/porting/SRC-06/source-multiplier-runtime-fixture-Peer-01/fixture.json",
+        "sha256": "8695b473971839da69f22b0836ff87f50f38b5633a1893a1e833b0596a847f68",
+        "bytes": 4573279
+      },
+      "fixture_projection": {
+        "path": ".runtime/porting/SRC-06/source-multiplier-runtime-fixture-Peer-01/projection.json",
+        "sha256": "81160d4fdd38e7edc56066f53f7ab42bd33518f131bdd0ba5b783b38c80b2247",
+        "bytes": 4138
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-multiplier_predictor-guard-55-03/before.json",
+          "sha256": "962f70d9392b4521c9e3b7acdf2e7640f6af1d60c5f6693e549131430a4d7682",
+          "bytes": 13691
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-multiplier_predictor-guard-55-03/after.json",
+          "sha256": "d76d88063cc18f8dabfd44d390d6b301112a27ed0f7646e82ac6039e6d0b27a4",
+          "bytes": 25659
+        }
+      ],
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-multiplier_predictor-Root-55-03/stdout.log",
+          "sha256": "940e1164b01381bce7a9b9318ac3d8856923da57b03b45f607f65b2aabfe5048",
+          "bytes": 413
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-multiplier_predictor-Root-55-03/stderr.log",
+          "sha256": "44af1931c39dee691bcefb3a14b025d2a4b98e45b4feb333a754254e87d14315",
+          "bytes": 1508262
+        }
+      },
+      "launch_Source": {
+        "path": ".runtime/porting/SRC-06/launch-warmup-multiplier-Exterior-Root-55-03.py",
+        "sha256": "38db6859c2be155f2d42382a04f014a1fad84814a7eed318648fa8c5d44b50c0",
+        "bytes": 3549
+      }
+    }
+  ],
+  "Exterior_prior05_qualified_progress": {
+    "actual_Source05_receipt": {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-Root-55-05/receipt.json",
+      "sha256": "a0dca32a96c2cc9c88860f90368fdb318f85fb92f20deccf6476bf49efb1bd1f",
+      "bytes": 9259
+    },
+    "proof_kind": "CODE_DERIVED_ORDERED_PROGRESS_NOT_DIRECT_MILESTONES",
+    "qualified_completed_categories": [
+      {
+        "category": "solar_clock",
+        "records": 47
+      },
+      {
+        "category": "exterior_coefficients",
+        "records": 57
+      },
+      {
+        "category": "absorption",
+        "records": 18
+      },
+      {
+        "category": "solar_surface",
+        "records": 15
+      }
+    ],
+    "inferred_completed_records": 137,
+    "not_a_direct_historical_milestone_observation": true,
+    "exact_reason": "The only blank-or-unknown-type Unavailable branch is the selected schedule manager. Before no_surface_gains, the dispatcher performs all four existing category calls with ? and exact full record checks. Their declared scalar-only owner factories do not call process_schedule_input. The first no-surface GainFactory::new invokes that old API with the actual first Constant blank type; the typed stop occurs before the first IHG observation/call. Reaching this actual unique failure therefore implies each prior full checked category returned. No new milestone or whole170PASS is fabricated.",
+    "remaining_categories": [
+      "internal_gains",
+      "beam_producer",
+      "surface_internal_gains"
+    ],
+    "known_native_and_Source_groups_not_rerun": [
+      "warmup",
+      "multiplier_predictor",
+      "purchased_air",
+      "surface",
+      "output_processor",
+      "air_history"
+    ],
+    "Source_weather_checks_101_are_distinct_from47_records": true,
+    "independent_progress_review": {
+      "path": ".runtime/porting/SRC-06/Audit-prior-Exterior-prefix-55-05-02/review.json",
+      "sha256": "2e9a9833845fb667f12240ade79a27709da2f93b110cd1c63e6744e654561b60",
+      "bytes": 9040
+    },
+    "recorded_source_snapshot": {
+      "path": ".runtime/porting/source-objects/ef/ef6061dfbcba15ef35255ac92c68923d1f15df595a875d5841f74b9fc19bfa58",
+      "sha256": "ef6061dfbcba15ef35255ac92c68923d1f15df595a875d5841f74b9fc19bfa58",
+      "bytes": 1867282
+    }
+  },
+  "Exterior_remaining_categories": [
+    {
+      "category": "internal_gains",
+      "actual_stage": "55-06",
+      "Source_compared_call_records": 9,
+      "Native_retained_records": 9,
+      "excluded_records": 0,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-internal_gains-Root-55-06/receipt.json",
+        "sha256": "10f334ba6485bf50fa4f8a78287ab292e76a1ac1e0e3b64bf8e2e8552a078e53",
+        "bytes": 9666
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Constant-Exterior-category-coherent-Peer-55-06/complete-proposed-compiler-Source-plan.json",
+        "sha256": "f77baa731d358fb7af43c7bc125d5308f327a8895fe6c739a60eca95abd5f5a5",
+        "bytes": 2595646
+      },
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/c9/c9530cb043365c42da886c29d99238ab2e0004a6fdb0a7064026de79a9151930",
+        "sha256": "c9530cb043365c42da886c29d99238ab2e0004a6fdb0a7064026de79a9151930",
+        "bytes": 1867282
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-Exterior-category-internal_gains-guard-55-06/before.json",
+          "sha256": "ce44507bf1fcf5cf3bb2e96618eafbcf1af492519e01fafc21876992e819a65b",
+          "bytes": 12907
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-Exterior-category-internal_gains-guard-55-06/after.json",
+          "sha256": "9dbf70927d666bdcad1596db47fd2f70420ec4fa65a80b473499d95471824f4a",
+          "bytes": 25348
+        }
+      ],
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-internal_gains-Root-55-06/stdout.log",
+          "sha256": "467ca56e4dbf2f96c7cc3b7b58e333547d78a92be11bdcbb106778c461f54403",
+          "bytes": 717
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-internal_gains-Root-55-06/stderr.log",
+          "sha256": "8e55a6ad38836add9fcbb809a1c031f39dcf4d5098d24dc58566aa0e853f2f16",
+          "bytes": 1508603
+        }
+      },
+      "launch_Source": {
+        "path": ".runtime/porting/SRC-06/launch-Constant-Exterior-category-Root-55-06.py",
+        "sha256": "a4e07d679f99d05193e6655f488f838e47eb4aab9614659e152e0746131586c7",
+        "bytes": 4716
+      },
+      "success_milestone_directly_observed": true,
+      "ep_runtime_compile_messages": 1
+    },
+    {
+      "category": "surface_internal_gains",
+      "actual_stage": "55-10",
+      "Source_compared_call_records": 6,
+      "Native_retained_records": 6,
+      "excluded_records": 0,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-surface_internal_gains-Root-55-10/receipt.json",
+        "sha256": "71ff0dcae621b598e0df0116ae2619b9180223818227a5b2fb545b99ad288b5a",
+        "bytes": 10219
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Setup-cold-weather-Outer-55-10/complete-proposed-compiler-Source-plan.json",
+        "sha256": "8db317b10465947da290e522ecf64d969b3a620384a778e01991878f4d777721",
+        "bytes": 2595800
+      },
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/bc/bc60ca6947c65a71c2a36d79cb413988d5b20e26d9489d1fdbc02966d26ee302",
+        "sha256": "bc60ca6947c65a71c2a36d79cb413988d5b20e26d9489d1fdbc02966d26ee302",
+        "bytes": 1867283
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-Setup-cold-weather-application-55-10/surface_internal_gains-before.json",
+          "sha256": "d8496ce53bda61a5fb4fea5e75507c824418c3c30c77e68f3b33314a28e1d2e0",
+          "bytes": 12503
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-Setup-cold-weather-application-55-10/surface_internal_gains-after.json",
+          "sha256": "3487bda65c0041c20acc05b364cdb655bbcff7a3285daf7970206a685a141ad6",
+          "bytes": 24364
+        }
+      ],
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-surface_internal_gains-Root-55-10/stdout.log",
+          "sha256": "95b98607d5b3dda3d43d550d9c174b5e5db0dfc3a6476cbaf6bc3fb70241f60c",
+          "bytes": 749
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-surface_internal_gains-Root-55-10/stderr.log",
+          "sha256": "4f4bcc12034c267299b84de384b9b8d497a1d2771525957bd110cc9e37b8a3f1",
+          "bytes": 1508496
+        }
+      },
+      "launch_Source": {
+        "path": ".runtime/porting/SRC-06/launch-independent-surface-Root-55-10.py",
+        "sha256": "673a3fc4dc6259acf06041389d00877b0e1bb76f01cbd4fbf3ebab2de1144ad7",
+        "bytes": 3606
+      },
+      "success_milestone_directly_observed": true,
+      "ep_runtime_compile_messages": 0
+    },
+    {
+      "category": "beam_producer",
+      "actual_stage": "55-11",
+      "Source_compared_call_records": 18,
+      "Native_retained_records": 27,
+      "excluded_records": 9,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-11/receipt.json",
+        "sha256": "245f6ddc8ca1c61d768134232f2348860762088ac5f555bcfb766724c2372865",
+        "bytes": 10522
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-SkyDif-output-predicate-Outer-55-11/complete-proposed-compiler-Source-plan.json",
+        "sha256": "685fee2a4addd8ae015d82d243148df4ad9a9a716430ca502a00d496262c975d",
+        "bytes": 2595904
+      },
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/a9/a9679afbd52628b5d528b6cacc0b6472614096c0f869ff7d7c97ce7c5663a1a9",
+        "sha256": "a9679afbd52628b5d528b6cacc0b6472614096c0f869ff7d7c97ce7c5663a1a9",
+        "bytes": 1867283
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-SkyDif-output-predicate-application-55-11/beam_producer-before.json",
+          "sha256": "317d5bb71b2173da90715a2e3afb22a1c9a7fb11cdcefd06b2128e13fc126f46",
+          "bytes": 12286
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-SkyDif-output-predicate-application-55-11/beam_producer-after.json",
+          "sha256": "6decc1e092b6f1d12c58a17b6a0a09589a2944e6533817b1c919eb50e40f3322",
+          "bytes": 24132
+        }
+      ],
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-11/stdout.log",
+          "sha256": "111f7050295e6bce49bf0ba7db37ac5d57f2749f91017a541fac14e39bcd3983",
+          "bytes": 718
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-11/stderr.log",
+          "sha256": "d837c3aadc424544132049bfe6d920155599958ceba1ca90216faac6a5832e02",
+          "bytes": 1508951
+        }
+      },
+      "launch_Source": {
+        "path": ".runtime/porting/SRC-06/run-SkyDif-output-predicate-Root-55-11.py",
+        "sha256": "c0daee994f3eeddb4b324f34554100033d069e16fab7dad3dd117e8a35ae916b",
+        "bytes": 8505
+      },
+      "success_milestone_directly_observed": true,
+      "ep_runtime_compile_messages": 1
+    }
+  ],
+  "qualified_impact_bridge": {
+    "path": ".runtime/porting/SRC-06/warmup-multiplier-Exterior-publication-draft-Peer-55-final-03/qualified-impact-bridge.json",
+    "sha256": "799f94be26c1f839ed5a57ca3bf1a5898dc90c4b1cded6bfb5fcdff119e55fb5",
+    "bytes": 3949
+  },
+  "all_seven_external_fixtures_stable": true,
+  "all_three_same_Source_snapshot": false,
+  "all_three_same_compiled_binary_claim": false,
+  "actual_accepted_selected_invocations": 5,
+  "preserved_Source_failures": [
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-warmup-Root-55/receipt.json",
+      "sha256": "fb77752e257b68e6879e01dbe4a9df3916eaa6067f4f4b063babdc8c32828679",
+      "bytes": 8791
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-multiplier_predictor-Root-55-02/receipt.json",
+      "sha256": "5c6241c4db03b2edfb07f52850f7e4315b97250c7a4d38f59a53c59dba200043",
+      "bytes": 8840
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-Root-55-02/receipt.json",
+      "sha256": "537caded3894cae7ba2bce81ff7468ef46a6103f9d5cd76c13a738584e17f7fb",
+      "bytes": 8803
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-Root-55-03/receipt.json",
+      "sha256": "95db066b9ee58437d36c7a8a1ccc41c3e69ce25fa4de49161a91d094da97c472",
+      "bytes": 8803
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-Root-55-04/receipt.json",
+      "sha256": "6573673bc7f2085b2ae54c3b07063efa5af13bc36615d08264a16a522b74fa47",
+      "bytes": 8802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-Root-55-05/receipt.json",
+      "sha256": "a0dca32a96c2cc9c88860f90368fdb318f85fb92f20deccf6476bf49efb1bd1f",
+      "bytes": 9259
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-06/receipt.json",
+      "sha256": "8278b99c981f3a2ed2df684ba9b067d1e5767b72a28ee6e3b76fb043acb6cdbc",
+      "bytes": 9664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-surface_internal_gains-Root-55-06/receipt.json",
+      "sha256": "038b150a20c17b43bbf5f1c97c0b915ed1c9b6ddf544a353f970c81e7da61e12",
+      "bytes": 9690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-07/receipt.json",
+      "sha256": "564ff73ffa0f34290d2c8de927d164e6a0c237ff9cdf3760f100e27ef835397f",
+      "bytes": 9662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-08/receipt.json",
+      "sha256": "58bd7117eb194eed5854910a48b91c5cd83a484406c614464cda93849aef439c",
+      "bytes": 10006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-09/receipt.json",
+      "sha256": "d1c8275a1d5c8f9a660c2f92b8ec2fae9c9a34e877d2f3f56897d0c73198d613",
+      "bytes": 10005
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-exterior-beam_producer-Root-55-10/receipt.json",
+      "sha256": "11415fd8428a2c25de6d2a8da32a167062a6d946a6cfd85b3e604c39de4faf0b",
+      "bytes": 10191
+    }
+  ],
+  "preserved_Source_failure_count": 12,
+  "metadata_only_preflight_stops": [
+    {
+      "log": {
+        "path": ".runtime/porting/SRC-06/Root55-04-Weather-diagnostic-launch.log",
+        "sha256": "b3446ba520fcf1e17f51edc60b9a59738505b26a1ce89de767df6aed083275c1",
+        "bytes": 3050
+      },
+      "scientific_command_not_started": true,
+      "qualification": "Root-reviewed helper metadata preflight stop; separate from twelve actual failed Source commands. Whole original encoding retained."
+    },
+    {
+      "log": {
+        "path": ".runtime/porting/SRC-06/Root55-06-02-surface-gains-launch.log",
+        "sha256": "8becdf4cb8e527f6ce7e5e0d322e8e258082796d3376702042afb399df2496f8",
+        "bytes": 3282
+      },
+      "scientific_command_not_started": true,
+      "qualification": "Root-reviewed helper metadata preflight stop; separate from twelve actual failed Source commands. Whole original encoding retained."
+    },
+    {
+      "log": {
+        "path": ".runtime/porting/SRC-06/Root55-10-Setup-cold-weather-launch.log",
+        "sha256": "1f65bc98bdb92b6a27af7f03c02843794086adaa1993cbb4ef2f0e84e33e6615",
+        "bytes": 2334
+      },
+      "scientific_command_not_started": true,
+      "qualification": "Root-reviewed helper metadata preflight stop; separate from twelve actual failed Source commands. Whole original encoding retained."
+    }
+  ],
+  "correction_stages": [
+    {
+      "name": "Root-Exterior-factory-phase-context-application-55-07",
+      "application": {
+        "path": ".runtime/porting/SRC-06/Root-Exterior-factory-phase-context-application-55-07/receipt.json",
+        "sha256": "e6c1ca6bcc28d0f9090d18d70c2173e09561278b400c04e10c8f10aba853094c",
+        "bytes": 14113
+      },
+      "independent_peer": {
+        "path": ".runtime/porting/SRC-06/Peer-Exterior-factory-phase-context-review-55-07-02/review.json",
+        "sha256": "47f69ab503233b0a1c444f2467c4c400b8142230eb2056bc322452679e4ddf54",
+        "bytes": 7920
+      },
+      "draft": {
+        "path": ".runtime/porting/SRC-06/source-Exterior-factory-phase-context-Outer-55-07-02/draft.json",
+        "sha256": "c49483e149948e7d1faa6dbf5bc150deaa1577b1aef50c30500ff6fa4adfbced",
+        "bytes": 6589
+      },
+      "prior_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Constant-Exterior-category-coherent-Peer-55-06/complete-proposed-compiler-Source-plan.json",
+        "sha256": "f77baa731d358fb7af43c7bc125d5308f327a8895fe6c739a60eca95abd5f5a5",
+        "bytes": 2595646
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Exterior-factory-phase-context-Outer-55-07-02/complete-proposed-compiler-Source-plan.json",
+        "sha256": "9fc90146aba857f47277a36c2b6739d45565f78fdac72680142b99bd33021612",
+        "bytes": 2595653
+      },
+      "author_Source": {
+        "path": ".runtime/porting/SRC-06/run-Exterior-factory-phase-context-Root-55-07.py",
+        "sha256": "a4c4be3175acf139407dd4fc0f25726e4eb5a28824a7a97c782ab04728910f2c",
+        "bytes": 5872
+      }
+    },
+    {
+      "name": "Root-ShadowCalculation-application-55-08",
+      "application": {
+        "path": ".runtime/porting/SRC-06/Root-ShadowCalculation-application-55-08/receipt.json",
+        "sha256": "533a065202a5283a45528e5d2778d6b304a3ce410deda471e68a45f3de39ecbe",
+        "bytes": 13299
+      },
+      "independent_peer": {
+        "path": ".runtime/porting/SRC-06/Root-ShadowCalculation-application-55-08/independent-review.json",
+        "sha256": "e2c162830464ae7d6b79ab3c1a7b1339f930c5c33bdc6997f3c7e1d3fcc7e228",
+        "bytes": 1814
+      },
+      "draft": {
+        "path": ".runtime/porting/SRC-06/source-ShadowCalculation-explicit-Outer-55-08-02/draft.json",
+        "sha256": "eeca3026fc18966705a7e20c2fd12c41c8130c798b6060b3d76423d6082e149d",
+        "bytes": 14591
+      },
+      "prior_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Exterior-factory-phase-context-Outer-55-07-02/complete-proposed-compiler-Source-plan.json",
+        "sha256": "9fc90146aba857f47277a36c2b6739d45565f78fdac72680142b99bd33021612",
+        "bytes": 2595653
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-ShadowCalculation-explicit-Outer-55-08/complete-proposed-compiler-Source-plan.json",
+        "sha256": "252cf72faff2fde39664ccc3bb7e1e2be59bacf41abf31690b3d040c144b754a",
+        "bytes": 2595763
+      },
+      "author_Source": {
+        "path": ".runtime/porting/SRC-06/run-ShadowCalculation-Root-55-08.py",
+        "sha256": "732d4d01c171e5314727b2ee06905c346964029946613bf90b232f2f102f8eae",
+        "bytes": 9005
+      }
+    },
+    {
+      "name": "Root-Zone-primary-convection-application-55-09",
+      "application": {
+        "path": ".runtime/porting/SRC-06/Root-Zone-primary-convection-application-55-09/receipt.json",
+        "sha256": "2a7f6107895f4835077619bd9ed8c963bd61c8a7fc60d8a80ea3185f35561027",
+        "bytes": 13208
+      },
+      "independent_peer": {
+        "path": ".runtime/porting/SRC-06/Root-Zone-primary-convection-application-55-09/independent-review.json",
+        "sha256": "10faa947103937fb8813c441eebbae52bef8d6b232afee7c8ae07bbb0aa418d5",
+        "bytes": 1677
+      },
+      "draft": {
+        "path": ".runtime/porting/SRC-06/source-Zone-primary-convection-Outer-55-09/draft.json",
+        "sha256": "8f643618b1c394dfad2a3c03bf8cf561da78bc78607b9006ecba5ad4eebe4aec",
+        "bytes": 7824
+      },
+      "prior_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-ShadowCalculation-explicit-Outer-55-08/complete-proposed-compiler-Source-plan.json",
+        "sha256": "252cf72faff2fde39664ccc3bb7e1e2be59bacf41abf31690b3d040c144b754a",
+        "bytes": 2595763
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Zone-primary-convection-Outer-55-09/complete-proposed-compiler-Source-plan.json",
+        "sha256": "34c21aa4b41ee4206dc11000082744b4b88bf49ff5736f7329fbd46794abed58",
+        "bytes": 2595748
+      },
+      "author_Source": {
+        "path": ".runtime/porting/SRC-06/run-Zone-primary-convection-Root-55-09.py",
+        "sha256": "9d6938244c1f30939a90621f80b71741a3b9c7fa7c537aed2febbc6909058b98",
+        "bytes": 8361
+      }
+    },
+    {
+      "name": "Root-Setup-cold-weather-application-55-10",
+      "application": {
+        "path": ".runtime/porting/SRC-06/Root-Setup-cold-weather-application-55-10/receipt.json",
+        "sha256": "c1e9d9f436a20a5051bf94341d3be90c518613295cf91ee5160e6ed0a6332b91",
+        "bytes": 13195
+      },
+      "independent_peer": {
+        "path": ".runtime/porting/SRC-06/Root-Setup-cold-weather-application-55-10/independent-review.json",
+        "sha256": "3e4acf45e722d6cae9f2c0e9b83471e31264ee97420623dcfd707b4e35ec6643",
+        "bytes": 1908
+      },
+      "draft": {
+        "path": ".runtime/porting/SRC-06/source-Setup-cold-weather-Outer-55-10/draft.json",
+        "sha256": "0e47c102fe0918dcbdee05e1f19b0d305a118b8c8d6330cba307ddfe0c0b24e6",
+        "bytes": 10884
+      },
+      "prior_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Zone-primary-convection-Outer-55-09/complete-proposed-compiler-Source-plan.json",
+        "sha256": "34c21aa4b41ee4206dc11000082744b4b88bf49ff5736f7329fbd46794abed58",
+        "bytes": 2595748
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Setup-cold-weather-Outer-55-10/complete-proposed-compiler-Source-plan.json",
+        "sha256": "8db317b10465947da290e522ecf64d969b3a620384a778e01991878f4d777721",
+        "bytes": 2595800
+      },
+      "author_Source": {
+        "path": ".runtime/porting/SRC-06/run-Setup-cold-weather-Root-55-10-02.py",
+        "sha256": "0dddd95fff71105992a730b1cce323700d71782a4731c63cde5648f422522bbc",
+        "bytes": 8583
+      }
+    },
+    {
+      "name": "Root-SkyDif-output-predicate-application-55-11",
+      "application": {
+        "path": ".runtime/porting/SRC-06/Root-SkyDif-output-predicate-application-55-11/receipt.json",
+        "sha256": "e9015516de816f5fc0f6663e0553426de130324755270913241e9dc268ee57ca",
+        "bytes": 13355
+      },
+      "independent_peer": {
+        "path": ".runtime/porting/SRC-06/Root-SkyDif-output-predicate-application-55-11/independent-review.json",
+        "sha256": "f53a9374b1c028695c184bfd55223607103e9fbed705581f30e3b182f5522c5b",
+        "bytes": 2631
+      },
+      "draft": {
+        "path": ".runtime/porting/SRC-06/source-SkyDif-output-predicate-Outer-55-11/draft.json",
+        "sha256": "a723e85d42fe77b038e47aef4787faf41d29a05973ceda7686ffff05ebebc043",
+        "bytes": 12805
+      },
+      "prior_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-Setup-cold-weather-Outer-55-10/complete-proposed-compiler-Source-plan.json",
+        "sha256": "8db317b10465947da290e522ecf64d969b3a620384a778e01991878f4d777721",
+        "bytes": 2595800
+      },
+      "complete_compiler_plan": {
+        "path": ".runtime/porting/SRC-06/source-SkyDif-output-predicate-Outer-55-11/complete-proposed-compiler-Source-plan.json",
+        "sha256": "685fee2a4addd8ae015d82d243148df4ad9a9a716430ca502a00d496262c975d",
+        "bytes": 2595904
+      },
+      "author_Source": {
+        "path": ".runtime/porting/SRC-06/run-SkyDif-output-predicate-Root-55-11.py",
+        "sha256": "c0daee994f3eeddb4b324f34554100033d069e16fab7dad3dd117e8a35ae916b",
+        "bytes": 8505
+      }
+    }
+  ],
+  "preserved_Native_calendar_failure": {
+    "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-exterior/receipt.json",
+    "sha256": "754608ce80adea660e491e863d5621207ad86026c1e1544adc99f896c39d3588",
+    "bytes": 9652
+  },
+  "gate_changes": 0,
+  "private_cache_state_observed": false
+}

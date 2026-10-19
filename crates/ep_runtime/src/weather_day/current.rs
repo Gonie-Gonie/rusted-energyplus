@@ -203,7 +203,7 @@ impl WeatherSession {
             &state.weather,
             &mut state.environment,
         )?;
-        determine_sun_up_down(state);
+        determine_sun_up_down(state)?;
         if state.environment.current_weather.sun_is_up && state.weather.solar_altitude_angle < 0.0 {
             return Err(WeatherDayError::source_fatal(format!(
                 "SetCurrentWeather: At {:02}/{:02} {:02} Sun is Up but Solar Altitude Angle is < 0.0",
@@ -325,7 +325,7 @@ impl WeatherSession {
 }
 
 /// Literal DetermineSunUpDown; the daily and location operands have real owners.
-pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) {
+pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) -> Result<(), WeatherDayError> {
     const DEG_TO_RAD: f64 = std::f64::consts::PI / 180.0;
     let env = &mut state.environment;
     let daily = &state.today_variables;
@@ -342,10 +342,12 @@ pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) {
     let h = weather.hour_angle * DEG_TO_RAD;
     let cos_zenith = env.sin_latitude * daily.sin_solar_declin_angle
         + env.cos_latitude * daily.cos_solar_declin_angle * h.cos();
-    let solar_zenith = cos_zenith.acos();
+    let solar_zenith = ep_platform_math::acos(cos_zenith)
+        .map_err(|error| WeatherDayError::admission(format!("DetermineSunUpDown acos: {error}")))?;
     let sin_altitude = env.cos_latitude * daily.cos_solar_declin_angle * h.cos()
         + env.sin_latitude * daily.sin_solar_declin_angle;
-    let solar_altitude = sin_altitude.asin();
+    let solar_altitude = ep_platform_math::asin(sin_altitude)
+        .map_err(|error| WeatherDayError::admission(format!("DetermineSunUpDown asin: {error}")))?;
     let cos_azimuth = -(env.sin_latitude * cos_zenith - daily.sin_solar_declin_angle)
         / (env.cos_latitude * solar_zenith.sin());
     // Source max(CosAzimuth,-1), then min(1,CosAzimuth), without new clamps.
@@ -355,7 +357,8 @@ pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) {
         cos_azimuth
     };
     let cos_azimuth = if 1.0 < cos_azimuth { 1.0 } else { cos_azimuth };
-    let solar_azimuth = cos_azimuth.acos();
+    let solar_azimuth = ep_platform_math::acos(cos_azimuth)
+        .map_err(|error| WeatherDayError::admission(format!("DetermineSunUpDown acos: {error}")))?;
     weather.solar_altitude_angle = solar_altitude / DEG_TO_RAD;
     weather.solar_azimuth_angle = solar_azimuth / DEG_TO_RAD;
     if weather.hour_angle < 0.0 {
@@ -374,4 +377,5 @@ pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) {
             - daily.cos_solar_declin_angle * env.sin_latitude * h.cos();
         current.solar_direction_cosines[0] = daily.cos_solar_declin_angle * h.sin();
     }
+    Ok(())
 }

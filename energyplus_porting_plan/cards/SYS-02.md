@@ -69,20 +69,12 @@ CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생�
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
 
-## Selected warmup unit contract (before observation)
+## 현재 검증 근거
 
-The selected unit pins HeatBalanceManager.cc 2824-2963, 2971-3057 and 3059-3226 and the real Rust private new/record/check_day methods. Its input-only 25-case companion declares ordered Zone associations, ZTAV [C], heat/cool rates [W], actual clocks, minimum/maximum days, temperature tolerance [delta C] and dimensionless load tolerance. Before any endpoint pairing, genuine Native Allocate owners and every pre-RecKeep operand must exactly match the independent Rust constructor/input. Compare all eight retained daily values, four flags, four metrics and WarmupFlag in full call order. No SNLoad producer equations are copied. Report operations and missing rolling/report/backend owners remain explicitly unavailable. The ignored observer, disk-full Native link failure and future selected comparison do not close SYS-02/03 unit, integration or production gates.
+[55번 원본 비교](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json)는 실제 Project/Zone getter와 전체 열수지 allocator로 만든 같은 소유자에서 RecKeep 50회와 Check 19회를 이어 실행하고, 상태값 45,072개를 원시 비트로 비교했습니다. 일별 extrema·이전날 값, rolling 값, 보고 배열, 수렴 지표·flags, 실제 clock·EIO·오류 상태를 각 호출 전후에 확인했습니다. 이 결과는 해당 55-02 실행과 명시적 변경 영향 근거에 한정합니다.
 
-## Actual selected daily warmup comparison
+일별 온도와 부하의 실제 생산자, 최소·최대일수·네 수렴조건, transfer/reset 및 warning/backend 순서는 기존 계약을 유지합니다. ZTAV와 실제 SNLoad를 사용하며 MAT나 예측 부하를 대입하지 않습니다. 부하 수렴 허용값은 무차원입니다.
 
-Genuine unchanged-core Native calls and the real Rust private methods matched all 25 fixed cases: 10,785 input/initial-owner checks and 7,383 selected comparisons across 343 boundaries, zero mismatches. Native retained all 347 calls; 14 Report operations and all rolling/report/backend/producer/ordinary obligations remain unavailable for this selected lane. Actual Rust Source360ab473 has 3,916 members and 3,914 unrelated files unchanged. fmt/Clippy passed; focused323/workspace4,947 passed with one intentionally ignored observer; its explicit exact invocation passed one test. No whole-card gate changed.
-Evidence: [selected daily methods, complete observations and quality](../evidence/SYS-02-selected-warmup/summary.json) (`d0844e7898420da97f9bcc5f997ee9c00f1313c314a4b39d397a8ba6f2505b23`).
+이전 선택 비교는 [일별 수렴](../evidence/SYS-02-selected-warmup/summary.json)과 [일별·rolling 상태](../evidence/SYS-02-rolling-warmup/summary.json)에 보존합니다. 당시 제외 항목과 실패·품질 기록도 각 증거의 원래 범위를 유지합니다.
 
-## Rolling owner extension (before observation)
-
-The bounded extension retains TempZone/LoadZone [C/W] and their PrevDay and SecPrevDay owners, initialized to +0 by Original Allocate (2899-2906). Every selected Record performs the exact ordered six writes (3002-3007); daily extrema transfer/reset leaves them intact. Load selection retains the first operand on an equal comparison, including signed zero. The existing input-only companion is unchanged and all initial/pre-RecKeep input joins remain mandatory. The observer adds all six actual per-Zone rolling scalars; the existing 13 selected-owner keys are unchanged. A prospective comparer successor must bind these new owners before any pairing. First-Run report collection/caller continuation, report/StdDev, diagnostics/backend and ordinary handoff remain pending. This Source proposal, its unexecuted tests and any future selected observation do not promote SYS-02/03 gates.
-
-## Actual selected daily and rolling warmup comparison
-
-Genuine unchanged-core Native calls and the real Rust private methods matched all 25 fixed cases: 10,953 input/initial-owner checks and 10,023 selected comparisons across 343 boundaries, zero mismatches. Native retained all 347 calls; 14 Report operations and all report/backend/producer/ordinary obligations remain unavailable for this selected lane. Actual Rust Source5f982aba has 3,917 members and 3,913 unrelated files unchanged. fmt/Clippy passed; focused325/workspace4,949 passed with one intentionally ignored observer; its explicit exact invocation passed one test. No whole-card gate changed.
-Evidence: [selected daily and rolling methods, complete observations and quality](../evidence/SYS-02-rolling-warmup/summary.json) (`c47c491c78c2adc3821ebff3c7c4ce6f7c9d4b6184abc652b0316f2fab38f93a`).
+실제 Surface/공기 부모의 호출 연결, warmup 종료일과 첫 RunPeriod의 상태 인계 및 같은 최종 Source의 15개 일반 실행은 별도 확인합니다. 이 카드의 네 gate와 전체 A 14/54·B 14/64는 변경하지 않습니다.

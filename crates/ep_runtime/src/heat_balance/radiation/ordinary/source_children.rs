@@ -173,6 +173,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         &mut self,
         solar: &OrdinarySolarRadiation,
         geometry: &SurfaceGeometryInputState,
+        detailed_shading: bool,
     ) -> Result<(), Error> {
         let live = SourceSolarOutputOwners {
             radiation: solar,
@@ -194,7 +195,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         };
         register_source_sky_diffuse_debug_outputs(
             &live,
-            self.shadowing.detailed_sky_diffuse_algorithm,
+            detailed_shading,
             &mut output,
         )
     }

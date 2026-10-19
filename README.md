@@ -80,6 +80,19 @@ Current counts are tracked outside the README. Generated coverage specs track
 the output-variable inventory, and release evidence separates passed
 release-evidence series from broader declared conformance/output requests.
 
+Recent [scoped original-source comparisons](energyplus_porting_plan/evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json)
+cover 69 persistent warmup calls, 21 multiplier-two predictor/corrector/history
+calls, and 170 admitted weather, solar and gain records. Warmup and multiplier
+checks compare 45,072 and 17,893 raw state/return fields. Exterior coverage joins
+a verified ordered prefix of 137 records with 33 successful later category
+records; all 179 Native records remain available, including nine exploratory
+shading records outside the fixed input scope. These results retain their
+recorded execution stages and unchanged-code bridges. The final fifteen-case
+run on one current Source, full Surface cadence and warmup handoff comparison
+remain separate work; card gates remain A 14/54 and B 14/64.
+
+The workspace test run did not pass: the observed failure is the stable-output-layout assertion, whose two audit lines have matching content but Windows CRLF rather than its hardcoded LF. That assertion correction is pending; this checkpoint does not claim a passing workspace suite.
+
 ## How To Run And Verify
 
 ```powershell

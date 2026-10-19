@@ -14,12 +14,12 @@ impl SourceZoneAirPredictorCorrector {
         if self.flags.initialize_setpoints_once {
             let n = extent(owners.globals.num_of_zones)?;
             let fan = &mut owners.fan.thermostat;
-            if fan.zone_tstat_setpoints.is_some() {
-                return Err(Error::Unavailable(
-                    "repeated actual zoneTstatSetpts allocate2382",
-                ));
+            // Array1D::allocate retains an equal-size class array in the
+            // original non-debug build; changed extents reconstruct its rows.
+            if fan.zone_tstat_setpoints.as_ref().map(Vec::len) != Some(n) {
+                fan.zone_tstat_setpoints =
+                    Some(vec![controls::SourceZoneTstatSetpoint::default(); n]);
             }
-            fan.zone_tstat_setpoints = Some(vec![controls::SourceZoneTstatSetpoint::default(); n]);
             fan.load_correction_factor = Some(vec![0.0; n]);
             fan.temp_control_type = Some(vec![0; n]);
             fan.temp_control_type_report = Some(vec![0; n]);

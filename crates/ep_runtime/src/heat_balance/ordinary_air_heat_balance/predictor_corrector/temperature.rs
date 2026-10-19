@@ -178,3 +178,15 @@ impl SourceZoneSpaceHeatBalanceData {
         Ok(temperature_change)
     }
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl SourceZoneSpaceHeatBalanceData {
+    /// Caller bridge only; the original full member body above owns all math.
+    pub(crate) fn correct_native_multiplier_cohort(
+        &mut self, number: i32, use_zone_history: bool,
+        controller: &mut SourceZoneAirPredictorCorrector,
+        owners: &mut SourceZoneAirOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        self.correct_source_zone_temperature(number, use_zone_history, controller, owners)
+    }
+}

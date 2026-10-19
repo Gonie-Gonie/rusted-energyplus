@@ -6,6 +6,7 @@ members = [
     "crates/ep_model",
     "crates/ep_compiler",
     "crates/ep_runtime",
+    "crates/ep_platform_math",
     "crates/ep_oracle",
     "crates/ep_compare",
     "crates/ep_conformance",

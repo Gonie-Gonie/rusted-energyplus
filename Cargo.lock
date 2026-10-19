@@ -99,6 +99,10 @@ name = "ep_oracle"
 version = "0.1.0"
 
 [[package]]
+name = "ep_platform_math"
+version = "0.1.0"
+
+[[package]]
 name = "ep_raw_model"
 version = "0.1.0"
 dependencies = [
@@ -126,6 +130,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "ep_model",
+ "ep_platform_math",
  "serde_json",
 ]
 

@@ -280,12 +280,48 @@ impl SelectedScheduleManager {
             ))
     }
 
+    /// Existing callers without a diagnostic owner stop at the first requested warning.
     pub(crate) fn process_schedule_input(
         &mut self,
         input: &mut SelectedInputProcessor,
         declarations: &SelectedScheduleInput,
         time_steps_in_hour: usize,
         audit_files: &mut dyn ScheduleAuditFileHost,
+    ) -> Result<(), SelectedScheduleError> {
+        self.process_schedule_input_with_optional_backend(
+            input,
+            declarations,
+            time_steps_in_hour,
+            audit_files,
+            None,
+        )
+    }
+
+    /// Same ProcessScheduleInput owners, with the caller's live diagnostic backend.
+    pub(crate) fn process_schedule_input_with_backend(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+        backend: &mut super::error_backend::SourceErrorBackend<'_>,
+    ) -> Result<(), SelectedScheduleError> {
+        self.process_schedule_input_with_optional_backend(
+            input,
+            declarations,
+            time_steps_in_hour,
+            audit_files,
+            Some(backend),
+        )
+    }
+
+    fn process_schedule_input_with_optional_backend(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+        mut backend: Option<&mut super::error_backend::SourceErrorBackend<'_>>,
     ) -> Result<(), SelectedScheduleError> {
         if self.schedule_input_processed {
             return Ok(());
@@ -480,11 +516,37 @@ impl SelectedScheduleManager {
                 .type_name
                 .as_ref()
                 .and_then(|name| self.schedule_type_map.get(name))
-                .copied()
-                .ok_or(SelectedScheduleError::Unavailable(
-                    "blank or unknown type warning",
-                ))?;
-            self.schedules[number.0].schedule_type_number = Some(type_number);
+                .copied();
+            if let Some(type_number) = type_number {
+                self.schedules[number.0].schedule_type_number = Some(type_number);
+            } else {
+                let backend = backend
+                    .as_deref_mut()
+                    .ok_or(SelectedScheduleError::Unavailable(
+                        "blank or unknown type warning",
+                    ))?;
+                // Native1988-1994 invokes the real UtilityRoutines helpers.
+                // cAlphaFields(2) is the pinned Constant schema field below;
+                // no absent type is replaced by a declared ScheduleTypeLimits.
+                backend
+                    .show_warning_error(&format!(
+                        "ProcessScheduleInput: Schedule:Constant = {}",
+                        row.name,
+                    ))
+                    .map_err(super::selected_heat_balance_input::HeatBalanceInputError::from)?;
+                let field_message = match row.type_name.as_deref().filter(|name| !name.is_empty()) {
+                    None => "Schedule Type Limits Name is empty.".to_owned(),
+                    Some(name) => format!("Schedule Type Limits Name = {name}, item not found."),
+                };
+                backend
+                    .show_continue_error(&field_message)
+                    .map_err(super::selected_heat_balance_input::HeatBalanceInputError::from)?;
+                backend
+                    .show_continue_error("Schedule will not be validated.")
+                    .map_err(super::selected_heat_balance_input::HeatBalanceInputError::from)?;
+                // AddScheduleConstant's actual Invalid (-1), represented by
+                // None on the retained Source schedule, remains untouched.
+            }
         }
         self.resize_source_constant(0, slots, 0.0)?;
         self.resize_source_constant(1, slots, 1.0)?;

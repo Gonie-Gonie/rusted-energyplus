@@ -453,3 +453,19 @@ impl CtfInitializationReports {
         }))
     }
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl super::SelectedInternalHeatGains {
+    /// Passive views of the actual retained symbolic pointer targets. No rate
+    /// getter/calculation is invoked and no owner is copied into a new cache.
+    pub(crate) fn native_gap_device_bindings(
+        &self,
+    ) -> Result<Vec<Vec<[Option<OrdinaryGainRateTarget>; 7]>>, HeatBalanceInputError> {
+        self.allocations.space_devices.as_deref().unwrap_or_default().iter().map(|owner| {
+            if owner.number_of_devices == 0 { return Ok(Vec::new()); }
+            let rows=owner.devices.as_deref().ok_or(HeatBalanceInputError::Unavailable("actual device target storage"))?;
+            if rows.len()<owner.number_of_devices {return Err(HeatBalanceInputError::Unavailable("actual device target active bounds"));}
+            Ok(rows[..owner.number_of_devices].iter().map(|row|row.targets.map(|v|v.map(target))).collect())
+        }).collect()
+    }
+}

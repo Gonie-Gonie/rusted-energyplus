@@ -215,33 +215,21 @@ impl SourceZoneAirDemand {
     ) -> Result<(), Error> {
         let zones = usize::try_from(globals.num_of_zones)
             .map_err(|_| Error::Unavailable("actual ZoneDemand NumOfZones2412"))?;
-        if self.zones.is_some() {
-            return Err(Error::Unavailable(
-                "repeated native demand allocate2412 state not yet represented",
-            ));
-        }
-        self.zones = Some(vec![SourceSystemSensibleDemand::default(); zones]);
-        if self.zone_moisture.is_some() {
-            return Err(Error::Unavailable(
-                "repeated native demand allocate2413 state not yet represented",
-            ));
-        }
-        self.zone_moisture = Some(vec![SourceSystemMoistureDemand::default(); zones]);
+        let rows = self.zones.get_or_insert_with(Vec::new);
+        rows.resize(zones, SourceSystemSensibleDemand::default());
+        rows.fill(SourceSystemSensibleDemand::default());
+        let rows = self.zone_moisture.get_or_insert_with(Vec::new);
+        rows.resize(zones, SourceSystemMoistureDemand::default());
+        rows.fill(SourceSystemMoistureDemand::default());
         if space_controls.simulation || space_controls.sizing {
             let spaces = usize::try_from(globals.num_spaces)
                 .map_err(|_| Error::Unavailable("actual SpaceDemand numSpaces2415"))?;
-            if self.spaces.is_some() {
-                return Err(Error::Unavailable(
-                    "repeated native demand allocate2415 state not yet represented",
-                ));
-            }
-            self.spaces = Some(vec![SourceSystemSensibleDemand::default(); spaces]);
-            if self.space_moisture.is_some() {
-                return Err(Error::Unavailable(
-                    "repeated native demand allocate2416 state not yet represented",
-                ));
-            }
-            self.space_moisture = Some(vec![SourceSystemMoistureDemand::default(); spaces]);
+            let rows = self.spaces.get_or_insert_with(Vec::new);
+            rows.resize(spaces, SourceSystemSensibleDemand::default());
+            rows.fill(SourceSystemSensibleDemand::default());
+            let rows = self.space_moisture.get_or_insert_with(Vec::new);
+            rows.resize(spaces, SourceSystemMoistureDemand::default());
+            rows.fill(SourceSystemMoistureDemand::default());
         }
         Ok(())
     }

@@ -226,3 +226,7 @@ impl OrdinarySolarRadiation {
         Ok(cases.len())
     }
 }
+
+mod absorption;
+
+mod sky_opaque;

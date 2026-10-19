@@ -21,6 +21,8 @@ pub(crate) use manager::{SourceInitSurfaceOwners, SourceInitSurfaceProviders};
 pub(crate) mod output;
 pub(crate) mod outside_driver;
 mod prefix;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+pub(crate) use prefix::check_glazing_shading_status_change as native_gap_check_glazing_shading_status_change;
 mod radiant_handoff;
 mod registration;
 pub(crate) mod report;

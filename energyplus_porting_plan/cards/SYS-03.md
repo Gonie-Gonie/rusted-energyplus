@@ -69,49 +69,12 @@ CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생�
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
 
-## Historical bounded warmup owner/caller amendment (before application; all gates remain pending)
+## 현재 검증 근거와 남은 인계 확인
 
-- Pin HeatBalanceManager.cc 180-244 (caller), 2598-2663 and 2880-2918 (actual allocation/BeginEnvrn), 2971-3057 (RecKeepHeatBalance), and 3059-3226 (CheckWarmupConvergence). The daily owner is per Zone, distinct from MAT, CTF history and summary.
-- Direct demand prerequisites are ZoneTempPredictorCorrector.cc 3863-3940, 4043-4128 and DataZoneEnergyDemands.cc 323-329 with its actual declarations. Only the real absent system-zone-node branch supplies literal SNLoad=0; predicted demand, PurchasedAir supply output or missing metadata must never become its replacement.
-- BeginEnvrn previous heat/cool/max/min owners start at +0. Current heat/cool/max start at -9999 and min at 1000. Record actual ZTAV and accepted unmultiplied airSysHeatRate/airSysCoolRate after each real timestep; never substitute MAT for unavailable ZTAV.
-- Check every Zone's max/min temperature differences and normalized heat/cool changes in Native order. Preserve the strict >1e-4 load guard, in-place 100 W floor, retained comparison values in inactive branches, then per-zone transfer/reset. LoadsConvergTol is dimensionless; the existing Rust `_w` spelling is historical.
-- The bounded first implementation admits actual uncontrolled A topology through real ModelGraph node absence plus real equipment-connection absence. Controlled or unknown demand ownership is explicitly unavailable; no B warmup activation or synthetic load producer is included.
-- The genuine ordinary A pipeline must choose the existing Building-based warmup options producer; the current hourly_samples call disables warmup. The separate diagnostic branch keeps its explicit old options, and B is unchanged.
-- Native maximum-day severe/continue effects and first-RunPeriod convergence reports remain required actual backend/environment prerequisites. A forced maximum-day exit is not convergence, and this bounded unit does not close those report/error gates.
-- After the actual final warmup EndDay decision, retain all thermal/demand/daily owners, set the real WarmupFlag false and DayOfSim/DayOfSimChr to zero without weather transport, then let the existing next RunPeriod BeginDay establish day 1. Pin SimulationManager.cc 404-556 and the direct weather caller/owner declarations.
-- Required tests include first-day previous-zero behavior, all four tests including real load failure, floor/guard/retained-value ordering, actual uncontrolled report reachability, rejection before callback for controlled topology, and warmup-to-RunPeriod owner/clock retention. Any future Native comparison uses genuine same inputs and all reached owners; no result-based fixtures or convergence-count expectations.
+warmup 종료 판정의 현재 단위 근거는 [55번의 실제 RecKeep/Check 69회·45,072개 상태 비교](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json)입니다. 이 결과만으로 마지막 warmup부터 첫 RunPeriod까지의 전체 인계가 검증되지는 않습니다.
 
-At this amendment stage, the proposed Rust changes were held Source only. No Native/candidate execution, numerical PASS, completed scope/unit/integration/production gate or predecessor completion is claimed.
+실제 마지막 EndDay 판정 뒤 thermal/demand/일별 소유자를 유지하고 WarmupFlag와 DayOfSim/DayOfSimChr를 원본 순서대로 전환해야 합니다. 다음 BeginDay와 InitHeatBalance 전후의 SurfTempIn·CTF 상수항과 이력·MAT·W, 실제 환경/clock 및 backend를 비교합니다. 보고된 시간평균 습도비로 내부 W를 추정하지 않습니다. 같은 최종 Source에서 첫 1·2·24시간 추적과 다일·연간 연결을 확인하는 계약도 유지합니다.
 
-## Applied uncontrolled warmup owner and quality
+역사적 근거는 [실제 uncontrolled warmup 소유자 적용](../evidence/SYS-03-warmup-owner/summary.json), [원본 R 문자열 615개 비교](../evidence/SYS-03-round-format/summary.json), [선택 Report 14회·EIO 및 당시 일반 A 품질](../evidence/SYS-03-ordinary-warmup-report/summary.json)에 보존합니다. R 비교의 양의 무한대 5개 제외와 각 실행의 미검증 가족·실패 기록은 그대로 남습니다.
 
-Actual Source8fc2a29b retains3,915 files with3,902 unrelated files byte-exact. The strict ordinary A caller now enables model warmup; actual uncontrolled sensible reports feed all-zone four-criterion convergence and the final accepted EndDay hands weather globals through Day0. fmt/Clippy passed; focused323/workspace4,947 tests passed, zero failed/ignored. Native same-input numerical comparison and ordinary handoff parity remain unverified. Full rolling/report/EIO/diagnostic effects and controlled demand remain pending; no card gates changed.
-Evidence: [actual application and quality](../evidence/SYS-03-warmup-owner/summary.json) (`3922d1a4dae0c8f190903bc6c8e3d2833ef2fb36a8c20158fdbbeb396c509e71`).
-
-## Bounded Original R formatter prerequisite
-
-Before extending actual warmup report and diagnostic effects, port only the Original IOFiles.hh R formatting branch and its directly invoked helpers: lines117-140,247-305 and734-786 at the pinned26.1.0 revision. All relevant fmt caller ranges and input contracts are retained in the reviewed Source preparation. Inputs are actual IEEE binary64 values and explicit precision; output is the exact UTF-8 string or an explicit unavailable domain. Preserve operation order, strict fixed-output threshold, sign/zero behavior, three fixed versus one exponential nextafter steps, positive large-number conversion/truncation and minimum three-digit exponent padding. Do not rescale decimals, substitute expected strings, change F/G formatting or weaken comparisons.
-
-The prospective124 input values and five formats declare620 observations. Positive infinity reaches Original undefined log10-to-int conversion; its five rows must remain explicitly uninvoked/unavailable in both lanes. All other615 rows require genuine Original formatting and exact text comparison. Record full input/executable bytes before and after each invocation, actual linked inline header/provider provenance, actual Cargo-emitted binary, all five literal-to-formatted Source correspondences and complete outputs. Native executes before applying the Rust formatter. This helper prerequisite does not claim complete report/backend, warmup handoff, whole-card or production gates; those retain their existing pending status.
-
-## Actual bounded Original R format comparison
-
-Genuine unchanged-core Original R formatting and the actual Rust formatter passed the selected available exact-text scope: 124 literal binary64 values, 620 declarations and 615 required nonexcluded text pairs; actual returned pairs 615, mismatches 0. The five positive-infinity rows in each lane remain explicitly uninvoked/unavailable and are not PASS. All precisions0/2/3/4/10, full input/executable/custody proofs, provider/loader attempts and complete observations are retained. Actual Source5660999c has3,922 members and3,917 unrelated files unchanged. fmt/Clippy passed; focused333/workspace4,957 passed, zero failed, with actual ignored counts2/2. Floating exception state/NaN payload, full report/backend, ordinary warmup handoff and whole-card gates remain pending; no gate changed.
-Evidence: [selected exact texts, full observations and quality](../evidence/SYS-03-round-format/summary.json) (0bb2ff7ffaace772c680b90cf3b4a0aed57eb185e941048783e42c83dcae09ab).
-
-## Ordinary A report/backend continuation contract (reviewed before application)
-
-- The explicit ordinary uncontrolled A entry retains actual first-instance Raw Output:Diagnostics detailed-report facts and selected SimulationControl inputs. Active sizing/pure-load/controlled demand are unavailable; B, generic and manual callers do not infer this reporting contract.
-- Reborrow the same caller-owned CtfRunOutputs EIO/error/console/backend through initialization, warmup and Run. Preserve reached bytes and typed IO/backend causes across failure; optional callback/SQLite owners remain the actual caller operands, with no substitute sinks.
-- Genuine BeginEnvrn resets daily previous/current extrema, rolling Temp/Load/Prev/SecPrev sentinels, report difference/full matrices and Count in Original 2639-2652 order. LoadZoneSecPrevDay, scratch and constructor header/warning flags are not reset by that block. Direct Allocate remains a distinct +0 lane.
-- After each actual successful thermal timestep, the admitted uncontrolled SNLoad report supplies fresh accepted rates/stamp, then RecKeep updates every Zone through all warmup and Run timesteps. The first non-Warmup Run day alone collects detailed/full report matrices; the summary requires actual EndDay/DayOfSim1/!DoingSizing. Truncated first-day samples do not report a fabricated full day.
-- At maximum warmup days, each real Zone check precedes its severe/continue effects and then transfer/reset. Retain both once-warning flags, actual environment/phase and all backend counters/prefixes; emit the global insufficient-days severe after the Zone loop before WarmupFlag mutation. Shared Source R formatting is a separately reviewed dependency, not an assumed text PASS.
-- New tests exercise real Rust production weather A caller continuation through partial/full/two Run days, report Count/headers/tails and fresh timestamps, plus maximum-day multi-Zone diagnostic order/once flags and actual failing sink stops. No new Native observation, whole SYS-02/03, ordinary parity or gate PASS is claimed by this held Source.
-
-## Actual selected report comparison and ordinary A quality
-
-Genuine unchanged-core Native and Rust selected report owners/EIO matched across 25 cases, 371 boundaries and 14 actual Report calls: 3,325 initial report-owner checks and 210,245 report endpoint checks, zero mismatches. This comparison remains bound to Source d362e54d and was not rerun after the test-only fixture correction. The correction supplies the existing authored loader-name owner; all 3,927 unrelated Source members, including production code, remain byte-exact. Current Source d34a84b7 passed fmt/Clippy, the targeted ordinary A regression 1/0/0, focused 341/0/2 and workspace 4,968/0/2 (passed/failed/ignored). Earlier Clippy/workspace failures and both Source histories are retained.
-
-Five families remain explicitly unavailable and are not PASS: warning_flags, sensible_report_producer_and_energies, error_backend_and_callbacks, error_console_prefixes and ordinary_weather_handoff. Selected report proof and genuine Rust caller tests do not establish full backend/producer equivalence, ordinary Native handoff parity or whole SYS-02/03 completion. All gates and A 14/54 / B 14/64 totals remain unchanged.
-
-Evidence: [selected report owners/EIO, historical comparison and current quality](../evidence/SYS-03-ordinary-warmup-report/summary.json).
+원본과 Source의 두 경계 전체 snapshot, 실제 Surface cadence와 같은 최종 Source의 15개 일반 실행·전체 출력 검증은 별도 과제입니다. 이 카드의 네 gate와 전체 A 14/54·B 14/64는 변경하지 않습니다.

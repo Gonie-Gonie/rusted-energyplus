@@ -63,7 +63,7 @@ impl OrdinarySolarRadiation {
         self.solar_timestep.hc_ns.dimension([figures], Some(0))?;
         self.solar_timestep.hc_nv.dimension([figures], Some(0))?;
         self.solar_timestep.hc_t.dimension([figures], Some(0.0))?;
-        let _general = vec![0_i32; ordinal(self.solar_timestep.max_gss)?];
+        let mut general = vec![0_i32; ordinal(self.solar_timestep.max_gss)?];
         let _back = vec![0_i32; ordinal(self.solar_timestep.max_gss)?];
         let _sub = vec![0_i32; ordinal(self.solar_timestep.max_gss)?];
         self.solar_timestep.penumbra_ids.clear();
@@ -84,10 +84,9 @@ impl OrdinarySolarRadiation {
                 let z = value.ok_or(Error::Unavailable("actual written Vertex"))?[2];
                 if z < z_min { z_min = z; }
             }
-            let _ = z_min;
-            if control.solar_distribution != SelectedSolarDistribution::Minimal {
-                return Err(Error::Unavailable("DetermineShadowingCombinations genuine positive general-caster child"));
-            }
+            let general_count = self.source_general_shadow_candidates(
+                geometry, control, number, shadowing, z_min, &mut general,
+            )?;
             // Source5518: inspect every real row; an actually reached subsurface
             // requires CHKSBS, so it cannot be silently treated as count0.
             for candidate in 1..=count {
@@ -97,11 +96,13 @@ impl OrdinarySolarRadiation {
             }
             let combination = &mut self.solar_timestep.shadow_combinations.as_mut().unwrap()[number - 1];
             combination.use_this_surface = true;
-            combination.num_gen_surface = 0;
+            combination.num_gen_surface = i32::try_from(general_count).map_err(|_| Error::Unavailable("actual NGSS signed storage"))?;
             combination.num_back_surface = 0;
             combination.num_sub_surface = 0;
-            self.solar_timestep.max_dim = self.solar_timestep.max_dim.max(0);
-            combination.general = Some(vec![0]);
+            self.solar_timestep.max_dim = self.solar_timestep.max_dim.max(combination.num_gen_surface);
+            let mut retained_general = vec![0; general_count + 1];
+            retained_general[1..].copy_from_slice(&general[..general_count]);
+            combination.general = Some(retained_general);
             combination.back = Some(vec![0]);
             combination.sub = Some(vec![0]);
         }
@@ -245,41 +246,56 @@ impl OrdinarySolarRadiation {
             return Err(Error::Unavailable("UpdateComplexWindows actual positive complex windows"));
         }
         for &hour in &hours { for &step in &time_steps {
-            let sun = self.solar_timestep.complex.sun_costs.read([step,hour])?;
-            self.solar_timestep.sun_cosines = sun.map(Some);
-            self.solar_timestep.shading.surf_sun_cos_theta.fill(0.0)?;
-            if sun[2] < 0.00001 { continue; }
-            for number in 1..=count {
-                let normal = geometry_properties(geometry, number)?.out_norm;
-                let cosine = sun[0] * normal[0] + sun[1] * normal[1] + sun[2] * normal[2];
-                self.solar_timestep.shading.surf_sun_cos_theta.set([number], cosine)?;
-                if step == steps || detailed { self.solar_timestep.heat_balance.surf_cos_inc_ang_hr.set([hour,number], cosine)?; }
-                self.solar_timestep.heat_balance.surf_cos_inc_ang.set([hour,step,number], cosine)?;
-            }
-            // SourceShadingMethod currently has exactly the real admitted
-            // PolygonClipping variant; Scheduled/Imported remain input-bound.
-            self.source_shadow(geometry, hour, step)?;
-            for number in 1..=count {
-                let surface = source_surface(geometry, number)?;
-                if surface.area >= 1.0e-10 {
-                    let fraction = self.solar_timestep.shading.surf_sunlit_area.read([number])? / surface.net_area_shadow_calc;
-                    if step == steps || detailed { self.solar_timestep.heat_balance.surf_sunlit_frac_hr.set([hour,number], fraction)?; }
-                    self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], fraction)?;
-                    if fraction < 1.0e-5 { self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], 0.0)?; }
-                }
-                if self.solar_timestep.heat_balance.surf_sunlit_frac.read([hour,step,number])? > 1.0 {
-                    self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], 1.0)?;
-                }
-            }
-            if shadowing.detailed_sky_diffuse_algorithm && geometry.shading_transmittance_varies && control.solar_distribution != SelectedSolarDistribution::Minimal {
-                return Err(Error::Unavailable("FigureSolarBeamAtTimestep actual detailed diffuse shading child"));
-            }
-            for &number in &geometry.surface_lists.all_exterior_solar_window_with_frame {
-                if self.solar_timestep.heat_balance.surf_sunlit_frac.read([hour,step,ordinal(number)?])? > 0.0 {
-                    return Err(Error::Unavailable("FigureSolarBeamAtTimestep actual CalcFrameDividerShadow"));
-                }
-            }
+            self.source_figure_solar_beam_at_timestep(geometry, control, globals, shadowing, hour, step)?;
         } }
+        Ok(())
+    }
+
+    /// SolarShading5070-5245. The same admitted Figure body is used by the
+    /// genuine CalcPerSolarBeam caller and by a direct unit caller. It reads the
+    /// already-produced SUNCOSTS cell; it never computes or seeds that value.
+    pub(crate) fn source_figure_solar_beam_at_timestep(
+        &mut self, geometry: &mut SurfaceGeometryInputState,
+        control: &SelectedHeatBalanceInputState, globals: &WeatherGlobalState,
+        shadowing: &SourceShadowingInput, hour: usize, step: usize,
+    ) -> Result<(), Error> {
+        let count = surface_count(geometry)?;
+        let steps = ordinal(globals.time_steps_in_hour)?;
+        let detailed = shadowing.detailed_solar_timestep_integration;
+        let sun = self.solar_timestep.complex.sun_costs.read([step,hour])?;
+        self.solar_timestep.sun_cosines = sun.map(Some);
+        self.solar_timestep.shading.surf_sun_cos_theta.fill(0.0)?;
+        if sun[2] < 0.00001 { return Ok(()); }
+        for number in 1..=count {
+            let normal = geometry_properties(geometry, number)?.out_norm;
+            let cosine = sun[0] * normal[0] + sun[1] * normal[1] + sun[2] * normal[2];
+            self.solar_timestep.shading.surf_sun_cos_theta.set([number], cosine)?;
+            if step == steps || detailed { self.solar_timestep.heat_balance.surf_cos_inc_ang_hr.set([hour,number], cosine)?; }
+            self.solar_timestep.heat_balance.surf_cos_inc_ang.set([hour,step,number], cosine)?;
+        }
+        // SourceShadingMethod currently has exactly the real admitted
+        // PolygonClipping variant; Scheduled/Imported remain input-bound.
+        self.source_shadow(geometry, hour, step)?;
+        for number in 1..=count {
+            let surface = source_surface(geometry, number)?;
+            if surface.area >= 1.0e-10 {
+                let fraction = self.solar_timestep.shading.surf_sunlit_area.read([number])? / surface.net_area_shadow_calc;
+                if step == steps || detailed { self.solar_timestep.heat_balance.surf_sunlit_frac_hr.set([hour,number], fraction)?; }
+                self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], fraction)?;
+                if fraction < 1.0e-5 { self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], 0.0)?; }
+            }
+            if self.solar_timestep.heat_balance.surf_sunlit_frac.read([hour,step,number])? > 1.0 {
+                self.solar_timestep.heat_balance.surf_sunlit_frac.set([hour,step,number], 1.0)?;
+            }
+        }
+        if shadowing.detailed_sky_diffuse_algorithm && geometry.shading_transmittance_varies && control.solar_distribution != SelectedSolarDistribution::Minimal {
+            return Err(Error::Unavailable("FigureSolarBeamAtTimestep actual detailed diffuse shading child"));
+        }
+        for &number in &geometry.surface_lists.all_exterior_solar_window_with_frame {
+            if self.solar_timestep.heat_balance.surf_sunlit_frac.read([hour,step,ordinal(number)?])? > 0.0 {
+                return Err(Error::Unavailable("FigureSolarBeamAtTimestep actual CalcFrameDividerShadow"));
+            }
+        }
         Ok(())
     }
 

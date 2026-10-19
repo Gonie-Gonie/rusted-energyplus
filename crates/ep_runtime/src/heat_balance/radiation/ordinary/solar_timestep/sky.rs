@@ -150,7 +150,7 @@ impl OrdinarySolarRadiation {
             self.solar_timestep.shading.surf_dif_shdg_ratio_horiz_hrts.dimension([steps,24,count], None)?;
             self.solar_timestep.shading.surf_dif_shdg_ratio_horiz_hrts.fill(1.0)?;
         }
-        children.register_sky_diffuse_outputs(self, geometry)?;
+        children.register_sky_diffuse_outputs(self, geometry, detailed)?;
         for phi in 0..6 {
             self.solar_timestep.sun_cosines[2] = Some(*self.solar_timestep.sin_phi.get(phi).ok_or(Error::Unavailable("actual InitSolar patch sine"))?);
             for theta in 0..24 {

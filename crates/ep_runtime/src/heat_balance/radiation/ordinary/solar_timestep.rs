@@ -5,10 +5,12 @@ pub(crate) mod state;
 mod allocation;
 mod sky;
 mod period;
+mod general_shadow;
 mod initialization;
 mod environment;
 mod heat_gain;
 mod distribution;
+mod opaque_exterior;
 pub(crate) use state::SourceSolarTimestepState;
 use super::OrdinarySolarRadiation;
 use crate::heat_balance::selected_heat_balance_input::{
@@ -70,7 +72,7 @@ pub(crate) trait SourceSolarChildren {
     fn register_solar_module_outputs(&mut self, solar: &OrdinarySolarRadiation,
         geometry: &SurfaceGeometryInputState, zones: &SelectedZoneInputOwners, backend: &mut SourceErrorBackend<'_>) -> Result<(), Error>;
     fn register_sky_diffuse_outputs(&mut self, solar: &OrdinarySolarRadiation,
-        geometry: &SurfaceGeometryInputState) -> Result<(), Error>;
+        geometry: &SurfaceGeometryInputState, detailed_shading: bool) -> Result<(), Error>;
     fn calc_daylight_coefficients(&mut self, solar: &mut OrdinarySolarRadiation,
         geometry: &mut SurfaceGeometryInputState, globals: &WeatherGlobalState, backend: &mut SourceErrorBackend<'_>) -> Result<(), Error>;
 }

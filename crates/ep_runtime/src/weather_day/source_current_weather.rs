@@ -49,7 +49,8 @@ impl WeatherSession {
                 1,
             )?;
         }
-        o.schedules.update_source_schedule_values(&state.global, &state.environment)?;
+        o.schedules
+            .update_source_schedule_values(&state.global, &state.environment)?;
         let report_hour = hour.checked_sub(1).ok_or(Error::Unavailable(
             "actual CurMnDyHr hour subtraction domain",
         ))? as u16;
@@ -114,7 +115,7 @@ impl WeatherSession {
             &state.weather,
             &mut state.environment,
         )?;
-        super::current::determine_sun_up_down(state);
+        super::current::determine_sun_up_down(state)?;
         if state.environment.current_weather.sun_is_up && state.weather.solar_altitude_angle < 0.0 {
             if o.backend.state.warmup_flag != state.global.warmup_flag {
                 return Err(Error::Unavailable(

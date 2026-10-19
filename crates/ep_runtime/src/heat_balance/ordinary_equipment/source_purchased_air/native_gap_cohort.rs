@@ -2121,9 +2121,56 @@ fn units(u: hb::source_output_registration::SourceOutputUnits) -> i32 {
         U::Ppm => 3,
     }
 }
+/// Compose the same persistent output domains for passive registered-Which reads.
+struct RegisteredOutputOwners<'a> {
+    equipment: &'a OrdinaryEquipment,
+    air: hb::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners<'a>,
+}
+impl SourceRealOutputOwners for RegisteredOutputOwners<'_> {
+    fn real_output(
+        &self,
+        target: hb::source_output_registration::SourceRealOutputTarget,
+    ) -> std::result::Result<&f64, hb::radiation::ordinary::OrdinaryRadiationError> {
+        match target {
+            hb::source_output_registration::SourceRealOutputTarget::Air { .. } => {
+                self.air.real_output(target)
+            }
+            _ => self.equipment.real_output(target),
+        }
+    }
+}
+impl SourceIntegerOutputOwners for RegisteredOutputOwners<'_> {
+    fn integer_output(
+        &self,
+        target: hb::source_output_registration::SourceIntegerOutputTarget,
+    ) -> std::result::Result<&i32, hb::radiation::ordinary::OrdinaryRadiationError> {
+        match target {
+            hb::source_output_registration::SourceIntegerOutputTarget::ZoneThermostatControlType {
+                ..
+            } => self.air.integer_output(target),
+            _ => self.equipment.integer_output(target),
+        }
+    }
+}
 fn registration(s: &Factory) -> Result<Value> {
     use hb::source_output_registration::{
         SourceIntegerOutputTarget as I, SourceRealOutputTarget as R,
+    };
+    let report = hb::ordinary_air_heat_balance::predictor_corrector::simple_air::SourceAirReportOutputOwners {
+        controller: &s.controller,
+    };
+    let resilience = hb::ordinary_surface_management::SourceResilienceOutputOwners {
+        zones: &s.zones,
+    };
+    let owners = RegisteredOutputOwners {
+        equipment: &s.equipment,
+        air: hb::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners {
+            air: &s.air,
+            demand: &s.controller.demand,
+            fan: &s.fan,
+            report: &report,
+            resilience: &resilience,
+        },
     };
     let mut dictionary = Vec::new();
     for r in &s.registration.dictionary_variables {
@@ -2133,7 +2180,7 @@ fn registration(s: &Factory) -> Result<Value> {
     for (i, r) in s.registration.out_vars.iter().enumerate() {
         let mut row = json!({"name":r.name,"key":r.key,"units":units(r.units),"timeStepType":r.time_step_type as i32,"storeType":r.store_type as i32,"freq":r.frequency as i32,"meterNums":r.meter_numbers,"owner_address":pointer(r)});
         if let Some(target) = r.which {
-            let value = s.registration.read_registered_real(i, &s.equipment)?;
+            let value = s.registration.read_registered_real(i, &owners)?;
             row["Which"] = pointer(value);
             row["live_value"] = number(*value);
             row["same_unit_field"] = match target {
@@ -2143,7 +2190,7 @@ fn registration(s: &Factory) -> Result<Value> {
                 _ => json!([]),
             };
         } else if let Some(target) = r.integer_which {
-            let value = s.registration.read_registered_integer(i, &s.equipment)?;
+            let value = s.registration.read_registered_integer(i, &owners)?;
             row["Which"] = pointer(value);
             row["live_value"] = json!(*value);
             row["same_unit_field"] = match target {
@@ -2422,3 +2469,7 @@ impl OrdinaryEquipment {
 mod output_processor;
 
 mod air_history;
+
+mod warmup;
+
+mod multiplier_predictor;

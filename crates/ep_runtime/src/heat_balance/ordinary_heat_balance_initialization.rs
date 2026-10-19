@@ -200,3 +200,15 @@ fn fill(values: &mut Option<Vec<f64>>, value: f64) -> Result<(), Error> {
         .fill(value);
     Ok(())
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl SourceHeatBalanceManager {
+    /// Test-only access to the same actual complete allocator, without staging its arrays.
+    pub(crate) fn allocate_native_warmup_cohort_arrays(
+        &mut self,
+        owners: &mut SourceInitHeatBalanceOwners<'_, '_>,
+        providers: &mut impl SourceInitHeatBalanceProviders,
+    ) -> Result<(), Error> {
+        self.allocate_heat_balance_arrays(owners, providers)
+    }
+}
