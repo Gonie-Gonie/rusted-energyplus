@@ -16,14 +16,14 @@ use std::io::Write;
 /// Actual DataLoopNode.hh502–513 constructor record. The zero allocation has no rows.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(super) struct SourceMoreNodeData {
-    relative_humidity: f64,
-    report_enthalpy: f64,
-    volume_flow_rate_standard_density: f64,
-    volume_flow_rate_current_density: f64,
-    wet_bulb_temperature: f64,
-    density: f64,
-    air_dew_point_temperature: f64,
-    specific_heat: f64,
+    pub(super) relative_humidity: f64,
+    pub(super) report_enthalpy: f64,
+    pub(super) volume_flow_rate_standard_density: f64,
+    pub(super) volume_flow_rate_current_density: f64,
+    pub(super) wet_bulb_temperature: f64,
+    pub(super) density: f64,
+    pub(super) air_dew_point_temperature: f64,
+    pub(super) specific_heat: f64,
 }
 
 impl SourceMoreNodeData {

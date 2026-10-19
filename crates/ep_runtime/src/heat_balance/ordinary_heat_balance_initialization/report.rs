@@ -96,6 +96,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             dictionary_host: o.dictionary_host,
         };
         let mut owners = SourceHvacOwners {
+            runtime_language: &o.startup.runtime_language,
             air: o.air,
             controller: self.controller,
             zones: o.zones,
@@ -181,7 +182,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     fn calculate_more_node_info(&mut self) -> Result<(), Error> {
         self.owners
             .equipment
-            .calculate_source_more_node_info(self.owners.environment)
+            .calculate_source_more_node_info(
+                self.owners.environment, &*self.owners.registration,
+                &*self.owners.schedules, &self.owners.startup.runtime_language,
+            )
     }
     fn update_zone_data_and_report(&mut self) -> Result<(), Error> {
         self.zone_child(ZoneChild::Output)

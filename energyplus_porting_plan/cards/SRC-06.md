@@ -476,3 +476,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [예측·보정 Native 코호트 전용 실행](../evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json). 기존 코호트 본문을 메인 스레드 전용 타깃으로 옮겨 예측·보정 각 1,168건과 양수 유입 810건을 비트 단위로 확인했다. 실행 명령은 `cargo test --locked -p ep_runtime --features native-controlled-air-cohort --test native_controlled_air_cohort`이다. 작업 스레드에서 발생한 실패·진단 3회를 보존했으며 계산식·기대값·허용오차는 바꾸지 않았다. 생산 경로 증거와 게이트 수는 체크포인트 31에서 이어받는다.
+
+
+[Source33 component/Node report](../evidence/SRC-06-canonical-component-node-report-33/summary.json). B의 실제 결과: `GetHeatBalanceInput: actual controlled ZoneVentRepVars/ZoneEquipConfig.ZoneName1993–1994 before zone declarations`. 이번 단계는 CLI 두 건으로 검증했으며, 테스트 코호트 결과는 부모 증거로 구분합니다.

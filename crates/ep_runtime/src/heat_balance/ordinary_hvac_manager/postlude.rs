@@ -60,13 +60,9 @@ impl SourceHvacManager {
     }
     pub(crate) fn update_source_plant_node_thermal_history(
         &self,
-        o: &SourceHvacOwners<'_, '_>,
+        o: &mut SourceHvacOwners<'_, '_>,
     ) -> Result<(), Error> {
-        if *o.equipment.source_number_of_nodes() > 0 {
-            return Err(Error::Unavailable(
-                "actual Node TempLastTimestep/EnthalpyLastTimestep firstrow2958",
-            ));
-        }
+        o.equipment.update_source_node_thermal_history()?;
         if self.simulation.plant.total_loops > 0 && !o.clock.warmup_flag {
             return Err(Error::Unavailable(
                 "actual PlantLoop thermal history firstrow2964",

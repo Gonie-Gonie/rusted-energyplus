@@ -164,3 +164,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Native 코호트 실행 문맥](evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json). 안정 Rust의 전용 `harness=false` 타깃은 같은 실제 소유자·진입값·검증 본문을 프로세스 메인에서 실행한다. FPU 제어·생산 API·습공기 물성 계산·허용오차를 수정하지 않으며 Native의 캐시 적중·경고 이력이나 FPU 레지스터 일치는 주장하지 않는다.
+
+
+[Source33 component/Node report](evidence/SRC-06-canonical-component-node-report-33/summary.json). 기존 Config·물리 Node와 요청·스케줄·EMS 상태를 재사용하고, Native 호출과 기록 순서를 보존합니다.

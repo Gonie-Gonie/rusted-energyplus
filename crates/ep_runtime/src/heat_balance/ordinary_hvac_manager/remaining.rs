@@ -309,7 +309,9 @@ impl<
             C::CheckConcurrentEirPlantLoopHeatPumpOperation => {
                 manager.check_source_concurrent_eir_heat_pumps()
             }
-            C::CalculateMoreNodeInfo => o.equipment.calculate_source_more_node_info(o.environment),
+            C::CalculateMoreNodeInfo => o.equipment.calculate_source_more_node_info(
+                o.environment, &*output.registration, &*o.schedules, o.runtime_language,
+            ),
             C::DetectOscillatingZoneTemperature => {
                 let mut owners = SourceOscillationOwners {
                     globals: o.globals,

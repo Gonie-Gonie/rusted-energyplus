@@ -307,3 +307,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [SRC-06 통합 코호트 전용 타깃](evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json). 기존 본문 1개를 명시적 메인 스레드 테스트로 실행했다. 일반 단위 테스트에서는 큰 코호트를 제외하며, 실패·진단 3회와 성공 1회를 구분해 기록했다. 게이트 수는 그대로다.
+
+
+[Source33 component/Node report](evidence/SRC-06-canonical-component-node-report-33/summary.json). 제어 구역 성분별 열수지와 노드 이력·추가정보 계산 묶음의 B/A 실행 결과를 기록합니다.

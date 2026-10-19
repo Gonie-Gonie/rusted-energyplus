@@ -502,6 +502,10 @@ impl SourceZoneEquipmentConfigRef<'_> {
     pub(crate) fn return_node_air_loop_number(&self, ordinal: usize) -> Option<&i32> {
         self.row.return_node_air_loop_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
     }
+    /// Actual stored InletNodeADUNum, consumed after each component-report sum.
+    pub(crate) fn inlet_node_air_distribution_unit_number(&self, ordinal: usize) -> Option<&i32> {
+        self.row.inlet_node_air_distribution_unit_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
     pub(crate) fn number_exhaust_nodes(&self) -> &usize {
         &self.row.exhaust_nodes
     }
@@ -557,6 +561,20 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    /// PlantManager2943-2962: writes the same full physical Node array.
+    pub(crate) fn update_source_node_thermal_history(
+        &mut self,
+    ) -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        if self.nodes.number_of_nodes > 0 {
+            for node in self.nodes.physical.as_mut()
+                .ok_or(E::Unavailable("actual Node thermal-history physical array2958"))? {
+                node.temperature_last_timestep = node.temperature;
+                node.enthalpy_last_timestep = node.enthalpy;
+            }
+        }
+        Ok(())
+    }
     /// Native HVACManager1769-1784 on the same complete Node array and default row.
     pub(crate) fn source_node_mass_flow(&self, ordinal: i32)
         -> Result<f64, super::selected_heat_balance_input::HeatBalanceInputError> {

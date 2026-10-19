@@ -119,6 +119,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
         };
         self.hvac.manage_source_hvac(
             &mut SourceHvacOwners {
+                runtime_language: &o.startup.runtime_language,
                 air: o.air,
                 controller,
                 zones: o.zones,

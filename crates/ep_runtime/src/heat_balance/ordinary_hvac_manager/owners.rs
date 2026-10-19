@@ -30,6 +30,7 @@ use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
 use crate::psychrometrics::SourcePsychrometricAccess;
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 pub(crate) struct SourceHvacOwners<'a, 'backend> {
+    pub(crate) runtime_language: &'a crate::heat_balance::selected_simulation_startup::SelectedRuntimeLanguage,
     pub(crate) air: &'a mut SourceAirHeatBalance,
     pub(crate) controller: &'a mut SourceZoneAirPredictorCorrector,
     pub(crate) zones: &'a mut SelectedZoneInputOwners,
