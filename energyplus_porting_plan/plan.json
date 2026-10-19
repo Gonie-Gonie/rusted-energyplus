@@ -12881,6 +12881,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json",
         "sha256": "ab2d5ff31081622cd9fba7564cc3fc2a8ba9cc80415f51dcd75e7a2eb27d1986",
         "size_bytes": 5274
+      },
+      "canonical_controlled_zone_corrector_31": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json",
+        "sha256": "8ee5e72982e35178e54798faf514019f046771641f48e0203f195bbb30963c2d",
+        "size_bytes": 4705
       }
     },
     {

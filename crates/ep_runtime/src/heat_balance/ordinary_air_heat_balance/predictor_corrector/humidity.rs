@@ -1,4 +1,4 @@
-//! Actual uncontrolled correctHumRat4433-4619; same live humidity/latent fields.
+//! Actual zone-only correctHumRat4433-4619; same live humidity/latent/Node fields.
 use super::*;
 impl SourceZoneSpaceHeatBalanceData {
     pub(super) fn correct_source_zone_humidity(
@@ -7,15 +7,26 @@ impl SourceZoneSpaceHeatBalanceData {
         controller: &SourceZoneAirPredictorCorrector,
         owners: &mut SourceZoneAirOwners<'_, '_>,
     ) -> Result<(), Error> {
-        let moisture_mass_flow_rate = 0.0;
-        let zone_mass_flow_rate = 0.0;
+        let mut moisture_mass_flow_rate = 0.0;
+        let mut zone_mass_flow_rate = 0.0;
         let z = zone(owners, number)?;
-        let _zone_multiplier = z
+        let zone_multiplier = z
             .multiplier
             .checked_mul(z.list_multiplier)
             .ok_or(Error::Unavailable("defined Source humidity ZoneMult4447"))?;
         if z.is_controlled {
-            return Err(Error::Unavailable("positive humidity inlet ZoneEquip4453"));
+            let config = owners.equipment.source_zone_equipment_config(number)?;
+            for at in 0..*config.number_inlet_nodes() {
+                let node_number = *config.inlet_node_numbers()
+                    .and_then(|nodes| nodes.get(at))
+                    .ok_or(Error::Unavailable("actual humidity controlled InletNode4456"))?;
+                let ordinal = i32::try_from(node_number)
+                    .map_err(|_| Error::Unavailable("actual humidity InletNode native integer ordinal"))?;
+                let inlet = owners.equipment.source_zone_air_node(ordinal)?;
+                moisture_mass_flow_rate += (*inlet.mass_flow_rate * *inlet.humidity_ratio)
+                    / f64::from(zone_multiplier);
+                zone_mass_flow_rate += *inlet.mass_flow_rate / f64::from(zone_multiplier);
+            }
         } else if z.is_return_plenum {
             return Err(Error::Unavailable("positive humidity return plenum4463"));
         } else if z.is_supply_plenum {
@@ -88,6 +99,11 @@ impl SourceZoneSpaceHeatBalanceData {
         if self.air_hum_rat_temp < 0.0 {
             self.air_hum_rat_temp = 0.0;
         }
+        // Conservative raw-temperature admission before the actual cached
+        // Psat-backed call; diagnostic/CalledFrom transport is not yet ported.
+        if self.zt <= -100.0 || self.zt >= 200.0 {
+            return Err(Error::Unavailable("actual humidity WFromRh/Psat diagnostic-aware normal-temperature domain4568"));
+        }
         let saturation = owners
             .psychrometrics
             .evaluate(
@@ -109,8 +125,11 @@ impl SourceZoneSpaceHeatBalanceData {
         if controller.subsystems.hybrid_model.active {
             return Err(Error::Unavailable("positive hybrid humidity zone4581"));
         }
-        if zone(owners, number)?.system_zone_node_number > 0 {
-            return Err(Error::Unavailable("positive humidity SystemNode4599"));
+        let node_number = zone(owners, number)?.system_zone_node_number;
+        if node_number > 0 {
+            let node = owners.equipment.source_zone_air_node_mut(node_number)?;
+            *node.humidity_ratio = self.air_hum_rat_temp;
+            *node.enthalpy = energyplus_psy_h_fn_tdb_w(self.zt, self.air_hum_rat_temp);
         }
         if owners.control.do_latent_sizing {
             return Err(Error::Unavailable("positive latent sizing4603"));

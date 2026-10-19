@@ -301,3 +301,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source HVAC Node 생명주기 검증](evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json). 기존 물리 Node와 Config를 사용하는 HVAC 초기화·이력·설정값 경로와 반환공기 열 플래그를 연결했습니다. 실제 B 경계와 A24 회귀 결과는 연결된 증거에 기록합니다.
+
+
+[Source 구역 온습도 보정 검증](evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json). 제어 구역의 실제 공급 Node를 사용하는 ThirdOrder 온도·습도 보정 경로를 연결했습니다. 실제 B 경계와 A24 회귀 결과는 연결된 증거에 기록합니다.

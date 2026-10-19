@@ -470,3 +470,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source HVAC Node 생명주기 검증](../evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json). HVAC Node 생명주기 묶음의 실제 실행 결과를 기록합니다. B의 실제 경계는 `GetHeatBalanceInput: positive controlled Zone supply sums5203`이며, 전체 B나 미정 Native 이력의 수치 동등성 완료를 주장하지 않습니다.
+
+
+[Source 구역 온습도 보정 검증](../evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json). 제어 구역 온습도 보정 묶음의 실행 결과를 기록합니다. B의 실제 경계는 `GetHeatBalanceInput: positive component ZoneEquip inlet5488`이며, 전체 B 또는 내부 Native 보정 상태의 수치 동등성 완료를 주장하지 않습니다.

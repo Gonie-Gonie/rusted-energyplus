@@ -49,9 +49,19 @@ impl SourceZoneSpaceHeatBalanceData {
         if corrector {
             let z = zone(owners, number)?;
             if z.is_controlled {
-                return Err(Error::Unavailable(
-                    "positive controlled Zone supply sums5203",
-                ));
+                let config = owners.equipment.source_zone_equipment_config(number)?;
+                for at in 0..*config.number_inlet_nodes() {
+                    let node_number = *config.inlet_node_numbers()
+                        .and_then(|nodes| nodes.get(at))
+                        .ok_or(Error::Unavailable("actual controlled Zone InletNode5207"))?;
+                    let ordinal = i32::try_from(node_number)
+                        .map_err(|_| Error::Unavailable("actual controlled InletNode native integer ordinal"))?;
+                    let node = owners.equipment.source_zone_air_node(ordinal)?;
+                    let cp_air = energyplus_psy_cp_air_fn_w(self.air_hum_rat);
+                    let mass_flow_rate_cp_air = *node.mass_flow_rate * cp_air;
+                    self.sum_sys_m_cp += mass_flow_rate_cp_air;
+                    self.sum_sys_m_cp_t += mass_flow_rate_cp_air * *node.temperature;
+                }
             } else if z.is_return_plenum {
                 return Err(Error::Unavailable("positive return plenum sums5215"));
             } else if z.is_supply_plenum {

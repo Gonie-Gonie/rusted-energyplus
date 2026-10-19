@@ -158,3 +158,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source HVAC Node 생명주기 검증](evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json). Node 번호와 반환공기 연결은 실제 보유 배열에서 읽으며, Node 설정값과 수렴 이력은 같은 소유자에 Native 순서로 씁니다. 초기화되지 않은 이력은 미정 상태로 유지하며 임의의 수치로 채우지 않습니다.
+
+
+[Source 구역 온습도 보정 검증](evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json). 공급 유량 합과 현열·수분 보정은 같은 Config·Node·AirHB 및 정상 Cp·포화압 캐시를 사용합니다. 계산값과 보고 필드의 쓰기 순서를 보존하며, 미구현 포화압 진단 경계는 실제 호출 직전에 명시합니다.

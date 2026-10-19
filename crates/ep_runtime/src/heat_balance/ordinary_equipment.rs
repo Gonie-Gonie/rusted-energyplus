@@ -489,6 +489,9 @@ impl SourceZoneEquipmentConfigRef<'_> {
     pub(crate) fn number_inlet_nodes(&self) -> &usize {
         &self.row.inlet_nodes
     }
+    pub(crate) fn inlet_node_numbers(&self) -> Option<&[usize]> {
+        self.row.inlet_node_numbers.as_deref()
+    }
     /// Actual stored physical ordinals, read in Native InitAirLoops/ConnectReturnNodes.
     pub(crate) fn inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
         self.row.inlet_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
@@ -507,6 +510,13 @@ impl SourceZoneEquipmentConfigRef<'_> {
     }
 }
 
+/// Temporary reads of the same physical Node fields used by air correction.
+pub(crate) struct SourceZoneAirNodeRef<'a> {
+    pub(crate) temperature: &'a f64,
+    pub(crate) mass_flow_rate: &'a f64,
+    pub(crate) humidity_ratio: &'a f64,
+}
+
 /// Temporary disjoint references into the sole actual DataLoopNode.Node row.
 /// Prediction rollback and setpoint handoff mutate this same physical owner.
 pub(crate) struct SourceZoneAirNodeMut<'a> {
@@ -514,6 +524,7 @@ pub(crate) struct SourceZoneAirNodeMut<'a> {
     pub(crate) humidity_ratio: &'a mut f64,
     pub(crate) enthalpy: &'a mut f64,
     pub(crate) temperature_setpoint: &'a mut f64,
+    pub(crate) mass_flow_rate: &'a f64,
 }
 
 /// A borrow of actual Config storage, never a flags projection or snapshot.
@@ -576,6 +587,21 @@ impl OrdinaryEquipment {
         }
         Ok(())
     }
+    pub(crate) fn source_zone_air_node(
+        &self,
+        ordinal: i32,
+    ) -> Result<SourceZoneAirNodeRef<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let at = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
+            .ok_or(E::Unavailable("actual air Node positive ordinal"))?;
+        let row = self.nodes.physical.as_deref().and_then(|rows| rows.get(at))
+            .ok_or(E::Unavailable("actual same physical air Node allocation"))?;
+        Ok(SourceZoneAirNodeRef {
+            temperature: &row.temperature,
+            mass_flow_rate: &row.mass_flow_rate,
+            humidity_ratio: &row.humidity_ratio,
+        })
+    }
     pub(crate) fn source_zone_air_node_mut(
         &mut self,
         ordinal: i32,
@@ -590,6 +616,7 @@ impl OrdinaryEquipment {
             humidity_ratio: &mut row.humidity_ratio,
             enthalpy: &mut row.enthalpy,
             temperature_setpoint: &mut row.temperature_setpoint,
+            mass_flow_rate: &row.mass_flow_rate,
         })
     }
     /// Actual VerifyControlledZoneForThermostat5702 exact-name search.

@@ -1,0 +1,90 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 4,
+  "existing_Rust_sources": 4,
+  "new_Rust_sources": 0,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Actual production B then appropriate A24 only. No unrelated test/profile, repeated cohort, new test or alltargets.",
+  "scope": "Same retained physical Node/Config/zone AirHB ThirdOrder controlled supply sums, temperature and humidity correction. Actual normal Cp/Psat cache and per-field writes, no legacy facade or numerical mirror. Corrected two actual property-call boundaries retain honest conservative normal-temperature domain.",
+  "property_boundary_qualification": "Two actual caller-local raw-temperature bounds conservatively exclude unported Psat diagnostic/CalledFrom operations. They do not model the exact representative/cache-hit/Warmup warning predicate.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-controlled-zone-corrector.v1",
+  "status": "Genuine Source controlled-zone ThirdOrder corrector; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-corrector-held-Peer-31/manifest.json",
+    "sha256": "1cbe6323dffd4bd9ff614fda19640d2399edf06541fbd694254e8b617dceb951",
+    "bytes": 41094
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-controlled-zone-corrector-Source-review-31-03-02/review.json",
+    "sha256": "eecdee3b60ab1f58efaf89a759016666909be3081632001d54dae73560d842b5",
+    "bytes": 32606
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-corrector-held-Peer-31/complete-final-compiler-Source-plan.json",
+    "sha256": "a470c88d1f37eb13f5b6938292e508e286bd81ce5eed32d8192d1fb557bf3dd0",
+    "bytes": 2630033
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-corrector-B-NOLIMIT-24H-command-Root-31/receipt.json",
+    "sha256": "2aa6261bf82ab53789ce3bfcd3550aa3854e22dadb43d240d5738ddd60e45882",
+    "bytes": 4412
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-corrector-A-24H-command-Root-31/receipt.json",
+    "sha256": "f291e567a5375f71eab0c82342c3bb3e254ea8339ee07d0d44571b9bf6616674",
+    "bytes": 4361
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-zone-corrector-actual-review-31/review.json",
+    "sha256": "070e317a31abeeb22031948e6a4a9b28672794e6fc1396944ecfc667cc61affb",
+    "bytes": 17652
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: positive component ZoneEquip inlet5488",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted30_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-hvac-controlled-node-lifecycle-actual-review-30/review.json",
+      "sha256": "e2ebb413a2ae7e70f9f0e469dd74821991665d7af242192e1ffa97767773f808",
+      "bytes": 18048
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal30": 7,
+    "CSV_files_whole_equal30": 2,
+    "scope": "Proof transfer from accepted30; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-corrector-B-NOLIMIT-24H-Root-31/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither internal numerical Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-corrector-31/evidence.zip",
+    "sha256": "2e008b5a530b4f3f54c59a9689c436d5aa0793314333005aeab58437c3c6e8d2",
+    "bytes": 1697768
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-corrector-31/manifest.json",
+    "sha256": "321e9e9da55eb9fd038f0cf44512293740bf6d0202966f437d094caf38c97849",
+    "bytes": 30311
+  },
+  "archive_entries": 120,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-controlled-zone-corrector-checkpoint-Peer-31.py",
+    "sha256": "d1dca3c043e3c67f4a9240b3e416bc1263aab3208eec4734fbb84ccdfeff1485",
+    "bytes": 12303
+  }
+}
