@@ -12796,6 +12796,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/summary.json",
         "sha256": "83cc962b11e0bd66e32c6cb7b0420910aae837dab2621684d6a17b0373f87efe",
         "size_bytes": 12323
+      },
+      "canonical_compact_schedules_13": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-compact-schedules-13/summary.json",
+        "sha256": "d8f9e7c94b9ab226efa0d9775df0441c0d6fb7f986c943e12c76d05a8df3472f",
+        "size_bytes": 5722
       }
     },
     {

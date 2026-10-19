@@ -1,50 +1,44 @@
-//! Genuine selected Constant Schedule pointer lookup and min/max methods.
-use super::{SelectedScheduleManager, SourceScheduleIndex};
+//! Genuine native Schedule pointer use propagation and selected min/max.
+use super::{SelectedScheduleData, SelectedScheduleManager, SourceScheduleIndex};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 impl SelectedScheduleManager {
-    pub(crate) fn get_source_schedule(&mut self, name: &str) -> Option<SourceScheduleIndex> {
-        let index = *self.schedule_map.get(name)?;
-        let row = self.schedules.get_mut(index.0)?;
+    pub(crate) fn get_source_schedule(&mut self, name: &str) -> Result<Option<SourceScheduleIndex>, E> {
+        let Some(&index) = self.schedule_map.get(name) else { return Ok(None); };
+        let row = self.schedules.get_mut(index.0).ok_or(E::Unavailable("actual Schedule map/index association"))?;
         if !row.is_used {
             row.is_used = true;
+            if matches!(row.data, SelectedScheduleData::Detailed(_)) {
+                // Native2560-2603 propagates used through each actual pointer.
+                for day in 1..=366 {
+                    let SelectedScheduleData::Detailed(detail) = &self.schedules[index.0].data else {
+                        return Err(E::Unavailable("actual GetSchedule Detailed dynamic type"));
+                    };
+                    let Some(week) = detail.week_schedules[day] else { continue; };
+                    let week_row = self.week_schedules.get_mut(week).ok_or(E::Unavailable("actual GetSchedule week pointer"))?;
+                    if week_row.is_used { continue; }
+                    week_row.is_used = true;
+                    for day_type in 1..13 {
+                        let day = self.week_schedules[week].day_schedules[day_type]
+                            .ok_or(E::Unavailable("actual GetSchedule null day dereference"))?;
+                        self.day_schedules.get_mut(day).ok_or(E::Unavailable("actual GetSchedule day pointer"))?.is_used = true;
+                    }
+                }
+            }
         }
-        Some(index)
+        Ok(Some(index))
     }
-    fn source_constant_min_max(&mut self, index: SourceScheduleIndex) -> Result<(f64, f64), E> {
-        let row = self
-            .schedules
-            .get_mut(index.0)
-            .ok_or(E::Unavailable("actual selected Schedule pointer"))?;
-        if !row.is_min_max_set {
-            row.min_value = row.current_value;
-            row.max_value = row.current_value;
-            row.is_min_max_set = true;
-        }
+    fn source_selected_min_max(&mut self, index: SourceScheduleIndex) -> Result<(f64, f64), E> {
+        self.ensure_source_min_max(index)?;
+        let row = self.schedules.get(index.0).ok_or(E::Unavailable("actual selected Schedule pointer"))?;
         Ok((row.min_value, row.max_value))
     }
     pub(crate) fn source_min(&mut self, index: SourceScheduleIndex) -> Result<f64, E> {
-        Ok(self.source_constant_min_max(index)?.0)
+        Ok(self.source_selected_min_max(index)?.0)
     }
     pub(crate) fn source_max(&mut self, index: SourceScheduleIndex) -> Result<f64, E> {
-        Ok(self.source_constant_min_max(index)?.1)
+        Ok(self.source_selected_min_max(index)?.1)
     }
-    pub(crate) fn source_check_min(
-        &mut self,
-        index: SourceScheduleIndex,
-        minimum: f64,
-    ) -> Result<bool, E> {
+    pub(crate) fn source_check_min(&mut self, index: SourceScheduleIndex, minimum: f64) -> Result<bool, E> {
         Ok(f64::from(f32::EPSILON) >= minimum - self.source_min(index)?)
-    }
-    pub(crate) fn source_constant_day_min_max(
-        &self,
-        index: SourceScheduleIndex,
-    ) -> Result<(f64, f64), E> {
-        let row = self
-            .schedules
-            .get(index.0)
-            .ok_or(E::Unavailable("actual Constant day-type schedule pointer"))?;
-        // ScheduleConstant3534-3538 ignores day-group and uses currentVal;
-        // it neither sets isMinMaxSet nor consumes any derived schedule cache.
-        Ok((row.current_value, row.current_value))
     }
 }

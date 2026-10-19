@@ -294,6 +294,7 @@ impl SourceInitializationFiles {
                     )?.hvac_globals,
                     prescan: &reports.output_prescan,
                     environment: &weather.state.environment,
+                    clock: &weather.state.global,
                     gains: &reports.selected_internal_heat_gains,
                     exterior: &session.exterior,
                     schedules: required(

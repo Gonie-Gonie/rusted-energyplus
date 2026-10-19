@@ -1,0 +1,123 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "production_sources": 15,
+  "changed_Rust_sources": 17,
+  "new_test_functions": 1,
+  "Native_paired_input_cohorts": 2,
+  "ticks_per_cohort": 96,
+  "schedules_per_tick": 5,
+  "expected_reported_bit_checks": 960,
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/manifest.json",
+    "sha256": "43b11fd3ee2a2f71c9488d3dd4c4787b1b52e7139524272e1d4b93b36f03a755",
+    "bytes": 67794
+  },
+  "producer_independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-Compact-coherent-producer-Source-review-01/review.json",
+    "sha256": "cbc39c0577c13cca931a104f804c10f66b6fa457727ee4ef9ee2873e04a9ab4f",
+    "bytes": 17292
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/complete-final-compiler-Source-plan.json",
+    "sha256": "987d93621db9510f3f9dd1dd5c1f150262c74df282c184c4b60cec9aacb0871a",
+    "bytes": 2502682
+  },
+  "cohort_independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-Compact-Native-cohort-test-Source-review-01/review.json",
+    "sha256": "3521583432e627b53cc4f02fd971b80a19804b95967d7cf33afd407efa384c58",
+    "bytes": 7603
+  },
+  "Native_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "full_B_or_finite15_completion_claim": false,
+  "gate_changes": false,
+  "scope": "Native aligned No interpolation Compact retained-owner math and current clock lookup. A receives genuine MissingDay0 resize correction; unsupported diagnostics/interpolations and later B equipment are explicitly incomplete.",
+  "compile_fix": {
+    "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/manifest.json",
+    "sha256": "a41d1b8183ab5c8875b34511ff8d844f718870fdd691b428c8caa40abf1c1f2d",
+    "bytes": 11427
+  },
+  "compile_fix_independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-Compact-narrow-compiler-fix-Source-review-01/review.json",
+    "sha256": "0627b3a9813aa0a78f17cf2488ec0fde2c9e04311d99bf3670242f437a7cd287",
+    "bytes": 11939
+  },
+  "initial_failed_check": {
+    "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13/receipt.json",
+    "sha256": "98ddf16ec6f181fac0f21bd6bf7e1b6dabfc48f183ccf34972a083dda133ef59",
+    "bytes": 5525
+  },
+  "initial_check_success_claim": false,
+  "schema": "src06-canonical-compact-schedules.v1",
+  "status": "Genuine Compact retained-owner port, one Native-paired test passed, A24 completed; B remains incomplete at the recorded next operation",
+  "canonical_check": {
+    "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13-02/receipt.json",
+    "sha256": "fc934dbdfe10a203796c14cfec61409ffa0ac2446848150d853d9d650108ca7b",
+    "bytes": 5703
+  },
+  "canonical_test": {
+    "path": ".runtime/porting/SRC-06/canonical-source-compact-native-cohort-Root-13/receipt.json",
+    "sha256": "a7fc46c979de81ed6179c940cd7921fcb95435817e1af2a5c46c31e446565cbc",
+    "bytes": 5868
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-command-Root-13/receipt.json",
+    "sha256": "3144d1544002b39678eda01ff8e3df4612fcc9a1c24bbe011564455e3f7abc59",
+    "bytes": 6465
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-command-Root-13/receipt.json",
+    "sha256": "c16dcdf62c193e0b776a5a677f566aa4e349fcba5f9391db650b7167954090a8",
+    "bytes": 6414
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-compact-actual-review-13/review.json",
+    "sha256": "407afc658f551afd156b9c50b62f18c616a22436d6329d7a0468a64a36327fa0",
+    "bytes": 16002
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: positive nominal controlled Zone lookup",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "Native_paired_cohort_test_passed": true,
+  "reported_bit_checks": 960,
+  "A24_original_tolerance_and_roundtrip_proof_transferred": {
+    "series": 58,
+    "samples": 5352,
+    "unchanged_policy": {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    "accepted12_proof": {
+      "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+      "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+      "bytes": 27122
+    },
+    "physical_files_whole_equal12": 7,
+    "CSV_files_whole_equal12": 2,
+    "table_lines": 19312,
+    "only30_clock_line_changes_versus12": true,
+    "scope": "Reported results proof transfer from accepted12 through exact physical/CSV and exactly two owned-path JSON/runtime bridges; not a Native zero-ULP or internal-state equivalence claim."
+  },
+  "validation_refs": {
+    "path": ".runtime/porting/SRC-06/compact-source-publication-prepared-Audit-13/validation-refs.json",
+    "sha256": "6ebfc5197998dc3f1822a8bedddf6801ec7e61d5225814bc955fc927612741a5",
+    "bytes": 2027
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-compact-schedules-13/evidence.zip",
+    "sha256": "ec0671585bf7f975b1d7d0b79361a7ebb82f54cabddfb74a5587dce11cb9dba1",
+    "bytes": 2034924
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-compact-schedules-13/manifest.json",
+    "sha256": "bd9ca484d797e5eff9610a2c83abe31651dd674a40a8b19ed9a49803c052836d",
+    "bytes": 49877
+  },
+  "archive_entries": 211,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-compact-source-checkpoint-Audit-13-template.py",
+    "sha256": "923ffd5bd999f1e05780db1b469a1aa353d701178198b00f84829b125ac89d2b",
+    "bytes": 12251
+  }
+}

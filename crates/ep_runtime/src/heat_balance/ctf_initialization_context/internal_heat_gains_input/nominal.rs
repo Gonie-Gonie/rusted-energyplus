@@ -122,7 +122,7 @@ impl SelectedInternalHeatGains {
                 // Four original day-type calls, each receiving the SAME schedule.
                 for group in 0..4 {
                     let (minimum, maximum) =
-                        owners.schedules.source_constant_day_min_max(schedule)?;
+                        owners.schedules.source_day_group_min_max(schedule, group)?;
                     write!(owners.eio, "{},", rounded(row.design_level * minimum, 3)?)?;
                     if group == 3 {
                         writeln!(owners.eio, "{}", rounded(row.design_level * maximum, 3)?)?;

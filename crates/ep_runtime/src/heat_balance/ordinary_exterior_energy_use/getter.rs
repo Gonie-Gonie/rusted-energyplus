@@ -57,7 +57,7 @@ impl SourceExteriorEnergyUse {
                     "actual Exterior blank Schedule Name severe155",
                 ));
             }
-            let pointer = o.schedules.get_source_schedule(&o.shortcut.alpha_args[1]);
+            let pointer = o.schedules.get_source_schedule(&o.shortcut.alpha_args[1])?;
             self.light_mut(number)?.schedule = pointer;
             let pointer = pointer.ok_or(Error::Unavailable(
                 "actual Exterior Schedule not-found severe158",

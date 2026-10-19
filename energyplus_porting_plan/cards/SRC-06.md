@@ -419,3 +419,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source B 입력·출력 형식·보고값 비교 검증](../evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/summary.json). B 입력의 실제 값·확장 필드·선언 순서·양수 개수를 같은 InputProcessor에 보존하고, 실제 초기화의 Schedule:Compact 미구현 경계까지 진행했습니다. B 실행은 exit6으로 명시적으로 중단하며 완료 처리하지 않습니다. RDD/MDD는 원래 출력 시점에 Native와 같은 Windows 줄바꿈을 사용합니다. 같은 새 코어의 A-24H는 종료·내보내기에 성공했고 5,352개 값의 기존 전체 증명과 일치합니다. 이전 Source11의 A-72H 16,056개·연간 1,953,480개 보고값은 원래 허용오차·계열별 RMSE 실패가 모두 0입니다. 공개 스트림 비교 도구는 같은 알고리즘을 유지하며 A-72H 대조로 확인했습니다. 연간 비교는 반복하지 않았습니다. 숫자 차이와 정책 메타데이터의 기존 한계를 보존하며, 내부 비트 동일성·B 및 전체 15사례·카드 게이트 완료를 주장하지 않습니다. A14/54·B14/64는 유지합니다.
+
+
+[Source Compact 스케줄 검증](../evidence/SRC-06-canonical-compact-schedules-13/summary.json). 무보간 Compact의 분별 값·타임스텝 합계·최솟값/최댓값·현재 시계 조회를 Native 순서로 연결했습니다. 단일 테스트에서 기본 입력과 빈 시각(:15) 변형의 96×5×2개 스케줄 값이 Native와 비트 단위로 일치했고, A-24H 종료·내보내기와 기존 5,352개 보고값 검증도 유지했습니다. B는 Compact 처리를 마친 뒤 GetHeatBalanceInput의 제어 대상 Zone 조회에서 중단합니다. 추가 보간·진단 분기와 후속 B 장비 포팅은 남아 있으며 A14/54·B14/64 게이트는 유지합니다.

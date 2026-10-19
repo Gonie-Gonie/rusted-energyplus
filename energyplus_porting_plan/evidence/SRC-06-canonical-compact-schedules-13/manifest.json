@@ -1,0 +1,1067 @@
+{
+  "schema": "src06-canonical13-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-compact-schedules-13/evidence.zip",
+    "sha256": "ec0671585bf7f975b1d7d0b79361a7ebb82f54cabddfb74a5587dce11cb9dba1",
+    "bytes": 2034924
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "bytes": 122929
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InternalHeatGains.cc",
+      "sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+      "bytes": 536516
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+      "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+      "bytes": 187792
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+      "bytes": 23158
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+      "bytes": 490422
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/milo/dtoa.h",
+      "sha256": "2960c73ab30ce81e3a0182a0a47fb6cb3eb3faf800363e26d803fcb21e13d54c",
+      "bytes": 8504
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/milo/itoa.h",
+      "sha256": "9fcef5d24f05a04eac3eebaa7ca7d1a08fa848ba7b2285dd9bb38d424aa2a4ab",
+      "bytes": 10015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-Compact-coherent-producer-Source-review-01/review.json",
+      "sha256": "cbc39c0577c13cca931a104f804c10f66b6fa457727ee4ef9ee2873e04a9ab4f",
+      "bytes": 17292
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Native-B-compact-empty-HH-input-Root-13/input.idf",
+      "sha256": "6c6a504b92f8bf865dc4348e7ef52a7ab9137669ccf07ad2d3ab3dbe9fe560c2",
+      "bytes": 13023
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Native-B-compact-empty-HH-reference-Root-13/reference.json",
+      "sha256": "99be7fa71e1f5a8fbcd4b55a02bfb10c8d1a102c60bc15f6072c5ab9ea3a7f37",
+      "bytes": 67750
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Native-B-compact-schedule-reference-Root-13/reference.json",
+      "sha256": "999ecaaf89fb0484a74704075ad7455a713d3e63d2fb7e29bec9ec85cbc38fa5",
+      "bytes": 67200
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-Compact-Native-cohort-test-Source-review-01/review.json",
+      "sha256": "3521583432e627b53cc4f02fd971b80a19804b95967d7cf33afd407efa384c58",
+      "bytes": 7603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-Compact-narrow-compiler-fix-Source-review-01/review.json",
+      "sha256": "0627b3a9813aa0a78f17cf2488ec0fde2c9e04311d99bf3670242f437a7cd287",
+      "bytes": 11939
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-Native-Compact-two-case-reference-provenance-review-01/review.json",
+      "sha256": "f0d0ade036ec223e6415ac0b3c09fb87ddda870cba73ca01c1c9c19e8f6dd0e1",
+      "bytes": 15836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+      "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+      "bytes": 27122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-compact-actual-review-13/review.json",
+      "sha256": "407afc658f551afd156b9c50b62f18c616a22436d6329d7a0468a64a36327fa0",
+      "bytes": 16002
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-compact-actual-review-13/table-clock-differences.json",
+      "sha256": "37241afd998b36d72aead3643d3dd2e51f3819860b8aafe3e35aeeb2fd234bf8",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-compact-application-13/receipt.json",
+      "sha256": "fa1937bbc5c6251a63ffed1c2b8cee0bea756928f0398842d9e9a8014e9eeaa3",
+      "bytes": 1242
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-compact-compile-fix-application-13/receipt.json",
+      "sha256": "b3989555ca558e32491ef4c59ec0cb3a5301a1c1ab98ded67fbe47efc63b9ed6",
+      "bytes": 691
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-compact-preflight-13/review.json",
+      "sha256": "9c6221bf1988c23580228d7254def8507f72d229fed33bcf23cc69a0c7123e10",
+      "bytes": 1720
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-compact-native-cohort-Audit-01.py",
+      "sha256": "81f380f4559882ea862e6c14ebb70de978993fa189bf3801a72d0a5f63116e2e",
+      "bytes": 22270
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-source-compact-schedules-Outer-01.py",
+      "sha256": "3f78f416f5c80bb3cb607dd5eb64de5b9991eb673ff3131ec0fcc8a3d8304676",
+      "bytes": 13976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-B-raw-IO-B-NOLIMIT-24H-Root-12/output/input/converted.epJSON",
+      "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+      "bytes": 37726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/diagnostics.json",
+      "sha256": "d9862d45eda5a4313d8bc4803da41f28d723dadbb43231cb9814a89ddb6c3a92",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplustbl.htm",
+      "sha256": "38f9f8ff1e4a12e54fe97134569be9b061d50e978bb344fe6302f7974581bc99",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/eplustbl.xml",
+      "sha256": "7efb3fe04f0460a5b7edbc524f9bce5199977f9f976637cf329e5b74835c09a4",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/results/source-reported-results.json",
+      "sha256": "34a2bb01119187a46352816b39bc8f93a6f441fe31785748df5b988329dc61af",
+      "bytes": 1679892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-Root-13/output/run-summary.json",
+      "sha256": "e6ebe2da41df4ffac5459d2f4ef6457808d96080b0ea911e9683fb19d4e1f3c3",
+      "bytes": 32331
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-command-Root-13/receipt.json",
+      "sha256": "c16dcdf62c193e0b776a5a677f566aa4e349fcba5f9391db650b7167954090a8",
+      "bytes": 6414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-command-Root-13/stderr.log",
+      "sha256": "c1588b423977a3003a23d05a6061fdc15d61fc95c021c779910c1799dc12967b",
+      "bytes": 740
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-A-24H-command-Root-13/stdout.log",
+      "sha256": "6022c14bdf116b25f0ecc9fb5986dc823ee53af2987d4f5d5152f4a8567aa1b8",
+      "bytes": 348230
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-Root-13/output/diagnostics.json",
+      "sha256": "3ff26b92ea51afebe311eeeba6bfa3efc88659083324752cf43824a4534dd0f0",
+      "bytes": 2973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-Root-13/output/run-summary.json",
+      "sha256": "c261211c778919733b50ec5df19bcab0efa2f455690cb70c7494dc7913192381",
+      "bytes": 24937
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-command-Root-13/receipt.json",
+      "sha256": "3144d1544002b39678eda01ff8e3df4612fcc9a1c24bbe011564455e3f7abc59",
+      "bytes": 6465
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-command-Root-13/stderr.log",
+      "sha256": "cba839f61b2ab23fd870602e875f830fb4d2b99a68ffd35eaa2cf870d69fe061",
+      "bytes": 10665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-B-NOLIMIT-24H-command-Root-13/stdout.log",
+      "sha256": "f228e813a33a2f2c88811c2bcce37c96475e2d50386e6ca7b51696562bab1561",
+      "bytes": 348265
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13-02/receipt.json",
+      "sha256": "fc934dbdfe10a203796c14cfec61409ffa0ac2446848150d853d9d650108ca7b",
+      "bytes": 5703
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13-02/stderr.log",
+      "sha256": "8ce5bbf1a22e3468ae72167548d7906ad4343573acaaf8c764cf798ab603fd27",
+      "bytes": 51232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13/receipt.json",
+      "sha256": "98ddf16ec6f181fac0f21bd6bf7e1b6dabfc48f183ccf34972a083dda133ef59",
+      "bytes": 5525
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13/stderr.log",
+      "sha256": "4f691e61d0dac48aba7d3a405822a72fc600fd1de7a711f224946b3f335e704f",
+      "bytes": 18142
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-all-targets-Root-13/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-native-cohort-Root-13/receipt.json",
+      "sha256": "a7fc46c979de81ed6179c940cd7921fcb95435817e1af2a5c46c31e446565cbc",
+      "bytes": 5868
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-native-cohort-Root-13/stderr.log",
+      "sha256": "b72a6708cea8d0018ca8d130a0a12242db9c9d4b70c4da5d3a82270f4171d900",
+      "bytes": 50228
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-compact-native-cohort-Root-13/stdout.log",
+      "sha256": "2727d1bb90dec139dfbac716ad14261ddc2d8662cccd06f945bd93d78b201790",
+      "bytes": 257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compact-source-publication-prepared-Audit-13/publication-template.json",
+      "sha256": "97eb84092b6530e2efb77ec1b8fdedb3bb8fe907d146712ad1b0545ab61e2526",
+      "bytes": 44305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compact-source-publication-prepared-Audit-13/validation-refs.json",
+      "sha256": "6ebfc5197998dc3f1822a8bedddf6801ec7e61d5225814bc955fc927612741a5",
+      "bytes": 2027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.eso",
+      "sha256": "98e8547cb1791ac901d2ff5b73b28262b37e0556a81c67b941b03bae16d26e8f",
+      "bytes": 202704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/receipt.json",
+      "sha256": "5e4c9f0ad0ca63bd3ba1a03e41373cbebf350a9d606071e6745dedbd4f794f2b",
+      "bytes": 4807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/stdout.log",
+      "sha256": "23e64c8a198370022137578a93a4ac76cbc98b4af1afce65d7eefbdb4b157286",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-compact-empty-HH-Root-13/output/energyplusout.eso",
+      "sha256": "58463f4d6aeec354c9920965f59b1a75010da5ab634120e58bcee6660cf20663",
+      "bytes": 203859
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-compact-empty-HH-command-Root-13/receipt.json",
+      "sha256": "bea9aa6c5a6ff05340c619487a8cd34491f15c23e80a451e97793286e5c49c14",
+      "bytes": 3224
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-compact-empty-HH-command-Root-13/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-compact-empty-HH-command-Root-13/stdout.log",
+      "sha256": "1933db1b1411fead58ca9d8da535e27243ea851075537de74e715b946e7e4a2e",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-compact-source-publication-Audit-13.py",
+      "sha256": "77a61b977c609a20369b7c7696209b8126f31d0aa6ef931670e4342ddcbd1f39",
+      "bytes": 8152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-source-compact-compile-fix-Root-13.py",
+      "sha256": "40edfc5cb38e85819d55cdebb53b3a585f537dcbb6e08fd359382e41c1ec1766",
+      "bytes": 5174
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-compact-source-checkpoint-Audit-13-template.py",
+      "sha256": "923ffd5bd999f1e05780db1b469a1aa353d701178198b00f84829b125ac89d2b",
+      "bytes": 12251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-compact-schedules-Source-Audit-01.py",
+      "sha256": "add1049ebc705d73bde7d7b6ee53ccd0b8c6735e2bc38b33642e538dba78bd93",
+      "bytes": 16394
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-source-compact-schedules-Outer-01.py",
+      "sha256": "300a5e006cfbd7dd18b4f3f81ea5ca4ff2d4d1d259d0a64c5da810e401cf1d3c",
+      "bytes": 14275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/before/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "e8116c828b3377142002fb119ee0e59652e1b02390dc41b448d639be9f95c4f7",
+      "bytes": 34322
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "0927f775a3cdba306271ae731b4cee8d9bad5bb5184cc3fc4318d7fcc24eb3be",
+      "bytes": 47758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "sha256": "3c10427431acdea85ecc153c9bb3613a660d630f33301113751bf80415fcb276",
+      "bytes": 17892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "1b4171b66530815b7b36f39f9a574a60d779343d001d4291dcbcfaf7e4e6799f",
+      "bytes": 21802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/complete-final-compiler-Source-plan.json",
+      "sha256": "987d93621db9510f3f9dd1dd5c1f150262c74df282c184c4b60cec9aacb0871a",
+      "bytes": 2502682
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/01-forward_diff.diff",
+      "sha256": "34a2280caec4cfb1935cb7aad6159abcc57cc71e38a10addd6fff6957d846eb4",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/01-inverse_diff.diff",
+      "sha256": "6c6993bd259b5f353ca022aa14ef686d3c36b375c74fb9021d759653885728a6",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/02-forward_diff.diff",
+      "sha256": "7dd299d211f317a03d6f873738584c00175cd4d545a9bceb095de4b2ca6ee905",
+      "bytes": 564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/02-inverse_diff.diff",
+      "sha256": "02b88af2ac249821943b2034fbd27fe777194a5802722618fa0c8f7a35a32b74",
+      "bytes": 564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/03-forward_diff.diff",
+      "sha256": "fbb26c921b17e8d6c6cf7be1d30c8f314161e79fa838ac13948f81c140ded9c4",
+      "bytes": 589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/03-inverse_diff.diff",
+      "sha256": "3ddca25c234eb5091cb7c83b22a8a87374d87211852462013dc7e83e800bc6c0",
+      "bytes": 589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/04-forward_diff.diff",
+      "sha256": "41492327ea6cef031f24ee57ff82d09cea74806822c35586eeea900cc3b887fc",
+      "bytes": 688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/diffs/04-inverse_diff.diff",
+      "sha256": "0978a2dac9fc246dccb233393d38f3d3c68c863d0042505d761f592d16b158c6",
+      "bytes": 688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/manifest.json",
+      "sha256": "a41d1b8183ab5c8875b34511ff8d844f718870fdd691b428c8caa40abf1c1f2d",
+      "bytes": 11427
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "54abfa214e09150e425cb705bab4ae767b5c9647ec0c2e01accb664576920149",
+      "bytes": 34372
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "bytes": 47825
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "sha256": "5168e5a3a22e105083bf779b8cca489a7bfe2f0948003727e28f339c38256551",
+      "bytes": 17786
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-compile-fix-held-Root-13/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "1e15d36a020a3bc78e30d03f9c5d336adbdc1f572f6a4799429dac41826e74b9",
+      "bytes": 21851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-native-cohort-held-Audit-01/manifest.json",
+      "sha256": "c51df39cefb11bf96157ad1ad2f0d1b5820dc64058ec6ae795a0ed7fd5d3edf2",
+      "bytes": 9024
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/InputProcessing_InputProcessor.cc-789-839.txt",
+      "sha256": "de2f3bbbdfca2958a18997c78407896d3d73334f344b0f636ddb435ac2e7b47c",
+      "bytes": 2491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/InternalHeatGains.cc-3168-3194.txt",
+      "sha256": "d10f0d932fac2818090efbbf2ea06a7e80f2c7e9dababc4729d1bb8f5fd3b06b",
+      "bytes": 1486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-106-169.txt",
+      "sha256": "0ea05653490d6ca303b4d243d9e0434a2dde2b26a9ec049b5ebc1330edc1ca8c",
+      "bytes": 4750
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-1268-1521.txt",
+      "sha256": "0202f42a941206473f6935929b4fd86e91bcf24a7d98d8307a88265f04021261",
+      "bytes": 12542
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-1959-2003.txt",
+      "sha256": "c2a00ddf1193f4cc4bbc6f7d24888a1306e4a95dc7ccca6f9960cda264a1524e",
+      "bytes": 2257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-211-328.txt",
+      "sha256": "76d71dbe41a2168083a273da38d7cb73c8db2a76742174acf1fc287fb0f81635",
+      "bytes": 5019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-2193-2264.txt",
+      "sha256": "140a97d99e609eccd8747520c63353a64e05d86210f8379e67185356caae5a66",
+      "bytes": 3335
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-2459-2603.txt",
+      "sha256": "6d1611925388288e3dc09a18fc20776d61c597a3f95e0acf35690ed0413699e8",
+      "bytes": 5645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-2670-2704.txt",
+      "sha256": "3416e64e0558aa8da6bdbd89b6217e07d59589519cac2781cf3e6bae3ddf641f",
+      "bytes": 1472
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-2733-2961.txt",
+      "sha256": "8c69d2e5f9a27c90b8131b98f8938533e1bcb93161fd0cfa8980e131071e6f30",
+      "bytes": 11390
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-2963-3073.txt",
+      "sha256": "cbba239e6f02be8ff78777d1808347498838e19ed9fe190498b0ed71465e0c06",
+      "bytes": 5528
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3075-3249.txt",
+      "sha256": "f97852fc74c5799d2522f151c3aae8846df430de8ce7f008d76d36ce7ed6ead7",
+      "bytes": 6414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3251-3346.txt",
+      "sha256": "0311c291374f6fbbd70adbec5ea2535854dfa872cbaefb2fa8e47e20064aa4c0",
+      "bytes": 2836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3369-3414.txt",
+      "sha256": "622e226e2907ad90c1c85024589ce8a7a2490722c94467bcd71475d28337b2e4",
+      "bytes": 2019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3433-3532.txt",
+      "sha256": "4b3bf38064836b79382568d296662113996180fa1335f1ce6539027cc0768488",
+      "bytes": 3958
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3534-3643.txt",
+      "sha256": "36184109a1ccd912a104122f59a6ab55de322e4e4e461851e317e12df9ef8902",
+      "bytes": 5100
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-3743-3859.txt",
+      "sha256": "4aae629878da7f158ffa690328231e079c351cad6efee43a76f60acb14e34873",
+      "bytes": 5087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.cc-409-557.txt",
+      "sha256": "ad0d8a7c988d188f72ca80e857ce45fbc71718232bb21b3acb03e670cfd2fdfd",
+      "bytes": 7476
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.hh-165-359.txt",
+      "sha256": "1277576bf4766d9ee0da7648258168ea70b7857f1885e199433e3e170e18dffa",
+      "bytes": 8084
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.hh-493-513.txt",
+      "sha256": "bab672b9e244d207f008326b92f0bf59c7f67732cb35a4d33fcc8cbcda9205ad",
+      "bytes": 934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/ScheduleManager.hh-72-143.txt",
+      "sha256": "ab3650f451029a45585ae6da6ae10b04d6f9eb7af8719ce0209003096e612ec5",
+      "bytes": 2010
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedule-owner-plan-Outer-01/Native/WeatherManager.cc-2058-2082.txt",
+      "sha256": "61d0020020069b77716345490d8e58ddd8487107ab5be32fdfb588f14c99632b",
+      "bytes": 1439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-draft-Outer-01/parent/crates/ep_run/src/ordinary_schedule_input.rs",
+      "sha256": "e0109071d40bcd64a8b0e26fa337016b15c5929f60b98d5ae20cf8f56da50691",
+      "bytes": 3654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-draft-Outer-01/parent/crates/ep_runtime/src/heat_balance/selected_input_processor.rs",
+      "sha256": "38c2a3279465d8401bd8413a1a1709949d07194c5639acd1786222892286be72",
+      "bytes": 13196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-draft-Outer-01/parent/crates/ep_runtime/src/heat_balance/selected_input_processor/input_statistics.rs",
+      "sha256": "d2f1e2ceba580466523b0b044b9bc6590cc37a2dada781a3ff9289fac124c83f",
+      "bytes": 11065
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-draft-Outer-01/parent/crates/ep_runtime/src/heat_balance/source_output_registration/milo_dtoa.rs",
+      "sha256": "21481b96d81177793fe3ae23d96486f09819f1b23372073d36ddd552fb180542",
+      "bytes": 10901
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-draft-Outer-01/parent/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "7d001ab994ef9b61c560cb40d996f66f8f8194bd2e9bcc02c1ea16ccf4ca14c3",
+      "bytes": 28294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/Constant-and-A-representation-proof.json",
+      "sha256": "3840acb48ec61bb8cde9802b5124738bd850d49874d56748bfe2c9e863e47205",
+      "bytes": 2396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "sha256": "8c7496075e3c8434fc416f76c47567f6013b620e5891661710436965873a7e1c",
+      "bytes": 19470
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/nominal.rs",
+      "sha256": "8dec7bc5daaad8108c9ea493685b154a513a984d6bfe819230d3a31c488fe37c",
+      "bytes": 6724
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use/getter.rs",
+      "sha256": "0c4bfaaf160a883f1bb23be2147ab8f23bd90f3e469d38f64ba48c66d8f2a5a9",
+      "bytes": 7146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "febed0503958cd7aafd85f493729447b9bf00fa8115145bdd9e52061f74a0085",
+      "bytes": 7701
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "29258a9d632dbc53013a3b7d34a5874e4de52c589d01b51d3dcebc7fdd9af54b",
+      "bytes": 47567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "4209a3b466d8dd6d26b3739a9d8b024c1799fa0f903ed6f060e2d6d40cd77120",
+      "bytes": 17554
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/accessors.rs",
+      "sha256": "368ed7dd8a60afbe30266394b1d630663890d1a8ec3ffe275c7ded1eb16d5f99",
+      "bytes": 2018
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "0653bcf88f106628cf57d78691c175d80a72da5ebfa86789f52687cd80c59b5f",
+      "bytes": 2334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact_native_tests.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/day_group.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/detailed.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/fixtures/compact_native_b.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/report.rs",
+      "sha256": "1b80a9971c7db98b5c7a4e35655254d9f3c4206a1b8dbd2a689fc248722ef477",
+      "bytes": 4285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "904966e45c4b9392d08d6128c728305abfe05124d830d054ef595493b02b8a8e",
+      "bytes": 21596
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/before/crates/ep_runtime/src/weather_day/source_current_weather.rs",
+      "sha256": "9a2cbce403d3374f0261143447e7fcfe1af66b0fc6c8900d91735ae8455e172e",
+      "bytes": 13396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/01-forward_diff.diff",
+      "sha256": "79b213245428dbc3e563d2241ba21ca10489776d449fbec3deac0ed1be2eb52a",
+      "bytes": 763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/01-inverse_diff.diff",
+      "sha256": "32376d15ff3da4094ffb8ae2b316ce2f2d914b5e4cc240157973c206c293a10b",
+      "bytes": 763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/02-forward_diff.diff",
+      "sha256": "5a9a00e252b028320980c6dc16eda32fb3bb5c87ca3c3f88b7d27480bcc112ed",
+      "bytes": 799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/02-inverse_diff.diff",
+      "sha256": "9b26eed46ff1830f259253ab9ea187fe006b9eeee021dd1a0cc677cc2d319a4e",
+      "bytes": 799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/03-forward_diff.diff",
+      "sha256": "1f016a885df5140e21c14e9365cb65ed8d7cd0f5ae7de59feb5b80980eddc8cc",
+      "bytes": 654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/03-inverse_diff.diff",
+      "sha256": "01bc5432d0534ade6580bb5604ae9d7a0f65bd01eefdc411dbdbfefd24116211",
+      "bytes": 654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/04-forward_diff.diff",
+      "sha256": "876485bb608849bd763267c3301b168a4f87d3e78af104c49e9f31c2aebbecd1",
+      "bytes": 464
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/04-inverse_diff.diff",
+      "sha256": "72b01b5b25e7e7e9067e1bb2378995247f8ac856b0d01af0e59a10c470c13935",
+      "bytes": 464
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/05-forward_diff.diff",
+      "sha256": "a9622befc1caf047b8674d1ba140cd7f826a9d781ace09a257f5915cd6e63c72",
+      "bytes": 1005
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/05-inverse_diff.diff",
+      "sha256": "bd8b063056351c8abbb0768c8c414976344e72adfe6b158cbb615230d7a3a9bd",
+      "bytes": 1005
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/06-forward_diff.diff",
+      "sha256": "5c0763b55a1194a90250ac29262f86c8a4e051695b6637ceb531e6b77437232a",
+      "bytes": 4353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/06-inverse_diff.diff",
+      "sha256": "f83dbdc518494265c80f3f8f0af3592c12542e9814341e7df505bc85b147a920",
+      "bytes": 4353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/07-forward_diff.diff",
+      "sha256": "566dcb086bccfb9b342aa2495cab7526d5a0652c54b17833326b52b05b54ecc6",
+      "bytes": 7739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/07-inverse_diff.diff",
+      "sha256": "d5500ba15bc13cf99d609f49269f37136da1d42fee4660e3c0f4bf913cd8e974",
+      "bytes": 7739
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/08-forward_diff.diff",
+      "sha256": "c2f2d1410509db25880dc4f20bab8bed4aebc57bcb2cd9d5fc8c9b91fe159472",
+      "bytes": 18390
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/08-inverse_diff.diff",
+      "sha256": "54457b29971d751c4d41bc7221cec1d2724377ff7380e0472dfc88f95d3b0bce",
+      "bytes": 18390
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/09-forward_diff.diff",
+      "sha256": "1f949257d858e34be9fffc2bb356f25a921396d1d9145b8db220fd13d3ad3cd4",
+      "bytes": 11398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/09-inverse_diff.diff",
+      "sha256": "8ac088c0f7dac7e12163597f71999403d1ded0b72c65ccf254bf212844b5be29",
+      "bytes": 11398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/10-forward_diff.diff",
+      "sha256": "dbeb27c030af4a83fd96ee43a4f6444d77f9ab1b594104ab2cb3ec7f8c5cb397",
+      "bytes": 6758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/10-inverse_diff.diff",
+      "sha256": "e6b3cadd6b8fcfe839f9fb0f7a78c42bb841fecf5754462990f4df03d16aa7df",
+      "bytes": 6758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/11-forward_diff.diff",
+      "sha256": "a026f9e565c7f4319e2046599c56d9715b6ce9f1c09a17dcef7be58afd543c83",
+      "bytes": 9022
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/11-inverse_diff.diff",
+      "sha256": "e47de1f7e2a7cac8076e47573899aece7693f26cae92b15664557c02a0b681ce",
+      "bytes": 9022
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/12-forward_diff.diff",
+      "sha256": "999b027f3d4a1e7e7738f391567c101d0bd81b62c9c78f0dd318ad28f47191b9",
+      "bytes": 23841
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/12-inverse_diff.diff",
+      "sha256": "eacf273f3b1286ed40520f1272d4459c31eacbd3aa26dfa778b6e45a08272b2d",
+      "bytes": 23841
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/13-forward_diff.diff",
+      "sha256": "3e13e7d0181af14a145c810f761fdfd2658b9d0a59675ab3609fdf662d86d434",
+      "bytes": 2545
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/13-inverse_diff.diff",
+      "sha256": "1ab4381b56531bde049c65afe12bfdeb33369fe8a532a6b260acc42dd77055c6",
+      "bytes": 2545
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/14-forward_diff.diff",
+      "sha256": "b13af0f9c70999862bc69fdf505172fb887e800d4294dba7641d3ae2b7106136",
+      "bytes": 11654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/14-inverse_diff.diff",
+      "sha256": "ae59bb0f104628a077df5b52070fbaa571802f9e5cb6b855029eaa9d276db7ac",
+      "bytes": 11654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/15-forward_diff.diff",
+      "sha256": "3e5ca1955c0aa6ca5e055ba0626a214ab75a2c693e376c24c837f5ba60617aae",
+      "bytes": 510
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/15-inverse_diff.diff",
+      "sha256": "3d12ffc2a88b794240dbae61f158c953697cb93dd00601cd005ae1324d576d72",
+      "bytes": 510
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/16-forward_diff.diff",
+      "sha256": "f0f6a3c0d20849d62a2bef9fc3d97b195f7f2764888576caada77cc8bf82e4f2",
+      "bytes": 504
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/diffs/16-inverse_diff.diff",
+      "sha256": "cc0ee7370dc25aebeb3310de1f4730a3d65baa17de6057440198b453559084b4",
+      "bytes": 504
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/integration-contract.json",
+      "sha256": "805f8740783598b1308edd95d1ac5fb4fcd426580b14e1062c14df17a3763dad",
+      "bytes": 3332
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/manifest.json",
+      "sha256": "43b11fd3ee2a2f71c9488d3dd4c4787b1b52e7139524272e1d4b93b36f03a755",
+      "bytes": 67794
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "bytes": 19471
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/nominal.rs",
+      "sha256": "47679f799d3ba4a77390242f3abde528f3ee2888e8f81ada7902c1f7bc28e6b7",
+      "bytes": 6728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use/getter.rs",
+      "sha256": "14277df4691cc81118498f7c4ca31f7cbd4a156f023c4f82f425999fac68b514",
+      "bytes": 7147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "ed55993527e5dc69343e35062afd2fc8b534086958647ba53ee0f3e3e2cc0bf8",
+      "bytes": 7757
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "0927f775a3cdba306271ae731b4cee8d9bad5bb5184cc3fc4318d7fcc24eb3be",
+      "bytes": 47758
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "b6cee3339304527e17cbc7a3559c8aad9c8943fd105956d879325290799fb568",
+      "bytes": 20658
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/accessors.rs",
+      "sha256": "3d4b19742ead65c6c37788a9dba876842e9fafc1202eeeffba64cce7190cf39d",
+      "bytes": 2571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "a2d41216feef61fb1e36e8ea29e76131c9c842287c2711212931bf522a369103",
+      "bytes": 6103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "sha256": "3c10427431acdea85ecc153c9bb3613a660d630f33301113751bf80415fcb276",
+      "bytes": 17892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact_native_tests.rs",
+      "sha256": "e5c4048d6f87d048520870d7a8fcdb11369bab5b6f8a9ed58c36679ccf350fa0",
+      "bytes": 10965
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/day_group.rs",
+      "sha256": "0d776d03f0bd1c7a0a93133f80f273f0912a4c03032c181fdef696eb882bc83e",
+      "bytes": 6448
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/detailed.rs",
+      "sha256": "799fe55951153431f8c07f3d4abb3ebe10c1baecd0828dfde29b81b33c10bf49",
+      "bytes": 8698
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/fixtures/compact_native_b.rs",
+      "sha256": "7ed3c2289e6eeb9a6c6fbc396b93eab6c744142f1e4258cb8f1ce40a4fbe94cb",
+      "bytes": 23619
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/report.rs",
+      "sha256": "9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "bytes": 4404
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "1b4171b66530815b7b36f39f9a574a60d779343d001d4291dcbcfaf7e4e6799f",
+      "bytes": 21802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-compact-schedules-held-Outer-01/proposed/crates/ep_runtime/src/weather_day/source_current_weather.rs",
+      "sha256": "6d8c8a7a99de5ea33a39cd528e4ac5e0b08f6548fc620804ed173ae9caa9ecc8",
+      "bytes": 13429
+    },
+    {
+      "path": ".runtime/porting/source-objects/b3/b34051786751a102fe12cd169a1e7d81fc2c27d024a1bb4263cce86c435c755b",
+      "sha256": "b34051786751a102fe12cd169a1e7d81fc2c27d024a1bb4263cce86c435c755b",
+      "bytes": 1837310
+    },
+    {
+      "path": ".runtime/porting/source-objects/ee/eea183ce2320d8817694cc8c77f5130f0e4e49c18f5a03e5c8498658e46f6430",
+      "sha256": "eea183ce2320d8817694cc8c77f5130f0e4e49c18f5a03e5c8498658e46f6430",
+      "bytes": 1837310
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "345701a9b38d4b680021d22a854589a7a8cffab4435add41653aaac4bb1ca46a",
+      "bytes": 48349
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "de5ee972be7b3c75bf9100bc0d860626fd172fa636b2202b89c8d395374f764d",
+      "bytes": 16989
+    },
+    {
+      "path": "crates/ep_run/src/ordinary_input_processor/schema.rs",
+      "sha256": "8e7fcff4af20454825fd83ba08560f1c45b520128188de7f8f491c4d7536f560",
+      "bytes": 12601
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "bytes": 19471
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/nominal.rs",
+      "sha256": "47679f799d3ba4a77390242f3abde528f3ee2888e8f81ada7902c1f7bc28e6b7",
+      "bytes": 6728
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_exterior_energy_use/getter.rs",
+      "sha256": "14277df4691cc81118498f7c4ca31f7cbd4a156f023c4f82f425999fac68b514",
+      "bytes": 7147
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "ed55993527e5dc69343e35062afd2fc8b534086958647ba53ee0f3e3e2cc0bf8",
+      "bytes": 7757
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "54abfa214e09150e425cb705bab4ae767b5c9647ec0c2e01accb664576920149",
+      "bytes": 34372
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "bytes": 47825
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "sha256": "b6cee3339304527e17cbc7a3559c8aad9c8943fd105956d879325290799fb568",
+      "bytes": 20658
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/accessors.rs",
+      "sha256": "3d4b19742ead65c6c37788a9dba876842e9fafc1202eeeffba64cce7190cf39d",
+      "bytes": 2571
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/annual.rs",
+      "sha256": "a2d41216feef61fb1e36e8ea29e76131c9c842287c2711212931bf522a369103",
+      "bytes": 6103
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "sha256": "5168e5a3a22e105083bf779b8cca489a7bfe2f0948003727e28f339c38256551",
+      "bytes": 17786
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact_native_tests.rs",
+      "sha256": "e5c4048d6f87d048520870d7a8fcdb11369bab5b6f8a9ed58c36679ccf350fa0",
+      "bytes": 10965
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/day_group.rs",
+      "sha256": "0d776d03f0bd1c7a0a93133f80f273f0912a4c03032c181fdef696eb882bc83e",
+      "bytes": 6448
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/detailed.rs",
+      "sha256": "799fe55951153431f8c07f3d4abb3ebe10c1baecd0828dfde29b81b33c10bf49",
+      "bytes": 8698
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/fixtures/compact_native_b.rs",
+      "sha256": "7ed3c2289e6eeb9a6c6fbc396b93eab6c744142f1e4258cb8f1ce40a4fbe94cb",
+      "bytes": 23619
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/report.rs",
+      "sha256": "9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "bytes": 4404
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "1e15d36a020a3bc78e30d03f9c5d336adbdc1f572f6a4799429dac41826e74b9",
+      "bytes": 21851
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/source_current_weather.rs",
+      "sha256": "6d8c8a7a99de5ea33a39cd528e4ac5e0b08f6548fc620804ed173ae9caa9ecc8",
+      "bytes": 13429
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/summary.json",
+      "sha256": "83cc962b11e0bd66e32c6cb7b0420910aae837dab2621684d6a17b0373f87efe",
+      "bytes": 12323
+    }
+  ],
+  "scope": "One direct Compact proposal plus narrow compiler correction,17finalSources/peer/finalplan, exact Native-paired cohort custody and actual four receipts/Root accepted readback. Initial101check is retained without a success claim. No historical ZIP recursion, annual JSON/CSV or full transitive rebuild archive claim.",
+  "full_transitive_rebuild_archive_claim": false
+}

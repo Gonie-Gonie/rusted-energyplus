@@ -306,7 +306,7 @@ impl SelectedInternalHeatGains {
             )?;
             local.alpha_args[..6].clone_from_slice(&values.alphas);
             local.numeric_args[..7].copy_from_slice(&values.numbers);
-            let schedule = owners.schedules.get_source_schedule(&values.alphas[3]);
+            let schedule = owners.schedules.get_source_schedule(&values.alphas[3])?;
             let invalid_schedule = if local.alpha_field_blanks[3] {
                 Some(format!("{} cannot be empty.", local.alpha_field_names[3]))
             } else if schedule.is_none() {

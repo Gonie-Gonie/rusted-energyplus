@@ -107,3 +107,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source B 입력·출력 형식·보고값 비교 검증](evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/summary.json). B 입력의 실제 값·확장 필드·선언 순서·양수 개수를 같은 InputProcessor에 보존하고, 실제 초기화의 Schedule:Compact 미구현 경계까지 진행했습니다. B 실행은 exit6으로 명시적으로 중단하며 완료 처리하지 않습니다. RDD/MDD는 원래 출력 시점에 Native와 같은 Windows 줄바꿈을 사용합니다. 같은 새 코어의 A-24H는 종료·내보내기에 성공했고 5,352개 값의 기존 전체 증명과 일치합니다. 이전 Source11의 A-72H 16,056개·연간 1,953,480개 보고값은 원래 허용오차·계열별 RMSE 실패가 모두 0입니다. 공개 스트림 비교 도구는 같은 알고리즘을 유지하며 A-72H 대조로 확인했습니다. 연간 비교는 반복하지 않았습니다. 숫자 차이와 정책 메타데이터의 기존 한계를 보존하며, 내부 비트 동일성·B 및 전체 15사례·카드 게이트 완료를 주장하지 않습니다. A14/54·B14/64는 유지합니다.
+
+
+[Source Compact 스케줄 검증](evidence/SRC-06-canonical-compact-schedules-13/summary.json). Compact는 동일 InputProcessor·Schedule·Week·Day 소유자와 실제 시계를 사용합니다. Native1269의 같은 MissingDay0 재할당을 보존하며, 실제 A/B의 시간당 4단계에서는 24→96개 값으로 바뀝니다. 후속 B 연산은 미완료입니다.

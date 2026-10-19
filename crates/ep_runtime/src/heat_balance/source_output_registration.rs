@@ -115,6 +115,10 @@ pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRe
 mod instant_meter;
 mod meter_reporting;
 mod milo_dtoa;
+/// Same Native Milo dtoa used by InputProcessor numeric-to-alpha getters.
+pub(crate) fn source_json_alpha_number(value: f64) -> Result<String, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    milo_dtoa::source_dtoa(value)
+}
 mod report_for_tabular;
 mod report_streams;
 mod report_writers;

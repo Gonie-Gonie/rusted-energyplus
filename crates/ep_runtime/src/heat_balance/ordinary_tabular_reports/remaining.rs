@@ -19,6 +19,7 @@ pub(crate) struct SourceRemainingPredefinedOwners<'a> {
     pub(crate) gain_modules: &'a crate::heat_balance::selected_gain_modules::SourceGainModules,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) environment: &'a WeatherEnvironmentState,
+    pub(crate) clock: &'a crate::weather::day::WeatherGlobalState,
     pub(crate) gains: &'a SelectedInternalHeatGains,
     pub(crate) exterior: &'a SourceExteriorEnergyUse,
     pub(crate) schedules: &'a SelectedScheduleManager,
@@ -185,6 +186,8 @@ impl SourceTabularReports {
                     ))?,
                     start_of_week,
                     o.environment.current_year_is_leap_year,
+                    o.clock.time_steps_in_hour,
+
                 )?;
                 real2(
                     o.table,
@@ -1464,6 +1467,8 @@ impl SourceTabularReports {
                 schedule.number,
                 start_of_week,
                 o.environment.current_year_is_leap_year,
+                    o.clock.time_steps_in_hour,
+
             )?;
             real0(
                 o.table,
@@ -1476,6 +1481,9 @@ impl SourceTabularReports {
                 schedule.number,
                 start_of_week,
                 o.environment.current_year_is_leap_year,
+                    o.clock.time_steps_in_hour,
+                    o.clock.time_step_zone,
+
             )?;
             real0(
                 o.table,

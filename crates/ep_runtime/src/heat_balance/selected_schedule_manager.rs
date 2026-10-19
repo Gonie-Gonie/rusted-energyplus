@@ -1,11 +1,16 @@
-//! Actual constant-only ScheduleManager initialization, separate from derived caches.
+//! Genuine Constant/Compact ScheduleManager with retained native day/week owners.
 use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnavailable};
 use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
 mod accessors;
 mod annual;
+mod compact;
+mod detailed;
+mod day_group;
 mod report;
+#[cfg(test)]
+mod compact_native_tests;
 
 /// Actual source-ordered ScheduleTypeLimits getter values after raw admission.
 #[derive(Clone, Debug, PartialEq)]
@@ -62,7 +67,7 @@ pub(crate) struct SelectedScheduleType {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct SelectedConstantSchedule {
+pub(crate) struct SelectedSchedule {
     pub(crate) name: String,
     pub(crate) number: SourceScheduleIndex,
     pub(crate) is_used: bool,
@@ -73,11 +78,38 @@ pub(crate) struct SelectedConstantSchedule {
     pub(crate) ems_actuated_on: bool,
     pub(crate) ems_value: f64,
     pub(crate) current_value: f64,
-    pub(crate) timestep_values: Vec<f64>,
+    pub(crate) data: SelectedScheduleData,
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct SelectedMissingDaySchedule {
+pub(crate) enum SelectedScheduleData {
+    Constant { timestep_values: Vec<f64> },
+    Detailed(SelectedDetailedSchedule),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedDetailedSchedule {
+    pub(crate) schedule_kind: i32,
+    pub(crate) week_schedules: [Option<usize>; 367],
+    pub(crate) max_min_by_day_type_set: [bool; 13],
+    pub(crate) min_by_day_type: [f64; 13],
+    pub(crate) max_by_day_type: [f64; 13],
+    pub(crate) use_daylight_saving: bool,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedWeekSchedule {
+    pub(crate) name: String,
+    pub(crate) number: usize,
+    pub(crate) is_used: bool,
+    pub(crate) min_value: f64,
+    pub(crate) max_value: f64,
+    pub(crate) is_min_max_set: bool,
+    pub(crate) day_schedules: [Option<usize>; 13],
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedDaySchedule {
     pub(crate) name: String,
     pub(crate) number: usize,
     pub(crate) is_used: bool,
@@ -98,11 +130,13 @@ pub(crate) struct SelectedScheduleManager {
     pub(crate) schedule_input_processed: bool,
     pub(crate) schedule_file_shading_processed: bool,
     pub(crate) schedule_types: Vec<SelectedScheduleType>,
-    pub(crate) schedules: Vec<SelectedConstantSchedule>,
-    pub(crate) day_schedules: Vec<SelectedMissingDaySchedule>,
+    pub(crate) schedules: Vec<SelectedSchedule>,
+    pub(crate) day_schedules: Vec<SelectedDaySchedule>,
+    pub(crate) week_schedules: Vec<SelectedWeekSchedule>,
     pub(crate) schedule_type_map: BTreeMap<String, usize>,
     pub(crate) schedule_map: BTreeMap<String, SourceScheduleIndex>,
     pub(crate) day_schedule_map: BTreeMap<String, usize>,
+    pub(crate) week_schedule_map: BTreeMap<String, usize>,
 }
 impl Default for SelectedScheduleManager {
     fn default() -> Self {
@@ -114,9 +148,11 @@ impl Default for SelectedScheduleManager {
             schedule_types: Vec::new(),
             schedules: Vec::new(),
             day_schedules: Vec::new(),
+            week_schedules: Vec::new(),
             schedule_type_map: BTreeMap::new(),
             schedule_map: BTreeMap::new(),
             day_schedule_map: BTreeMap::new(),
+            week_schedule_map: BTreeMap::new(),
         }
     }
 }
@@ -124,6 +160,7 @@ impl Default for SelectedScheduleManager {
 #[derive(Debug)]
 pub(crate) enum SelectedScheduleError {
     Input(SelectedInputUnavailable),
+    HeatBalance(Box<super::selected_heat_balance_input::HeatBalanceInputError>),
     Unavailable(&'static str),
     Audit(std::io::Error),
     AuditOpen {
@@ -136,6 +173,11 @@ impl From<SelectedInputUnavailable> for SelectedScheduleError {
         Self::Input(value)
     }
 }
+impl From<super::selected_heat_balance_input::HeatBalanceInputError> for SelectedScheduleError {
+    fn from(value: super::selected_heat_balance_input::HeatBalanceInputError) -> Self {
+        Self::HeatBalance(Box::new(value))
+    }
+}
 impl From<std::io::Error> for SelectedScheduleError {
     fn from(value: std::io::Error) -> Self {
         Self::Audit(value)
@@ -145,6 +187,7 @@ impl std::fmt::Display for SelectedScheduleError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Input(e) => std::fmt::Display::fmt(e, f),
+            Self::HeatBalance(e) => std::fmt::Display::fmt(e, f),
             Self::Audit(e) => std::fmt::Display::fmt(e, f),
             Self::AuditOpen { path, .. } => write!(
                 f,
@@ -159,6 +202,7 @@ impl std::error::Error for SelectedScheduleError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Input(e) => Some(e),
+            Self::HeatBalance(e) => Some(e.as_ref()),
             Self::Audit(e) => Some(e),
             Self::AuditOpen { source, .. } => Some(source),
             Self::Unavailable(_) => None,
@@ -169,7 +213,7 @@ impl std::error::Error for SelectedScheduleError {
 impl SelectedScheduleManager {
     fn add_constant(&mut self, name: &str, value: f64, slots: usize) -> SourceScheduleIndex {
         let number = SourceScheduleIndex(self.schedules.len());
-        self.schedules.push(SelectedConstantSchedule {
+        self.schedules.push(SelectedSchedule {
             name: name.into(),
             number,
             is_used: false,
@@ -180,7 +224,7 @@ impl SelectedScheduleManager {
             ems_actuated_on: false,
             ems_value: 0.0,
             current_value: value,
-            timestep_values: vec![value; slots],
+            data: SelectedScheduleData::Constant { timestep_values: vec![value; slots] },
         });
         self.schedule_map.insert(name.to_ascii_uppercase(), number);
         number
@@ -192,7 +236,7 @@ impl SelectedScheduleManager {
         &mut self,
         time_steps_in_hour: usize,
     ) -> Result<(), SelectedScheduleError> {
-        if !self.schedules.is_empty() || !self.day_schedules.is_empty() {
+        if !self.schedules.is_empty() || !self.day_schedules.is_empty() || !self.week_schedules.is_empty() {
             return Err(SelectedScheduleError::Unavailable(
                 "repeated init_constant_state outside caller guard",
             ));
@@ -204,7 +248,7 @@ impl SelectedScheduleManager {
         self.schedules[off.0].is_used = true;
         let on = self.add_constant("Constant-1.0", 1.0, slots);
         self.schedules[on.0].is_used = true;
-        self.day_schedules.push(SelectedMissingDaySchedule {
+        self.day_schedules.push(SelectedDaySchedule {
             name: "MissingDaySchedule-0.0".into(),
             number: 0,
             is_used: true,
@@ -276,7 +320,7 @@ impl SelectedScheduleManager {
                         .checked_add(extra_alpha)
                         .ok_or(SelectedScheduleError::Unavailable("local alpha size"))?,
                 );
-                if !matches!(family, "ScheduleTypeLimits" | "Schedule:Constant") {
+                if !matches!(family, "ScheduleTypeLimits" | "Schedule:Constant" | "Schedule:Compact") {
                     return Err(SelectedScheduleError::Unavailable(
                         "nonconstant schedule input",
                     ));
@@ -287,7 +331,7 @@ impl SelectedScheduleManager {
         max_numbers = max_numbers.max(args.numerics);
         max_alphas = max_alphas.max(args.alphas);
         // Real getter-local arrays, distinct from dataIPShortCut and its false blanks.
-        let mut locals = (
+        let mut locals: SourceScheduleGetterLocals = (
             vec![String::new(); max_alphas],
             vec![String::new(); max_alphas],
             vec![String::new(); max_numbers],
@@ -295,6 +339,27 @@ impl SelectedScheduleManager {
             vec![true; max_alphas],
             vec![true; max_numbers],
         );
+        // Native527-555: real Compact prescan, before audit or type getters.
+        let mut max_compact_numbers = 0usize;
+        for number in 0..input.get_num_objects_found("Schedule:Compact") {
+            let alphas = Self::get_source_compact_object_item(input, number, &mut locals, false)?;
+            for field in 2..alphas {
+                if locals.0[field].starts_with("UNTIL") {
+                    max_compact_numbers = max_compact_numbers.checked_add(1)
+                        .ok_or(SelectedScheduleError::Unavailable("actual Compact Until count"))?;
+                }
+            }
+        }
+        if max_compact_numbers > max_numbers {
+            max_numbers = max_compact_numbers;
+            // Native deallocates cNumericFields, Numbers, lNumericBlanks first.
+            locals.2 = Vec::new();
+            locals.3 = Vec::new();
+            locals.5 = Vec::new();
+            locals.2 = vec![String::new(); max_numbers];
+            locals.3 = vec![0.0; max_numbers];
+            locals.5 = vec![true; max_numbers];
+        }
         if input.get_num_objects_found("Schedule:File:Shading") > 0 {
             return Err(SelectedScheduleError::Unavailable("file shading"));
         }
@@ -387,6 +452,11 @@ impl SelectedScheduleManager {
         let slots = 24usize
             .checked_mul(time_steps_in_hour)
             .ok_or(SelectedScheduleError::Unavailable("timestep storage size"))?;
+        // Native1269 resizes the same MissingDaySchedule before Compact input.
+        self.day_schedules.get_mut(0).ok_or(SelectedScheduleError::Unavailable(
+            "actual MissingDaySchedule0 before Compact",
+        ))?.timestep_values = vec![0.0; slots];
+        self.process_source_compacts(input, time_steps_in_hour, &mut locals)?;
         for row in &declarations.constants {
             // getObjectItem resets all six getter-local arrays before unused erase.
             locals.0.fill(String::new());
@@ -412,23 +482,22 @@ impl SelectedScheduleManager {
                 ))?;
             self.schedules[number.0].schedule_type_number = Some(type_number);
         }
-        self.schedules[0].timestep_values = vec![0.0; slots];
-        self.schedules[1].timestep_values = vec![1.0; slots];
-        for schedule in &mut self.schedules {
-            let Some(type_number) = schedule.schedule_type_number else {
+        self.resize_source_constant(0, slots, 0.0)?;
+        self.resize_source_constant(1, slots, 1.0)?;
+        for index in 0..self.schedules.len() {
+            let Some(type_number) = self.schedules[index].schedule_type_number else {
                 continue;
             };
             let limits = &self.schedule_types[type_number];
             if !limits.is_limited {
                 continue;
             }
-            // ScheduleConstant::setMinMaxVals: no reduction or epsilon substitute.
-            schedule.min_value = schedule.current_value;
-            schedule.max_value = schedule.current_value;
-            schedule.is_min_max_set = true;
+            let (minimum, maximum) = (limits.min_value, limits.max_value);
+            self.ensure_source_min_max_with_steps(SourceScheduleIndex(index), time_steps_in_hour)?;
+            let schedule = &self.schedules[index];
             // Original ScheduleBase::checkMinMaxVals, inclusive subtraction first.
-            let min_ok = f64::from(f32::EPSILON) >= limits.min_value - schedule.min_value;
-            let max_ok = schedule.max_value - limits.max_value <= f64::from(f32::EPSILON);
+            let min_ok = f64::from(f32::EPSILON) >= minimum - schedule.min_value;
+            let max_ok = schedule.max_value - maximum <= f64::from(f32::EPSILON);
             if !(min_ok && max_ok) {
                 return Err(SelectedScheduleError::Unavailable(
                     "schedule bounds severe/fatal",
@@ -443,3 +512,7 @@ impl SelectedScheduleManager {
         Ok(())
     }
 }
+
+type SourceScheduleGetterLocals = (
+    Vec<String>, Vec<String>, Vec<String>, Vec<f64>, Vec<bool>, Vec<bool>,
+);

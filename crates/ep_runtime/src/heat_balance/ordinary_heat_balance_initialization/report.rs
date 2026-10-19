@@ -46,6 +46,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 o.registration,
                 o.prescan,
                 o.clock.minutes_in_time_step,
+                o.clock,
+                o.environment,
                 o.output_host,
                 o.eio,
                 o.dictionary_host,

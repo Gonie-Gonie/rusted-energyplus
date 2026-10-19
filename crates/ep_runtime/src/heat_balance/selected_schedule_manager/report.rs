@@ -1,6 +1,7 @@
 //! ReportScheduleVals3612–3643 and UpdateScheduleVals2465–2488.
 //! Retained Which reads currentVal; getCurrentVal EMS semantics are separate.
 use super::{SelectedScheduleManager, SourceScheduleIndex};
+use crate::weather::day::{WeatherGlobalState, WeatherEnvironmentState};
 use crate::heat_balance::{
     radiation::ordinary::{OrdinaryRadiationError, OrdinaryRadiationUnavailable},
     selected_heat_balance_input::HeatBalanceInputError as Error,
@@ -33,6 +34,8 @@ impl SelectedScheduleManager {
         registration: &mut SourceOutputRegistration,
         prescan: &SourceOutputPreScan,
         minutes_in_time_step: i32,
+        clock: &WeatherGlobalState,
+        environment: &WeatherEnvironmentState,
         host: &mut H,
         eio: &mut dyn std::io::Write,
         dictionary_host: &mut D,
@@ -69,21 +72,20 @@ impl SelectedScheduleManager {
             }
             self.do_schedule_reporting_setup = false;
         }
-        self.update_source_schedule_values()
+        self.update_source_schedule_values(clock, environment)
     }
-    /// Actual UpdateScheduleVals2465 on the same admitted constant-schedule owner.
-    pub(crate) fn update_source_schedule_values(&mut self) -> Result<(), Error> {
-        // The admitted manager has only genuine ScheduleConstant rows. Native
-        // getHrTsVal2543 ignores hour/timestep and reads tsVals.front(), not currentVal.
-        for schedule in &mut self.schedules {
-            schedule.current_value = if schedule.ems_actuated_on {
-                schedule.ems_value
+    /// Actual UpdateScheduleVals2465 uses the same live global/environment.
+    pub(crate) fn update_source_schedule_values(
+        &mut self, clock: &WeatherGlobalState, environment: &WeatherEnvironmentState,
+    ) -> Result<(), Error> {
+        for index in 0..self.schedules.len() {
+            let value = if self.schedules[index].ems_actuated_on {
+                self.schedules[index].ems_value
             } else {
-                *schedule
-                    .timestep_values
-                    .first()
-                    .ok_or(Error::Unavailable("actual Constant tsVals.front2546"))?
+                self.source_hr_ts_value(SourceScheduleIndex(index), clock.hour_of_day,
+                    clock.time_step, clock, environment)?
             };
+            self.schedules[index].current_value = value;
         }
         Ok(())
     }
