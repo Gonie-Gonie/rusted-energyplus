@@ -13,6 +13,7 @@ pub use input::{
     ProjectDiagnosticsObject, ProjectInputObject, ProjectInputValue, SelectedProjectDataInput,
 };
 mod environment;
+mod threading;
 mod getter;
 
 /// Genuine backend/OS failure or explicit unsupported input boundary.
@@ -70,6 +71,8 @@ fn fatal(backend: &mut SourceErrorBackend<'_>, message: &str) -> Result<(), Proj
 /// Actual retained SystemVariables members consumed/written by this selected getter.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct ProjectSystemVariables {
+    // Grouped actual threading members; not another SysVars instance.
+    pub(crate) threading: threading::SourceThreadingSystemVariables,
     pub(crate) ci_force_time_step: bool,
     pub(crate) minimal_shadowing: bool,
     pub(crate) minimum_report_frequency: String,

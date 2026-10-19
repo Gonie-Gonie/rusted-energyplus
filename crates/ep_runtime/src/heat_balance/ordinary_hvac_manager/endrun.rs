@@ -13,3 +13,19 @@ impl SourceHvacManager {
         Ok(())
     }
 }
+
+impl SourceHvacManager {
+    /// Actual DumpAirLoopStatistics1998-2024. The live SysVars flag is the
+    /// first predicate; a zero NumPrimaryAirSys is not a substitute guard.
+    pub(crate) fn dump_source_air_loop_statistics(
+        &self,
+        system: &crate::heat_balance::selected_project_data::ProjectSystemVariables,
+    ) -> Result<(), Error> {
+        if !system.track_air_loop_env_flag {
+            return Ok(());
+        }
+        Err(Error::Unavailable(
+            "actual DumpAirLoopStatistics local StatisticsFilePath.open2015",
+        ))
+    }
+}

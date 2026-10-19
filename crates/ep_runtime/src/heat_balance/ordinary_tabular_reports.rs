@@ -13,6 +13,8 @@ mod heat_gain;
 mod input;
 mod monthly_initialization;
 mod output_files;
+mod endrun_files;
+mod audit;
 pub(crate) mod remaining;
 mod weather_stat;
 mod source_demand;
@@ -286,3 +288,11 @@ pub(crate) use post_summary::SourceSurfaceShadowingReportOwners;
 
 mod post_summary_next;
 pub(crate) use post_summary_next::SourcePostSummaryReportOwners;
+
+mod predefined_report;
+pub(crate) use predefined_report::SourcePredefinedReportOwners;
+
+mod resilience_report;
+pub(crate) use resilience_report::SourceResilienceTableOwners;
+
+mod periodic_reports;

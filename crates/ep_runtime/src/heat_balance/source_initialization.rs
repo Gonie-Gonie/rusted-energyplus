@@ -18,6 +18,7 @@ use ep_model::ReportInputs;
 use std::io;
 
 mod files;
+pub(crate) use files::SourceCloseOutputFilesOwners;
 mod kickoff_postlude;
 pub(crate) use kickoff_postlude::SourceFaultsManager;
 mod output_reporting;

@@ -264,6 +264,8 @@ impl CtfInitializationContext<'_> {
                 minutes,
                 host,
                 eio: self.eio,
+                registry: &reports.registry,
+                table: &mut reports.table,
             };
             reports
                 .selected_internal_heat_gains

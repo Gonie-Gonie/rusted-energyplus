@@ -1,4 +1,4 @@
-//! Genuine ManageSimulation566-596 prefix; later tabular report children remain bounded.
+//! Genuine ManageSimulation566-620 endrun caller on the same retained owners.
 use crate::RuntimeError;
 use crate::heat_balance::ctf_initialization_context::{CtfInitializationReports, hb_input_error};
 use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
@@ -40,16 +40,16 @@ fn warning(
         .map_err(hb_input_error)
 }
 impl SourceInitializationFiles {
-    /// Continue on the original owners after Primary564, through the actual596 predefined prefix.
-    /// Does not replay the primary Warmup=false writer, construct/reset a PSY
-    /// scope or local owner, or close any file. Actual594 opens the same TAB files.
+    /// Continue on the original owners after Primary564 through actual620.
+    /// Does not replay the primary Warmup=false writer or construct/reset a PSY
+    /// scope or simulation local. Actual594 opens and602 closes the same TAB files.
     /// The caller retains the same
     /// files/backend/weather session and the existing single outer PSY scope.
     ///
     /// # Errors
     /// Preserves each typed child cause and all preceding effects. Positive SQL
-    /// sqliteBegin582 remains unavailable. Actual596 preserves each genuine child
-    /// cause and stops at the next unported operation in Source order.
+    /// sqliteBegin582 remains unavailable. Represented children execute through
+    /// their real completion, including physical output closure606 and final620.
     pub fn source_simulation_endrun_prefix_on_session(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,
@@ -155,7 +155,100 @@ impl SourceInitializationFiles {
             )
             .map_err(hb_input_error)?;
         self.open_source_output_tabular_file_on_session(session, reports, weather, backend)?;
-        self.write_source_tabular_reports_prefix_on_session(session, reports, weather, backend)
+        self.write_source_tabular_reports_prefix_on_session(session, reports, weather, backend)?;
+        // The Native children below are outside WriteTabularReports and run
+        // after its unconditional audit suffix, even if WriteTabularFiles=false.
+        let session = required(session.as_mut(), "actual same session before tariff reports598")?;
+        let globals = required(
+            reports.selected_heat_balance_globals.as_ref(),
+            "actual same Globals before tariff reports598",
+        )?;
+        let project = required(
+            reports.selected_project_data.as_ref(),
+            "actual same SysVars before outer endrun598",
+        )?;
+        reports.economic_tariff.write_source_tabular_tariff_reports(
+            &mut session.tabular,
+            globals,
+            required(
+                reports.selected_zone_input.as_ref(),
+                "actual same Zones before tariff floor-area prerequisite598",
+            )?,
+            &mut *backend,
+            &SourceDiagnosticFlags {
+                kickoff: &globals.kickoff_simulation,
+                developer: &project.system.developer_flag,
+                warmup: &weather.state.global.warmup_flag,
+                doing_sizing: &globals.doing_sizing,
+            },
+        ).map_err(hb_input_error)?;
+        reports.source_life_cycle_cost.compute_source_life_cycle_cost_and_report(
+            &mut *backend,
+            &SourceDiagnosticFlags {
+                kickoff: &globals.kickoff_simulation,
+                developer: &project.system.developer_flag,
+                warmup: &weather.state.global.warmup_flag,
+                doing_sizing: &globals.doing_sizing,
+            },
+        ).map_err(hb_input_error)?;
+        session.tabular.close_source_tabular_files().map_err(hb_input_error)?;
+        session.hvac.dump_source_air_loop_statistics(&project.system).map_err(hb_input_error)?;
+        self.close_source_output_files(
+            &mut crate::heat_balance::source_initialization::SourceCloseOutputFilesOwners {
+                registration: &reports.output_registration,
+                tabular: &session.tabular,
+                solar: required(
+                    reports.ordinary_solar_radiation.as_ref(),
+                    "actual same SolarShading before CloseOutputFiles606",
+                )?,
+                geometry: &reports.surface_geometry_input,
+                system: &project.system,
+                prescan: &reports.output_prescan,
+                runtime_language: &required(
+                    reports.selected_simulation_startup.as_ref(),
+                    "actual same RuntimeLanguage before CloseOutputFiles606",
+                )?.runtime_language,
+                connections: &session.hvac.ancillary.branch_node_connections,
+                heat_balance: &reports.heat_balance_input_state,
+                standard_output_record_count: &reports.source_standard_output_record_count,
+                standard_meter_record_count: &reports.source_standard_meter_record_count,
+                shading_stream: &mut session.shading_stream,
+                output_control: &reports.source_output_control,
+            },
+        ).map_err(hb_input_error)?;
+        // Actual609 child first tests this same database pointer. Null has no
+        // further reads/effects; positive first needs its real DB predicate.
+        if reports.source_sqlite.present() {
+            return Err(unavailable(
+                "actual CreateSQLiteZoneExtendedOutput167 sqlite.writeOutputToSQLite predicate",
+            ));
+        }
+        if reports.source_sqlite.present() {
+            backend.display_source_string(
+                "Writing final SQL reports",
+                &SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.state.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                },
+            ).map_err(hb_input_error)?;
+            return Err(unavailable(
+                "actual final SQL sqliteCommit613 before initializeIndexes614",
+            ));
+        }
+        // The actual SimulationManager179 ErrorsFound cell is retained by
+        // this same WeatherSession across prelude, Setup and Primary. It is
+        // distinct from HeatBalance's separate input ErrorsFound member.
+        if weather.errors_found {
+            return match backend.show_fatal_error(
+                "Error condition occurred.  Previous Severe Errors cause termination.",
+            ) {
+                Ok(never) => match never {},
+                Err(stop) => Err(hb_input_error(HeatBalanceInputError::Fatal(stop))),
+            };
+        }
+        Ok(()) // Genuine ManageSimulation620, after all real preceding children.
     }
 }
 
@@ -165,7 +258,7 @@ impl SourceInitializationFiles {
     /// No simulation local, clock or first-call flag is initialized or reset here.
     ///
     /// # Errors
-    /// Returns the actual typed prefix child failure, including the actual next tabular child boundary.
+    /// Returns the actual typed child failure or genuine successful endrun620.
     pub fn source_simulation_endrun_prefix(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,
@@ -180,8 +273,8 @@ impl SourceInitializationFiles {
 }
 
 impl SourceInitializationFiles {
-    // Actual WriteTabularReports5212-5227 on the same retained owners. The
-    // existing outer on-session call already holds the single weather borrow.
+    // Actual WriteTabularReports5212-5295 on the same retained owners. The
+    // outer on-session call already holds the single real weather borrow.
     fn write_source_tabular_reports_prefix_on_session(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,
@@ -456,10 +549,133 @@ impl SourceInitializationFiles {
                     .map_err(hb_input_error)?;
             }
             if session.tabular.display_thermal_resilience_summary && !globals.do_pure_load_calc {
-                return Err(unavailable("actual WriteTabularReports5244 WriteThermalResilienceTables entry"));
+                session.tabular.write_source_thermal_resilience_tables(
+                    &mut crate::heat_balance::ordinary_tabular_reports::SourceResilienceTableOwners {
+                        globals,
+                        zones: required(
+                            reports.selected_zone_input.as_ref(),
+                            "actual same Zone/Resilience/ZoneDaylight before thermal resilience5244",
+                        )?,
+                        gains: &reports.selected_internal_heat_gains,
+                        registry: &reports.registry,
+                        table: &mut reports.table,
+                        results: &reports.source_results_framework,
+                        sqlite: &reports.source_sqlite,
+                        writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                            monetary: &reports.cost_estimate_monetary,
+                            flags: SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &project.system.developer_flag,
+                                warmup: &weather.state.global.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            },
+                            backend: &mut *backend,
+                        },
+                    },
+                ).map_err(hb_input_error)?;
             }
-            return Err(unavailable("actual WriteTabularReports5246 CO2Resilience conditional entry"));
+            if session.tabular.display_co2_resilience_summary && !globals.do_pure_load_calc {
+                session.tabular.write_source_co2_resilience_tables(
+                    &mut crate::heat_balance::ordinary_tabular_reports::SourceResilienceTableOwners {
+                        globals,
+                        zones: required(
+                            reports.selected_zone_input.as_ref(),
+                            "actual same Zone/Resilience/ZoneDaylight before co2 resilience5247",
+                        )?,
+                        gains: &reports.selected_internal_heat_gains,
+                        registry: &reports.registry,
+                        table: &mut reports.table,
+                        results: &reports.source_results_framework,
+                        sqlite: &reports.source_sqlite,
+                        writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                            monetary: &reports.cost_estimate_monetary,
+                            flags: SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &project.system.developer_flag,
+                                warmup: &weather.state.global.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            },
+                            backend: &mut *backend,
+                        },
+                    },
+                ).map_err(hb_input_error)?;
+            }
+            if session.tabular.display_visual_resilience_summary && !globals.do_pure_load_calc {
+                session.tabular.write_source_visual_resilience_tables(
+                    &mut crate::heat_balance::ordinary_tabular_reports::SourceResilienceTableOwners {
+                        globals,
+                        zones: required(
+                            reports.selected_zone_input.as_ref(),
+                            "actual same Zone/Resilience/ZoneDaylight before visual resilience5250",
+                        )?,
+                        gains: &reports.selected_internal_heat_gains,
+                        registry: &reports.registry,
+                        table: &mut reports.table,
+                        results: &reports.source_results_framework,
+                        sqlite: &reports.source_sqlite,
+                        writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                            monetary: &reports.cost_estimate_monetary,
+                            flags: SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &project.system.developer_flag,
+                                warmup: &weather.state.global.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            },
+                            backend: &mut *backend,
+                        },
+                    },
+                ).map_err(hb_input_error)?;
+            }
+            if weather.state.weather.tot_report_periods > 0 {
+                return Err(unavailable("actual WriteTabularReports5253 WriteReportPeriodTimeConsumption12480 local array allocation entry"));
+            }
+            for _period in 1..=weather.state.weather.tot_thermal_report_periods {
+                return Err(unavailable("actual WriteTabularReports5256 WriteThermalResilienceTablesRepPeriod12539 actual WriteTabularFiles and styles entry"));
+            }
+            for _period in 1..=weather.state.weather.tot_co2_report_periods {
+                // Native13690 intentionally returns when WriteTabularFiles is
+                // true. Preserve that original guard, including its TODO bug.
+                if !*session.tabular.source_write_tabular_files_mut() {
+                    return Err(unavailable("actual CO2ResilienceRepPeriod13692 tabularReportPasses first header operation"));
+                }
+            }
+            for _period in 1..=weather.state.weather.tot_visual_report_periods {
+                return Err(unavailable("actual WriteTabularReports5262 WriteVisualResilienceTablesRepPeriod13801 actual WriteTabularFiles and styles entry"));
+            }
+            required(
+                reports.coil_selection_report.as_mut(),
+                "actual same coilSelectionReportObj before finishCoilSummary5265",
+            )?.finish_source_coil_summary_report_table().map_err(hb_input_error)?;
+            session.tabular.write_source_predefined_tables(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourcePredefinedReportOwners {
+                    registry: &reports.registry,
+                    table: &mut reports.table,
+                    results: &reports.source_results_framework,
+                    sqlite: &reports.source_sqlite,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
+            if weather.state.global.do_weath_sim {
+                session.tabular.write_source_monthly_tables().map_err(hb_input_error)?;
+                session.tabular.write_source_time_bin_tables().map_err(hb_input_error)?;
+                session.tabular.write_source_annual_tables().map_err(hb_input_error)?;
+            }
         }
-        Err(unavailable("actual WriteTabularReports5278 audit ensure_open entry"))
+        session.tabular.write_source_tabular_audit(
+            self,
+            &reports.source_output_control,
+            &reports.registry,
+            &reports.table,
+        ).map_err(hb_input_error)?;
+        Ok(())
     }
 }

@@ -61,6 +61,14 @@ impl SourceTabularOutputStream {
         }
         Ok(())
     }
+    // Native ofstream.close acts on this exact member after its final footer.
+    // Dropping File closes the same OS handle; no reopen, sync, reset or flush
+    // operation is inserted. Native's already-closed close sets failbit.
+    pub(super) fn close(&mut self) {
+        if self.file.take().is_none() {
+            self.failed = true;
+        }
+    }
     pub(super) fn bytes(&mut self, bytes: &[u8]) -> Result<(), Error> {
         if self.failed {
             return Ok(());

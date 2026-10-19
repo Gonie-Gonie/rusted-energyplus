@@ -47,6 +47,9 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) minutes: i32,
     pub(super) host: &'a mut dyn SourceOutputFileHost,
     pub(super) eio: &'a mut dyn Write,
+    // The same actual DataOutRptPredefined registry and table-entry owner.
+    pub(super) registry: &'a crate::heat_balance::predefined_tables::PredefinedRegistry,
+    pub(super) table: &'a mut crate::heat_balance::ctf_reports::PredefinedStringTable,
 }
 
 impl SelectedInternalHeatGains {
@@ -92,6 +95,15 @@ impl SelectedInternalHeatGains {
             ..Default::default()
         };
         for (kind, family) in FAMILIES[..9].iter().enumerate() {
+            // Native IHG924-925 initializes these procedure locals at the
+            // Lights stage, before setupIHGZonesAndSpaces927. Other stages
+            // do not construct them. Positive Lights still stop in their
+            // existing actual getter before any total-entry write.
+            let lighting_totals = if kind == 1 {
+                Some((0.0_f64, 0.0_f64))
+            } else {
+                None
+            };
             let objects = self.preprocess(family, kind, owners)?;
             if self.totals[kind] > 0 {
                 if kind != 6 {
@@ -109,6 +121,32 @@ impl SelectedInternalHeatGains {
                         .ok_or_else(|| unavailable("actual other misc allocation"))?,
                     &mut local,
                     owners,
+                )?;
+            }
+            if let Some((sum_area, sum_power)) = lighting_totals {
+                // Native1254-1261 is OUTSIDE the TotLights>0 block and
+                // precedes ElectricEquipment1263, even for no Lights.
+                let density_column = *owners.registry.named_indices.get("pdchInLtDens")
+                    .ok_or_else(|| unavailable("actual IHG1254 lighting-density column"))?;
+                if sum_area > 0.0 {
+                    owners.table.fixed_real_entry_4(
+                        density_column, "Interior Lighting Total", sum_power / sum_area,
+                    )?;
+                } else {
+                    // Native DataPrecisionGlobals::constant_zero is +0.0.
+                    owners.table.fixed_real_entry_4(
+                        density_column, "Interior Lighting Total", 0.0,
+                    )?;
+                }
+                let area_column = *owners.registry.named_indices.get("pdchInLtArea")
+                    .ok_or_else(|| unavailable("actual IHG1260 lighting-area column"))?;
+                owners.table.fixed_real_entry_2(
+                    area_column, "Interior Lighting Total", sum_area,
+                )?;
+                let power_column = *owners.registry.named_indices.get("pdchInLtPower")
+                    .ok_or_else(|| unavailable("actual IHG1261 lighting-power column"))?;
+                owners.table.fixed_real_entry_2(
+                    power_column, "Interior Lighting Total", sum_power,
                 )?;
             }
         }

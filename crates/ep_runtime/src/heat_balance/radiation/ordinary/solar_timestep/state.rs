@@ -229,6 +229,8 @@ pub(crate) struct SourceSolarTimestepState {
     pub(crate) complex: SourceComplexSolarState,
     pub(crate) max_hcv: i32,
     pub(crate) max_hc_array_bounds: i32,
+    /// Actual SolarShading.hh432 ctor0; sole numerical writer is MULTOL4585.
+    pub(crate) max_number_of_figures: i32,
     pub(crate) max_hc_array_increment: i32,
     pub(crate) max_gss: i32,
     pub(crate) max_bks: i32,
@@ -270,7 +272,7 @@ impl Default for SourceSolarTimestepState {
         Self {
             shading: SourceSolarShadingArrays::default(), heat_balance: SourceSolarHeatBalanceArrays::default(),
             shadow_combinations: None, casting_surface: None, penumbra_ids: Vec::new(), complex: SourceComplexSolarState::default(), max_hcv: 15,
-            max_hc_array_bounds: 0, max_hc_array_increment: 0,
+            max_hc_array_bounds: 0, max_hc_array_increment: 0, max_number_of_figures: 0,
             max_gss: 50, max_bks: 50, max_sbs: 50, max_dim: 0,
             ngsshc: 0, nbkshc: 0, nrvlhc: 0, nsbshc: 0, lochca: 0,
             calc_sky_dif_shading: false, shadowing_days_left: 0,

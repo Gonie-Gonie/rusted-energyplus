@@ -1,6 +1,7 @@
 //! Genuine EconomicTariff219-256 on the admitted zero-tariff domain.
 //! Positive tariff construction and positive CurrencyType getter remain explicit.
 mod compute_tariff;
+mod tabular_report;
 use super::error_backend::SourceErrorBackend;
 use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};

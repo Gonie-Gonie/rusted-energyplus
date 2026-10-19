@@ -566,8 +566,12 @@ mod tests {
                 .ok_or("moved IP missing")?
                 .is_object_unused("Version", "v")
         );
-        let version_line =
-            format!("Program Version,{}\n", failure.state.version_string).into_bytes();
+        let version_line = format!(
+            "Program Version,{}{}",
+            failure.state.version_string,
+            if cfg!(windows) { "\r\n" } else { "\n" }
+        )
+        .into_bytes();
         assert_eq!(std::fs::read(dir.join("eplusrs.eso"))?, version_line);
         assert_eq!(std::fs::read(dir.join("eplusrs.eio"))?, version_line);
         assert!(!dir.join("eplusrs.bnd").exists());
@@ -672,7 +676,13 @@ mod tests {
         }
         assert_eq!(
             std::fs::read(dir.join("eplusrs.audit"))?,
-            b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+            if cfg!(windows) {
+                b"  Processing Schedule Input -- Start\r\n  Processing Schedule Input -- Complete\r\n"
+                    .as_slice()
+            } else {
+                b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+                    .as_slice()
+            }
         );
         success.initialize_source_state(&ep_model::ReportInputs::default())?;
         success.persist(&dir)?;

@@ -12781,6 +12781,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-post-summary-core-09/summary.json",
         "sha256": "8acca551e7c71d6fd303cb6725d5170008189658ae33d9f492433eb1217440ef",
         "size_bytes": 48724
+      },
+      "canonical_completed_endrun_core_10": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-endrun-core-10/summary.json",
+        "sha256": "49c9d1f0fae44d86afab5a13f484a03c8fe348aceb53b8ca1ce04513b8bae52b",
+        "size_bytes": 323492
       }
     },
     {

@@ -4,6 +4,12 @@ use crate::heat_balance::ordinary_equipment::OrdinaryEquipment;
 use std::io::Write;
 
 impl SourceBranchNodeConnections {
+    pub(crate) fn source_number_node_connections(&self) -> &i32 {
+        &self.number_node_connections
+    }
+    pub(crate) fn source_max_number_node_connections(&self) -> &i32 {
+        &self.max_number_node_connections
+    }
     pub(crate) fn source_number_component_sets(&self) -> &i32 {
         &self.number_component_sets
     }

@@ -48,6 +48,13 @@ impl std::error::Error for StartupError {
 pub(crate) struct SelectedRuntimeLanguage {
     pub(crate) number_of_sensors: usize,
     pub(crate) number_of_actuators_used: usize,
+    // Actual DataRuntimeLanguage.hh751-755 constructors; CheckIfAnyEMS does
+    // not reset these GetEMSInput/SetupEMSActuator/InternalVariable cells.
+    pub(crate) number_ems_actuators_available: i32,
+    pub(crate) max_ems_actuators_available: i32,
+    pub(crate) number_internal_variables_used: i32,
+    pub(crate) number_ems_internal_variables_available: i32,
+    pub(crate) max_ems_internal_variables_available: i32,
     pub(crate) number_of_program_call_managers: usize,
     pub(crate) number_of_erl_programs: usize,
     pub(crate) number_of_erl_subroutines: usize,

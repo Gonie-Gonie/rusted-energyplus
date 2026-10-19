@@ -75,19 +75,31 @@ impl SourceOutputStream {
 }
 impl Write for SourceOutputStream {
     fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
-        let result = self
-            .file
-            .as_mut()
-            .ok_or_else(|| {
-                io::Error::new(io::ErrorKind::NotConnected, "actual output is not open")
-            })?
-            .write(bytes);
-        if result.is_err() || matches!(result,Ok(0) if !bytes.is_empty()) {
-            self.failed = true;
-        }
-        result
+        // Native ostream.write consumes the requested logical byte sequence;
+        // its Windows text-mode file buffer expands each LF at the same handle.
+        self.write_all(bytes).map(|()| bytes.len())
     }
     fn write_all(&mut self, bytes: &[u8]) -> io::Result<()> {
+        // IOFiles.open uses in|out|trunc, without binary. Rust File uses the
+        // binary OS handle, so perform the actual text-mode translation here,
+        // at each reached write. Already supplied CR is retained: CRLF input
+        // becomes CRCRLF, exactly as a Windows CRT text stream would write it.
+        #[cfg(windows)]
+        let translated;
+        #[cfg(windows)]
+        let bytes = if bytes.contains(&b'\n') {
+            let mut text = Vec::with_capacity(bytes.len());
+            for &byte in bytes {
+                if byte == b'\n' {
+                    text.push(b'\r');
+                }
+                text.push(byte);
+            }
+            translated = text;
+            translated.as_slice()
+        } else {
+            bytes
+        };
         let result = self
             .file
             .as_mut()
@@ -242,6 +254,9 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
 
 mod dictionaries;
 mod reporting;
+mod endrun_audit;
+mod endrun;
+pub(crate) use endrun::SourceCloseOutputFilesOwners;
 pub(crate) use reporting::{SourceRuntimeMeterStreams, SourceRuntimeReportStreams};
 
 impl crate::weather::day::source_weather_initialization::SourceWeatherEio for SourceOutputStream {

@@ -277,3 +277,5 @@ impl SelectedPluginManager {
         ))
     }
 }
+
+mod coil_summary;
