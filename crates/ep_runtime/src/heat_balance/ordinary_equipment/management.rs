@@ -320,7 +320,9 @@ impl SourceHvacManager {
                             fan: o.fan,
                             globals: o.globals,
                             clock: o.clock,
-                            environment: o.environment,
+                            hvac: o.hvac,
+                            air_loop: &self.simulation.air_loop,
+                            source_is_epjson: o.source_is_epjson,
                         };
                         let mut purchased_calculation = super::source_purchased_air::SourcePurchasedAirCalcOwners {
                             availability: &mut self.ancillary.availability,
@@ -337,7 +339,7 @@ impl SourceHvacManager {
                             &name, current_equipment_zone, equipment_pointer, number,
                             o.shortcut, *o.source_is_epjson, o.schedules, purchased_initialization.globals.num_of_zones,
                             &mut self.ancillary.branch_node_connections, purchased_initialization.globals.any_energy_management_system_in_model,
-                            &mut purchased_output, &mut purchased_initialization, &mut purchased_calculation,
+                            &mut purchased_output, &mut purchased_initialization, &mut purchased_calculation, o.predefined_registry,
                             first_hvac_iteration, &mut system_output_provided, &mut latent_output_provided,
                         )?;
                     }

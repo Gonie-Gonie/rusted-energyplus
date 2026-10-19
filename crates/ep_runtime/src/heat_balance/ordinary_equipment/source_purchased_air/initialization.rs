@@ -5,7 +5,11 @@ use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGloba
 use crate::heat_balance::selected_sizing::SelectedSizingManager;
 use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays;
-use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
+use crate::weather::day::WeatherGlobalState;
+use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
+use crate::heat_balance::ordinary_hvac_manager::simulation::state::SourceAirLoopData;
+use crate::heat_balance::source_output_registration::SourceOutputDictionaryHost;
+use crate::heat_balance::selected_sizing::{autosizing::{size_source_component, SourceAutoSizingType as Sizer},sizer_output::{SourceSizerReportingOwners,report_sizer_output}};
 
 /// Temporary disjoint borrows into actual HVAC caller owners; no copied readiness or values.
 pub(crate) struct SourcePurchasedAirInitOwners<'a> {
@@ -13,7 +17,9 @@ pub(crate) struct SourcePurchasedAirInitOwners<'a> {
     pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
-    pub(crate) environment: &'a WeatherEnvironmentState,
+    pub(crate) hvac: &'a SelectedHvacGlobals,
+    pub(crate) air_loop: &'a SourceAirLoopData,
+    pub(crate) source_is_epjson: &'a bool,
 }
 
 fn bool_at(rows: &Option<Vec<bool>>, number: i32) -> Result<bool, Error> {
@@ -58,8 +64,8 @@ impl OrdinaryEquipment {
         Ok(false)
     }
 
-    pub(super) fn initialize_source_purchased_air(&mut self, unit_number: i32, controlled_zone: i32,
-        schedules: &SelectedScheduleManager, o: &mut SourcePurchasedAirInitOwners<'_>) -> Result<(), Error> {
+    pub(super) fn initialize_source_purchased_air<D:SourceOutputDictionaryHost>(&mut self, unit_number: i32, controlled_zone: i32,
+        schedules: &SelectedScheduleManager, o: &mut SourcePurchasedAirInitOwners<'_>, report:&mut SourceSizerReportingOwners<'_,D>) -> Result<(), Error> {
         if self.purchased_air.initialize_once {
             let count = usize::try_from(self.purchased_air.number_purchased_air)
                 .map_err(|_|Error::Unavailable("actual InitPurchasedAir allocation count1075"))?;
@@ -130,16 +136,16 @@ impl OrdinaryEquipment {
             }
         }
         if !o.globals.system_sizing_calculation && bool_at(&self.purchased_air.sizing_flags, unit_number)? {
-            self.size_source_purchased_air(unit_number, o.sizing)?;
+            self.size_source_purchased_air(unit_number, o, report)?;
             *bool_at_mut(&mut self.purchased_air.sizing_flags, unit_number)? = false;
         }
         if o.clock.begin_envrn_flag && bool_at(&self.purchased_air.environment_flags, unit_number)? {
             let row = self.purchased_unit_mut(unit_number)?;
             if row.heating_limit == Limit::FlowRate || row.heating_limit == Limit::FlowRateAndCapacity {
-                row.max_heat_mass_flow_rate = o.environment.std_rho_air * row.max_heat_vol_flow_rate;
+                row.max_heat_mass_flow_rate = report.environment.std_rho_air * row.max_heat_vol_flow_rate;
             } else { row.max_heat_mass_flow_rate = 0.0; }
             if row.cooling_limit == Limit::FlowRate || row.cooling_limit == Limit::FlowRateAndCapacity {
-                row.max_cool_mass_flow_rate = o.environment.std_rho_air * row.max_cool_vol_flow_rate;
+                row.max_cool_mass_flow_rate = report.environment.std_rho_air * row.max_cool_vol_flow_rate;
             } else { row.max_cool_mass_flow_rate = 0.0; }
             *bool_at_mut(&mut self.purchased_air.environment_flags, unit_number)? = false;
         }
@@ -172,92 +178,108 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
-    // Full ordinary sizing branch. Each positive real Sizer remains its own first-operation boundary.
+    // Native ordinary SizePurchasedAir branch, with the real local Sizer lifecycle.
     #[allow(unused_variables, unused_assignments)]
-    fn size_source_purchased_air(&mut self, unit_number: i32, sizing: &mut SelectedSizingManager) -> Result<(), Error> {
-        let mut cooling_air_vol_flow_des = 0.0;
-        let mut heating_air_vol_flow_des = 0.0;
-        let row = self.purchased_unit(unit_number)?;
-        let mut max_heat_vol_flow_rate_des = 0.0;
-        let mut max_heat_vol_flow_rate_user = 0.0;
-        let mut max_cool_vol_flow_rate_des = 0.0;
-        let mut max_cool_vol_flow_rate_user = 0.0;
-        let mut max_heat_sens_cap_des = 0.0;
-        let mut max_heat_sens_cap_user = 0.0;
-        let mut max_cool_tot_cap_des = 0.0;
-        let mut max_cool_tot_cap_user = 0.0;
-        sizing.zone_heating_only_fan = false;
-        sizing.zone_cooling_only_fan = false;
-        let comp_type = &row.c_object_name;
-        let comp_name = &row.name;
-        if sizing.current_zone_equipment_number > 0 {
-            let _zone_sizing = sizing.zone_equipment_sizing.as_mut().and_then(|rows|rows.get_mut(at(sizing.current_zone_equipment_number).ok()?))
+    fn size_source_purchased_air<D:SourceOutputDictionaryHost>(&mut self, unit_number: i32, o:&mut SourcePurchasedAirInitOwners<'_>, report:&mut SourceSizerReportingOwners<'_,D>) -> Result<(), Error> {
+        let mut cooling_air_vol_flow_des=0.0;let mut heating_air_vol_flow_des=0.0;
+        let mut max_heat_vol_flow_rate_des=0.0;let mut max_heat_vol_flow_rate_user=0.0;
+        let mut max_cool_vol_flow_rate_des=0.0;let mut max_cool_vol_flow_rate_user=0.0;
+        let mut max_heat_sens_cap_des=0.0;let mut max_heat_sens_cap_user=0.0;
+        let mut max_cool_tot_cap_des=0.0;let mut max_cool_tot_cap_user=0.0;
+        o.sizing.zone_heating_only_fan=false;o.sizing.zone_cooling_only_fan=false;
+        let comp_type=self.purchased_unit(unit_number)?.c_object_name.clone();
+        let comp_name=self.purchased_unit(unit_number)?.name.clone();
+        if o.sizing.current_zone_equipment_number>0 {
+            let _zone_sizing=o.sizing.zone_equipment_sizing.as_mut().and_then(|r|r.get_mut(at(o.sizing.current_zone_equipment_number).ok()?))
                 .ok_or(Error::Unavailable("actual SizePurchasedAir ZoneEqSizing1390"))?;
-            let mut sizing_string: String;
-            let mut field_number: usize;
-            let mut print_flag: bool;
-            let mut errors_found = false;
-            if row.hvac_sizing_index > 0 {
-                return Err(Error::Unavailable("actual SizePurchasedAir DataZoneNumber1396 scalable sizing"));
-            } else {
-                field_number = 5;
-                sizing_string = self.purchased_numeric_field_name(unit_number, field_number)?.to_owned() + " [m3/s]";
-                let mut is_auto_size = false;
-                print_flag = true;
-                if row.max_heat_vol_flow_rate == -99999.0 && (row.heating_limit == Limit::FlowRate || row.heating_limit == Limit::FlowRateAndCapacity) { is_auto_size = true; }
-                if !is_auto_size && !sizing.zone_sizing_run_done {
-                    if row.max_heat_vol_flow_rate > 0.0 { return Err(Error::Unavailable("actual SizePurchasedAir HeatingAirFlowSizer1710")); }
-                    max_heat_vol_flow_rate_des = 0.0;
-                } else {
-                    sizing.zone_heating_only_fan = true;
-                    let temp_size = row.max_heat_vol_flow_rate;
-                    return Err(Error::Unavailable("actual SizePurchasedAir HeatingAirFlowSizer1720"));
+            let mut sizing_string:String;let mut field_number:usize;let mut print_flag:bool;let mut errors_found=false;
+            if self.purchased_unit(unit_number)?.hvac_sizing_index>0 {
+                o.sizing.autosizing.DataZoneNumber=self.purchased_unit(unit_number)?.zone_ptr;
+                let zone_hvac_index=self.purchased_unit(unit_number)?.hvac_sizing_index;
+                field_number=5;print_flag=true;
+                sizing_string=self.purchased_numeric_field_name(unit_number,field_number)?.to_owned()+" [m3/s]";
+                return Err(Error::Unavailable("actual SizePurchasedAir ZoneHVACSizing HeatingSAFMethod1407"));
+            }
+            else {
+                field_number=5;sizing_string=self.purchased_numeric_field_name(unit_number,field_number)?.to_owned()+" [m3/s]";
+                let mut is_auto_size=false;print_flag=true;
+                {let row=self.purchased_unit(unit_number)?;if row.max_heat_vol_flow_rate == -99999.0 && (row.heating_limit==Limit::FlowRate||row.heating_limit==Limit::FlowRateAndCapacity){is_auto_size=true;}}
+                if !is_auto_size && !o.sizing.zone_sizing_run_done {
+                    if self.purchased_unit(unit_number)?.max_heat_vol_flow_rate>0.0 {
+                        let value=self.purchased_unit(unit_number)?.max_heat_vol_flow_rate;
+                        let result=size_source_component(Sizer::HeatingAirFlow,&sizing_string,value,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                        self.purchased_unit_mut(unit_number)?.max_heat_vol_flow_rate=result;
+                    }
+                    max_heat_vol_flow_rate_des=0.0;
+                }else{
+                    o.sizing.zone_heating_only_fan=true;
+                    let temp_size=self.purchased_unit(unit_number)?.max_heat_vol_flow_rate;
+                    max_heat_vol_flow_rate_des=size_source_component(Sizer::HeatingAirFlow,&sizing_string,self.purchased_unit(unit_number)?.max_heat_vol_flow_rate,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                    self.purchased_unit_mut(unit_number)?.max_heat_vol_flow_rate=max_heat_vol_flow_rate_des;
+                    o.sizing.zone_heating_only_fan=false;
                 }
-                is_auto_size = false;
-                field_number = 6;
-                sizing_string = self.purchased_numeric_field_name(unit_number, field_number)?.to_owned() + " [m3/s]";
-                if row.max_heat_sens_cap == -99999.0 && (row.heating_limit == Limit::Capacity || row.heating_limit == Limit::FlowRateAndCapacity) { is_auto_size = true; }
-                if !is_auto_size && !sizing.zone_sizing_run_done {
-                    if row.max_heat_sens_cap > 0.0 { return Err(Error::Unavailable("actual SizePurchasedAir HeatingCapacitySizer1739")); }
-                } else {
-                    let temp_size = row.max_heat_sens_cap;
+                is_auto_size=false;field_number=6;sizing_string=self.purchased_numeric_field_name(unit_number,field_number)?.to_owned()+" [m3/s]";
+                {let row=self.purchased_unit(unit_number)?;if row.max_heat_sens_cap == -99999.0 && (row.heating_limit==Limit::Capacity||row.heating_limit==Limit::FlowRateAndCapacity){is_auto_size=true;}}
+                if !is_auto_size && !o.sizing.zone_sizing_run_done {
+                    if self.purchased_unit(unit_number)?.max_heat_sens_cap>0.0 {
+                        max_heat_sens_cap_des=size_source_component(Sizer::HeatingCapacity,&sizing_string,self.purchased_unit(unit_number)?.max_heat_sens_cap,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                    }
+                }else{
+                    let temp_size=self.purchased_unit(unit_number)?.max_heat_sens_cap;
                     return Err(Error::Unavailable("actual SizePurchasedAir FinalZoneSizing.MinOA1746"));
                 }
-                if max_heat_sens_cap_des < 1.0 { max_heat_sens_cap_des = 0.0; }
+                if max_heat_sens_cap_des<1.0 {max_heat_sens_cap_des=0.0;}
                 if is_auto_size {
-                    self.purchased_unit_mut(unit_number)?.max_heat_sens_cap = max_heat_sens_cap_des;
-                    return Err(Error::Unavailable("actual SizePurchasedAir reportSizerOutput1760"));
-                } else if row.max_heat_sens_cap > 0.0 && max_heat_sens_cap_des > 0.0 {
-                    max_heat_sens_cap_user = row.max_heat_sens_cap;
-                    return Err(Error::Unavailable("actual SizePurchasedAir reportSizerOutput1774"));
+                    self.purchased_unit_mut(unit_number)?.max_heat_sens_cap=max_heat_sens_cap_des;
+                    report_sizer_output(report,&comp_type,&comp_name,"Design Size Maximum Sensible Heating Capacity [W]",max_heat_sens_cap_des,None,None)?;
+                    if self.purchased_unit(unit_number)?.outdoor_air {return Err(Error::Unavailable("actual SizePurchasedAir FinalZoneSizing.MinOA1763"));}
+                }else if self.purchased_unit(unit_number)?.max_heat_sens_cap>0.0 && max_heat_sens_cap_des>0.0 {
+                    max_heat_sens_cap_user=self.purchased_unit(unit_number)?.max_heat_sens_cap;
+                    report_sizer_output(report,&comp_type,&comp_name,"Design Size Maximum Sensible Heating Capacity [W]",max_heat_sens_cap_des,Some("User-Specified Maximum Sensible Heating Capacity [W]"),Some(max_heat_sens_cap_user))?;
+                    if o.globals.display_extra_warnings {
+                        if ((max_heat_sens_cap_des-max_heat_sens_cap_user).abs()/max_heat_sens_cap_user)>o.sizing.autosizing.AutoVsHardSizingThreshold {
+                            return Err(Error::Unavailable("actual SizePurchasedAir heating sizing difference ShowMessage1785"));
+                        }
+                    }
                 }
-                print_flag = true;
-                is_auto_size = false;
-                if row.max_cool_vol_flow_rate == -99999.0 && (row.cooling_limit == Limit::FlowRate || row.cooling_limit == Limit::FlowRateAndCapacity || (row.outdoor_air && row.economizer_type != Econ::NoEconomizer)) { is_auto_size = true; }
-                if !is_auto_size && !sizing.zone_sizing_run_done {
-                    if row.max_cool_vol_flow_rate > 0.0 { return Err(Error::Unavailable("actual SizePurchasedAir CoolingAirFlowSizer1808")); }
-                } else {
-                    sizing.zone_cooling_only_fan = true;
-                    let temp_size = row.max_cool_vol_flow_rate;
-                    return Err(Error::Unavailable("actual SizePurchasedAir CoolingAirFlowSizer1821"));
+                print_flag=true;is_auto_size=false;
+                {let row=self.purchased_unit(unit_number)?;if row.max_cool_vol_flow_rate == -99999.0 && (row.cooling_limit==Limit::FlowRate||row.cooling_limit==Limit::FlowRateAndCapacity||(row.outdoor_air&&row.economizer_type!=Econ::NoEconomizer)){is_auto_size=true;}}
+                if !is_auto_size && !o.sizing.zone_sizing_run_done {
+                    if self.purchased_unit(unit_number)?.max_cool_vol_flow_rate>0.0 {
+                        let string_override=if *o.source_is_epjson {"maximum_cooling_air_flow_rate [m3/s]"}else{"Maximum Cooling Air Flow Rate [m3/s]"};
+                        let result=size_source_component(Sizer::CoolingAirFlow,string_override,self.purchased_unit(unit_number)?.max_cool_vol_flow_rate,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                        self.purchased_unit_mut(unit_number)?.max_cool_vol_flow_rate=result;
+                    }
+                }else{
+                    o.sizing.zone_cooling_only_fan=true;
+                    let temp_size=self.purchased_unit(unit_number)?.max_cool_vol_flow_rate;
+                    let string_override=if *o.source_is_epjson {"maximum_cooling_air_flow_rate [m3/s]"}else{"Maximum Cooling Air Flow Rate [m3/s]"};
+                    max_cool_vol_flow_rate_des=size_source_component(Sizer::CoolingAirFlow,string_override,temp_size,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                    self.purchased_unit_mut(unit_number)?.max_cool_vol_flow_rate=max_cool_vol_flow_rate_des;
+                    o.sizing.zone_cooling_only_fan=false;
                 }
-                is_auto_size = false;
-                field_number = 8;
-                sizing_string = self.purchased_numeric_field_name(unit_number, field_number)?.to_owned() + " [m3/s]";
-                if row.max_cool_tot_cap == -99999.0 && (row.cooling_limit == Limit::Capacity || row.cooling_limit == Limit::FlowRateAndCapacity) { is_auto_size = true; }
-                if !is_auto_size && !sizing.zone_sizing_run_done {
-                    if row.max_cool_tot_cap > 0.0 { return Err(Error::Unavailable("actual SizePurchasedAir CoolingCapacitySizer1844")); }
-                } else {
-                    sizing.zone_cooling_only_fan = true;
+                is_auto_size=false;field_number=8;sizing_string=self.purchased_numeric_field_name(unit_number,field_number)?.to_owned()+" [m3/s]";
+                {let row=self.purchased_unit(unit_number)?;if row.max_cool_tot_cap == -99999.0 && (row.cooling_limit==Limit::Capacity||row.cooling_limit==Limit::FlowRateAndCapacity){is_auto_size=true;}}
+                if !is_auto_size && !o.sizing.zone_sizing_run_done {
+                    if self.purchased_unit(unit_number)?.max_cool_tot_cap>0.0 {
+                        let result=size_source_component(Sizer::CoolingCapacity,&sizing_string,self.purchased_unit(unit_number)?.max_cool_tot_cap,print_flag,&comp_type,&comp_name,o.sizing,o.globals,o.hvac,o.air_loop,o.source_is_epjson,report,&mut errors_found)?;
+                        self.purchased_unit_mut(unit_number)?.max_cool_tot_cap=result;
+                    }
+                }else{
+                    o.sizing.zone_cooling_only_fan=true;
                     return Err(Error::Unavailable("actual SizePurchasedAir FinalZoneSizing.MinOA1851"));
                 }
-                if max_cool_tot_cap_des < 1.0 { max_cool_tot_cap_des = 0.0; }
+                if max_cool_tot_cap_des<1.0 {max_cool_tot_cap_des=0.0;}
                 if is_auto_size {
-                    self.purchased_unit_mut(unit_number)?.max_cool_tot_cap = max_cool_tot_cap_des;
-                    return Err(Error::Unavailable("actual SizePurchasedAir reportSizerOutput1865"));
-                } else if row.max_cool_tot_cap > 0.0 && max_cool_tot_cap_des > 0.0 {
-                    max_cool_tot_cap_user = row.max_cool_tot_cap;
-                    return Err(Error::Unavailable("actual SizePurchasedAir reportSizerOutput1879"));
+                    self.purchased_unit_mut(unit_number)?.max_cool_tot_cap=max_cool_tot_cap_des;
+                    report_sizer_output(report,&comp_type,&comp_name,"Design Size Maximum Total Cooling Capacity [W]",max_cool_tot_cap_des,None,None)?;
+                    if self.purchased_unit(unit_number)?.outdoor_air {return Err(Error::Unavailable("actual SizePurchasedAir FinalZoneSizing.MinOA1868"));}
+                }else if self.purchased_unit(unit_number)?.max_cool_tot_cap>0.0 && max_cool_tot_cap_des>0.0 {
+                    max_cool_tot_cap_user=self.purchased_unit(unit_number)?.max_cool_tot_cap;
+                    report_sizer_output(report,&comp_type,&comp_name,"Design Size Maximum Total Cooling Capacity [W]",max_cool_tot_cap_des,Some("User-Specified Maximum Total Cooling Capacity [W]"),Some(max_cool_tot_cap_user))?;
+                    if o.globals.display_extra_warnings {
+                        if ((max_cool_tot_cap_des-max_cool_tot_cap_user).abs()/max_cool_tot_cap_user)>o.sizing.autosizing.AutoVsHardSizingThreshold {return Err(Error::Unavailable("actual SizePurchasedAir cooling sizing difference ShowMessage1890"));}
+                    }
                 }
             }
         }
@@ -269,4 +291,17 @@ impl OrdinaryEquipment {
             .and_then(|row|row.field_names.as_ref()).and_then(|names|names.get(field_number.checked_sub(1)?))
             .map(String::as_str).ok_or(Error::Unavailable("actual PurchasedAir sizing FieldNames ordinal"))
     }
+}
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl OrdinaryEquipment {
+    // These typed0 identities are unused Source bookkeeping only; Native's sizing
+    // unit has no Zone/Space allocation, and this helper does not construct one.
+    pub(crate) fn source_sizer_cohort_cold_owner() -> Result<Self, Error> {
+        Self::new_owners(None, &[ep_model::ZoneId(0)], &[ep_model::SpaceId(0)])
+            .map_err(|_| Error::Unavailable("test-only Source cold sizing owner"))
+    }
+    pub(crate) fn source_sizer_cohort_full_size<D:SourceOutputDictionaryHost>(
+        &mut self, o:&mut SourcePurchasedAirInitOwners<'_>, report:&mut SourceSizerReportingOwners<'_,D>
+    ) -> Result<(), Error> { self.size_source_purchased_air(1,o,report) }
 }

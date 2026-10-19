@@ -46,11 +46,10 @@ impl SourceTabularReports {
             SourceOutputStoreType::Average,
         )?;
         for _pass in 0..self.input_state.tabular_report_passes.len() {
-            // Native14247 iterates the entire allocation, not the occupied count.
-            // Positive CompSize records remain unrepresented in this finite API.
+            // Native14247 resets the entire actual allocation, including its tail.
             if let Some(entries) = &mut registry.component_sizing_entries {
                 for entry in entries {
-                    match *entry {}
+                    entry.written = false;
                 }
             }
             let count = extent(registry.component_sizing_count)?;
@@ -58,16 +57,22 @@ impl SourceTabularReports {
             let _unique_obj = vec![String::new(); count];
             let mut loop_limit = 0;
             while loop_limit <= 100 {
-                let found_entry = 0;
+                let mut found_entry = 0;
                 loop_limit += 1;
-                for _entry in 1..=registry.component_sizing_count {
-                    return Err(Error::Unavailable(
-                        "actual WriteComponentSizing14269 CompSizeTableEntry.written read",
-                    ));
+                for number in 1..=registry.component_sizing_count {
+                    let index = usize::try_from(number - 1)
+                        .map_err(|_| Error::Unavailable("actual WriteComponentSizing entry ordinal14268"))?;
+                    let entry = registry.component_sizing_entries.as_ref().and_then(|rows| rows.get(index))
+                        .ok_or(Error::Unavailable("actual WriteComponentSizing entry allocation14268"))?;
+                    if !entry.written {
+                        found_entry = number;
+                        break;
+                    }
                 }
                 if found_entry == 0 {
                     break;
                 }
+                return Err(Error::Unavailable("actual WriteComponentSizing positive grouped-table child14276"));
             }
         }
         Ok(())

@@ -1,0 +1,478 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "new_test_bodies": 0,
+  "new_targets_features_dependencies": 0,
+  "selected_files": 16,
+  "selected_existing": 10,
+  "selected_new": 6,
+  "production_changes": 13,
+  "test_only_successors": 6,
+  "shared_stage_paths": 3,
+  "compiler_inputs": 4517,
+  "Rust_sources": 4504,
+  "actual_Source_focused_invocations": 1,
+  "actual_Source_CLI_invocations": 5,
+  "actual_new_Native_unit_invocations": 1,
+  "Native_engine_or_full_suite_rerun": false,
+  "validation_scope": "Actual one existing59case Source scientific body, independent Native59 full original-core function run, five actual normal Source24h CLI completions. Subsequent read-only comparison files are separate from the historical aggregate scope; CAPACITY25 raw/bit differences remain explicit, zero original-tolerance/RMSE failures. No limit72h/annual/full15/64card or blanket ancillary IO PASS.",
+  "schema": "src06-canonical-hard-sized-purchased-air43.v1",
+  "status": "Genuine Base/FanHeat/Scalable four Sizers and real component sizing reports; actual59case pass and five Source62024h completions",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/manifest.json",
+    "sha256": "07042064f18e8ccbf7eb42a3303c68b5d0cf393cc9f5acc0a1bcbc624a4712c2",
+    "bytes": 122234
+  },
+  "production_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-hard-sized-purchased-air-Source-review-43-04/review.json",
+    "sha256": "3fe10f9e890c8737c06935296a360f0a028a141188661c71bc70b98fd786e843",
+    "bytes": 28113
+  },
+  "test_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-hard-size-Source-cohort-review-43-02/review.json",
+    "sha256": "b11edd054913319872d6656e4d4713f3fc690bd9c91d3d558812d873c3d9554d",
+    "bytes": 15984
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/complete-final-compiler-Source-plan.json",
+    "sha256": "0e375beed2838380d857e424b6215c937d8a2b163945647e44a18eaf91280958",
+    "bytes": 2642502
+  },
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root-hard-sized-purchased-air-cohort-application-43/receipt.json",
+    "sha256": "3ce67870fba913b8698076eb11f010635e55ce4c23c7410fb37c0892c63d8dc5",
+    "bytes": 81341
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-hard-sized-purchased-air-actual-review-43/review.json",
+    "sha256": "7d99de8f8f795a95e60019881da44ca2676af137e549b49d1b6eaa5e28a8e2ca",
+    "bytes": 55442
+  },
+  "Source_focused_test": {
+    "path": ".runtime/porting/SRC-06/canonical-source-hard-size-cohort-Root-43/receipt.json",
+    "sha256": "15582a03e61f782c62ffe68fbdc147fcd6a9ba4109944f6fdd0c74e6f1a9f4f0",
+    "bytes": 4832
+  },
+  "actual_focused_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-hard-size-cohort-actual-review-43/review.json",
+    "sha256": "4694e170a388c2cda1543b497ae2f7a23d85b3be4d541d2084071197fb35de2b",
+    "bytes": 7009
+  },
+  "actual_Native59_unit": {
+    "path": ".runtime/porting/SRC-06/hard-size-native-unit-run-Root-43/receipt.json",
+    "sha256": "c20b291f8fe299c88f3301f687b0dafcdd95958cfef8303c21594a93b165eb18",
+    "bytes": 10254
+  },
+  "actual_59cases_bit_exact": 59,
+  "actual_finite_binary64_fields": 19781,
+  "actual_test_bodies_executed": 1,
+  "actual_production_CLI_invocations": 5,
+  "actual_Source_completed_cases": [
+    "B-NOLIMIT-24H",
+    "B-FLOW-24H",
+    "B-CAPACITY-24H",
+    "B-BOTH-24H",
+    "A-24H"
+  ],
+  "ordered_cases": [
+    {
+      "case": "B-NOLIMIT-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-command-Root-43/receipt.json",
+        "sha256": "55db69248c7c73c869ac7d13c889ac90fdc426d4f2d3d9aa215bcef25cc6f4f1",
+        "bytes": 5537
+      },
+      "exit_code": 0,
+      "Source620_completed": true,
+      "true_post_sizing_frontier": null,
+      "reported_output_Native_equivalence_claim": false,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/run-summary.json",
+        "sha256": "6223b7dbc0f6223897a77abf6cefee0656a38f117bcfb9f95628d4acbaec0b1e",
+        "bytes": 61386
+      },
+      "diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/diagnostics.json",
+        "sha256": "a51a7484b1f406ddff66e7fe9f62d8aff186866a25e3cfb0b7723b5bdf867a8d",
+        "bytes": 2589
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "bytes": 13025
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      }
+    },
+    {
+      "case": "B-FLOW-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/receipt.json",
+        "sha256": "43fc7c851985b830d5cc20d7e652b772cf458e43b96fb8d54df103de557c75d1",
+        "bytes": 5526
+      },
+      "exit_code": 0,
+      "Source620_completed": true,
+      "true_post_sizing_frontier": null,
+      "reported_output_Native_equivalence_claim": false,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/run-summary.json",
+        "sha256": "680a6fa9df44f80db74538ebe1e4587da89095b4c3e7263d49b6ed1eecdfb7aa",
+        "bytes": 60898
+      },
+      "diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/diagnostics.json",
+        "sha256": "e60d6dc33c4c028e9fb76d94098378b732f787bfbf428ad62540181be5095d30",
+        "bytes": 2589
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+        "bytes": 13042
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      }
+    },
+    {
+      "case": "B-CAPACITY-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/receipt.json",
+        "sha256": "dfcec4ecca0901677214d9d96fd7b84617b615fd798a373100992d3aae29fc1a",
+        "bytes": 5541
+      },
+      "exit_code": 0,
+      "Source620_completed": true,
+      "true_post_sizing_frontier": null,
+      "reported_output_Native_equivalence_claim": false,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/run-summary.json",
+        "sha256": "5af5684d8c9943f5875ae3ae37f32f2357083b273bf3ce4392a27b78b4d8d186",
+        "bytes": 61005
+      },
+      "diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/diagnostics.json",
+        "sha256": "8cf30cf4c71efb2c568a207ede0d1a63064f4b01e6a10d0128a1d91465c2e3e1",
+        "bytes": 2589
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+        "bytes": 13044
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      }
+    },
+    {
+      "case": "B-BOTH-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/receipt.json",
+        "sha256": "40cfb8fdfaa484b74370baa841bc812a19c33aac33762371401a7950fb7f8cfc",
+        "bytes": 5526
+      },
+      "exit_code": 0,
+      "Source620_completed": true,
+      "true_post_sizing_frontier": null,
+      "reported_output_Native_equivalence_claim": false,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/run-summary.json",
+        "sha256": "3a5dffa25a60472c4bb6ba164a4574ce253c7328920dbbd36bb810a6234cfed0",
+        "bytes": 60889
+      },
+      "diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/diagnostics.json",
+        "sha256": "d2e489c83bd158fd861116e2fdea7f53bda9e7cb6690d5d527319da81692f489",
+        "bytes": 2589
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+        "bytes": 13070
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      }
+    },
+    {
+      "case": "A-24H",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-command-Root-43/receipt.json",
+        "sha256": "9ba082bcd7e9c6be7446aa8e0f6df6c295254c72bc9a7e8046ebe5455b8f6d44",
+        "bytes": 5485
+      },
+      "exit_code": 0,
+      "Source620_completed": true,
+      "true_post_sizing_frontier": null,
+      "reported_output_Native_equivalence_claim": false,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/run-summary.json",
+        "sha256": "dd07a55adb7880fcfa74d086e4a012ce8fbd2e38260d4072049be87cef4ed9d9",
+        "bytes": 32800
+      },
+      "diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/diagnostics.json",
+        "sha256": "dc2de4d48dc6c9421c6838e9401acf5eccee858056b590c6e8e8dc0dc2a83c27",
+        "bytes": 6151
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "bytes": 9275
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      }
+    }
+  ],
+  "physical_sizing_EIO_rows_paired": [
+    {
+      "case": "B-FLOW-24H",
+      "physical_Source_EIO": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.eio",
+        "sha256": "bf59931d5edcf817994d15d95d317236c89dc55fb10feb82ffce148d625b6a4f",
+        "bytes": 13050
+      },
+      "actual_Native_unit": {
+        "path": ".runtime/porting/SRC-06/hard-size-native-unit-run-Root-43/receipt.json",
+        "sha256": "c20b291f8fe299c88f3301f687b0dafcdd95958cfef8303c21594a93b165eb18",
+        "bytes": 10254
+      },
+      "Native_full_Size_case": "full-SizePurchasedAir-FLOW",
+      "rows": 2,
+      "selected_all_row_bytes_equal_after_only_memoryLF_to_physicalCRLF_terminator_bridge": true
+    },
+    {
+      "case": "B-CAPACITY-24H",
+      "physical_Source_EIO": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.eio",
+        "sha256": "5a1ebcc085e0d54ac604850830890781ac78900f1a9d4252741f210419886587",
+        "bytes": 13337
+      },
+      "actual_Native_unit": {
+        "path": ".runtime/porting/SRC-06/hard-size-native-unit-run-Root-43/receipt.json",
+        "sha256": "c20b291f8fe299c88f3301f687b0dafcdd95958cfef8303c21594a93b165eb18",
+        "bytes": 10254
+      },
+      "Native_full_Size_case": "full-SizePurchasedAir-CAPACITY",
+      "rows": 4,
+      "selected_all_row_bytes_equal_after_only_memoryLF_to_physicalCRLF_terminator_bridge": true
+    },
+    {
+      "case": "B-BOTH-24H",
+      "physical_Source_EIO": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.eio",
+        "sha256": "cf16f5fd088a6a45ba6622757ac463beff63466d7b6d3e48247ca781b129ebac",
+        "bytes": 13637
+      },
+      "actual_Native_unit": {
+        "path": ".runtime/porting/SRC-06/hard-size-native-unit-run-Root-43/receipt.json",
+        "sha256": "c20b291f8fe299c88f3301f687b0dafcdd95958cfef8303c21594a93b165eb18",
+        "bytes": 10254
+      },
+      "Native_full_Size_case": "full-SizePurchasedAir-BOTH",
+      "rows": 6,
+      "selected_all_row_bytes_equal_after_only_memoryLF_to_physicalCRLF_terminator_bridge": true
+    }
+  ],
+  "regression_proof_transfers": {
+    "A24_series": 58,
+    "A24_samples": 5352,
+    "NoLimit_series": 102,
+    "NoLimit_samples": 9792,
+    "accepted44": {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-predefined-actual-review-44/review.json",
+      "sha256": "a0200bcebc991909674966221d2e0d9c46f71c273ebc2a4f53067611420a8c0d",
+      "bytes": 19106
+    },
+    "accepted45_NoLimit": {
+      "path": ".runtime/porting/SRC-06/Root-nolimit-B24-durations-actual-review-45/review.json",
+      "sha256": "ea21b8494191229fce99742599df474054fde4f2c8eb950097384606117b962f",
+      "bytes": 43666
+    },
+    "scope": "Separate actual unchanged full physical/CSV/JSON/runtime proofs; no A/B production evidence is inferred from the sizing unit."
+  },
+  "supplemental_24h_limit_reported_comparisons": [
+    {
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-FLOW-24H-reported-Root-43/comparison.json",
+        "sha256": "69d39a7afb0185640a1ba4cc7473bfb2eb0829d80867311cc24fb330f5fa9d0d",
+        "bytes": 146278
+      },
+      "case": "B-FLOW-24H",
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+        "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08",
+        "bytes": 38121
+      },
+      "Native_authority_kind": "actual CON01 API-observer engine summary (not CLI receipt)",
+      "totals": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 0,
+        "parsed_binary64_unequal": 0,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      }
+    },
+    {
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-24H-reported-Root-43/comparison.json",
+        "sha256": "9da0259a8871f7bcb730fdbb8c5f7a158fa801eb69460850642b36a037450dd9",
+        "bytes": 148123
+      },
+      "case": "B-CAPACITY-24H",
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+        "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d",
+        "bytes": 41968
+      },
+      "Native_authority_kind": "actual CON01 API-observer engine summary (not CLI receipt)",
+      "totals": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 25,
+        "parsed_binary64_unequal": 25,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      }
+    },
+    {
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-BOTH-24H-reported-Root-43/comparison.json",
+        "sha256": "fd1fc80e435c905ef13da1e6a492389242760a02f518c685dfe5ec0548966d18",
+        "bytes": 146278
+      },
+      "case": "B-BOTH-24H",
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+        "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef",
+        "bytes": 40997
+      },
+      "Native_authority_kind": "actual CON01 API-observer engine summary (not CLI receipt)",
+      "totals": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 0,
+        "parsed_binary64_unequal": 0,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      }
+    }
+  ],
+  "FLOW_CAPACITY_BOTH_reported_Native_numerics": "Separate later read-only actual24h comparisons all pass unchanged original tolerances/RMSE; CAPACITY25 raw/binary64 differences retained. Historical aggregate7d99 remains unchanged. Limit72h/annual/internal-state and ancillary IO not certified here",
+  "ancillary_full_IO_PASS": false,
+  "source_Git_transport": {
+    "Git_filter_view": {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/receipt.json",
+      "sha256": "268d46e57bf18b723d4b981210f3f2378a3125ee3433939c0e80f6d9a532bce5",
+      "bytes": 12579
+    },
+    "actual_staged_index_view": {
+      "path": ".runtime/porting/SRC-06/Root-source43-actual-staged-index-view/receipt.json",
+      "sha256": "736f22b7e61ea8eb7110466bcfa95ce457f89adee4427c7107d9ae44c10dd49e",
+      "bytes": 6680
+    },
+    "actual_staged_index_verified": true,
+    "compiled_archive_live_sources_unchanged": true,
+    "selected_files": 16,
+    "Git_CRLF_to_LF_projection_files": 3,
+    "other_Git_blobs_whole_equal_compiled_bytes": 13,
+    "CRLF_projection_details": [
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+          "sha256": "953a6d41325765e8d51652457a315cec37c57e2844f5691532769b8e83deb777",
+          "bytes": 24046
+        },
+        "CRLF_count": 294,
+        "Git_filter_blob_oid": "79dcc030388f66cbd338800a3fecc457cee6a168",
+        "canonical_Git_LF_sha256": "26152fb9ca12e49f5bf76d180fa07d1bcf781025be86062c4a8fc994e2a953c1",
+        "canonical_Git_LF_bytes": 23752,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+          "sha256": "26152fb9ca12e49f5bf76d180fa07d1bcf781025be86062c4a8fc994e2a953c1",
+          "bytes": 23752
+        }
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+          "sha256": "0cacd187319069b9d5b6da1a44704d74b212208943ab97fca74a3802440a368c",
+          "bytes": 25618
+        },
+        "CRLF_count": 311,
+        "Git_filter_blob_oid": "63c10ef4aa7a33fa76b4e0447175bdfccea34d8c",
+        "canonical_Git_LF_sha256": "04da3f97ef0908c52d9fe5217939fa8983e4d038e3731fd0e0f5a0bd83b883ab",
+        "canonical_Git_LF_bytes": 25307,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+          "sha256": "04da3f97ef0908c52d9fe5217939fa8983e4d038e3731fd0e0f5a0bd83b883ab",
+          "bytes": 25307
+        }
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+          "sha256": "14c6f5813cdf45c4c14886fa4a1092f83a3aeb4535269ebfc0a2402722774843",
+          "bytes": 8835
+        },
+        "CRLF_count": 167,
+        "Git_filter_blob_oid": "7a139b487f4128a31dc9e80fdeb767bd4e004b5d",
+        "canonical_Git_LF_sha256": "fc061915d89d24c43f36e732b3dceee44c80fb6705b38c4d1a9fe00707660533",
+        "canonical_Git_LF_bytes": 8668,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+          "sha256": "fc061915d89d24c43f36e732b3dceee44c80fb6705b38c4d1a9fe00707660533",
+          "bytes": 8668
+        }
+      }
+    ],
+    "qualification": "Actual4517 compiler/archive/live byte proofs and all59/fiveCLI results remain authentic raw bytes. Root read the actual staged sixteen Git blobs: exactly three equal only CRLF-to-LF projections and thirteen equal raw compiled bytes. This records no numerical change or rerun; final documentation/evidence staging, commit and later live-LF compiler transport bridge remain separate Root actions."
+  },
+  "limits": [
+    "One actual59case Source main-body pass is a separate scientific sizing certificate, not A/B production regression evidence.",
+    "NoLimit+A24 original numerical/own-export proofs transfer only through separate whole physical/CSV/JSON/runtime comparisons; A tables allow only exact existing clock/date metadata positions.",
+    "FLOW/CAP/BOTH actual0 results are Source620 execution facts only until separate Native reported comparisons; typed6 records remain actual frontiers, never numerical PASS.",
+    "Only component sizing EIO selected rows are paired here to true Native full functions/retained original CON01 rows, with explicit owned LF/CRLF terminator bridge. No blanket normalization.",
+    "No whole15/card/gate/ancillary-I/O completion or positive unrepresented design/autosize/fan/SQL branch proof."
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hard-sized-purchased-air-43/evidence.zip",
+    "sha256": "0a033edb821dcf4e01ce2fe74707714baddb2dc0b64ba472b7de4aedb268cc7c",
+    "bytes": 5218867
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hard-sized-purchased-air-43/manifest.json",
+    "sha256": "6a97babfb71d1b83210436dfe6d42f93b855382a472adc63c6fafb1e539cdbe5",
+    "bytes": 109957
+  },
+  "archive_entries": 431,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-hard-sized-purchased-air-checkpoint-Peer-43-02.py",
+    "sha256": "c25d6f4d05396d885fe25ace19eb526489d09989d8ac587a89f4d4beca635baf",
+    "bytes": 12153
+  }
+}

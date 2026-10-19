@@ -141,6 +141,7 @@ fn canary_state(begin_envrn: bool, holiday: i32) -> WeatherDayState {
             },
             source_weather_station_initialized: true,
             source_site_atmosphere_initialized: true,
+            one_time_component_report_header_flag: false,
             force_begin_env_reset_suppress: true,
             previous_sol_rad_positive: true,
             cloud_fraction: real(315, 0),

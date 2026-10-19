@@ -64,6 +64,7 @@ impl OrdinaryEquipment {
         output:&mut SourcePurchasedAirReportingOutputContext<'_,H,D>,
         initialization:&mut SourcePurchasedAirInitOwners<'_>,
         calculation:&mut SourcePurchasedAirCalcOwners<'_, '_>,
+        predefined_registry:&mut crate::heat_balance::predefined_tables::PredefinedRegistry,
         first_hvac_iteration:bool,system_output:&mut f64,moisture_output:&mut f64,
     )->Result<(),Error>{
         if self.purchased_air.get_purchased_air_input {
@@ -99,7 +100,13 @@ impl OrdinaryEquipment {
                     .ok_or(Error::Unavailable("actual SimPurchasedAir CheckEquipName197"))?=false;
             }
         }
-        self.initialize_source_purchased_air(unit_number, controlled_zone, schedules, initialization)?;
+        {
+            let mut report=crate::heat_balance::selected_sizing::sizer_output::SourceSizerReportingOwners {
+                registry:predefined_registry,environment:&mut *calculation.environment,
+                dictionary_host:&*output.dictionary_host,eio:&mut *output.eio,
+            };
+            self.initialize_source_purchased_air(unit_number, controlled_zone, schedules, initialization,&mut report)?;
+        }
         self.calculate_source_purchased_air(unit_number,controlled_zone,system_output,moisture_output,schedules,calculation)?;
         self.update_source_purchased_air(unit_number,first_hvac_iteration)?;
         self.report_source_purchased_air(unit_number,schedules,calculation)?;
@@ -301,5 +308,22 @@ impl OrdinaryEquipment {
     pub(crate) fn source_purchased_air_mixed_air_humidity_ratio(&self, number: i32) -> Result<f64, Error> {
         self.source_purchased_air_report_input()?;
         Ok(self.purchased_unit(number)?.mixed_air_hum_rat)
+    }
+}
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl OrdinaryEquipment {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn source_sizer_cohort_size_bridge<D:SourceOutputDictionaryHost>(
+        &mut self, sizing:&mut crate::heat_balance::selected_sizing::SelectedSizingManager,
+        globals:&crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+        hvac:&crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+        air_loop:&crate::heat_balance::ordinary_hvac_manager::simulation::state::SourceAirLoopData,
+        report:&mut crate::heat_balance::selected_sizing::sizer_output::SourceSizerReportingOwners<'_,D>,
+    )->Result<(),crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>{
+        let fan=crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+        let clock=crate::weather::day::WeatherGlobalState::default();let format=false;
+        let mut o=initialization::SourcePurchasedAirInitOwners{sizing,fan:&fan,globals,clock:&clock,hvac,air_loop,source_is_epjson:&format};
+        self.source_sizer_cohort_full_size(&mut o,report)
     }
 }

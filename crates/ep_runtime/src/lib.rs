@@ -44,6 +44,13 @@ pub use zone_equipment::*;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let selection=std::env::args().skip(1).collect::<Vec<_>>();
+    if selection.len()==1 && selection[0]=="--sizer-only" {
+        println!("running 1 native hard-size cohort on process main");
+        let cases=crate::heat_balance::selected_sizing::SelectedSizingManager::run_native_hard_size_cohort()?;
+        println!("cohort native_controlled_air_cohort ... ok");
+        println!("cohort result: ok. 1 passed; 0 failed; genuine Native hard-size cases={cases}");
+        return Ok(());
+    }
     if selection.len()==1 && selection[0]=="--report-only" {
         println!("running 1 native system-report cohort on process main");
         let (energy,vent,variants)=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_system_report_cohort()?;
@@ -51,7 +58,7 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
         println!("cohort result: ok. 1 passed; 0 failed; energy entries={energy}; ventilation entries={vent}; named Native-unit variants={variants}");
         return Ok(());
     }
-    if !selection.is_empty() {return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"expected no arguments or --report-only").into());}
+    if !selection.is_empty() {return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"expected no arguments, --report-only or --sizer-only").into());}
     println!("running 1 native controlled-air cohort on process main");
     crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_controlled_air_cohort()?;
     let (energy,vent,variants)=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_system_report_cohort()?;

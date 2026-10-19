@@ -127,6 +127,8 @@ pub struct WeatherEnvironmentState {
     pub(crate) source_weather_station_initialized: bool,
     /// Rust witness assigned only after the real selected site/EIO return.
     pub(crate) source_site_atmosphere_initialized: bool,
+    /// Native DataEnvironment.hh216 ctortrue; real BaseSizer reporting clears it.
+    pub one_time_component_report_header_flag: bool,
     /// Actual DataEnvironment constructor false; GetProjectData may override it.
     pub force_begin_env_reset_suppress: bool,
     /// Actual DataEnvironment.hh130 EMS control, constructorfalse.
@@ -308,6 +310,7 @@ impl Default for WeatherEnvironmentState {
             },
             source_weather_station_initialized: false,
             source_site_atmosphere_initialized: false,
+            one_time_component_report_header_flag: true,
             force_begin_env_reset_suppress: false,
             ems_out_dry_bulb_override_on: false,
             ems_out_dry_bulb_override_value: 0.0,

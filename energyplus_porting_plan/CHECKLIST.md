@@ -340,3 +340,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source45 NoLimit B24/72/annual validation](evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json). Source44의 동일한 빌드로 B72와 연간을 실행하고 새 Native 기준 실행을 각각 연결했다. 새 테스트 빌드는 없으며 공개 비교 도구에 Regular RDD 읽기만 추가했다. 카드·게이트 수치는 변경하지 않았다.
+
+
+[Source43 hard-sized PurchasedAir](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json). One existing process-main selector passed all59 genuine full-Native sizing cases (19,781 raw binary64 fields); four B24h modes and A24h all completed Source620. Separate reported-stream comparisons passed original tolerances. Gates remain A14/54 and B14/64.

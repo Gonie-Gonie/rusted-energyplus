@@ -47,11 +47,23 @@ pub(crate) struct SourcePredefinedShadowRelation {
     pub(crate) receiving_kind: i32,
 }
 
+/// Actual CompSizeTableEntryType seven default-initialized Native members.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceComponentSizingEntry {
+    pub(crate) component_type: String,
+    pub(crate) component_name: String,
+    pub(crate) description: String,
+    pub(crate) value: f64,
+    pub(crate) string_value: String,
+    pub(crate) active: bool,
+    pub(crate) written: bool,
+}
+
 /// Actual allocated registry arrays, counters, named indices and layer vector.
 ///
 /// Full allocated vectors include unoccupied slots. Each occupied index is
 /// one-based. Table entries and unrelated report aggregates remain caller-owned.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PredefinedRegistry {
     /// Actual reportName allocation, including its unused tail.
     pub reports: Option<Vec<PredefinedReportName>>,
@@ -71,9 +83,8 @@ pub struct PredefinedRegistry {
     pub column_capacity: i32,
     /// Actual numColumnTag.
     pub column_count: i32,
-    /// Actual CompSizeTableEntry Array1D constructor-unallocated; positive records
-    /// are unrepresented in the admitted empty-sizing Source domain.
-    pub(crate) component_sizing_entries: Option<Vec<std::convert::Infallible>>,
+    /// Actual CompSizeTableEntry Array1D, including its full allocated tail.
+    pub(crate) component_sizing_entries: Option<Vec<SourceComponentSizingEntry>>,
     /// Actual sizeCompSizeTableEntry constructor0.
     pub(crate) component_sizing_capacity: i32,
     /// Actual numCompSizeTableEntry constructor0.
@@ -157,6 +168,25 @@ fn next_slot<T: Clone + Default>(
 }
 
 impl PredefinedRegistry {
+    /// Genuine AddCompSizeTableEntry1975-2005; preserve all other row members.
+    pub(crate) fn add_component_sizing_real_entry(
+        &mut self,
+        component_type: &str,
+        component_name: &str,
+        description: &str,
+        value: f64,
+    ) -> Result<(), CtfReportUnavailable> {
+        let index = next_slot(&mut self.component_sizing_entries,
+            &mut self.component_sizing_capacity, &mut self.component_sizing_count)?;
+        let row = self.component_sizing_entries.as_mut().and_then(|rows| rows.get_mut(index))
+            .ok_or(CtfReportUnavailable::TableOwner)?;
+        row.component_type = component_type.to_owned();
+        row.component_name = component_name.to_owned();
+        row.description = description.to_owned();
+        row.value = value;
+        Ok(())
+    }
+
     /// Full SetPredefinedTables sequence with the caller's actual sizing flags.
     /// Existing arrays, named IDs and layer vector are retained across visits.
     pub fn set_predefined_tables(

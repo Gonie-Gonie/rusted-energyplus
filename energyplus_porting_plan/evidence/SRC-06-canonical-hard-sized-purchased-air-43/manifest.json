@@ -1,0 +1,2240 @@
+{
+  "schema": "src06-canonical-hard-size43-finite-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hard-sized-purchased-air-43/evidence.zip",
+    "sha256": "0a033edb821dcf4e01ce2fe74707714baddb2dc0b64ba472b7de4aedb268cc7c",
+    "bytes": 5218867
+  },
+  "entries": [
+    {
+      "path": ".gitattributes",
+      "sha256": "f603b618b76520ba29dfe34fd18ecef07c3b043169b1cf37b3d6d697d6599b06",
+      "bytes": 880
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.eio",
+      "sha256": "a5df8c4f25d2be7cb79dadee2fc4930daa160d30bb322b3ddfb06d0e1351cb1d",
+      "bytes": 13673
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.eio",
+      "sha256": "c0339d86040a8e73fe9565692df7df7488f6681ca1d2abb991756b3969453124",
+      "bytes": 13373
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.eio",
+      "sha256": "edc9679274d78f79adeb5b978b03c4e5a68c4db9a63015e7286a0b85e6b5d636",
+      "bytes": 13086
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-hard-size-Native-unit-Source-review-43/review.json",
+      "sha256": "65d58b81be358160308de45520ba3d71e350927d2774ee85656ec0017a680b21",
+      "bytes": 8625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-hard-size-Source-cohort-review-43-02/review.json",
+      "sha256": "b11edd054913319872d6656e4d4713f3fc690bd9c91d3d558812d873c3d9554d",
+      "bytes": 15984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-hard-sized-purchased-air-Source-review-43-04/review.json",
+      "sha256": "3fe10f9e890c8737c06935296a360f0a028a141188661c71bc70b98fd786e843",
+      "bytes": 28113
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-hard-sized-purchased-air-cohort-application-43/receipt.json",
+      "sha256": "3ce67870fba913b8698076eb11f010635e55ce4c23c7410fb37c0892c63d8dc5",
+      "bytes": 81341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-nolimit-B24-durations-actual-review-45/review.json",
+      "sha256": "ea21b8494191229fce99742599df474054fde4f2c8eb950097384606117b962f",
+      "bytes": 43666
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hard-size-cohort-actual-review-43/review.json",
+      "sha256": "4694e170a388c2cda1543b497ae2f7a23d85b3be4d541d2084071197fb35de2b",
+      "bytes": 7009
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hard-sized-purchased-air-actual-review-43/A24-table-clock-differences.json",
+      "sha256": "41a3df415203b989d666235b00ca79cfe6fed4918f2a4d14f0c5e4ed41763bfc",
+      "bytes": 7844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hard-sized-purchased-air-actual-review-43/review.json",
+      "sha256": "7d99de8f8f795a95e60019881da44ca2676af137e549b49d1b6eaa5e28a8e2ca",
+      "bytes": 55442
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-predefined-actual-review-44/review.json",
+      "sha256": "a0200bcebc991909674966221d2e0d9c46f71c273ebc2a4f53067611420a8c0d",
+      "bytes": 19106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+      "sha256": "26152fb9ca12e49f5bf76d180fa07d1bcf781025be86062c4a8fc994e2a953c1",
+      "bytes": 23752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+      "sha256": "04da3f97ef0908c52d9fe5217939fa8983e4d038e3731fd0e0f5a0bd83b883ab",
+      "bytes": 25307
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+      "sha256": "fc061915d89d24c43f36e732b3dceee44c80fb6705b38c4d1a9fe00707660533",
+      "bytes": 8668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/receipt.json",
+      "sha256": "268d46e57bf18b723d4b981210f3f2378a3125ee3433939c0e80f6d9a532bce5",
+      "bytes": 12579
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source43-actual-staged-index-view/receipt.json",
+      "sha256": "736f22b7e61ea8eb7110466bcfa95ce457f89adee4427c7107d9ae44c10dd49e",
+      "bytes": 6680
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-hard-size-cohort-combined-Root-43.py",
+      "sha256": "408d6e34182e873fa53fe23154b13216263ed66bd7cb69fca142741f690988dd",
+      "bytes": 10177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-hard-size-Source-cohort-Peer-43.py",
+      "sha256": "955bdc8d459567909381faa76deda4501b1e6776f86ec67831ae167e43c287a9",
+      "bytes": 21633
+    },
+    {
+      "path": ".runtime/porting/SRC-06/build-hard-size-Native-unit-Peer-43.py",
+      "sha256": "fa185d1eaab619745be7ad79dcd64b621b4ae3d6d87b8a18a54482e5197df27d",
+      "bytes": 6304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-size-cohort-Root-43/receipt.json",
+      "sha256": "15582a03e61f782c62ffe68fbdc147fcd6a9ba4109944f6fdd0c74e6f1a9f4f0",
+      "bytes": 4832
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-size-cohort-Root-43/stderr.log",
+      "sha256": "ed4b8ab9a6e4b41830db4b14d411e3c5d3f81674a0630b00c19e83929a6ab25b",
+      "bytes": 1503445
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-size-cohort-Root-43/stdout.log",
+      "sha256": "912d1a44e8409cd97148a96f80fb8f132f58463700643c07b2012ea044d2f326",
+      "bytes": 166
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/clk02-weather-production-trace.json",
+      "sha256": "232f73a017fcde1f215052712ca9423b2c0943c4b8580803007990cdff2fc2bd",
+      "bytes": 92097
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/clk03-weather-day-production-trace.json",
+      "sha256": "5cd14a26539fd685bebc54ff6ccb839ea52b76cb376f8964ccf55d059fb99a26",
+      "bytes": 991
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/clock-calls.json",
+      "sha256": "014d85b8861b6fd18d8c7ae2a6df13bb5ef29048b8095a9c6ceec174840191e0",
+      "bytes": 1114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/compiled-geometry.json",
+      "sha256": "3bd80c1b4b1f386be178152274190b44ae3a4755d444c32dc218f6838f8418be",
+      "bytes": 21272
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/diagnostics.json",
+      "sha256": "dc2de4d48dc6c9421c6838e9401acf5eccee858056b590c6e8e8dc0dc2a83c27",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.bnd",
+      "sha256": "2a74d3295dd901885e8c6c2dfab1af08acb488dc12487fd4332751ed46c42795",
+      "bytes": 6329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.ctf.log",
+      "sha256": "a60bed4789e4c8a7ead18e92629fa6714074f014f8f470be184b9cee7fc08cda",
+      "bytes": 1808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.dbg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.dxf",
+      "sha256": "ad463f2e8fa5e87affe71ef56d0bc6dd9c3061f61f7f20694afe48b97e32cc85",
+      "bytes": 5392
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.err",
+      "sha256": "c16d505d4afa0c1e2ca5d553804f50493c8175647ac6910fc6eb794c8b7c5471",
+      "bytes": 2575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.mtd",
+      "sha256": "d66e7e246cd5333997aeccfa85c9c4754410b521c108f24e3e72bd8c28be9e4f",
+      "bytes": 7395
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplustbl.htm",
+      "sha256": "056b2a2c376a64cfcb90b9b1a495790fc2c32811bcb00b59784ff53995f8bb96",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/eplustbl.xml",
+      "sha256": "09eacbe0bbcdf02efb6c0a6c3d91427765633742a3db95f93bafc4dd3bf985ba",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/geo02-geometry-operands.json",
+      "sha256": "998965d25d41af4104d4383813274e15889c61bb0de84bc2a365daadbb795b7f",
+      "bytes": 598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/input/input-hashes.json",
+      "sha256": "00cccce1e22c8e90e2625c30a63d0aac95b5a982f5a31caa6c9d532bbce7d9a1",
+      "bytes": 757
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/input/original.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "bytes": 27734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "bytes": 9275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/logs/source-order-stage-state-snapshots.json",
+      "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577",
+      "bytes": 9007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/model/execution-plan.json",
+      "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519",
+      "bytes": 33097
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/model/graph-summary.json",
+      "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781",
+      "bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/model/raw-model-summary.json",
+      "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948",
+      "bytes": 969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/model/typed-model-summary.json",
+      "sha256": "ebecdec210bf20e9e8ce1595b40635d3fda27a1c2ce38c2b97bec2c811666190",
+      "bytes": 4522
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/porting_scope.json",
+      "sha256": "cfd8efc8025749e00b7c4abcd46f4af78a521a79624bf8323debe842318e8fa1",
+      "bytes": 14509
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/psy02-calls.json",
+      "sha256": "087185549e70f3f7498294a3bcb158843acf218eaec960b50b5f3984f6820edc",
+      "bytes": 1697636
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/psychrometrics-calls.json",
+      "sha256": "c5e41b5ecf2e48267f7400bd332c5be1a00de509d9bff9c910fdd879937c375c",
+      "bytes": 5359861
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "bytes": 690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "bytes": 546
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/results/source-reported-results.json",
+      "sha256": "8e08b94399d036bb223a11f5ba5ab92660f10a8b4df328b6fc38cb6d591e3253",
+      "bytes": 1679926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/run-summary.json",
+      "sha256": "dd07a55adb7880fcfa74d086e4a012ce8fbd2e38260d4072049be87cef4ed9d9",
+      "bytes": 32800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/sch01_compiled_schedules.json",
+      "sha256": "438ea79ed3d96ae6e083ccf420ec726339e9d9e3f969b4be704aca40ba4c27cb",
+      "bytes": 4869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/support-assessment.json",
+      "sha256": "41a447ca7470198c737ff892e742cd5eb032aa3db3b2357d2736080c816f2050",
+      "bytes": 13934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-Root-43/output/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "bytes": 3960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-command-Root-43/receipt.json",
+      "sha256": "9ba082bcd7e9c6be7446aa8e0f6df6c295254c72bc9a7e8046ebe5455b8f6d44",
+      "bytes": 5485
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-command-Root-43/stderr.log",
+      "sha256": "6216260fa4122307c307a60c3d3afac9ba063f387fdcd93db0b242aadd98d88c",
+      "bytes": 1080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-A-24H-command-Root-43/stdout.log",
+      "sha256": "2c6cf724010fe04f6a5a844f126d61884dfb3e28c54744f39593f744a9c4dea6",
+      "bytes": 440321
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/diagnostics.json",
+      "sha256": "d2e489c83bd158fd861116e2fdea7f53bda9e7cb6690d5d527319da81692f489",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.audit",
+      "sha256": "68f2484d66ffd88de45aaf53084336f865bc98850441350c445658743b83f0ef",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.ctf.log",
+      "sha256": "528200cf69d55ee4275e45b8b10cb9d0c470d0e246185a51883c2ce1b0418594",
+      "bytes": 1313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.dbg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.eio",
+      "sha256": "cf16f5fd088a6a45ba6622757ac463beff63466d7b6d3e48247ca781b129ebac",
+      "bytes": 13637
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.err",
+      "sha256": "52bb24cb01d497d0b492af36e5b090c398130a2581ff3d2787a01acddee6fcea",
+      "bytes": 1414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.eso",
+      "sha256": "9cc896121e166195173038b8ada42837e5cbcf8b5adb65675acca2c291ab4af2",
+      "bytes": 203129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.mtd",
+      "sha256": "626ab2b8356d27c1895fae1dadb6bf2ff1418f05deb9414619e777b35beadc5a",
+      "bytes": 5887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/input/converted.epJSON",
+      "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a",
+      "bytes": 37971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/input/input-hashes.json",
+      "sha256": "4f4856583f8f5e44b96d0ff0f6247418f3228d9ba977bd6917c6eb61ec85e7a2",
+      "bytes": 774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/input/original.epJSON",
+      "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a",
+      "bytes": 37971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/input/original.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+      "bytes": 13070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/model/execution-plan.json",
+      "sha256": "92bb6c0e601a0585aef914e494f993e1b3bd4309e5a67cdc49309a0e087e6efb",
+      "bytes": 35239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/model/graph-summary.json",
+      "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d",
+      "bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/model/raw-model-summary.json",
+      "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414",
+      "bytes": 914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/model/typed-model-summary.json",
+      "sha256": "0792e76735c9a33ca240bc8e52b47f0c572b7de6703d7ddef77e5a792d864535",
+      "bytes": 4297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/porting_scope.json",
+      "sha256": "888b5488783d9ebebab328b398b4f3b2206261fbbe38f111ae08ee9bc334cbaa",
+      "bytes": 21601
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/reports/compatibility-boundary.md",
+      "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354",
+      "bytes": 710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/reports/run-report.md",
+      "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b",
+      "bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/results/source-eso.csv",
+      "sha256": "218e2c6506eb042ea2c32cf5b6b0e30eace4b910d73e42f651ee861531f808df",
+      "bytes": 2992788
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/results/source-reported-results.json",
+      "sha256": "b112c92e694585154264da23c7bfa0b31a3a42b85eb6a59ed96eb41d72c2498c",
+      "bytes": 3027013
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/run-summary.json",
+      "sha256": "3a5dffa25a60472c4bb6ba164a4574ce253c7328920dbbd36bb810a6234cfed0",
+      "bytes": 60889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/support-assessment.json",
+      "sha256": "b3a86ce87ec502007f0daf5dc339bc6d6162afc28b3bcb7f08172c643d08b217",
+      "bytes": 23561
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/support-report.md",
+      "sha256": "57b150dc37211ba3592259b65631a2d4181f73c0409f40124d869e234f9ed0fe",
+      "bytes": 16567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/receipt.json",
+      "sha256": "40cfb8fdfaa484b74370baa841bc812a19c33aac33762371401a7950fb7f8cfc",
+      "bytes": 5526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/stderr.log",
+      "sha256": "9b987aef68057716745fb6a291d95e72710c4380ecefb47d29e6b74ebaa995e4",
+      "bytes": 2768
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/stdout.log",
+      "sha256": "9c8b7c431e453a4ff04eeb0d63ca05188b61343c393a4dab1135c12b2cc37883",
+      "bytes": 440341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/diagnostics.json",
+      "sha256": "8cf30cf4c71efb2c568a207ede0d1a63064f4b01e6a10d0128a1d91465c2e3e1",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.audit",
+      "sha256": "b7d23097184d9477042edda7ddbbe2fcee43e667968da58ebbd516631f66a92b",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.ctf.log",
+      "sha256": "528200cf69d55ee4275e45b8b10cb9d0c470d0e246185a51883c2ce1b0418594",
+      "bytes": 1313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.dbg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.eio",
+      "sha256": "5a1ebcc085e0d54ac604850830890781ac78900f1a9d4252741f210419886587",
+      "bytes": 13337
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.err",
+      "sha256": "37d2b7f702fbab8bd5bf5e70b78085ebb6526dcf1d26530b66f69cbb9e4aa589",
+      "bytes": 1414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.eso",
+      "sha256": "6848fcfe4d1654bb543a9d99c679336e6712f433b4d69b87df4f847c07ce88c4",
+      "bytes": 204884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.mtd",
+      "sha256": "626ab2b8356d27c1895fae1dadb6bf2ff1418f05deb9414619e777b35beadc5a",
+      "bytes": 5887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/input/converted.epJSON",
+      "sha256": "dc079358dc1cd02b32696db3f5bec6a83baf25f3b20e71ac50d9f83465030817",
+      "bytes": 37845
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/input/input-hashes.json",
+      "sha256": "d767486e7a206fe02557a2dc50e9c4152cd7ec20181af17e3a0c5397112db28d",
+      "bytes": 786
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/input/original.epJSON",
+      "sha256": "dc079358dc1cd02b32696db3f5bec6a83baf25f3b20e71ac50d9f83465030817",
+      "bytes": 37845
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/input/original.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+      "bytes": 13044
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/model/execution-plan.json",
+      "sha256": "92bb6c0e601a0585aef914e494f993e1b3bd4309e5a67cdc49309a0e087e6efb",
+      "bytes": 35239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/model/graph-summary.json",
+      "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d",
+      "bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/model/raw-model-summary.json",
+      "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414",
+      "bytes": 914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/model/typed-model-summary.json",
+      "sha256": "0792e76735c9a33ca240bc8e52b47f0c572b7de6703d7ddef77e5a792d864535",
+      "bytes": 4297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/porting_scope.json",
+      "sha256": "99c3cc137640956dd45ae204aef2485c2f1875df8941d3bd14b107973c590065",
+      "bytes": 21577
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/reports/compatibility-boundary.md",
+      "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354",
+      "bytes": 710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/reports/run-report.md",
+      "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b",
+      "bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/results/source-eso.csv",
+      "sha256": "0a39579c39225cd5773cb8ad731d38d7ce30e90cdc344110d89c14fb5d0d1bec",
+      "bytes": 2996298
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/results/source-reported-results.json",
+      "sha256": "d02dd624d46c7002c755bb7a2cd172f7aa4a842ff400fd79b2e1e0ae1e60109c",
+      "bytes": 3030531
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/run-summary.json",
+      "sha256": "5af5684d8c9943f5875ae3ae37f32f2357083b273bf3ce4392a27b78b4d8d186",
+      "bytes": 61005
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/support-assessment.json",
+      "sha256": "ea1d705ab3833dea70d9ba8402f3ac0b53830f0d07b5656d129e3123eb3cd8a7",
+      "bytes": 23561
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/support-report.md",
+      "sha256": "57b150dc37211ba3592259b65631a2d4181f73c0409f40124d869e234f9ed0fe",
+      "bytes": 16567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/receipt.json",
+      "sha256": "dfcec4ecca0901677214d9d96fd7b84617b615fd798a373100992d3aae29fc1a",
+      "bytes": 5541
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/stderr.log",
+      "sha256": "ab171a2d08e21ff9cad059aab3cb8042b0c02b9f917a27a7df53a12874c74317",
+      "bytes": 2776
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/stdout.log",
+      "sha256": "32716b699faa7a4ecc673d1c2bd5ea97b747d9153ae6d3fb9e68fa9821ad76b4",
+      "bytes": 440357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/diagnostics.json",
+      "sha256": "e60d6dc33c4c028e9fb76d94098378b732f787bfbf428ad62540181be5095d30",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.audit",
+      "sha256": "d7c632b7c4b6d3bca36daf8e4b771e92601d4cc30d6176a7a63a235577ae17fa",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.ctf.log",
+      "sha256": "528200cf69d55ee4275e45b8b10cb9d0c470d0e246185a51883c2ce1b0418594",
+      "bytes": 1313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.dbg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.eio",
+      "sha256": "bf59931d5edcf817994d15d95d317236c89dc55fb10feb82ffce148d625b6a4f",
+      "bytes": 13050
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.err",
+      "sha256": "f9fea233406e20dc4517541eaa2dc860e5e9c625865ce5a950b574fd567ddebc",
+      "bytes": 1414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.eso",
+      "sha256": "28a66a4bf4cbbd1ecb7490bfcc2aeea350d5b704b84d67ec9ed440fe38e4588b",
+      "bytes": 202179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.mtd",
+      "sha256": "626ab2b8356d27c1895fae1dadb6bf2ff1418f05deb9414619e777b35beadc5a",
+      "bytes": 5887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/input/converted.epJSON",
+      "sha256": "5a4d64ae7107fd32fff7234179e920912ef993284443d585a58eff60233cb7f4",
+      "bytes": 37842
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/input/input-hashes.json",
+      "sha256": "4add61695fc781ecec3fbe053ea78fee71caf24d693a203b3dd4b2c5af49af9e",
+      "bytes": 774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/input/original.epJSON",
+      "sha256": "5a4d64ae7107fd32fff7234179e920912ef993284443d585a58eff60233cb7f4",
+      "bytes": 37842
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/input/original.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+      "bytes": 13042
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/model/execution-plan.json",
+      "sha256": "92bb6c0e601a0585aef914e494f993e1b3bd4309e5a67cdc49309a0e087e6efb",
+      "bytes": 35239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/model/graph-summary.json",
+      "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d",
+      "bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/model/raw-model-summary.json",
+      "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414",
+      "bytes": 914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/model/typed-model-summary.json",
+      "sha256": "0792e76735c9a33ca240bc8e52b47f0c572b7de6703d7ddef77e5a792d864535",
+      "bytes": 4297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/porting_scope.json",
+      "sha256": "e37e8d27d161caaea7cad6675f0cd9ea2104f62b258bd0a0c77a960b089f5553",
+      "bytes": 21571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/reports/compatibility-boundary.md",
+      "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354",
+      "bytes": 710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/reports/run-report.md",
+      "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b",
+      "bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/results/source-eso.csv",
+      "sha256": "847fd0ef3fe04ce2cd5ebc9e15202851d964b4aeb96818af2cadeb802de5b427",
+      "bytes": 2990888
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/results/source-reported-results.json",
+      "sha256": "c969a4ad223b2c2cdf37ac1485b5bcabe09d3821df351381a351c9bdcb484d9a",
+      "bytes": 3025113
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/run-summary.json",
+      "sha256": "680a6fa9df44f80db74538ebe1e4587da89095b4c3e7263d49b6ed1eecdfb7aa",
+      "bytes": 60898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/support-assessment.json",
+      "sha256": "a75ef6e15d9fede17748562ba2ccac679421b32ba0ed57233b7feeb4bd43b79e",
+      "bytes": 23561
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/support-report.md",
+      "sha256": "57b150dc37211ba3592259b65631a2d4181f73c0409f40124d869e234f9ed0fe",
+      "bytes": 16567
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/receipt.json",
+      "sha256": "43fc7c851985b830d5cc20d7e652b772cf458e43b96fb8d54df103de557c75d1",
+      "bytes": 5526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/stderr.log",
+      "sha256": "2ba24e2df9264d0eac122175a5ea0bc666e6873f36a58af6f79df4cfb7f16945",
+      "bytes": 2768
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/stdout.log",
+      "sha256": "83e87153096429479e21aae70241fedf7464697ff6ce597001c5e23abcd24885",
+      "bytes": 440341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/diagnostics.json",
+      "sha256": "a51a7484b1f406ddff66e7fe9f62d8aff186866a25e3cfb0b7723b5bdf867a8d",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.audit",
+      "sha256": "2578d15e47d92880a70d2d0b037bdf292cfa6909ce5343212baa1af3c9dd5aa3",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.ctf.err",
+      "sha256": "c0e0be2d9a08750234fa88c1b42906324e821f0c13e4122c973dbf3eff1b7975",
+      "bytes": 523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.ctf.log",
+      "sha256": "528200cf69d55ee4275e45b8b10cb9d0c470d0e246185a51883c2ce1b0418594",
+      "bytes": 1313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.dbg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.eio",
+      "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+      "bytes": 12652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.err",
+      "sha256": "c89cc2e5007ccbf5fb2e1dc57aa7c701e08a6b6a75724f7db40fb8a5fb4fc113",
+      "bytes": 1414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.eso",
+      "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+      "bytes": 202668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.mtd",
+      "sha256": "626ab2b8356d27c1895fae1dadb6bf2ff1418f05deb9414619e777b35beadc5a",
+      "bytes": 5887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/input/converted.epJSON",
+      "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+      "bytes": 37726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/input/input-hashes.json",
+      "sha256": "092e70cae97da212e30240c1d33593d7795681bafab4b1f0fac061feb831a2c3",
+      "bytes": 783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/input/original.epJSON",
+      "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+      "bytes": 37726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/input/original.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "bytes": 65
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/model/execution-plan.json",
+      "sha256": "92bb6c0e601a0585aef914e494f993e1b3bd4309e5a67cdc49309a0e087e6efb",
+      "bytes": 35239
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/model/graph-summary.json",
+      "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d",
+      "bytes": 479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/model/raw-model-summary.json",
+      "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414",
+      "bytes": 914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/model/typed-model-summary.json",
+      "sha256": "0792e76735c9a33ca240bc8e52b47f0c572b7de6703d7ddef77e5a792d864535",
+      "bytes": 4297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/porting_scope.json",
+      "sha256": "c2204966c22ce96d54f5b56bf9345897d89c973278de54a25db8ff95467a50fb",
+      "bytes": 21562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/reports/compatibility-boundary.md",
+      "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354",
+      "bytes": 710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/reports/run-report.md",
+      "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b",
+      "bytes": 566
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/results/source-eso.csv",
+      "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+      "bytes": 2991866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/results/source-reported-results.json",
+      "sha256": "9aebc4de2d48a107b217b6e0e2794c72bf63488d5f024788886d05fcadd2ecbf",
+      "bytes": 3026103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/run-summary.json",
+      "sha256": "6223b7dbc0f6223897a77abf6cefee0656a38f117bcfb9f95628d4acbaec0b1e",
+      "bytes": 61386
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/support-assessment.json",
+      "sha256": "5bda22761c3eea817ab018310ee13c7ca44b35021c7863efea17e5a0f0e88fdf",
+      "bytes": 23969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-Root-43/output/support-report.md",
+      "sha256": "c4722aacc84fd5f0137d51520a1703573a31747861e223b38b9b1657393bba04",
+      "bytes": 16632
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-command-Root-43/receipt.json",
+      "sha256": "55db69248c7c73c869ac7d13c889ac90fdc426d4f2d3d9aa215bcef25cc6f4f1",
+      "bytes": 5537
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-command-Root-43/stderr.log",
+      "sha256": "653b120812a49d3b3fc7c4042a7a0a2ce4fa1fdf153b6b4c1c0a56e082eb5413",
+      "bytes": 10253
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-NOLIMIT-24H-command-Root-43/stdout.log",
+      "sha256": "2e98f9c3ba897cf923bd49b84f58551c6ba6f6c997f0272e5a995ef3517bec99",
+      "bytes": 440356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-hard-size-cohort-actual-Peer-43.py",
+      "sha256": "6df14962b23b0a88961a754fc2d8b85e2c159597f6d12a70725b7032d11ecb73",
+      "bytes": 8672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-hard-sized-purchased-air-actual-Peer-43.py",
+      "sha256": "dfa71d16c230b775a872028408dcec56ef8b6a659e65e4c17094c96dc07fbb00",
+      "bytes": 15760
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source43-Git-text-view-Root.py",
+      "sha256": "119c201e3dac05eba7517975c463cc67468f988d09e5a90585f9840528c756b9",
+      "bytes": 3142
+    },
+    {
+      "path": ".runtime/porting/SRC-06/combine-hard-size-production-cohort-Peer-43.py",
+      "sha256": "9929effd4c5d245db90671f24fcf28fce6f22baadf40a21931773ea2c70be2ac",
+      "bytes": 9824
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-24H-reported-Root-43/comparison.json",
+      "sha256": "fd1fc80e435c905ef13da1e6a492389242760a02f518c685dfe5ec0548966d18",
+      "bytes": 146278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-24H-reported-Root-43/comparison.json",
+      "sha256": "9da0259a8871f7bcb730fdbb8c5f7a158fa801eb69460850642b36a037450dd9",
+      "bytes": 148123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-24H-reported-Root-43/comparison.json",
+      "sha256": "69d39a7afb0185640a1ba4cc7473bfb2eb0829d80867311cc24fb330f5fa9d0d",
+      "bytes": 146278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-24H-reported-Root-44/comparison.json",
+      "sha256": "d2263d8c26582e382f0f33127ec49c0851a7c9e7e47cb75b296eccdb9a9acfad",
+      "bytes": 146326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/freeze-hard-size-Native-unit-Peer-43.py",
+      "sha256": "c151e5783c1b44dc3499cdca173be3b2c65747783deb0ecf82ad1473a5fa85f1",
+      "bytes": 12389
+    },
+    {
+      "path": ".runtime/porting/SRC-06/freeze-hard-size-Source-cohort-Peer-43-02.py",
+      "sha256": "9e72d65aa5194da4522d32403ccc68a9204bf9602840427a99db906859c5e1b0",
+      "bytes": 9122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/DataHVACGlobals.hh.92-106.txt",
+      "sha256": "4aefc1c46ca76a7a980b43383bc69b91d6da0f24cdc4a35c0a908a9ba8dfc2fa",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/EnergyPlusData.cc.530-645.txt",
+      "sha256": "8f05e3dc356f8b3ee311b491cac9f46e91cc2ec284463ea26b8438ddace9e1a6",
+      "bytes": 5602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/EnergyPlusFixture.cc.183-202.txt",
+      "sha256": "ca08ad9e26ae46aad3104466907f9eca4f031c8f9ce75d3764ca8dc6cc3f1a82",
+      "bytes": 725
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/EnergyPlusFixture.cc.78-98.txt",
+      "sha256": "1ee74f3e8421d429954d8b7f27b640b09d26149fe49bda4f1337bd6e255a1105",
+      "bytes": 678
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/HeatingCapacitySizing.unit.cc.93-149.txt",
+      "sha256": "bacc6acf0cadc299f43046b9cc588352a8ee586ff5bc59adbed2fcab13fb1969",
+      "bytes": 2721
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/IOFiles.cc.247-269.txt",
+      "sha256": "2a2161097ed551983e08e38dc9c442ef170ffdda4536eadfe22767c1eff245ec",
+      "bytes": 501
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/IOFiles.hh.468-496.txt",
+      "sha256": "44a03afbd8c9e8af09bee8ebbe48bd35ac4182f75eee67c8cd06fb1d6fbf407e",
+      "bytes": 945
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/IOFiles.hh.588-603.txt",
+      "sha256": "dc45b4fe7c579ba4bb3dfb7a705724359dd2fa4810c6e9c2439fee89d1a7dca6",
+      "bytes": 458
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/OutputReportPredefined.hh.136-149.txt",
+      "sha256": "fdfb80954046617eb1d98143082bcfe8fe492d03edb556cf9258a1d3e43e49f3",
+      "bytes": 316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/OutputReportPredefined.hh.1674-1682.txt",
+      "sha256": "e0c03ef659a044c3aff8210b24a317a1c259ca126c685829827df957967ae5a3",
+      "bytes": 188
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/OutputReportPredefined.hh.69-76.txt",
+      "sha256": "938f5ba27d4db19e5109619da7ebd7e1c8d5fae3fc316bb10cb8dbeeabf6a2e1",
+      "bytes": 326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/PurchasedAirManager.hh.390-406.txt",
+      "sha256": "92c1bbe03a2f1c765bb157ecdb54cef0dcd763d265844ce7e7a6b687473da851",
+      "bytes": 1198
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/extents/PurchasedAirManager.hh.69-325.txt",
+      "sha256": "50ed4b38d579398a4a64ea571beb1a1f2325ad84867d60124d5e08a78c3102d4",
+      "bytes": 20690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+      "bytes": 60978
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a",
+      "bytes": 22346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/src/EnergyPlus/PurchasedAirManager.hh",
+      "sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+      "bytes": 29562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/tst/EnergyPlus/unit/Autosizing/HeatingCapacitySizing.unit.cc",
+      "sha256": "9ec42d308344e1ecc54deee5f0e7b2d06b8419248c0a596204a74efacb2e97d7",
+      "bytes": 43785
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-Native-fullfunction-unit-readonly-plan-Peer-43/Native/tst/EnergyPlus/unit/Fixtures/EnergyPlusFixture.cc",
+      "sha256": "cfb2a7173b12bfe6ac291bebaf6100a6351b0d05e4f81411a8c5a5c28b5baec9",
+      "bytes": 16731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+      "sha256": "fc76790e89122784da36a9687c22079a2aefe67cdf498b0d55e32ac9d52b598e",
+      "bytes": 3087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-build-Root-43/native-build.json",
+      "sha256": "dc81440073838e77aeba33f9b42aebf4a18db8109c9e5381c7ca0c5c12c2f20f",
+      "bytes": 8108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/extents/Array1D.hh.100-114.txt",
+      "sha256": "c5e98001aac605083d05314f50b43caa325c953bb9221a97a9757413a5020508",
+      "bytes": 242
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/extents/EPVector.hh.245-266.txt",
+      "sha256": "935a2f2b5b9f0c6d6e2a0be47785f2148f353f005faceaa347cf0a4b1cd204d7",
+      "bytes": 587
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/extents/EnergyPlusData.cc.55-307.txt",
+      "sha256": "8af38121cabb7ce12227efab723727f73eaaa86ad6c18189b24cbc6de2cb6adf",
+      "bytes": 18273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/extents/IndexRange.hh.45-57.txt",
+      "sha256": "ad587ba6dc9b571c3bb171ba4c1a9660803efacef25289da11e3172c1c1b28c1",
+      "bytes": 191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/extents/InputProcessor.cc.650-687.txt",
+      "sha256": "9fa18d107d0b51a0b9900ad052500a7415cd2ac30596d893409c232e33a2e9f2",
+      "bytes": 1796
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "bytes": 122929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+      "bytes": 55083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/Native/third_party/ObjexxFCL/src/ObjexxFCL/IndexRange.hh",
+      "sha256": "a39ae1b7a080804adde332e26437cdfa63c4a657755b449264e0ed62915d6c26",
+      "bytes": 10584
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/actual-case-inputs.json",
+      "sha256": "e2957f89ec23eaf5e17e7ba3f10beff17daf598b5563a324558a0cf954e78dd4",
+      "bytes": 3501
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/argv-path-only-delta.json",
+      "sha256": "6d5f5bee55a5f82365fbbf9057c35df4aebad7115b91e394657f8e211998c461",
+      "bytes": 2180
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/draft.json",
+      "sha256": "ca289401224257c313d7a39b34eefa33934fe5db1bda43691bc2fdc62f7165df",
+      "bytes": 116059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-draft-Peer-43/hard_size_unit_main.cpp",
+      "sha256": "e5f2126fccc43c9aeb42c395c5f3fccbf8a43d07f65ca918a1627e18b2449d4b",
+      "bytes": 29924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-native-unit-run-Root-43/receipt.json",
+      "sha256": "c20b291f8fe299c88f3301f687b0dafcdd95958cfef8303c21594a93b165eb18",
+      "bytes": 10254
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-sized-purchased-air-publication-prepared-Peer-43-02/template.json",
+      "sha256": "aa9dfa184c62f5272f184f4f595a6921a965732ea64854aaf4121a7329d450b5",
+      "bytes": 64001
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-sized-purchased-air-publication-prepared-Peer-43/Native-unit-output.json",
+      "sha256": "eef1efc3c3725aad7426ad920b2c7218613c98dc97fa6a112314794639255c37",
+      "bytes": 2752105
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-sized-purchased-air-publication-prepared-Peer-43/template.json",
+      "sha256": "11ecc880b737a8f64ac493f1b7320ffcda058318cb806157905add8b7f5cff38",
+      "bytes": 58314
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-hard-size-cohort-Peer-43.py",
+      "sha256": "8bebaf7544942a44e99743e7a42867db3c3c9a0c5927672641a842c0897b81fa",
+      "bytes": 1245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-hard-sized-purchased-air-Peer-43.py",
+      "sha256": "f1ad92bf952b5abc75aec026afa5cf0e98a08d48aceb95cee0b783a596337b31",
+      "bytes": 2908
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/strict-API24-comparer.py",
+      "sha256": "ec8d0f6f6945f6bdec8cfcf422fd27b11a5f2e4d185b839e8877972ccd4bca9d",
+      "bytes": 26462
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-hard-sized-purchased-air-publication-Peer-43.py",
+      "sha256": "3911bd242d027af4987d309f244f0d725d4b763a60af90439a7dd625f0352f5c",
+      "bytes": 7429
+    },
+    {
+      "path": ".runtime/porting/SRC-06/project-hard-size-Native-unit-fixture-Peer-43.py",
+      "sha256": "be320e355679f25240d322ff24b1a74967a0f91f5f7fe2b0b2c188b13099dc0f",
+      "bytes": 4147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-hard-sized-purchased-air-checkpoint-Peer-43-02.py",
+      "sha256": "c25d6f4d05396d885fe25ace19eb526489d09989d8ac587a89f4d4beca635baf",
+      "bytes": 12153
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-hard-sized-purchased-air-checkpoint-Peer-43.py",
+      "sha256": "6a038a79820c3bbedeb881a39fd64344effdba1d1d3d6c2f40d6860f30bd14e8",
+      "bytes": 11015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-hard-size-Native-unit-Peer-43.py",
+      "sha256": "d50ab8c1659af9e33367e064d1550143ae6b4956d4e28751f20696e027688aa6",
+      "bytes": 10617
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "f3f61d9c14f1fdad7fff4787ad477d015ad763911cb6d73cedb250bc8e9fdd0e",
+      "bytes": 25643
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "0cd321116800014e749a0cc29a499ebf39aeedc15cab62863f8fab263d912c89",
+      "bytes": 23227
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "cc976707f95b622540168c345e902f620aee2f442e39208f995324ed6a6154d4",
+      "bytes": 25844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/draft.json",
+      "sha256": "f03d3a6be82c3e5ed29e4cb6be5bbc31e883e6337d5a2bcb22a89b8f721bac6b",
+      "bytes": 42423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/full4504-Rust-API-census.json",
+      "sha256": "8837debb02e5d5a5b2c9a3b93c364d7ecfc45ecdf4ba043d2535f66a1f2f85de",
+      "bytes": 12801
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "9ef10e8a49e6bfba7a1b553f5bb5795218a011ea0ca04fd4ff3fbee61eba6f5f",
+      "bytes": 24839
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+      "sha256": "953a6d41325765e8d51652457a315cec37c57e2844f5691532769b8e83deb777",
+      "bytes": 24046
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+      "sha256": "0cacd187319069b9d5b6da1a44704d74b212208943ab97fca74a3802440a368c",
+      "bytes": 25618
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/native_cohort.rs",
+      "sha256": "46d6691b64cf16b3393cd6bbc3439d4f453ea04bea285926f72d49a203bad0a0",
+      "bytes": 34603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/native_cohort/fixtures/native_hard_size.rs",
+      "sha256": "88d083a93c2643209be5f995bda8d0b01396400918b4a68f0f7166f78dff088b",
+      "bytes": 2755004
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/native_cohort/fixtures/projection.json",
+      "sha256": "3e03c1d83ef944ee65fd92519706fb41ed063e78c4fd42c05c8b160aa372ee71",
+      "bytes": 2444
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-size-cohort-draft-Peer-43-02/proposed/crates/ep_runtime/src/lib.rs",
+      "sha256": "21cb22453edb82edc0ca452ffb9da2e47ec719c4e55d25cab706da8663bf5204",
+      "bytes": 2992
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/complete-final-compiler-Source-plan.json",
+      "sha256": "0e375beed2838380d857e424b6215c937d8a2b163945647e44a18eaf91280958",
+      "bytes": 2642502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/01.forward.diff",
+      "sha256": "f9649d491c816c3434a8607aa384a63a7916e4fb36ba4972e9d487a25e47b7d8",
+      "bytes": 1555
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/01.inverse.diff",
+      "sha256": "9fa6b3267e9a03aeb5243fc24c8596d399887d3fb9b97f050e5f2f693a7bf92b",
+      "bytes": 1555
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/02.forward.diff",
+      "sha256": "4ea962c9392b0dc3afc6b45818a63a4033e9bbdd1e8fc2ecea68d841b2ed150a",
+      "bytes": 2935
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/02.inverse.diff",
+      "sha256": "1f468fee76d90de03945f4638f3b465529bc0da6d51f6cb5d2c0c50417c397cb",
+      "bytes": 2935
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/03.forward.diff",
+      "sha256": "b13ab3170d52f71539adea4b38ecd08ae740431e77455cc743cfe0f4db7739b9",
+      "bytes": 687
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/03.inverse.diff",
+      "sha256": "65524d70a8376e6a41b541141959ce6051e34d91bed68a3b52357316fa556f46",
+      "bytes": 687
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/04.forward.diff",
+      "sha256": "b9c068353470dad5864b505329a12b67a79c7f0794e645454a164605d1f78ede",
+      "bytes": 43213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/04.inverse.diff",
+      "sha256": "2ad8b46f6a54f79ccea59e1281f05d95f2e665d912c53a48473e8a933671a15a",
+      "bytes": 43192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/05.forward.diff",
+      "sha256": "2a16fbe0521b59c9386aab1d8f8d3e4823980e0824970a9b5ae50440ad89974b",
+      "bytes": 2249
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/05.inverse.diff",
+      "sha256": "2bc1a58aaaf44856da8c489bc9d376258259b6c4c1772705b0304ab70e2fa04d",
+      "bytes": 2249
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/06.forward.diff",
+      "sha256": "ba357cf2cb73cf6445c22dee8e6fc38798086ac51bdd2b1a3e57b3e984fa2e5d",
+      "bytes": 2836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/06.inverse.diff",
+      "sha256": "5e9f79c37ae3c70797630573b6ca588f1983b847c5b5a1ee61efabdd56e98b2e",
+      "bytes": 2836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/07.forward.diff",
+      "sha256": "ea7120a9982a537d3270d892f6b45599a9889cbc14738a8fd2c11841faa41275",
+      "bytes": 1439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/07.inverse.diff",
+      "sha256": "738f43931bec93b83ba70b1930f12e3645d6d14855ab5656316ee76eaf057113",
+      "bytes": 1439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/08.forward.diff",
+      "sha256": "78af381f03059db2ca863bdd15ccf9478718195cebf1ba0665f60c6630267f41",
+      "bytes": 26110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/08.inverse.diff",
+      "sha256": "5cba6fcc87030c1bbe4b75e9e0fdfa9afdedf7341e61e71d70e7504a23a93c3c",
+      "bytes": 26110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/09.forward.diff",
+      "sha256": "2b4b7f6bfd3b8e548cb21148dfa85c4e3fb07893b5770fbdbd63057a90b82c65",
+      "bytes": 9194
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/09.inverse.diff",
+      "sha256": "558c54f32ab8735a9342f900b367ff5bc7bc1ccd586b74bde95cb5d123e89458",
+      "bytes": 9194
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/10.forward.diff",
+      "sha256": "84e4d64a980287a36137ebc5962c0282c3cb29d80d93970eadfdef7d7786bff6",
+      "bytes": 35111
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/10.inverse.diff",
+      "sha256": "809e58ca923afd3793d5874deb408aff3573f17e8196f53c86eb217d56cfa61c",
+      "bytes": 35111
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/11.forward.diff",
+      "sha256": "34f6e06a25ac8f429b1077553bed003b1ce2f074cd43c47ac3def4c7b4493710",
+      "bytes": 2755262
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/11.inverse.diff",
+      "sha256": "00c9e22aabe42179a8d722a2f47f5f22006cb9ebda0a9ebc897f0d12efdd03d8",
+      "bytes": 2755262
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/12.forward.diff",
+      "sha256": "e45953afae30c9bb78ab16e66ad5bad9be3032181e19e79fee4388b7f04c8921",
+      "bytes": 15425
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/12.inverse.diff",
+      "sha256": "ac5c69d8adc91266b8b6338e13a39c79890e67375aadb4fb97c460d1b9c780ac",
+      "bytes": 15425
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/13.forward.diff",
+      "sha256": "cf2547a1dc753f7866ff18d8f60e23c41bd8b60c5564ad2724ed05cf8151f3dd",
+      "bytes": 3264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/13.inverse.diff",
+      "sha256": "341e9893424986b33a6f33ac7ec4e8ebc89efc3974018cbfde46b411fea7e990",
+      "bytes": 3264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/14.forward.diff",
+      "sha256": "863be7b4977bf6a6837d4db1e100b7f13245545b3d6a89978329b44de58524db",
+      "bytes": 1948
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/14.inverse.diff",
+      "sha256": "d1c10b8f8f9c1fdfcfdc7f4c4e8770473b0d897d92dda082e1c397f2eb791243",
+      "bytes": 1948
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/15.forward.diff",
+      "sha256": "33289e799113d3d226fb841f2ea8956bdf4794bef0e6e73795be71c08fc9bb39",
+      "bytes": 1027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/15.inverse.diff",
+      "sha256": "b697710b0412660983ed03fdc72c9070191e80a96b2c130a1ec95a3a7194641a",
+      "bytes": 1027
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/16.forward.diff",
+      "sha256": "7796a6f53867dd8f028111531c289a4524e6617e70a1ecab5c1b674ee01301e0",
+      "bytes": 459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/diffs/16.inverse.diff",
+      "sha256": "a2c13f474d73f04fcc4103db1cf01aaba53845d558dbe0b3c5b76519505a81ab",
+      "bytes": 459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/manifest.json",
+      "sha256": "07042064f18e8ccbf7eb42a3303c68b5d0cf393cc9f5acc0a1bcbc624a4712c2",
+      "bytes": 122234
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.cc.191-302.txt",
+      "sha256": "ec2ee44d946d7277dc048f0f9279a210dc38da921af71ae8036e865569bf3ce0",
+      "bytes": 5722
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.cc.303-342.txt",
+      "sha256": "04dba18f388f4acca29a5735eac8d5e60c905e8665377fa0c6bca8be7800fed5",
+      "bytes": 2093
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.cc.303-343.txt",
+      "sha256": "5ed880549fbd1776285a6a3de6d15550e0c9e3f0cd4617102132ccd62079e52d",
+      "bytes": 2095
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.cc.370-667.txt",
+      "sha256": "b6dfaa59e5273e2c1349d9785c775369bdf234e8e1207b11f8994be983c06582",
+      "bytes": 18235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.cc.62-161.txt",
+      "sha256": "675f758e1c5be08c5d9c7095fb96a16bbb1d0bfe993ebf85fbf1cca3495f72c9",
+      "bytes": 5789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.hh.302-310.txt",
+      "sha256": "86915d72bba7344383c8cf7e5475d07d08d92ba5717276c2248b001b9c031425",
+      "bytes": 492
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Base.hh.75-285.txt",
+      "sha256": "380c7c9d5b4bada99de899ece258e6dbea21cd45051508310590fab7be21990c",
+      "bytes": 7844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/BaseSizerWithFanHeatInputs.cc.55-111.txt",
+      "sha256": "10693ca631b95598eb8e151106a60a4ab3d37ce0a2600322bb2e6cc32dc6c74f",
+      "bytes": 3100
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/BaseSizerWithFanHeatInputs.hh.60-105.txt",
+      "sha256": "65ef84e9640ed64108138525eaf8243ace1f4484f7d3cb07764b243c2bae9da8",
+      "bytes": 1464
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/BaseSizerWithScalableInputs.cc.55-147.txt",
+      "sha256": "2d85d9fdbd7e545a33065c5f3b0cfd944acf408f498c54c98fbb11e06b0a47bc",
+      "bytes": 5375
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/BaseSizerWithScalableInputs.hh.58-102.txt",
+      "sha256": "3c0393297a59e42aaee1ad9cfffce95d7aa25079f5f2102ea33e565b7fefe705",
+      "bytes": 1581
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingAirFlowSizing.cc.320-424.txt",
+      "sha256": "356ce33ae3e6968c3768baac28dcca4766acca3c0b1a0582996b1c1dec1d7621",
+      "bytes": 6051
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingAirFlowSizing.cc.59-104.txt",
+      "sha256": "9388507be4b2478545236895ba6dc56ba9bdce2e930d678382d59e9ebc6d7cd1",
+      "bytes": 3098
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingAirFlowSizing.hh.58-74.txt",
+      "sha256": "6dcc837400f43f0270164f8327468d791092ebb37f0d6de45a584b6a3e29a244",
+      "bytes": 421
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingCapacitySizing.cc.600-601.txt",
+      "sha256": "0c1cf8698cd2f6b8c3f3dbfc459ed027bc1e38ce63ef60f718d26b64a4d450ed",
+      "bytes": 27
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingCapacitySizing.cc.62-107.txt",
+      "sha256": "960235d0fa6cd7a8224b1b691866ad14e4a617e8b17dd583adaf5e35fe0313eb",
+      "bytes": 2699
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/CoolingCapacitySizing.hh.58-75.txt",
+      "sha256": "8b75b7840567c1532eae0d0183bf62223934228056f17ba65e7254a4886ea571",
+      "bytes": 418
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataEnvironment.hh.210-218.txt",
+      "sha256": "e6777a3b49f83503937ec9e2aedd9b7a9c315541e35be5f5e0b2af36685a0f34",
+      "bytes": 548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataHVACGlobals.cc.93-132.txt",
+      "sha256": "5dc4ee6d0794057a73c31276b7a0a9770a0f60f4c4cb894456189a01d6f1f891",
+      "bytes": 3056
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataHVACGlobals.hh.129-179.txt",
+      "sha256": "c543b34c71db193959e28e18a6f9932a204e79f9adf854257db88891d8db742f",
+      "bytes": 1023
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataHVACGlobals.hh.428-442.txt",
+      "sha256": "5362112cf326e5d59d605c1d8ae684f4b1affe688decbda4d516e5cc641fc159",
+      "bytes": 568
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataSizing.hh.101-110.txt",
+      "sha256": "652aedfbeb12b05f37922766a22391700d2be75bc1425952b4bb31e5a3b3ee56",
+      "bytes": 172
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataSizing.hh.1240-1382.txt",
+      "sha256": "1eef9d73e771dfa1befa45ae965b0e1a80d640999669aae650fac4c197e082b6",
+      "bytes": 16295
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/DataSizing.hh.241-285.txt",
+      "sha256": "0bdf72078a86c2db0d3fe6f54bb2fa54272bbc4af094feb364f5de7c74f56fcf",
+      "bytes": 2867
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/EPVector.hh.200-230.txt",
+      "sha256": "40877ac48f053eb5def8e268ff7b74acc54f01cca4df9a22afdfb3a6d23d45c2",
+      "bytes": 633
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/EPVector.hh.59-148.txt",
+      "sha256": "1cefdd883b14c3c0ce48b22c30ff91ad74cc23c6cecfbe38a45fa9568b28e154",
+      "bytes": 2086
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/HeatingAirFlowSizing.cc.55-300.txt",
+      "sha256": "c7ef901514b9646beb86150cd845f82d9c8d0602158bd7a2e14892d12c53e9c2",
+      "bytes": 18396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/HeatingAirFlowSizing.hh.58-76.txt",
+      "sha256": "bf337dfcd51915a68f27952d810b3b80fb1d762c7a15bf1e450cd26641f82435",
+      "bytes": 445
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/HeatingCapacitySizing.cc.438-498.txt",
+      "sha256": "9deda7472f7eeb3583b5534cdd6eae43768489c0dca1c6ad3fc6f68df4fa5c58",
+      "bytes": 3311
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/HeatingCapacitySizing.cc.59-115.txt",
+      "sha256": "d25f22975af3ad41ffd86b6f21eb19e240215d83beaa7928626d747c8dd8dae2",
+      "bytes": 3051
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/HeatingCapacitySizing.hh.58-74.txt",
+      "sha256": "45ffcbcea016927b92b4e116386f54cde78c4fd3d6be23e095dd2ea1db328e3b",
+      "bytes": 410
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/IOFiles.hh.117-139.txt",
+      "sha256": "c262776007dcc6feb2abcc169808d790830cfe23d693622901c0537ea568efaa",
+      "bytes": 818
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/IOFiles.hh.249-306.txt",
+      "sha256": "10ccb5b594c78ce16c690b18aa86c0d3ce3c9d95544347f4f27a7b7ded210730",
+      "bytes": 2616
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/OutputReportPredefined.cc.1975-2005.txt",
+      "sha256": "027c0a1c576813ea1da7993e6096e0577e6fafe6ff7bc3357ce62d214abd9f94",
+      "bytes": 1880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/OutputReportPredefined.hh.136-146.txt",
+      "sha256": "b6ee8f55b93941173b93099183acf52b254799ff25cb76c1945cbac35666bac5",
+      "bytes": 281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/OutputReportPredefined.hh.1708-1716.txt",
+      "sha256": "59506f2a0ed5e6625e65205493ada76d95361cc4c0d702dc44533b051344f20a",
+      "bytes": 483
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/OutputReportPredefined.hh.70-75.txt",
+      "sha256": "4145618e3a32b8890c7ce1a733cadea9226f6e73ac721a1a9280773723a5355b",
+      "bytes": 244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/OutputReportTabular.cc.14243-14280.txt",
+      "sha256": "9c6134ca6ea1e8af28be6907a85ee0e341a8a9d368b5b6a4a7fbde25bcc03ba2",
+      "bytes": 1971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/Psychrometrics.hh.679-745.txt",
+      "sha256": "cef0d1a1ce1056db35cb4d886dff3d508dc3a369e4e7954b513a22b1a58a3cac",
+      "bytes": 2033
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/PurchasedAirManager.cc.1326-1408.txt",
+      "sha256": "d4dee5de929a0263685b964500d547dcec4aa090594428de9a2a179dd00b46e9",
+      "bytes": 4387
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/extents/PurchasedAirManager.cc.1697-1911.txt",
+      "sha256": "bc6572082d2c395d3c4f6b7d2c53fa09ae7169869824a35dca0690d0d66a3968",
+      "bytes": 14779
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/Base.cc",
+      "sha256": "dd98bb4b0faa591f082918b7d2e03f8235070141869bdae09ed7e70f9a1fc21f",
+      "bytes": 54926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/Base.hh",
+      "sha256": "4995ad3c06d75515e2765ce7a68f61cf8c3682c7b308a918918dbc8e0a6da8af",
+      "bytes": 15148
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.cc",
+      "sha256": "1f2898cf55055dfc98623f5bfc4351de69373e44a6110c026e75e25037a2851d",
+      "bytes": 6858
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh",
+      "sha256": "2e96e081f7f2ea59761c9931eea1b937eaf43f79c0f229590a613fef1d9c5d48",
+      "bytes": 5478
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/BaseSizerWithScalableInputs.cc",
+      "sha256": "17de71c13ed0f03293e52da45bd4c47f0e0639d35882e70dcd0c8530751486bc",
+      "bytes": 8994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh",
+      "sha256": "f416c50b343135afb760cec1dd9750700f275e5540b39fa28c0b5c94f71ece01",
+      "bytes": 6751
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/CoolingAirFlowSizing.cc",
+      "sha256": "c4396e59f81229cf2aba21e762cf087f9b8760392e2ca9d8b8f8e8cb687194d6",
+      "bytes": 30050
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/CoolingAirFlowSizing.hh",
+      "sha256": "2eb51530c3ed933ea1fa87bc998093fe2797b7dd0588af3787257d365dcca361",
+      "bytes": 4015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/CoolingCapacitySizing.cc",
+      "sha256": "cfae748171bbc2e70cb532c49c30bf8d3e1ba3b79b1117fefc31738b390884c0",
+      "bytes": 43800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/CoolingCapacitySizing.hh",
+      "sha256": "a33a5b16f32996df33e5e73ac1881bdcd5a89106ab1066389f84b186854e46c8",
+      "bytes": 4037
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/HeatingAirFlowSizing.cc",
+      "sha256": "50f5cec854d4ee6f1881a36dcf4e66865efe11831bc2f6d50a9b364baa16b0cd",
+      "bytes": 22105
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/HeatingAirFlowSizing.hh",
+      "sha256": "b3b0da9f9c823eaa2e36f2e9fe0e13e2cebf68d0120e7fb23b71bdb81ffb2387",
+      "bytes": 4077
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/HeatingCapacitySizing.cc",
+      "sha256": "e0be4632457534e369621b73f5eb96a5f8d8c133142fc9c88828be0a233f3a5f",
+      "bytes": 35125
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Autosizing/HeatingCapacitySizing.hh",
+      "sha256": "a22049b483d783c6cf1a6808556329f08f5f8612f40f21da840c58191ae7f4bf",
+      "bytes": 3989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "bytes": 16816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/DataHVACGlobals.cc",
+      "sha256": "01275a4c80da5e7b74f64f0b0554033e1b6c271299fc2608e23867825af4b973",
+      "bytes": 25655
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "bytes": 24717
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/DataSizing.hh",
+      "sha256": "cf16d26b03010c9b5ca77a89b92004961111dce6451393bf0b23e604220768c5",
+      "bytes": 116969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "bytes": 11096
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+      "bytes": 32371
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/OutputReportPredefined.cc",
+      "sha256": "a833c153bbd89783a6075056c0ff791a2dec041df4badfdfa499fd0bd1b53674",
+      "bytes": 169800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/OutputReportPredefined.hh",
+      "sha256": "0f6469e250751848f4256d4e1dc380776391c6f93f93f5879941ca19b65b108a",
+      "bytes": 61093
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/OutputReportTabular.cc",
+      "sha256": "8253e49dfaa51b94f1e045665cd76cbe24f6ae04bd364c4538c349f5ada553c2",
+      "bytes": 1103718
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "bytes": 108928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/Native/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+      "bytes": 209881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-03/constructor-ledger.json",
+      "sha256": "ce3921b76d5c8d0fe6d4bde7f54c140edcd0ceabe00889850cdba0f0696a560d",
+      "bytes": 27928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/Native/extents/CoolingCapacitySizing.cc.552-594.txt",
+      "sha256": "774e069c8b9df3d28d7f7d40e1c4813e8bbb7053dde776e29758f025cac99b31",
+      "bytes": 3006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/draft.json",
+      "sha256": "c1744d9ef6a5628abfa3284f29929fbcd9328b6bb94440ddcdde465716173a9d",
+      "bytes": 61336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "a938c5ea495408809ef261cb225aac07534127ba999539d49764ec26634ac7fe",
+      "bytes": 25783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/calculation.rs",
+      "sha256": "df82395d2133524b550b254c9ec877360468630d21be38483d63509abe545611",
+      "bytes": 34770
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/post_summary.rs",
+      "sha256": "f4fdda3dcf95e7dab085cc9045734770fef2562af9f712e64b1252643b2e713d",
+      "bytes": 13879
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "sha256": "c21cb1139ec1765d67878c8985fd7876a432317502179061b5f9cdf6bc211f47",
+      "bytes": 12506
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "95ac360c90109c53289fdad518393759587322cf90b4e2076a5bf09c7ff0fb51",
+      "bytes": 26101
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+      "sha256": "14c6f5813cdf45c4c14886fa4a1092f83a3aeb4535269ebfc0a2402722774843",
+      "bytes": 8835
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/owners.rs",
+      "sha256": "83f5824ff9bfd11634dedfff2e122a1c717fd648b24627d377a551e0ba1dcdc1",
+      "bytes": 14955
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/sizer_output.rs",
+      "sha256": "005204b6be9e9aa325c525b2aeae604e12cd86670137208e39d93e739f42f8d7",
+      "bytes": 3021
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "fde8662dd6310e55bdc1f2cb09d35a855eba534221d3a7e779630093c29ca233",
+      "bytes": 28487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-draft-Peer-43-04/proposed/crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "bcac863b230619004f1347892f716e0ba14bd2ffa2aeb4a5a2d93bb55f3db92c",
+      "bytes": 23955
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-held-Peer-43/manifest.json",
+      "sha256": "fcc0f89806809bb91e3c231a0f631f35a0154dcfc0622ef09c3adb10c09b239d",
+      "bytes": 75980
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-calculation-held-Audit-27/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/calculation.rs",
+      "sha256": "b112bb3a6681b68a055328f2d04773d799ff6528e7ef412acaa7df9f5352a63c",
+      "bytes": 34766
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-initialization-held-Peer-26/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+      "sha256": "e7d3d1e91bf6b576271d380991a7ef6438e345d50e311255653f74388d24ff47",
+      "bytes": 18359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40/proposed/crates/ep_runtime/src/lib.rs",
+      "sha256": "393357fae48ef60e5dc8f7586dfe3dc14c2acb0cc5e5f454e8877ab39bb4d8e9",
+      "bytes": 2544
+    },
+    {
+      "path": ".runtime/porting/source-objects/0e/0e3cea64ff6035036999614be8e1a88ab1dd0e1c52d2de45c83cbf03d6fc8ca1",
+      "sha256": "0e3cea64ff6035036999614be8e1a88ab1dd0e1c52d2de45c83cbf03d6fc8ca1",
+      "bytes": 11365
+    },
+    {
+      "path": ".runtime/porting/source-objects/0e/0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+      "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+      "bytes": 6674
+    },
+    {
+      "path": ".runtime/porting/source-objects/0e/0ed5e8137d454eb17fe4fefcb07c2357f394c2f17bd9fc9c86dda322d0f97b64",
+      "sha256": "0ed5e8137d454eb17fe4fefcb07c2357f394c2f17bd9fc9c86dda322d0f97b64",
+      "bytes": 23897
+    },
+    {
+      "path": ".runtime/porting/source-objects/38/38ca852ed7c51bdada2ee743540be285631c9e9706d98588d7031083910db483",
+      "sha256": "38ca852ed7c51bdada2ee743540be285631c9e9706d98588d7031083910db483",
+      "bytes": 42548
+    },
+    {
+      "path": ".runtime/porting/source-objects/42/425b90a4711d7e3d15ba55714d7b4b16e965e7d65afdbbdb9c4c1c9103d36744",
+      "sha256": "425b90a4711d7e3d15ba55714d7b4b16e965e7d65afdbbdb9c4c1c9103d36744",
+      "bytes": 13481
+    },
+    {
+      "path": ".runtime/porting/source-objects/6d/6d360deafafe70bdbcd5dd01392789681fd2f291a79c7583e64d306e4b626b7a",
+      "sha256": "6d360deafafe70bdbcd5dd01392789681fd2f291a79c7583e64d306e4b626b7a",
+      "bytes": 11089
+    },
+    {
+      "path": ".runtime/porting/source-objects/77/7759d37373ac220353445aa846c8cdafba9cc7a2681c87d6fdcd7a97f51554aa",
+      "sha256": "7759d37373ac220353445aa846c8cdafba9cc7a2681c87d6fdcd7a97f51554aa",
+      "bytes": 4561
+    },
+    {
+      "path": ".runtime/porting/source-objects/7d/7d001ab994ef9b61c560cb40d996f66f8f8194bd2e9bcc02c1ea16ccf4ca14c3",
+      "sha256": "7d001ab994ef9b61c560cb40d996f66f8f8194bd2e9bcc02c1ea16ccf4ca14c3",
+      "bytes": 28294
+    },
+    {
+      "path": ".runtime/porting/source-objects/ab/ab6937befbd7f5bed66d26ad70e47125e0b210954a51074bb7451f44789ec311",
+      "sha256": "ab6937befbd7f5bed66d26ad70e47125e0b210954a51074bb7451f44789ec311",
+      "bytes": 1852403
+    },
+    {
+      "path": ".runtime/porting/source-objects/b2/b232c84ec9187dc491a2fa8ad9234b82aa101eea7b851b5e148a24beb9770536",
+      "sha256": "b232c84ec9187dc491a2fa8ad9234b82aa101eea7b851b5e148a24beb9770536",
+      "bytes": 19415
+    },
+    {
+      "path": ".runtime/porting/source-objects/c6/c6b03ef228cbc902fbe745b776476b165091b6af0f5c0141bf73d3c453a09368",
+      "sha256": "c6b03ef228cbc902fbe745b776476b165091b6af0f5c0141bf73d3c453a09368",
+      "bytes": 4105
+    },
+    {
+      "path": ".runtime/porting/source-objects/cf/cf6d599805fb2718a96160afb3a82b1e7adc5002b861ab0625fd84474d70f515",
+      "sha256": "cf6d599805fb2718a96160afb3a82b1e7adc5002b861ab0625fd84474d70f515",
+      "bytes": 6143
+    },
+    {
+      "path": ".runtime/porting/source-objects/dc/dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "sha256": "dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/source-objects/f2/f22cbc8a42f9e861cc38fbb3a2f3be010322402c7f7d2363bce2f3207d4bd9e6",
+      "sha256": "f22cbc8a42f9e861cc38fbb3a2f3be010322402c7f7d2363bce2f3207d4bd9e6",
+      "bytes": 5182
+    },
+    {
+      "path": ".runtime/porting/source-objects/fd/fd508c48c5ca298b1d5d9105dccf29f5c7d577f4a49a7a0ac22554545080e289",
+      "sha256": "fd508c48c5ca298b1d5d9105dccf29f5c7d577f4a49a7a0ac22554545080e289",
+      "bytes": 3572
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "a938c5ea495408809ef261cb225aac07534127ba999539d49764ec26634ac7fe",
+      "bytes": 25783
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "9ef10e8a49e6bfba7a1b553f5bb5795218a011ea0ca04fd4ff3fbee61eba6f5f",
+      "bytes": 24839
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/calculation.rs",
+      "sha256": "df82395d2133524b550b254c9ec877360468630d21be38483d63509abe545611",
+      "bytes": 34770
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+      "sha256": "953a6d41325765e8d51652457a315cec37c57e2844f5691532769b8e83deb777",
+      "bytes": 24046
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/post_summary.rs",
+      "sha256": "f4fdda3dcf95e7dab085cc9045734770fef2562af9f712e64b1252643b2e713d",
+      "bytes": 13879
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "sha256": "c21cb1139ec1765d67878c8985fd7876a432317502179061b5f9cdf6bc211f47",
+      "bytes": 12506
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "95ac360c90109c53289fdad518393759587322cf90b4e2076a5bf09c7ff0fb51",
+      "bytes": 26101
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+      "sha256": "0cacd187319069b9d5b6da1a44704d74b212208943ab97fca74a3802440a368c",
+      "bytes": 25618
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+      "sha256": "14c6f5813cdf45c4c14886fa4a1092f83a3aeb4535269ebfc0a2402722774843",
+      "bytes": 8835
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/native_cohort.rs",
+      "sha256": "46d6691b64cf16b3393cd6bbc3439d4f453ea04bea285926f72d49a203bad0a0",
+      "bytes": 34603
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/native_cohort/fixtures/native_hard_size.rs",
+      "sha256": "88d083a93c2643209be5f995bda8d0b01396400918b4a68f0f7166f78dff088b",
+      "bytes": 2755004
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/owners.rs",
+      "sha256": "83f5824ff9bfd11634dedfff2e122a1c717fd648b24627d377a551e0ba1dcdc1",
+      "bytes": 14955
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/sizer_output.rs",
+      "sha256": "005204b6be9e9aa325c525b2aeae604e12cd86670137208e39d93e739f42f8d7",
+      "bytes": 3021
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "21cb22453edb82edc0ca452ffb9da2e47ec719c4e55d25cab706da8663bf5204",
+      "bytes": 2992
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "fde8662dd6310e55bdc1f2cb09d35a855eba534221d3a7e779630093c29ca233",
+      "bytes": 28487
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/tests.rs",
+      "sha256": "bcac863b230619004f1347892f716e0ba14bd2ffa2aeb4a5a2d93bb55f3db92c",
+      "bytes": 23955
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+      "bytes": 13070
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+      "bytes": 13044
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+      "bytes": 13042
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+      "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef",
+      "bytes": 40997
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+      "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d",
+      "bytes": 41968
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+      "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08",
+      "bytes": 38121
+    }
+  ],
+  "source_Git_transport": {
+    "Git_filter_view": {
+      "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/receipt.json",
+      "sha256": "268d46e57bf18b723d4b981210f3f2378a3125ee3433939c0e80f6d9a532bce5",
+      "bytes": 12579
+    },
+    "actual_staged_index_view": {
+      "path": ".runtime/porting/SRC-06/Root-source43-actual-staged-index-view/receipt.json",
+      "sha256": "736f22b7e61ea8eb7110466bcfa95ce457f89adee4427c7107d9ae44c10dd49e",
+      "bytes": 6680
+    },
+    "actual_staged_index_verified": true,
+    "compiled_archive_live_sources_unchanged": true,
+    "selected_files": 16,
+    "Git_CRLF_to_LF_projection_files": 3,
+    "other_Git_blobs_whole_equal_compiled_bytes": 13,
+    "CRLF_projection_details": [
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+          "sha256": "953a6d41325765e8d51652457a315cec37c57e2844f5691532769b8e83deb777",
+          "bytes": 24046
+        },
+        "CRLF_count": 294,
+        "Git_filter_blob_oid": "79dcc030388f66cbd338800a3fecc457cee6a168",
+        "canonical_Git_LF_sha256": "26152fb9ca12e49f5bf76d180fa07d1bcf781025be86062c4a8fc994e2a953c1",
+        "canonical_Git_LF_bytes": 23752,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs",
+          "sha256": "26152fb9ca12e49f5bf76d180fa07d1bcf781025be86062c4a8fc994e2a953c1",
+          "bytes": 23752
+        }
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+          "sha256": "0cacd187319069b9d5b6da1a44704d74b212208943ab97fca74a3802440a368c",
+          "bytes": 25618
+        },
+        "CRLF_count": 311,
+        "Git_filter_blob_oid": "63c10ef4aa7a33fa76b4e0447175bdfccea34d8c",
+        "canonical_Git_LF_sha256": "04da3f97ef0908c52d9fe5217939fa8983e4d038e3731fd0e0f5a0bd83b883ab",
+        "canonical_Git_LF_bytes": 25307,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing.rs",
+          "sha256": "04da3f97ef0908c52d9fe5217939fa8983e4d038e3731fd0e0f5a0bd83b883ab",
+          "bytes": 25307
+        }
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+        "actual_compiled_live": {
+          "path": "crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+          "sha256": "14c6f5813cdf45c4c14886fa4a1092f83a3aeb4535269ebfc0a2402722774843",
+          "bytes": 8835
+        },
+        "CRLF_count": 167,
+        "Git_filter_blob_oid": "7a139b487f4128a31dc9e80fdeb767bd4e004b5d",
+        "canonical_Git_LF_sha256": "fc061915d89d24c43f36e732b3dceee44c80fb6705b38c4d1a9fe00707660533",
+        "canonical_Git_LF_bytes": 8668,
+        "only_CRLF_to_LF": true,
+        "LF_view": {
+          "path": ".runtime/porting/SRC-06/Root-source43-Git-text-transport-view/canonical-Git-LF-view/crates/ep_runtime/src/heat_balance/selected_sizing/autosizing/globals.rs",
+          "sha256": "fc061915d89d24c43f36e732b3dceee44c80fb6705b38c4d1a9fe00707660533",
+          "bytes": 8668
+        }
+      }
+    ],
+    "qualification": "Actual4517 compiler/archive/live byte proofs and all59/fiveCLI results remain authentic raw bytes. Root read the actual staged sixteen Git blobs: exactly three equal only CRLF-to-LF projections and thirteen equal raw compiled bytes. This records no numerical change or rerun; final documentation/evidence staging, commit and later live-LF compiler transport bridge remain separate Root actions."
+  },
+  "scope": "Current16 Source whole proposals and all6 actual Source invocations only: one same-existing59case selector then5 real24h CLIs, Native59 direct original-core unit Source/output/recipes/authority and explicit EIO2/4/6 evidence. Previous proofs are referenced/compact metadata only; no historical ZIP, annual JSON, old Air fixture, core/exe/providers or full shell environment is archived. Ancillary outputs remain raw unclassified evidence. Three separately authenticated FLOW/CAPACITY/BOTH24h reported-stream comparisons are numerical PASS under unchanged original tolerances/RMSE; CAPACITY25 raw/binary64 differences remain explicit. The earlier7d99 aggregate retains its original capture-time pending scope. Limit72h/annual/internal-state and ancillary full-IO certification remain open here. Actual compiled/archive/live raw Source bytes are retained; exactly three Git blobs are the separately authenticated CRLF-to-LF byte projection, and thirteen are whole exact."
+}

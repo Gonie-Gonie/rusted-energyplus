@@ -12946,6 +12946,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json",
         "sha256": "0ef6bebe81f22fc398d3b84744b630ad6f61a4ca14511682c9821bd0bb126aff",
         "size_bytes": 28911
+      },
+      "canonical_hard_sized_purchased_air_43": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json",
+        "sha256": "373e9ffe1685ecc8314c759150558de0740510a8a5d9be347864b74222d2ef7a",
+        "size_bytes": 22273
       }
     },
     {

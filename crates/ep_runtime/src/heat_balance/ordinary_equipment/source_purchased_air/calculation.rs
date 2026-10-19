@@ -22,7 +22,7 @@ pub(crate) struct SourcePurchasedAirCalcOwners<'a, 'backend> {
     pub(crate) air: &'a SourceAirHeatBalance,
     pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
     pub(crate) hvac: &'a SelectedHvacGlobals,
-    pub(crate) environment: &'a WeatherEnvironmentState,
+    pub(crate) environment: &'a mut WeatherEnvironmentState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,

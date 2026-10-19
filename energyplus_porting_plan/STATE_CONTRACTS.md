@@ -197,3 +197,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source45 NoLimit B24/72/annual validation](evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json). 자체 JSON/CSV 재확인은 B24의 9,792개에 한정한다. B72·연간 내보내기는 미검증으로 남기고 부가 IO의 미분류 차이도 보존한다. 연간 대형 결과와 실행 바이너리를 증거 ZIP에 넣지 않는다.
+
+
+[Source43 hard-sized PurchasedAir](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json). The sole sizing owner now retains80 genuine DataSizing defaults and136 Base/FanHeat/Scalable locals; actual EIO/header and all7 fields of allocated CompSize rows match full Native methods, including repeated100→200 growth and heating/cooling report asymmetry. Cp evidence is public call-sequence behavior on the same processmain cache; no cache/FP/tolerance reset or expected-state injection. Actual compiled/archive bytes remain unchanged; the accepted Root staged-index readback records exactly three CRLF-to-LF Git projections and thirteen byte-identical Source blobs.
