@@ -113,6 +113,8 @@ pub(crate) use exterior_light_target::SourceExteriorLightOutputField;
 pub(crate) use system_reports_target::{SourceSystemReportsOutputField, SourceZoneVentReportOutputField};
 mod general_real;
 mod meters;
+mod metered_variables;
+pub(crate) use metered_variables::{SourceMeterData, SourceMeteredVariable, SourceMeterHeatOrCool};
 mod weather_target;
 pub(crate) use facility_target::{SourceFacilityOutputField, SourceNonFacilityOutputOwners};
 pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRealOutputField};

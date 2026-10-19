@@ -65,46 +65,24 @@ impl SourceSystemReports {
     /// Actual SimulationManager333 call; the flag write precedes all loops.
     pub(crate) fn create_source_energy_report_structure(
         &mut self,
-        o: &SourceSystemReportOwners<'_>,
+        globals: &SelectedHeatBalanceGlobals,
+        hvac: &SelectedHvacGlobals,
+        equipment: &mut OrdinaryEquipment,
+        branch: &crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
+        registration: &SourceOutputRegistration,
     ) -> Result<(), Error> {
         self.vent_report_structure_created = true;
-        if o.hvac.number_of_primary_air_systems > 0 {
+        if hvac.number_of_primary_air_systems > 0 {
             return Err(Error::Unavailable(
                 "actual CreateEnergyReportStructure2246 PrimaryAirSystems.NumBranches",
             ));
         }
-        // The second primary loop2379 is also empty, independently of Plant counts.
-        for zone in 1..=o.globals.num_of_zones {
-            if !*o
-                .equipment
-                .source_zone_equipment_config(zone)?
-                .is_controlled()
-            {
-                continue;
-            }
-            return Err(Error::Unavailable(
-                "actual CreateEnergyReportStructure2502 controlled ZoneEquipList.NumOfEquipTypes",
-            ));
-        }
-        for zone in 1..=o.globals.num_of_zones {
-            if !*o
-                .equipment
-                .source_zone_equipment_config(zone)?
-                .is_controlled()
-            {
-                continue;
-            }
-            return Err(Error::Unavailable(
-                "actual CreateEnergyReportStructure2663 controlled ZoneEquipList.NumOfEquipTypes",
-            ));
-        }
-        let total = o
-            .hvac
-            .number_plant_loops
-            .checked_add(o.hvac.number_condenser_loops)
-            .ok_or(Error::Unavailable(
-                "undefined plant plus condenser loop count2747",
-            ))?;
+        // Both actual primary-system outer loops have zero rows here.
+        equipment.create_source_zone_equipment_energy_report_structure(
+            globals.num_of_zones, branch, registration,
+        )?;
+        let total = hvac.number_plant_loops.checked_add(hvac.number_condenser_loops)
+            .ok_or(Error::Unavailable("undefined plant plus condenser loop count2747"))?;
         if total > 0 {
             return Err(Error::Unavailable(
                 "actual CreateEnergyReportStructure2755/2758 live VentRepPlant/VentRepCond row",

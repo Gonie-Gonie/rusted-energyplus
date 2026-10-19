@@ -1,0 +1,786 @@
+{
+  "schema": "src06-canonical37-finite-engine-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-structure-37/evidence.zip",
+    "sha256": "c2377c743ba379754b1d1616298437c28d576aa295e32397a7f038986d8e4055",
+    "bytes": 1495573
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/BranchNodeConnections.cc",
+      "sha256": "bc34ef8d562e56a9b586f8f390fc51019258aa004707bc1479f3fd04371c5616",
+      "bytes": 126666
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+      "bytes": 35280
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+      "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+      "bytes": 225982
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+      "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+      "bytes": 55700
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemReports.cc",
+      "sha256": "373928bdae2a85ccc62677c7297269ee34804a93251eba69fe9dec9ce491b795",
+      "bytes": 308416
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-energy-report-structure-Source-review-37-02/review.json",
+      "sha256": "62224d168f09366e6a4f93dba16207dc2ac35ea4f34effe343c5d2f79be9f60b",
+      "bytes": 27381
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-energy-report-structure-application-37/receipt.json",
+      "sha256": "3607bd93e225929dc53c3618d6b93e406f6fa0a0b753bd4f82551769a6bfff70",
+      "bytes": 23664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/review.json",
+      "sha256": "8cb34d64a3103bd6467d08bedd13082e2e14f2fe793ff8edfb20787781049c24",
+      "bytes": 20024
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/table-clock-differences.json",
+      "sha256": "334ee65d58dcda482e9b050b2550b5343d3642f9b34b7d8ae47431003122c58a",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/review.json",
+      "sha256": "9dcd1e19b8c26adbc37cab859532dd96edde6b5bbfd9ebbe4465b4eb04979990",
+      "bytes": 20155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-energy-report-structure-Root-37-02.py",
+      "sha256": "59c98352578f84139e5af9cbd1f79b4288e836b78114d64ec93b6e62946aeb48",
+      "bytes": 7434
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-energy-report-structure-Root-37.py",
+      "sha256": "7d95060e7932d1400406fd8e06532cdda7daeb2641aa08d1df220ccb899b37e7",
+      "bytes": 6916
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/diagnostics.json",
+      "sha256": "ad9491ae0b5ea701210543828aa062fa1f9cc12fe556da175954dc7109c5bf60",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplustbl.htm",
+      "sha256": "7e43e5b619a25bf34d7ecdb07cdc893801bfe7979b9464832dc51dc0f4ca7fa7",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/eplustbl.xml",
+      "sha256": "57ac22c003ce68d24e83edc8c4b82cfd8abd41bb3f5f147c34242f5fb09b005b",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/results/source-reported-results.json",
+      "sha256": "56d384b46eab0f777741a5283c75d4981cbbd8dba9d5c2da467c6c36d7a5d015",
+      "bytes": 1679924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-Root-37/output/run-summary.json",
+      "sha256": "769537580418cb1d042fd5e213e5b3c7c9c3a42773c7a358f3987e7e703efdc5",
+      "bytes": 32763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-command-Root-37/receipt.json",
+      "sha256": "824b0e923acb7a1e65400024dd60f50a48e33c549fa22a53d86be2344e78f51f",
+      "bytes": 5078
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-command-Root-37/stderr.log",
+      "sha256": "6685c3949b07e0d6a790d39c7594a8ab83af9817de0242cc17bae50afffeb07e",
+      "bytes": 1079
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-command-Root-37/stdout.log",
+      "sha256": "0e68a08f66fccdc90f6898a229b245419181fb7c969b0274ad683f05cef104d4",
+      "bytes": 405387
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-Root-37/output/diagnostics.json",
+      "sha256": "827617275b012e55e46a329bd7ba80e5bb4303399b1ff8708ee481a16324f9f7",
+      "bytes": 3002
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-Root-37/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-Root-37/output/run-summary.json",
+      "sha256": "149cf2a706d4f64bb876d97633ca67a933faf026f243605d79f4ad88e2a0b917",
+      "bytes": 25336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-command-Root-37/receipt.json",
+      "sha256": "c7c980e61b242ad7749f6df5b92576419746e16ae20b316d2b1a897111a72986",
+      "bytes": 5129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-command-Root-37/stderr.log",
+      "sha256": "e87897e06d07f610b308856052717a5bcf33c0b5017509bec340d2ea93b8e532",
+      "bytes": 11058
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-command-Root-37/stdout.log",
+      "sha256": "77af205e17b8334f60cb5a10fa29c593c39f4417232479e5719092012930a020",
+      "bytes": 405422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-energy-report-structure-actual-Root-37.py",
+      "sha256": "ddc935777b5823a02c7d53cf540ae3aff2f00f8fe5df87205ef90f0b47cf7565",
+      "bytes": 9513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/correct-energy-report-structure-import-Outer-37-02.py",
+      "sha256": "2473ead2f8ff6c17d9996289c7d6394d2b27f02a6d2723af006c128f004bdbcb",
+      "bytes": 5652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/energy-report-structure-publication-READY-Audit-37-02/publication-template.json",
+      "sha256": "62973e7cc9a9155b1fb00ccbb391c940de2a13cd15eaf2808cc5359c029db318",
+      "bytes": 33180
+    },
+    {
+      "path": ".runtime/porting/SRC-06/energy-report-structure-publication-prepared-Audit-37/publication-template.json",
+      "sha256": "600f10c144c1566ee35bf3a148e2c98a76e80f2c2c17616bfcae6cb426182f19",
+      "bytes": 30459
+    },
+    {
+      "path": ".runtime/porting/SRC-06/energy-report-structure-publication-prepared-Audit-37/publisher-forward.diff",
+      "sha256": "8950e58b6a43e367381d3a002b03c1b5b0356f974b43bce25621c5318055eb09",
+      "bytes": 10995
+    },
+    {
+      "path": ".runtime/porting/SRC-06/energy-report-structure-publication-prepared-Audit-37/publisher-inverse.diff",
+      "sha256": "11eeb8b744779cb718d961da8e78d08bd1942479567b203a574fdacb72c70de9",
+      "bytes": 10995
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-energy-report-structure-Root-37.py",
+      "sha256": "f2ee1e349fd13beab16b10e116c43ae78ee9eb833d74c496cc2094ed1fa9ed22",
+      "bytes": 1337
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-energy-report-structure-draft-Outer-37.py",
+      "sha256": "307495c0e5c5270d7711069cdae9ba38297d695fd24cf81f335fbd33e44f6231",
+      "bytes": 13542
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-energy-report-structure-publication-Audit-37.py",
+      "sha256": "7bc6adc3d42e1eb25fdd8acf3b6e058b3beaf563239191b4373a8d471b6b9d99",
+      "bytes": 7832
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-system-report-equipment-context-Outer-37/plan.json",
+      "sha256": "b9dbe2e76e178d25d4e123fd3336d14df3eb51da2c619683dff0b675aec74bd6",
+      "bytes": 7603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-system-report-equipment-readonly-plan-Outer-35/plan.json",
+      "sha256": "a67f6583b1c54f04e2a6a122fc9456c10b02f8f572adce0c02ae8cf24c74f5f0",
+      "bytes": 24307
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-energy-report-structure-checkpoint-Audit-37.py",
+      "sha256": "042079808d871c4da2b9a36c783bf0283906f13b89bd06b2d5170d36bd41ace6",
+      "bytes": 10447
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-startup-connection-validation-report-checkpoint-Audit-35.py",
+      "sha256": "9056747e4481114371ed005a07b1c5dc59ace6af22fcd72b318a114bd0083d49",
+      "bytes": 10499
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-energy-report-structure-Outer-37.py",
+      "sha256": "f5d79e682361ebb92144329a5ff61a89d8d0cecdb4e6c727bac670f773c78835",
+      "bytes": 8074
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/BranchNodeConnections-1476-1506.txt",
+      "sha256": "ac3c9d3e6d1fedd3f1cdd012c6881f00d3ae291b8f262deddddbba7849980af5",
+      "bytes": 1086
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/BranchNodeConnections-1600-1625.txt",
+      "sha256": "9e0a6a4b1d39b332a5a7ebcd95d32f81e432eb1ed0128e9846fef4d46a388631",
+      "bytes": 864
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/BranchNodeConnections-1655-1781.txt",
+      "sha256": "73e0473367abff6e217af936fcc4c18cfa54fe4afa8a90df80606fb30b3931ef",
+      "bytes": 5072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/DataGlobalConstants-550-558.txt",
+      "sha256": "84f50b6f4b342c67421a4fc9654b525ce1a64a67299d52d0fb3a8718656c8435",
+      "bytes": 158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/DataZoneEquipment-385-448.txt",
+      "sha256": "1cf8519d2310336fae7141928d2fb6c45b285ba0295732523635ff8c1bfd2594",
+      "bytes": 3806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/OutputProcessor-169-241.txt",
+      "sha256": "b5e12d9a29578dc842983719b48c2996a4c942dce7be3ba0bfb2b26994b8ba35",
+      "bytes": 1896
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/OutputProcessor-4306-4413.txt",
+      "sha256": "1bf2a01202ca63a5bce7e1b15f4f681b7653633d109e3153457236fbe74ba44a",
+      "bytes": 3658
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/OutputProcessor-589-613.txt",
+      "sha256": "79d281678544941901cef533b500e1ab401a2bf01075e68a687ede9015ade605",
+      "bytes": 821
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/SystemReports-2194-2246.txt",
+      "sha256": "65a1433833a3bd2eb0258fe54114563af73e868c30ed2bafc7d423dbd73672da",
+      "bytes": 1750
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/SystemReports-2496-2736.txt",
+      "sha256": "62c8c17ae9f3300131c7ac597c0d3a40e19fd2b64dd70693b212bd2f10697d77",
+      "bytes": 14772
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/SystemReports-2747-2758.txt",
+      "sha256": "d891467de20bdb20fc7f86999e1f28abb40d402a5da3ae7fa62f129358111b9d",
+      "bytes": 808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/Native/SystemReports-2877-2895.txt",
+      "sha256": "db6d36b9912a00db96c3247acae54849ecc502b647aa0b831422e5ba3e7f3547",
+      "bytes": 1010
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/registration.rs",
+      "sha256": "ee59de0084c86feee6555894d257d9b2606409295f4b291818c4b94311323345",
+      "bytes": 19584
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "6981cf9afdada8077d018f2635fb816e7271865516696ef69a150188380bc2c1",
+      "bytes": 17777
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/ordinary_system_reports.rs",
+      "sha256": "70c7d12dde1daddd8445a186c705f873913eabf5096ecb8362b3761ecf8433ed",
+      "bytes": 1547
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "420271fd61f33cc21c7172ff0278393a7083c1f6d6fc648f20a1a3e06aec6b3a",
+      "bytes": 11031
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+      "sha256": "7275e47b282388e5d73b424ddae79e5bb540eba8d9152ad7c236032300b8cfc5",
+      "bytes": 12943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "sha256": "9b992142e1a0824b3813f8d435f5eceb2d66bb24a677c75884cc1d635a904c04",
+      "bytes": 24665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/contexts/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "cf90dc0cd42b9c83b0cb4b7294d2f29537c2699a2a685cdd58e488d9c8d2746a",
+      "bytes": 6989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/draft.json",
+      "sha256": "c5ceb31ff711dc67ad757d909df9b0e037f7a3e7ee5d727dbaab8345b27661e8",
+      "bytes": 34496
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/import-correction.json",
+      "sha256": "22d4389b3d153f05b898633d4ef59de337e9e2e8c3ce04f36bc54ce50c53cef4",
+      "bytes": 1897
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/01.stdout",
+      "sha256": "ab4414ae858e6456702c4c3b533e5692e95d6804b31502857c126dbbf25c0d4c",
+      "bytes": 2172
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/02.stdout",
+      "sha256": "e862d14dd143087e503bd5d1de2bc955b42df9282e484087c4e0956cdee8ba02",
+      "bytes": 22559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/03.stdout",
+      "sha256": "fc0e3d3a010f3b0466e9c80a2b3702c4f69e7cb391a83e968a453f2f0f43c899",
+      "bytes": 52233
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/04.stdout",
+      "sha256": "72375b13cdc9d8249b2b89e91f996cb224e2ad1a17b354b76aadfdeb9e8e94ea",
+      "bytes": 3850
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/05.stdout",
+      "sha256": "0f248bfc9abe91a47f74f2886020ec9d84d1c71fbae864e2ea653371c977d1ca",
+      "bytes": 11248
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/06.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/06.stdout",
+      "sha256": "a11148012944d3c158221e0ac58219490f4a43b327a4cd26fc44fe494e8eea6a",
+      "bytes": 26740
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/07.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/07.stdout",
+      "sha256": "d68a0b555ad366f71145a840d0536ac30025a7f973d0b8f1bdd3114902d1d56a",
+      "bytes": 8002
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/08.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/08.stdout",
+      "sha256": "9d7587e41c4807a9206d8c58555066f4f898bf2837d4799e37127a0fc27d1814",
+      "bytes": 5935
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/09.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37-02/parse/09.stdout",
+      "sha256": "95fc36d844292b4e518a28d12783468b379728f21eeb7260f7bec38b5d976791",
+      "bytes": 10947
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-draft-Outer-37/draft.json",
+      "sha256": "de3e2a7eea485e0207279f1a014cbdd1da6421944ea1980dc520e13cdf8cb862",
+      "bytes": 33527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "2ee3eaa0a5f08f675782190921339db37e8b62660395e1282b931232370e1fac",
+      "bytes": 50287
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_energy_report.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "e567eb044634f935618735c8e1666f7b82b8a54d92fbc658f40551f1e9717bc2",
+      "bytes": 26642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/ordinary_system_reports/initialization.rs",
+      "sha256": "6d2304ae02f2281d21c064a10e327494acb147699441d2dab2053351d0012e6b",
+      "bytes": 11625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "a7c15c95923b7197fb12fbb98ebe8761112018511578a5000a97b5ad0a43ad77",
+      "bytes": 22416
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/source_output_registration/metered_variables.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "dc7f7634fb50a6e06e20fa6238e4d349e7e44339cb9add9adc1b79ed7416d1a0",
+      "bytes": 2145
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/component_data.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/complete-final-compiler-Source-plan.json",
+      "sha256": "8c6b325dd5f1ce54433d430823ae8c6e21366e6fbb96a91102cad117aa1bc14c",
+      "bytes": 2634549
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/01.forward.diff",
+      "sha256": "c062d51bfd03f34b61e9c498cc6f7d5044372b7e928e0effae8975ca8821251b",
+      "bytes": 449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/01.inverse.diff",
+      "sha256": "506873f2b01cece654bb68ee9a72b6b14e3c6466004c666026f66ec6053548b8",
+      "bytes": 449
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/02.forward.diff",
+      "sha256": "25258cf030e7adacb2f4e91bfe230f9fdc357cf48ba16f46705139ec35d9aa4d",
+      "bytes": 631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/02.inverse.diff",
+      "sha256": "9ad51efcb3a165015bf024c7ce45d522e14b862529297d811934c837bb390e1e",
+      "bytes": 631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/03.forward.diff",
+      "sha256": "edbfdce7a82c9e0d986343251137e83b94e16b720df38273bd178563ef2a10bb",
+      "bytes": 336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/03.inverse.diff",
+      "sha256": "e3d9bc5236eb64b1f087ecf45b0d604bd02dfc419e16427e8ea2ab846c94a89c",
+      "bytes": 336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/04.forward.diff",
+      "sha256": "11de152d5579183ac6754c4343b6e623dfc2e00ab859a875ea72574d3bac7a78",
+      "bytes": 887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/04.inverse.diff",
+      "sha256": "2aa33791b482081e7f2cd3ea449ac47a595d2845a9ee108c643f8776d3845906",
+      "bytes": 887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/05.forward.diff",
+      "sha256": "5991ff83df861743c594d36b95740f68fc2c88c00f951ab5e36e5ec19c97ea9a",
+      "bytes": 2727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/05.inverse.diff",
+      "sha256": "909b9db8549fbeda9f7fb6d3c9a17622acfd295103cba8583a1b10e352531aba",
+      "bytes": 2727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/06.forward.diff",
+      "sha256": "bc27ddd44bf1b4c4890a372fb0aa7b8ab138cc6c22b16204f27b71fd2859b408",
+      "bytes": 2619
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/06.inverse.diff",
+      "sha256": "6cf9b18fe5cec00df84b602288caaae2e47424b65e4439508f2e624c20cfb8f5",
+      "bytes": 2619
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/07.forward.diff",
+      "sha256": "5b5eadea5ed9bc1c915624a89def1a30bda77a09f7a383c4eca5bf817e3fc69c",
+      "bytes": 6693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/07.inverse.diff",
+      "sha256": "f44e9c34274884942c496bff5f2783557b7f7bb73358b8e09e06d00b2e9e20d1",
+      "bytes": 6693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/08.forward.diff",
+      "sha256": "e55626332788480fc816d07f0b353b5f43bc8b5b93a2594330ef8a0022a6bbf6",
+      "bytes": 5331
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/08.inverse.diff",
+      "sha256": "e910b41e932f49ec37fb94c42c2e27dbf993c4301f149c4fa0e5299ee870880a",
+      "bytes": 5331
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/09.forward.diff",
+      "sha256": "9a51b3ab573bba8f60a5e3c51148d6a2d634632587c0808cbc8b564875cc555f",
+      "bytes": 9040
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/diffs/09.inverse.diff",
+      "sha256": "bc35bfe5aa7c53664ca11336a9b2706d18d8bf4b9d3f28736c43ad7e91ed6d1a",
+      "bytes": 9040
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "2ee3eaa0a5f08f675782190921339db37e8b62660395e1282b931232370e1fac",
+      "bytes": 50287
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_energy_report.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "e567eb044634f935618735c8e1666f7b82b8a54d92fbc658f40551f1e9717bc2",
+      "bytes": 26642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_system_reports/initialization.rs",
+      "sha256": "6d2304ae02f2281d21c064a10e327494acb147699441d2dab2053351d0012e6b",
+      "bytes": 11625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "a7c15c95923b7197fb12fbb98ebe8761112018511578a5000a97b5ad0a43ad77",
+      "bytes": 22416
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/metered_variables.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "dc7f7634fb50a6e06e20fa6238e4d349e7e44339cb9add9adc1b79ed7416d1a0",
+      "bytes": 2145
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/component_data.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/manifest.json",
+      "sha256": "2d5d6b30eab50a8eed168b12eabcc7ef3f072e5d22610cb303b1e44b86b0c99a",
+      "bytes": 35602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9c1d793f22edaa1b40744b32c777deb6a6630b941b712f4c68edd170aacd3732",
+      "bytes": 50313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_energy_report.rs",
+      "sha256": "d4cb7edf51035cacc76ae969978e835911c8a24167919849f38a0cddbf65f273",
+      "bytes": 8794
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "54c309f661685ed86afe495fef4833316434529d49e3544843770ea6a46817c3",
+      "bytes": 3511
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "d12179dc3cc25e6a6c40f514df856442bd59929de51d67023f301401ff9ef5be",
+      "bytes": 26232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/ordinary_system_reports/initialization.rs",
+      "sha256": "72faa9721da6d53768e2f6408f3ef47eb13ba32b7dfdeb1e331e4c5dd5edb329",
+      "bytes": 11087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "a47d67027e9b434d4537c7ecb2bb77b9f5a694fa482e0307e3c8adbaaf0a4c7a",
+      "bytes": 22538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/metered_variables.rs",
+      "sha256": "886cba2693362d53fb3f5efca2dd831b95dcf645c60b237e924a7182214f0d34",
+      "bytes": 5118
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "fe4db398882427d2e949d5aa635085a394d28a387d18975f1992753a1ab99f81",
+      "bytes": 2165
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/component_data.rs",
+      "sha256": "72a697d026fbf6186aafcbe1f0e8041bfb323f5ea6439f63d6f021d936003bff",
+      "bytes": 6491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/whole-crates-final-API-census.json",
+      "sha256": "525c9de50dd16ba074a2651ca2475119b0550174bcd0c212e6cc91228742b3fd",
+      "bytes": 7110
+    },
+    {
+      "path": ".runtime/porting/source-objects/52/524b16b03010f50b487030c2136f3a0f660a8f5fdd614684be7a9067769f986c",
+      "sha256": "524b16b03010f50b487030c2136f3a0f660a8f5fdd614684be7a9067769f986c",
+      "bytes": 1848519
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9c1d793f22edaa1b40744b32c777deb6a6630b941b712f4c68edd170aacd3732",
+      "bytes": 50313
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_energy_report.rs",
+      "sha256": "d4cb7edf51035cacc76ae969978e835911c8a24167919849f38a0cddbf65f273",
+      "bytes": 8794
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "54c309f661685ed86afe495fef4833316434529d49e3544843770ea6a46817c3",
+      "bytes": 3511
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "d12179dc3cc25e6a6c40f514df856442bd59929de51d67023f301401ff9ef5be",
+      "bytes": 26232
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_system_reports/initialization.rs",
+      "sha256": "72faa9721da6d53768e2f6408f3ef47eb13ba32b7dfdeb1e331e4c5dd5edb329",
+      "bytes": 11087
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "a47d67027e9b434d4537c7ecb2bb77b9f5a694fa482e0307e3c8adbaaf0a4c7a",
+      "bytes": 22538
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/metered_variables.rs",
+      "sha256": "886cba2693362d53fb3f5efca2dd831b95dcf645c60b237e924a7182214f0d34",
+      "bytes": 5118
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "fe4db398882427d2e949d5aa635085a394d28a387d18975f1992753a1ab99f81",
+      "bytes": 2165
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes/component_data.rs",
+      "sha256": "72a697d026fbf6186aafcbe1f0e8041bfb323f5ea6439f63d6f021d936003bff",
+      "bytes": 6491
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json",
+      "sha256": "863399e3eae4659bdfe670a35c1ac324aa2add544de0fb87b2b5acca01f733b9",
+      "bytes": 6498
+    }
+  ],
+  "scope": "Six existing and three new production Sources and exactly two actual B/A CLI receipts. The parent35 A24 proof is separately attributed; no cohort or new Native rerun by37. No historical ZIP recursion, raw Native capture, exe/core, annual output payload or blanket mathematical equivalence claim."
+}

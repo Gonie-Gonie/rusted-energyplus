@@ -12906,6 +12906,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json",
         "sha256": "863399e3eae4659bdfe670a35c1ac324aa2add544de0fb87b2b5acca01f733b9",
         "size_bytes": 6498
+      },
+      "canonical_energy_report_structure_37": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-structure-37/summary.json",
+        "sha256": "2a4daefe84cccba881b743c119e3d1c46dd5e11e33ae02328dc46cba6e375bf5",
+        "size_bytes": 6410
       }
     },
     {

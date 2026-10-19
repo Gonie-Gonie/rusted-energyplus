@@ -173,3 +173,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source35 startup connection validation/report](evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json). 같은 BranchNodeConnections 기록과 Config·EquipmentList·물리 NodeID를 빌려 읽는다. 실제 부모 플래그를 센 뒤 할당 범위를 결정하고, NodeID[0]의 저장된 Undefined 값과 Native의 우선순위 출력 순서를 보존한다. 보고용 복사 상태는 추가하지 않는다.
+
+
+[Source37 energy report structure](evidence/SRC-06-canonical-energy-report-structure-37/summary.json). GetComponentData와 계량변수 조회는 같은 Branch·OutputRegistration·장비 소유자를 빌린다. Native의 임시 배열 초기화·복사·EquipmentData 기록 순서를 유지하며, 보고용 대체 소유자나 계산값 캐시는 추가하지 않는다.

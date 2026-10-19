@@ -1,5 +1,6 @@
 //! Reached DataZoneEquipment/ZoneEquipmentManager constructor records.
 use std::convert::Infallible;
+use crate::heat_balance::source_output_registration::SourceMeterData;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct SourceAirIn {
@@ -40,7 +41,7 @@ pub(super) struct SourceEquipmentData {
     pub(super) inlet_node_numbers: Option<Vec<i32>>,
     pub(super) outlet_node_numbers: Option<Vec<i32>>,
     pub(super) number_metered_variables: i32,
-    pub(super) metered_variables: Option<Vec<Infallible>>,
+    pub(super) metered_variables: Option<Vec<SourceMeterData>>,
     pub(super) sub_equipment: Option<Vec<Infallible>>,
     pub(super) energy_transfer_component: i32,
     pub(super) zone_equipment_to_plant_pointer: i32,

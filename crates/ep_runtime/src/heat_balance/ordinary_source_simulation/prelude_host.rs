@@ -490,38 +490,25 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
     }
     fn create_energy_report_structure(&mut self) -> Result<(), RuntimeError> {
         let session = required(
-            self.session.as_mut(),
-            "actual SystemReports before energy structure",
+            self.session.as_mut(), "actual SystemReports before energy structure",
         )?;
-        let owners = SourceSystemReportOwners {
-            globals: required(
-                self.reports.selected_heat_balance_globals.as_ref(),
-                "actual globals before energy structure",
-            )?,
-            hvac: &required(
-                self.reports.selected_simulation_startup.as_ref(),
-                "actual HVAC globals before energy structure",
-            )?
-            .hvac_globals,
-            equipment: required(
-                self.reports.source_zone_equipment.as_ref(),
-                "actual zone equipment before energy structure",
-            )?,
-            zones: required(
-                self.reports.selected_zone_input.as_ref(),
-                "actual zones before energy structure",
-            )?,
-            air_loop: &session.hvac.simulation.air_loop,
-            predefined_registry: &self.reports.registry,
-            predefined_table: &mut self.reports.table,
-            predefined_summary: &mut session.comfort_summary,
-        };
-        session
-            .hvac
-            .ancillary
-            .system_reports
-            .create_source_energy_report_structure(&owners)
-            .map_err(hb_input_error)
+        let globals = required(
+            self.reports.selected_heat_balance_globals.as_ref(),
+            "actual globals before energy structure",
+        )?;
+        let hvac = &required(
+            self.reports.selected_simulation_startup.as_ref(),
+            "actual HVAC globals before energy structure",
+        )?.hvac_globals;
+        let equipment = required(
+            self.reports.source_zone_equipment.as_mut(),
+            "actual zone equipment before energy structure",
+        )?;
+        let ancillary = &mut session.hvac.ancillary;
+        ancillary.system_reports.create_source_energy_report_structure(
+            globals, hvac, equipment, &ancillary.branch_node_connections,
+            &self.reports.output_registration,
+        ).map_err(hb_input_error)
     }
     fn produce_rdd_mdd(&mut self) -> Result<(), RuntimeError> {
         self.reports

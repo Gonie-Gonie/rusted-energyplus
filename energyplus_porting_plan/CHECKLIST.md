@@ -316,3 +316,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source35 startup connection validation/report](evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json). 노드 연결 검사와 제어 구역·장비 목록·비부모 노드 연결 보고를 통합했다. 별도 빌드와 체크포인트를 반복하지 않고 실제 B/A24 한 쌍으로 확인한다. 게이트 수는 그대로다.
+
+
+[Source37 energy report structure](evidence/SRC-06-canonical-energy-report-structure-37/summary.json). 에너지 보고 구조 생성 경로를 기존 파일 6개와 새 파일 3개로 연결했다. 실제 B/A24 한 쌍을 확인하며, 추가 테스트나 별도 Native 실행은 없다. 게이트 수는 그대로다.

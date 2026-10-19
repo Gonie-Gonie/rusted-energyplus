@@ -1,6 +1,7 @@
 //! Actual shared BranchNodeConnections module slice and two finite checks.
 mod reporting;
 mod registration;
+mod component_data;
 mod check_connections;
 pub(crate) use registration::{SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
 use registration::SourceNodeConnection;

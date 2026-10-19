@@ -1,0 +1,121 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "selected_existing_production_Sources": 6,
+  "new_production_Source_files": 3,
+  "selected_production_Sources": 9,
+  "corrected02_full_semantic_review_used": true,
+  "actual_Branch_OutputRegistration_Equipment_owners": true,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "scope": "Controlled energy report structure creation uses the same actual equipment lists, connection registry, OutputProcessor metered-variable metadata and retained EquipmentData. Native temporary allocation/copy/write order is preserved. Positive unrepresented parent/child/system/diagnostic branches remain explicit boundaries.",
+  "qualification": "Actual B frontier and any retained-Native BND comparison are recorded only from accepted Root37 execution, not inferred from Source35. A24 original5352 proof is transferred only after current-run strict equal35 checks. No scientific/math/tolerance changes or new tests; existing full Native cohort is unchanged and not rerun.",
+  "Native_BND_reported_IO_comparison": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-Root-37/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    "BND_bytes": 8559,
+    "BND_node_block_present": true,
+    "Native_paired_Node_state_or_IO_claim": "Entire BND reported IO body only; no internal thermodynamic Node state claim",
+    "Native_capture": {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    "Native_original_BND": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    "full_BND_body_bytes_equal": true,
+    "compared_body_bytes": 8518,
+    "compared_body_lines": 106,
+    "excluded_headers": [
+      "Program Version,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.10.19 14:12\r",
+      "Program Version,rusted-energyplus 0.1.0\r"
+    ],
+    "Native_BND_finite_copy": {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    }
+  },
+  "Native_BND_qualification": "Entire8518-byte/106-line reported IO body exact after excluding only each file's exact Program Version first line including its CR. No body normalization, new Native run or internal thermodynamic Node-state equivalence claim.",
+  "schema": "src06-canonical-energy-report-structure.v1",
+  "status": "Genuine Source energy report structure on actual connected equipment and metered-variable owners; actual B result recorded",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/manifest.json",
+    "sha256": "2d5d6b30eab50a8eed168b12eabcc7ef3f072e5d22610cb303b1e44b86b0c99a",
+    "bytes": 35602
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-energy-report-structure-Source-review-37-02/review.json",
+    "sha256": "62224d168f09366e6a4f93dba16207dc2ac35ea4f34effe343c5d2f79be9f60b",
+    "bytes": 27381
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/complete-final-compiler-Source-plan.json",
+    "sha256": "8c6b325dd5f1ce54433d430823ae8c6e21366e6fbb96a91102cad117aa1bc14c",
+    "bytes": 2634549
+  },
+  "accepted_parent_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/review.json",
+    "sha256": "9dcd1e19b8c26adbc37cab859532dd96edde6b5bbfd9ebbe4465b4eb04979990",
+    "bytes": 20155
+  },
+  "accepted_parent_plan": {
+    "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/complete-final-compiler-Source-plan.json",
+    "sha256": "5a98c187ae7221137fb64654019110e4e170389e2d32e0bca0f592b49e62eedf",
+    "bytes": 2632654
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-B-NOLIMIT-24H-command-Root-37/receipt.json",
+    "sha256": "c7c980e61b242ad7749f6df5b92576419746e16ae20b316d2b1a897111a72986",
+    "bytes": 5129
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-energy-report-structure-A-24H-command-Root-37/receipt.json",
+    "sha256": "824b0e923acb7a1e65400024dd60f50a48e33c549fa22a53d86be2344e78f51f",
+    "bytes": 5078
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/review.json",
+    "sha256": "8cb34d64a3103bd6467d08bedd13082e2e14f2fe793ff8edfb20787781049c24",
+    "bytes": 20024
+  },
+  "actual_B_completed": false,
+  "actual_B_result": "GetHeatBalanceInput: actual InitEnergyReports145 FindItemInList/EquipListIndex assignment",
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted35_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/review.json",
+      "sha256": "9dcd1e19b8c26adbc37cab859532dd96edde6b5bbfd9ebbe4465b4eb04979990",
+      "bytes": 20155
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal35": 7,
+    "CSV_files_whole_equal35": 2,
+    "scope": "Accepted35 A24 proof transfer. No new Native/72H/annual or internal-state comparison."
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-structure-37/evidence.zip",
+    "sha256": "c2377c743ba379754b1d1616298437c28d576aa295e32397a7f038986d8e4055",
+    "bytes": 1495573
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-structure-37/manifest.json",
+    "sha256": "11b6d2f99b7fb117db654d1739bdb36342c54931d267a0ab7173afd4c250df51",
+    "bytes": 37861
+  },
+  "archive_entries": 155,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-energy-report-structure-checkpoint-Audit-37.py",
+    "sha256": "042079808d871c4da2b9a36c783bf0283906f13b89bd06b2d5170d36bd41ace6",
+    "bytes": 10447
+  }
+}
