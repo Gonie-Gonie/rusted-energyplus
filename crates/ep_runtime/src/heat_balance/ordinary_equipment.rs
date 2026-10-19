@@ -4,6 +4,7 @@ pub(crate) mod management;
 mod node_reporting;
 mod source_input;
 mod source_equipment_types;
+mod source_equipment_initialization;
 mod source_equipment_getter;
 mod source_controlled_equipment;
 mod source_node_connections;

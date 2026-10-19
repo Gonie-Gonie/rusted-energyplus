@@ -1,4 +1,6 @@
 //! Genuine ZoneEnergyDemand/HeatBalance AirReport allocated owners.
+// Sequenced EPVector arrays preserve None allocation vs Some allocation.
+// Their real allocate() performs value-initialization and an explicit T{} fill.
 use super::*;
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceAirReport {
@@ -153,9 +155,9 @@ pub(crate) struct SourceSystemSensibleDemand {
     pub(crate) remaining_output_to_cool_sp: f64,
     pub(crate) unadjusted_remaining_output_to_heat_sp: f64,
     pub(crate) unadjusted_remaining_output_to_cool_sp: f64,
-    pub(crate) sequenced_output_required: Vec<f64>,
-    pub(crate) sequenced_output_to_heating_sp: Vec<f64>,
-    pub(crate) sequenced_output_to_cooling_sp: Vec<f64>,
+    pub(crate) sequenced_output_required: Option<Vec<f64>>,
+    pub(crate) sequenced_output_to_heating_sp: Option<Vec<f64>>,
+    pub(crate) sequenced_output_to_cooling_sp: Option<Vec<f64>>,
     pub(crate) predicted_rate: f64,
     pub(crate) predicted_heating_sp_rate: f64,
     pub(crate) predicted_cooling_sp_rate: f64,
@@ -181,9 +183,9 @@ pub(crate) struct SourceSystemMoistureDemand {
     pub(crate) remaining_output_to_dehumid_sp: f64,
     pub(crate) unadjusted_remaining_output_to_humid_sp: f64,
     pub(crate) unadjusted_remaining_output_to_dehumid_sp: f64,
-    pub(crate) sequenced_output_required: Vec<f64>,
-    pub(crate) sequenced_output_to_humid_sp: Vec<f64>,
-    pub(crate) sequenced_output_to_dehumid_sp: Vec<f64>,
+    pub(crate) sequenced_output_required: Option<Vec<f64>>,
+    pub(crate) sequenced_output_to_humid_sp: Option<Vec<f64>>,
+    pub(crate) sequenced_output_to_dehumid_sp: Option<Vec<f64>>,
     pub(crate) predicted_rate: f64,
     pub(crate) predicted_humid_sp_rate: f64,
     pub(crate) predicted_dehumid_sp_rate: f64,

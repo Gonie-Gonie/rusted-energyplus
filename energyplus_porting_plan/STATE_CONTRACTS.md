@@ -131,3 +131,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 설비 가용성 경로 검증](evidence/SRC-06-canonical-component-availability-22/summary.json). 기존 가용성 소유자와 실제 생성자·입력 플래그를 사용합니다. 설비별 상태 초기화와 구역·하이브리드 조건의 원래 순서를 보존합니다.
+
+
+[Source 구역 설비 초기화 검증](evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json). 최초·환경·시간 단계 초기화는 기존 수요·크기 산정·설비 구성·물리 Node 상태를 공유한다. EPVector 할당의 실제 영 초기화와 할당 여부를 보존한다.

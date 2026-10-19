@@ -4,21 +4,24 @@ impl super::super::demand::SourceSystemSensibleDemand {
     pub(super) fn begin_source_environment(&mut self) -> Result<(), Error> {
         self.base.remaining_output_required = 0.0;
         self.base.total_output_required = 0.0;
-        if !self.sequenced_output_required.is_empty() {
+        if self.sequenced_output_required.is_some() {
             for number in 0..usize::try_from(self.base.num_zone_equipment)
                 .map_err(|_| Error::Unavailable("actual sensible NumZoneEquipment"))?
             {
                 *self
                     .sequenced_output_required
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced sensible demand"))? = 0.0;
                 *self
                     .sequenced_output_to_heating_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced heating demand"))? = 0.0;
                 *self
                     .sequenced_output_to_cooling_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced cooling demand"))? = 0.0;
             }
         }
@@ -60,17 +63,20 @@ impl super::super::demand::SourceSystemSensibleDemand {
             {
                 *self
                     .sequenced_output_required
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual predicted sequenced demand"))? =
                     self.base.total_output_required;
                 *self
                     .sequenced_output_to_heating_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual predicted sequenced heating"))? =
                     self.output_required_to_heating_sp;
                 *self
                     .sequenced_output_to_cooling_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual predicted sequenced cooling"))? =
                     self.output_required_to_cooling_sp;
             }
@@ -82,21 +88,24 @@ impl super::super::demand::SourceSystemMoistureDemand {
     pub(super) fn begin_source_environment(&mut self) -> Result<(), Error> {
         self.base.remaining_output_required = 0.0;
         self.base.total_output_required = 0.0;
-        if !self.sequenced_output_required.is_empty() {
+        if self.sequenced_output_required.is_some() {
             for number in 0..usize::try_from(self.base.num_zone_equipment)
                 .map_err(|_| Error::Unavailable("actual moisture NumZoneEquipment"))?
             {
                 *self
                     .sequenced_output_required
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced moisture demand"))? = 0.0;
                 *self
                     .sequenced_output_to_humid_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced humidifying"))? = 0.0;
                 *self
                     .sequenced_output_to_dehumid_sp
-                    .get_mut(number)
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number))
                     .ok_or(Error::Unavailable("actual sequenced dehumidifying"))? = 0.0;
             }
         }

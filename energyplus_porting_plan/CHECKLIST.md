@@ -274,3 +274,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 설비 가용성 경로 검증](evidence/SRC-06-canonical-component-availability-22/summary.json). 실제 설비 수만큼 가용성 상태를 할당하고 관리자 없는 설비의 처리 경로를 연결했습니다. B·A24 실행 결과와 남은 경계를 공개 요약에 기록합니다.
+
+
+[Source 구역 설비 초기화 검증](evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json). 구역 설비 초기화 경로를 연결했다. 실제 B·A24 실행과 남은 경계는 요약 자료에 기록한다.

@@ -443,3 +443,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 설비 가용성 경로 검증](../evidence/SRC-06-canonical-component-availability-22/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: actual controlled ZoneEquipList count223`입니다. 전체 B 완료와 Node 상태의 Native 검증은 아직 주장하지 않습니다.
+
+
+[Source 구역 설비 초기화 검증](../evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json). 실제 B의 미완료 경계는 `GetHeatBalanceInput: actual controlled Config.ZoneExh3665`이다. 내부 Native 상태 일치와 B 전체 완료를 주장하지 않는다.

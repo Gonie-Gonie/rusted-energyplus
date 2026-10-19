@@ -12836,6 +12836,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-component-availability-22/summary.json",
         "sha256": "a51099e9adc8f17fbf06a59eb2aa7817078a17ab8eee052b48a4594fb57bef92",
         "size_bytes": 4402
+      },
+      "canonical_zone_equipment_initialization_23": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json",
+        "sha256": "c4beb131d45d1bdb45908f0bbe9fa696b8a2e1ed9e24d5b179662873234c8253",
+        "size_bytes": 4662
       }
     },
     {

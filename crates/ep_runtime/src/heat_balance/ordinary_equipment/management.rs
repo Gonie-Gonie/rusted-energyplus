@@ -31,32 +31,71 @@ impl SourceHvacManager {
     }
     fn initialize_source_zone_equipment(
         &mut self,
-        _first_hvac_iteration: bool,
+        first_hvac_iteration: bool,
         o: &mut SourceHvacOwners<'_, '_>,
     ) -> Result<(), Error> {
         if o.equipment.init_equipment_one_time_flag {
             o.equipment.init_equipment_one_time_flag = false;
-            let count = usize::try_from(o.globals.num_of_zones)
-                .map_err(|_| Error::Unavailable("actual ZoneEqSizing NumOfZones allocation214"))?;
-            o.sizing.zone_equipment_sizing =
-                Some(vec![SourceZoneEquipmentSizing::default(); count]);
+            let zones = usize::try_from(o.globals.num_of_zones)
+                .map_err(|_| Error::Unavailable("actual ZoneEqSizing NumOfZones211"))?;
+            o.sizing.zone_equipment_sizing = Some(vec![SourceZoneEquipmentSizing::default(); zones]);
             for number in 1..=o.globals.num_of_zones {
-                let config = o.equipment.source_zone_equipment_config(number)?;
-                if !*config.is_controlled() {
+                let config = o.equipment.zone_config.as_deref()
+                    .and_then(|rows| rows.get(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual ZoneEquipConfig214"))?;
+                if !config.is_controlled {
                     continue;
                 }
-                let row = o
-                    .equipment
-                    .zone_config
-                    .as_deref()
-                    .and_then(|v| v.get(at(number).ok()?))
-                    .ok_or(Error::Unavailable("actual controlled ZoneEquipConfig218"))?;
-                if row.equipment_list_index == 0 {
+                if config.equipment_list_index == 0 {
                     continue;
                 }
-                return Err(Error::Unavailable(
-                    "actual controlled ZoneEquipList count223",
-                ));
+                let count = o.equipment.equipment_lists.as_deref()
+                    .and_then(|rows| config.equipment_list_index.checked_sub(1).and_then(|at| rows.get(at)))
+                    .ok_or(Error::Unavailable("actual controlled ZoneEquipList221"))?
+                    .number_of_equipment_types;
+                let native_count = i32::try_from(count)
+                    .map_err(|_| Error::Unavailable("actual ZoneEquipCount221 integer domain"))?;
+                let sensible = o.controller.demand.zones.as_mut()
+                    .and_then(|rows| rows.get_mut(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual ZoneSysEnergyDemand222"))?;
+                sensible.base.num_zone_equipment = native_count;
+                sensible.sequenced_output_required = Some(vec![0.0; count]);
+                sensible.sequenced_output_to_heating_sp = Some(vec![0.0; count]);
+                sensible.sequenced_output_to_cooling_sp = Some(vec![0.0; count]);
+                let moisture = o.controller.demand.zone_moisture.as_mut()
+                    .and_then(|rows| rows.get_mut(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual ZoneSysMoistureDemand227"))?;
+                moisture.base.num_zone_equipment = native_count;
+                moisture.sequenced_output_required = Some(vec![0.0; count]);
+                moisture.sequenced_output_to_humid_sp = Some(vec![0.0; count]);
+                moisture.sequenced_output_to_dehumid_sp = Some(vec![0.0; count]);
+                let sizing = o.sizing.zone_equipment_sizing.as_mut()
+                    .and_then(|rows| rows.get_mut(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual ZoneEqSizing232"))?;
+                // Native232 allocation followed by explicit233 whole-array =0.
+                // Demand EPVector allocations separately follow their genuine zero-fill API.
+                sizing.sizing__method = Some(vec![0; 35]); // HVAC::NumOfSizingTypes
+                if o.space_controls.simulation || o.space_controls.sizing {
+                    let zone = o.zones.zones.as_deref()
+                        .and_then(|rows| rows.get(at(number).ok()?))
+                        .ok_or(Error::Unavailable("actual controlled Zone spaceIndexes235"))?;
+                    for &space in &zone.space_indexes {
+                        let sensible = o.controller.demand.spaces.as_mut()
+                            .and_then(|rows| rows.get_mut(at(space).ok()?))
+                            .ok_or(Error::Unavailable("actual spaceSysEnergyDemand236"))?;
+                        sensible.base.num_zone_equipment = native_count;
+                        sensible.sequenced_output_required = Some(vec![0.0; count]);
+                        sensible.sequenced_output_to_heating_sp = Some(vec![0.0; count]);
+                        sensible.sequenced_output_to_cooling_sp = Some(vec![0.0; count]);
+                        let moisture = o.controller.demand.space_moisture.as_mut()
+                            .and_then(|rows| rows.get_mut(at(space).ok()?))
+                            .ok_or(Error::Unavailable("actual spaceSysMoistureDemand241"))?;
+                        moisture.base.num_zone_equipment = native_count;
+                        moisture.sequenced_output_required = Some(vec![0.0; count]);
+                        moisture.sequenced_output_to_humid_sp = Some(vec![0.0; count]);
+                        moisture.sequenced_output_to_dehumid_sp = Some(vec![0.0; count]);
+                    }
+                }
             }
         }
         if o.equipment.init_equipment_environment_flag && o.clock.begin_envrn_flag {
@@ -65,14 +104,12 @@ impl SourceHvacManager {
             }
             if let Some(rows) = self.ancillary.availability.zone_components.as_mut() {
                 for number in 1..=14 {
-                    let row = rows.get_mut(number - 1).ok_or(Error::Unavailable(
-                        "actual same ZoneComp type allocation263",
-                    ))?;
+                    let row = rows.get_mut(number - 1)
+                        .ok_or(Error::Unavailable("actual same ZoneComp type257"))?;
                     if let Some(managers) = row.managers.as_mut() {
                         for number in 1..=row.total_components {
-                            let manager = managers
-                                .get_mut(at(number)?)
-                                .ok_or(Error::Unavailable("actual ZoneCompAvailMgrs268"))?;
+                            let manager = managers.get_mut(at(number)?)
+                                .ok_or(Error::Unavailable("actual ZoneCompAvailMgrs260"))?;
                             manager.status = 0;
                             manager.start_time = 0;
                             manager.stop_time = 0;
@@ -80,59 +117,21 @@ impl SourceHvacManager {
                     }
                 }
             }
-            if let Some(rows) = &o.equipment.zone_config {
-                for row in rows {
-                    if !row.is_controlled {
-                        continue;
-                    }
-                    return Err(Error::Unavailable(
-                        "actual controlled Config beginEnvironmentInit278",
-                    ));
-                }
-            }
+            o.equipment.begin_source_equipment_environment(false, o.environment, o.control, o.contaminants)?;
             if o.space_controls.simulation {
-                if let Some(rows) = &o.equipment.space_config {
-                    for row in rows {
-                        if !row.is_controlled {
-                            continue;
-                        }
-                        return Err(Error::Unavailable(
-                            "actual controlled SpaceConfig beginEnvironmentInit285",
-                        ));
-                    }
-                }
+                o.equipment.begin_source_equipment_environment(true, o.environment, o.control, o.contaminants)?;
             }
             o.equipment.init_equipment_environment_flag = false;
         }
         if !o.clock.begin_envrn_flag {
             o.equipment.init_equipment_environment_flag = true;
         }
-        if let Some(rows) = &o.equipment.zone_config {
-            for row in rows {
-                if !row.is_controlled {
-                    continue;
-                }
-                return Err(Error::Unavailable(
-                    "actual controlled Config hvacTimeStepInit304",
-                ));
-            }
-        }
+        o.equipment.initialize_source_equipment_timestep(false, first_hvac_iteration, o.control)?;
         if o.space_controls.simulation {
-            if let Some(rows) = &o.equipment.space_config {
-                for row in rows {
-                    if !row.is_controlled {
-                        continue;
-                    }
-                    return Err(Error::Unavailable(
-                        "actual controlled SpaceConfig hvacTimeStepInit311",
-                    ));
-                }
-            }
+            o.equipment.initialize_source_equipment_timestep(true, first_hvac_iteration, o.control)?;
         }
         if o.hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable(
-                "actual InitZoneEquipment AirLoopFlow317",
-            ));
+            return Err(Error::Unavailable("actual InitZoneEquipment AirLoopFlow308"));
         }
         Ok(())
     }
