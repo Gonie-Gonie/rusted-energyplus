@@ -41,4 +41,22 @@ impl SelectedScheduleManager {
     pub(crate) fn source_check_min(&mut self, index: SourceScheduleIndex, minimum: f64) -> Result<bool, E> {
         Ok(f64::from(f32::EPSILON) >= minimum - self.source_min(index)?)
     }
+
+    /// Actual ScheduleBase::checkMinMaxVals for the caller's two inclusive bounds.
+    pub(crate) fn source_check_min_max_inclusive(
+        &mut self, index: SourceScheduleIndex, minimum: f64, maximum: f64,
+    ) -> Result<bool, E> {
+        let (actual_minimum, actual_maximum) = self.source_selected_min_max(index)?;
+        let min_ok = f64::from(f32::EPSILON) >= minimum - actual_minimum;
+        let max_ok = actual_maximum - maximum <= f64::from(f32::EPSILON);
+        Ok(min_ok && max_ok)
+    }
+    /// Exact Constant::hasVal. Detailed traversal is an explicit separate bound.
+    pub(crate) fn source_has_value(&self, index: SourceScheduleIndex, value: f64) -> Result<bool, E> {
+        let row = self.schedules.get(index.0).ok_or(E::Unavailable("actual hasVal Schedule pointer"))?;
+        match &row.data {
+            SelectedScheduleData::Constant { .. } => Ok(value == row.current_value),
+            SelectedScheduleData::Detailed(_) => Err(E::Unavailable("actual ScheduleDetailed::hasVal3433")),
+        }
+    }
 }

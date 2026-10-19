@@ -79,6 +79,7 @@ pub(crate) struct SourceManageSurfaceOwners<'a, 'backend, H, D> {
     pub(crate) schedules: &'a mut SelectedScheduleManager,
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
+    pub(crate) source_is_epjson: &'a bool,
     pub(crate) scan: &'a mut ReportScanState,
     pub(crate) report_inputs: &'a ReportInputs,
     pub(crate) registration: &'a mut SourceOutputRegistration,

@@ -262,3 +262,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 체적·Node 경로 검증](evidence/SRC-06-canonical-Node-lifecycle-16/summary.json). 체적·Node 경로를 연결하고 기존 소유권 테스트와 A-24H 회귀를 통과했습니다. B의 실제 다음 경계는 증빙 요약에 기록했으며 A14/54·B14/64 게이트는 유지합니다.
+
+
+[Source 온도조절기 입력 검증](evidence/SRC-06-canonical-thermostat-17/summary.json). 온도조절기 입력 경로를 연결하고 기존 소유권 테스트와 A-24H 회귀를 검증했습니다. B의 실제 경계는 증빙 요약을 따르며 A14/54·B14/64 게이트는 유지합니다.

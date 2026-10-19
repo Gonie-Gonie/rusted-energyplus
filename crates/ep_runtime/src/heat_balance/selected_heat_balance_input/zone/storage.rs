@@ -76,6 +76,8 @@ pub(crate) struct SelectedZoneData {
     pub(crate) moisture_capacity_multiplier: f64,
     pub(crate) carbon_dioxide_capacity_multiplier: f64,
     pub(crate) generic_contaminant_capacity_multiplier: f64,
+    /// Native DataHeatBalance.hh606 ctor0, written by actual thermostat getter419.
+    pub(crate) temperature_controlled_zone_index: i32,
     pub(crate) humidity_control_zone_index: i32,
     pub(crate) air_heat_balance_imbalance_error_index: i32,
     pub(crate) space_indexes: Vec<i32>,
@@ -155,6 +157,7 @@ impl Default for SelectedZoneData {
             moisture_capacity_multiplier: 1.0,
             carbon_dioxide_capacity_multiplier: 1.0,
             generic_contaminant_capacity_multiplier: 1.0,
+            temperature_controlled_zone_index: 0,
             humidity_control_zone_index: 0,
             air_heat_balance_imbalance_error_index: 0,
             space_indexes: Vec::new(),

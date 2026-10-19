@@ -211,6 +211,12 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "OtherEquipment",
         name_field_index: 0,
     },
+    // GetZoneAirSetPoints consumes the actual thermostat numeric-field
+    // count. Preserve its staged name/order/max-fields on the same raw owner.
+    IdfOrderTarget {
+        object_type: "ZoneControl:Thermostat",
+        name_field_index: 0,
+    },
     // ScheduleManager uses getObjectItem's preserved IDF order within these
     // families. Cross-family registration order remains the compiler's owner.
     IdfOrderTarget {
@@ -385,6 +391,7 @@ pub fn apply_idf_declaration_order(
                         | "Site:Location"
                         | "RunPeriod"
                         | "SizingPeriod:DesignDay"
+                        | "ZoneControl:Thermostat"
                 )
             {
                 report_field_counts.push((
@@ -565,7 +572,8 @@ fn scan_target_objects(
         // is now explicitly outside this newly required metadata domain.
         if let Some(object_type) = fields.first()
             && (object_type.eq_ignore_ascii_case("RunPeriod")
-                || object_type.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
+                || object_type.eq_ignore_ascii_case("SizingPeriod:DesignDay")
+                || object_type.eq_ignore_ascii_case("ZoneControl:Thermostat"))
             && targets
                 .iter()
                 .any(|target| target.object_type.eq_ignore_ascii_case(object_type))

@@ -431,3 +431,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 체적·Node 경로 검증](../evidence/SRC-06-canonical-Node-lifecycle-16/summary.json). Native에 없는 추가 체적 제한을 제거하고 같은 Node 소유자의 보고 등록·실제 값 참조·필드 초기화를 연결했습니다. 기존 Native 비제어 입력 1쌍(pair7)·소유권 전이 테스트와 A-24H 회귀를 통과하고 보고값 5,352개의 기존 검증을 유지했습니다. B의 실제 미완료 경계는 `GetHeatBalanceInput: positive thermostat getObjectItem332`입니다. Node setup/reset의 실제 도달 범위는 증빙 요약을 따르며, 내부 상태의 Native 대조와 후속 B 포팅은 남아 있습니다. 게이트는 A14/54·B14/64를 유지합니다.
+
+
+[Source 온도조절기 입력 검증](../evidence/SRC-06-canonical-thermostat-17/summary.json). 온도조절기·설정값 입력과 실제 선언 순서를 처리하고 같은 Zone·Schedule 소유자에 연결했습니다. 기존 소유권 테스트와 A-24H 회귀를 통과했으며 B의 실제 미완료 경계는 `GetHeatBalanceInput: positive actual TempControlledZone2700`입니다. 내부 상태의 Native 대조와 후속 B 포팅은 남아 있습니다. 게이트는 A14/54·B14/64를 유지합니다.

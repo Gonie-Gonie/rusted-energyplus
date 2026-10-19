@@ -1,12 +1,16 @@
-//! Actual GetZoneAirSetPoints zero-control body; reached positive branches explicit.
+//! Actual GetZoneAirSetPoints with genuine finite positive Thermostat input.
 use super::*;
 use std::io::Write;
+mod thermostat;
 impl SourceZoneAirPredictorCorrector {
     pub(crate) fn get_source_zone_air_setpoints(
         &mut self,
         owners: &mut SourceZoneAirOwners<'_, '_>,
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
+        let errors_found = false; // Actual GetZoneAirSetPoints local ctor274.
+        // Actual getter-local arrays remain live through this function.
+        let mut thermostat_locals = thermostat::SourceThermostatInputLocals::default();
         owners.shortcut.current_module_object = "ZoneControl:Thermostat".into();
         self.controls.number_thermostat_statements = owners
             .input
@@ -21,9 +25,7 @@ impl SourceZoneAirPredictorCorrector {
             self.controls.number_thermostat_statements
         ]);
         self.controls.number_temperature_zones = 0;
-        if self.controls.number_thermostat_statements > 0 {
-            return Err(Error::Unavailable("positive thermostat getObjectItem332"));
-        }
+        self.get_source_thermostat_objects(owners, &mut thermostat_locals)?;
         for (kind, family, line) in [
             (1, "THERMOSTATSETPOINT:SINGLEHEATING", 525),
             (2, "THERMOSTATSETPOINT:SINGLECOOLING", 561),
@@ -41,15 +43,19 @@ impl SourceZoneAirPredictorCorrector {
                     controls::SourceZoneSetpointSchedule::default();
                     self.flags.number_temperature_controls[kind]
                 ]);
-                return Err(Error::Unavailable(match line {
-                    525 => "actual positive singleHeat first getObjectItem529",
-                    561 => "actual positive singleCool first getObjectItem565",
-                    597 => "actual positive singleHeatCool first getObjectItem601",
-                    _ => "actual positive dual first getObjectItem637",
-                }));
+                if kind == 4 {
+                    self.get_source_dual_setpoint_schedules(owners)?;
+                } else {
+                    return Err(Error::Unavailable(match line {
+                        525 => "actual positive singleHeat first getObjectItem529",
+                        561 => "actual positive singleCool first getObjectItem565",
+                        _ => "actual positive singleHeatCool first getObjectItem601",
+                    }));
+                }
             }
             // Native false count leaves the real Array1D unallocated; no zero resize.
         }
+        self.link_source_thermostat_schedules(owners, &mut thermostat_locals)?;
         owners.shortcut.current_module_object = "ZoneControl:Humidistat".into();
         self.controls.number_humidity_zones = i32::try_from(
             owners
@@ -178,7 +184,16 @@ impl SourceZoneAirPredictorCorrector {
             ));
         }
         self.flags.number_stage_zones = 0;
-        // Local ErrorsFound was false; zero-control path emits no final fatal.
+        // The valid finite path retains the actual false local constructor;
+        // unported diagnostic branches stop before their first message/write.
+        if errors_found {
+            return match owners.backend.show_fatal_error(
+                "Errors getting Zone Control input data.  Preceding condition(s) cause termination.",
+            ) {
+                Err(error) => Err(Error::Fatal(error)),
+                Ok(never) => match never {},
+            };
+        }
         Ok(())
     }
     pub(crate) fn calculate_source_air_temperature_setpoints(

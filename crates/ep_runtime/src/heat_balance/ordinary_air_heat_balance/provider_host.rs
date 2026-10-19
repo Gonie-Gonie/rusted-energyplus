@@ -136,6 +136,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
                 hvac: &mut o.startup.hvac_globals,
                 input: o.input,
                 shortcut: o.shortcut,
+                source_is_epjson: o.source_is_epjson,
                 psychrometrics: o.psychrometrics,
                 backend: o.backend,
                 plant_loops: &mut o.startup.plant_loops,

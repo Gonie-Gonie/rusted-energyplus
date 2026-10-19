@@ -47,6 +47,7 @@ pub(crate) struct SourceHvacOwners<'a, 'backend> {
     pub(crate) hvac: &'a mut SelectedHvacGlobals,
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
+    pub(crate) source_is_epjson: &'a bool,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
     /// Same actual DataPlant.PlantLoop allocated empty by SimulationManager; no second array.
@@ -55,7 +56,7 @@ pub(crate) struct SourceHvacOwners<'a, 'backend> {
     pub(crate) contaminants: &'a mut SourceContaminantArrays,
     pub(crate) gain_modules: &'a mut SourceGainModules,
     pub(crate) facility: Option<&'a mut FacilityElectricService>,
-    pub(crate) schedules: &'a SelectedScheduleManager,
+    pub(crate) schedules: &'a mut SelectedScheduleManager,
     pub(crate) tabular: &'a mut SourceTabularReports,
     /// Actual report-side owners are reborrowed during this call, never held again by R.
     pub(crate) radiation: &'a mut crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation,
@@ -101,6 +102,8 @@ impl SourceHvacOwners<'_, '_> {
             hvac: self.hvac,
             input: self.input,
             shortcut: self.shortcut,
+            source_is_epjson: self.source_is_epjson,
+            schedules: self.schedules,
             psychrometrics: self.psychrometrics,
             backend: self.backend,
         };
