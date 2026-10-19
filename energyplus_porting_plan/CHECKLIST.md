@@ -277,3 +277,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 구역 설비 초기화 검증](evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json). 구역 설비 초기화 경로를 연결했다. 실제 B·A24 실행과 남은 경계는 요약 자료에 기록한다.
+
+
+[Source 구역 설비 시뮬레이션 진입 검증](evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json). 설비 우선순위와 부하 배분을 실제 실행 경로에 연결했다. B의 다음 경계와 A24 회귀 검증은 요약 자료에 기록한다.

@@ -1,6 +1,7 @@
 //! Genuine ZoneEquipmentManager142–320/3538–4194/4933–5284/5342–5570 ordinary path.
 pub(crate) mod availability;
 mod modules;
+mod output_required;
 use crate::heat_balance::ordinary_hvac_manager::{SourceHvacManager, SourceHvacOwners};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_sizing::SourceZoneEquipmentSizing;
@@ -187,7 +188,115 @@ impl SourceHvacManager {
                 .air;
             air.non_air_system_response = 0.0;
             air.sys_dep_zone_loads = 0.0;
-            return Err(Error::Unavailable("actual controlled Config.ZoneExh3665"));
+            {
+                let config = o.equipment.zone_config.as_mut()
+                    .and_then(|rows| rows.get_mut(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual controlled ZoneEquipConfig3664"))?;
+                config.zone_exhaust = 0.0;
+                config.zone_exhaust_balanced = 0.0;
+                config.plenum_mass_flow = 0.0;
+            }
+            o.sizing.current_zone_equipment_number = number;
+            if o.space_controls.simulation && !o.globals.doing_sizing {
+                let count = o.zones.zones.as_ref().and_then(|rows| rows.get(at(number).ok()?))
+                    .ok_or(Error::Unavailable("actual controlled Zone spaceIndexes3670"))?.space_indexes.len();
+                for i in 0..count {
+                    let space = o.zones.zones.as_ref().and_then(|rows| rows.get(at(number).ok()?))
+                        .and_then(|zone| zone.space_indexes.get(i)).copied()
+                        .ok_or(Error::Unavailable("actual controlled Space ordinal3670"))?;
+                    let air = &mut o.air.spaces.as_mut().and_then(|rows| rows.get_mut(at(space).ok()?))
+                        .ok_or(Error::Unavailable("actual controlled Space AirHB3671"))?.air;
+                    air.non_air_system_response = 0.0;
+                    air.sys_dep_zone_loads = 0.0;
+                    let config = o.equipment.space_config.as_mut().and_then(|rows| rows.get_mut(at(space).ok()?))
+                        .ok_or(Error::Unavailable("actual spaceEquipConfig3674"))?;
+                    if !config.is_controlled { continue; }
+                    config.zone_exhaust = 0.0;
+                    config.zone_exhaust_balanced = 0.0;
+                    config.plenum_mass_flow = 0.0;
+                }
+            }
+            output_required::initialize(o, number, first_hvac_iteration)?;
+            let count = o.equipment.equipment_lists.as_ref().and_then(|rows| rows.get(at(number).ok()?))
+                .ok_or(Error::Unavailable("actual SimZoneEquipment ZoneEquipList3688"))?.number_of_equipment_types;
+            for equipment_number in 1..=count {
+                o.hvac.turn_fans_on = false;
+                o.hvac.turn_fans_off = false;
+                o.hvac.unbalanced_exhaust_mass_flow = 0.0;
+                o.hvac.balanced_exhaust_mass_flow = 0.0;
+                o.hvac.plenum_induced_mass_flow = 0.0;
+                let equipment_pointer = o.equipment.priority_simulation_order.as_ref()
+                    .and_then(|rows| rows.get(equipment_number - 1))
+                    .ok_or(Error::Unavailable("actual PrioritySimOrder EquipPtr3697"))?.equipment_pointer;
+                let _system_output_provided = 0.0;
+                let _latent_output_provided = 0.0;
+                let _non_air_system_output = 0.0;
+                o.sizing.data_cool_coil_capacity = 0.0;
+                if o.equipment.first_pass_zone_equipment_flag {
+                    let sizing = o.sizing.zone_equipment_sizing.as_mut()
+                        .and_then(|rows| rows.get_mut(at(number).ok()?))
+                        .ok_or(Error::Unavailable("actual first-pass ZoneEqSizing3704"))?;
+                    sizing.air__vol__flow = 0.0;
+                    sizing.max_hw_vol__flow = 0.0;
+                    sizing.max_cw_vol__flow = 0.0;
+                    sizing.oa_vol__flow = 0.0;
+                    sizing.des__cooling__load = 0.0;
+                    sizing.des__heating__load = 0.0;
+                    sizing.cooling__air__vol__flow = 0.0;
+                    sizing.heating__air__vol__flow = 0.0;
+                    sizing.system__air__vol__flow = 0.0;
+                    sizing.air__flow = false;
+                    sizing.cooling__air__flow = false;
+                    sizing.heating__air__flow = false;
+                    sizing.system__air__flow = false;
+                    sizing.capacity = false;
+                    sizing.cooling__capacity = false;
+                    sizing.heating__capacity = false;
+                    sizing.system__capacity = false;
+                    sizing.design__size__from__parent = false;
+                }
+                let equipment_type = o.equipment.priority_simulation_order.as_ref()
+                    .and_then(|rows| rows.get(equipment_number - 1))
+                    .ok_or(Error::Unavailable("actual PrioritySimOrder equipType3725"))?.equipment_type;
+                let list = o.equipment.equipment_lists.as_ref()
+                    .and_then(|rows| rows.get(at(o.sizing.current_zone_equipment_number).ok()?))
+                    .ok_or(Error::Unavailable("actual current ZoneEquipList3727"))?;
+                let component_number = list.equipment_indices.as_ref()
+                    .and_then(|rows| rows.get(at(equipment_pointer).ok()?)).copied()
+                    .ok_or(Error::Unavailable("actual ZoneEquipList EquipIndex3729"))?;
+                let mut valid_availability_component = false;
+                if equipment_type <= 14 { valid_availability_component = true; }
+                if component_number > 0 && valid_availability_component {
+                    // Genuine positive cached CompIndex enters this call on later
+                    // iterations; no perpetual first-call/zero-count shortcut.
+                    return Err(Error::Unavailable("actual GetZoneEqAvailabilityManager3739"));
+                }
+                if o.space_controls.simulation && !o.globals.doing_sizing {
+                    let splitter = list.equipment_splitter_indices.as_ref()
+                        .and_then(|rows| rows.get(at(equipment_pointer).ok()?)).copied()
+                        .ok_or(Error::Unavailable("actual zoneEquipSplitterIndex3751"))?;
+                    if splitter > -1 {
+                        return Err(Error::Unavailable("actual zoneEquipSplitter adjustLoads3753"));
+                    }
+                }
+                match equipment_type {
+                    12 => {
+                        let _name = &o.equipment.priority_simulation_order.as_ref()
+                            .and_then(|rows| rows.get(equipment_number - 1))
+                            .ok_or(Error::Unavailable("actual PurchasedAir priority name3872"))?.equipment_name;
+                        let _same_component_index = o.equipment.equipment_lists.as_mut()
+                            .and_then(|rows| rows.get_mut(at(o.sizing.current_zone_equipment_number).ok()?))
+                            .and_then(|list| list.equipment_indices.as_mut())
+                            .and_then(|rows| rows.get_mut(at(equipment_pointer).ok()?))
+                            .ok_or(Error::Unavailable("actual PurchasedAir same EquipIndex3877"))?;
+                        return Err(Error::Unavailable("actual PurchasedAirManager SimPurchasedAir3871"));
+                    }
+                    // Current real input admits only PurchasedAir. Any later
+                    // represented positive type must enter its actual callee,
+                    // never produce a fabricated zero equipment response.
+                    _ => return Err(Error::Unavailable("actual SimZoneEquipment positive equipment callee switch3747")),
+                }
+            }
         }
         if o.space_controls.simulation && !o.globals.doing_sizing {
             for row in &o.equipment.zone_equipment_mixers {

@@ -134,3 +134,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 구역 설비 초기화 검증](evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json). 최초·환경·시간 단계 초기화는 기존 수요·크기 산정·설비 구성·물리 Node 상태를 공유한다. EPVector 할당의 실제 영 초기화와 할당 여부를 보존한다.
+
+
+[Source 구역 설비 시뮬레이션 진입 검증](evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json). 기존 설비 목록·수요 배열·스케줄 상태를 공유하고, 실제 분기 순서대로 우선순위와 최초 크기 산정 상태를 갱신한다.

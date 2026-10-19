@@ -1,0 +1,89 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 4,
+  "existing_Rust_sources": 3,
+  "new_Rust_sources": 1,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Two actual CLI runs B then A24. No unrelated test-profile rerun or habitual alltargets check.",
+  "scope": "Genuine controlled SimZoneEquipment prefix, full first-pass18 sizing resets, six-field priority order and actual sequential demand initialization/distribution with both live schedule reads. Same retained owners; genuine PurchasedAir callee stays unsupported, with no CP442 facade or fabricated post-callee equipment response.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-zone-equipment-orchestration.v1",
+  "status": "Genuine Source zone equipment orchestration; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/manifest.json",
+    "sha256": "3128a1953cb042a2c07cb5c42fdfd2a040cb176b606ba13c22144b77af99178d",
+    "bytes": 28730
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-zone-equipment-orchestration-Source-review-24/review.json",
+    "sha256": "7c70713293af5bd6d085cfdf7b63ed694fa0597c04964b7f6dd88735b18930fe",
+    "bytes": 53750
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/complete-final-compiler-Source-plan.json",
+    "sha256": "6a221fec449050e28c20ebab2dcc568bbed68297fa2d5e08d0929ae67ee99f3f",
+    "bytes": 2554168
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/receipt.json",
+    "sha256": "b35cc057d92439bb8fa4c6ec67084661c2b8ec4d8314813a10c707ac052eac9c",
+    "bytes": 4296
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/receipt.json",
+    "sha256": "0cc0a6f9b0690d41b7c023f826ba7193a2c42552373a2c2dc82b2e394e115216",
+    "bytes": 4244
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-orchestration-actual-review-24/review.json",
+    "sha256": "f79231cea404f6c733cc5039340e697af04551319ebad97c4bc5d92b836b971e",
+    "bytes": 17505
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: actual PurchasedAirManager SimPurchasedAir3871",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted23_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-initialization-actual-review-23/review.json",
+      "sha256": "006c4919f095f7108979f2c026f967ccc1c10c2a95b1e030951555ff393b0625",
+      "bytes": 17445
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal23": 7,
+    "CSV_files_whole_equal23": 2,
+    "scope": "Proof transfer from accepted23; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-Root-24/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither positive zone equipment orchestration Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/evidence.zip",
+    "sha256": "f3707d4cfabafad7012b966ba1b4d896ff5ea32d6f1ed48bdfba71b6bc894100",
+    "bytes": 1408829
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/manifest.json",
+    "sha256": "546b53859b92582442c490d08d905ce2939aab657696081e5af65d0c41900409",
+    "bytes": 24565
+  },
+  "archive_entries": 99,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-zone-equipment-orchestration-checkpoint-Peer-24.py",
+    "sha256": "dd5afc9bb8fcf1e0ec05ba9f06fd41f4d802f0db86176ef35100947b2468b5a7",
+    "bytes": 12108
+  }
+}

@@ -1,0 +1,506 @@
+{
+  "schema": "src06-canonical24-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/evidence.zip",
+    "sha256": "f3707d4cfabafad7012b966ba1b4d896ff5ea32d6f1ed48bdfba71b6bc894100",
+    "bytes": 1408829
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "bytes": 24717
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSizing.hh",
+      "sha256": "cf16d26b03010c9b5ca77a89b92004961111dce6451393bf0b23e604220768c5",
+      "bytes": 116969
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "bytes": 12483
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.cc",
+      "sha256": "8d7eba6b146ad0b81312cbcfb32357b530ce6f5ec1716ed9e4dc8dd2901b3a6a",
+      "bytes": 142562
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "bytes": 11096
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+      "bytes": 209881
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+      "bytes": 23158
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.cc",
+      "sha256": "fa4a784f847e9d85a19b9f871c4c23a78b8de630a7300546a4a2551db0d257cd",
+      "bytes": 428353
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.hh",
+      "sha256": "9b2bf21af8e1563591143948ff30cd5641d3b72bcfe135b1222daf98fdb592b8",
+      "bytes": 16204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-zone-equipment-orchestration-Source-review-24/review.json",
+      "sha256": "7c70713293af5bd6d085cfdf7b63ed694fa0597c04964b7f6dd88735b18930fe",
+      "bytes": 53750
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-orchestration-actual-review-24/review.json",
+      "sha256": "f79231cea404f6c733cc5039340e697af04551319ebad97c4bc5d92b836b971e",
+      "bytes": 17505
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-orchestration-actual-review-24/table-clock-differences.json",
+      "sha256": "d06d2bacf26ba8503856c717482280faa6ff159465fe97af6e1ffa58cc598339",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-zone-equipment-orchestration-application-24/receipt.json",
+      "sha256": "a3ddd7bf1bd812efba7c57a9305f096053796a982cbfaee135e39171209fd498",
+      "bytes": 11994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-zone-equipment-orchestration-Root-24.py",
+      "sha256": "b57e96963292d065faf7b51b4f1bc23e5b3f20d7cc6c4843ccc5771b0e6ec089",
+      "bytes": 5413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/diagnostics.json",
+      "sha256": "b7b009d7d56fd15cc5f2fc81671a7180d2fee80912779aa070b24a44dcd6d3a6",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplustbl.htm",
+      "sha256": "9d7d3df5e5698645511154e3edb9f50afaca4dd781baffe88ef9ca3a9d70cd11",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/eplustbl.xml",
+      "sha256": "1a19eebd7a0b8e77930026fbd968011271824ff15b393b1b121b027872910fc7",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/results/source-reported-results.json",
+      "sha256": "d46b3b0e0b8700de4c1805657e6f8527d6a2f648d4c826220680a69ebde4d0f0",
+      "bytes": 1679934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-Root-24/output/run-summary.json",
+      "sha256": "02b4b1e7de57c639c56b622392b4380e15cc2dc2d3f1ab921ac99cfd89628b85",
+      "bytes": 32899
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/receipt.json",
+      "sha256": "0cc0a6f9b0690d41b7c023f826ba7193a2c42552373a2c2dc82b2e394e115216",
+      "bytes": 4244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/stderr.log",
+      "sha256": "c250f6ca055e7f9f98d0639f14ebca3a996cba49544337dcd6c4e6b3397f6dbc",
+      "bytes": 761
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/stdout.log",
+      "sha256": "e5a98b3dedb3ce3f3d29d990549ebe53fce4020655b2987696510a4fe6386706",
+      "bytes": 371771
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-Root-24/output/diagnostics.json",
+      "sha256": "840dd77618aac9552700a87d87464f62de02ecfd909680aefd40fdb349707326",
+      "bytes": 2980
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-Root-24/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-Root-24/output/run-summary.json",
+      "sha256": "2cba720167468ffae58f9a76c5c5ea369ba5002f6ca476d978848f511a4bcd4f",
+      "bytes": 25462
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/receipt.json",
+      "sha256": "b35cc057d92439bb8fa4c6ec67084661c2b8ec4d8314813a10c707ac052eac9c",
+      "bytes": 4296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/stderr.log",
+      "sha256": "f76988edab7fe4d38762d118d389850421c671f028cd95b9e40f448d124955c5",
+      "bytes": 10702
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/stdout.log",
+      "sha256": "8d3b573a704037f31263d6718c5e03081863123d1901c1b4833957ef343853f4",
+      "bytes": 371806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-zone-equipment-orchestration-actual-Root-24.py",
+      "sha256": "4e1b7338a6612e072a3e4c268de870d9c9ed85bb6d5fabc87ec915a7b3aa6b06",
+      "bytes": 6228
+    },
+    {
+      "path": ".runtime/porting/SRC-06/draft-zone-equipment-orchestration-Source-Peer-24.py",
+      "sha256": "fc871846e133e5e12ec5bb5117fccb615f523c9d169ef01643468fbb931f1fda",
+      "bytes": 12702
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-zone-equipment-orchestration-Root-24.py",
+      "sha256": "dcaf05ccac5553d6c37a1469649184a69b4292ddd7e9c40e5459090fccb8360f",
+      "bytes": 1334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-zone-equipment-orchestration-publication-Peer-24.py",
+      "sha256": "430c72dfc849cb17672cbe95ceeb3cbb18162959899d91e1cc11534b899841bb",
+      "bytes": 10187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-zone-equipment-orchestration-checkpoint-Peer-24.py",
+      "sha256": "dd5afc9bb8fcf1e0ec05ba9f06fd41f4d802f0db86176ef35100947b2468b5a7",
+      "bytes": 12108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-zone-equipment-orchestration-Source-Peer-24.py",
+      "sha256": "ac6d18eabdbde9b2806ebd68bd190ee6a9861042558cc8b8d2769db4d3086244",
+      "bytes": 16334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/Native-literal-extents.json",
+      "sha256": "321acc981d1f25f6a12715efbaac836e581cfe67b57139ba9eaa75c5b291052d",
+      "bytes": 103921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "90486f97aaae36433c97925c14495b1f51a5d76c646f9844b69ca57b3b65a942",
+      "bytes": 16143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/before/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "e6f52122e3f1fbc151cdae54fb9c633924b4c7ab8c8e7999123749d3fda60a96",
+      "bytes": 16261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/before/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "f36f1df3da7a4b9c566d1415d5ce24e7f9c826858cd0d6bb6878c636d1a338b3",
+      "bytes": 24109
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/complete-final-compiler-Source-plan.json",
+      "sha256": "6a221fec449050e28c20ebab2dcc568bbed68297fa2d5e08d0929ae67ee99f3f",
+      "bytes": 2554168
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs",
+      "sha256": "043e7dada0c39b64e98b399ee3e13f8c885af1e640c0cc0204e3679bd945990d",
+      "bytes": 8167
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/demand.rs",
+      "sha256": "8320fb86e257a3574c87f6cc6e2ea6e038d7e7f16357a6ba7e17e643888726f6",
+      "bytes": 10642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/subsystems.rs",
+      "sha256": "960cf8796fecb0fc1d9d26747d845586ef4b562c617708ae0aeeeacd7177fe93",
+      "bytes": 16316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "52dac9ef8732fe1991c5b81ca3641abd9706e89262de4b81562334e36dd5b32b",
+      "bytes": 40865
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/first_call.rs",
+      "sha256": "a071d75d08b45bbbdf41c461ce84c30fd4bbd00dc0ef55743a13a027f22d5988",
+      "bytes": 2289
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "c5f214fd0f64268acc28140bd37f040a8c67b7955e30d4979415874558adfbf3",
+      "bytes": 10977
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/selected_heat_balance_space_controls.rs",
+      "sha256": "01e0205c45be0c97639dc7a3f076983a4172f625496568528529250ada44a0ce",
+      "bytes": 357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/selected_schedule_manager/report.rs",
+      "sha256": "9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "bytes": 4404
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/context/crates/ep_runtime/src/heat_balance/source_initialization/run_prefix.rs",
+      "sha256": "d9ece57a47fc617d97cbeb147b155248bcf7b6ba5fcf53b17eb7cfb042ce48c0",
+      "bytes": 10195
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/01-forward.diff",
+      "sha256": "594867e0f0e7a484078c073d0adbb1984b91677087c9099f031d83f1b9803892",
+      "bytes": 8238
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/01-inverse.diff",
+      "sha256": "1ebdff02cb1ee2aac3d929d876c6741b569899aae1ce8beea762bbd9b2071718",
+      "bytes": 8238
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/02-forward.diff",
+      "sha256": "1899e5e486e74262ae4fc2eb9ef5c145a7a754d9b8ac62aab643bfd2d3c38581",
+      "bytes": 14809
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/02-inverse.diff",
+      "sha256": "a847e922feec5deed521952cc3bfc2fe392040421e08935940e4c3563c71d8cf",
+      "bytes": 14809
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/03-forward.diff",
+      "sha256": "e26ed0d2abe0d4ed6bca14d1666f5a58aff9186d7d59a8064e0c2c9d78acd5cf",
+      "bytes": 1143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/03-inverse.diff",
+      "sha256": "c720178f96832d1cc86eedb914a33bfcec014b228abc7abd5711b125916ec650",
+      "bytes": 1143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/04-forward.diff",
+      "sha256": "471bf0225e776b0b0bdd439a6240d02e863d7cf2ad71c407f6097241c0186c19",
+      "bytes": 885
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/diffs/04-inverse.diff",
+      "sha256": "de119cc5de1c1c56b5b2ffc3fe0fe49d53c2027586b4cc1238083ee509a0e920",
+      "bytes": 885
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/integration-contract.json",
+      "sha256": "bc336159de0f0a04ad74ee86876db770e3e80b2ccc3ab5a1ac074af7d7c97fce",
+      "bytes": 3904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "90486f97aaae36433c97925c14495b1f51a5d76c646f9844b69ca57b3b65a942",
+      "bytes": 16143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/literal-inverse/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "e6f52122e3f1fbc151cdae54fb9c633924b4c7ab8c8e7999123749d3fda60a96",
+      "bytes": 16261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/literal-inverse/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "f36f1df3da7a4b9c566d1415d5ce24e7f9c826858cd0d6bb6878c636d1a338b3",
+      "bytes": 24109
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/manifest.json",
+      "sha256": "3128a1953cb042a2c07cb5c42fdfd2a040cb176b606ba13c22144b77af99178d",
+      "bytes": 28730
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/01.stdout",
+      "sha256": "89594680c7d0dfba24b902cca5f5d4ad70432bab726021d068cca877a3d941b7",
+      "bytes": 26264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/02.stdout",
+      "sha256": "8d7d1b2a7030199af0de29636a1e0339527874a22310b8d0296121ab415711eb",
+      "bytes": 16574
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/03.stdout",
+      "sha256": "dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/parse/04.stdout",
+      "sha256": "7772ec1ab213ad2ffbeaf92b3a24665b2d349f1e39c9533b02b02fb9571fe173",
+      "bytes": 24273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "ce8592b53caea730afa744769a6afb91ffb3410ee02c84c6b706932ae5d9636c",
+      "bytes": 23282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "8044155e379f144022e626c5be43e5e9758f0a72478eebb4a878b28971d6368b",
+      "bytes": 14368
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/proposed/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/proposed/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "be246c5041b2bdbb5d5a8f09d64bba3a7b581eec1bd711a047c53b9edfefd734",
+      "bytes": 24273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-orchestration-held-Peer-24/whole-crates-concrete-API-inventory.json",
+      "sha256": "c6e99af81c032452bb70924102f5c53bdae8887e40828caccf89ca3610233718",
+      "bytes": 30283
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-orchestration-publication-prepared-Peer-24/publication-template.json",
+      "sha256": "dd664f5c4320dce0089a6de53f56004325451dfeeb715936abc69bf2c4dac5ee",
+      "bytes": 20017
+    },
+    {
+      "path": ".runtime/porting/source-objects/4a/4ab5dc6512937890795d32aad1ecc5399a38c556ae4f75407a2aa23022b0807b",
+      "sha256": "4ab5dc6512937890795d32aad1ecc5399a38c556ae4f75407a2aa23022b0807b",
+      "bytes": 1842690
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "ce8592b53caea730afa744769a6afb91ffb3410ee02c84c6b706932ae5d9636c",
+      "bytes": 23282
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "8044155e379f144022e626c5be43e5e9758f0a72478eebb4a878b28971d6368b",
+      "bytes": 14368
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "bytes": 16684
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "be246c5041b2bdbb5d5a8f09d64bba3a7b581eec1bd711a047c53b9edfefd734",
+      "bytes": 24273
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-initialization-23/summary.json",
+      "sha256": "c4beb131d45d1bdb45908f0bbe9fa696b8a2e1ed9e24d5b179662873234c8253",
+      "bytes": 4662
+    }
+  ],
+  "scope": "4 coherent zone equipment orchestration Sources, Native authority, accepted peer and actual B/A24. No test/fixture execution claim, historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}

@@ -81,6 +81,11 @@ pub(crate) struct SelectedHvacGlobals {
     pub(crate) number_of_primary_air_systems: i32,
     /// DataHVACGlobals.hh520/524 explicitfalse, same real module flags.
     pub(crate) turn_fans_on: bool,
+    /// Actual DataHVACGlobals.hh517-521 constructor scalars, same owner.
+    pub(crate) turn_fans_off: bool,
+    pub(crate) unbalanced_exhaust_mass_flow: f64,
+    pub(crate) balanced_exhaust_mass_flow: f64,
+    pub(crate) plenum_induced_mass_flow: f64,
     pub(crate) night_vent_on: bool,
     /// Actual DataHVACGlobals.hh530/532 constructor false, genuine child writers.
     pub(crate) air_loop_init: bool,
@@ -118,6 +123,10 @@ impl Default for SelectedHvacGlobals {
         Self {
             number_of_primary_air_systems: 0,
             turn_fans_on: false,
+            turn_fans_off: false,
+            unbalanced_exhaust_mass_flow: 0.0,
+            balanced_exhaust_mass_flow: 0.0,
+            plenum_induced_mass_flow: 0.0,
             night_vent_on: false,
             air_loop_init: false,
             get_air_path_data_done: false,

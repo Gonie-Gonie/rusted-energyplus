@@ -122,6 +122,8 @@ pub(crate) struct SelectedSizingManager {
     pub(crate) current_system_number: i32,
     pub(crate) current_zone_equipment_number: i32,
     pub(crate) current_terminal_unit_sizing_number: i32,
+    /// Actual DataSizing.hh1304 constructor, reset by SimZoneEquipment3701.
+    pub(crate) data_cool_coil_capacity: f64,
     pub(crate) system_sizing_run_done: bool,
     pub(crate) zone_sizing_run_done: bool,
     pub(crate) number_of_oa_requirements: usize,
@@ -152,6 +154,7 @@ impl Default for SelectedSizingManager {
             current_system_number: 0,
             current_zone_equipment_number: 0,
             current_terminal_unit_sizing_number: 0,
+            data_cool_coil_capacity: 0.0,
             system_sizing_run_done: false,
             zone_sizing_run_done: false,
             number_of_oa_requirements: 0,
