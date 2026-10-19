@@ -523,6 +523,10 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    /// Actual VerifyControlledZoneForThermostat5702 exact-name search.
+    pub(crate) fn verify_source_controlled_zone_for_thermostat(&self, name: &str) -> bool {
+        self.zone_config.as_ref().is_some_and(|rows| rows.iter().any(|row| row.zone_name == name))
+    }
     /// Actual ReportLoopConnections2656 allocated(ZoneEquipConfig), not an input-count inference.
     pub(crate) fn source_zone_equipment_config_allocated(&self) -> bool {
         self.zone_config.is_some()

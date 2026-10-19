@@ -12821,6 +12821,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-17/summary.json",
         "sha256": "5d3a79f56399cd39eab1a12d7f247fc455711ee77bf0d7378945b138486ed680",
         "size_bytes": 5542
+      },
+      "canonical_thermostat_current_19": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-current-19/summary.json",
+        "sha256": "768e4929f6273c7ade2f2515cc8d92f364a042ea3d85e9b98281f14faf7e1f97",
+        "size_bytes": 4306
       }
     },
     {

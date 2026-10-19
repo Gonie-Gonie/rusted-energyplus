@@ -2,6 +2,7 @@
 use super::*;
 use std::io::Write;
 mod thermostat;
+mod current;
 impl SourceZoneAirPredictorCorrector {
     pub(crate) fn get_source_zone_air_setpoints(
         &mut self,
@@ -225,18 +226,13 @@ impl SourceZoneAirPredictorCorrector {
             .as_mut()
             .ok_or(Error::Unavailable("actual occupied cool3296"))?
             .fill(Some(100.0));
-        if self.controls.number_temperature_zones > 0 {
-            return Err(Error::Unavailable("positive thermostat ActualZoneNum3303"));
-        }
+        self.calculate_source_current_temperature_controls(owners)?;
         if self.controls.number_comfort_zones > 0 {
             return Err(Error::Unavailable(
                 "positive CalcZoneAirComfortSetPoints3456",
             ));
         }
-        // Genuine OverrideAirSetPointsforEMSCntrl6470 loops same actual control count.
-        if self.controls.number_temperature_zones > 0 {
-            return Err(Error::Unavailable("positive thermostat EMS override6471"));
-        }
+        self.override_source_air_setpoints_for_ems(owners)?;
         Ok(())
     }
 }

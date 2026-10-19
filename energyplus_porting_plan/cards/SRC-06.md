@@ -434,3 +434,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 온도조절기 입력 검증](../evidence/SRC-06-canonical-thermostat-17/summary.json). 온도조절기·설정값 입력과 실제 선언 순서를 처리하고 같은 Zone·Schedule 소유자에 연결했습니다. 기존 소유권 테스트와 A-24H 회귀를 통과했으며 B의 실제 미완료 경계는 `GetHeatBalanceInput: positive actual TempControlledZone2700`입니다. 내부 상태의 Native 대조와 후속 B 포팅은 남아 있습니다. 게이트는 A14/54·B14/64를 유지합니다.
+
+
+[Source 온도 설정값 경로 검증](../evidence/SRC-06-canonical-thermostat-current-19/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: positive controlled predicted load6862`입니다. 전체 B 완료와 내부 수치의 Native 동등성은 별도 검증 대상으로 남습니다.

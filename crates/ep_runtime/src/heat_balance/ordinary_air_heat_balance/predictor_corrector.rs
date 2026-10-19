@@ -56,7 +56,9 @@ pub(crate) struct SourceZoneAirOwners<'a, 'b> {
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) source_is_epjson: &'a bool,
+    pub(crate) faults: &'a crate::heat_balance::source_initialization::SourceFaultsManager,
     pub(crate) schedules: &'a mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+    pub(crate) availability: &'a crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'b>,
 }

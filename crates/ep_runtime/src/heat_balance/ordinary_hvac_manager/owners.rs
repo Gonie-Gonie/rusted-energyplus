@@ -48,6 +48,7 @@ pub(crate) struct SourceHvacOwners<'a, 'backend> {
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) source_is_epjson: &'a bool,
+    pub(crate) faults: &'a crate::heat_balance::source_initialization::SourceFaultsManager,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
     /// Same actual DataPlant.PlantLoop allocated empty by SimulationManager; no second array.
@@ -79,6 +80,7 @@ pub(crate) struct SourceHvacOwners<'a, 'backend> {
 impl SourceHvacOwners<'_, '_> {
     pub(super) fn zone_air_update(
         &mut self,
+        availability: &crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability,
         update: SourceAirUpdate,
         temperature_change: &mut f64,
         prior_time_step: f64,
@@ -103,6 +105,8 @@ impl SourceHvacOwners<'_, '_> {
             input: self.input,
             shortcut: self.shortcut,
             source_is_epjson: self.source_is_epjson,
+            faults: self.faults,
+            availability,
             schedules: self.schedules,
             psychrometrics: self.psychrometrics,
             backend: self.backend,

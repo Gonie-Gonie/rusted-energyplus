@@ -137,6 +137,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
                 input: o.input,
                 shortcut: o.shortcut,
                 source_is_epjson: o.source_is_epjson,
+                faults: o.faults,
                 psychrometrics: o.psychrometrics,
                 backend: o.backend,
                 plant_loops: &mut o.startup.plant_loops,

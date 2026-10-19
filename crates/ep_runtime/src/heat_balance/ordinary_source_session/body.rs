@@ -114,6 +114,7 @@ impl OrdinarySourceSession {
                     "same actual InputProcessor before HB body",
                 ))?,
             shortcut: &mut reports.input_processor_shortcut,
+            faults: &reports.source_faults_manager,
             source_is_epjson: &reports.heat_balance_input.as_ref()
                 .ok_or(Error::Unavailable("same actual input format before thermostat getter"))?.source_is_epjson,
             scan: &mut reports.scan,

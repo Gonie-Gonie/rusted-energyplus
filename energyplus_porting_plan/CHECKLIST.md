@@ -265,3 +265,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 온도조절기 입력 검증](evidence/SRC-06-canonical-thermostat-17/summary.json). 온도조절기 입력 경로를 연결하고 기존 소유권 테스트와 A-24H 회귀를 검증했습니다. B의 실제 경계는 증빙 요약을 따르며 A14/54·B14/64 게이트는 유지합니다.
+
+
+[Source 온도 설정값 경로 검증](evidence/SRC-06-canonical-thermostat-current-19/summary.json). 온도 제어 환경 초기화와 현재 설정값 경로를 연결했습니다. 실제 B 경계와 A24 검증 결과는 공개 요약에 기록합니다.

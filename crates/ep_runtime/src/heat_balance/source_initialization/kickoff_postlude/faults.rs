@@ -69,6 +69,10 @@ impl std::fmt::Display for SourceFaultsError {
 }
 impl std::error::Error for SourceFaultsError {}
 impl SourceFaultsManager {
+    /// Borrow actual retained FaultsManager count; no input-absence inference.
+    pub(crate) fn source_number_faulty_thermostat(&self) -> &i32 {
+        &self.number_faulty_thermostat
+    }
     pub(crate) fn check_and_read_source_faults(
         &mut self,
         input: &SelectedInputProcessor,

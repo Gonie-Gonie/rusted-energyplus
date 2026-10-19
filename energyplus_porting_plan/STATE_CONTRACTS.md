@@ -122,3 +122,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 온도조절기 입력 검증](evidence/SRC-06-canonical-thermostat-17/summary.json). 온도조절기는 같은 원시 입력 순서·Zone 행·TempControlledZone 소유자를 사용하고 실제 ScheduleIndex 포인터를 보존합니다. 환경 초기화와 현재 설정값 갱신의 미구현 경계는 명시적으로 유지합니다.
+
+
+[Source 온도 설정값 경로 검증](evidence/SRC-06-canonical-thermostat-current-19/summary.json). 현재 설정값은 같은 Schedule·OptStart·Faults 소유자를 참조합니다. Dual 냉방·난방 갱신과 EMS 대입 순서를 보존합니다.

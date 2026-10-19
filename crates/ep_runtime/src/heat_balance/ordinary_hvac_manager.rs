@@ -128,6 +128,7 @@ impl SourceHvacManager {
             .set_source_outdoor_air_nodes(o.input)?;
         self.manage_source_refrigerated_case_racks(o)?;
         o.zone_air_update(
+            &self.ancillary.availability,
             SourceAirUpdate::GetZoneSetPoints,
             &mut temperature_change,
             prior_time_step,
@@ -202,6 +203,7 @@ impl SourceHvacManager {
             .simulate_source_indoor_green(o.input)?;
         o.update_source_internal_gains()?;
         o.zone_air_update(
+            &self.ancillary.availability,
             SourceAirUpdate::PredictStep,
             &mut temperature_change,
             prior_time_step,
@@ -223,6 +225,7 @@ impl SourceHvacManager {
         }
         o.clock.begin_time_step_flag = false;
         o.zone_air_update(
+            &self.ancillary.availability,
             SourceAirUpdate::CorrectStep,
             &mut temperature_change,
             prior_time_step,
@@ -299,6 +302,7 @@ impl SourceHvacManager {
                 }
                 o.update_source_internal_gains()?;
                 o.zone_air_update(
+                    &self.ancillary.availability,
                     SourceAirUpdate::PredictStep,
                     &mut temperature_change,
                     prior_time_step,
@@ -317,6 +321,7 @@ impl SourceHvacManager {
                 children.run(Child::ManageWaterInits, self, o, eio)?;
                 o.hvac.shorten_time_step_sys = false;
                 o.zone_air_update(
+                    &self.ancillary.availability,
                     SourceAirUpdate::CorrectStep,
                     &mut temperature_change,
                     prior_time_step,
@@ -332,6 +337,7 @@ impl SourceHvacManager {
                     )?;
                 }
                 o.zone_air_update(
+                    &self.ancillary.availability,
                     SourceAirUpdate::PushSystemHistories,
                     &mut temperature_change,
                     prior_time_step,
@@ -387,6 +393,7 @@ impl SourceHvacManager {
             row.air.air_hum_rat_avg_comf = row.air.air_hum_rat_avg;
         }
         o.zone_air_update(
+            &self.ancillary.availability,
             SourceAirUpdate::PushZoneHistories,
             &mut temperature_change,
             prior_time_step,

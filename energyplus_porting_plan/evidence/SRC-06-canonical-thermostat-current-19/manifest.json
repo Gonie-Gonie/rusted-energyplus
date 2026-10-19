@@ -1,0 +1,756 @@
+{
+  "schema": "src06-canonical19-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-current-19/evidence.zip",
+    "sha256": "a335b089a56b19e36011f75e3ffcc18c8531eb741eb47b4ebb03004a50d30284",
+    "bytes": 1440720
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FaultsManager.cc",
+      "sha256": "5ae3b214d4d027e828778a8f4bcb8bf8d7af85043ce7cfc8f402bf50eb95f108",
+      "bytes": 120888
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FaultsManager.hh",
+      "sha256": "4c69ed873bbe58f36a737fcb5b2211aa71c4b83dd2ce5e9b9bc77bce70975946",
+      "bytes": 18542
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+      "bytes": 23158
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.cc",
+      "sha256": "547edeea98d989496b604157ada3a6f4e47ba3be93d47a2546640f2ddf46d652",
+      "bytes": 288728
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.hh",
+      "sha256": "5532cfe78d3bbf6cb8ed601393a9d005235f02f06141079302711f992b452cbd",
+      "bytes": 34058
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+      "sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f",
+      "bytes": 33012
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "bytes": 404705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-thermostat-current-Source-review-19/review.json",
+      "sha256": "f54f9f3a22249a30bf3b2e74f05fb980f3d2127a972ba48cca1c564ed0386f32",
+      "bytes": 26684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-current-actual-review-19/review.json",
+      "sha256": "0f2c5abf5ed98916ca0bf78316c9a431ec9294be470026342e2452eb7db5632d",
+      "bytes": 16564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-current-actual-review-19/table-clock-differences.json",
+      "sha256": "2d0b8b390f330092d449b19a2245851cb06fead71ef1511d92bf99d654adf856",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-thermostat-current-application-19/receipt.json",
+      "sha256": "b10a8dbd595f30ef1f1fc1fbb51f6e2c648823e1d6b039d0082b0da6a8e66bb1",
+      "bytes": 28613
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-thermostat-current-Root-19.py",
+      "sha256": "90c1a2faab5e3e9bb249121bf2d1350cf5bed53f1e25030000a010cdba56a825",
+      "bytes": 5301
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-thermostat-current-draft-Outer-19.py",
+      "sha256": "b778c66ad01e6327cfa056f00566a0245bd8308b81643a7061b666dd7a352e01",
+      "bytes": 8281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/diagnostics.json",
+      "sha256": "d74f8b2941e4ea3d74552d7c95ff16a7f2c2de28f2d4ff9f5ce4c1f5c079e8e5",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplustbl.htm",
+      "sha256": "070eafe9a4ed6e916187f267e8fdbd925f2c91ed41521d257aae1ae001f68353",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/eplustbl.xml",
+      "sha256": "db0436dbff353ac9ddff1d133ba4bb0aa5f2096a99ebf390b0b38cb646631d8c",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/results/source-reported-results.json",
+      "sha256": "83c76f5f3382ac78752e1a393c6dd3a83e10f322fb2235904a1c27818b7b938a",
+      "bytes": 1679914
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-Root-19/output/run-summary.json",
+      "sha256": "1a74d0088686a0b1a2048de17f2c35d8398419fc1695998766ceb69f9d3ba23a",
+      "bytes": 32629
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-command-Root-19/receipt.json",
+      "sha256": "1a03745b1aa408753918514beefc254aa641cb0d772de767a894e4682898ce01",
+      "bytes": 5731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-command-Root-19/stderr.log",
+      "sha256": "f4902cdc8c3e4f09b31b7fc1a995833abd63d38e14c7a4df8df668fde72d5a8a",
+      "bytes": 751
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-A-24H-command-Root-19/stdout.log",
+      "sha256": "abbe5c192781e220915d4332432b96415fdb204964d17106470eb8545e58780f",
+      "bytes": 368504
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-Root-19/output/diagnostics.json",
+      "sha256": "c86fc36269749e727f92428477a486ea92f7d8e068b4694a3779a0fde002f30a",
+      "bytes": 2972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-Root-19/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-Root-19/output/run-summary.json",
+      "sha256": "5c7de743791f0af6c4a587f49e758fdecc7906460ff00377d6bfd878b5c1dec8",
+      "bytes": 25214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-command-Root-19/receipt.json",
+      "sha256": "9f5a3b94540715a48f0637c2ad65bfd71f0d56006e23c0c481fecbd922be29c1",
+      "bytes": 5783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-command-Root-19/stderr.log",
+      "sha256": "6590e4c9608d81847a36fa1d7de71afd1f30946a0958fa2f99a48934c365a2f1",
+      "bytes": 10683
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-current-B-NOLIMIT-24H-command-Root-19/stdout.log",
+      "sha256": "e73841f37fcf5146a77feb1a7f0f61f366b896fe2a9ae0bd3c4a994c39f3af2f",
+      "bytes": 368539
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-thermostat-current-actual-Root-19.py",
+      "sha256": "67aceffeea641f4b13d1805e002c8bc3109dcb43d91c7037824df3f57f2a131c",
+      "bytes": 6066
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-thermostat-current-Root-19.py",
+      "sha256": "02f9f547570bafb6146f836d8d2000d5830e6eb0dddfd47feaf5e39be9ecd08e",
+      "bytes": 1276
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-thermostat-current-checkpoint-Outer-19-02.py",
+      "sha256": "0ae6c3df5a9ac2387a0f0b40057fd9f0814abfd5c47c22b088882b375d46d336",
+      "bytes": 12065
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-thermostat-current-Outer-19.py",
+      "sha256": "0efc0f30b3b6a069d896f191c89efa6a16335e458ac62c91bce3602f3fa18dd1",
+      "bytes": 15834
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/Native-literal-extents.json",
+      "sha256": "6eaf347c693f8444c5e579dadf318d390f82d7aa0a39ac6bf04ad8ee3c84eec4",
+      "bytes": 39835
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs",
+      "sha256": "869036ab90cdd72d4ea3edd3dd53cf2464cc0077b008bbed526961a2150395dc",
+      "bytes": 7924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/environment.rs",
+      "sha256": "3acc792b4520f3a93b5b4194fb0c9f68362840527f68559bd731c48fc6ba6244",
+      "bytes": 5604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "05e9169c90f59388ef2369f36f8c71d9eea6923b5b324d397c424d1f76fdb259",
+      "bytes": 10877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input/current.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/provider_host.rs",
+      "sha256": "5577fc7c7ce77f5b8528693ef342b54d294d4dde07d85a2a0f49f24caee8b903",
+      "bytes": 7357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "22ccb24d33c899a9e528a1ac406e2a830d3f6986c03f5a1163a5161fe8645976",
+      "bytes": 39328
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "27dd1b24cf415399b7c84c4af1007dca9647f884ed20f8d1746cc131d1f98170",
+      "bytes": 7807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager.rs",
+      "sha256": "fff727f4c90461e9c8797d298e5842bb7c9ca7db4d5cf1c4e300ae00c0304aa6",
+      "bytes": 17538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "7960454f5731af7a4b3d6606f97139d9d389d92fd25f5fa5227f88274d4f7d2b",
+      "bytes": 10710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs",
+      "sha256": "17acbba8f12cd6e600bb39e7467aead6f66dc9cf2e8e067544b272db30a35c96",
+      "bytes": 8256
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs",
+      "sha256": "f81acc8eac36c4d915c5b882763883cb56886dedd6a2319fd7488f41ed2b156c",
+      "bytes": 17121
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/before/crates/ep_runtime/src/heat_balance/source_initialization/kickoff_postlude/faults.rs",
+      "sha256": "f213824bae830be64341b331a404561d647f19476e53ece5a376a4b8706dbef2",
+      "bytes": 7570
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/complete-final-compiler-Source-plan.json",
+      "sha256": "99eb663e7917d2277541e15aae9a4db9cd6b6dccd3763e40acb1f3e508648903",
+      "bytes": 2526596
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/01-forward_diff.diff",
+      "sha256": "666e687690649fc84afaaea3d58e0d15c8b7da54f4c4be9482eb43c310f0f279",
+      "bytes": 4054
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/01-inverse_diff.diff",
+      "sha256": "cc250bc0aecbb67df512731f26255c119cf0b6565f03506518d81a3b82f23484",
+      "bytes": 4054
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/02-forward_diff.diff",
+      "sha256": "955eeb3d73569c09ccfbdecbb3bcc73dd6e56325eceb8ca258d4350276aa7733",
+      "bytes": 8900
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/02-inverse_diff.diff",
+      "sha256": "e2642ccdd646cc3601cc3b71a957b339cf7912088242421f2bd49274c8c0a5da",
+      "bytes": 8900
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/03-forward_diff.diff",
+      "sha256": "e066cbe4457f9513b1bb01ea19db59e603532ef6823e498d0c6f138c1d361d0c",
+      "bytes": 1304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/03-inverse_diff.diff",
+      "sha256": "8fcc12d6a9e6dc6de4ea229de7aed03962bed34a20a58f233e3e38c435b06021",
+      "bytes": 1304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/04-forward_diff.diff",
+      "sha256": "368f487300d218d232c0dab713c5b629bc141c6fdfbb989e7af49a985e546925",
+      "bytes": 822
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/04-inverse_diff.diff",
+      "sha256": "ef3f983507b9ac294beb8ea925fb948776bbb6da8d3c972b6ae95bf88d61cbd0",
+      "bytes": 822
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/05-forward_diff.diff",
+      "sha256": "30098b3a0ddd8f9d0d01155dada34ce2920cb529d42e72dd1b02b84adb7d5474",
+      "bytes": 508
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/05-inverse_diff.diff",
+      "sha256": "b9c9eb9ad1fccb16719193eb804faa44e7c51182c7d0344d6eb1d7a5eba9ff24",
+      "bytes": 508
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/06-forward_diff.diff",
+      "sha256": "d4e16b9201250644cdef2b55a0d45bb6d2a8cba6aa0b463218e176727219df89",
+      "bytes": 674
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/06-inverse_diff.diff",
+      "sha256": "3d203dad88ebcadbd11b3a80d60f72d4a041fb201f63d140510a80c4d16dd20c",
+      "bytes": 674
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/07-forward_diff.diff",
+      "sha256": "1fbc7d1e0defd3f47e119f0fc74f2b2cebce87d052ccd49c60b2f77921d25852",
+      "bytes": 488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/07-inverse_diff.diff",
+      "sha256": "b0613c3e4eb816c8afa231deea6853cd91bbd8917553070bf8d62e5e4e5b17c2",
+      "bytes": 488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/08-forward_diff.diff",
+      "sha256": "886cc3192c42a475272bf267f364a185c0755438f6f2f3cea2e6361edb2d5b2b",
+      "bytes": 1311
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/08-inverse_diff.diff",
+      "sha256": "d26316f0e0bbeb28f540398384ca21dda2ab1fb183ff0766ade7bd96a47fdff9",
+      "bytes": 1311
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/09-forward_diff.diff",
+      "sha256": "df8dfa8573503e89c24acd38daf49553e5af8b9c9bdf48700c2c8001936b4337",
+      "bytes": 2285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/09-inverse_diff.diff",
+      "sha256": "f50440149107d1a145095bc93f9e92e9c2410a91a2aeb1967c6ccc17fe8de2ef",
+      "bytes": 2285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/10-forward_diff.diff",
+      "sha256": "788b8ba1b2642593d1a4258302bddc5a6b715061a206796f6a87697feb994c91",
+      "bytes": 603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/10-inverse_diff.diff",
+      "sha256": "c6a3f946ffa5a9babb331f85ff1a970ade83c320293fcd12720a242f5f5a32d0",
+      "bytes": 603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/11-forward_diff.diff",
+      "sha256": "55e28f20f6d440d025fc3dbff86b17a67406fa057189817c5e0b60ebb3ea8d6d",
+      "bytes": 618
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/11-inverse_diff.diff",
+      "sha256": "d4050f64169d63f2431b5bcbf0d1f62e9fd7baa56e230437341b59616053328d",
+      "bytes": 618
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/12-forward_diff.diff",
+      "sha256": "d1d8c40ed4784851ff54bfe13dfae0a5683a433e53e7d4f2e3fbf90e64f41eb7",
+      "bytes": 597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/diffs/12-inverse_diff.diff",
+      "sha256": "71e17363ef4ced10e20e9e57286a0c3c3d725549b361fbcba67035f646f904ba",
+      "bytes": 597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/draft-freeze-at-seal.json",
+      "sha256": "b5dfd1772d5f598df43cef6e52ceaa8cfb46ee0bda84bb388c5f1a6ad3c0aaf2",
+      "bytes": 5904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/draft-status-at-seal.json",
+      "sha256": "98ceb0cb40abbca71dc14fe2189c629517d1ccbefd48ddebb93c5b71ef780b6c",
+      "bytes": 2937
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/integration-contract.json",
+      "sha256": "8f35895a5b5f2e7ad12c5d232c0e54597cebd4a391cd28e7331fae75f9193254",
+      "bytes": 3114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs",
+      "sha256": "869036ab90cdd72d4ea3edd3dd53cf2464cc0077b008bbed526961a2150395dc",
+      "bytes": 7924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/environment.rs",
+      "sha256": "3acc792b4520f3a93b5b4194fb0c9f68362840527f68559bd731c48fc6ba6244",
+      "bytes": 5604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "05e9169c90f59388ef2369f36f8c71d9eea6923b5b324d397c424d1f76fdb259",
+      "bytes": 10877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input/current.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/provider_host.rs",
+      "sha256": "5577fc7c7ce77f5b8528693ef342b54d294d4dde07d85a2a0f49f24caee8b903",
+      "bytes": 7357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "22ccb24d33c899a9e528a1ac406e2a830d3f6986c03f5a1163a5161fe8645976",
+      "bytes": 39328
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "27dd1b24cf415399b7c84c4af1007dca9647f884ed20f8d1746cc131d1f98170",
+      "bytes": 7807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager.rs",
+      "sha256": "fff727f4c90461e9c8797d298e5842bb7c9ca7db4d5cf1c4e300ae00c0304aa6",
+      "bytes": 17538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "7960454f5731af7a4b3d6606f97139d9d389d92fd25f5fa5227f88274d4f7d2b",
+      "bytes": 10710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs",
+      "sha256": "17acbba8f12cd6e600bb39e7467aead6f66dc9cf2e8e067544b272db30a35c96",
+      "bytes": 8256
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs",
+      "sha256": "f81acc8eac36c4d915c5b882763883cb56886dedd6a2319fd7488f41ed2b156c",
+      "bytes": 17121
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/literal-inverse/crates/ep_runtime/src/heat_balance/source_initialization/kickoff_postlude/faults.rs",
+      "sha256": "f213824bae830be64341b331a404561d647f19476e53ece5a376a4b8706dbef2",
+      "bytes": 7570
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/manifest.json",
+      "sha256": "b654dd0c88a5f8a27aa2d885c385a543021b1420c4dbd36a94627e17ad280283",
+      "bytes": 41103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/01.stdout",
+      "sha256": "c076d551a52332328b884ae7d17844cae30b370d82573651ba1ce62739f6a326",
+      "bytes": 9654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/02.stdout",
+      "sha256": "ed1738d87c5ea1b9a7afcd49679ab2d7af3bb96627e43bbec1e001a237074ebf",
+      "bytes": 10493
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/03.stdout",
+      "sha256": "58b8a64c01657b332d97df8926fa92c6815cf99b92c414da09493bd5753ff274",
+      "bytes": 10678
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/04.stdout",
+      "sha256": "58f0ff67966965a1357b10010cd9932f4f18db1027637a8e77a9d1b5a32a8eae",
+      "bytes": 8152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/05.stdout",
+      "sha256": "f4b2f627171d678bfaf5808132127382a5203ade61bbdca60c418f739df79ca6",
+      "bytes": 7391
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/06.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/06.stdout",
+      "sha256": "056cef1564fd8311acd9e4a66f796f6936ef43ffdab14c57af0f69add6428018",
+      "bytes": 39789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/07.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/07.stdout",
+      "sha256": "112ef7528c03a02a0fc6dd8b09f0ff973f1db0024b0d9af7358ee48a564954c9",
+      "bytes": 7837
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/08.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/08.stdout",
+      "sha256": "100b8888ec4b3b018b96ca9561f14ba164361fd22a7528e7f2df339c473402c2",
+      "bytes": 10971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/09.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/09.stdout",
+      "sha256": "dd02dc84d219abe67326cf615210b8f7905d10e4bc84fd05dd1e2c04ab075a7c",
+      "bytes": 17856
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/10.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/10.stdout",
+      "sha256": "fdaaf84904b484848175884e9c33bbde3cc27a71b103b5ae580f04b2855ebc76",
+      "bytes": 8398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/11.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/11.stdout",
+      "sha256": "c3f3baa7ee420ea6118ea33721f1551144a95994a1dbf2f837674a0456603115",
+      "bytes": 17213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/12.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/parse/12.stdout",
+      "sha256": "507a8c6c9337b90c69e8b5fd7f4d86d98b081c458a1272a029cb62ca68691e8d",
+      "bytes": 7762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs",
+      "sha256": "6620b8e4d9a041dc6dc7785fb9803be61e90b72e5aa4cd3f2bd8ae070f0b20f5",
+      "bytes": 8136
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/environment.rs",
+      "sha256": "ef1f75e07f3e3a9668cbb5e977ca20c7a314dc67cedc98db6c8e6e9a3f74e8a9",
+      "bytes": 8594
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "3992fb5727695d9fe37c7489441986db15553f5b2b74ca4bc3431383b546dc4e",
+      "bytes": 10631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input/current.rs",
+      "sha256": "b57bebd77c61f5c94fa24b11e0d02c6e2346953ad29f6cf6afe10564c4ff44d2",
+      "bytes": 8505
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/provider_host.rs",
+      "sha256": "f4b2f627171d678bfaf5808132127382a5203ade61bbdca60c418f739df79ca6",
+      "bytes": 7391
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "28afdd9722e7a9e3c7e6847a2d99bce56378c1d31a10773626cc3c63fbdce729",
+      "bytes": 39597
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "112ef7528c03a02a0fc6dd8b09f0ff973f1db0024b0d9af7358ee48a564954c9",
+      "bytes": 7837
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager.rs",
+      "sha256": "25b4beebbde09eb4e61fc78ddfeee0858d790a9fa05f82ee273d69bcc80464a3",
+      "bytes": 17856
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "100b8888ec4b3b018b96ca9561f14ba164361fd22a7528e7f2df339c473402c2",
+      "bytes": 10971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs",
+      "sha256": "df7b4b4edb24f173c6205f498784ad0b8e2e35872f00a9c63bb3e01f5bf4179f",
+      "bytes": 8308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs",
+      "sha256": "c3f3baa7ee420ea6118ea33721f1551144a95994a1dbf2f837674a0456603115",
+      "bytes": 17213
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/proposed/crates/ep_runtime/src/heat_balance/source_initialization/kickoff_postlude/faults.rs",
+      "sha256": "507a8c6c9337b90c69e8b5fd7f4d86d98b081c458a1272a029cb62ca68691e8d",
+      "bytes": 7762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-current-held-Outer-19/whole-crates-concrete-API-inventory.json",
+      "sha256": "ba97abe9f921318ca002d502d3b3b325c65f46a5beac99c255bce50eb69e6d29",
+      "bytes": 37234
+    },
+    {
+      "path": ".runtime/porting/SRC-06/thermostat-current-publication-prepared-Outer-19-02/publication-template.json",
+      "sha256": "081cac4ad11f0f5e60811cb5686f08e0738faeee38d22e2fd358287ffaae1739",
+      "bytes": 30092
+    },
+    {
+      "path": ".runtime/porting/source-objects/cf/cfe34ba687aff231e21c1103e415f63a1f171b1c8973fd41f7fa57ff57815306",
+      "sha256": "cfe34ba687aff231e21c1103e415f63a1f171b1c8973fd41f7fa57ff57815306",
+      "bytes": 1841920
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs",
+      "sha256": "6620b8e4d9a041dc6dc7785fb9803be61e90b72e5aa4cd3f2bd8ae070f0b20f5",
+      "bytes": 8136
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/environment.rs",
+      "sha256": "ef1f75e07f3e3a9668cbb5e977ca20c7a314dc67cedc98db6c8e6e9a3f74e8a9",
+      "bytes": 8594
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input.rs",
+      "sha256": "3992fb5727695d9fe37c7489441986db15553f5b2b74ca4bc3431383b546dc4e",
+      "bytes": 10631
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/input/current.rs",
+      "sha256": "b57bebd77c61f5c94fa24b11e0d02c6e2346953ad29f6cf6afe10564c4ff44d2",
+      "bytes": 8505
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/provider_host.rs",
+      "sha256": "f4b2f627171d678bfaf5808132127382a5203ade61bbdca60c418f739df79ca6",
+      "bytes": 7391
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "28afdd9722e7a9e3c7e6847a2d99bce56378c1d31a10773626cc3c63fbdce729",
+      "bytes": 39597
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/report.rs",
+      "sha256": "112ef7528c03a02a0fc6dd8b09f0ff973f1db0024b0d9af7358ee48a564954c9",
+      "bytes": 7837
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager.rs",
+      "sha256": "25b4beebbde09eb4e61fc78ddfeee0858d790a9fa05f82ee273d69bcc80464a3",
+      "bytes": 17856
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "100b8888ec4b3b018b96ca9561f14ba164361fd22a7528e7f2df339c473402c2",
+      "bytes": 10971
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs",
+      "sha256": "df7b4b4edb24f173c6205f498784ad0b8e2e35872f00a9c63bb3e01f5bf4179f",
+      "bytes": 8308
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs",
+      "sha256": "c3f3baa7ee420ea6118ea33721f1551144a95994a1dbf2f837674a0456603115",
+      "bytes": 17213
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/kickoff_postlude/faults.rs",
+      "sha256": "507a8c6c9337b90c69e8b5fd7f4d86d98b081c458a1272a029cb62ca68691e8d",
+      "bytes": 7762
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-17/summary.json",
+      "sha256": "5d3a79f56399cd39eab1a12d7f247fc455711ee77bf0d7378945b138486ed680",
+      "bytes": 5542
+    }
+  ],
+  "scope": "12 coherent Thermostat environment/current Sources, Native authority, accepted peer and actual B/A24. No test/fixture execution claim, historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}
