@@ -26,11 +26,12 @@ rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 | 기상·태양열·내부발열 | [허용 범위 170개 기록](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json): 순서·본문으로 검증한 이전 prefix 137개와 이후 성공한 범주 33개. Native 전체 179개 보존, 범위 밖 차양 9개 제외 |
 | 선택 표면 계산·비수렴 종료 분기 | [SUR03 전체 선택 함수 24회·SUR05 지정 종료 분기 30회](evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) 비교 통과. 후자는 전체 실내 반복 호출이 아님 |
 | Source 품질 정리 | [57번 품질 기록](evidence/SRC-06-source-quality-hygiene-57/summary.json): 같은 Source에서 fmt·기본 feature workspace strict Clippy·workspace 4,975개(기존 제외 2개)·선택 beam 18개 통과 |
+| HVAC 입력·호출 오류 | [58번 원본 비교](evidence/SRC-06-canonical-purchased-air-admission-58/summary.json): 실제 전체 Sim 7회·35개 상태·7,096개 원시 수치 관측값 일치. Fatal 6개와 반환 노드로 계속하는 1개를 구분; 기존 정상 60회도 통과 |
 | 성공 실행 출력 정리 | [A/B 24시간 두 건](evidence/SRC-06-canonical-successful-log-layout-49/summary.json), 기존 계산·CSV·JSON 유지, 중복 오류 파일 제거, 콘솔 원문을 `logs/source-console.log`로 이동 |
 
 55번 증거는 각 실제 실행 단계와 변경되지 않은 본문·읽기 범위의 연결 근거를 보존합니다. 170개를 한 번에 성공한 실행이나 전 범주의 동일 바이너리·Source 검증으로 합쳐 표기하지 않습니다.
 
-다음 작업은 HVAC01의 필수 오류 경로 7개(EH7)를 원본의 진단·종료 순서대로 연결하는 것입니다. 그 뒤 실제 Source Surface 부모의 반복·호출 시점과 warmup→RunPeriod의 MAT·W·CTF 상태 인계를 비교합니다. Native 두 경계 관측은 960개 실수 필드와 실행 플래그를 확인했으며, Source 비교는 아직 수행하지 않았습니다. 이어 같은 최종 Source의 15개 일반 실행, 전체 JSON/CSV 재읽기와 부수 출력 검증을 마무리합니다. 기존 15건의 과거 보고 값 증거는 각 실행의 범위로 유지합니다.
+HVAC01의 필수 오류 경로 7개는 원본의 진단·상태 변경·종료 순서대로 연결하고 비교를 통과했습니다. 잘못된 배기 노드는 실제 Severe 후 반환 노드로 전환하여 계속 계산합니다. 현재 Source의 fmt·strict Clippy·workspace 4,975개(기존 제외 2개)도 통과했습니다. 비교 어댑터의 첫 컴파일 실패와 필드 경로 한 줄 수정은 58번 증거에 보존합니다. 다음 작업은 실제 Source Surface 부모의 반복·호출 시점과 warmup→RunPeriod의 MAT·W·CTF 상태 인계 비교입니다. Native 두 경계 관측은 960개 실수 필드와 실행 플래그를 확인했으며, Source 비교는 아직 수행하지 않았습니다. 이어 같은 최종 Source의 15개 일반 실행, 전체 JSON/CSV 재읽기와 부수 출력 검증을 마무리합니다. 기존 15건의 과거 보고 값 증거는 각 실행의 범위로 유지합니다.
 
 기존 audit 시험의 CRLF 기대값 수정과 관측기 최초 컴파일 실패 13건·`serde_json` 의존성 수정은 56번 증거에 남아 있습니다. 이후 57번에서는 포맷과 항목별 문서·lint를 정리하고, 14개 누락값 요청을 기존 오류로 전달하도록 바로잡았습니다. 실제 fmt·strict Clippy·workspace와 선택 beam 검증은 통과했으며, 앞선 두 Clippy 실패도 보존합니다. 별도 feature의 process-main cohort에는 미사용 helper 경고 3,419개가 남아 있으므로 모든 feature가 경고 없이 통과했다고 해석하지 않습니다. 이번 품질 정리로 카드 gate를 바꾸지 않습니다.
 

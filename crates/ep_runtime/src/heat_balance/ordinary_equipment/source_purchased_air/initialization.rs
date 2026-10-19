@@ -120,6 +120,7 @@ impl OrdinaryEquipment {
         schedules: &SelectedScheduleManager,
         o: &mut SourcePurchasedAirInitOwners<'_>,
         report: &mut SourceSizerReportingOwners<'_, D>,
+        backend: &mut crate::heat_balance::error_backend::SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
         if self.purchased_air.initialize_once {
             let count = usize::try_from(self.purchased_air.number_purchased_air)
@@ -184,8 +185,24 @@ impl OrdinaryEquipment {
                         "actual InitPurchasedAir controlled Config1124",
                     ))?;
                 if find_number(supply, &config.inlet_node_numbers, config.inlet_nodes)? == 0 {
-                    return Err(Error::Unavailable(
-                        "actual InitPurchasedAir supply not inlet severe1127",
+                    let row = self.purchased_unit(unit_number)?;
+                    backend.show_severe_error(&format!(
+                        "InitPurchasedAir: In {} = {}",
+                        row.c_object_name, row.name
+                    ))?;
+                    backend.show_continue_error(&format!(
+                        "Zone Supply Air Node Name={} is not a zone inlet node.",
+                        self.source_node_id(usize::try_from(supply).map_err(|_| {
+                            Error::Unavailable("actual positive supply NodeID ordinal")
+                        })?)?
+                    ))?;
+                    backend.show_continue_error(&format!(
+                        "Check ZoneHVAC:EquipmentConnections for zone={}",
+                        config.zone_name
+                    ))?;
+                    return Err(super::purchased_air_fatal(
+                        backend,
+                        "Preceding condition causes termination.",
                     ));
                 }
             }
@@ -200,9 +217,25 @@ impl OrdinaryEquipment {
                         "actual InitPurchasedAir controlled Config1144",
                     ))?;
                 if find_number(exhaust, &config.exhaust_node_numbers, config.exhaust_nodes)? == 0 {
-                    return Err(Error::Unavailable(
-                        "actual InitPurchasedAir exhaust not exhaust severe1147",
-                    ));
+                    let row = self.purchased_unit(unit_number)?;
+                    backend.show_severe_error(&format!(
+                        "InitPurchasedAir: In {} = {}",
+                        row.c_object_name, row.name
+                    ))?;
+                    backend.show_continue_error(&format!(
+                        "Zone Exhaust Air Node Name={} is not a zone exhaust node.",
+                        self.source_node_id(usize::try_from(exhaust).map_err(|_| {
+                            Error::Unavailable("actual positive exhaust NodeID ordinal")
+                        })?)?
+                    ))?;
+                    backend.show_continue_error(&format!(
+                        "Check ZoneHVAC:EquipmentConnections for zone={}",
+                        config.zone_name
+                    ))?;
+                    backend.show_continue_error(
+                        "Zone return air node will be used for ideal loads recirculation air.",
+                    )?;
+                    use_return_node = true;
                 } else {
                     self.purchased_unit_mut(unit_number)?
                         .zone_recirc_air_node_num =

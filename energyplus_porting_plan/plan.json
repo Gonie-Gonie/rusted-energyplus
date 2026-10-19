@@ -13037,6 +13037,17 @@
         },
         "sha256": "7acc4887606df00415bec219a0bedab1c060a005926b21ce44be3bd3b917b1cc",
         "size_bytes": 10589
+      },
+      "canonical_purchased_air_admission_58": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/summary.json",
+        "sha256": "5439976c5b3c94467c5a31708eb87558db01b99cbbc0da3b496eee8517fd789b",
+        "size_bytes": 8272,
+        "actual_review": {
+          "path": ".runtime/porting/SRC-06/Root58-actual-review/review.json",
+          "sha256": "fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724",
+          "bytes": 11974
+        },
+        "qualification": "Actual7 admission full calls/35 states7096 paired raw fields; six Fatal and one continuation; existing60 positive calls75524 observations; current fmt/strict Clippy/workspace4975 pass. Final15/cadence and gates pending."
       }
     },
     {
@@ -15209,7 +15220,18 @@
       "applicability": "B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "actual_error_admission_58": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/summary.json",
+        "sha256": "5439976c5b3c94467c5a31708eb87558db01b99cbbc0da3b496eee8517fd789b",
+        "size_bytes": 8272,
+        "actual_review": {
+          "path": ".runtime/porting/SRC-06/Root58-actual-review/review.json",
+          "sha256": "fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724",
+          "bytes": 11974
+        },
+        "qualification": "Actual7 admission full calls/35 states7096 paired raw fields; six Fatal and one continuation; existing60 positive calls75524 observations; current fmt/strict Clippy/workspace4975 pass. Final15/cadence and gates pending."
+      }
     },
     {
       "id": "HVAC-02",

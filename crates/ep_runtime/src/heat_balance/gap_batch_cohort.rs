@@ -22,6 +22,7 @@ pub(crate) fn run_with_category(
     if !matches!(
         group,
         "purchased_air"
+            | "purchased_air_admission"
             | "surface"
             | "exterior"
             | "output_processor"
@@ -59,6 +60,7 @@ pub(crate) fn run_with_category(
     }
     match group {
         "purchased_air"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_purchased_air_cohort(&fixture),
+        "purchased_air_admission"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_purchased_air_admission_cohort(&fixture),
         "surface"=>surface::run(&fixture),
         "outside_surface"=>super::ordinary_surface_initialization::OrdinarySurfaceInitialization::run_native_gap_outside_surface_cohort(&fixture),
         "inside_convergence_branch"=>super::ordinary_surface_initialization::OrdinarySurfaceInitialization::run_native_inside_convergence_branch_cohort(&fixture),

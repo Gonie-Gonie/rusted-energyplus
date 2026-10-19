@@ -1,0 +1,1789 @@
+{
+  "schema": "src06-finite-EH58-publication-index.v1",
+  "entries": [
+    {
+      "role": "Root accepted actual review",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-actual-review/review.json",
+        "sha256": "fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724",
+        "bytes": 11974
+      },
+      "member": "objects/fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724"
+    },
+    {
+      "role": "Root actual five-Source application",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-application-02.json",
+        "sha256": "60079b8f29997c46f8486c6cb15917bec59bfe41bce6faab73947afd3bf4de29",
+        "bytes": 1781
+      },
+      "member": "objects/60079b8f29997c46f8486c6cb15917bec59bfe41bce6faab73947afd3bf4de29"
+    },
+    {
+      "role": "Source scaffold04",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/draft.json",
+        "sha256": "0789133c32814f948f5359bd9ebd29f6fa09d5c2a0c8294871f5a9f6a5480528",
+        "bytes": 18294
+      },
+      "member": "objects/0789133c32814f948f5359bd9ebd29f6fa09d5c2a0c8294871f5a9f6a5480528"
+    },
+    {
+      "role": "Source scaffold independent04 peer",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-admission-scaffold-review-Outer-04/review.json",
+        "sha256": "117b2f76fffb44e4ff4fbd7233b3a29f936608bd415e98a0533bda087fa57e66",
+        "bytes": 19252
+      },
+      "member": "objects/117b2f76fffb44e4ff4fbd7233b3a29f936608bd415e98a0533bda087fa57e66"
+    },
+    {
+      "role": "production Source03",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-draft-Audit-58-03/draft.json",
+        "sha256": "26bbff13c5d822ffd5c90a99a8225353b50b522b0d9a9bb35be5751b4f18806b",
+        "bytes": 21789
+      },
+      "member": "objects/26bbff13c5d822ffd5c90a99a8225353b50b522b0d9a9bb35be5751b4f18806b"
+    },
+    {
+      "role": "production independent03 peer",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-EH7-Source-review-Outer-03/review.json",
+        "sha256": "5c44cd6d8b310334bcc4e1b6e26b1be83f2fc2931eb5804f97743c426a2d227f",
+        "bytes": 17688
+      },
+      "member": "objects/5c44cd6d8b310334bcc4e1b6e26b1be83f2fc2931eb5804f97743c426a2d227f"
+    },
+    {
+      "role": "complete current compiler plan",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/complete-final-compiler-Source-plan.json",
+        "sha256": "95a0e5a2b1d5d2ba186ccaf11a95ab132d666a78d57164e5c9f9b5c23bc15527",
+        "bytes": 2673243
+      },
+      "member": "objects/95a0e5a2b1d5d2ba186ccaf11a95ab132d666a78d57164e5c9f9b5c23bc15527"
+    },
+    {
+      "role": "exact parent compiler plan",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root-hygiene-application-57-03/complete-final-compiler-Source-plan.json",
+        "sha256": "91c62154fa3a08e04a6eac1d0e096801d5bccfc221ede167e77e91ea00dc2631",
+        "bytes": 2622368
+      },
+      "member": "objects/91c62154fa3a08e04a6eac1d0e096801d5bccfc221ede167e77e91ea00dc2631"
+    },
+    {
+      "role": "lossless whole-worker projection/slices",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-runtime-fixture-Outer-58-01/projection.json",
+        "sha256": "732f35999d54271866a874a35b27f1560215c2e9dcd50d8ee2d91fe03c199ce7",
+        "bytes": 51171
+      },
+      "member": "objects/732f35999d54271866a874a35b27f1560215c2e9dcd50d8ee2d91fe03c199ce7"
+    },
+    {
+      "role": "ONE whole new EH7 fixture",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-runtime-fixture-Outer-58-01/fixture.json",
+        "sha256": "c9e1b4a3db23c18f2a0b0dec68913b31fd9c58ee82c7d51abb118d40a81c46d3",
+        "bytes": 1734716
+      },
+      "member": "objects/c9e1b4a3db23c18f2a0b0dec68913b31fd9c58ee82c7d51abb118d40a81c46d3"
+    },
+    {
+      "role": "actual Native build metadata",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/native-build.json",
+        "sha256": "13306bf92868a197fee3b0949f0a0e7076a3ccd7137a7a44052152c1dd548868",
+        "bytes": 12666
+      },
+      "member": "objects/13306bf92868a197fee3b0949f0a0e7076a3ccd7137a7a44052152c1dd548868"
+    },
+    {
+      "role": "exact Native recipe",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-recipes-READY-Outer-01/manifest.json",
+        "sha256": "bfbafe506aed6fa5b6e3c1f6a6330e52f709b580e4344fe8f05a2a51b513eb07",
+        "bytes": 25266
+      },
+      "member": "objects/bfbafe506aed6fa5b6e3c1f6a6330e52f709b580e4344fe8f05a2a51b513eb07"
+    },
+    {
+      "role": "new Native caller/readset",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/draft.json",
+        "sha256": "341f727e85ee75e0bdcdebf2f7e04a8fdacbc7081f866f4d39587deec2f915ba",
+        "bytes": 17764
+      },
+      "member": "objects/341f727e85ee75e0bdcdebf2f7e04a8fdacbc7081f866f4d39587deec2f915ba"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/before.rs",
+        "sha256": "0d3c24e2b42434a1b542da552940764bb0d39124d349980eb7272954711e75dd",
+        "bytes": 32163
+      },
+      "member": "objects/0d3c24e2b42434a1b542da552940764bb0d39124d349980eb7272954711e75dd"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/proposed.rs",
+        "sha256": "d68239857b9f29262919e5baa35707057c143591177c5e398f1e5c51bbda60f5",
+        "bytes": 34501
+      },
+      "member": "objects/d68239857b9f29262919e5baa35707057c143591177c5e398f1e5c51bbda60f5"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/forward.diff",
+        "sha256": "ed8977f8722a998e1a90816a7f5dd4e9ba7f58f3a5885cdcff5cd3235b34a7b9",
+        "bytes": 8359
+      },
+      "member": "objects/ed8977f8722a998e1a90816a7f5dd4e9ba7f58f3a5885cdcff5cd3235b34a7b9"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/inverse.diff",
+        "sha256": "c1a8f53a5b370543c33f6240c24ea82ae247db94c8d9667aa6b374915b9780d0",
+        "bytes": 8359
+      },
+      "member": "objects/c1a8f53a5b370543c33f6240c24ea82ae247db94c8d9667aa6b374915b9780d0"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/literal.ndiff",
+        "sha256": "3dcd6208971b5033cc0bea7e452f6c1266cde08d3ef203e2f54e701066e54cf0",
+        "bytes": 37688
+      },
+      "member": "objects/3dcd6208971b5033cc0bea7e452f6c1266cde08d3ef203e2f54e701066e54cf0"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/01/parse.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/before.rs",
+        "sha256": "b16aeb6c304eb058c08d25db5c01ceccb16b43fcdc9e6628af5bb58a92a7fae4",
+        "bytes": 32658
+      },
+      "member": "objects/b16aeb6c304eb058c08d25db5c01ceccb16b43fcdc9e6628af5bb58a92a7fae4"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/proposed.rs",
+        "sha256": "614a936ffd7a1cd61d41b7597a6ba780c5c393e57a174cc267a60b466ccc0e65",
+        "bytes": 34466
+      },
+      "member": "objects/614a936ffd7a1cd61d41b7597a6ba780c5c393e57a174cc267a60b466ccc0e65"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/forward.diff",
+        "sha256": "1c465b5174aca1432572e0559647b400ea7f5e0183070acf4ff345f9364595b5",
+        "bytes": 3590
+      },
+      "member": "objects/1c465b5174aca1432572e0559647b400ea7f5e0183070acf4ff345f9364595b5"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/inverse.diff",
+        "sha256": "e1b9031904a93c629785f7dab4d3f3db6de29cbceeb025a60c3c22ad217608c0",
+        "bytes": 3590
+      },
+      "member": "objects/e1b9031904a93c629785f7dab4d3f3db6de29cbceeb025a60c3c22ad217608c0"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/literal.ndiff",
+        "sha256": "fd3cd2ca16741df63adaec941003a040c05c833b87b613ff107704e603f3e1a3",
+        "bytes": 36319
+      },
+      "member": "objects/fd3cd2ca16741df63adaec941003a040c05c833b87b613ff107704e603f3e1a3"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/initialization.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/02/parse.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/before.rs",
+        "sha256": "29e6df4d4b9f43dab02f12fc402e3687254c9ef1fe66f1246fc9e4c41fb80fb3",
+        "bytes": 98648
+      },
+      "member": "objects/29e6df4d4b9f43dab02f12fc402e3687254c9ef1fe66f1246fc9e4c41fb80fb3"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/proposed.rs",
+        "sha256": "896a86a758af6210ef71048edf348925528e6c2ac86161f0ec2c155fcc377341",
+        "bytes": 99160
+      },
+      "member": "objects/896a86a758af6210ef71048edf348925528e6c2ac86161f0ec2c155fcc377341"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/forward.diff",
+        "sha256": "13dac888949910c9889aa1b02ed2ec44f88f84585831ae43f980227cd6dc1892",
+        "bytes": 1596
+      },
+      "member": "objects/13dac888949910c9889aa1b02ed2ec44f88f84585831ae43f980227cd6dc1892"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/inverse.diff",
+        "sha256": "da871ccd8c36ec793c895105bbe92dcd35823f686221c1f9c4900afab6c886ac",
+        "bytes": 1596
+      },
+      "member": "objects/da871ccd8c36ec793c895105bbe92dcd35823f686221c1f9c4900afab6c886ac"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/literal.ndiff",
+        "sha256": "b599b843901088bf76682d078feb5afe96c8d1d1a340bcbfe2d8b208352e1609",
+        "bytes": 104146
+      },
+      "member": "objects/b599b843901088bf76682d078feb5afe96c8d1d1a340bcbfe2d8b208352e1609"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/03/parse.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/before.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/proposed.rs",
+        "sha256": "d57b72c910d94b87b89774da1fed4524fd054a93de2b1a4172469161266ba986",
+        "bytes": 18469
+      },
+      "member": "objects/d57b72c910d94b87b89774da1fed4524fd054a93de2b1a4172469161266ba986"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/forward.diff",
+        "sha256": "58971d84fff79f4234d9772d13becbdb599c12af31236a8ad982ec07620bf32e",
+        "bytes": 19194
+      },
+      "member": "objects/58971d84fff79f4234d9772d13becbdb599c12af31236a8ad982ec07620bf32e"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/inverse.diff",
+        "sha256": "145d88b4f09019b2a9ad60f52cfae28f3f58feb20f2b3e6aa9b68508544eabbf",
+        "bytes": 19194
+      },
+      "member": "objects/145d88b4f09019b2a9ad60f52cfae28f3f58feb20f2b3e6aa9b68508544eabbf"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/literal.ndiff",
+        "sha256": "8522af8d747696032d255ee058de1a5b4cc329e8b0feb91d93b62fac994467cf",
+        "bytes": 19439
+      },
+      "member": "objects/8522af8d747696032d255ee058de1a5b4cc329e8b0feb91d93b62fac994467cf"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/admissions.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/04/parse.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/before.rs",
+        "sha256": "eee271048ac86f61ded604cc6b6dd869224d22a5cc3461668447f8b5e9634d4a",
+        "bytes": 3662
+      },
+      "member": "objects/eee271048ac86f61ded604cc6b6dd869224d22a5cc3461668447f8b5e9634d4a"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/proposed.rs",
+        "sha256": "0c30411d37fd10c5c303b33f3ea84634b797bf7554ce70392973dca537070c84",
+        "bytes": 3840
+      },
+      "member": "objects/0c30411d37fd10c5c303b33f3ea84634b797bf7554ce70392973dca537070c84"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/forward.diff",
+        "sha256": "961a411be337cb18dd73fa34171df12452faf81d6af7300b5f1bec7894268e2c",
+        "bytes": 980
+      },
+      "member": "objects/961a411be337cb18dd73fa34171df12452faf81d6af7300b5f1bec7894268e2c"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/inverse.diff",
+        "sha256": "c45ed6b9e1dd713a706a718f138eee22dc9ad5c23efa67f670491e919be8bdeb",
+        "bytes": 980
+      },
+      "member": "objects/c45ed6b9e1dd713a706a718f138eee22dc9ad5c23efa67f670491e919be8bdeb"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/literal.ndiff",
+        "sha256": "995df603afde37281326235ef0652342568aaa183bef5665d3167d85eae8b1ad",
+        "bytes": 3988
+      },
+      "member": "objects/995df603afde37281326235ef0652342568aaa183bef5665d3167d85eae8b1ad"
+    },
+    {
+      "role": "Source5/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/05/parse.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Source scaffold supporting proof/primary_input_inverse_proof",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/primary-input-inverses.json",
+        "sha256": "c2505c1d3ea174d18dd21283c7dcff28eb73ddfcc9c81aef71b131af2e8c55a3",
+        "bytes": 2813
+      },
+      "member": "objects/c2505c1d3ea174d18dd21283c7dcff28eb73ddfcc9c81aef71b131af2e8c55a3"
+    },
+    {
+      "role": "Source scaffold supporting proof/constructor_console_binding_proof",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/constructor-console-binding-proof.json",
+        "sha256": "d2fd3a4fffd2c814dcf133ec4d7c665ebd1c06c66f23b053cf69d706e071233a",
+        "bytes": 2119
+      },
+      "member": "objects/d2fd3a4fffd2c814dcf133ec4d7c665ebd1c06c66f23b053cf69d706e071233a"
+    },
+    {
+      "role": "Source scaffold supporting proof/Node_allocation_epoch_proof",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/Node-allocation-epoch-proof.json",
+        "sha256": "3a00ac55d265e58c0de18104984aa032ff26a5f9c944d986d3d15c34a88ff929",
+        "bytes": 3838
+      },
+      "member": "objects/3a00ac55d265e58c0de18104984aa032ff26a5f9c944d986d3d15c34a88ff929"
+    },
+    {
+      "role": "Source scaffold supporting proof/concrete_source_contexts",
+      "authority": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+        "sha256": "99257a14dd9e35e5a0d3280e31c8c451f606ac3e0aeb83240ebaadae0356c05a",
+        "bytes": 139513
+      },
+      "member": "objects/99257a14dd9e35e5a0d3280e31c8c451f606ac3e0aeb83240ebaadae0356c05a"
+    },
+    {
+      "role": "Source scaffold supporting proof/concrete_source_contexts",
+      "authority": {
+        "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+        "sha256": "5afcf3464c9eb2aafe8fedda07955be38dcaa4bc1e60c04831edb1bb02e0971b",
+        "bytes": 24994
+      },
+      "member": "objects/5afcf3464c9eb2aafe8fedda07955be38dcaa4bc1e60c04831edb1bb02e0971b"
+    },
+    {
+      "role": "Source scaffold supporting proof/concrete_source_contexts",
+      "authority": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_globals.rs",
+        "sha256": "5e042faefe2389d80c5a718f4f97d5bb4f8c2d7be6139c53cde03c6863b959dc",
+        "bytes": 5338
+      },
+      "member": "objects/5e042faefe2389d80c5a718f4f97d5bb4f8c2d7be6139c53cde03c6863b959dc"
+    },
+    {
+      "role": "Source scaffold supporting proof/concrete_source_contexts",
+      "authority": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_project_data.rs",
+        "sha256": "a88fc93579030b5f5065d5baff476dd58142668decc051492309b60ba6dc819d",
+        "bytes": 7835
+      },
+      "member": "objects/a88fc93579030b5f5065d5baff476dd58142668decc051492309b60ba6dc819d"
+    },
+    {
+      "role": "Source scaffold supporting proof/concrete_source_contexts",
+      "authority": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+        "sha256": "6bf8243cfc7cbaf184d896825e3ebdb5b7bf461a62f3b5b7a21f8b4fab4d40fa",
+        "bytes": 58957
+      },
+      "member": "objects/6bf8243cfc7cbaf184d896825e3ebdb5b7bf461a62f3b5b7a21f8b4fab4d40fa"
+    },
+    {
+      "role": "Source scaffold supporting proof/rejected02_scaffold_peer",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-admission-scaffold-review-Outer-02/review.json",
+        "sha256": "cbc035a4a52144bf09b91c7df897f2c0a5dc63edd4fc11b7fdf721a116d1d0c4",
+        "bytes": 4258
+      },
+      "member": "objects/cbc035a4a52144bf09b91c7df897f2c0a5dc63edd4fc11b7fdf721a116d1d0c4"
+    },
+    {
+      "role": "Source scaffold supporting proof/rejected02_finding",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-EH7-Source-review-Outer-02/review.json",
+        "sha256": "0ac4e95255366e1b68dcc383703834870ae51a7fe942ea68515495188bf0adf5",
+        "bytes": 1695
+      },
+      "member": "objects/0ac4e95255366e1b68dcc383703834870ae51a7fe942ea68515495188bf0adf5"
+    },
+    {
+      "role": "Source scaffold supporting proof/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/author-purchased-air-admission-scaffold-Audit-58-04.py",
+        "sha256": "4220ec4949ac8a118e0f8d64f8954d6a86672eb24361e9c24b69385ec7939adb",
+        "bytes": 16487
+      },
+      "member": "objects/4220ec4949ac8a118e0f8d64f8954d6a86672eb24361e9c24b69385ec7939adb"
+    },
+    {
+      "role": "production member/caller authority/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/author-purchased-air-admission-Source-Audit-58-03.py",
+        "sha256": "aae5c5081b3591b86ff34429898b42f5f310b85424afd2a1141d28fbf13861d7",
+        "bytes": 14454
+      },
+      "member": "objects/aae5c5081b3591b86ff34429898b42f5f310b85424afd2a1141d28fbf13861d7"
+    },
+    {
+      "role": "Native new caller authority/named_inputs",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/named-inputs.json",
+        "sha256": "f751480d20092c6054789ecbdee7b8524fcd337019d518b00d7c89865632a7a4",
+        "bytes": 12771
+      },
+      "member": "objects/f751480d20092c6054789ecbdee7b8524fcd337019d518b00d7c89865632a7a4"
+    },
+    {
+      "role": "Native new caller authority/fragment",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/purchased_air_admission_fragment.cpp",
+        "sha256": "4ac77ccdadceda3fd269b9e984da165f447b18f32f9d91f84434625b23e7dc86",
+        "bytes": 4554
+      },
+      "member": "objects/4ac77ccdadceda3fd269b9e984da165f447b18f32f9d91f84434625b23e7dc86"
+    },
+    {
+      "role": "Native new caller authority/combined_TU",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/purchased_air_admission.cpp",
+        "sha256": "be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e",
+        "bytes": 55475
+      },
+      "member": "objects/be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e"
+    },
+    {
+      "role": "Native new caller authority/caller_Sources",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/native_admission_main.cpp",
+        "sha256": "e3338362cd7b7e7ece105440e35d2db62035cadb7aec320e194ae8c14ffadef4",
+        "bytes": 1984
+      },
+      "member": "objects/e3338362cd7b7e7ece105440e35d2db62035cadb7aec320e194ae8c14ffadef4"
+    },
+    {
+      "role": "Native new caller authority/caller_Sources",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/purchased_air_admission.cpp",
+        "sha256": "be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e",
+        "bytes": 55475
+      },
+      "member": "objects/be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e"
+    },
+    {
+      "role": "Native new caller authority/common_header",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/native_gap_batches.hh",
+        "sha256": "89826583eb2f52a33ae9e49c41ed0159d9472574acc462dd15cd415e04bf3dd9",
+        "bytes": 185
+      },
+      "member": "objects/89826583eb2f52a33ae9e49c41ed0159d9472574acc462dd15cd415e04bf3dd9"
+    },
+    {
+      "role": "Native new caller authority/carry_proof",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/purchased_air_admission_fragment.cpp",
+        "sha256": "4ac77ccdadceda3fd269b9e984da165f447b18f32f9d91f84434625b23e7dc86",
+        "bytes": 4554
+      },
+      "member": "objects/4ac77ccdadceda3fd269b9e984da165f447b18f32f9d91f84434625b23e7dc86"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+        "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+        "bytes": 209881
+      },
+      "member": "objects/54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.cc.144-210.txt",
+        "sha256": "8e6a84112cc07d5fc0fb0a62d8308b907772f2bf0168e028dfc26cfd85670ac8",
+        "bytes": 3025
+      },
+      "member": "objects/8e6a84112cc07d5fc0fb0a62d8308b907772f2bf0168e028dfc26cfd85670ac8"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.cc.212-1053.txt",
+        "sha256": "2de343f6db05063f12852ab93cfb0210cdebdefbab28e6c5a629cdb4c2905198",
+        "bytes": 50879
+      },
+      "member": "objects/2de343f6db05063f12852ab93cfb0210cdebdefbab28e6c5a629cdb4c2905198"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.cc.1054-1324.txt",
+        "sha256": "eaf96ceb5aa473b5d4e912789fa86064f38c7ef47b2faedaa0f659ddcc2b567f",
+        "bytes": 16391
+      },
+      "member": "objects/eaf96ceb5aa473b5d4e912789fa86064f38c7ef47b2faedaa0f659ddcc2b567f"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+        "sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+        "bytes": 29562
+      },
+      "member": "objects/231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.hh.70-327.txt",
+        "sha256": "bbd77e1f061d22ef993e91dbf87f9d6d7ea55678cc6da884263db9727533f765",
+        "bytes": 20685
+      },
+      "member": "objects/bbd77e1f061d22ef993e91dbf87f9d6d7ea55678cc6da884263db9727533f765"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.hh.331-347.txt",
+        "sha256": "1f7808b25d0b093ea3cc1f7c9cecb17bd6b957c9a5c9c668fd724c91362a2c74",
+        "bytes": 839
+      },
+      "member": "objects/1f7808b25d0b093ea3cc1f7c9cecb17bd6b957c9a5c9c668fd724c91362a2c74"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/PurchasedAirManager.hh.389-433.txt",
+        "sha256": "994a9632b18821dcdd147666abc8cc3c901f847852062efd61a00eca1061da1d",
+        "bytes": 2058
+      },
+      "member": "objects/994a9632b18821dcdd147666abc8cc3c901f847852062efd61a00eca1061da1d"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+        "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+        "bytes": 81995
+      },
+      "member": "objects/87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/UtilityRoutines.cc.758-897.txt",
+        "sha256": "32a5bd6e63196eeaddb59bd7a4d4f4e3a05c80d2695c9f50252d8e7ce74eec8d",
+        "bytes": 5633
+      },
+      "member": "objects/32a5bd6e63196eeaddb59bd7a4d4f4e3a05c80d2695c9f50252d8e7ce74eec8d"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/UtilityRoutines.cc.1381-1430.txt",
+        "sha256": "bf8fc4b7fd62a9b3d12f768ad918f6490ca2e73423f1a7cb9ab8e73318707e71",
+        "bytes": 1851
+      },
+      "member": "objects/bf8fc4b7fd62a9b3d12f768ad918f6490ca2e73423f1a7cb9ab8e73318707e71"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+        "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494",
+        "bytes": 7439
+      },
+      "member": "objects/e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/EnergyPlus.hh.53-70.txt",
+        "sha256": "ffe281870b61586df43e7d4af3060f25715f248dafb533f18cc94b0801dfa2ce",
+        "bytes": 319
+      },
+      "member": "objects/ffe281870b61586df43e7d4af3060f25715f248dafb533f18cc94b0801dfa2ce"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+        "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+        "bytes": 18669
+      },
+      "member": "objects/966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/DataErrorTracking.hh.180-244.txt",
+        "sha256": "e0e98b4e3edb9164e398fd1e49d72dbb355f6dbd98b957ca09053b993d72d773",
+        "bytes": 3505
+      },
+      "member": "objects/e0e98b4e3edb9164e398fd1e49d72dbb355f6dbd98b957ca09053b993d72d773"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "bytes": 13547
+      },
+      "member": "objects/2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/DataGlobals.hh.144-176.txt",
+        "sha256": "583d607c167be908f48bb6435de61982c828c60d382b25a6ab1b9c0bf7187235",
+        "bytes": 3227
+      },
+      "member": "objects/583d607c167be908f48bb6435de61982c828c60d382b25a6ab1b9c0bf7187235"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DisplayRoutines.cc",
+        "sha256": "93484887c838695f37c7c50b53744de8eb708f93319dfe18832a76c6be924f21",
+        "bytes": 7847
+      },
+      "member": "objects/93484887c838695f37c7c50b53744de8eb708f93319dfe18832a76c6be924f21"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/DisplayRoutines.cc.63-111.txt",
+        "sha256": "74a2ec467d069f41fc8cce8c2d77294150d1f3b475bf33a108f77f5598e19abc",
+        "bytes": 1523
+      },
+      "member": "objects/74a2ec467d069f41fc8cce8c2d77294150d1f3b475bf33a108f77f5598e19abc"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSystemVariables.hh",
+        "sha256": "b027e65ffab2d18fd08a6df1b905b96bf1159f52651834699c520fca53727669",
+        "bytes": 10017
+      },
+      "member": "objects/b027e65ffab2d18fd08a6df1b905b96bf1159f52651834699c520fca53727669"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/DataSystemVariables.hh.87-110.txt",
+        "sha256": "6721c0293653d560b1cc5c553debe8cda70527dddd9497f07c98ec7180f6a00e",
+        "bytes": 1579
+      },
+      "member": "objects/6721c0293653d560b1cc5c553debe8cda70527dddd9497f07c98ec7180f6a00e"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+        "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+        "bytes": 26592
+      },
+      "member": "objects/b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94"
+    },
+    {
+      "role": "Native new caller authority/Native_authorities",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/Native/DataLoopNode.hh.401-477.txt",
+        "sha256": "66ed02d213e8ada20f20150dfd9fc76c7685b620f5d4d85724adcb03f3f3b7bd",
+        "bytes": 3813
+      },
+      "member": "objects/66ed02d213e8ada20f20150dfd9fc76c7685b620f5d4d85724adcb03f3f3b7bd"
+    },
+    {
+      "role": "Native new caller authority/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-purchased-air-EH7-Native-Outer-02.py",
+        "sha256": "82b9600020c2dc0581d6634617b349d6556e651d650bc19f709c5b13349de5ee",
+        "bytes": 16364
+      },
+      "member": "objects/82b9600020c2dc0581d6634617b349d6556e651d650bc19f709c5b13349de5ee"
+    },
+    {
+      "role": "Native recipe/helper/independent_Native_peer",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-EH7-Native-review-Audit-02/review.json",
+        "sha256": "b60037ef7099b9361e9cd50ccdd1e0515e6d86e31e8729271af587acded9f13b",
+        "bytes": 10521
+      },
+      "member": "objects/b60037ef7099b9361e9cd50ccdd1e0515e6d86e31e8729271af587acded9f13b"
+    },
+    {
+      "role": "Native recipe/helper/EH_scope",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/HVAC01-admission-scope-Audit-58-01/scope.json",
+        "sha256": "5730b067f88f0b14034b78667cec1bb2d48a508f6bbd9f85e60a90922f80ea6d",
+        "bytes": 17238
+      },
+      "member": "objects/5730b067f88f0b14034b78667cec1bb2d48a508f6bbd9f85e60a90922f80ea6d"
+    },
+    {
+      "role": "Native recipe/helper/caller_Sources",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/native_admission_main.cpp",
+        "sha256": "e3338362cd7b7e7ece105440e35d2db62035cadb7aec320e194ae8c14ffadef4",
+        "bytes": 1984
+      },
+      "member": "objects/e3338362cd7b7e7ece105440e35d2db62035cadb7aec320e194ae8c14ffadef4"
+    },
+    {
+      "role": "Native recipe/helper/caller_Sources",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/purchased_air_admission.cpp",
+        "sha256": "be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e",
+        "bytes": 55475
+      },
+      "member": "objects/be70ee214f4578bf9db3dc64c777cacad4fff941c3d3fdd241444d968200582e"
+    },
+    {
+      "role": "Native recipe/helper/common_header",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/native_gap_batches.hh",
+        "sha256": "89826583eb2f52a33ae9e49c41ed0159d9472574acc462dd15cd415e04bf3dd9",
+        "bytes": 185
+      },
+      "member": "objects/89826583eb2f52a33ae9e49c41ed0159d9472574acc462dd15cd415e04bf3dd9"
+    },
+    {
+      "role": "Native recipe/helper/named_inputs",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-draft-Outer-02/named-inputs.json",
+        "sha256": "f751480d20092c6054789ecbdee7b8524fcd337019d518b00d7c89865632a7a4",
+        "bytes": 12771
+      },
+      "member": "objects/f751480d20092c6054789ecbdee7b8524fcd337019d518b00d7c89865632a7a4"
+    },
+    {
+      "role": "Native recipe/helper/common_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased_air_EH7_native_common_Outer_01.py",
+        "sha256": "6098cfdb22c9f8e7f6db0864fca94d4321981757938a640834d692131193b1aa",
+        "bytes": 6748
+      },
+      "member": "objects/6098cfdb22c9f8e7f6db0864fca94d4321981757938a640834d692131193b1aa"
+    },
+    {
+      "role": "Native recipe/helper/build_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/build-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec",
+        "bytes": 7398
+      },
+      "member": "objects/a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec"
+    },
+    {
+      "role": "Native recipe/helper/run_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f",
+        "bytes": 15854
+      },
+      "member": "objects/6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f"
+    },
+    {
+      "role": "Native recipe/helper/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-purchased-air-EH7-Native-recipes-Outer-01.py",
+        "sha256": "42f6bcde77a6b2eff878531f2a069d7ecaf0ab303e62154f65b6e3a6aeed5294",
+        "bytes": 8145
+      },
+      "member": "objects/42f6bcde77a6b2eff878531f2a069d7ecaf0ab303e62154f65b6e3a6aeed5294"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/build-warmup-multiplier-Native-Root-02.py",
+        "sha256": "ccb651b7318ce9c99cdaca491f3f5da41d6d01662c14e6389ecabd1a2b975b12",
+        "bytes": 20545
+      },
+      "member": "objects/ccb651b7318ce9c99cdaca491f3f5da41d6d01662c14e6389ecabd1a2b975b12"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/build-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec",
+        "bytes": 7398
+      },
+      "member": "objects/a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-recipes-READY-Outer-01/build.forward.diff",
+        "sha256": "08b89ba0a7061454b2fa788e651befd61b20d46eaba90ce2767289b0a6c4f449",
+        "bytes": 28262
+      },
+      "member": "objects/08b89ba0a7061454b2fa788e651befd61b20d46eaba90ce2767289b0a6c4f449"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-recipes-READY-Outer-01/build.inverse.diff",
+        "sha256": "c0e98f7a4cefd878fe7b5f01806c6b1d587379dc818308c3d918879353620ba5",
+        "bytes": 28253
+      },
+      "member": "objects/c0e98f7a4cefd878fe7b5f01806c6b1d587379dc818308c3d918879353620ba5"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-warmup-multiplier-Native-Root-02.py",
+        "sha256": "206e4615dc0a61e8b608b2b2cb5e37d327918b95c61a9e85b924d1d19f0f5617",
+        "bytes": 34047
+      },
+      "member": "objects/206e4615dc0a61e8b608b2b2cb5e37d327918b95c61a9e85b924d1d19f0f5617"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f",
+        "bytes": 15854
+      },
+      "member": "objects/6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-recipes-READY-Outer-01/run.forward.diff",
+        "sha256": "67cced929ad363d3a1dc46d88d517d858033c79c692cc78c2137d06618ff8a26",
+        "bytes": 49784
+      },
+      "member": "objects/67cced929ad363d3a1dc46d88d517d858033c79c692cc78c2137d06618ff8a26"
+    },
+    {
+      "role": "Native recipe/helper/helper_literal_deltas",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-recipes-READY-Outer-01/run.inverse.diff",
+        "sha256": "4990c9e17f93ee92fcc3f37e9fff8c56f4751f94a71dc50a56ce4d16548b6f4a",
+        "bytes": 49769
+      },
+      "member": "objects/4990c9e17f93ee92fcc3f37e9fff8c56f4751f94a71dc50a56ce4d16548b6f4a"
+    },
+    {
+      "role": "Native recipe/helper/Python_source_syntax",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-purchased-air-EH7-Native-recipes-Outer-01.py",
+        "sha256": "42f6bcde77a6b2eff878531f2a069d7ecaf0ab303e62154f65b6e3a6aeed5294",
+        "bytes": 8145
+      },
+      "member": "objects/42f6bcde77a6b2eff878531f2a069d7ecaf0ab303e62154f65b6e3a6aeed5294"
+    },
+    {
+      "role": "Native recipe/helper/Python_source_syntax",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/build-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec",
+        "bytes": 7398
+      },
+      "member": "objects/a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec"
+    },
+    {
+      "role": "Native recipe/helper/Python_source_syntax",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f",
+        "bytes": 15854
+      },
+      "member": "objects/6c503c81623df871edd450d3145212fb260b6bceffbb3610e9a007a6d079225f"
+    },
+    {
+      "role": "Native recipe/helper/Python_source_syntax",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased_air_EH7_native_common_Outer_01.py",
+        "sha256": "6098cfdb22c9f8e7f6db0864fca94d4321981757938a640834d692131193b1aa",
+        "bytes": 6748
+      },
+      "member": "objects/6098cfdb22c9f8e7f6db0864fca94d4321981757938a640834d692131193b1aa"
+    },
+    {
+      "role": "Native actual build log/custody/compiles",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-1-receipt.json",
+        "sha256": "9a24be47a1f4a6db3296f40e9aa6a3e5b5b4de74ac295e7641c187c260765e27",
+        "bytes": 7199
+      },
+      "member": "objects/9a24be47a1f4a6db3296f40e9aa6a3e5b5b4de74ac295e7641c187c260765e27"
+    },
+    {
+      "role": "Native actual build log/custody/compiles",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-2-receipt.json",
+        "sha256": "74224ebe228e097406908cb7871c2d9a23c524402fbe9bd6ab40cb32ac528083",
+        "bytes": 7202
+      },
+      "member": "objects/74224ebe228e097406908cb7871c2d9a23c524402fbe9bd6ab40cb32ac528083"
+    },
+    {
+      "role": "Native actual build log/custody/link",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/link-receipt.json",
+        "sha256": "e93af0086befb0fc6a344d979fe20c4975f25a7a166f3223168d145df819cba2",
+        "bytes": 2675
+      },
+      "member": "objects/e93af0086befb0fc6a344d979fe20c4975f25a7a166f3223168d145df819cba2"
+    },
+    {
+      "role": "Native actual build log/custody/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/Native-before.json",
+        "sha256": "7b678c1dcdfe443b68deac52ef3b293a847a37ac6474d0d431ec0daf66d3d014",
+        "bytes": 36362
+      },
+      "member": "objects/7b678c1dcdfe443b68deac52ef3b293a847a37ac6474d0d431ec0daf66d3d014"
+    },
+    {
+      "role": "Native actual build log/custody/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/Native-after.json",
+        "sha256": "8422bb1e06cb284471d9606c2ce6805bf23f088cc8344897aff61ca08f91855a",
+        "bytes": 36213
+      },
+      "member": "objects/8422bb1e06cb284471d9606c2ce6805bf23f088cc8344897aff61ca08f91855a"
+    },
+    {
+      "role": "Native actual build log/custody/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/build-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec",
+        "bytes": 7398
+      },
+      "member": "objects/a370e4800485d6ae6f6683b0c313c867cf089324bc6c0770e2d39ab22be74cec"
+    },
+    {
+      "role": "Native actual compiler/link logs/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-1.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native actual compiler/link logs/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native actual compiler/link logs/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-2.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native actual compiler/link logs/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/compile-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native actual compiler/link logs/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/link.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native actual compiler/link logs/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-build-Root-01/link.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "fixture proof/source_primary_inverse_proof",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/primary-input-inverses.json",
+        "sha256": "c2505c1d3ea174d18dd21283c7dcff28eb73ddfcc9c81aef71b131af2e8c55a3",
+        "bytes": 2813
+      },
+      "member": "objects/c2505c1d3ea174d18dd21283c7dcff28eb73ddfcc9c81aef71b131af2e8c55a3"
+    },
+    {
+      "role": "fixture proof/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/wrap-purchased-air-EH7-Native-Root-01.py",
+        "sha256": "e8e90bd657b16d8af121f8c0dd29f1e5fd4f6181d333bf1f1222f062389ec970",
+        "bytes": 13438
+      },
+      "member": "objects/e8e90bd657b16d8af121f8c0dd29f1e5fd4f6181d333bf1f1222f062389ec970"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/receipt.json",
+        "sha256": "9194ee49c32ebbc43725739ba3c88aeeac5423600c42bda1e48a65d6b51d7ff0",
+        "bytes": 5717
+      },
+      "member": "objects/9194ee49c32ebbc43725739ba3c88aeeac5423600c42bda1e48a65d6b51d7ff0"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/stdout.log",
+        "sha256": "7df7facb351494b93f551a9586e415f451ec9a3363fb0b25175347861b2642fd",
+        "bytes": 113
+      },
+      "member": "objects/7df7facb351494b93f551a9586e415f451ec9a3363fb0b25175347861b2642fd"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/actual-child-modules.json",
+        "sha256": "ba5af6bb4730b95d4cb46618b3148872faaed66baa61f598295e9191e22a5492",
+        "bytes": 4415
+      },
+      "member": "objects/ba5af6bb4730b95d4cb46618b3148872faaed66baa61f598295e9191e22a5492"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/missing_availability_schedule/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_availability_schedule/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/receipt.json",
+        "sha256": "f1ebbb96ad07659a79998749116e9e61e84637ee23f39a82830fa37eda2b6ac7",
+        "bytes": 5644
+      },
+      "member": "objects/f1ebbb96ad07659a79998749116e9e61e84637ee23f39a82830fa37eda2b6ac7"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/stdout.log",
+        "sha256": "eaf80743204068cb4c1a73c8322e92fa68e2ddc81027c48feab8692409f1ab0c",
+        "bytes": 73
+      },
+      "member": "objects/eaf80743204068cb4c1a73c8322e92fa68e2ddc81027c48feab8692409f1ab0c"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/actual-child-modules.json",
+        "sha256": "02dbc61672b7bd2c72c0d35c6a2824b95fe226a726619a5c8d566e9fa6a9e3f2",
+        "bytes": 4299
+      },
+      "member": "objects/02dbc61672b7bd2c72c0d35c6a2824b95fe226a726619a5c8d566e9fa6a9e3f2"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/disconnected_supply_node/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_supply_node/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/receipt.json",
+        "sha256": "aabd4cd7e063a39eec2bd660497d5044cb5f64957e8889b843f37978c7278c3e",
+        "bytes": 5582
+      },
+      "member": "objects/aabd4cd7e063a39eec2bd660497d5044cb5f64957e8889b843f37978c7278c3e"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "member": "objects/b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/actual-child-modules.json",
+        "sha256": "8077663f9eafd6d22bad8e9cae34533e7a7319b6d00aae957860fc35a58f23f8",
+        "bytes": 4299
+      },
+      "member": "objects/8077663f9eafd6d22bad8e9cae34533e7a7319b6d00aae957860fc35a58f23f8"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/disconnected_exhaust_node/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-disconnected_exhaust_node/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/missing_component_name/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/receipt.json",
+        "sha256": "f4ef40e2a73e18626a1196558ec5d1e88fe268319519ec13d7d01b223521e2d7",
+        "bytes": 5566
+      },
+      "member": "objects/f4ef40e2a73e18626a1196558ec5d1e88fe268319519ec13d7d01b223521e2d7"
+    },
+    {
+      "role": "Native worker/missing_component_name/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/stdout.log",
+        "sha256": "6a72c5ee232becd7e52f01962c905ed529b2ecc4b25422cd8882e3bc76b0ddd1",
+        "bytes": 88
+      },
+      "member": "objects/6a72c5ee232becd7e52f01962c905ed529b2ecc4b25422cd8882e3bc76b0ddd1"
+    },
+    {
+      "role": "Native worker/missing_component_name/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/missing_component_name/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/actual-child-modules.json",
+        "sha256": "8a631396127f448f276a159d292b3c19b01bc6ccffd41ac04b86b9425a2cb105",
+        "bytes": 4299
+      },
+      "member": "objects/8a631396127f448f276a159d292b3c19b01bc6ccffd41ac04b86b9425a2cb105"
+    },
+    {
+      "role": "Native worker/missing_component_name/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/missing_component_name/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-missing_component_name/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/receipt.json",
+        "sha256": "cd7e8e4c4d27d3207818e9f62c7fff45efa98923b1b13f2753d709a4997aaa3b",
+        "bytes": 5626
+      },
+      "member": "objects/cd7e8e4c4d27d3207818e9f62c7fff45efa98923b1b13f2753d709a4997aaa3b"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/stdout.log",
+        "sha256": "27ec1c1634f711eb7a6dbd864258f641933fd6a17bdd03306ecace4172395394",
+        "bytes": 137
+      },
+      "member": "objects/27ec1c1634f711eb7a6dbd864258f641933fd6a17bdd03306ecace4172395394"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/actual-child-modules.json",
+        "sha256": "ae5f70e13e5ad544795f1546d62f8ca251f9d5691feaef23b61b52956d557e02",
+        "bytes": 4299
+      },
+      "member": "objects/ae5f70e13e5ad544795f1546d62f8ca251f9d5691feaef23b61b52956d557e02"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/invalid_high_comp_index/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_high_comp_index/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/receipt.json",
+        "sha256": "14df5ed98becde838ef77455d67ea116ed30bdcbd01a3f099e6fcbdd255d8955",
+        "bytes": 5667
+      },
+      "member": "objects/14df5ed98becde838ef77455d67ea116ed30bdcbd01a3f099e6fcbdd255d8955"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/stdout.log",
+        "sha256": "e6cc1222f74ec5610f0cc5c872bbbba48ff0915b9ba48b8d08a044c64cfb11b9",
+        "bytes": 138
+      },
+      "member": "objects/e6cc1222f74ec5610f0cc5c872bbbba48ff0915b9ba48b8d08a044c64cfb11b9"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/actual-child-modules.json",
+        "sha256": "4582001ae5a36d9d192901f3fa1790f2fe1ab7515a117f5e307d0daf79e8c8a5",
+        "bytes": 4298
+      },
+      "member": "objects/4582001ae5a36d9d192901f3fa1790f2fe1ab7515a117f5e307d0daf79e8c8a5"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/invalid_negative_comp_index/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-invalid_negative_comp_index/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/actual_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/receipt.json",
+        "sha256": "b951e90d73341f2c5e60b6ffc7b338075f7749308767038b9ad8a62a0979cd79",
+        "bytes": 5743
+      },
+      "member": "objects/b951e90d73341f2c5e60b6ffc7b338075f7749308767038b9ad8a62a0979cd79"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/raw_stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/stdout.log",
+        "sha256": "d4ae7cec77d20ed5f1adaed12e31b66e2c3bea9fa81ef234f46adb32e60ea3fb",
+        "bytes": 165
+      },
+      "member": "objects/d4ae7cec77d20ed5f1adaed12e31b66e2c3bea9fa81ef234f46adb32e60ea3fb"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/raw_stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/actual_child_modules",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/actual-child-modules.json",
+        "sha256": "7f7a34291daeb7054fbfd0b857b250fc0366bc7e560483711c1d02d12575ea28",
+        "bytes": 4299
+      },
+      "member": "objects/7f7a34291daeb7054fbfd0b857b250fc0366bc7e560483711c1d02d12575ea28"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/Native_before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/Native-before.json",
+        "sha256": "2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f",
+        "bytes": 37120
+      },
+      "member": "objects/2fa223ea69c3e19054e78fb3e4aa4e5a82ab75efbf8e26f112a4db821a477c2f"
+    },
+    {
+      "role": "Native worker/mismatched_cached_component_name/Native_after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/purchased-air-EH7-Native-run-Root-01-mismatched_cached_component_name/Native-after.json",
+        "sha256": "b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9",
+        "bytes": 36996
+      },
+      "member": "objects/b62f753d2d552646588cedb82fa0db9689d5a2c6960f12a3f35746a0283edff9"
+    },
+    {
+      "role": "actual Source/fmt/receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-fmt-command-02/receipt.json",
+        "sha256": "bbff2b1fd2283f133e55fa6c0bea7ee6fb57d15915da6aef4ff6a27566cf33de",
+        "bytes": 3727
+      },
+      "member": "objects/bbff2b1fd2283f133e55fa6c0bea7ee6fb57d15915da6aef4ff6a27566cf33de"
+    },
+    {
+      "role": "actual Source/fmt/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-fmt-command-02/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "actual Source/fmt/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-fmt-command-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "actual Source/fmt/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/12/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "sha256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "bytes": 1869577
+      },
+      "member": "objects/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b"
+    },
+    {
+      "role": "actual Source/clippy/receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-clippy-command-02/receipt.json",
+        "sha256": "80e1bd09845a00382812a8ef6e5ba709a461aab568617f90dd5903331f73fae8",
+        "bytes": 3820
+      },
+      "member": "objects/80e1bd09845a00382812a8ef6e5ba709a461aab568617f90dd5903331f73fae8"
+    },
+    {
+      "role": "actual Source/clippy/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-clippy-command-02/stdout.log",
+        "sha256": "7aa419fd4845ee9143cd2a90f50997f3443cdfb0ec29e1acc0b334c3ac9c3ff3",
+        "bytes": 96248
+      },
+      "member": "objects/7aa419fd4845ee9143cd2a90f50997f3443cdfb0ec29e1acc0b334c3ac9c3ff3"
+    },
+    {
+      "role": "actual Source/clippy/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-clippy-command-02/stderr.log",
+        "sha256": "17cec41c15defcf1b900cf317c541aa7eda5668ad32aaa9125327d1865d7e1cd",
+        "bytes": 383
+      },
+      "member": "objects/17cec41c15defcf1b900cf317c541aa7eda5668ad32aaa9125327d1865d7e1cd"
+    },
+    {
+      "role": "actual Source/clippy/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/12/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "sha256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "bytes": 1869577
+      },
+      "member": "objects/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b"
+    },
+    {
+      "role": "actual Source/workspace/receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-workspace-command/receipt.json",
+        "sha256": "8516d14893e2280ae352135185e0696e5d2f447e640f8bf11f258a1436a3e564",
+        "bytes": 3754
+      },
+      "member": "objects/8516d14893e2280ae352135185e0696e5d2f447e640f8bf11f258a1436a3e564"
+    },
+    {
+      "role": "actual Source/workspace/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-workspace-command/stdout.log",
+        "sha256": "0481d7368856447dceccda49408df8a5885169f5ae8ae1e2969d1efeab92696f",
+        "bytes": 761260
+      },
+      "member": "objects/0481d7368856447dceccda49408df8a5885169f5ae8ae1e2969d1efeab92696f"
+    },
+    {
+      "role": "actual Source/workspace/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-workspace-command/stderr.log",
+        "sha256": "8032df1ad089601cfa98ccb70b885cdea6f7745e9c728472d3e7646b357f2263",
+        "bytes": 2833
+      },
+      "member": "objects/8032df1ad089601cfa98ccb70b885cdea6f7745e9c728472d3e7646b357f2263"
+    },
+    {
+      "role": "actual Source/workspace/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/12/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "sha256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "bytes": 1869577
+      },
+      "member": "objects/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b"
+    },
+    {
+      "role": "actual Source/EH7/receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command-02/receipt.json",
+        "sha256": "32f65d62175b4ed18f9c3c0b275504a365f587a4de21043112db106a0ccc06f4",
+        "bytes": 4072
+      },
+      "member": "objects/32f65d62175b4ed18f9c3c0b275504a365f587a4de21043112db106a0ccc06f4"
+    },
+    {
+      "role": "actual Source/EH7/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command-02/stdout.log",
+        "sha256": "189443887df581ddada6b00c4ddb22a4cbf7abd5644446b75218ee9a0bd3e9a8",
+        "bytes": 424
+      },
+      "member": "objects/189443887df581ddada6b00c4ddb22a4cbf7abd5644446b75218ee9a0bd3e9a8"
+    },
+    {
+      "role": "actual Source/EH7/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command-02/stderr.log",
+        "sha256": "42518dac0e35ab271588869fde2243bea4aa8565d53503b24df63a7e39bea05b",
+        "bytes": 1434780
+      },
+      "member": "objects/42518dac0e35ab271588869fde2243bea4aa8565d53503b24df63a7e39bea05b"
+    },
+    {
+      "role": "actual Source/EH7/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/12/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "sha256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "bytes": 1869577
+      },
+      "member": "objects/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b"
+    },
+    {
+      "role": "actual Source/P1/receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-P1-command/receipt.json",
+        "sha256": "6797614c09044c16aa6f212b21fc5fffc15ddcc56aab217f781f37f6972c4f26",
+        "bytes": 4042
+      },
+      "member": "objects/6797614c09044c16aa6f212b21fc5fffc15ddcc56aab217f781f37f6972c4f26"
+    },
+    {
+      "role": "actual Source/P1/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-P1-command/stdout.log",
+        "sha256": "466de06236652ca1ece665ed4afe6ee85beba441d7b03e61500febfc7b6a6945",
+        "bytes": 367
+      },
+      "member": "objects/466de06236652ca1ece665ed4afe6ee85beba441d7b03e61500febfc7b6a6945"
+    },
+    {
+      "role": "actual Source/P1/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-P1-command/stderr.log",
+        "sha256": "a1989376b973aec7cbcd186c89657ec925f70811a0474c0979523e536164ad84",
+        "bytes": 1434673
+      },
+      "member": "objects/a1989376b973aec7cbcd186c89657ec925f70811a0474c0979523e536164ad84"
+    },
+    {
+      "role": "actual Source/P1/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/12/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "sha256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+        "bytes": 1869577
+      },
+      "member": "objects/12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b"
+    },
+    {
+      "role": "original applied five-Source application before cfg binding",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-application.json",
+        "sha256": "0591654c3b197155978bd51ac11e88afd42c1372a4afb5637341165cf03c7d8a",
+        "bytes": 1355
+      },
+      "member": "objects/0591654c3b197155978bd51ac11e88afd42c1372a4afb5637341165cf03c7d8a"
+    },
+    {
+      "role": "original58 compiler plan before cfg binding",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/complete-proposed-compiler-Source-plan.json",
+        "sha256": "fe33d8bad9a4dea9601bb18038f006341e75f39e5bcee6652d6a7dd4d49baf44",
+        "bytes": 2622970
+      },
+      "member": "objects/fe33d8bad9a4dea9601bb18038f006341e75f39e5bcee6652d6a7dd4d49baf44"
+    },
+    {
+      "role": "exact cfg field binding correction/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/before.rs",
+        "sha256": "d57b72c910d94b87b89774da1fed4524fd054a93de2b1a4172469161266ba986",
+        "bytes": 18469
+      },
+      "member": "objects/d57b72c910d94b87b89774da1fed4524fd054a93de2b1a4172469161266ba986"
+    },
+    {
+      "role": "exact cfg field binding correction/after",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/after.rs",
+        "sha256": "51f7db8c88b03ba1b567fba5b762013785fc55c2c18ded262ccc89be407f5ef7",
+        "bytes": 18476
+      },
+      "member": "objects/51f7db8c88b03ba1b567fba5b762013785fc55c2c18ded262ccc89be407f5ef7"
+    },
+    {
+      "role": "exact cfg field binding correction/forward",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/forward.diff",
+        "sha256": "49a9ac14464e029a9e2ac26cf1a93d40f604ae687c6b52e6809f3bceef842a20",
+        "bytes": 407
+      },
+      "member": "objects/49a9ac14464e029a9e2ac26cf1a93d40f604ae687c6b52e6809f3bceef842a20"
+    },
+    {
+      "role": "exact cfg field binding correction/inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/inverse.diff",
+        "sha256": "716dcf13360c9e1cbe3035ddd6ecb649dd0df0fb7231402c07b7102c26ca9f24",
+        "bytes": 407
+      },
+      "member": "objects/716dcf13360c9e1cbe3035ddd6ecb649dd0df0fb7231402c07b7102c26ca9f24"
+    },
+    {
+      "role": "preserved initial EH7 compile failure; zero scientific calls",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command/receipt.json",
+        "sha256": "5d6892a6677894629c85cfeaf00c20ca2a229b479b99392dc8bfaefec16e7ea2",
+        "bytes": 4067
+      },
+      "member": "objects/5d6892a6677894629c85cfeaf00c20ca2a229b479b99392dc8bfaefec16e7ea2"
+    },
+    {
+      "role": "preserved EH7 compile failure/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "preserved EH7 compile failure/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-EH7-command/stderr.log",
+        "sha256": "38836739d1d807230c99975d8f8a3cd622e5f7a3ea42e070481204de9cc9e157",
+        "bytes": 830888
+      },
+      "member": "objects/38836739d1d807230c99975d8f8a3cd622e5f7a3ea42e070481204de9cc9e157"
+    },
+    {
+      "role": "preserved EH7 compile failure/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/0b/0b6a90f08264545d11037c90c995608529b04dc0914c7533d487a6db99e13596",
+        "sha256": "0b6a90f08264545d11037c90c995608529b04dc0914c7533d487a6db99e13596",
+        "bytes": 1869577
+      },
+      "member": "objects/0b6a90f08264545d11037c90c995608529b04dc0914c7533d487a6db99e13596"
+    },
+    {
+      "role": "Root actual acceptance checker Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/review-purchased-air-EH7-actual-Root-58.py",
+        "sha256": "6b7572d5383b051ce649efd4e19ecfdd7e136197b3fa11ad1de4fdc97a51d1ab",
+        "bytes": 8709
+      },
+      "member": "objects/6b7572d5383b051ce649efd4e19ecfdd7e136197b3fa11ad1de4fdc97a51d1ab"
+    },
+    {
+      "role": "Root original guarded application Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/apply-purchased-air-EH7-Root-58.py",
+        "sha256": "fcef95ab82851b6b782a279c4851f0cb97bad3db1a98a0c5aa69e06f0f0ffd78",
+        "bytes": 3427
+      },
+      "member": "objects/fcef95ab82851b6b782a279c4851f0cb97bad3db1a98a0c5aa69e06f0f0ffd78"
+    },
+    {
+      "role": "Root explicit small supplementary evidence",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root58-unit-authorities-before-02.json",
+        "sha256": "ef98368527d339ba56f814dc2b9f6d9f12e86ebcf9dfa418d1f3037415a92a00",
+        "bytes": 985
+      },
+      "member": "objects/ef98368527d339ba56f814dc2b9f6d9f12e86ebcf9dfa418d1f3037415a92a00"
+    },
+    {
+      "role": "this finite publisher Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-purchased-air-EH7-publication-Peer-58-03.py",
+        "sha256": "cfd722462ea989a86c86ddfa041dbdeffacd3d100310780fe4db7036b534a885",
+        "bytes": 21673
+      },
+      "member": "objects/cfd722462ea989a86c86ddfa041dbdeffacd3d100310780fe4db7036b534a885"
+    }
+  ],
+  "unique_objects": 146,
+  "all_CRC_SHA_bytes_verified": true
+}

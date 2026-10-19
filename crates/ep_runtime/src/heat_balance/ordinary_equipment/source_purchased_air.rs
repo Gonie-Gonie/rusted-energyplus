@@ -25,6 +25,27 @@ pub(super) use calculation::SourcePurchasedAirCalcOwners;
 pub(super) use initialization::SourcePurchasedAirInitOwners;
 use owners::*;
 
+// UtilityRoutines1564-1568: the live header/value are getter inputs, not output fixtures.
+fn purchased_air_item_not_found(
+    backend: &mut SourceErrorBackend<'_>,
+    object_type: &str,
+    object_name: &str,
+    field_name: &str,
+    field_value: &str,
+) -> Result<(), Error> {
+    backend.show_severe_error(&format!("GetPurchasedAir: {object_type} = {object_name}"))?;
+    backend.show_continue_error(&format!("{field_name} = {field_value}, item not found."))?;
+    Ok(())
+}
+
+// Preserve all real fatal backend effects and its distinct typed termination.
+fn purchased_air_fatal(backend: &mut SourceErrorBackend<'_>, message: &str) -> Error {
+    match backend.show_fatal_error(message) {
+        Ok(never) => match never {},
+        Err(stop) => Error::Fatal(stop),
+    }
+}
+
 fn at(number: i32) -> Result<usize, Error> {
     number
         .checked_sub(1)
@@ -169,8 +190,9 @@ impl OrdinaryEquipment {
                     Error::Unavailable("actual SimPurchasedAir unit index integer domain")
                 })?,
                 None => {
-                    return Err(Error::Unavailable(
-                        "actual SimPurchasedAir unit-not-found fatal177",
+                    return Err(purchased_air_fatal(
+                        calculation.backend,
+                        &format!("SimPurchasedAir: Unit not found={name}"),
                     ));
                 }
             };
@@ -179,8 +201,12 @@ impl OrdinaryEquipment {
         } else {
             unit_number = component_index;
             if unit_number > self.purchased_air.number_purchased_air || unit_number < 1 {
-                return Err(Error::Unavailable(
-                    "actual SimPurchasedAir invalid CompIndex fatal184",
+                return Err(purchased_air_fatal(
+                    calculation.backend,
+                    &format!(
+                        "SimPurchasedAir:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                        unit_number, self.purchased_air.number_purchased_air, name
+                    ),
                 ));
             }
             let check = *self
@@ -193,8 +219,14 @@ impl OrdinaryEquipment {
                 ))?;
             if check {
                 if name != self.purchased_unit(unit_number)?.name {
-                    return Err(Error::Unavailable(
-                        "actual SimPurchasedAir cached unit-name fatal191",
+                    return Err(purchased_air_fatal(
+                        calculation.backend,
+                        &format!(
+                            "SimPurchasedAir: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                            unit_number,
+                            name,
+                            self.purchased_unit(unit_number)?.name
+                        ),
                     ));
                 }
                 *self
@@ -221,6 +253,7 @@ impl OrdinaryEquipment {
                 schedules,
                 initialization,
                 &mut report,
+                calculation.backend,
             )?;
         }
         self.calculate_source_purchased_air(
@@ -339,9 +372,14 @@ impl OrdinaryEquipment {
                 let value = getter::alpha(output.input, object, "availability_schedule_name")?;
                 self.purchased_unit_mut(number)?.avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.avail_sched.is_none() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir availability schedule severe292",
-                    ));
+                    purchased_air_item_not_found(
+                        backend,
+                        &shortcut.current_module_object,
+                        object,
+                        "Availability Schedule Name",
+                        &value,
+                    )?;
+                    errors_found = true;
                 }
                 let supply = getter::alpha(output.input, object, "zone_supply_air_node_name")?;
                 let node = self
@@ -487,17 +525,27 @@ impl OrdinaryEquipment {
                     getter::alpha(output.input, object, "heating_availability_schedule_name")?;
                 self.purchased_unit_mut(number)?.heat_avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.heat_avail_sched.is_none() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir heating schedule severe380",
-                    ));
+                    purchased_air_item_not_found(
+                        backend,
+                        &shortcut.current_module_object,
+                        object,
+                        "Heating Availability Schedule Name",
+                        &value,
+                    )?;
+                    errors_found = true;
                 }
                 let value =
                     getter::alpha(output.input, object, "cooling_availability_schedule_name")?;
                 self.purchased_unit_mut(number)?.cool_avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.cool_avail_sched.is_none() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir cooling schedule severe389",
-                    ));
+                    purchased_air_item_not_found(
+                        backend,
+                        &shortcut.current_module_object,
+                        object,
+                        "Cooling Availability Schedule Name",
+                        &value,
+                    )?;
+                    errors_found = true;
                 }
                 let value = getter::alpha(output.input, object, "dehumidification_control_type")?;
                 self.purchased_unit_mut(number)?.dehumid_ctrl_type = humidity(&value);
@@ -575,9 +623,14 @@ impl OrdinaryEquipment {
                 )?;
                 self.purchased_unit_mut(number)?.heat_fuel_eff_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.heat_fuel_eff_sched.is_none() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir heating fuel schedule severe503",
-                    ));
+                    purchased_air_item_not_found(
+                        backend,
+                        &shortcut.current_module_object,
+                        object,
+                        "Heating Fuel Efficiency Schedule Name",
+                        &value,
+                    )?;
+                    errors_found = true;
                 }
                 let value = getter::alpha(output.input, object, "heating_fuel_type")?;
                 self.purchased_unit_mut(number)?.heating_fuel_type = fuel(&value);
@@ -588,9 +641,14 @@ impl OrdinaryEquipment {
                 )?;
                 self.purchased_unit_mut(number)?.cool_fuel_eff_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.cool_fuel_eff_sched.is_none() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir cooling fuel schedule severe515",
-                    ));
+                    purchased_air_item_not_found(
+                        backend,
+                        &shortcut.current_module_object,
+                        object,
+                        "Cooling Fuel Efficiency Schedule Name",
+                        &value,
+                    )?;
+                    errors_found = true;
                 }
                 let value = getter::alpha(output.input, object, "cooling_fuel_type")?;
                 self.purchased_unit_mut(number)?.cooling_fuel_type = fuel(&value);
@@ -608,8 +666,9 @@ impl OrdinaryEquipment {
             }
         }
         if errors_found {
-            return Err(Error::Unavailable(
-                "actual GetPurchasedAir ErrorsFound fatal1049",
+            return Err(purchased_air_fatal(
+                backend,
+                "GetPurchasedAir: Errors found in input. Preceding conditions cause termination.",
             ));
         }
         Ok(())

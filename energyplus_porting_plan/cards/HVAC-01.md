@@ -67,3 +67,11 @@ HVAC-02와 ZON-03의 존ID 일치
 
 [실제 명령·고정 원본 범위·입력 해시·독립 검토·실패 기록](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)에 모았습니다. 표면 검증 55개 기록은 IdealLoads 전용 시험 파일 한 개만 바뀐 것을 확인해 재사용했습니다. 이 단위 비교로 카드의 네 gate를 일괄 완료 처리하지 않습니다.
 
+
+## 실제 입력·호출 오류 비교 58
+
+[58번 증거](../evidence/SRC-06-canonical-purchased-air-admission-58/summary.json)는 원본 `PurchasedAirManager.cc`의 Sim 177/184/191, getter의 누락 스케줄 누적 후 최종 Fatal, Init 1127–1164의 공급·배기 노드 검사를 실제 동일 입력으로 비교한다. 원본 7개 독립 프로세스와 Rust의 실제 getter 소유자 7개에서 전체 Sim을 각 한 번 호출했다. 스케줄 누락·공급 노드 오류·이름 누락·상한/음수 인덱스·캐시 이름 불일치는 실제 Fatal 6개이며, 배기 노드 오류 1개는 Severe를 남긴 후 반환 노드로 전환하여 정상 반환한다.
+
+35개 전체 상태의 7,096개 binary64 관측값, 등록 변수·owner 관계, 진단·종료 메시지와 콘솔 전체가 일치했다. 원본 문서 전체의 7,180개에는 입력값 84개가 추가되므로 수치 분모를 합치지 않는다. Node 주소 대응은 실제 양쪽 크기가 하나 늘어나는 두 경우에서만 새 저장소 수명으로 전환하며, 나머지 모든 owner 및 같은 크기의 주소 관계는 유지한다. 기존 정상 전체 호출 60회·75,524개 관측값도 같은 Source에서 통과했다.
+
+변경 파일은 `ordinary_equipment/source_purchased_air.rs`, 그 하위 `initialization.rs`, `native_gap_cohort.rs`, 새 비교용 `native_gap_cohort/admissions.rs`와 `gap_batch_cohort.rs` 다섯 개다. 첫 cfg 컴파일의 잘못된 프로젝트 필드 경로와 실제 종료 101은 보존했으며, 실제 `ProjectSystemVariables` 소유자로 읽는 한 줄을 수정한 후 재검증했다. 현재 fmt·strict default-feature workspace Clippy·workspace 4,975개(기존 제외 2개)는 모두 통과했다. 다른 누락 스케줄 필드명 네 개는 원본의 같은 제어 흐름·문자열을 정적으로 검토한 범위이며 추가 실행으로 세지 않는다. 단위 비교와 남은 최종 생산·연결 gate를 구분한다.

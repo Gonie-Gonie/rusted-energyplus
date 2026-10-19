@@ -1,0 +1,184 @@
+{
+  "schema": "src06-canonical-purchased-air-admission-checkpoint.v1",
+  "status": "ACTUAL_SOURCE_NATIVE_SELECTED_UNIT_AND_QUALITY_PASS_FINAL15_PENDING",
+  "public_directory": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58",
+  "actual_review": {
+    "path": ".runtime/porting/SRC-06/Root58-actual-review/review.json",
+    "sha256": "fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724",
+    "bytes": 11974
+  },
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root58-application-02.json",
+    "sha256": "60079b8f29997c46f8486c6cb15917bec59bfe41bce6faab73947afd3bf4de29",
+    "bytes": 1781
+  },
+  "original_application": {
+    "path": ".runtime/porting/SRC-06/Root58-application.json",
+    "sha256": "0591654c3b197155978bd51ac11e88afd42c1372a4afb5637341165cf03c7d8a",
+    "bytes": 1355
+  },
+  "initial_scaffold_parent_proposals": {
+    "path": ".runtime/porting/SRC-06/source-purchased-air-admission-scaffold-Audit-58-04/draft.json",
+    "sha256": "0789133c32814f948f5359bd9ebd29f6fa09d5c2a0c8294871f5a9f6a5480528",
+    "bytes": 18294
+  },
+  "final_cfg_binding_correction": {
+    "path": ".runtime/porting/SRC-06/Root58-application-02.json",
+    "sha256": "60079b8f29997c46f8486c6cb15917bec59bfe41bce6faab73947afd3bf4de29",
+    "bytes": 1781
+  },
+  "production_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-purchased-air-EH7-Source-review-Outer-03/review.json",
+    "sha256": "5c44cd6d8b310334bcc4e1b6e26b1be83f2fc2931eb5804f97743c426a2d227f",
+    "bytes": 17688
+  },
+  "scaffold_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-purchased-air-admission-scaffold-review-Outer-04/review.json",
+    "sha256": "117b2f76fffb44e4ff4fbd7233b3a29f936608bd415e98a0533bda087fa57e66",
+    "bytes": 19252
+  },
+  "complete_compiler_Source_plan": {
+    "path": ".runtime/porting/SRC-06/Root58-cfg-field-binding-02/complete-final-compiler-Source-plan.json",
+    "sha256": "95a0e5a2b1d5d2ba186ccaf11a95ab132d666a78d57164e5c9f9b5c23bc15527",
+    "bytes": 2673243
+  },
+  "actual_one_Source_snapshot_SHA256": "12826205296f5053869bd5134a177e389e886c40466df47ab1d90751a38bcf0b",
+  "actual_commands": {
+    "fmt": {
+      "path": ".runtime/porting/SRC-06/Root58-fmt-command-02/receipt.json",
+      "sha256": "bbff2b1fd2283f133e55fa6c0bea7ee6fb57d15915da6aef4ff6a27566cf33de",
+      "bytes": 3727
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-06/Root58-clippy-command-02/receipt.json",
+      "sha256": "80e1bd09845a00382812a8ef6e5ba709a461aab568617f90dd5903331f73fae8",
+      "bytes": 3820
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-06/Root58-workspace-command/receipt.json",
+      "sha256": "8516d14893e2280ae352135185e0696e5d2f447e640f8bf11f258a1436a3e564",
+      "bytes": 3754
+    },
+    "EH7": {
+      "path": ".runtime/porting/SRC-06/Root58-EH7-command-02/receipt.json",
+      "sha256": "32f65d62175b4ed18f9c3c0b275504a365f587a4de21043112db106a0ccc06f4",
+      "bytes": 4072
+    },
+    "P1": {
+      "path": ".runtime/porting/SRC-06/Root58-P1-command/receipt.json",
+      "sha256": "6797614c09044c16aa6f212b21fc5fffc15ddcc56aab217f781f37f6972c4f26",
+      "bytes": 4042
+    }
+  },
+  "Source_EH7_full_call_records": 7,
+  "Source_EH7_paired_state_raw_fields": 7096,
+  "Native_EH7_whole_observed_raw_fields": 7180,
+  "Native_EH7_explicit_primary_input_raw_fields": 84,
+  "EH7_denominator_qualification": "35 paired states contain7096 compared raw fields; the Native whole-worker7180 count also includes84 explicit primary fields (12 per worker). These denominators are distinct.",
+  "Source_positive_P1_regression_records": 60,
+  "Source_positive_P1_paired_raw_state_fields": 75524,
+  "Native_workers": 7,
+  "Native_actual_fatal_outcomes": 6,
+  "Native_actual_returns": 1,
+  "single_new_whole_fixture": {
+    "path": ".runtime/porting/SRC-06/source-purchased-air-admission-runtime-fixture-Outer-58-01/fixture.json",
+    "sha256": "c9e1b4a3db23c18f2a0b0dec68913b31fd9c58ee82c7d51abb118d40a81c46d3",
+    "bytes": 1734716
+  },
+  "fixture_projection": {
+    "path": ".runtime/porting/SRC-06/source-purchased-air-admission-runtime-fixture-Outer-58-01/projection.json",
+    "sha256": "732f35999d54271866a874a35b27f1560215c2e9dcd50d8ee2d91fe03c199ce7",
+    "bytes": 51171
+  },
+  "whole_worker_slice_proof": [
+    {
+      "worker": "missing_availability_schedule",
+      "byte_start": 13146,
+      "bytes": 244252,
+      "sha256": "3903cc808d571f95fd55f1b2027c31ffda8996d18b10fa831002b32b5637bd71"
+    },
+    {
+      "worker": "disconnected_supply_node",
+      "byte_start": 257399,
+      "bytes": 249550,
+      "sha256": "0a54e4f8a51d945f29c4000db33cd778c36aa3cecebbef367f24c1a37ed941db"
+    },
+    {
+      "worker": "disconnected_exhaust_node",
+      "byte_start": 506950,
+      "bytes": 249322,
+      "sha256": "0d48ccbc5c10db1bdf2d67a7c694f4cb985e04ec884efb212a1939df01a13615"
+    },
+    {
+      "worker": "missing_component_name",
+      "byte_start": 756273,
+      "bytes": 244352,
+      "sha256": "743c53618311164c3e89eecc7e7ecf4677919f9a467690ecacacef1284147491"
+    },
+    {
+      "worker": "invalid_high_comp_index",
+      "byte_start": 1000626,
+      "bytes": 244450,
+      "sha256": "7ce0c9210b0643a42cffd0fdd6511b1e0e052dac9075ce2f610f0244a8722a24"
+    },
+    {
+      "worker": "invalid_negative_comp_index",
+      "byte_start": 1245077,
+      "bytes": 244472,
+      "sha256": "717f13df5b0bfbf5917d24d25e40672f74dd90059039c9904048328a14e8dbd7"
+    },
+    {
+      "worker": "mismatched_cached_component_name",
+      "byte_start": 1489550,
+      "bytes": 244546,
+      "sha256": "3f411512e2fb7f0960bb9ffad5b593dda9f36874e2abba2dd62e716fa8f7e64c"
+    }
+  ],
+  "carried_old_P1_fixture_hash_only": {
+    "path": ".runtime/porting/SRC-06/source-purchased-air-runtime-fixture-Peer-P1-01/fixture.json",
+    "sha256": "f307fdec8d9dd55720653ee767b4e08b3e02a6276656d559c060b8e59224b456",
+    "bytes": 10880386
+  },
+  "old_P1_fixture_archive_duplicated": false,
+  "old_P1_public_evidence": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/summary.json",
+  "archive": {
+    "path": ".runtime/porting/SRC-06/purchased-air-admission-publication-Root-58-01/purchased-air-admission-58.zip",
+    "sha256": "cfc349b8d27f3b29ba8e1d91fcdd071cda4be65e364557cc1848c246e55dc2b4",
+    "bytes": 2453566
+  },
+  "finite_index": {
+    "path": ".runtime/porting/SRC-06/purchased-air-admission-publication-Root-58-01/index.json",
+    "sha256": "17151f50cba9b832ebf11a06cfd001e7b9c8846bb3e2a4a7de053b3b7b9f915d",
+    "bytes": 82879
+  },
+  "changed_Source_files": 5,
+  "existing_Source_files": 4,
+  "new_Source_files": 1,
+  "compiler_inputs": 4562,
+  "Rust_sources": 4548,
+  "preserved_initial_compile_failure": {
+    "path": ".runtime/porting/SRC-06/Root58-EH7-command/receipt.json",
+    "sha256": "5d6892a6677894629c85cfeaf00c20ca2a229b479b99392dc8bfaefec16e7ea2",
+    "bytes": 4067
+  },
+  "failed_compile_scientific_calls": 0,
+  "qualification": "This is the named HVAC01 error-path port and its positive P1 regression with actual Root quality commands. Initial scaffold04 proposals are the parent of one exact cfg-only developer_flag owner-binding correction. The initial compile101 executed zero scientific calls and remains preserved. One disconnected-exhaust case genuinely returns, while six cases reach authentic fatal outcomes. No unexecuted branch, full15/cadence result, historical same-binary proof, tolerance change, new scientific formula or card promotion is inferred.",
+  "gate_changes": 0,
+  "publisher_Cargo_Native_Source_test_or_Git_invocations": 0,
+  "canonical_writes": 0,
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/prepare-purchased-air-EH7-publication-Peer-58-03.py",
+    "sha256": "cfd722462ea989a86c86ddfa041dbdeffacd3d100310780fe4db7036b534a885",
+    "bytes": 21673
+  },
+  "public_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/purchased-air-admission-58.zip",
+    "sha256": "cfc349b8d27f3b29ba8e1d91fcdd071cda4be65e364557cc1848c246e55dc2b4",
+    "size_bytes": 2453566
+  },
+  "public_index": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/index.json",
+    "sha256": "17151f50cba9b832ebf11a06cfd001e7b9c8846bb3e2a4a7de053b3b7b9f915d",
+    "size_bytes": 82879
+  }
+}

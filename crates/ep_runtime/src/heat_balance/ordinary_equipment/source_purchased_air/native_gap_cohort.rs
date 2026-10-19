@@ -558,6 +558,13 @@ struct Factory {
 
 impl Factory {
     fn new(definitions: &Value, definition: &Value) -> Result<Self> {
+        Self::new_with_console_output(definitions, definition, false)
+    }
+    fn new_with_console_output(
+        definitions: &Value,
+        definition: &Value,
+        print_console_output: bool,
+    ) -> Result<Self> {
         let input = make_input(definitions, definition)?;
         let mut shortcut = SourceInputProcessorShortCut::default();
         shortcut.allocate_from_input(&input)?;
@@ -575,6 +582,9 @@ impl Factory {
         let mut input = input;
         let mut prescan = SourceOutputPreScan::default();
         let mut state = error_state();
+        // DataGlobals.hh177 real Native constructor; EH selects true before any getter.
+        // Existing P1 factories explicitly retain their original false caller setting.
+        state.print_console_output = print_console_output;
         let mut error = Vec::new();
         let mut console = Vec::new();
         let mut project = SelectedProjectData::default();
@@ -1132,6 +1142,7 @@ impl Factory {
                     &self.schedules,
                     &mut init,
                     &mut reporting,
+                    calc.backend,
                 )?;
             }
             "calc" => self.equipment.calculate_source_purchased_air(
@@ -2478,3 +2489,5 @@ mod air_history;
 mod warmup;
 
 mod multiplier_predictor;
+
+mod admissions;
