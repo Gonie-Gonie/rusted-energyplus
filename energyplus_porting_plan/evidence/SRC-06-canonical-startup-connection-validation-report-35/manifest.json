@@ -1,0 +1,666 @@
+{
+  "schema": "src06-canonical35-finite-engine-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-startup-connection-validation-report-35/evidence.zip",
+    "sha256": "9a99e67aa07851c9142e9b35e2183f6c8ac7f439777f34cbec6f68561f63779a",
+    "bytes": 1701763
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Peer-check-node-connections-Source-review-35/review.json",
+      "sha256": "202152087d5c5dcb6272153bf19d87c1c1f7005e58ef926f6675944fea85c0b3",
+      "bytes": 20252
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-startup-connection-validation-report-Source-review-35/review.json",
+      "sha256": "2b34c577869d48ff7eab536151b52a6c3025eecdfbdd719e0f4a0faf22dde8ec",
+      "bytes": 22029
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-zone-ventilation-actual-review-34/review.json",
+      "sha256": "ec2e7f307040ecfc083c4822146ec9a4b3f69ad44db23ff137051c4514f1c844",
+      "bytes": 17760
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/review.json",
+      "sha256": "9dcd1e19b8c26adbc37cab859532dd96edde6b5bbfd9ebbe4465b4eb04979990",
+      "bytes": 20155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-startup-connection-validation-report-actual-review-35/table-clock-differences.json",
+      "sha256": "a22bc3f76b4d21e232fa5cf93f48826734859a8c6e3dda7f6ee1ec10826d87db",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-startup-connection-validation-report-application-35/receipt.json",
+      "sha256": "c99efb82549b43beb0fcacfc40ed7bf0550cb028e4f5ad6a37cd856fc97c921a",
+      "bytes": 18575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-startup-connection-validation-report-Root-35.py",
+      "sha256": "c1eb25151fae3e92aec50a975725ebf172d9e5c2e8c0f06acd2d8ee7cfd95295",
+      "bytes": 6527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-positive-connection-reports-Audit-36.py",
+      "sha256": "9ff2c82930ff88ec5d689834a77cb379aabd7527eda63b8ee1b4165ffebfa457",
+      "bytes": 16137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/diagnostics.json",
+      "sha256": "5c3200965be6768562f32a532a6996f7d98f94ec2d8330d6116fef24ca1cf133",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplustbl.htm",
+      "sha256": "36c85caa3a659788b53eb52b5e32bba309c4650e5c31700b242588044bb9cf4e",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/eplustbl.xml",
+      "sha256": "3f18bdebaf737124a7bdb615dfebe9ec63def5005c610c9589489e8b50b16ca1",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/results/source-reported-results.json",
+      "sha256": "9bd2216c8e369fe6449cc268c5916fa1ffc6ff6408daf66d5680b214aa2b8f6c",
+      "bytes": 1679950
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-Root-35/output/run-summary.json",
+      "sha256": "4786c30f1a6e3ff28d1de561a6555a3d3450cae88e01e35bfa749aa8cbfb1c31",
+      "bytes": 33115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-command-Root-35/receipt.json",
+      "sha256": "4202c121f0216e19c6a51a9be091c1476dd275b55bdf3929c467562323eef66c",
+      "bytes": 4432
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-command-Root-35/stderr.log",
+      "sha256": "710dad94d2ad4a19e0c57df1b7bb9547d549be5229e5df7d54849df63b6453e0",
+      "bytes": 1092
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-A-24H-command-Root-35/stdout.log",
+      "sha256": "53a7dc6c5eb45f3de6292cda8e2a8c8646e4dfe7dab62738298575a26fc959be",
+      "bytes": 402035
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-Root-35/output/diagnostics.json",
+      "sha256": "59b96a52737b8216715b5ad394bd87e987f7b02e6e4f222018fa5d6c45f854d1",
+      "bytes": 3013
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-Root-35/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-Root-35/output/run-summary.json",
+      "sha256": "12d95a4e5685d545e6e8436fbb281426cecedcef0c97cd28a1911c013d58202f",
+      "bytes": 25661
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-command-Root-35/receipt.json",
+      "sha256": "b95c0618923b60dd66bf2f692675acef15c5f749bc6f5db4a88b0c2aa847281e",
+      "bytes": 4483
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-command-Root-35/stderr.log",
+      "sha256": "371ae94ab414baaf68ba445975de02f702a30bd0019df8df0562694f436d5140",
+      "bytes": 11079
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-startup-connection-validation-report-B-NOLIMIT-24H-command-Root-35/stdout.log",
+      "sha256": "bffd4af2a0cd08c8db4bf28539964b7ed7ce6414d1be5ccde4976317c90da004",
+      "bytes": 402070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/BranchNodeConnections-694-738.txt",
+      "sha256": "955d2d4ea66a06a0044f482f4d4222c42d9bc0b42b0d1cec44b0179d74aa7a41",
+      "bytes": 3114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/BranchNodeConnections-865-1474.txt",
+      "sha256": "72c0536e72a4004bde520d292950a67744901f8509489672b7078f0b80bf3168",
+      "bytes": 33109
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/DataBranchNodeConnections-113-128.txt",
+      "sha256": "0d00bb241ec4928b07fd1f7e7656654ec3060bb41691d536ca920d057beaf194",
+      "bytes": 645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/DataBranchNodeConnections-79-89.txt",
+      "sha256": "da543e3adf620c63c690b131b097104fae2a01bbbc94d11aeb3cc04afd83ddc3",
+      "bytes": 994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/EPVector-331-338.txt",
+      "sha256": "dfbbdc27065cbbeee29ce21575cc9961b9311dafb299518ec9598cea32ed105c",
+      "bytes": 313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/EPVector-98-109.txt",
+      "sha256": "a2164b142aa88bae7c02a3cac8c0afcf14d929957babe593893e8257a0ad09db",
+      "bytes": 258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-node-connections-readonly-plan-Outer-35/SimulationManager-303-333.txt",
+      "sha256": "cdc3b70420f058b3ebb9d62668652d449f651795a509739ee8a087fb96c4c3ff",
+      "bytes": 1187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-startup-connection-validation-report-actual-Root-35.py",
+      "sha256": "edc304478c66104b90677fb40048de588d559ed107bbff82de4ecef59a99d765",
+      "bytes": 9384
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-startup-connection-validation-report-Root-35.py",
+      "sha256": "3bb940039d9e4926b83b50839674bcadab44669b00ff3e4265a3b6cd9dee56e0",
+      "bytes": 1345
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/DataBranchNodeConnections.hh.79-128.txt",
+      "sha256": "13af29b58fda0b68ff886c3f55189b94b5fb400490dd58409bae6615a396dddb",
+      "bytes": 3035
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/DataLoopNode.hh.146-435.txt",
+      "sha256": "7b0a5fd5db0f872a9b63db53552ecd17566c86ff1fd718f518c9e39a350f3458",
+      "bytes": 11281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/DataLoopNode.hh.77-144.txt",
+      "sha256": "bfc2bc55a45acbd15e7dd4dffa03ef81a1b025b8b2b0d18941cfa51a716caab3",
+      "bytes": 5072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/DataZoneEquipment.hh.245-382.txt",
+      "sha256": "7c055bdfbb3df3e13a8fb389d0efc26504617c75ead10827025a2b6e7579e8af",
+      "bytes": 8704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/DataZoneEquipment.hh.415-457.txt",
+      "sha256": "f3b48554f2f80cd6712766cc9216ee55f02a2e4424011eaac017c3efbd6657db",
+      "bytes": 2697
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/EPVector.hh.56-155.txt",
+      "sha256": "9c5b5dedef6f07db13b786142b4eee9d01e5a4f028650a2a2b4a53c124250627",
+      "bytes": 2274
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/NodeInputManager.cc.650-743.txt",
+      "sha256": "c073d096d18184772be03c71139e8d99aacac39ae7533ee18b62903c83b6d4d8",
+      "bytes": 4714
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/SimulationManager.cc.2066-2204.txt",
+      "sha256": "58454a2728b445c3570046f3e4f51ddbbedfb28f416440f7a1786e1e879f8a16",
+      "bytes": 8337
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-extents/SimulationManager.cc.2653-2775.txt",
+      "sha256": "f4164fb78cf5137d08044534382f5a59b867ad083479ecd80bceb050f9ba0568",
+      "bytes": 7136
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/DataBranchNodeConnections.hh",
+      "sha256": "0ede444a45c3776893756ad29a9ae5ddcfcb9959b5927b2a1339b7646ef11298",
+      "bytes": 7805
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/DataLoopNode.hh",
+      "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+      "bytes": 26592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "bytes": 11096
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/NodeInputManager.cc",
+      "sha256": "90914bc81beea62bbcfe2c164a3492b2b3db566654e82cba3cbfdae286669970",
+      "bytes": 70173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/Native-whole/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "bytes": 168527
+    },
+    {
+      "path": ".runtime/porting/SRC-06/positive-startup-connection-report-readonly-Audit-36/plan.json",
+      "sha256": "6816cd0605ea300350653e4286f13031c64ee1d971bb42c7287b9dcaa772c40a",
+      "bytes": 14378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-check-node-connections-draft-Outer-35.py",
+      "sha256": "484e8fd2b65cd32a231bc241851a347375a21575be7942b9978d18f3f245b7ad",
+      "bytes": 9302
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-startup-connection-publication-Audit-35.py",
+      "sha256": "e7e55e7c9b4eda1f837ac08a252e428b91c5aa51f1a124ceb51aceb7fc97af0c",
+      "bytes": 7570
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-startup-connection-validation-report-Audit-35.py",
+      "sha256": "d97ad4c273528dfed2ba4f3b09f2b27cefe86ebf248c384f1660914a0ca68316",
+      "bytes": 11805
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-controlled-zone-ventilation-checkpoint-Audit-34.py",
+      "sha256": "ecdcf2ecc4a3342fdd3ec151b84e183410715a166f8672136b2bbfe66cb27434",
+      "bytes": 10427
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-startup-connection-validation-report-checkpoint-Audit-35.py",
+      "sha256": "9056747e4481114371ed005a07b1c5dc59ace6af22fcd72b318a114bd0083d49",
+      "bytes": 10499
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-startup-connection-validation-report-Audit-35-02.py",
+      "sha256": "cc8050301ef3f602441532b783808a57901cccb64a6aa489359acb218f4e1edf",
+      "bytes": 8760
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-check-node-connections-draft-Outer-35/Native-ConnectionObjectType146-437.txt",
+      "sha256": "b90076da3662137af39b0887ec2936b4b68a78072d08679dccd8213612e7b52b",
+      "bytes": 11289
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-check-node-connections-draft-Outer-35/draft.json",
+      "sha256": "9915e6de64a4be0fd57864989e89103ebd51cc96208196a448fce1ac6ba005dc",
+      "bytes": 12556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-connection-reports-draft-Audit-36/draft.json",
+      "sha256": "748558821b3b23922490d566a4b64ca7fa452ac200f2060adf6b0961d89eaf7f",
+      "bytes": 8305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-draft-Audit-35/API-census.json",
+      "sha256": "c0a8787ffb7b78696d80735dd5378245952d2d81fde57b560285a4aa75f857ce",
+      "bytes": 8172
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-draft-Audit-35/Native-whole/BranchNodeConnections.cc",
+      "sha256": "bc34ef8d562e56a9b586f8f390fc51019258aa004707bc1479f3fd04371c5616",
+      "bytes": 126666
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-draft-Audit-35/draft.json",
+      "sha256": "ceb65bce1f146d94f749c66073f724eb3b6a8375e23d71277d61c83cce225601",
+      "bytes": 35969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/actual34-parent-full-readback.json",
+      "sha256": "8e7bc5ab90dac529721f85a37255da3d5ef4c85a8c6565a1a4d48529f42814bc",
+      "bytes": 2270090
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "379e89a8008a279158539b8d1543561d0ff600f03c8e46b60bcb52ea35d48951",
+      "bytes": 46930
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/before/crates/ep_runtime/src/heat_balance/startup_integrity/connection_reports.rs",
+      "sha256": "2750ac299fecdf625bf76af989ba65789de8d0bb5912ef836c97eeead2eb4902",
+      "bytes": 15334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "bytes": 2833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/reporting.rs",
+      "sha256": "7b43e7fcf3a1990949f689b4a4e081cfbfacef6b59764ad954932b27b9465a86",
+      "bytes": 4943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/complete-final-compiler-Source-plan.json",
+      "sha256": "5a98c187ae7221137fb64654019110e4e170389e2d32e0bca0f592b49e62eedf",
+      "bytes": 2632654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/01-forward.diff",
+      "sha256": "0a2011cc353928596c0911e3bf38d99e146e7d6db96842d44cf50ff06cbe158d",
+      "bytes": 1506
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/01-inverse.diff",
+      "sha256": "e771b9df482bfbbd4e52b7d1f131f1b0589c3b711527e6938e4cc181610a64b6",
+      "bytes": 1506
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/02-forward.diff",
+      "sha256": "ba306d04090fcf33fe8fb470b1a9bd8e6cfa473d819f6983340b9d510540a75b",
+      "bytes": 16732
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/02-inverse.diff",
+      "sha256": "99deeac14972422a2c7a5abeed87c67af83b6a612a0bd9a6ed24233688ee5e53",
+      "bytes": 16732
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/03-forward.diff",
+      "sha256": "058a29ebf95a52bc580536966c450aee71e5b370dda5f87fe89ab89d77ce9135",
+      "bytes": 4155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/03-inverse.diff",
+      "sha256": "cec9997123a456e00e2bd700e5612a75f1c09a5b2f6464718df8e1ccda7f2f9d",
+      "bytes": 4155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/04-forward.diff",
+      "sha256": "62bb1d670133bd3deeb514f4ba79fa69d7b5a0cbf1582f415b1a9fd731911bc8",
+      "bytes": 4492
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/04-inverse.diff",
+      "sha256": "8886bf7ca6caf43c18a99e707375490ad70e94cd2e25efb2bb173ff8eaf4f87f",
+      "bytes": 4492
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/05-forward.diff",
+      "sha256": "3ee5285aba1869dc5f5f0bae7a5ed7114b1c7120f8eacdc0482b93547bdca726",
+      "bytes": 5098
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/diffs/05-inverse.diff",
+      "sha256": "f72fe0298d0d501289c5266ca013c16b6bd6e4aab892b91c7bb3e7d6b2ba055f",
+      "bytes": 5098
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "379e89a8008a279158539b8d1543561d0ff600f03c8e46b60bcb52ea35d48951",
+      "bytes": 46930
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/connection_reports.rs",
+      "sha256": "2750ac299fecdf625bf76af989ba65789de8d0bb5912ef836c97eeead2eb4902",
+      "bytes": 15334
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "bytes": 2833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/check_connections.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/reporting.rs",
+      "sha256": "7b43e7fcf3a1990949f689b4a4e081cfbfacef6b59764ad954932b27b9465a86",
+      "bytes": 4943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/manifest.json",
+      "sha256": "59acc57202c4cd0771d9330f0ae759b33ff2d9b126f8a4b0700e1cc70971e144",
+      "bytes": 37058
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/01.stdout",
+      "sha256": "a2cc5fb67f774f2bf415de060ff0c7b8362801f7cebfef2a2b1a2f7b78ec52cb",
+      "bytes": 2152
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/02.stdout",
+      "sha256": "1e5587cd7921c62e70a44bd1dda0d5d19e7605b0f2ef1809444227fde1248594",
+      "bytes": 20076
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/03.stdout",
+      "sha256": "4ae81f706467ce4ac4f4eeecaf76d5c731796bd7746476bc363ea16d2deac559",
+      "bytes": 52207
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/04.stdout",
+      "sha256": "e4bf59d05d2aeab75dce0e513b4755d14d31d157f5139b1c928341de5de76a21",
+      "bytes": 19880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/parse/05.stdout",
+      "sha256": "306a93adaaa592edd18762e524e203b26dc3f77e514296f2cb7730251238cbe1",
+      "bytes": 8586
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "2ee3eaa0a5f08f675782190921339db37e8b62660395e1282b931232370e1fac",
+      "bytes": 50287
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/connection_reports.rs",
+      "sha256": "dff7aa35b06b97c5a7851aa03538e89576bcf3e7d8373b9350c554e4ea064149",
+      "bytes": 18770
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "dc7f7634fb50a6e06e20fa6238e4d349e7e44339cb9add9adc1b79ed7416d1a0",
+      "bytes": 2145
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/check_connections.rs",
+      "sha256": "a6c23c6daa3f1904843adc2e294a3468c6b22026a81764a82e0b1ebf3c00d60e",
+      "bytes": 16351
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-startup-connection-validation-report-held-Audit-35/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/reporting.rs",
+      "sha256": "6a9d8e26fef0774886d87d77ab9c858c8727376eda6c0b7f8fc7ce4ac6145c7d",
+      "bytes": 7503
+    },
+    {
+      "path": ".runtime/porting/SRC-06/startup-connection-validation-report-publication-READY-Audit-35-02/publication-template.json",
+      "sha256": "705d405d9962d242f5c4e00f29894a3a9f92ca5d35d9efb827e89c03b9e0dd1d",
+      "bytes": 28664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/startup-connection-validation-report-publication-prepared-Audit-35/publication-template.json",
+      "sha256": "016a2f977d04ad2567ca9b74cef19a2f5c9b6b5c60da522e69e04ab90e84d4ec",
+      "bytes": 25878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/startup-connection-validation-report-publication-prepared-Audit-35/publisher-forward.diff",
+      "sha256": "d47076cdcd89b45181da189526989e65569152c054b619513377f26094b024db",
+      "bytes": 10902
+    },
+    {
+      "path": ".runtime/porting/SRC-06/startup-connection-validation-report-publication-prepared-Audit-35/publisher-inverse.diff",
+      "sha256": "bd56db930c9096c229de7e815bbfe02db2108cf9e5538f4a28a7093f89ac5fb8",
+      "bytes": 10902
+    },
+    {
+      "path": ".runtime/porting/source-objects/27/2750ac299fecdf625bf76af989ba65789de8d0bb5912ef836c97eeead2eb4902",
+      "sha256": "2750ac299fecdf625bf76af989ba65789de8d0bb5912ef836c97eeead2eb4902",
+      "bytes": 15334
+    },
+    {
+      "path": ".runtime/porting/source-objects/37/379e89a8008a279158539b8d1543561d0ff600f03c8e46b60bcb52ea35d48951",
+      "sha256": "379e89a8008a279158539b8d1543561d0ff600f03c8e46b60bcb52ea35d48951",
+      "bytes": 46930
+    },
+    {
+      "path": ".runtime/porting/source-objects/3c/3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/source-objects/6d/6d39a569605b07e99b9f3b30d1f0e7f54d63720144b30680407bdfcfe01caa13",
+      "sha256": "6d39a569605b07e99b9f3b30d1f0e7f54d63720144b30680407bdfcfe01caa13",
+      "bytes": 1847387
+    },
+    {
+      "path": ".runtime/porting/source-objects/76/76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "sha256": "76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "bytes": 2833
+    },
+    {
+      "path": ".runtime/porting/source-objects/7b/7b43e7fcf3a1990949f689b4a4e081cfbfacef6b59764ad954932b27b9465a86",
+      "sha256": "7b43e7fcf3a1990949f689b4a4e081cfbfacef6b59764ad954932b27b9465a86",
+      "bytes": 4943
+    },
+    {
+      "path": ".runtime/porting/source-objects/81/8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": ".runtime/porting/source-objects/9e/9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "sha256": "9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "bytes": 9829
+    },
+    {
+      "path": ".runtime/porting/source-objects/af/afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "sha256": "afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "bytes": 21286
+    },
+    {
+      "path": ".runtime/porting/source-objects/b8/b8b99282729ffc93e83e1b67f52d5456c90e99a0380cd07c4dcef8747c005fd4",
+      "sha256": "b8b99282729ffc93e83e1b67f52d5456c90e99a0380cd07c4dcef8747c005fd4",
+      "bytes": 8710
+    },
+    {
+      "path": ".runtime/porting/source-objects/cf/cf90dc0cd42b9c83b0cb4b7294d2f29537c2699a2a685cdd58e488d9c8d2746a",
+      "sha256": "cf90dc0cd42b9c83b0cb4b7294d2f29537c2699a2a685cdd58e488d9c8d2746a",
+      "bytes": 6989
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "2ee3eaa0a5f08f675782190921339db37e8b62660395e1282b931232370e1fac",
+      "bytes": 50287
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/connection_reports.rs",
+      "sha256": "dff7aa35b06b97c5a7851aa03538e89576bcf3e7d8373b9350c554e4ea064149",
+      "bytes": 18770
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "dc7f7634fb50a6e06e20fa6238e4d349e7e44339cb9add9adc1b79ed7416d1a0",
+      "bytes": 2145
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes/check_connections.rs",
+      "sha256": "a6c23c6daa3f1904843adc2e294a3468c6b22026a81764a82e0b1ebf3c00d60e",
+      "bytes": 16351
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes/reporting.rs",
+      "sha256": "6a9d8e26fef0774886d87d77ab9c858c8727376eda6c0b7f8fc7ce4ac6145c7d",
+      "bytes": 7503
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json",
+      "sha256": "64d7e27ef6517be37c5b9fef78f348fa5725a74cc3365a44885bf710396a9528",
+      "bytes": 4627
+    }
+  ],
+  "scope": "Four existing and one new production Sources and exactly two actual B/A CLI receipts. The parent34 A24 proof is separately attributed; no cohort or new Native rerun by35. No historical ZIP recursion, raw Native capture, exe/core, annual output payload or blanket mathematical equivalence claim."
+}

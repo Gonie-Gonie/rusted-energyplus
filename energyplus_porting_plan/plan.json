@@ -12901,6 +12901,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json",
         "sha256": "64d7e27ef6517be37c5b9fef78f348fa5725a74cc3365a44885bf710396a9528",
         "size_bytes": 4627
+      },
+      "canonical_startup_connection_validation_report_35": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json",
+        "sha256": "863399e3eae4659bdfe670a35c1ac324aa2add544de0fb87b2b5acca01f733b9",
+        "size_bytes": 6498
       }
     },
     {

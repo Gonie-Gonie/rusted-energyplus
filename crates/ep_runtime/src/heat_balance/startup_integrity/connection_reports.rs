@@ -276,9 +276,38 @@ pub(crate) fn report_source_loop_connections(
             {
                 continue;
             }
-            return Err(Error::Unavailable(
-                "actual ReportLoopConnections2684 controlled ZoneEquipConfig.ZoneName",
-            ));
+            let config = o.equipment.source_zone_equipment_config(number)?;
+            writeln!(bnd, " Controlled Zone,{},{},{},{},{},{},{}",
+                config.zone_name(), config.equipment_list_name(), config.control_list_name(),
+                o.equipment.source_node_id(*config.zone_node_number())?,
+                config.number_inlet_nodes(), config.number_exhaust_nodes(), config.number_return_nodes())?;
+            for ordinal in 1..=*config.number_inlet_nodes() {
+                // Native reads heat-node name first, and only this exact name
+                // is replaced. Cooling NodeID0 remains the real Undefined.
+                let heat_node = *config.heating_distribution_inlet_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2692 AirDistUnitHeat.InNode"))?;
+                let heat_name = o.equipment.source_node_id(heat_node)?;
+                let chr_name = if heat_name == "Undefined" { "N/A" } else { heat_name };
+                let inlet = *config.inlet_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2700 InletNode"))?;
+                let cool = *config.cooling_distribution_inlet_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2701 AirDistUnitCool.InNode"))?;
+                writeln!(bnd, "   Controlled Zone Inlet,{},{},{},{},{}", ordinal,
+                    config.zone_name(), o.equipment.source_node_id(inlet)?,
+                    o.equipment.source_node_id(cool)?, chr_name)?;
+            }
+            for ordinal in 1..=*config.number_exhaust_nodes() {
+                let node = *config.exhaust_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2709 ExhaustNode"))?;
+                writeln!(bnd, "   Controlled Zone Exhaust,{},{},{}", ordinal,
+                    config.zone_name(), o.equipment.source_node_id(node)?)?;
+            }
+            for ordinal in 1..=*config.number_return_nodes() {
+                let node = *config.return_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2716 ReturnNode"))?;
+                writeln!(bnd, "   Controlled Zone Return,{},{},{}", ordinal,
+                    config.zone_name(), o.equipment.source_node_id(node)?)?;
+            }
         }
         line(bnd, SEPARATOR)?;
         line(bnd, LOOP_FORMAT_720)?;
@@ -293,9 +322,24 @@ pub(crate) fn report_source_loop_connections(
             {
                 continue;
             }
-            return Err(Error::Unavailable(
-                "actual ReportLoopConnections2737 ZoneEquipList.Name",
-            ));
+            let list = o.equipment.source_zone_equipment_list(number)?;
+            let config = o.equipment.source_zone_equipment_config(number)?;
+            writeln!(bnd, " Zone Equipment List,{},{},{},{}", number,
+                list.name(), config.zone_name(), list.number_equipment_types())?;
+            for ordinal in 1..=*list.number_equipment_types() {
+                let equipment_type = list.equipment_type_name(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2745 EquipTypeName"))?;
+                let name = list.equipment_name(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2746 EquipName"))?;
+                // Preserve actual Native argument order, although the existing
+                // descriptive header names the opposite priority ordering.
+                let cooling = list.cooling_priority(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2748 CoolingPriority"))?;
+                let heating = list.heating_priority(ordinal)
+                    .ok_or(Error::Unavailable("actual ReportLoopConnections2749 HeatingPriority"))?;
+                writeln!(bnd, "   Zone Equipment Component,{},{},{},{},{},{}", ordinal,
+                    equipment_type, name, config.zone_name(), cooling, heating)?;
+            }
         }
     }
     o.dual_duct

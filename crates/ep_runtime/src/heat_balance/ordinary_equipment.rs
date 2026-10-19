@@ -483,6 +483,19 @@ pub(crate) struct SourceZoneEquipmentConfigRef<'a> {
     row: &'a EquipmentConfig,
 }
 impl SourceZoneEquipmentConfigRef<'_> {
+    /// Actual names and physical node ordinals consumed by startup reports.
+    pub(crate) fn equipment_list_name(&self) -> &str { &self.row.equipment_list_name }
+    pub(crate) fn control_list_name(&self) -> &str { &self.row.control_list_name }
+    pub(crate) fn zone_node_number(&self) -> &usize { &self.row.zone_node }
+    pub(crate) fn exhaust_node_number(&self, ordinal: usize) -> Option<&usize> {
+        self.row.exhaust_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
+    pub(crate) fn heating_distribution_inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
+        Some(&self.row.air_distribution_units_heat.as_ref()?.get(ordinal.checked_sub(1)?)?.inlet_node)
+    }
+    pub(crate) fn cooling_distribution_inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
+        Some(&self.row.air_distribution_units_cool.as_ref()?.get(ordinal.checked_sub(1)?)?.inlet_node)
+    }
     /// Same retained Config.ZoneName read by SystemReports1994.
     pub(crate) fn zone_name(&self) -> &str {
         &self.row.zone_name
@@ -515,6 +528,25 @@ impl SourceZoneEquipmentConfigRef<'_> {
     }
     pub(crate) fn number_return_nodes(&self) -> &usize {
         &self.row.return_nodes
+    }
+}
+
+/// A short borrow of the same actual EquipmentList row, not a report projection.
+pub(crate) struct SourceZoneEquipmentListRef<'a> { row: &'a EquipmentList }
+impl SourceZoneEquipmentListRef<'_> {
+    pub(crate) fn name(&self) -> &str { &self.row.name }
+    pub(crate) fn number_equipment_types(&self) -> &usize { &self.row.number_of_equipment_types }
+    pub(crate) fn equipment_type_name(&self, ordinal: usize) -> Option<&str> {
+        self.row.equipment_type_names.as_ref()?.get(ordinal.checked_sub(1)?).map(String::as_str)
+    }
+    pub(crate) fn equipment_name(&self, ordinal: usize) -> Option<&str> {
+        self.row.equipment_names.as_ref()?.get(ordinal.checked_sub(1)?).map(String::as_str)
+    }
+    pub(crate) fn cooling_priority(&self, ordinal: usize) -> Option<&i32> {
+        self.row.cooling_priorities.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
+    pub(crate) fn heating_priority(&self, ordinal: usize) -> Option<&i32> {
+        self.row.heating_priorities.as_ref()?.get(ordinal.checked_sub(1)?)
     }
 }
 
@@ -657,6 +689,22 @@ impl OrdinaryEquipment {
     }
     pub(crate) fn source_air_distribution_units(&self) -> Option<&[std::convert::Infallible]> {
         self.air_distribution_units.as_deref()
+    }
+    /// Native NodeID has physical lower bound0. Index0 is read from actual
+    /// allocator storage (Undefined), never synthesized for missing owners.
+    pub(crate) fn source_node_id(&self, number: usize) -> Result<&str, super::selected_heat_balance_input::HeatBalanceInputError> {
+        i32::try_from(number).map_err(|_| super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual NodeID signed ordinal"))?;
+        self.nodes.node_ids.as_ref().and_then(|rows| rows.get(number)).map(String::as_str)
+            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual allocated physical NodeID"))
+    }
+    /// Native2737 uses the actual parallel controlled-zone Count, without an
+    /// EquipListIndex remap or name search.
+    pub(crate) fn source_zone_equipment_list(&self, ordinal: i32) -> Result<SourceZoneEquipmentListRef<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
+        let index=ordinal.checked_sub(1).and_then(|n|usize::try_from(n).ok())
+            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual ZoneEquipList report ordinal"))?;
+        let row=self.equipment_lists.as_ref().and_then(|rows|rows.get(index))
+            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same ZoneEquipList report allocation"))?;
+        Ok(SourceZoneEquipmentListRef { row })
     }
     pub(crate) fn source_zone_equipment_config(
         &self,

@@ -170,3 +170,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source34 controlled-zone ventilation](evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json). ZoneVentRepVars의 기존 20개 기본값과 할당을 유지한다. Config.ZoneName을 빌리고 같은 SystemReports 소유자의 구역 인덱스·필드로 매번 출력값을 해석한다. 보고값 복사본이나 새 계산 상태는 만들지 않는다.
+
+
+[Source35 startup connection validation/report](evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json). 같은 BranchNodeConnections 기록과 Config·EquipmentList·물리 NodeID를 빌려 읽는다. 실제 부모 플래그를 센 뒤 할당 범위를 결정하고, NodeID[0]의 저장된 Undefined 값과 Native의 우선순위 출력 순서를 보존한다. 보고용 복사 상태는 추가하지 않는다.

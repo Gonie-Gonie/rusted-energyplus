@@ -1,6 +1,7 @@
 //! Actual shared BranchNodeConnections module slice and two finite checks.
 mod reporting;
 mod registration;
+mod check_connections;
 pub(crate) use registration::{SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
 use registration::SourceNodeConnection;
 use super::{Error, extent};
@@ -35,22 +36,6 @@ impl Default for SourceBranchNodeConnections {
     }
 }
 impl SourceBranchNodeConnections {
-    /// Actual zero connection loops leave caller ErrorsFound latched unchanged.
-    pub(crate) fn check_source_node_connections(
-        &mut self,
-        _errors_found: &mut bool,
-    ) -> Result<(), Error> {
-        let error_counter = 0;
-        for _connection in 1..=self.number_node_connections {
-            return Err(Error::Unavailable(
-                "actual CheckNodeConnections919 NodeConnections.ConnectionType first record access",
-            ));
-        }
-        // Native check10 array allocations are guarded by actual count>0.
-        // All remaining count-governed checks also have zero iterations here.
-        self.number_node_connection_errors += error_counter;
-        Ok(())
-    }
     /// Actual self-pair skip precedes first component record read at2452.
     pub(crate) fn test_source_component_sets(&self, _errors_found: &mut bool) -> Result<(), Error> {
         let already_noted = vec![false; extent(self.number_component_sets)?];

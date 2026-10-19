@@ -482,3 +482,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source34 controlled-zone ventilation](../evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json). 제어 구역의 실제 환기 보고 상태에 출력 20개를 Native 순서로 연결했다. 구역명과 보고값은 기존 소유자에서 직접 참조하며 앞 8개는 실제 VentLoadsReportEnabled를 따른다. B 실행 결과: `GetHeatBalanceInput: actual CheckNodeConnections919 NodeConnections.ConnectionType first record access`. A24 회귀는 기존 5,352개 보고값 증거를 이어받고, 계산식 변경이나 테스트 추가는 없다.
+
+
+[Source35 startup connection validation/report](../evidence/SRC-06-canonical-startup-connection-validation-report-35/summary.json). 시작 단계의 노드 연결 검사와 연결 보고를 하나의 변경 단위로 연결했다. 실제 연결 기록과 Config·장비 목록·물리 NodeID를 사용하며, 미구현 진단과 양수 부모 목록은 명시적 경계로 남긴다. B 실행 결과: `GetHeatBalanceInput: actual CreateEnergyReportStructure2502 controlled ZoneEquipList.NumOfEquipTypes`. A24의 기존 5,352개 보고값 증거를 이어받고 새 테스트나 계산식 변경은 없다. 각 파일의 정확한 Program Version 첫 줄만 제외한 BND 본문 8,518바이트·106줄이 보존된 Native 결과와 일치했다. 이 비교는 보고 I/O에 한정한다.
