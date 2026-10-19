@@ -455,3 +455,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source IdealLoads 입력·보고 연결 검증](../evidence/SRC-06-canonical-purchased-air-input-25/summary.json). PurchasedAir 입력과 실제 장비의 보고 선언을 연결했다. B는 `GetHeatBalanceInput: actual PurchasedAirManager InitPurchasedAir201`에서 중단되며, B 전체 완료는 후속 작업이다.
+
+
+[Source IdealLoads 초기화 검증](../evidence/SRC-06-canonical-purchased-air-initialization-26/summary.json). IdealLoads 초기화의 실행 결과를 기록했다. B의 실제 경계는 `GetHeatBalanceInput: actual PurchasedAir CalcPurchAirLoads203`이며 Calc·Update·Report 및 B 전체 완료는 별도 작업이다.

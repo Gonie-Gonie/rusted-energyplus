@@ -3,6 +3,8 @@ pub(crate) mod owners;
 mod getter;
 mod schema;
 mod registration;
+mod initialization;
+pub(super) use initialization::SourcePurchasedAirInitOwners;
 use owners::*;
 use super::{OrdinaryEquipment, source_nodes::SourceNodeFluidType};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
@@ -54,10 +56,11 @@ impl OrdinaryEquipment {
     }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn simulate_source_purchased_air<H:SourceOutputFileHost,D:SourceOutputDictionaryHost>(
-        &mut self,name:&str,current_equipment_zone:i32,equipment_pointer:i32,_controlled_zone:i32,
+        &mut self,name:&str,current_equipment_zone:i32,equipment_pointer:i32,controlled_zone:i32,
         shortcut:&mut SourceInputProcessorShortCut,source_is_epjson:bool,schedules:&mut SelectedScheduleManager,
         number_zones:i32,branch:&mut SourceBranchNodeConnections,any_ems:bool,
         backend:&mut SourceErrorBackend<'_>,output:&mut SourcePurchasedAirReportingOutputContext<'_,H,D>,
+        initialization:&mut SourcePurchasedAirInitOwners<'_>,
     )->Result<(),Error>{
         if self.purchased_air.get_purchased_air_input {
             self.get_source_purchased_air(shortcut,source_is_epjson,schedules,number_zones,branch,any_ems,backend,output)?;
@@ -92,9 +95,8 @@ impl OrdinaryEquipment {
                     .ok_or(Error::Unavailable("actual SimPurchasedAir CheckEquipName197"))?=false;
             }
         }
-        // This is the real next lifecycle call, before its one-time allocation
-        // or sizing/environment writers. No CP442 response is substituted.
-        Err(Error::Unavailable("actual PurchasedAirManager InitPurchasedAir201"))
+        self.initialize_source_purchased_air(unit_number, controlled_zone, schedules, initialization)?;
+        Err(Error::Unavailable("actual PurchasedAir CalcPurchAirLoads203"))
     }
     #[allow(clippy::too_many_arguments)]
     fn get_source_purchased_air<H:SourceOutputFileHost,D:SourceOutputDictionaryHost>(

@@ -126,6 +126,9 @@ pub(crate) struct SelectedSizingManager {
     pub(crate) data_cool_coil_capacity: f64,
     pub(crate) system_sizing_run_done: bool,
     pub(crate) zone_sizing_run_done: bool,
+    /// Actual DataSizing.hh1285-1286 cold constructors; SizePurchasedAir1384-1385 writes these same cells.
+    pub(crate) zone_cooling_only_fan: bool,
+    pub(crate) zone_heating_only_fan: bool,
     pub(crate) number_of_oa_requirements: usize,
     pub(crate) default_oa_requirement: usize,
     pub(crate) oa_requirements: Option<Vec<SelectedOARequirement>>,
@@ -157,6 +160,8 @@ impl Default for SelectedSizingManager {
             data_cool_coil_capacity: 0.0,
             system_sizing_run_done: false,
             zone_sizing_run_done: false,
+            zone_cooling_only_fan: false,
+            zone_heating_only_fan: false,
             number_of_oa_requirements: 0,
             default_oa_requirement: 0,
             oa_requirements: None,

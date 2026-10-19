@@ -301,11 +301,19 @@ impl SourceHvacManager {
                             dictionary_host: output.dictionary_host,
                             eio: &mut *eio,
                         };
+                        let current_equipment_zone = o.sizing.current_zone_equipment_number;
+                        let mut purchased_initialization = super::source_purchased_air::SourcePurchasedAirInitOwners {
+                            sizing: o.sizing,
+                            fan: o.fan,
+                            globals: o.globals,
+                            clock: o.clock,
+                            environment: o.environment,
+                        };
                         o.equipment.simulate_source_purchased_air(
-                            &name, o.sizing.current_zone_equipment_number, equipment_pointer, number,
-                            o.shortcut, *o.source_is_epjson, o.schedules, o.globals.num_of_zones,
-                            &mut self.ancillary.branch_node_connections, o.globals.any_energy_management_system_in_model,
-                            o.backend, &mut purchased_output,
+                            &name, current_equipment_zone, equipment_pointer, number,
+                            o.shortcut, *o.source_is_epjson, o.schedules, purchased_initialization.globals.num_of_zones,
+                            &mut self.ancillary.branch_node_connections, purchased_initialization.globals.any_energy_management_system_in_model,
+                            o.backend, &mut purchased_output, &mut purchased_initialization,
                         )?;
                         // Actual Init/Calc/Update/Report has not returned in
                         // this bounded producer; never forge its zero response.
