@@ -19,6 +19,7 @@ use crate::heat_balance::{
         },
     },
     ordinary_exterior_energy_use::SourceExteriorEnergyUse,
+    ordinary_equipment::OrdinaryEquipment,
     ordinary_pollution::SourcePollutionModule,
     ordinary_surface_initialization::{
         SourceSurfaceHeatBalanceArrays, output::SourceSurfaceOutputOwners,
@@ -66,6 +67,7 @@ impl SourceRealOutputOwners for HvacLossFields<'_> {
 /// sixteen energy-meter reads exclude its own carbon outputs. A forbidden
 /// partial-view read is an explicit error, never a fabricated numeric zero.
 struct LiveReadView<'a> {
+    nodes: &'a OrdinaryEquipment,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
     schedules: &'a SelectedScheduleManager,
     surface: &'a dyn SourceRealOutputOwners,
@@ -83,6 +85,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         use SourceRealOutputTarget as T;
         match target {
+            T::Node { .. } => self.nodes.real_output(target),
             T::Weather { .. } => self
                 .weather_outputs
                 .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?
@@ -109,6 +112,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
 }
 
 struct LiveReadFields<'a> {
+    nodes: &'a OrdinaryEquipment,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
     schedules: &'a SelectedScheduleManager,
     arrays: &'a SourceSurfaceHeatBalanceArrays,
@@ -157,6 +161,7 @@ impl LiveReadFields<'_> {
         };
         let hvac = HvacLossFields(self.control);
         read(&LiveReadView {
+            nodes: self.nodes,
             weather_outputs: self.weather_outputs,
             schedules: self.schedules,
             surface: &surface,
@@ -199,6 +204,7 @@ impl SourceOrdinaryHvacRemaining {
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
         let fields = LiveReadFields {
+            nodes: &*o.equipment,
             weather_outputs: None,
             schedules: o.schedules,
             arrays: o.surface_arrays,
@@ -331,6 +337,7 @@ impl<
             }
             C::CalculatePollution => {
                 let fields = LiveReadFields {
+            nodes: &*o.equipment,
                     weather_outputs: None,
                     schedules: o.schedules,
                     arrays: o.surface_arrays,

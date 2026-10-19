@@ -89,6 +89,7 @@ pub(crate) struct SourceAllOutputOwners<'a> {
 impl SourceRealOutputOwners for SourceAllOutputOwners<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         match target {
+            SourceRealOutputTarget::Node { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
             SourceRealOutputTarget::Weather { .. } => self.weather.real_output(target),
             SourceRealOutputTarget::Schedule { .. } => self.schedules.real_output(target),
             SourceRealOutputTarget::SystemReports { .. } => self.system_reports.real_output(target),

@@ -1,0 +1,747 @@
+{
+  "schema": "src06-canonical16-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Node-lifecycle-16/evidence.zip",
+    "sha256": "675ff46d8098bc9f48c7a54d6c9505a8654da422b930c2f562bda178d3f05c62",
+    "bytes": 1375716
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-positive-Node-lifecycle-coherent-Source-review-16/review.json",
+      "sha256": "c6fc2acade986737f7c0c6617aebd4227604f149bef8e9515fe7fbcc36416a08",
+      "bytes": 36814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Node-lifecycle-publication-prepared-Audit-16-02/publication-template.json",
+      "sha256": "5a4a99717d4ad655cd5b9412e4a58309d0fabc6764d96ba823770b779da3026e",
+      "bytes": 33681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Node-lifecycle-publication-prepared-Audit-16-02/validation-refs.json",
+      "sha256": "379d35ee2692939eecf7fa7515ed92bd3c3d7ef2b83032727fbba94f9207cffd",
+      "bytes": 1862
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-Node-lifecycle-application-16/receipt.json",
+      "sha256": "dca9b7ef4ae428e88b80e61f31a21c674dd66f943dad064aebccc3740247c4a9",
+      "bytes": 38080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-Node-lifecycle-actual-review-16/review.json",
+      "sha256": "80a38621a8b95eaff7917308d473696ab7c448ac6bc7366a5f674f554cb497b9",
+      "bytes": 17753
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-Node-lifecycle-actual-review-16/table-clock-differences.json",
+      "sha256": "36178d24f9a64ab0046812d9a62cdcce3f2bace920466c0a0e08a82f2610d91d",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-equipment-actual-review-15/review.json",
+      "sha256": "e27d2e82d2332a4b1057ae98cdf84997c03ec4b5f9d4b95df33ff347fcdf807d",
+      "bytes": 18050
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-Node-lifecycle-Root-16.py",
+      "sha256": "636404296dfb8043ebdf692e02e4fa25e26314bb7725e8f9e98081ab999a2453",
+      "bytes": 5190
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/diagnostics.json",
+      "sha256": "f5d71838dbf23a2a5f380b47d76d6a7a1f59dbc61e8c1077152606a9b54e47f1",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplustbl.htm",
+      "sha256": "10520b1619bd9f8c979466a9fb0f134c4b8b2e7e858fd0d8f7c9105a43f4f94e",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/eplustbl.xml",
+      "sha256": "016755dc89a742b4ad1c5e1794baee25673aec5040bfb6b59da15333849e2cb9",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/results/source-reported-results.json",
+      "sha256": "996979339efc8371562883b6add3269c3c8ccd352441fc21870c728ec5599311",
+      "bytes": 1679906
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-Root-16/output/run-summary.json",
+      "sha256": "20aa8d3d8fb8729d2b503bce3b63f60485e42930eff0c43f2742c0b7dbbdc802",
+      "bytes": 32530
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-command-Root-16/receipt.json",
+      "sha256": "ad1ef979fc3fcb3519e8bf3197812782b5c4725898d889d683153dbe12ebb8aa",
+      "bytes": 5798
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-command-Root-16/stderr.log",
+      "sha256": "066eb197b094db85994e8ea5dc2f55f4c41f8a997e84322d98367f2c4a288e2e",
+      "bytes": 747
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-command-Root-16/stdout.log",
+      "sha256": "6c304763a57bef300590dec9d96c50b9c75248c1c66e8c6d1591eed2b77cdb12",
+      "bytes": 366266
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-Root-16/output/diagnostics.json",
+      "sha256": "ba0390d18a6224d2184ffd8c20afbba63b955f860b923757c72404ba9df35d0a",
+      "bytes": 2970
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-Root-16/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-Root-16/output/run-summary.json",
+      "sha256": "cfa5e986f4e1f870efb486046983a3661399970fe9386a22a32e2147a57c0c8c",
+      "bytes": 25112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-command-Root-16/receipt.json",
+      "sha256": "ec97f487e8cae5d1ddc6f8bf22f3873e3fcfa17b005f2ad0cb54e31ed59f767c",
+      "bytes": 5850
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-command-Root-16/stderr.log",
+      "sha256": "c9a051e26c41e3f5e5f461edd1ec4457a52f54750e047eb64388fadae10aa700",
+      "bytes": 10673
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-command-Root-16/stdout.log",
+      "sha256": "de8452c6f8ceb347bc0a58d2839df056ddbd73086f934176d4ee5e9ce5de442c",
+      "bytes": 366301
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-owner-test-Root-16/receipt.json",
+      "sha256": "f0978b88bc0d4bc88fec41b3c48a915f5c52d97dbfbceeacfc77ba60b3566462",
+      "bytes": 5211
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-owner-test-Root-16/stderr.log",
+      "sha256": "27b40fc91733e52081f5b3a05c2dfa380886b7181652bf57da6eae290719a5cc",
+      "bytes": 52978
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-owner-test-Root-16/stdout.log",
+      "sha256": "0a543ed2aae674f80563f99b27dc3413dc448028e4f04a19aa524d0b6c06a579",
+      "bytes": 229
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-Node-lifecycle-actual-Root-16.py",
+      "sha256": "5a75275c71fdb8baaed22f0e1adcfdcfcb400241beea3fb878d631372934cbff",
+      "bytes": 7433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-Node-lifecycle-publication-Audit-16.py",
+      "sha256": "4e386e4d0b4df846b99c2b9a5a5f8ea5d716eee7641e5f96262fe4f7b1481671",
+      "bytes": 9009
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-closed-volume-helper-Root-16.py",
+      "sha256": "ae8931be8a300b0b8bd8c5d4b3c7d948f179b3c3f6736d6948ebd676dfbf4def",
+      "bytes": 6681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-Node-lifecycle-checkpoint-Audit-16-template-02.py",
+      "sha256": "3980fd4c3c37c3b8ad33b9eff0689e0cae5da4b2f7f340993c9f97aac8588144",
+      "bytes": 11565
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-positive-Node-lifecycle-Source-Audit-16.py",
+      "sha256": "d83c1f59aedf99edf03d902fa52defbf1a7f5510ee708d6bd3f8cda854d30b76",
+      "bytes": 14179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-positive-Node-lifecycle-Source-Peer-01.py",
+      "sha256": "d12bb0cc1b40d5dfac403ce2327bb59d52732726dd8a5ecbb9e3d11f34333a35",
+      "bytes": 16530
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-closed-volume-helper-held-Root-16/manifest.json",
+      "sha256": "7ed149e0d5d628a1d6a9e8213bca5bf44fa0099f0afb297310b591a98c8d6400",
+      "bytes": 9163
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/DataGlobalConstants.hh-371-482.txt",
+      "sha256": "6065e9892bd887fb2d9e69edb91fa76e0f4c168f438969048d8b53d95561b435",
+      "bytes": 2788
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/DataLoopNode.hh-439-555.txt",
+      "sha256": "243257edbaf0d77d3c5d7ca6b6623f572c5608e436d3f4f2df393653193caf8c",
+      "bytes": 6166
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/DataLoopNode.hh-66-96.txt",
+      "sha256": "d6fa518458cc35a13f5862df82910584a7eed3369319956b000de407d15d253a",
+      "bytes": 642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/HVACManager.cc-2151-2197.txt",
+      "sha256": "185e7b6b0090f530963881fd9f63ccb84310d29b803b6a9925986a783c1b162c",
+      "bytes": 2275
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/NodeInputManager.cc-188-514.txt",
+      "sha256": "54c30071eb4218818b4f90b1b71287e14606966689e9d79de16a7891c03ed9cd",
+      "bytes": 20015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/OutputProcessor.cc-3003-3144.txt",
+      "sha256": "be3461e66fcba280183a0717979d3d295c4e02ad21ba9f88cf510141678b7e42",
+      "bytes": 6065
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/SimulationManager.cc-278-326.txt",
+      "sha256": "bb2e7a027bed6c621670fe82d951126013813462e379738917bce4cdb9912732",
+      "bytes": 2137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/SurfaceGeometry.cc-12010-12322.txt",
+      "sha256": "0c0d518a8f311391a383ff5256746da79a9d68a13813254096980282c4db33b6",
+      "bytes": 18861
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/SurfaceGeometry.cc-12325-12348.txt",
+      "sha256": "1c89657c65dd2628b4b8958045da3626de8a8444c270161b86caf3d16d4ee05d",
+      "bytes": 1648
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/UtilityRoutines.cc-360-405.txt",
+      "sha256": "7ebbe9d7825c7ec320e936ef7cf08f7988a765788da79c849a4bc6a054476ceb",
+      "bytes": 1578
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/Vectors.cc-505-529.txt",
+      "sha256": "f71ac1e24a0674318cf51eda4db0fe37fc7f587c9be3b803d6e3fff9ebbbc155",
+      "bytes": 765
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native/Vectors.hh-130-147.txt",
+      "sha256": "86f463513641dea569f4ed1d15a502f06b2850af46e134d61e5379fbe946f99f",
+      "bytes": 370
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/Native34-declaration-and-live-owner-ledger.json",
+      "sha256": "48582f24a007a28f7ac8dac0bbfb4b598ea568e74b372847d731f631cf9b5886",
+      "bytes": 15634
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/ResetNodeData-assignment-ledger.json",
+      "sha256": "75267905a795b7a5d4eef8aa702f9c84cf5f1ce5e826daae7c0645b2e34885b7",
+      "bytes": 671
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_reset.rs",
+      "sha256": "050aebb2750b30df39045d293e9cbc2c445c5d6f0698dc44b5ea92127f4f1dc3",
+      "bytes": 924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "5fbedaa876f2cc2b242cdedcedd4cb748d21f52256d3b910578443471b66402b",
+      "bytes": 3147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "749a344d0c934c6d13ae09a48bef23c67e70499e75e3c24cd760b5b4b8af92e7",
+      "bytes": 17391
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "9308e7c107a8c3e4a50d6cec6fa7103fec1b3a8e94d220b62b8f49a97135fdb2",
+      "bytes": 5486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "751baf08e460addab40f611f1c103aaeaf61a2c2464ea87211195898f0967f62",
+      "bytes": 25170
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "235533d61678459ed57c4f28f4dcfa0f7dfa99dd0344ac880b1279e1b12e21c5",
+      "bytes": 9508
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_initialization/files/reporting.rs",
+      "sha256": "a991c1347ab640ed25d3a5512bb35faa2b4aa738b339d44d19d2dec08bcc5a5e",
+      "bytes": 4952
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "1e15d36a020a3bc78e30d03f9c5d336adbdc1f572f6a4799429dac41826e74b9",
+      "bytes": 21851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "1aaf6e6950e9c544e833e312bbbecc084f76a44e8a1f4ad1778ae76912a6d58b",
+      "bytes": 4151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "755a351ed66249a308decf42f57ea32869599025a5f949029e1eceba903b5e1a",
+      "bytes": 10849
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "599383dbebdf5d367ebc1ca55c7d106ba734c0a5350d816bccde1d7309597a30",
+      "bytes": 2587
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/node_target.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "091c6757b0aaa79df41b74c587de8245df40d2e4577b42931de5836e8aca1ed1",
+      "bytes": 3288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/complete-compiler-Source-plan.json",
+      "sha256": "71504d7a979932333f303406703eceac5d8621337f965ae2624472f2081f3359",
+      "bytes": 2871776
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/geometry/zone_volume.rs",
+      "sha256": "95648785c5ac377251fa52b93d5ebbccdf16e15007c02812ab6d2f0a7ab04cf5",
+      "bytes": 16067
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/geometry/zone_volume/topology.rs",
+      "sha256": "45b019780fbb343d68d8efc9ebc4651630ed92f7b3a00545bf05da2edb1a0155",
+      "bytes": 7166
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "f4fcf52efc3c610fe7245ca2c7875cfd0d44283786d6d868318f75f5723a6862",
+      "bytes": 12045
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/error_backend/scoped.rs",
+      "sha256": "af69e182256d88481f4ece5d2068c1878d11291af8fa7915c897bc5f59597029",
+      "bytes": 4642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "22ccb24d33c899a9e528a1ac406e2a830d3f6986c03f5a1163a5161fe8645976",
+      "bytes": 39328
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_nodes.rs",
+      "sha256": "9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "bytes": 9829
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "9a6e378c020c4e7bd532dae81cf87eed4e88bc43f25f4429538bf2fa8b78deb4",
+      "bytes": 10571
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude.rs",
+      "sha256": "ed0792612a76a88c5e6d579790d1829e38e4e5f496b641de631fd1e57e754f9c",
+      "bytes": 7916
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/primary_host.rs",
+      "sha256": "ed4f978477fd3252273f0c81a4d43c940b994de56edb99d112304da87fe92cb1",
+      "bytes": 11854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/selected_heat_balance_globals.rs",
+      "sha256": "f22cbc8a42f9e861cc38fbb3a2f3be010322402c7f7d2363bce2f3207d4bd9e6",
+      "bytes": 5182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs",
+      "sha256": "f033c2ebe6c859205fbb41d2491a5f21465bc5491998572510d9cf9bfb5dc8aa",
+      "bytes": 20138
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/source_initialization/files.rs",
+      "sha256": "23df238236cba1ae5e368174f6df00bd1b775178989cf5edc3ae78f3d99b1940",
+      "bytes": 11694
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+      "sha256": "7759d37373ac220353445aa846c8cdafba9cc7a2681c87d6fdcd7a97f51554aa",
+      "bytes": 4561
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+      "sha256": "7275e47b282388e5d73b424ddae79e5bb540eba8d9152ad7c236032300b8cfc5",
+      "bytes": 12943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/source_output_registration/requested_input.rs",
+      "sha256": "001daea8ab6b1edc4a21b3e9470ef1df173ba887681974198b2d036e1d2529b6",
+      "bytes": 8335
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/context/crates/ep_runtime/src/heat_balance/source_output_registration/update_data.rs",
+      "sha256": "01e29b65c3fe5aec10b2b474984af7cf9e7646301834f324dd0c2499b7f1ce55",
+      "bytes": 19122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/01-forward.diff",
+      "sha256": "cd5521d7aaa4df12acf09142638753f714aaa369b40c42a22f47d5ef3afff3e9",
+      "bytes": 3105
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/01-inverse.diff",
+      "sha256": "31fcad0b6d0c4a1d5cdbcb1fd5526de9f7b396193aeb68534c29a9696cc356ee",
+      "bytes": 3105
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/02-forward.diff",
+      "sha256": "d7d7573a247791ff12050296845aff1b537b71c272e82a64209d63a16c5530a0",
+      "bytes": 18518
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/02-inverse.diff",
+      "sha256": "a26c0e5d545fbba47fc36e7084b687898f9b4fc7ff91c16b120a3b961fb3b55b",
+      "bytes": 18518
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/03-forward.diff",
+      "sha256": "1bbd8cf4b0fc4108968ea3515730652d027e3dec0589851ead2043050b77f920",
+      "bytes": 2304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/03-inverse.diff",
+      "sha256": "410e43387f456541548518b5d1187371e99ce1471cd9408cd5e51af76be8f7a1",
+      "bytes": 2304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/04-forward.diff",
+      "sha256": "c6c7e8db8bb6001e56d97bf9ac76b869dedc64b36df92860072ba5c0965c278d",
+      "bytes": 486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/04-inverse.diff",
+      "sha256": "1e96537c222ef0bf4576af4e86d6524b7b852ba8bdec759e03b7b73e2107887a",
+      "bytes": 486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/05-forward.diff",
+      "sha256": "6e3270019951b5197feb4745218d3dd499c1632b29d820d63faacb29c7af103e",
+      "bytes": 3022
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/05-inverse.diff",
+      "sha256": "082117917e1296ccc6f42f30cf201ccca15ffcace01b6c037681d6ccf45922ac",
+      "bytes": 3022
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/06-forward.diff",
+      "sha256": "b61f8191a11c741b38bedc1a98de070686de3ee5123fc5d91d0d790f67d7d73f",
+      "bytes": 1804
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/06-inverse.diff",
+      "sha256": "da4dab37eb0e3192432a0b706f6ec3752ba5552ea23a976874587de15a9945ed",
+      "bytes": 1804
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/07-forward.diff",
+      "sha256": "fd77e5ded423acb18cf79fb9f360fc8ae9c0631b1d769256f11708528973b573",
+      "bytes": 698
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/07-inverse.diff",
+      "sha256": "7ff10532db3bcacaf66f8d29cea74d813ae5d0295f4835a0ace7a67149ac33bc",
+      "bytes": 698
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/08-forward.diff",
+      "sha256": "a891a3acd27d7e38069670a944d6dce53f776a77c282a9817c25a1969367959d",
+      "bytes": 980
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/08-inverse.diff",
+      "sha256": "49ac189f7d85e224dd1e67c81d3084bb50a48a11bee03961967e60bb724a9587",
+      "bytes": 980
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/09-forward.diff",
+      "sha256": "c201191793a484a116c775255bffd1cf5d19e772fa0425dfe1cbbc181a82ec89",
+      "bytes": 763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/09-inverse.diff",
+      "sha256": "4ca819f499324bd97bb8dcce2c617bbc16e7b671df724a4ab2d860a506dd3ac1",
+      "bytes": 763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/10-forward.diff",
+      "sha256": "f5ad1137425a6d786cd8c766a73421672b11751d391486922d6bb89c552223e6",
+      "bytes": 514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/10-inverse.diff",
+      "sha256": "4896d34a2c7b7604c5f55786f418bd6604f423e00e85f67d38d045978c512942",
+      "bytes": 514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/11-forward.diff",
+      "sha256": "e7d2b8711f5c6c6c1391c9f523cb2fec0fa26103bd3f5643eee5a6408c1a4a82",
+      "bytes": 632
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/11-inverse.diff",
+      "sha256": "9b402b18e9956a8a2bab7ab36eaa222fce3d793e9e37994d4729a1396df6c590",
+      "bytes": 632
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/12-forward.diff",
+      "sha256": "8eb9928cbbe72b20ef47eea05b35a1d388df28709fb4ee04b0f49c720293b57f",
+      "bytes": 1822
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/12-inverse.diff",
+      "sha256": "09ba2201b738e01be3915f6363a8ab39f61fa99de95ffc4627bbe8f00fba69ec",
+      "bytes": 1822
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/13-forward.diff",
+      "sha256": "fe27b4964c191711d257d7896d817ca663a85eced6fbd52db423311497955c67",
+      "bytes": 660
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/diffs/13-inverse.diff",
+      "sha256": "8267492b1143e24910b58f6e6003a0f2aea62169d0754eb870e7c2c84544b185",
+      "bytes": 660
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/manifest.json",
+      "sha256": "d847033281222cf9a0461bd2f73b533024af03dea42beb784a5f70aa6e8c7f15",
+      "bytes": 61315
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_reset.rs",
+      "sha256": "97a87b14d9d5e8969dc7ae4a293575a7e92e567899cd7d35a23481a3223ee90e",
+      "bytes": 2269
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "260974d810127ad909b3db4ef8f4258653bdd7dfb68ca6ae52e9e9b1608cb455",
+      "bytes": 17789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "a0dcaad5f467bcc2d3973801aea291c10abc01636f486c5bd64d691adb1e52fb",
+      "bytes": 17663
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "08245b5512e59131db5b67164a15517f8adbe202436c5de6d24ec391e1953f72",
+      "bytes": 5520
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "e567eb044634f935618735c8e1666f7b82b8a54d92fbc658f40551f1e9717bc2",
+      "bytes": 26642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "36f0d5c009557e30b3a86afd6eacded03afa99fa608f0a4844b9f739ce7c8d50",
+      "bytes": 9222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_initialization/files/reporting.rs",
+      "sha256": "c19750cc99e482a46d55c9dc940ca07d28b1a80bd44a36596ab53eafe86e22f2",
+      "bytes": 5438
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "e720a3dd891fe4b64b5c94c69595e4bf7f0d645d0995aa10b53843f5a9560671",
+      "bytes": 22164
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "3e9eaddda4c8fccce080e055b63bae23e64ab55fc391ce28208da6403f858afc",
+      "bytes": 4266
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "7a649839a8722601415e0f916fda16def785cf1cbd4bce32e7770cc4599b9407",
+      "bytes": 10932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "0cd6294c5ffda9bcacfb1a695af0c1a5db3c59362474fee3d1448ebc325d943f",
+      "bytes": 2681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/node_target.rs",
+      "sha256": "698d27877869e727b95d4a251634c59061f7a054fd1fb59267b7d0eff0bc84bf",
+      "bytes": 1592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "be0ed5f4dae39c0055f66be4b9823d1e470b62cb2938e75806c4446e9ffc2450",
+      "bytes": 3338
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/whole-crates-private-API-and-test-caller-inventory.json",
+      "sha256": "4f12587f8d71b220093cb9f93fa702d08c6f14e01c51ebaeef464292b56eda37",
+      "bytes": 71786
+    },
+    {
+      "path": ".runtime/porting/source-objects/e5/e5fc08dac061d49378c26ecd9ab668c5606deb2723e11297818ce215ce60a274",
+      "sha256": "e5fc08dac061d49378c26ecd9ab668c5606deb2723e11297818ce215ce60a274",
+      "bytes": 1840688
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+      "sha256": "8fc26d9728a3d186d858f03ce3a75468610f837fefdcfadd4ca294d6eb824a2c",
+      "bytes": 85227
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_reset.rs",
+      "sha256": "97a87b14d9d5e8969dc7ae4a293575a7e92e567899cd7d35a23481a3223ee90e",
+      "bytes": 2269
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "260974d810127ad909b3db4ef8f4258653bdd7dfb68ca6ae52e9e9b1608cb455",
+      "bytes": 17789
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "a0dcaad5f467bcc2d3973801aea291c10abc01636f486c5bd64d691adb1e52fb",
+      "bytes": 17663
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "08245b5512e59131db5b67164a15517f8adbe202436c5de6d24ec391e1953f72",
+      "bytes": 5520
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_simulation/prelude_host.rs",
+      "sha256": "e567eb044634f935618735c8e1666f7b82b8a54d92fbc658f40551f1e9717bc2",
+      "bytes": 26642
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/setup_volume.rs",
+      "sha256": "36f0d5c009557e30b3a86afd6eacded03afa99fa608f0a4844b9f739ce7c8d50",
+      "bytes": 9222
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/files/reporting.rs",
+      "sha256": "c19750cc99e482a46d55c9dc940ca07d28b1a80bd44a36596ab53eafe86e22f2",
+      "bytes": 5438
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "e720a3dd891fe4b64b5c94c69595e4bf7f0d645d0995aa10b53843f5a9560671",
+      "bytes": 22164
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "3e9eaddda4c8fccce080e055b63bae23e64ab55fc391ce28208da6403f858afc",
+      "bytes": 4266
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "7a649839a8722601415e0f916fda16def785cf1cbd4bce32e7770cc4599b9407",
+      "bytes": 10932
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "0cd6294c5ffda9bcacfb1a695af0c1a5db3c59362474fee3d1448ebc325d943f",
+      "bytes": 2681
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/node_target.rs",
+      "sha256": "698d27877869e727b95d4a251634c59061f7a054fd1fb59267b7d0eff0bc84bf",
+      "bytes": 1592
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "be0ed5f4dae39c0055f66be4b9823d1e470b62cb2938e75806c4446e9ffc2450",
+      "bytes": 3338
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/summary.json",
+      "sha256": "d2df9acebeb8acc73184d07b78dee5c925a8cbd9c2fe666855c42fd22c959508",
+      "bytes": 7268
+    }
+  ],
+  "scope": "Coherent13Source Node lifecycle and Root signed-volume admission component, accepted independent full peer/final4487 plan and focused existing test/actual B+A24. Included JSON fixture is separately Git bound. No historical ZIP recursion, new Native dataset or annualJSON/CSV.",
+  "full_transitive_rebuild_archive_claim": false
+}

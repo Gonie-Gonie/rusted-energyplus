@@ -12811,6 +12811,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/summary.json",
         "sha256": "d2df9acebeb8acc73184d07b78dee5c925a8cbd9c2fe666855c42fd22c959508",
         "size_bytes": 7268
+      },
+      "canonical_Node_lifecycle_16": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Node-lifecycle-16/summary.json",
+        "sha256": "ce76a02e8dbf9684b8d57a5d6e6e2088d7c7d187736297d995058099dca9ba65",
+        "size_bytes": 6029
       }
     },
     {

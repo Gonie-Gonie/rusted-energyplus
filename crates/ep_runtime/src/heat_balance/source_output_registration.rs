@@ -99,6 +99,8 @@ use super::source_output_prescan::SourceOutputPreScan;
 use crate::error::WarmupOutputError;
 use std::collections::BTreeMap;
 mod air_target;
+mod node_target;
+pub(crate) use node_target::{SourceNodeOutputField, SourceNodeReportingOutputContext};
 mod system_target;
 pub(crate) use system_target::{SourceAllIntegerOutputOwners, SourceHvacRealOutputField};
 mod bound_real;
@@ -192,6 +194,10 @@ pub(crate) enum SourceOutputUnits {
     Kg,
     WPerM2,
     WPerM2K,
+    KgPerSecond,
+    M3PerSecond,
+    JPerKgK,
+    Ppm,
 }
 impl SourceOutputUnits {
     pub(crate) fn symbol(self) -> &'static str {
@@ -217,6 +223,10 @@ impl SourceOutputUnits {
             Self::Kg => "kg",
             Self::WPerM2 => "W/m2",
             Self::WPerM2K => "W/m2-K",
+            Self::KgPerSecond => "kg/s",
+            Self::M3PerSecond => "m3/s",
+            Self::JPerKgK => "J/kg-K",
+            Self::Ppm => "ppm",
         }
     }
 }

@@ -15,7 +15,7 @@ use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGloba
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::source_initialization::SourceInitializationFiles;
 use crate::heat_balance::source_output_registration::{
-    SourceMeterReportingOwners, SourceMtdFileHost,
+    SourceMeterReportingOwners, SourceMtdFileHost, SourceNodeReportingOutputContext,
 };
 use crate::weather::day::{ProductionWeatherTimestepSeries, WeatherDayState, WeatherSession};
 use ep_model::TypedModel;
@@ -95,15 +95,32 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
         )
     }
     fn setup_node_variables_for_reporting(&mut self) -> Result<(), RuntimeError> {
-        required(
-            self.reports.source_zone_equipment.as_mut(),
-            "actual sole NodeOwner before reporting setup",
-        )?
-        .setup_source_node_variables_for_reporting(
-            &self.backend.state.tracking,
-            self.files.bnd_stream(),
+        self.backend.with_scoped(
+            &mut (&mut *self.reports, &mut *self.files, &mut *self.output_host, &mut *self.weather),
+            |mut backend, (reports, files, output_host, weather)| {
+                let globals = required(reports.selected_heat_balance_globals.as_ref(),
+                    "actual globals before Node reporting setup")?;
+                let project = required(reports.selected_project_data.as_ref(),
+                    "actual Project before Node reporting setup")?;
+                let input = required(reports.selected_input_processor.as_mut(),
+                    "actual same IP before Node reporting setup")?;
+                let (mut dictionary, eio, bnd) = files.source_node_reporting_streams(
+                    &reports.source_sqlite, &mut reports.source_results_output_variables,
+                );
+                required(reports.source_zone_equipment.as_mut(),
+                    "actual sole NodeOwner before reporting setup")?
+                    .setup_source_node_variables_for_reporting(
+                        globals, &reports.heat_balance_input_state, &mut backend,
+                        &mut SourceNodeReportingOutputContext {
+                            registration: &mut reports.output_registration, input,
+                            prescan: &reports.output_prescan, reports: &self.model.report_inputs,
+                            minimum_report_frequency: &project.system.minimum_report_frequency,
+                            minutes_in_time_step: weather.state.global.minutes_in_time_step,
+                            host: &mut **output_host, dictionary_host: &mut dictionary, eio,
+                        }, bnd,
+                    ).map_err(hb_input_error)
+            },
         )
-        .map_err(hb_input_error)
     }
     fn setup_pollution_meter_reporting(&mut self) -> Result<(), RuntimeError> {
         self.backend.with_scoped(

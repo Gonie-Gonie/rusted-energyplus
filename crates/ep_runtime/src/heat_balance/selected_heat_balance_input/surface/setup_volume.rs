@@ -1,7 +1,7 @@
 //! Actual548 selected closed-zone call; return precedes550 centroid/bounds.
 use super::{Error, SelectedInputProcessor, SourceErrorBackend, SurfaceGeometryInputState};
 use crate::geometry::{
-    InitializedZoneGeometry, ZoneGeometryProperties, bounded_topology_rejection, initial_enclosure,
+    InitializedZoneGeometry, ZoneGeometryProperties, initial_enclosure,
     polyhedron_volume, surface_orientation, wall_heights_same,
 };
 use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
@@ -87,15 +87,9 @@ impl SurfaceGeometryInputState {
             };
             diagnostics.signed_polyhedron_volume_m3 =
                 polyhedron_volume(&numeric.faces, numeric.p0_m);
-            diagnostics.topology_rejection =
-                bounded_topology_rejection(&numeric.faces, &diagnostics);
-            if diagnostics.topology_rejection.is_some() {
-                // Six faces and consistent winding/positive signed volume are
-                // conservative Rust admission, not extra Native enclosure tests.
-                return Err(Error::Unavailable(
-                    "selected initially-closed six-quad volume domain",
-                ));
-            }
+            // Native's initially enclosed branch consumes the signed result
+            // directly, then retains a positive user-entered Zone.Volume.
+            // Face count and winding are not additional Native enclosure tests.
             let calculated = diagnostics
                 .signed_polyhedron_volume_m3
                 .ok_or(Error::Unavailable("finite actual closed polyhedron volume"))?;

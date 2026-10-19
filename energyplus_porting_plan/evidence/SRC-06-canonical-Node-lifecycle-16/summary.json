@@ -1,0 +1,117 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 13,
+  "existing_Rust_sources": 12,
+  "new_Rust_sources": 1,
+  "new_test_functions": 0,
+  "existing_test": "actual_native_get_equipment_pair_and_input_owner_transitions",
+  "test_scope": "One existing Native uncontrolled pair7 plus real input/owner transitions; not positive Node lifecycle Native paired state validation or all8 fixture cases.",
+  "existing_included_JSON_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+    "sha256": "8fc26d9728a3d186d858f03ce3a75468610f837fefdcfadd4ca294d6eb824a2c",
+    "bytes": 85227
+  },
+  "fixture_snapshot_scope": "Existing rs/Cargo recorder omits this included JSON, which is separately Git/current bound and directly archived; no recorder change.",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/manifest.json",
+    "sha256": "d847033281222cf9a0461bd2f73b533024af03dea42beb784a5f70aa6e8c7f15",
+    "bytes": 61315
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-positive-Node-lifecycle-coherent-Source-review-16/review.json",
+    "sha256": "c6fc2acade986737f7c0c6617aebd4227604f149bef8e9515fe7fbcc36416a08",
+    "bytes": 36814
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-positive-Node-lifecycle-held-Peer-01/complete-compiler-Source-plan.json",
+    "sha256": "71504d7a979932333f303406703eceac5d8621337f965ae2624472f2081f3359",
+    "bytes": 2871776
+  },
+  "Root_volume_component": {
+    "path": ".runtime/porting/SRC-06/source-closed-volume-helper-held-Root-16/manifest.json",
+    "sha256": "7ed149e0d5d628a1d6a9e8213bca5bf44fa0099f0afb297310b591a98c8d6400",
+    "bytes": 9163
+  },
+  "focused_validation_policy": "One meaningful existing runtime test build plus actualCLI B/A24; no new helper tests or habitual separate workspace-all-targets check.",
+  "scope": "Retain actual initial enclosure and signed volume calculation/user-volume branches while removing an extra Rust-only admission. Genuine sole-owner Node reporting declarations/live values/stream borrows and19+6 field reset are authored; actual reach and next boundary are reported solely by the accepted Root aggregate.",
+  "full_B_or_finite15_completion_claim": false,
+  "gate_changes": false,
+  "schema": "src06-canonical-Node-lifecycle.v1",
+  "status": "Genuine closed-volume/Node lifecycle Source; B remains incomplete at the exact actual frontier",
+  "canonical_existing_owner_test": {
+    "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-owner-test-Root-16/receipt.json",
+    "sha256": "f0978b88bc0d4bc88fec41b3c48a915f5c52d97dbfbceeacfc77ba60b3566462",
+    "bytes": 5211
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-command-Root-16/receipt.json",
+    "sha256": "ec97f487e8cae5d1ddc6f8bf22f3873e3fcfa17b005f2ad0cb54e31ed59f767c",
+    "bytes": 5850
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-A-24H-command-Root-16/receipt.json",
+    "sha256": "ad1ef979fc3fcb3519e8bf3197812782b5c4725898d889d683153dbe12ebb8aa",
+    "bytes": 5798
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-Node-lifecycle-actual-review-16/review.json",
+    "sha256": "80a38621a8b95eaff7917308d473696ab7c448ac6bc7366a5f674f554cb497b9",
+    "bytes": 17753
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: positive thermostat getObjectItem332",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "series": 58,
+    "samples": 5352,
+    "unchanged_policy": {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    "accepted15_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-equipment-actual-review-15/review.json",
+      "sha256": "e27d2e82d2332a4b1057ae98cdf84997c03ec4b5f9d4b95df33ff347fcdf807d",
+      "bytes": 18050
+    },
+    "physical_files_whole_equal15": 7,
+    "CSV_files_whole_equal15": 2,
+    "table_lines": 19312,
+    "clock_only_line_changes_versus15": 30,
+    "scope": "Transfer from accepted15 output evidence; no new Native/72h/annual execution or internal-state equivalence claim."
+  },
+  "preceding_B_returns": {
+    "closed_volume_returned": true,
+    "setup_returned": false,
+    "reset_returned": false,
+    "BND_node_block_present": false,
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-Node-lifecycle-B-NOLIMIT-24H-Root-16/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "qualification": "Actual failure moved beyond volume into HB thermostat input. The earlier HB-input failure precedes Node reporting and primary ResetNodeData; actual BND remains only the program-version header. No positive Node execution or Native paired Node-state/IO claim."
+  },
+  "validation_refs": {
+    "path": ".runtime/porting/SRC-06/Node-lifecycle-publication-prepared-Audit-16-02/validation-refs.json",
+    "sha256": "379d35ee2692939eecf7fa7515ed92bd3c3d7ef2b83032727fbba94f9207cffd",
+    "bytes": 1862
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Node-lifecycle-16/evidence.zip",
+    "sha256": "675ff46d8098bc9f48c7a54d6c9505a8654da422b930c2f562bda178d3f05c62",
+    "bytes": 1375716
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Node-lifecycle-16/manifest.json",
+    "sha256": "90b7a580c2ddf11ff6dccbce396b24becfeffe723368176c6f7b38415d9ff427",
+    "bytes": 36084
+  },
+  "archive_entries": 147,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-Node-lifecycle-checkpoint-Audit-16-template-02.py",
+    "sha256": "3980fd4c3c37c3b8ad33b9eff0689e0cae5da4b2f7f340993c9f97aac8588144",
+    "bytes": 11565
+  }
+}

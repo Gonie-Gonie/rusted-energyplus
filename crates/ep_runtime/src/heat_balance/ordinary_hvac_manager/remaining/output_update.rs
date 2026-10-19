@@ -48,6 +48,7 @@ impl SourceOrdinaryHvacRemaining {
             daylighting_sky_brightness: &o.environment.daylighting_sky_brightness,
         };
         let fields = LiveReadFields {
+            nodes: &*o.equipment,
             weather_outputs: Some(&weather),
             schedules: o.schedules,
             arrays: o.surface_arrays,

@@ -116,3 +116,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 제어장비 입력 검증](evidence/SRC-06-canonical-controlled-equipment-15/summary.json). 제어장비 입력은 기존 Zone·Schedule·Sizing·Node·Branch 소유자를 직접 갱신합니다. AirIn의 실제 terminal index 초기값 0과 미초기화 outlet index를 구별하고, 생성자·배열 할당·호출 순서를 보존합니다.
+
+
+[Source 체적·Node 경로 검증](evidence/SRC-06-canonical-Node-lifecycle-16/summary.json). 체적 계산은 Native의 최초 폐쇄 판정·부호와 양수 사용자 입력값 처리를 보존합니다. Node 보고는 같은 물리 필드·실제 스트림을 참조하고, 초기화는 지정된 19+6개 필드만 갱신합니다.

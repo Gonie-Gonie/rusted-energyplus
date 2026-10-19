@@ -36,6 +36,7 @@ impl super::SourceRealOutputOwners for SourceNonFacilityOutputOwners<'_> {
     ) -> Result<&f64, super::OrdinaryRadiationError> {
         use super::SourceRealOutputTarget as T;
         match target {
+            T::Node { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
             T::Weather { .. } => self.weather.real_output(target),
             T::Schedule { .. } => self.schedules.real_output(target),
             T::SystemReports { .. } => self.system_reports.real_output(target),
