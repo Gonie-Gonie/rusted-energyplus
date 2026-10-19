@@ -188,7 +188,7 @@ impl OrdinarySurfaceInitialization {
                     o.clock,
                     o.globals,
                     o.environment,
-                    o.backend.state.kickoff_simulation,
+                    o.globals.kickoff_simulation,
                     self.inside_surface_iterations,
                 ),
             );
@@ -212,7 +212,7 @@ impl OrdinarySurfaceInitialization {
                         "inside_ctf_loop_exited",
                         o.clock,
                         o.globals,
-                        o.backend.state.kickoff_simulation,
+                        o.globals.kickoff_simulation,
                         self.inside_surface_iterations,
                         crate::heat_balance::source_surface_cadence::Detail {
                             converged: Some(outcome.converged),
@@ -223,7 +223,7 @@ impl OrdinarySurfaceInitialization {
                         },
                     );
                     for &number in &o.geometry.surface_lists.all_ht {
-                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_exit_surface", o.clock, o.globals, o.backend.state.kickoff_simulation, self.inside_surface_iterations,
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_exit_surface", o.clock, o.globals, o.globals.kickoff_simulation, self.inside_surface_iterations,
                             crate::heat_balance::source_surface_cadence::Detail {surface:Some(number),inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
                     }
                 }
@@ -234,7 +234,7 @@ impl OrdinarySurfaceInitialization {
                     o.clock,
                     o.globals,
                     o.environment,
-                    o.backend.state.kickoff_simulation,
+                    o.globals.kickoff_simulation,
                     self.inside_surface_iterations,
                 ),
                 cadence_result.is_ok(),

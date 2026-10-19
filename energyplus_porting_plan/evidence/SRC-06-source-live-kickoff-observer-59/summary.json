@@ -1,0 +1,104 @@
+{
+  "schema": "src06-source-live-kickoff-observer-checkpoint.v1",
+  "status": "QUALITY_PASS_CORRECTED_A24_PENDING",
+  "public_directory": "energyplus_porting_plan/evidence/SRC-06-source-live-kickoff-observer-59",
+  "actual_review": {
+    "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
+    "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
+    "bytes": 6828
+  },
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root59-application.json",
+    "sha256": "b89cb2182b98a62308dd913d25006c82c4184a60a816cdd9a2577226c8a01407",
+    "bytes": 1483
+  },
+  "draft": {
+    "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/draft.json",
+    "sha256": "74a10141d894106a2b998032d25127f290d53ae009ea1b964c2d8a6cc58ed721",
+    "bytes": 43778
+  },
+  "peer": {
+    "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
+    "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
+    "bytes": 20756
+  },
+  "complete_compiler_Source_plan": {
+    "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/complete-proposed-compiler-Source-plan.json",
+    "sha256": "ae1b1d0bbb0df3a27ff348efa8016dcac0a27db056ad1271f4bafe81f6373fe2",
+    "bytes": 2623145
+  },
+  "actual_quality_commands": {
+    "fmt": {
+      "path": ".runtime/porting/SRC-06/Root59-fmt-command/receipt.json",
+      "sha256": "aa9be06c2707fbb552bee28400ae6e0a2468ca63a68adf7c8c5086bab45610ea",
+      "bytes": 3845
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-06/Root59-clippy-command/receipt.json",
+      "sha256": "bce0329e95ee9d6782fee974774dec20ae363d0692ff136a83052c2fba05139f",
+      "bytes": 3938
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-06/Root59-workspace-command/receipt.json",
+      "sha256": "99fcdb2fa96ef008139d9a28a001c5a2a13370738ab3f667517d9ec805ed698b",
+      "bytes": 3877
+    }
+  },
+  "actual_one_Source_snapshot_SHA256": "62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+  "six_Source_read_substitutions": 37,
+  "observer_argument_reads": 35,
+  "observer_handoff_predicate_reads": 2,
+  "prior_P6_Source0": {
+    "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/command/receipt.json",
+    "sha256": "e4efbd63a2881e60b445e78c10fa80493751795d89ecdc01179d3418a0989069",
+    "bytes": 3564
+  },
+  "prior_false_custody": {
+    "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/custody.json",
+    "sha256": "71ea7321b52d58a6b0558b722e5bad158e173eca59250bb020bce62e40b503da",
+    "bytes": 25857
+  },
+  "prior_failed_Surface_comparison": {
+    "path": ".runtime/porting/SRC-06/final-A24-Surface-readback-Root-P6-01/review.json",
+    "sha256": "a5f1af05b9f3af836840ed52bbadc777ff2ae1361b02976cdf6bb88d1256ee17",
+    "bytes": 135025
+  },
+  "prior_mismatches": {
+    "path": ".runtime/porting/SRC-06/final-A24-Surface-readback-Root-P6-01/mismatches.jsonl",
+    "sha256": "4c5e71d32a44effbcc15681387e870f551b313ab3998cbfeb260638607709e02",
+    "bytes": 366407
+  },
+  "historical_Source58_unit_review_reference_only": {
+    "path": ".runtime/porting/SRC-06/Root58-actual-review/review.json",
+    "sha256": "fac45206ec64be1b89945618f2f367586564ceb2b166b948109d99c6ba500724",
+    "bytes": 11974
+  },
+  "prior_unit_results_same_current_binary_claim": false,
+  "corrected_A24_or_final15_result_claim": false,
+  "gate_changes": 0,
+  "archive": {
+    "path": ".runtime/porting/SRC-06/live-kickoff-publication-Root-59-01/live-kickoff-observer-59.zip",
+    "sha256": "5b852f63360293ccea152073c0fcd2784c10917ffcf6533169b83e337f2d1d87",
+    "bytes": 848603
+  },
+  "finite_index": {
+    "path": ".runtime/porting/SRC-06/live-kickoff-publication-Root-59-01/index.json",
+    "sha256": "ff3dd7dbc484f0b8f39d265c1f7cfeccfe70a6e78b11a6a60917f08a0ccb0adb",
+    "bytes": 40099
+  },
+  "qualification": "Observer only; scientific owners/formulas unchanged. P6 remains failed; fresh P7 cadence/final15 pending. No large traces/Native streams/binaries/core/old fixtures copied.",
+  "publisher_executions_of_Cargo_Native_Source_tests_or_Git": 0,
+  "canonical_writes": 0,
+  "public_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-source-live-kickoff-observer-59/live-kickoff-observer-59.zip",
+    "sha256": "5b852f63360293ccea152073c0fcd2784c10917ffcf6533169b83e337f2d1d87",
+    "size_bytes": 848603
+  },
+  "public_index": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-source-live-kickoff-observer-59/index.json",
+    "sha256": "ff3dd7dbc484f0b8f39d265c1f7cfeccfe70a6e78b11a6a60917f08a0ccb0adb",
+    "size_bytes": 40099
+  },
+  "workspace_passed": 4975,
+  "workspace_existing_ignored": 2
+}

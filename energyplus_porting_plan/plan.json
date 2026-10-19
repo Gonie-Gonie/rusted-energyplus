@@ -13048,6 +13048,12 @@
           "bytes": 11974
         },
         "qualification": "Actual7 admission full calls/35 states7096 paired raw fields; six Fatal and one continuation; existing60 positive calls75524 observations; current fmt/strict Clippy/workspace4975 pass. Final15/cadence and gates pending."
+      },
+      "canonical_live_kickoff_observer_59": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-source-live-kickoff-observer-59/summary.json",
+        "sha256": "1df7b9a5f259f8df4d89dce3e2de77169e5186de29415b803f9c2217648aabbc",
+        "size_bytes": 4716,
+        "qualification": "37 observer-only live kickoff reads; current fmt/strict default Clippy/workspace4975 pass. Prior P6 failed1007 clock observations is preserved despite635375 bitexact numerical observations. Corrected P7/full15 pending; no gate changes."
       }
     },
     {

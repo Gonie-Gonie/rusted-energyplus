@@ -61,7 +61,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             && self.owners.clock.time_step == 1
             && self.owners.clock.begin_day_flag
             && !self.owners.globals.doing_sizing
-            && !self.owners.backend.state.kickoff_simulation
+            && !self.owners.globals.kickoff_simulation
         {
             crate::heat_balance::source_surface_cadence::record_handoff(
                 "before_first_run_init",
@@ -70,7 +70,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
                 self.owners.clock.kind_of_sim,
@@ -134,7 +134,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -161,7 +161,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -177,7 +177,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -206,7 +206,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -242,7 +242,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -267,7 +267,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),

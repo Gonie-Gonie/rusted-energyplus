@@ -98,7 +98,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
                 owners.clock,
                 owners.globals,
                 owners.environment,
-                owners.backend.state.kickoff_simulation,
+                owners.globals.kickoff_simulation,
                 surface.inside_surface_iterations,
             ),
         );
@@ -127,7 +127,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
                 owners.clock,
                 owners.globals,
                 owners.environment,
-                owners.backend.state.kickoff_simulation,
+                owners.globals.kickoff_simulation,
                 surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -140,7 +140,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
                     owners.clock,
                     owners.globals,
                     owners.environment,
-                    owners.backend.state.kickoff_simulation,
+                    owners.globals.kickoff_simulation,
                     surface.inside_surface_iterations,
                 ),
             );

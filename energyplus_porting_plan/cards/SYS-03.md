@@ -78,3 +78,9 @@ warmup 종료 판정의 현재 단위 근거는 [55번의 실제 RecKeep/Check 6
 역사적 근거는 [실제 uncontrolled warmup 소유자 적용](../evidence/SYS-03-warmup-owner/summary.json), [원본 R 문자열 615개 비교](../evidence/SYS-03-round-format/summary.json), [선택 Report 14회·EIO 및 당시 일반 A 품질](../evidence/SYS-03-ordinary-warmup-report/summary.json)에 보존합니다. R 비교의 양의 무한대 5개 제외와 각 실행의 미검증 가족·실패 기록은 그대로 남습니다.
 
 원본과 Source의 두 경계 전체 snapshot, 실제 Surface cadence와 같은 최종 Source의 15개 일반 실행·전체 출력 검증은 별도 과제입니다. 이 카드의 네 gate와 전체 A 14/54·B 14/64는 변경하지 않습니다.
+
+## 전역 kickoff 관측 연결 59
+
+[59번 증거](../evidence/SRC-06-source-live-kickoff-observer-59/summary.json)는 관측용 kickoff 입력을 진단용 복사본에서 실제 `SelectedHeatBalanceGlobals` 셀의 읽기로 바꾼 37곳을 보존한다. 원본 SimulationManager268/279와 실제 Source setup/postlude가 이미 그 전역 셀을 쓰고 있으며, 기존 과학 계산도 같은 셀을 사용한다. 35개 관측 인자와 두 opt-in 인계 관측 조건만 수정했으며 계산·플래그 쓰기·기대값·관측 스키마는 유지했다.
+
+첫 P6 A24의 실제 정상 종료, 635,375개 수치 비트 일치와 kickoff 관측 1,007개 불일치를 구분하여 보존한다. 포맷·strict default-feature Clippy·workspace 4,975개(기존 제외 2개)는 통과했다. 수정한 관측기의 새 P7 A24 결과와 최종 연결·생산 gate는 아직 판정하지 않는다.

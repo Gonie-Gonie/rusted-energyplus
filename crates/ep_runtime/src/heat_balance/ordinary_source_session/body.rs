@@ -191,7 +191,7 @@ impl OrdinarySourceSession {
             && owners.clock.day_of_sim == 0
             && owners.clock.kind_of_sim == 3
             && !owners.globals.doing_sizing
-            && !owners.backend.state.kickoff_simulation
+            && !owners.globals.kickoff_simulation
         {
             crate::heat_balance::source_surface_cadence::record_handoff(
                 "after_warmup_complete",
@@ -200,7 +200,7 @@ impl OrdinarySourceSession {
                     owners.clock,
                     owners.globals,
                     owners.environment,
-                    owners.backend.state.kickoff_simulation,
+                    owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
                 owners.clock.kind_of_sim,

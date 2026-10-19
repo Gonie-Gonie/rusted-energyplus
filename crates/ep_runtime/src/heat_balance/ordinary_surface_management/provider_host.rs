@@ -167,7 +167,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -227,7 +227,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -240,7 +240,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -281,7 +281,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -305,7 +305,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -329,7 +329,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -352,7 +352,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -367,7 +367,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -394,7 +394,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -407,7 +407,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );
@@ -458,7 +458,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
         );
@@ -486,7 +486,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 self.owners.clock,
                 self.owners.globals,
                 self.owners.environment,
-                self.owners.backend.state.kickoff_simulation,
+                self.owners.globals.kickoff_simulation,
                 self.surface.inside_surface_iterations,
             ),
             cadence_result.is_ok(),
@@ -499,7 +499,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     self.owners.clock,
                     self.owners.globals,
                     self.owners.environment,
-                    self.owners.backend.state.kickoff_simulation,
+                    self.owners.globals.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
             );

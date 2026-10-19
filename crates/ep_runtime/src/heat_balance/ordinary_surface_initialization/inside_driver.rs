@@ -317,7 +317,7 @@ impl OrdinarySurfaceInitialization {
                     "inside_convection_entry",
                     clock,
                     globals,
-                    backend.state.kickoff_simulation,
+                    globals.kickoff_simulation,
                     self.inside_surface_iterations,
                     if crate::heat_balance::source_surface_cadence::active() {
                         let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
@@ -356,7 +356,7 @@ impl OrdinarySurfaceInitialization {
                     "inside_convection_return",
                     clock,
                     globals,
-                    backend.state.kickoff_simulation,
+                    globals.kickoff_simulation,
                     self.inside_surface_iterations,
                     if crate::heat_balance::source_surface_cadence::active() {
                         let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
@@ -392,7 +392,7 @@ impl OrdinarySurfaceInitialization {
                     "inside_precalculation_return",
                     clock,
                     globals,
-                    backend.state.kickoff_simulation,
+                    globals.kickoff_simulation,
                     self.inside_surface_iterations,
                     if crate::heat_balance::source_surface_cadence::active() {
                         let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
@@ -427,7 +427,7 @@ impl OrdinarySurfaceInitialization {
                             "inside_first_immediate_solve",
                             clock,
                             globals,
-                            backend.state.kickoff_simulation,
+                            globals.kickoff_simulation,
                             self.inside_surface_iterations,
                             crate::heat_balance::source_surface_cadence::Detail {
                                 surface: Some(number),
@@ -450,14 +450,14 @@ impl OrdinarySurfaceInitialization {
                     if crate::heat_balance::source_surface_cadence::active()
                         && self.inside_surface_iterations < 2
                     {
-                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_before_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_before_temperature_assignment", clock, globals, globals.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
                     }
                     self.arrays
                         .solve_source_inside_opaque_ctf_at(index(number)?)?;
                     if crate::heat_balance::source_surface_cadence::active()
                         && self.inside_surface_iterations < 2
                     {
-                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_after_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::temperature(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_after_temperature_assignment", clock, globals, globals.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::temperature(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
                     }
                 }
                 for number in space.opaque.clone() {
@@ -614,7 +614,7 @@ impl OrdinarySurfaceInitialization {
             "inside_ctf_convergence_checks_reached",
             clock,
             globals,
-            backend.state.kickoff_simulation,
+            globals.kickoff_simulation,
             self.inside_surface_iterations,
             crate::heat_balance::source_surface_cadence::Detail {
                 maximum_delta_bits: Some(maximum_difference.to_bits()),

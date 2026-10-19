@@ -1,0 +1,862 @@
+{
+  "schema": "src06-observer59-finite-index.v1",
+  "entries": [
+    {
+      "role": "Root actual quality/carry review",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
+        "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
+        "bytes": 6828
+      },
+      "member": "objects/7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1"
+    },
+    {
+      "role": "Root observer application",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-application.json",
+        "sha256": "b89cb2182b98a62308dd913d25006c82c4184a60a816cdd9a2577226c8a01407",
+        "bytes": 1483
+      },
+      "member": "objects/b89cb2182b98a62308dd913d25006c82c4184a60a816cdd9a2577226c8a01407"
+    },
+    {
+      "role": "independent observer peer",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
+        "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
+        "bytes": 20756
+      },
+      "member": "objects/78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877"
+    },
+    {
+      "role": "six Source draft",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/draft.json",
+        "sha256": "74a10141d894106a2b998032d25127f290d53ae009ea1b964c2d8a6cc58ed721",
+        "bytes": 43778
+      },
+      "member": "objects/74a10141d894106a2b998032d25127f290d53ae009ea1b964c2d8a6cc58ed721"
+    },
+    {
+      "role": "whole final compiler plan",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/complete-proposed-compiler-Source-plan.json",
+        "sha256": "ae1b1d0bbb0df3a27ff348efa8016dcac0a27db056ad1271f4bafe81f6373fe2",
+        "bytes": 2623145
+      },
+      "member": "objects/ae1b1d0bbb0df3a27ff348efa8016dcac0a27db056ad1271f4bafe81f6373fe2"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/before.rs",
+        "sha256": "6e907fb4e2b19933d7c34f9bb361d88e9d11450dce59cbdc550c57fce4f96940",
+        "bytes": 30656
+      },
+      "member": "objects/6e907fb4e2b19933d7c34f9bb361d88e9d11450dce59cbdc550c57fce4f96940"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/proposed.rs",
+        "sha256": "cc38f780de47ba2b5a603ac756a843b5961a89b197fcda49e5eb07121130385e",
+        "bytes": 30614
+      },
+      "member": "objects/cc38f780de47ba2b5a603ac756a843b5961a89b197fcda49e5eb07121130385e"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/forward.diff",
+        "sha256": "79cfbdca8e301d8855d69d0cba6f77a3108b645e0e1a28305190d6e66faad951",
+        "bytes": 4863
+      },
+      "member": "objects/79cfbdca8e301d8855d69d0cba6f77a3108b645e0e1a28305190d6e66faad951"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/inverse.diff",
+        "sha256": "b4f71afb6c48367aa9bf21a4673acab1492035ceb4c35f85e0db8a33eb508542",
+        "bytes": 4863
+      },
+      "member": "objects/b4f71afb6c48367aa9bf21a4673acab1492035ceb4c35f85e0db8a33eb508542"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/literal.ndiff",
+        "sha256": "71690927d5f08fe4f7aad245e044c1e8dab00952d7e912a486d24edafeb7dac4",
+        "bytes": 34089
+      },
+      "member": "objects/71690927d5f08fe4f7aad245e044c1e8dab00952d7e912a486d24edafeb7dac4"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/01/syntax.json",
+        "sha256": "bc95f713d80f7fd1d790bf993a16c238b5ba0195f30aab8fccb6987fb3015b89",
+        "bytes": 835
+      },
+      "member": "objects/bc95f713d80f7fd1d790bf993a16c238b5ba0195f30aab8fccb6987fb3015b89"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/before.rs",
+        "sha256": "5f1665fd4729f80ef473d97191ddde8ad2b5781e6511fea2c00b9ff777dd4926",
+        "bytes": 11213
+      },
+      "member": "objects/5f1665fd4729f80ef473d97191ddde8ad2b5781e6511fea2c00b9ff777dd4926"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/proposed.rs",
+        "sha256": "77a5bce7519e1b66bd5fada5815f8e157a78c8a19faebfa4364a400a5c5f91c6",
+        "bytes": 11189
+      },
+      "member": "objects/77a5bce7519e1b66bd5fada5815f8e157a78c8a19faebfa4364a400a5c5f91c6"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/forward.diff",
+        "sha256": "1ece4ebb72fdc006e03b1aeb425155defe58310e06f0b4bf5ec13fd47dc8ab92",
+        "bytes": 2143
+      },
+      "member": "objects/1ece4ebb72fdc006e03b1aeb425155defe58310e06f0b4bf5ec13fd47dc8ab92"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/inverse.diff",
+        "sha256": "f4763e852fa0937a36478e0d0bfc9120f53d37f23abb8177292ea085747b12c3",
+        "bytes": 2143
+      },
+      "member": "objects/f4763e852fa0937a36478e0d0bfc9120f53d37f23abb8177292ea085747b12c3"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/literal.ndiff",
+        "sha256": "15dec8a3030646172804ee869293a7a7d6176364d5deee7dcb46b3cfa26c6f4e",
+        "bytes": 12598
+      },
+      "member": "objects/15dec8a3030646172804ee869293a7a7d6176364d5deee7dcb46b3cfa26c6f4e"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/02/syntax.json",
+        "sha256": "a9f5cebabc1ebd2775d2eaedc00ee7c2074469cb4d1871247d1598936c7b555e",
+        "bytes": 835
+      },
+      "member": "objects/a9f5cebabc1ebd2775d2eaedc00ee7c2074469cb4d1871247d1598936c7b555e"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/before.rs",
+        "sha256": "c8b5654a87f066bb1a4d8c7255b8f6fce87daf54deea8a4765f312dab1a5190d",
+        "bytes": 9517
+      },
+      "member": "objects/c8b5654a87f066bb1a4d8c7255b8f6fce87daf54deea8a4765f312dab1a5190d"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/proposed.rs",
+        "sha256": "3cb66d6a22041c6d93a31b075f2cb7d7cb01900f858499f64cbc7761cae08322",
+        "bytes": 9499
+      },
+      "member": "objects/3cb66d6a22041c6d93a31b075f2cb7d7cb01900f858499f64cbc7761cae08322"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/forward.diff",
+        "sha256": "1a6bff8ede646d7f3ee691c36ad887849c8497a93e48fd9222f53eb3bacbde3a",
+        "bytes": 1164
+      },
+      "member": "objects/1a6bff8ede646d7f3ee691c36ad887849c8497a93e48fd9222f53eb3bacbde3a"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/inverse.diff",
+        "sha256": "a2afabb746bd4d5dfd1d1e8c0ec5f2dcac6c1bd1474d691066bc0194140aa707",
+        "bytes": 1164
+      },
+      "member": "objects/a2afabb746bd4d5dfd1d1e8c0ec5f2dcac6c1bd1474d691066bc0194140aa707"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/literal.ndiff",
+        "sha256": "3f9b473f846dd06d8d9e5daa3b5acdd6c1801fb6eb7f91af4faad6e141f7baa9",
+        "bytes": 10413
+      },
+      "member": "objects/3f9b473f846dd06d8d9e5daa3b5acdd6c1801fb6eb7f91af4faad6e141f7baa9"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/03/syntax.json",
+        "sha256": "bc44624b600252d98abc6c4e62becb8ddafa3f65e0aba2c995f1ee4941f44745",
+        "bytes": 834
+      },
+      "member": "objects/bc44624b600252d98abc6c4e62becb8ddafa3f65e0aba2c995f1ee4941f44745"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/before.rs",
+        "sha256": "62efa7528e1d49fc9fce4cc638be97275cb01fca9ddde86cebdb979eb18add68",
+        "bytes": 26512
+      },
+      "member": "objects/62efa7528e1d49fc9fce4cc638be97275cb01fca9ddde86cebdb979eb18add68"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/proposed.rs",
+        "sha256": "138e879c7f6b4d9b9e74dc1ded5b6a3026360a1785ffbd8d53351bd435b02657",
+        "bytes": 26434
+      },
+      "member": "objects/138e879c7f6b4d9b9e74dc1ded5b6a3026360a1785ffbd8d53351bd435b02657"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/forward.diff",
+        "sha256": "7587a2b52ce7b5fad0220a69dc47dd3b61f8263425e6f862a8dbdce4671ee4c3",
+        "bytes": 4900
+      },
+      "member": "objects/7587a2b52ce7b5fad0220a69dc47dd3b61f8263425e6f862a8dbdce4671ee4c3"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/inverse.diff",
+        "sha256": "74f6170b882383498b17ba94da73cbc4eaf89022aacf89cc5ae8a4dc08c31785",
+        "bytes": 4900
+      },
+      "member": "objects/74f6170b882383498b17ba94da73cbc4eaf89022aacf89cc5ae8a4dc08c31785"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/literal.ndiff",
+        "sha256": "88ee4c4b16ea8c2b5912e1c432d112dd1745077a415cd0ce1c50443818fb4604",
+        "bytes": 29549
+      },
+      "member": "objects/88ee4c4b16ea8c2b5912e1c432d112dd1745077a415cd0ce1c50443818fb4604"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_surface_management/provider_host.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/04/syntax.json",
+        "sha256": "732dc57ccdb5f4f87d8145ec269cac8838e2ac4bb0513be87c9fd85990b6c47e",
+        "bytes": 835
+      },
+      "member": "objects/732dc57ccdb5f4f87d8145ec269cac8838e2ac4bb0513be87c9fd85990b6c47e"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/before.rs",
+        "sha256": "1098ce2f753436abf13fd0f99f8ba5651b4cf0813a9e613137fa3c7c2f080ae6",
+        "bytes": 12213
+      },
+      "member": "objects/1098ce2f753436abf13fd0f99f8ba5651b4cf0813a9e613137fa3c7c2f080ae6"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/proposed.rs",
+        "sha256": "f742d8127046e6a6095e36aee8c7e03e4cdf689c6742c252b4692e39b505529c",
+        "bytes": 12165
+      },
+      "member": "objects/f742d8127046e6a6095e36aee8c7e03e4cdf689c6742c252b4692e39b505529c"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/forward.diff",
+        "sha256": "b62068d126e9891c8b44e76c7eed955b86d648870bc8cf65dbb4170e2a12ee85",
+        "bytes": 3113
+      },
+      "member": "objects/b62068d126e9891c8b44e76c7eed955b86d648870bc8cf65dbb4170e2a12ee85"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/inverse.diff",
+        "sha256": "c0c57ace4179520d5cbebd3bb79d7bffef20c2f9a1558ad6eb1465c32a2ebb6a",
+        "bytes": 3113
+      },
+      "member": "objects/c0c57ace4179520d5cbebd3bb79d7bffef20c2f9a1558ad6eb1465c32a2ebb6a"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/literal.ndiff",
+        "sha256": "7ccfef98355ebaa827d5204f9a3863253fc437f9138ab70fb27ba6180705256b",
+        "bytes": 13914
+      },
+      "member": "objects/7ccfef98355ebaa827d5204f9a3863253fc437f9138ab70fb27ba6180705256b"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/05/syntax.json",
+        "sha256": "a3ead76db02a8e1d8da526d394a093e91f35110f361a2b62a20b3541af3209ee",
+        "bytes": 835
+      },
+      "member": "objects/a3ead76db02a8e1d8da526d394a093e91f35110f361a2b62a20b3541af3209ee"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/before.rs",
+        "sha256": "218dfff43a7bd8b60507047254fc9a8117d86abe9a599bd65293ace76be6f177",
+        "bytes": 9843
+      },
+      "member": "objects/218dfff43a7bd8b60507047254fc9a8117d86abe9a599bd65293ace76be6f177"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/proposed.rs",
+        "sha256": "d1ecd59ab9f412ec79db477cd6419466cdabfec3d15f145158df470d21620fec",
+        "bytes": 9831
+      },
+      "member": "objects/d1ecd59ab9f412ec79db477cd6419466cdabfec3d15f145158df470d21620fec"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/forward.diff",
+        "sha256": "ae1818bf8b9bdea2272822b09ff30230959e32edd74d489adf2ab796d16ba8a9",
+        "bytes": 908
+      },
+      "member": "objects/ae1818bf8b9bdea2272822b09ff30230959e32edd74d489adf2ab796d16ba8a9"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/inverse.diff",
+        "sha256": "389e0912a09476c6eb6d1ff8782ef079d8411595f6a4295bbe0587b5bce402fb",
+        "bytes": 908
+      },
+      "member": "objects/389e0912a09476c6eb6d1ff8782ef079d8411595f6a4295bbe0587b5bce402fb"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/literal_inverse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/literal.ndiff",
+        "sha256": "921411e4bddf03edd153e41ba354b6de8936f7a680770a3a1c69e1bc67b8f795",
+        "bytes": 10532
+      },
+      "member": "objects/921411e4bddf03edd153e41ba354b6de8936f7a680770a3a1c69e1bc67b8f795"
+    },
+    {
+      "role": "six Source/crates/ep_runtime/src/heat_balance/ordinary_source_session/body.rs/Source_only_parse",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/06/syntax.json",
+        "sha256": "9494a4a16bdc58c108a2f0ae02f81deb582c1dca70fc38468a18dea7f1d758c8",
+        "bytes": 834
+      },
+      "member": "objects/9494a4a16bdc58c108a2f0ae02f81deb582c1dca70fc38468a18dea7f1d758c8"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-01.txt",
+        "sha256": "ac9df5168b25c2acbdf630a04250b56946efde1b583e1f558421fbbfe28d2369",
+        "bytes": 2434
+      },
+      "member": "objects/ac9df5168b25c2acbdf630a04250b56946efde1b583e1f558421fbbfe28d2369"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-02.txt",
+        "sha256": "abda560c9bb5ae68b030cd997ac41f97154c4c21b4b94b317a3d9a01c765ab95",
+        "bytes": 2970
+      },
+      "member": "objects/abda560c9bb5ae68b030cd997ac41f97154c4c21b4b94b317a3d9a01c765ab95"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-03.txt",
+        "sha256": "19b11fbcf2d3897070c497933ebdb71ba770a91b2a6cd17672db55298fb25cba",
+        "bytes": 1465
+      },
+      "member": "objects/19b11fbcf2d3897070c497933ebdb71ba770a91b2a6cd17672db55298fb25cba"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-04.txt",
+        "sha256": "1be2d71c98d4d33f899ee39e86d46aab477c91a1e4eb971be8f33738f02b8404",
+        "bytes": 1617
+      },
+      "member": "objects/1be2d71c98d4d33f899ee39e86d46aab477c91a1e4eb971be8f33738f02b8404"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-05.txt",
+        "sha256": "659fb009d6909cabffc77a4ead980625c23e90ff351959dbb26dd49220355e12",
+        "bytes": 1651
+      },
+      "member": "objects/659fb009d6909cabffc77a4ead980625c23e90ff351959dbb26dd49220355e12"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-06.txt",
+        "sha256": "7c524dbe5fccb806a1a7777e6200dc5badd03888e9571f9365e4be0f4e73ad40",
+        "bytes": 1191
+      },
+      "member": "objects/7c524dbe5fccb806a1a7777e6200dc5badd03888e9571f9365e4be0f4e73ad40"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-07.txt",
+        "sha256": "c7a3451b93fa70d973480b08760b0955826a6f0cd21c92e7cab2c1cb5c24ea96",
+        "bytes": 1286
+      },
+      "member": "objects/c7a3451b93fa70d973480b08760b0955826a6f0cd21c92e7cab2c1cb5c24ea96"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-08.txt",
+        "sha256": "74d71e40b6c344a7bc46288ed57e737d0b36efa09f7208e3b550477b928a83b2",
+        "bytes": 514
+      },
+      "member": "objects/74d71e40b6c344a7bc46288ed57e737d0b36efa09f7208e3b550477b928a83b2"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-09.txt",
+        "sha256": "fb109feaa080bcd4c80c88e426594466ce0c84bff111ab8b85c5e3e55bb5687f",
+        "bytes": 2088
+      },
+      "member": "objects/fb109feaa080bcd4c80c88e426594466ce0c84bff111ab8b85c5e3e55bb5687f"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/context-10.txt",
+        "sha256": "2c9a6de19b6970e024725167bd70ad0358a04609647fc60b9a1c90f8d227f7e7",
+        "bytes": 1864
+      },
+      "member": "objects/2c9a6de19b6970e024725167bd70ad0358a04609647fc60b9a1c90f8d227f7e7"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/Native-01-DataGlobals.hh.txt",
+        "sha256": "c97c5c61b9ff7a0b9bb56c1ec207e4be66123e2dffd05e8e00bbdf0f0608a3b7",
+        "bytes": 1498
+      },
+      "member": "objects/c97c5c61b9ff7a0b9bb56c1ec207e4be66123e2dffd05e8e00bbdf0f0608a3b7"
+    },
+    {
+      "role": "exact frozen ownership/writer context",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Source-Surface-live-kickoff-observer-Peer-59-01/Native-02-SimulationManager.cc.txt",
+        "sha256": "5cbea2585367e20b59bb5a3953ef6fda5a0aed58210e75b402f51003202e4157",
+        "bytes": 789
+      },
+      "member": "objects/5cbea2585367e20b59bb5a3953ef6fda5a0aed58210e75b402f51003202e4157"
+    },
+    {
+      "role": "draft author/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/author-Surface-live-kickoff-observer-Peer-59-01.py",
+        "sha256": "370a03dd5e96e933aa5f01356cec3410a4768aef8b20f1eccd144543b50b0cea",
+        "bytes": 10665
+      },
+      "member": "objects/370a03dd5e96e933aa5f01356cec3410a4768aef8b20f1eccd144543b50b0cea"
+    },
+    {
+      "role": "preserved P6 actual failed comparison",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final-A24-Surface-readback-Root-P6-01/review.json",
+        "sha256": "a5f1af05b9f3af836840ed52bbadc777ff2ae1361b02976cdf6bb88d1256ee17",
+        "bytes": 135025
+      },
+      "member": "objects/a5f1af05b9f3af836840ed52bbadc777ff2ae1361b02976cdf6bb88d1256ee17"
+    },
+    {
+      "role": "all1007 P6 mismatches, uncapped",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final-A24-Surface-readback-Root-P6-01/mismatches.jsonl",
+        "sha256": "4c5e71d32a44effbcc15681387e870f551b313ab3998cbfeb260638607709e02",
+        "bytes": 366407
+      },
+      "member": "objects/4c5e71d32a44effbcc15681387e870f551b313ab3998cbfeb260638607709e02"
+    },
+    {
+      "role": "duration helper correction02",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/manifest.json",
+        "sha256": "200a41f5968b6360263bf4277de39fe61ac6dd1f8cb03b7af58992318d95f106",
+        "bytes": 7208
+      },
+      "member": "objects/200a41f5968b6360263bf4277de39fe61ac6dd1f8cb03b7af58992318d95f106"
+    },
+    {
+      "role": "duration helper proof/original_READY",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/ready.json",
+        "sha256": "2fe0e96981c967d5b4c9ecf2776ceecc73efc1ed9e63a4bbe4f417c6d57385a8",
+        "bytes": 73504
+      },
+      "member": "objects/2fe0e96981c967d5b4c9ecf2776ceecc73efc1ed9e63a4bbe4f417c6d57385a8"
+    },
+    {
+      "role": "duration helper proof/preserved_false_A24_custody",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/custody.json",
+        "sha256": "71ea7321b52d58a6b0558b722e5bad158e173eca59250bb020bce62e40b503da",
+        "bytes": 25857
+      },
+      "member": "objects/71ea7321b52d58a6b0558b722e5bad158e173eca59250bb020bce62e40b503da"
+    },
+    {
+      "role": "duration helper proof/actual_A24_Source_receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/command/receipt.json",
+        "sha256": "e4efbd63a2881e60b445e78c10fa80493751795d89ecdc01179d3418a0989069",
+        "bytes": 3564
+      },
+      "member": "objects/e4efbd63a2881e60b445e78c10fa80493751795d89ecdc01179d3418a0989069"
+    },
+    {
+      "role": "duration helper proof/producer_extents",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/producer-111-157.rs.txt",
+        "sha256": "c4abf790d93959c769f696ab63e694bdbb4950c217833b29341a51a409be10f9",
+        "bytes": 1752
+      },
+      "member": "objects/c4abf790d93959c769f696ab63e694bdbb4950c217833b29341a51a409be10f9"
+    },
+    {
+      "role": "duration helper proof/producer_extents",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/producer-164-176.rs.txt",
+        "sha256": "c8f19232a04f82cc5f9013ee2fa982eb4bcf08c15c9c7a661810a7d6faeb49f2",
+        "bytes": 1109
+      },
+      "member": "objects/c8f19232a04f82cc5f9013ee2fa982eb4bcf08c15c9c7a661810a7d6faeb49f2"
+    },
+    {
+      "role": "duration helper proof/author_Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-final15-duration-helper-correction-Outer-03.py",
+        "sha256": "1889ed18a01815bba9265ad8fffb6e831fb7c66c4e82ac39b4a7c11304030b5c",
+        "bytes": 6193
+      },
+      "member": "objects/1889ed18a01815bba9265ad8fffb6e831fb7c66c4e82ac39b4a7c11304030b5c"
+    },
+    {
+      "role": "preserved real P6 Source0/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/command/stdout.log",
+        "sha256": "def24e20bed7bf27a44ce067361dec42c435fd7999052358095b0559bfa3abbb",
+        "bytes": 49382
+      },
+      "member": "objects/def24e20bed7bf27a44ce067361dec42c435fd7999052358095b0559bfa3abbb"
+    },
+    {
+      "role": "preserved real P6 Source0/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-current-source-Root-P6/A-24H/command/stderr.log",
+        "sha256": "5a36227da43730860f50ade1fc22361e39017a5d5c81e79c8e373ec1e4bdec6a",
+        "bytes": 1159
+      },
+      "member": "objects/5a36227da43730860f50ade1fc22361e39017a5d5c81e79c8e373ec1e4bdec6a"
+    },
+    {
+      "role": "four final15 helpers/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15_root_common_Outer_01.py",
+        "sha256": "df1d129ea164f9e67bce8d0293bf4b19e733cfbe8bda67cc0fb0919a04e09249",
+        "bytes": 11152
+      },
+      "member": "objects/df1d129ea164f9e67bce8d0293bf4b19e733cfbe8bda67cc0fb0919a04e09249"
+    },
+    {
+      "role": "four final15 helpers/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15_root_common_Outer_02.py",
+        "sha256": "b28c3eda31f82ea580b77ea4c494d7d09fbb4df070d8e89b995d99047b9b47ea",
+        "bytes": 11219
+      },
+      "member": "objects/b28c3eda31f82ea580b77ea4c494d7d09fbb4df070d8e89b995d99047b9b47ea"
+    },
+    {
+      "role": "four final15 helpers/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/final15_root_common_Outer_02.py.forward.diff",
+        "sha256": "50cd2e55aa7bd3f2596a9b23a306e512f45526fb6de37a3ab310d7761554f72a",
+        "bytes": 1945
+      },
+      "member": "objects/50cd2e55aa7bd3f2596a9b23a306e512f45526fb6de37a3ab310d7761554f72a"
+    },
+    {
+      "role": "four final15 helpers/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/final15_root_common_Outer_02.py.inverse.diff",
+        "sha256": "59317ac3ed66e2b23342527add33e8040912c8e91550c8b4b827cee760825718",
+        "bytes": 1945
+      },
+      "member": "objects/59317ac3ed66e2b23342527add33e8040912c8e91550c8b4b827cee760825718"
+    },
+    {
+      "role": "four final15 helpers/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-final15-Root-Outer-01.py",
+        "sha256": "a7ca4ff5701ee23f3047d569378e812e98a06bc048718cd248980bfbb6fe27c8",
+        "bytes": 4231
+      },
+      "member": "objects/a7ca4ff5701ee23f3047d569378e812e98a06bc048718cd248980bfbb6fe27c8"
+    },
+    {
+      "role": "four final15 helpers/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-final15-Root-Outer-02.py",
+        "sha256": "1626dcc645fda6e2fda2207dd1672b7b5339360d22b39e7f3b840b7f0724fcbe",
+        "bytes": 4234
+      },
+      "member": "objects/1626dcc645fda6e2fda2207dd1672b7b5339360d22b39e7f3b840b7f0724fcbe"
+    },
+    {
+      "role": "four final15 helpers/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/prepare-final15-Root-Outer-02.py.forward.diff",
+        "sha256": "358779917c1c62dd77eadecda5e61856cea1debb9803127bc4cf5688c6f5e4d4",
+        "bytes": 919
+      },
+      "member": "objects/358779917c1c62dd77eadecda5e61856cea1debb9803127bc4cf5688c6f5e4d4"
+    },
+    {
+      "role": "four final15 helpers/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/prepare-final15-Root-Outer-02.py.inverse.diff",
+        "sha256": "045016133f23e5e1fdf4b1da716112e65a9e684f6a81bc1d52c675ecbb619195",
+        "bytes": 919
+      },
+      "member": "objects/045016133f23e5e1fdf4b1da716112e65a9e684f6a81bc1d52c675ecbb619195"
+    },
+    {
+      "role": "four final15 helpers/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-final15-Source-Root-Outer-01.py",
+        "sha256": "fc7e056f165e43626785d19420254b3342aa8764e8cc83ea086264f63e1a8e50",
+        "bytes": 4377
+      },
+      "member": "objects/fc7e056f165e43626785d19420254b3342aa8764e8cc83ea086264f63e1a8e50"
+    },
+    {
+      "role": "four final15 helpers/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/run-final15-Source-Root-Outer-02.py",
+        "sha256": "218731f70f2977cfdd3455a256dd4890dd25a6f295efd3dc3d5d819aeb8b123c",
+        "bytes": 4383
+      },
+      "member": "objects/218731f70f2977cfdd3455a256dd4890dd25a6f295efd3dc3d5d819aeb8b123c"
+    },
+    {
+      "role": "four final15 helpers/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/run-final15-Source-Root-Outer-02.py.forward.diff",
+        "sha256": "db2485008d1e968066b212cad25afee837737e3cd8352abf0155850e517ca28a",
+        "bytes": 1526
+      },
+      "member": "objects/db2485008d1e968066b212cad25afee837737e3cd8352abf0155850e517ca28a"
+    },
+    {
+      "role": "four final15 helpers/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/run-final15-Source-Root-Outer-02.py.inverse.diff",
+        "sha256": "bba85b0c0631a738af64a5876f1e01c21e33722f48167d27dec174939330f717",
+        "bytes": 1526
+      },
+      "member": "objects/bba85b0c0631a738af64a5876f1e01c21e33722f48167d27dec174939330f717"
+    },
+    {
+      "role": "four final15 helpers/before",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/review-final15-Source-Root-Outer-01.py",
+        "sha256": "9a76bd6577ce2c54faed083f205f8c3a33dc410742b6213700a0da357d9f6ddf",
+        "bytes": 9965
+      },
+      "member": "objects/9a76bd6577ce2c54faed083f205f8c3a33dc410742b6213700a0da357d9f6ddf"
+    },
+    {
+      "role": "four final15 helpers/proposed",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/review-final15-Source-Root-Outer-02.py",
+        "sha256": "779da8f9066aea635b446a7827cccb8bf63bed3a8096ec35b45d71417fc2ba47",
+        "bytes": 9971
+      },
+      "member": "objects/779da8f9066aea635b446a7827cccb8bf63bed3a8096ec35b45d71417fc2ba47"
+    },
+    {
+      "role": "four final15 helpers/forward_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/review-final15-Source-Root-Outer-02.py.forward.diff",
+        "sha256": "3d99453b8324ff9c393471e1a2c44f007104614f9f0a734b2ea4e395e8918f3e",
+        "bytes": 1599
+      },
+      "member": "objects/3d99453b8324ff9c393471e1a2c44f007104614f9f0a734b2ea4e395e8918f3e"
+    },
+    {
+      "role": "four final15 helpers/inverse_diff",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/final15-duration-helper-correction-Outer-02/review-final15-Source-Root-Outer-02.py.inverse.diff",
+        "sha256": "ec30406eb87391c1b12bfeda6e789a791e114809977d3b53fe4b33927f664b0d",
+        "bytes": 1599
+      },
+      "member": "objects/ec30406eb87391c1b12bfeda6e789a791e114809977d3b53fe4b33927f664b0d"
+    },
+    {
+      "role": "actual fmt receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-fmt-command/receipt.json",
+        "sha256": "aa9be06c2707fbb552bee28400ae6e0a2468ca63a68adf7c8c5086bab45610ea",
+        "bytes": 3845
+      },
+      "member": "objects/aa9be06c2707fbb552bee28400ae6e0a2468ca63a68adf7c8c5086bab45610ea"
+    },
+    {
+      "role": "actual fmt/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-fmt-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "actual fmt/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-fmt-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "member": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "role": "actual fmt/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/62/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "sha256": "62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "bytes": 1869577
+      },
+      "member": "objects/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9"
+    },
+    {
+      "role": "actual clippy receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-clippy-command/receipt.json",
+        "sha256": "bce0329e95ee9d6782fee974774dec20ae363d0692ff136a83052c2fba05139f",
+        "bytes": 3938
+      },
+      "member": "objects/bce0329e95ee9d6782fee974774dec20ae363d0692ff136a83052c2fba05139f"
+    },
+    {
+      "role": "actual clippy/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-clippy-command/stdout.log",
+        "sha256": "285061c060952d33642fe9d422f7545cb7dd512fe8728bd30f697fe78652c2be",
+        "bytes": 96303
+      },
+      "member": "objects/285061c060952d33642fe9d422f7545cb7dd512fe8728bd30f697fe78652c2be"
+    },
+    {
+      "role": "actual clippy/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-clippy-command/stderr.log",
+        "sha256": "5f1154eba87278ea97602779b760027e8ff574c41937c415044f973507bea30c",
+        "bytes": 686
+      },
+      "member": "objects/5f1154eba87278ea97602779b760027e8ff574c41937c415044f973507bea30c"
+    },
+    {
+      "role": "actual clippy/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/62/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "sha256": "62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "bytes": 1869577
+      },
+      "member": "objects/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9"
+    },
+    {
+      "role": "actual workspace receipt",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-workspace-command/receipt.json",
+        "sha256": "99fcdb2fa96ef008139d9a28a001c5a2a13370738ab3f667517d9ec805ed698b",
+        "bytes": 3877
+      },
+      "member": "objects/99fcdb2fa96ef008139d9a28a001c5a2a13370738ab3f667517d9ec805ed698b"
+    },
+    {
+      "role": "actual workspace/stdout",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-workspace-command/stdout.log",
+        "sha256": "e154ff241ea1ce9a2d9e3bfabafb85d1d7ff206b827f2cd381e2641577112b78",
+        "bytes": 761260
+      },
+      "member": "objects/e154ff241ea1ce9a2d9e3bfabafb85d1d7ff206b827f2cd381e2641577112b78"
+    },
+    {
+      "role": "actual workspace/stderr",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/Root59-workspace-command/stderr.log",
+        "sha256": "cf5c55ebdc40dc3de81b4aa63c8fd2536e3f3fd899a3acf43bc4b50f84f17942",
+        "bytes": 2833
+      },
+      "member": "objects/cf5c55ebdc40dc3de81b4aa63c8fd2536e3f3fd899a3acf43bc4b50f84f17942"
+    },
+    {
+      "role": "actual workspace/source_snapshot",
+      "authority": {
+        "path": ".runtime/porting/source-objects/62/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "sha256": "62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9",
+        "bytes": 1869577
+      },
+      "member": "objects/62cf89b59950c462b62fbb2f28a3fddb00d3ed2149ef44d491b48e6b268fe8d9"
+    },
+    {
+      "role": "Root actual checker",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/review-live-kickoff-quality-Root-59.py",
+        "sha256": "ee6bcb420c56fa31ed138b0d95598cd2b265f817e83c8b8023e3590b19e2dd27",
+        "bytes": 6293
+      },
+      "member": "objects/ee6bcb420c56fa31ed138b0d95598cd2b265f817e83c8b8023e3590b19e2dd27"
+    },
+    {
+      "role": "finite publisher Source",
+      "authority": {
+        "path": ".runtime/porting/SRC-06/prepare-live-kickoff-publication-Peer-59-01.py",
+        "sha256": "e5f15bbba9283040d115b60785ba47130dc4290a8676c3256070876ba092a9c6",
+        "bytes": 10129
+      },
+      "member": "objects/e5f15bbba9283040d115b60785ba47130dc4290a8676c3256070876ba092a9c6"
+    }
+  ],
+  "unique_objects": 92,
+  "all_CRC_SHA_bytes_verified": true
+}
