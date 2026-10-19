@@ -1,0 +1,95 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 4,
+  "existing_Rust_sources": 3,
+  "new_Rust_sources": 1,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Actual production B then A24 only. Inherited25 RawModel test is historical evidence, not checkpoint29 execution. No unrelated profile, repeated cohort, new test or alltargets.",
+  "scope": "Same controlled Config/physical Node/MassConservation mass, inlet/return and leaving operations; real schedule/fixed-flow arrays and return-node-filtered cached gains, refrigeration credit and demand reset. Same RoomAir allocation predicate. Actual flags/counts select finite branches; positive primary/mixing/exhaust/Space/window/allocatedRoomAir/diagnostic operations remain typed boundaries. All12/fullB/internal Native numerical equivalence unclaimed.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-controlled-air-balance.v1",
+  "status": "Genuine Source controlled mass and leaving conditions; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/manifest.json",
+    "sha256": "06b7d51e2dd42b4908b8e4a3ecf140f641fc0873aa28746231c002090a01065b",
+    "bytes": 38225
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Outer-controlled-air-balance-Source-review-29-02/review.json",
+    "sha256": "eea2a928ac696bcf93472828761f77eaa81870f6d257ef148bb376e94d3d6248",
+    "bytes": 27072
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/complete-final-compiler-Source-plan.json",
+    "sha256": "b2c88fdeebe86fe83773bbea67e882fe73aa5ac7ed952a517d53cf9841a02028",
+    "bytes": 2629456
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-command-Root-29/receipt.json",
+    "sha256": "fea32185b51470d44a0a3af5649671fae08ba9e6e371699caa11e76fdd075190",
+    "bytes": 4399
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-command-Root-29/receipt.json",
+    "sha256": "c83171f35ef0bc8078ba825355f6353d29245ea5cd2857e4b7a5a20ca113cea1",
+    "bytes": 4348
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-air-balance-actual-review-29/review.json",
+    "sha256": "85538c54d4a67e5a314706e83f6796b00835fe602d59805cd35310a01c289767",
+    "bytes": 17389
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: positive actual ZoneEquipConfig InletNode(1) read1939",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted28_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-output-actual-review-28/review.json",
+      "sha256": "1241f905980f76fbf4fcfbd0dc6ab6a97d8990871d2508af7482e52c1fb9fabe",
+      "bytes": 17345
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal28": 7,
+    "CSV_files_whole_equal28": 2,
+    "scope": "Proof transfer from accepted28; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-Root-29/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "inherited25_raw_metadata_test": {
+    "path": ".runtime/porting/SRC-06/canonical-purchased-air-IDF-metadata-test-Root-25/receipt.json",
+    "sha256": "5dff6e6fc343fe1dcc5e56c4dce4063fc4c3c9a408bb2f8779796f13e2313829",
+    "bytes": 6451
+  },
+  "inherited25_raw_test_is_not_checkpoint29_execution": true,
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither internal numerical Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-air-balance-29/evidence.zip",
+    "sha256": "24bccd7009a31824e7ac80becfed8aaebc8c8847bf679e611f2556076e4d2544",
+    "bytes": 1847921
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-air-balance-29/manifest.json",
+    "sha256": "3f85fac233d90fa3f663e93da14d3a294a0913e8f970495758155c090f3bdae0",
+    "bytes": 32742
+  },
+  "archive_entries": 134,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-controlled-air-balance-checkpoint-Audit-29.py",
+    "sha256": "eca73cd9c09ce1d2bcc041663030681da7626bddc00441dc16685a8ad7cdb651",
+    "bytes": 12724
+  }
+}

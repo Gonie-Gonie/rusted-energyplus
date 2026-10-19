@@ -1,0 +1,681 @@
+{
+  "schema": "src06-canonical29-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-air-balance-29/evidence.zip",
+    "sha256": "24bccd7009a31824e7ac80becfed8aaebc8c8847bf679e611f2556076e4d2544",
+    "bytes": 1847921
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-controlled-air-balance-Source-review-29-02/review.json",
+      "sha256": "eea2a928ac696bcf93472828761f77eaa81870f6d257ef148bb376e94d3d6248",
+      "bytes": 27072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-controlled-mass-return-Source-review-29-02/review.json",
+      "sha256": "2bfd6c1c97dbcb71b06d271f5a0dce39f152f2fe118a673d744258db8ef2d616",
+      "bytes": 18424
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-controlled-air-balance-application-29/receipt.json",
+      "sha256": "76bf065811412bc7919a60c8ed2c84bc5e1047a3a28038489c8ea57d3177283e",
+      "bytes": 13859
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-air-balance-actual-review-29/review.json",
+      "sha256": "85538c54d4a67e5a314706e83f6796b00835fe602d59805cd35310a01c289767",
+      "bytes": 17389
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-air-balance-actual-review-29/table-clock-differences.json",
+      "sha256": "03760564eb06767a85a92e65fd6529d84e1243ba182fd5eadf9ab8e1fc982afa",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-purchased-air-input-actual-review-25-02/review.json",
+      "sha256": "1bc1b45027a2a3a675e6dc16c12ce1e6fc1fe16076e66357a20044b6555402ca",
+      "bytes": 18290
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-output-actual-review-28/review.json",
+      "sha256": "1241f905980f76fbf4fcfbd0dc6ab6a97d8990871d2508af7482e52c1fb9fabe",
+      "bytes": 17345
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-controlled-air-balance-Root-29.py",
+      "sha256": "40efa75759ce1a69eca20bb297161e13551052afb33d15ccf8be98032e647342",
+      "bytes": 6435
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-purchased-air-IDF-metadata-test-Root-25/receipt.json",
+      "sha256": "5dff6e6fc343fe1dcc5e56c4dce4063fc4c3c9a408bb2f8779796f13e2313829",
+      "bytes": 6451
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/diagnostics.json",
+      "sha256": "9b553b2a8d38a58c8a2b9c691528531dd6f20840d8168eba16d80a578b5a594f",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplustbl.htm",
+      "sha256": "02b62ea0d44669960a36d48951d13ca95bd5f9784f2f5ce0ca83dd4f1037ccf7",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/eplustbl.xml",
+      "sha256": "74f630a58f63eeeafae2309ab12d96eb626d968398bd279ca5a863855655af45",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/results/source-reported-results.json",
+      "sha256": "f6d3cf267efec730633aaa87a2fc7ae00ece6f07656c62f428f6133aaea63416",
+      "bytes": 1679922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-Root-29/output/run-summary.json",
+      "sha256": "87ccc6b5ae3f2ecd3ecc05d4ca45872c854ba0d6849a69ddda46aef3a3528e53",
+      "bytes": 32746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-command-Root-29/receipt.json",
+      "sha256": "c83171f35ef0bc8078ba825355f6353d29245ea5cd2857e4b7a5a20ca113cea1",
+      "bytes": 4348
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-command-Root-29/stderr.log",
+      "sha256": "34e9bd1b8eaa12016dae9e334ca0c63a375a52c3c7065213a4381586b897e1a6",
+      "bytes": 755
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-A-24H-command-Root-29/stdout.log",
+      "sha256": "4bbc77fee4ce184d1e1d643f889b93db75a22946ca37d04c1fb51fc8cf6bead1",
+      "bytes": 403324
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-Root-29/output/diagnostics.json",
+      "sha256": "2a4d1be309739154aaf1d9a19b7e617eb18f4065955e4203dce48c13d8711b5f",
+      "bytes": 2987
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-Root-29/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-Root-29/output/run-summary.json",
+      "sha256": "f1bcb1467cf3fd0be9789a4e1136f4db902e2a9f7b794019c071b3c685f07bb1",
+      "bytes": 25322
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-command-Root-29/receipt.json",
+      "sha256": "fea32185b51470d44a0a3af5649671fae08ba9e6e371699caa11e76fdd075190",
+      "bytes": 4399
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-command-Root-29/stderr.log",
+      "sha256": "f3e6edb38a894ccd5ac55966c585b24268d3fc406ba76253eeb117f4a6e3d428",
+      "bytes": 10718
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-air-balance-B-NOLIMIT-24H-command-Root-29/stdout.log",
+      "sha256": "d74dbdf91836cc32e961c4784c02551c21a4032163c339861f4581ae82891d8a",
+      "bytes": 403359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-controlled-air-balance-actual-Root-29.py",
+      "sha256": "0d95f5b2e3df0d8c1726aabf47daea8f2cce8930b2cb82e8e2680befb45e3bd7",
+      "bytes": 6709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-balance-publication-prepared-Audit-29/publication-template.json",
+      "sha256": "9447a7125d274790563120032f1a8e816925853ec1c95f08cf51d6a84cbad0b5",
+      "bytes": 29369
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataHVACGlobals.hh.84-97.txt",
+      "sha256": "dc50f1003f8a8bae404cea9f50ac4cc337313d72b93184143629fc68cf18ffa9",
+      "bytes": 855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataHeatBalance.hh.1267-1303.txt",
+      "sha256": "16ef65ca36c38140a84d01b33b6a77a50cacd445a861ed8be73a8a04b261180d",
+      "bytes": 2974
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataHeatBalance.hh.1305-1326.txt",
+      "sha256": "45b8da432d52931b2a75ee90936a5a9250252ee7f4c898cd0e5d1be4912853bb",
+      "bytes": 2258
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataHeatBalance.hh.1355-1372.txt",
+      "sha256": "827cdd34e127a3e7094e317df43f4a1261b03e158021959a1d01aa6f8e5c7348",
+      "bytes": 796
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataHeatBalance.hh.213-222.txt",
+      "sha256": "6b4b7c76ac461917bc8d773ac7b20b50d4cd52f72fc43efe364da331e30af4ba",
+      "bytes": 226
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataRoomAirModel.hh.640-648.txt",
+      "sha256": "19fd02bb9018f966fcf13e6d38d75bd7caaf4d68af8f079ab16edd21cde3a0c9",
+      "bytes": 737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataRoomAirModel.hh.786-792.txt",
+      "sha256": "e9a9030359593d429867eb1e4e2ad7936881e5b838cbb936b5f24153af09862e",
+      "bytes": 441
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataZoneEquipment.cc.1866-1889.txt",
+      "sha256": "3fed09d4d53bf20353dd2ade11563ea68d81351d3633a21d44b1dd013c814d1c",
+      "bytes": 1255
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataZoneEquipment.cc.2329-2505.txt",
+      "sha256": "c2740c6f3b028963c644d513d94768872ff8520aabb79be53218104c4ab62c6e",
+      "bytes": 9977
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/DataZoneEquipment.hh.167-318.txt",
+      "sha256": "6b7e3e03d3a2e91a841b39d15b8e030e2efb06b0aa3ef84c24fecd870a677724",
+      "bytes": 5942
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/EPVector.hh.88-155.txt",
+      "sha256": "c6a8495786b76e6107301aa1ca66d107c3e7c19de3cbdf117e52586f455d3e5b",
+      "bytes": 1474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/Fmath.hh.338-344.txt",
+      "sha256": "adac2895827d687dfeacca560aec41f77eb548a1d8c0a0d55b2950032928749a",
+      "bytes": 108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/Fmath.hh.90-96.txt",
+      "sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9",
+      "bytes": 108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/InternalHeatGains.cc.8216-8255.txt",
+      "sha256": "d48f2aa84df20846f7f8b8db7aa8ceed7191b4fbe7c23cd5fc221fbffa36aa2e",
+      "bytes": 1884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/InternalHeatGains.cc.8506-8535.txt",
+      "sha256": "29a15dc821fd2182510b9dbd7a54a8b0f861f014844d22b4e3a5e0880c355e35",
+      "bytes": 1380
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/Psychrometrics.hh.623-666.txt",
+      "sha256": "09689bbc66823e0c23f5a8ef622784c45bad32c87f75444dbedace265ad7b0a7",
+      "bytes": 1684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/RoomAirModelManager.cc.270-301.txt",
+      "sha256": "14da8618c3d1ebc1f4db0eb40fa02fa4ae0c8e11c8d06751f6542ff68d847a9c",
+      "bytes": 2125
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/Solver.hpp.478-488.txt",
+      "sha256": "70a583341e5182440740d18996a800c6547272e913bd92e9fa8f0f9142a12b72",
+      "bytes": 919
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/ZoneEquipmentManager.cc.4933-5283.txt",
+      "sha256": "674a877ba824271bc07fba47e1063b7a68b8ebd40f54925f70f968207d166e81",
+      "bytes": 21487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native-extents/ZoneEquipmentManager.cc.5342-5543.txt",
+      "sha256": "0c8366d9dd26d040b8c3c8167eda90e4c05b21fe19f90df5eb2af62ac035a6bf",
+      "bytes": 13015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "sha256": "08f9d970200b2adb9b69cf3500cb63cf7bf873eb482d705fdc02827a6ce30759",
+      "bytes": 38569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "bytes": 24717
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "bytes": 133816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/DataRoomAirModel.hh",
+      "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+      "bytes": 45326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/DataZoneEquipment.cc",
+      "sha256": "8d7eba6b146ad0b81312cbcfb32357b530ce6f5ec1716ed9e4dc8dd2901b3a6a",
+      "bytes": 142562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "bytes": 11096
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/InternalHeatGains.cc",
+      "sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+      "bytes": 536516
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "bytes": 108928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/RoomAirModelManager.cc",
+      "sha256": "b6d793f4d5e47b6e6bc3c339c4e03aee9c449a413e298bcab8586efb6b4b9514",
+      "bytes": 175400
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/src/EnergyPlus/ZoneEquipmentManager.cc",
+      "sha256": "fa4a784f847e9d85a19b9f871c4c23a78b8de630a7300546a4a2551db0d257cd",
+      "bytes": 428353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/Native/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "bytes": 27600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-zone-mass-leaving-readonly-plan-Outer-29/plan.json",
+      "sha256": "6b056852e2a64a2424cad7c13db12954de42bb2f649fbd52e11f72fa6558311d",
+      "bytes": 31240
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-controlled-air-balance-Root-29.py",
+      "sha256": "f4109a328dff8ee7e21d098ece8e312a9da49e975ed0cca8d2c045f759eff81d",
+      "bytes": 1318
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-controlled-air-balance-publication-Audit-29.py",
+      "sha256": "5d554878a15cf19065bb3b87ff44545f8ab049396d19be576e939894b813e335",
+      "bytes": 11708
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-controlled-air-balance-checkpoint-Audit-29.py",
+      "sha256": "eca73cd9c09ce1d2bcc041663030681da7626bddc00441dc16685a8ad7cdb651",
+      "bytes": 12724
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-zone-equipment-output-checkpoint-Peer-28.py",
+      "sha256": "e35daa1a3beb4a70feb5a369b75877f1a4d4d32d170e77bbdcf7d32ea2ce01c4",
+      "bytes": 12203
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-controlled-leaving-join-Outer-29-02.py",
+      "sha256": "9c8d92ba9865b6359b91754c6296a679afc61e2c6c2cf97200353e9fcd872e3f",
+      "bytes": 12695
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-controlled-air-balance-Audit-29.py",
+      "sha256": "3d2a77bd6145af4c4bfd4659f4163ad4ec3d6d1df50fae3f90f903d6c52b0b04",
+      "bytes": 11422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-draft-Audit-29-02/draft.json",
+      "sha256": "f3cb01aae008d3edffe07a291039e0268a96a36643b1303879fb7a5c9a61a464",
+      "bytes": 10855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/API-census.json",
+      "sha256": "05ba31c48cdcb5a42dffef6d6e205971cb920a7256dd91e20014c1210b291894",
+      "bytes": 2549
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/Native-extents/DataHeatBalance.hh.213-223.txt",
+      "sha256": "7cd029eec149138bf20824da85d488c31a493547fbd4802ad700efbc2439b7b0",
+      "bytes": 227
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/actual28-parent-full-readback.json",
+      "sha256": "829b3d6ccc458681ef55fad89632a1d6ad3e1d369ffa44be1944dbc83321361c",
+      "bytes": 2269613
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/gains.rs",
+      "sha256": "e758b9410df45873ae72b71fd9b538d2570c05800dbbda98446e768f71aa7a34",
+      "bytes": 1831
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/subsystems.rs",
+      "sha256": "960cf8796fecb0fc1d9d26747d845586ef4b562c617708ae0aeeeacd7177fe93",
+      "bytes": 16316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "bytes": 29767
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/complete-final-compiler-Source-plan.json",
+      "sha256": "b2c88fdeebe86fe83773bbea67e882fe73aa5ac7ed952a517d53cf9841a02028",
+      "bytes": 2629456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/01-forward.diff",
+      "sha256": "eb5ec4063e502545e18acfd98b8a4862544eedc06992c6353877fb6def912eb4",
+      "bytes": 6115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/01-inverse.diff",
+      "sha256": "05cd63dbf6a5e9a7ae916f4a14fb836dd83be947c675cff66222eb1ce48f13c0",
+      "bytes": 6115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/02-forward.diff",
+      "sha256": "bb673669c6dcd5463ba5701846aa83da331462bc7661e7bf3f45f0c1def6dddf",
+      "bytes": 2552
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/02-inverse.diff",
+      "sha256": "e13dca92edaa875272fdcb6a2c4ac70b2fd0a59eaf0b7ba74908583914f8aacd",
+      "bytes": 2552
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/03-forward.diff",
+      "sha256": "84d5c96b5587735d620d848e61b4706c39760a2c4bf88df8182734a3dc96127d",
+      "bytes": 1093
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/03-inverse.diff",
+      "sha256": "9560e2264e70b2c409fd85d39b8f8015251d84d19c5b2fcf5dc03d9501e23a3f",
+      "bytes": 1093
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/04-forward.diff",
+      "sha256": "4a6474f48a94a0d5d09d1b99b1eb62694a1f3ca5d2ba0eb97a733f54a529716a",
+      "bytes": 26077
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/diffs/04-inverse.diff",
+      "sha256": "bf713443ce8f5689e8f70e2671442e5ec5c11b6efe9618992b2fcfa3572fd338",
+      "bytes": 26077
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/gains.rs",
+      "sha256": "e758b9410df45873ae72b71fd9b538d2570c05800dbbda98446e768f71aa7a34",
+      "bytes": 1831
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/subsystems.rs",
+      "sha256": "960cf8796fecb0fc1d9d26747d845586ef4b562c617708ae0aeeeacd7177fe93",
+      "bytes": 16316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "bytes": 29767
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/air_balance.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/manifest.json",
+      "sha256": "06b7d51e2dd42b4908b8e4a3ecf140f641fc0873aa28746231c002090a01065b",
+      "bytes": 38225
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/01.stdout",
+      "sha256": "e3d209743eed574ac7479a35b87d14afc81c6f6698e4dd0db16164aec34701dd",
+      "bytes": 30670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/02.stdout",
+      "sha256": "8e891523e2360460f5d3e1fec4043b035ca9cd82a6e0427ed6045fbd89642125",
+      "bytes": 4802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/03.stdout",
+      "sha256": "75fe49214b686730ef085f4c0c37ab43f53590a63050512a86a62aff12daa166",
+      "bytes": 16596
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/parse/04.stdout",
+      "sha256": "fafba571116d9d6d74f5e82d86d5e7ba51283997165e140775d84f39900fcab7",
+      "bytes": 30936
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/gains.rs",
+      "sha256": "7866755a8c6e625247d6f43f1109f7433db1aaa19c816353f9a4fb8e1f5de4d6",
+      "bytes": 4092
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/subsystems.rs",
+      "sha256": "75fe49214b686730ef085f4c0c37ab43f53590a63050512a86a62aff12daa166",
+      "bytes": 16596
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "f3f61d9c14f1fdad7fff4787ad477d015ad763911cb6d73cedb250bc8e9fdd0e",
+      "bytes": 25643
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-air-balance-held-Audit-29/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/air_balance.rs",
+      "sha256": "a58f34da16f080b761d76322d65ea4635a9d9fb9f59443b49da2de786d77fa1d",
+      "bytes": 25473
+    },
+    {
+      "path": ".runtime/porting/source-objects/04/043e7dada0c39b64e98b399ee3e13f8c885af1e640c0cc0204e3679bd945990d",
+      "sha256": "043e7dada0c39b64e98b399ee3e13f8c885af1e640c0cc0204e3679bd945990d",
+      "bytes": 8167
+    },
+    {
+      "path": ".runtime/porting/source-objects/05/05f807d6b60ef1b9fc8b60f7a4d3678405495f75a26ae284a9ab163507744c0a",
+      "sha256": "05f807d6b60ef1b9fc8b60f7a4d3678405495f75a26ae284a9ab163507744c0a",
+      "bytes": 4926
+    },
+    {
+      "path": ".runtime/porting/source-objects/08/0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/source-objects/3c/3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/source-objects/58/58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "bytes": 19471
+    },
+    {
+      "path": ".runtime/porting/source-objects/5c/5cd4e18de7a6b3e155cd08e52c9a480476d4f307c756743a2016784b882345f4",
+      "sha256": "5cd4e18de7a6b3e155cd08e52c9a480476d4f307c756743a2016784b882345f4",
+      "bytes": 5257
+    },
+    {
+      "path": ".runtime/porting/source-objects/64/64a10a245126455a962fa6a49031e4b09d194f6862dc6948dd71705161f5f9eb",
+      "sha256": "64a10a245126455a962fa6a49031e4b09d194f6862dc6948dd71705161f5f9eb",
+      "bytes": 1847004
+    },
+    {
+      "path": ".runtime/porting/source-objects/85/85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "sha256": "85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "bytes": 29767
+    },
+    {
+      "path": ".runtime/porting/source-objects/91/9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/source-objects/96/960cf8796fecb0fc1d9d26747d845586ef4b562c617708ae0aeeeacd7177fe93",
+      "sha256": "960cf8796fecb0fc1d9d26747d845586ef4b562c617708ae0aeeeacd7177fe93",
+      "bytes": 16316
+    },
+    {
+      "path": ".runtime/porting/source-objects/9c/9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "sha256": "9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "bytes": 4404
+    },
+    {
+      "path": ".runtime/porting/source-objects/9e/9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "sha256": "9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "bytes": 9829
+    },
+    {
+      "path": ".runtime/porting/source-objects/b7/b71c123101383ec99fa85609f85a241fb54b261163f99c8f5a86b4f7e1441679",
+      "sha256": "b71c123101383ec99fa85609f85a241fb54b261163f99c8f5a86b4f7e1441679",
+      "bytes": 2760
+    },
+    {
+      "path": ".runtime/porting/source-objects/b7/b7a698ba83fcd214a2067513510d37a9bf8b27ef685654668f6404f2cb09b111",
+      "sha256": "b7a698ba83fcd214a2067513510d37a9bf8b27ef685654668f6404f2cb09b111",
+      "bytes": 13502
+    },
+    {
+      "path": ".runtime/porting/source-objects/bc/bcc93d96d6e982927582fc98b15e5499cfd17ca404b6a571a73c7aea753153ba",
+      "sha256": "bcc93d96d6e982927582fc98b15e5499cfd17ca404b6a571a73c7aea753153ba",
+      "bytes": 24146
+    },
+    {
+      "path": ".runtime/porting/source-objects/c5/c5f214fd0f64268acc28140bd37f040a8c67b7955e30d4979415874558adfbf3",
+      "sha256": "c5f214fd0f64268acc28140bd37f040a8c67b7955e30d4979415874558adfbf3",
+      "bytes": 10977
+    },
+    {
+      "path": ".runtime/porting/source-objects/e6/e67816e7f95cfe800e33448f86de3c9404d9b985fcb0431fc3c192dbf04e5ac3",
+      "sha256": "e67816e7f95cfe800e33448f86de3c9404d9b985fcb0431fc3c192dbf04e5ac3",
+      "bytes": 16982
+    },
+    {
+      "path": ".runtime/porting/source-objects/e7/e758b9410df45873ae72b71fd9b538d2570c05800dbbda98446e768f71aa7a34",
+      "sha256": "e758b9410df45873ae72b71fd9b538d2570c05800dbbda98446e768f71aa7a34",
+      "bytes": 1831
+    },
+    {
+      "path": ".runtime/porting/source-objects/e9/e965f69ce378191d164f962e49b478a6c8373c9b9a44f8dde428337713daf2b9",
+      "sha256": "e965f69ce378191d164f962e49b478a6c8373c9b9a44f8dde428337713daf2b9",
+      "bytes": 4548
+    },
+    {
+      "path": ".runtime/porting/source-objects/f0/f033c2ebe6c859205fbb41d2491a5f21465bc5491998572510d9cf9bfb5dc8aa",
+      "sha256": "f033c2ebe6c859205fbb41d2491a5f21465bc5491998572510d9cf9bfb5dc8aa",
+      "bytes": 20138
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/gains.rs",
+      "sha256": "7866755a8c6e625247d6f43f1109f7433db1aaa19c816353f9a4fb8e1f5de4d6",
+      "bytes": 4092
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/subsystems.rs",
+      "sha256": "75fe49214b686730ef085f4c0c37ab43f53590a63050512a86a62aff12daa166",
+      "bytes": 16596
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "f3f61d9c14f1fdad7fff4787ad477d015ad763911cb6d73cedb250bc8e9fdd0e",
+      "bytes": 25643
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management/air_balance.rs",
+      "sha256": "a58f34da16f080b761d76322d65ea4635a9d9fb9f59443b49da2de786d77fa1d",
+      "bytes": 25473
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-output-28/summary.json",
+      "sha256": "07f8faa9a2132c0f86673768ed1b2d6040614407fb12052087030238eb0424df",
+      "bytes": 4522
+    }
+  ],
+  "scope": "4 coherent controlled mass/return/leaving Sources, Native authority, accepted peer and actual B/A24. No checkpoint29 test execution. No historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}

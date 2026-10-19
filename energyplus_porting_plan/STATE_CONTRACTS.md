@@ -152,3 +152,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 장비 출력·수요 갱신 검증](evidence/SRC-06-canonical-zone-equipment-output-28/summary.json). 장비 목록·우선순위와 현열·수분 수요는 기존 소유자에서 갱신하며, 다음 장비의 실제 스케줄 값을 Native 순서로 읽습니다. 가용성 입력 래치와 호출 횟수도 같은 컴포넌트 행에 보존합니다.
+
+
+[Source 구역 질량 보존·리턴 공기 검증](evidence/SRC-06-canonical-controlled-air-balance-29/summary.json). Config·물리 Node·MassConservation과 기존 캐시 이득을 함께 사용합니다. 리턴 노드 필터·냉동 잠열 크레디트·수요 초기화 순서를 보존하며, 습공기 물성의 미구현 진단은 명시적 경계로 남깁니다.

@@ -464,3 +464,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 장비 출력·수요 갱신 검증](../evidence/SRC-06-canonical-zone-equipment-output-28/summary.json). 출력 후처리·수요 갱신·가용성 경로의 실행 결과를 기록합니다. B의 실제 경계는 `GetHeatBalanceInput: actual controlled MassConservation5022`이며, 전체 B 및 내부 Native 수치 동등성 완료를 주장하지 않습니다.
+
+
+[Source 구역 질량 보존·리턴 공기 검증](../evidence/SRC-06-canonical-controlled-air-balance-29/summary.json). 제어 구역 질량 보존과 리턴 공기 조건의 실행 결과를 기록합니다. 실제 B 경계는 `GetHeatBalanceInput: positive actual ZoneEquipConfig InletNode(1) read1939`입니다. 전체 B 및 내부 Native 수치 동등성 완료는 별도입니다.

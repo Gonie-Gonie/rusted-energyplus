@@ -295,3 +295,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 장비 출력·수요 갱신 검증](evidence/SRC-06-canonical-zone-equipment-output-28/summary.json). 장비 호출 뒤 실제 반환 출력으로 구역 유량과 남은 부하를 갱신하는 경로를 연결했습니다. 관측된 B 경계와 A24 회귀 결과는 연결된 증거에 기록합니다.
+
+
+[Source 구역 질량 보존·리턴 공기 검증](evidence/SRC-06-canonical-controlled-air-balance-29/summary.json). 제어 구역의 유입·리턴 유량과 리턴 공기 상태 계산을 실제 소유자에 연결했습니다. 실행 범위와 A24 결과는 연결된 증거에서 확인합니다.

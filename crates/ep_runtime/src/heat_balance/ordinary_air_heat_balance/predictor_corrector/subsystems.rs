@@ -159,6 +159,9 @@ pub(crate) struct SourceRoomAir {
     pub(crate) disp_vent_1node_model_used: bool,
     pub(crate) ucsd_model_used: bool,
     pub(crate) air_models: Option<Vec<SourceRoomAirModel>>,
+    /// Same Native DataRoomAirModel AirPatternZoneInfo EPVector, ctor unallocated.
+    /// Positive user-pattern getter stops before its sole allocation writer.
+    pub(crate) air_pattern_zone_info: Option<Vec<std::convert::Infallible>>,
     pub(crate) num_room_afn_control: usize,
     pub(crate) num_temperature_distribution_controlled_zones: usize,
     pub(crate) num_constant_gradient: usize,
@@ -177,6 +180,7 @@ impl Default for SourceRoomAir {
             disp_vent_1node_model_used: false,
             ucsd_model_used: false,
             air_models: None,
+            air_pattern_zone_info: None,
             num_room_afn_control: 0,
             num_temperature_distribution_controlled_zones: 0,
             num_constant_gradient: 0,

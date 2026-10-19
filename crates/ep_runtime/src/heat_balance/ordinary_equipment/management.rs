@@ -2,6 +2,7 @@
 pub(crate) mod availability;
 mod modules;
 mod output_required;
+mod air_balance;
 use crate::heat_balance::ordinary_hvac_manager::{SourceHvacManager, SourceHvacOwners};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_sizing::SourceZoneEquipmentSizing;
@@ -401,7 +402,7 @@ impl SourceHvacManager {
                 o.equipment.number_zone_exhaust_controls,
             )?;
         self.calculate_source_zone_mass_balance(first_hvac_iteration, o)?;
-        self.calculate_source_zone_leaving_conditions(o)?;
+        self.calculate_source_zone_leaving_conditions(first_hvac_iteration, o)?;
         modules::simulate_source_duct_loss_default(o)?;
         o.equipment
             .management_modules
@@ -421,124 +422,13 @@ impl SourceHvacManager {
         }
         Ok(())
     }
-    fn calculate_source_zone_mass_balance(
-        &self,
-        _first_hvac_iteration: bool,
-        o: &mut SourceHvacOwners<'_, '_>,
-    ) -> Result<(), Error> {
-        o.hvac.zone_mass_balance_hvac_resim = false;
-        let mut iteration = 0;
-        let mut building_zone_mixing_flow: f64 = 0.0;
-        let mut building_zone_return_flow: f64 = 0.0;
-        if let Some(units) = o.equipment.air_distribution_units.as_deref() {
-            for unit in units {
-                match *unit {}
-            }
-        }
-        if o.hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable(
-                "actual CalcZoneMassBalance primary isAllOA4972",
-            ));
-        }
-        loop {
-            if o.control.enforce_zone_mass_balance {
-                for number in 1..=o.globals.num_of_zones {
-                    if !*o
-                        .equipment
-                        .source_zone_equipment_config(number)?
-                        .is_controlled()
-                    {
-                        continue;
-                    }
-                    return Err(Error::Unavailable(
-                        "actual controlled ZoneInfiltrationFlag4992",
-                    ));
-                }
-            }
-            let building_zone_mixing_flow_old = building_zone_mixing_flow;
-            building_zone_mixing_flow = 0.0;
-            let building_zone_return_flow_old = building_zone_return_flow;
-            building_zone_return_flow = 0.0;
-            for source_number in 1..=o.globals.num_of_zones {
-                let number = if o.control.enforce_zone_mass_balance {
-                    o.fan
-                        .zone_reorder
-                        .as_deref()
-                        .and_then(|v| v.get(at(source_number).ok()?))
-                        .copied()
-                        .flatten()
-                        .ok_or(Error::Unavailable("actual ZoneReOrder5017"))?
-                } else {
-                    source_number
-                };
-                if !*o
-                    .equipment
-                    .source_zone_equipment_config(number)?
-                    .is_controlled()
-                {
-                    continue;
-                }
-                return Err(Error::Unavailable("actual controlled MassConservation5022"));
-            }
-            for number in 1..=o.globals.num_of_zones {
-                let config = o.equipment.source_zone_equipment_config(number)?;
-                let _zone_air = o
-                    .air
-                    .zones
-                    .as_deref()
-                    .and_then(|v| v.get(at(number).ok()?))
-                    .ok_or(Error::Unavailable("actual same Zone AirHB5195"))?;
-                if !*config.is_controlled() {
-                    continue;
-                }
-                return Err(Error::Unavailable("actual controlled NumReturnNodes5199"));
-            }
-            if iteration > 0 {
-                let total_residual = (building_zone_mixing_flow - building_zone_mixing_flow_old)
-                    .abs()
-                    + (building_zone_return_flow - building_zone_return_flow_old).abs();
-                if total_residual < 0.000010 {
-                    o.hvac.zone_mass_balance_hvac_resim = false;
-                    break;
-                }
-                o.hvac.zone_mass_balance_hvac_resim = true;
-            }
-            if !o.control.enforce_zone_mass_balance {
-                break;
-            }
-            iteration += 1;
-            if iteration >= 25 {
-                break;
-            }
-        }
-        // Same genuine NumPrimaryAirSys zero makes final SysRetFlow traversal empty.
-        Ok(())
+    fn calculate_source_zone_mass_balance(&self, first_hvac_iteration: bool,
+        o: &mut SourceHvacOwners<'_, '_>) -> Result<(), Error> {
+        air_balance::mass_balance(first_hvac_iteration, o)
     }
-    fn calculate_source_zone_leaving_conditions(
-        &self,
-        o: &SourceHvacOwners<'_, '_>,
-    ) -> Result<(), Error> {
-        if o.space_controls.simulation && !o.globals.doing_sizing {
-            for row in &o.equipment.zone_return_mixers {
-                match *row {}
-            }
-        }
-        for number in 1..=o.globals.num_of_zones {
-            let row = o
-                .equipment
-                .zone_config
-                .as_deref()
-                .and_then(|v| v.get(at(number).ok()?))
-                .ok_or(Error::Unavailable("actual same ZoneEquipConfig5371"))?;
-            if !row.is_controlled {
-                continue;
-            }
-            if row.return_nodes == 0 {
-                continue;
-            }
-            return Err(Error::Unavailable("actual controlled return ZoneNode5380"));
-        }
-        Ok(())
+    fn calculate_source_zone_leaving_conditions(&self, first_hvac_iteration: bool,
+        o: &mut SourceHvacOwners<'_, '_>) -> Result<(), Error> {
+        air_balance::leaving_conditions(first_hvac_iteration, o)
     }
 }
 
