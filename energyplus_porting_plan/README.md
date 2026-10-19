@@ -5,6 +5,26 @@
 EnergyPlus 기준: v26.1.0 / `6f2e40d10250a105b49966baa24d843711e61048`  
 rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 
+
+## 현재 진행 상태
+
+완료 카드는 A **14/54**, B **14/64**입니다. 보고 값이 일치한 실행과 카드 전체의 완료 조건은 구분합니다. 아래 결과는 해당 기록의 Source 버전과 검증 범위에 한정합니다.
+
+| 검증 범위 | 실제 결과·증거 |
+|---|---|
+| A 비공조 24시간·72시간·연간 보고 값 | [현재 일반 종료 실행 3건](evidence/SRC-06-canonical-normal-completion-47/summary.json), 허용오차 위반·RMSE 0 |
+| B NoLimit 24시간·72시간·연간 보고 값 | [3건·3,613,248값](evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json), 허용오차 위반·RMSE 0 |
+| B flow/capacity/both × 24시간·72시간·연간 | [9건·10,839,744값](evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json), 허용오차 위반·RMSE 0 |
+| hard-sized IdealLoads | [원본 59건과 네 Sizer·전체 Size](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json) 비교 통과 |
+| 전체 predictor 부모 | [포착한 실제 호출 1,168건](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json) 비교 통과 |
+| 성공 실행 출력 정리 | [A/B 24시간 두 건](evidence/SRC-06-canonical-successful-log-layout-49/summary.json), 기존 계산·CSV·JSON 유지, 중복 오류 파일 제거, 콘솔 원문을 `logs/source-console.log`로 이동 |
+
+다음 작업은 전체 PurchasedAir 지속 호출, 복사·되돌리기·재시도 이력과 multiplier, 복사열·태양열·내부발열 생산자, CTF master history·분 단위 스케줄 경계, 전체 OutputProcessor 누적·reset의 원본 비교입니다. 이어 warmup→RunPeriod 상태 인계와 같은 최종 Source의 15개 실행 및 전체 JSON/CSV 재읽기를 마무리합니다. 현재 15건의 과거 증거를 하나의 최종 Source 검증으로 합쳐 표기하지 않습니다.
+
+검증은 변경한 계산 경로에 필요한 기존 통합 cohort 또는 실행만 수행합니다. 같은 몸체를 다시 검증할 근거가 없다면 이전 대규모 cohort·연간 실행·전체 테스트를 반복하지 않습니다. 문서와 로그 경로만 바꾼 경우에는 해당 출력 확인과 문서 검사를 사용합니다.
+
+각 카드의 네 gate와 증거 색인은 [CHECKLIST.md](CHECKLIST.md), [plan.json](plan.json), 상태 소유권은 [STATE_CONTRACTS.md](STATE_CONTRACTS.md)에 있습니다. 과거 단계별 진행 문장은 이 세 문서에서 걷어냈고, 기존 `evidence/`와 Git 이력은 보존했습니다. 과거 CTF 비교의 235,456개 불일치·2,754개 미확인은 해당 실행의 역사적 기록이며 현재 결과로 재분류하지 않습니다.
+
 ## 범위
 
 A: 앞서 검토한 비공조 불투명 1존.  

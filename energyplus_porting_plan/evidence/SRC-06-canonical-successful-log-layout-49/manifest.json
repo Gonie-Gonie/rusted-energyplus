@@ -1,0 +1,841 @@
+{
+  "schema": "src06-successful-log-layout49-finite-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-successful-log-layout-49/evidence.zip",
+    "sha256": "01bcb6a4ab0726db9bd7467391847d9e7738ccc09382f542e337f19ccd783a59",
+    "bytes": 3611081
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/full-table-metadata-differences.json",
+      "sha256": "17ab6463df871616e6c4e66cfaa805a403d2bcc7e74025862c565ca4bdba2257",
+      "bytes": 28915
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+      "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+      "bytes": 27122
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-successful-source-log-layout-Source-review-48/review.json",
+      "sha256": "0513493e22856c75934a9851a6ae5f58f5e748d544c04852745159898f873421",
+      "bytes": 4693
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-actual-review-P2/review.json",
+      "sha256": "3a023b7649744a15a0340053e4c08d3aaacb9a650ce8a1e2f9b632115246fde9",
+      "bytes": 4882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-publication-48/publication-readback.json",
+      "sha256": "91d7d898e20d658e99ad270610ec45aa366f1bc2b654ef3639a36970be235804",
+      "bytes": 3115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-normal-completion-A-24H-readback-47/review.json",
+      "sha256": "1a8cd6be364559cefae1820e1365ed8b27fafb066b6d6bda8844a03ad486907d",
+      "bytes": 37070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-normal-completion-B-NOLIMIT-24H-readback-47/review.json",
+      "sha256": "07b48df9996818b392ab98918493107c079f565b25a69e7467958236674b3350",
+      "bytes": 27414
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-normal-completion-actual-review-47/review.json",
+      "sha256": "43d8e0ed57d06aaa72fa7d2616cbdda9b32d5285ab07d050df992e62995eac58",
+      "bytes": 58160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-successful-log-layout-actual-review-49/review.json",
+      "sha256": "58a4af24ebf043ce5bc6654818f5e161d08d7914ffb6d471998eaba4d73eac51",
+      "bytes": 43025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-successful-source-log-layout-application-49/receipt.json",
+      "sha256": "ff356be51a67226ef7157ddda284274465914bd3ccb01bc6f684e0842cf24c3e",
+      "bytes": 4317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-successful-source-log-layout-Root-49-02.py",
+      "sha256": "9e97ab4d90887b7387a9a217d73c60b7bab897770bc1cb25a1e0b6881d408257",
+      "bytes": 6674
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-successful-source-log-layout-Root-49-03.py",
+      "sha256": "c70655b0785e61997b62d13b4121b6caa9bc857214a31c06d8859cc2bd29d339",
+      "bytes": 6674
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-successful-source-log-layout-Root-49-04.py",
+      "sha256": "db62cca4769576a01b0f45f80b6839f6ead8e2a9f74623a5759ca3f406599555",
+      "bytes": 6674
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-successful-source-log-layout-Root-49.py",
+      "sha256": "88e2e97e5bff07bb6e74a82092686e27ea950dde74777edde743b2edc6940aea",
+      "bytes": 6671
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/diagnostics.json",
+      "sha256": "7b982be3a9f5475a433428d484dc20b6b9ef8ffda49dea85b609fb112ce052a1",
+      "bytes": 3960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.bnd",
+      "sha256": "2a74d3295dd901885e8c6c2dfab1af08acb488dc12487fd4332751ed46c42795",
+      "bytes": 6329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.htm",
+      "sha256": "0219168fadf9e3ca05bf6016e6f621501ba620aca1b1f605373c10dd3df05497",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.xml",
+      "sha256": "850bc2035f5f0c68526d7aaf92758a606a6804ed0a038f5940f765d173d25d4e",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-reported-results.json",
+      "sha256": "d849ce8d06304653cb906868a9976f6d1006b8e011ba0f30efb6707749c976aa",
+      "bytes": 1679912
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-command-Root-47/receipt.json",
+      "sha256": "3b9d7e9f5e1c78857e78bb1bb2966d3d47cae9495dbfb3b2b42d71d893e8a56d",
+      "bytes": 7108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/diagnostics.json",
+      "sha256": "855910631023626c2162eb90eece6065fa616375effc5ef1194d3ccc5aec26cc",
+      "bytes": 398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.audit",
+      "sha256": "2578d15e47d92880a70d2d0b037bdf292cfa6909ce5343212baa1af3c9dd5aa3",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.eio",
+      "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+      "bytes": 12652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.eso",
+      "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+      "bytes": 202668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-eso.csv",
+      "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+      "bytes": 2991866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-reported-results.json",
+      "sha256": "d9cec7534fab23f30352dc26404a08779ef3f1ede248605b3f2cb84201593206",
+      "bytes": 3026089
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-command-Root-47/receipt.json",
+      "sha256": "80972645d3da545fd3a3322f229d2a44ae6af5bc14a49f370c8cb1244859bf81",
+      "bytes": 7160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/diagnostics.json",
+      "sha256": "436d869ee49dc14ff962aa6901ccfc935ee46192267fdcfe2ba5fa17affd34d2",
+      "bytes": 3960
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.bnd",
+      "sha256": "2a74d3295dd901885e8c6c2dfab1af08acb488dc12487fd4332751ed46c42795",
+      "bytes": 6329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.end",
+      "sha256": "cd68e7eb5dd85ef88de60d03fa5d5dd987193fae83dfde55bcc8c99c82222a80",
+      "bytes": 98
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.err",
+      "sha256": "e1f8f815328f79f277d5d9a566eb78ae89de08139133e8c9b87ffe44eb6abdcc",
+      "bytes": 892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.htm",
+      "sha256": "736bcfd348a2a082f2ab5b7bb419829f69ea1c469b45035af487f464e01161c2",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.xml",
+      "sha256": "4dcb4a69d98e59cffc7b96657e2823221ef57d584483ec64313a5b2a98758969",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/logs/source-console.log",
+      "sha256": "6d5ab27507392f20377c86a05c130cd66a691d84afe8a01277ad67d4a30152a4",
+      "bytes": 1883
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-reported-results.json",
+      "sha256": "5436e70ac31bf82b563e5c29cf1558a77fcc3c226018d2aa73d2af966af12573",
+      "bytes": 1679920
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/run-summary.json",
+      "sha256": "38dac91cdad1efcd535ff1dc365e5c84dcf154fecc24feb9b05210ba34aae097",
+      "bytes": 32707
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-command-Root-49/receipt.json",
+      "sha256": "e9c394203a5e19d599c6a07bf8fe294a17e7b677c121aa3200f42d9327960c38",
+      "bytes": 3802
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-command-Root-49/stderr.log",
+      "sha256": "48499df051ebf2dfa6b68bb0d9b331646b71245849e529e3a8506a647c13635a",
+      "bytes": 1380
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-command-Root-49/stdout.log",
+      "sha256": "ba5a7a7de190ba0c43486a7d079ddcc9e42d668e6f2e5af84cffd2b8e199c714",
+      "bytes": 442807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/diagnostics.json",
+      "sha256": "12d53a576f4bc924300e883d26eca64604a90772d81f9445b0f315bf62c38e3b",
+      "bytes": 398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.audit",
+      "sha256": "2578d15e47d92880a70d2d0b037bdf292cfa6909ce5343212baa1af3c9dd5aa3",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.eio",
+      "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+      "bytes": 12652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.end",
+      "sha256": "65d8727f5d496ca33de85b54ee247bc03dd0571f77e38facca3511b55429bd01",
+      "bytes": 98
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.err",
+      "sha256": "d47c074629d4574cb29937597af8b81a0f327a1bb77bfc0b405ea0e16ff112e1",
+      "bytes": 892
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.eso",
+      "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+      "bytes": 202668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.shd",
+      "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+      "bytes": 1401
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/logs/source-console.log",
+      "sha256": "61cf4e97429bd2abbbc29590d952c03701c17a5600289a0c0864c4e36fd8a807",
+      "bytes": 1388
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-eso.csv",
+      "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+      "bytes": 2991866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-reported-results.json",
+      "sha256": "292c3897f4206a90f1e8185d6b0d640cf4f1c5bb9c45ba38e7e2046a9ac04708",
+      "bytes": 3026097
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/run-summary.json",
+      "sha256": "502d563b3c4dfcc1d8a69fd8c4792b90825bf4f6b9379602c90204f1de3ce58a",
+      "bytes": 61306
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-command-Root-49/receipt.json",
+      "sha256": "8d31f3cdb9a036469f72c670c04911994fa63096e3fab9054bfe34b74711ff62",
+      "bytes": 3854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-command-Root-49/stderr.log",
+      "sha256": "b0d0221c30b858a0947f724f635f3303627dd8d63b85058db21eb5de9ef1a126",
+      "bytes": 2771
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-command-Root-49/stdout.log",
+      "sha256": "d7a47aac0a915521b9205ab9e6ca33ffbdd13c00c848cfc5f5430579b129951a",
+      "bytes": 442836
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-canonical-B-ingress-IO-A24-transfer-Peer-03.py",
+      "sha256": "0742d4694653c9f80e93e1ebe89ed80bf14696b148e39f8477f0c67c1cb50c74",
+      "bytes": 24774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-successful-source-log-layout-Root-49-02.py",
+      "sha256": "4b79d2a098225b5aa9a250b373c35cda0821d4dd3fee04463f33fb4ad934cb30",
+      "bytes": 8431
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-successful-source-log-layout-Root-49-03.py",
+      "sha256": "8478a0f1837b7240b32a004100d3266c11d0a283c1e090ca8d5c39deedb35668",
+      "bytes": 9833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-successful-source-log-layout-Root-49-04.py",
+      "sha256": "3e02441a4c3468142d299bb3bbd1dea5ec89904f2bc2c5b227da845582af8131",
+      "bytes": 11927
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-successful-source-log-layout-Root-49.py",
+      "sha256": "ce245f015a857aad2fe5e5a5d400f90169ad2a2dae11b919f0cfe09bbbe3df56",
+      "bytes": 7764
+    },
+    {
+      "path": ".runtime/porting/SRC-06/complete-successful-log-layout-publication-Audit-49-03.py",
+      "sha256": "c3456e75c722c8d27d5f6a574f6a99da19c91959de7a9d1e7f47f82f7ef244c2",
+      "bytes": 1676
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/CHECKLIST.md.before",
+      "sha256": "208b8a77493570fdb95bb3b7db23fbe946b83bde034f1750967431a8be16f97c",
+      "bytes": 49985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/CHECKLIST.md.forward.diff",
+      "sha256": "a8af3ba24b52f4ffec9325b1b318b3e5331536fa88ad6b17277341b92b66b147",
+      "bytes": 34117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/CHECKLIST.md.inverse.diff",
+      "sha256": "b9e2608e53bad894aaee03c7f9e56897811308df77b6cf8d1eda0240cb8dc7f7",
+      "bytes": 34119
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/CHECKLIST.md.proposed",
+      "sha256": "e5134af0ba68ddd8a93f00e27d444e3f7f6d258ac3a859fbf91182e2f13c209d",
+      "bytes": 17241
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/README.md.before",
+      "sha256": "020744ae54cd094eeb8fe66cb0405c00603bfc7e4000e322792abb551bcc7ddf",
+      "bytes": 5308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/README.md.forward.diff",
+      "sha256": "a8934462b3623a73db2bcd08168c519016d99288c758fc3bb63ef456f4b49143",
+      "bytes": 2921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/README.md.inverse.diff",
+      "sha256": "3a6b9d9d375fe2ff5dadfb254330a34732fffdc3a8e6f888b3d2125545729ce9",
+      "bytes": 2921
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/README.md.proposed",
+      "sha256": "927e354e9f832cb0a96b29f04cb83b16561da9eb91069325aee09a6cfe656f84",
+      "bytes": 7986
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/STATE_CONTRACTS.md.before",
+      "sha256": "051f0e03bc01a194bc200a5b285c8e1cd700707817e773e0743f98637d35b0c2",
+      "bytes": 38766
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/STATE_CONTRACTS.md.forward.diff",
+      "sha256": "2bf75092b5f675fc4a713e5ae9e6efb14ef9300ba16548dc34d514d40693ad13",
+      "bytes": 39218
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/STATE_CONTRACTS.md.inverse.diff",
+      "sha256": "c9b09bd74cf0b2dc917fb177d039f6f17bccf80be25151dc8a15d816ace68b1d",
+      "bytes": 39226
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/STATE_CONTRACTS.md.proposed",
+      "sha256": "8e26e97045353cd31838ff51fdcd8424d9e8bcdb248fb9820cf7e3cac52f03c2",
+      "bytes": 5775
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/cards__SRC-06.md.before",
+      "sha256": "cd9301e647079cb5a79c59d8e392ef1eab70ee7530e05a07634cf40c8b1860ed",
+      "bytes": 121243
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/cards__SRC-06.md.forward.diff",
+      "sha256": "be608027c2378f76cf597f7ad0ed587c0bdcf0599ed12c7ca2eb536a33073859",
+      "bytes": 120474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/cards__SRC-06.md.inverse.diff",
+      "sha256": "ebfdc0c95f1cc34a70371fbde2c81420acf08d90f1392d9b2bfe8b0de23a5ce1",
+      "bytes": 120484
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/cards__SRC-06.md.proposed",
+      "sha256": "196c4640b8feff1e704aa70ba7158eeef9cfa6d22cee07dbbf2875b8b172e0b5",
+      "bytes": 3983
+    },
+    {
+      "path": ".runtime/porting/SRC-06/concise-porting-docs-Root-49/manifest.json",
+      "sha256": "799babbcd661c749cc71d35a0103abe00f23e1c5bb01806b43978ef6c68cfff3",
+      "bytes": 4794
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-prepared-WAIT-Peer-P2/complete-proposed-compiler-Source-plan.json",
+      "sha256": "70d6b6ab3943fe061735b3c6b1dab41b15244bb5f0664c5fd6b74edd6165b22f",
+      "bytes": 2573746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-successful-source-log-layout-Root-49-02.py",
+      "sha256": "bf256d8b8e1a7c5eb8c50006ddf1bdb34cc4969d99b469c0d30b7a657f5572cb",
+      "bytes": 1627
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-successful-source-log-layout-Root-49-03.py",
+      "sha256": "791835fcd1651f3c242f8e2716ecf60efbfe0ccd5d35ad1a13f4e0cf710eb094",
+      "bytes": 1627
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-successful-source-log-layout-Root-49-04.py",
+      "sha256": "759d1d7182ea0a01068ff473d891a15cdf9161bec9eca160c5eb12166b3cfc07",
+      "bytes": 1627
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-successful-source-log-layout-Root-49.py",
+      "sha256": "0bbe82f04c44f3b55a5a18a795851411f94725c92359b25a41565e76e90d5ad6",
+      "bytes": 1624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-concise-porting-docs-Root-49.py",
+      "sha256": "7d405142694cdd701a730f5380a9a320b97281ab73c676e11e48ec10a51a0206",
+      "bytes": 9877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-log-layout-publication-Audit-49.py",
+      "sha256": "fa192f2b36f364144643f5d258afc2248cc20821b3dfa5457bc45e79430a39e0",
+      "bytes": 8772
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-source-log-layout-Peer-49-02.py",
+      "sha256": "337c4b794ecf344cda849a90ddff51570bf36e4ef6254e59a92dc73c9d831c67",
+      "bytes": 2840
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-source-log-layout-Peer-49-03.py",
+      "sha256": "ccbfda02541f0161e393d1d6fc7ed6c9697c26680f6ad2bb7363cc025ae9187c",
+      "bytes": 5061
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-source-log-layout-Peer-49-04.py",
+      "sha256": "810aababab2da0cf4cfd25fd365e8fa508821e84bc841b12f8244b18d4e87c00",
+      "bytes": 6690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-source-log-layout-Peer-49.py",
+      "sha256": "0e25c7c6b7f73f5235a431c2ad7e5ce79bd03c70e05449f064c7193332b3d9da",
+      "bytes": 5059
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-successful-source-log-layout-Root-48.py",
+      "sha256": "ce256f6f1e7d628b44603ae5dd5c4e7779905234e9796eb037bf97a273ad0f8e",
+      "bytes": 4650
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-full-predictor-parent-Root-P2.py",
+      "sha256": "dcc916140278514f1380b4e903558513f2bb4237279196866daa65f0d0e49643",
+      "bytes": 9593
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-normal-completion-Root-47.py",
+      "sha256": "d62493864fbbaeeb43caa6c93c6bc9107cb6c4025c70a6b13af1f0b09df152bc",
+      "bytes": 8582
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-successful-log-layout-Root-49.py",
+      "sha256": "d9c3e5c4881e5fd1d0e076e46c27d3709a40930bad6265f1c78807ef102fdb14",
+      "bytes": 8639
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-successful-log-layout-publication-Audit-49-02.py",
+      "sha256": "f89ada40609ce12f2568b5db404f103326686683dde7c25ff4f0b3a63e3ec902",
+      "bytes": 6403
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-normal-completion-held-Audit-47/complete-final-compiler-Source-plan.json",
+      "sha256": "b7e8572d708ee1ad5562861f35524a27f1ffb2f4cbc23988e8203d3ed2f77aa9",
+      "bytes": 2572388
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-log-layout-publication-doc-precheck-Audit-49-01/failure.json",
+      "sha256": "9c30857323b26106f02000ff418a29ae2e8b047652a580f060d3300a4a37fb1d",
+      "bytes": 383
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-log-layout-publication-doc-precheck-Audit-49-01/original-preparer.py",
+      "sha256": "9440cf70318e14ed0700beb3c989838936d1cc2ab479b1d3eafea6669fe54046",
+      "bytes": 6273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-log-layout-publication-ready-Audit-49-02/Root-doc-replacement-integration-proof.json",
+      "sha256": "a423dc25ca54a3d136480d0469258a8b76c475e9a43f8d91c9a6a7e6dd2b686b",
+      "bytes": 16023
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-log-layout-publication-ready-Audit-49-03/template.json",
+      "sha256": "d33313941573c41a5358f3fc66de9e1e9cb1843b60f30c15041c4fd797807fe6",
+      "bytes": 48167
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/before/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "455fc87b7389d6e113ce5a59d0f71e7a411f8415f7cea73b80817efd16b69577",
+      "bytes": 32070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/before/crates/ep_run/src/pipeline.rs",
+      "sha256": "85b3f342135c355ec75d15b0bebed8639d2a28ff9d15207e214a435f2d474251",
+      "bytes": 836806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/ctf_initialization_outputs.rs.forward.diff",
+      "sha256": "c6101fe04f1e2520abb5fdf0f56bffeff59344b75e6e563e810cf2e70d04c5c9",
+      "bytes": 1640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/ctf_initialization_outputs.rs.inverse.diff",
+      "sha256": "d665e685c269a9c54ee818e7128f5361e7b92d98c314c0e3add376338fff5c80",
+      "bytes": 1640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/draft.json",
+      "sha256": "96a003049d3073433e023744091b32143a630b413ba7f71f98dac83514130912",
+      "bytes": 3362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/pipeline.rs.forward.diff",
+      "sha256": "38123d522d5de8ebd8d89dd905623a7aa7e8199548e125d6585dc53d94dc5de4",
+      "bytes": 575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/pipeline.rs.inverse.diff",
+      "sha256": "b347ff0de5161ee528b3e0b0e9824fd0ecb229763fcab87b121ee9e842e81f35",
+      "bytes": 575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "85307bb9abdd43f0b9fb9068171eb2fbba8160bd53c9b8c278145c829e1612b8",
+      "bytes": 32990
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "6a62e4fab5bd914bffca8203b739484a00e277e5c14f4350e40455b91e5205d7",
+      "bytes": 836934
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-02/prepared.json",
+      "sha256": "8c8324aee04c0d2491ad6767211380d7d1a5feb81cf586914c8107ad3b26957f",
+      "bytes": 6171
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/apply-successful-source-log-layout-Root-49-02.py.forward.diff",
+      "sha256": "706ed2a26e01c1c59147c0b80cbef5693fb0adc91e733c897f945ea711e449d8",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/apply-successful-source-log-layout-Root-49-02.py.inverse.diff",
+      "sha256": "c6dd835636ccfa8859895b13da48bf0d4d44041c1ebceb45df279c72f95a2f1c",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/check-successful-source-log-layout-Root-49-02.py.forward.diff",
+      "sha256": "b90415a1b77a3010549b5de4178e1fc174e031167d619f9b78bc31996fe99d50",
+      "bytes": 7415
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/check-successful-source-log-layout-Root-49-02.py.inverse.diff",
+      "sha256": "1b0f229e0d808152e4564911a1667d1c3d486ba1da2d931f8ea2cee257eec69b",
+      "bytes": 7415
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/helper-correction.json",
+      "sha256": "8d79a0a39869fa5ed276be19e5ea87a141ee82e9781916c7f679b1f4e1f2c528",
+      "bytes": 3714
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/launch-successful-source-log-layout-Root-49-02.py.forward.diff",
+      "sha256": "792eeeab6e3ab1303b70d462b45471cc511f71639c8fec6b18f375aa15195e95",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/launch-successful-source-log-layout-Root-49-02.py.inverse.diff",
+      "sha256": "732a0845e5b4015b95502686d0b4f5fe327fb2d643e6ad3b4158057f422a4c06",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-03/prepared.json",
+      "sha256": "8391b6e7e1391d40c7b0b9ee7ae0d94b7af062e49a78574f4ea2fac6a7fe4e55",
+      "bytes": 6606
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/apply-successful-source-log-layout-Root-49-03.py.forward.diff",
+      "sha256": "af423f9b6d7dfac27ecc38049d8eb5a68eddea399b39055b9a321377cccb908f",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/apply-successful-source-log-layout-Root-49-03.py.inverse.diff",
+      "sha256": "7a42208ebd3bc2688625c31c33576c4e3c3751c3d1aad9dc49d0f44edeea4858",
+      "bytes": 623
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/check-successful-source-log-layout-Root-49-03.py.forward.diff",
+      "sha256": "1e4245b0c124fd82ec7ec98af668dadca56539c8c235fbedea78e4de9eba48c4",
+      "bytes": 9140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/check-successful-source-log-layout-Root-49-03.py.inverse.diff",
+      "sha256": "67dc60a907472e98d1f144b50c2ba57c0a6a520d18fa49c1e5d6ceb28640898d",
+      "bytes": 9140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/helper-correction.json",
+      "sha256": "4c18b095a1d2ae9e401844bacb29ac5c3482ef01dff3b8582c6dc2c95a94d779",
+      "bytes": 3715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/launch-successful-source-log-layout-Root-49-03.py.forward.diff",
+      "sha256": "f050651015c43a39feb1e558dc6872b9af13be0d0720a3caaba7e39f80e0b593",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/launch-successful-source-log-layout-Root-49-03.py.inverse.diff",
+      "sha256": "f0e506165f4959d3868101189907d1d910f1cca289c53ba071dc3ad281389513",
+      "bytes": 973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49-04/prepared.json",
+      "sha256": "a0e36d8a1e0b9317f679434aeb7a323ab1b0d6d75fa6f46b0c417ae8c9a84e28",
+      "bytes": 7488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49/complete-final-compiler-Source-plan.json",
+      "sha256": "62b9be145cf3872648aaddf39fb2de1455fde7800739067451c4a378641d2948",
+      "bytes": 2573725
+    },
+    {
+      "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49/prepared.json",
+      "sha256": "dc6586eb9b74ff1d3653c87e5834afede70e19f868c67285b460cce1bfaf59d2",
+      "bytes": 5646
+    },
+    {
+      "path": ".runtime/porting/source-objects/32/3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d",
+      "sha256": "3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d",
+      "bytes": 1855501
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/files/program_end.rs",
+      "sha256": "0ad52fc89afd5376c6c94c9f7ba1af7d6b7dce4c7b9be868c0ff3b8524deb776",
+      "bytes": 2888
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_initialization/program_completion.rs",
+      "sha256": "dabac5b9d27a527ecf17fd07641e83874bedadc543210f671ccff36eaaf5e64f",
+      "bytes": 21581
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "bytes": 9275
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-full-predictor-parent-48/summary.json",
+      "sha256": "e532a5a8821076a6d8d28e74b187be85824149bee2ab77625c9c64e3dc409b86",
+      "bytes": 6096
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "bytes": 8557
+    }
+  ],
+  "scope": "Two existing Source layout changes and actual A24/B-NOLIMIT24 normal CLIs only. Exact old/new Sources, independent semantic review, preparation corrections, actual receipts/logs/ERR/END and precise whole47 physical/CSV/JSON/runtime transfers. No new Native or scientific unit; no prior archive recursion, binaries, full environments, old scientific fixtures or long-duration output trees. Four exact compact Root-authored document replacements preserve the original card/policy prefixes, all64 table rows, gates and historical evidence. No chronological appends."
+}

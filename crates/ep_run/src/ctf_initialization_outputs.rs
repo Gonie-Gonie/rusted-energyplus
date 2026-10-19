@@ -444,6 +444,17 @@ impl CtfRunOutputs {
     }
 
     pub(crate) fn persist(&mut self, output_dir: &Path) -> Result<(), String> {
+        self.persist_after_runtime(output_dir, false)
+    }
+
+    /// Keep the Source console in the application log directory after actual
+    /// completion. Its primary ERR already belongs to the successful Source
+    /// file owner; failure and Legacy prefixes retain the original layout.
+    pub(crate) fn persist_after_runtime(
+        &mut self,
+        output_dir: &Path,
+        source_completed: bool,
+    ) -> Result<(), String> {
         if !self.reached {
             return Ok(());
         }
@@ -457,7 +468,18 @@ impl CtfRunOutputs {
             if name == "eplusrs.eio" && self.initialization_files.is_some() {
                 continue;
             }
-            std::fs::write(output_dir.join(name), bytes)
+            if source_completed && name == "eplusrs.ctf.err" {
+                continue;
+            }
+            let path = if source_completed && name == "eplusrs.ctf.log" {
+                let logs = output_dir.join("logs");
+                std::fs::create_dir_all(&logs)
+                    .map_err(|error| format!("failed to create Source log directory: {error}"))?;
+                logs.join("source-console.log")
+            } else {
+                output_dir.join(name)
+            };
+            std::fs::write(path, bytes)
                 .map_err(|error| format!("failed to write {name}: {error}"))?;
         }
         if let Some(files) = self.initialization_files.as_mut() {

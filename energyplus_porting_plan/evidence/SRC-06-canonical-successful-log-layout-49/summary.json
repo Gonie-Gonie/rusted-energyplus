@@ -1,0 +1,954 @@
+{
+  "status": "Successful Source log layout verified by two actual normal CLIs; numerical proofs inherited only through exact transfers.",
+  "behavior": "After a real successful Source completion and own-file read, retain the primary Source ERR, omit its duplicate logical-prefix error export, and move the unchanged buffered console bytes to logs/source-console.log. Failure and Legacy paths retain the old writer behavior.",
+  "existing_Source_changes": 2,
+  "new_Source_files": 0,
+  "actual_production_CLI_invocations": 2,
+  "actual_test_bodies_executed": 0,
+  "new_test_bodies": 0,
+  "current_cases": [
+    "A-24H",
+    "B-NOLIMIT-24H"
+  ],
+  "genuine_current_elapsed": {
+    "A-24H": "00hr 00min  1.70sec",
+    "B-NOLIMIT-24H": "00hr 00min  0.53sec"
+  },
+  "elapsed_policy": "Actual ERR/END/console elapsed bytes remain retained. The only old-versus-current elapsed bridge belongs to the same Source runtime output; no Native elapsed substitution or blanket normalization.",
+  "normal_features": [],
+  "scientific_unit_execution_claim": false,
+  "current_limit_or_long_duration_reexecution_claim": false,
+  "overall_ancillary_IO_PASS": false,
+  "scope_status": "A14/54 and B14/64 gates unchanged; this is not a final checkpoint.",
+  "document_policy": "Four compact Root-authored whole-document replacements; policy/card prefixes and64 table rows unchanged, all evidence retained. No chronological appends.",
+  "schema": "src06-canonical-successful-log-layout49.v1",
+  "base_HEAD": "dcb9dfe4a8e610affd883ef9211be31d54a1bd8a",
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": 0,
+  "final_checkpoint": false,
+  "producer": {
+    "path": ".runtime/porting/SRC-06/successful-source-log-layout-draft-Root-48/draft.json",
+    "sha256": "96a003049d3073433e023744091b32143a630b413ba7f71f98dac83514130912",
+    "bytes": 3362
+  },
+  "independent_semantic_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-successful-source-log-layout-Source-review-48/review.json",
+    "sha256": "0513493e22856c75934a9851a6ae5f58f5e748d544c04852745159898f873421",
+    "bytes": 4693
+  },
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root-successful-source-log-layout-application-49/receipt.json",
+    "sha256": "ff356be51a67226ef7157ddda284274465914bd3ccb01bc6f684e0842cf24c3e",
+    "bytes": 4317
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-successful-log-layout-actual-review-49/review.json",
+    "sha256": "58a4af24ebf043ce5bc6654818f5e161d08d7914ffb6d471998eaba4d73eac51",
+    "bytes": 43025
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/successful-source-log-layout-prepared-Peer-49/complete-final-compiler-Source-plan.json",
+    "sha256": "62b9be145cf3872648aaddf39fb2de1455fde7800739067451c4a378641d2948",
+    "bytes": 2573725
+  },
+  "ordered_cases": [
+    {
+      "case": "A-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-command-Root-49/receipt.json",
+        "sha256": "e9c394203a5e19d599c6a07bf8fe294a17e7b677c121aa3200f42d9327960c38",
+        "bytes": 3802
+      },
+      "actual_snapshot": {
+        "path": ".runtime/porting/source-objects/32/3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d",
+        "sha256": "3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d"
+      },
+      "all4525_archived_inputs_exact": true,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/run-summary.json",
+        "sha256": "38dac91cdad1efcd535ff1dc365e5c84dcf154fecc24feb9b05210ba34aae097",
+        "bytes": 32707
+      },
+      "diagnostics": {
+        "current": {
+          "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/diagnostics.json",
+          "sha256": "436d869ee49dc14ff962aa6901ccfc935ee46192267fdcfe2ba5fa17affd34d2",
+          "bytes": 3960
+        },
+        "prior47": {
+          "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/diagnostics.json",
+          "sha256": "7b982be3a9f5475a433428d484dc20b6b9ef8ffda49dea85b609fb112ce052a1",
+          "bytes": 3960
+        },
+        "all_rows_order_codes_severities_context_and_blocking_equal": true,
+        "sole_owned_conversion_time_message_bridge": true,
+        "current_actual_conversion_time": {
+          "decimal_payload": "0.233954000",
+          "seconds": 0.233954
+        },
+        "prior47_actual_conversion_time": {
+          "decimal_payload": "0.221728300",
+          "seconds": 0.2217283
+        }
+      },
+      "whole47_physics_and_export_transfer": {
+        "physical_streams": [
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.eso",
+              "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+              "bytes": 112177
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.eso",
+              "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+              "bytes": 112177
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.mtr",
+              "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+              "bytes": 2454
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.mtr",
+              "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+              "bytes": 2454
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.eio",
+              "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+              "bytes": 15340
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.eio",
+              "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+              "bytes": 15340
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.rdd",
+              "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+              "bytes": 30557
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.rdd",
+              "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+              "bytes": 30557
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.mdd",
+              "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+              "bytes": 3846
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.mdd",
+              "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+              "bytes": 3846
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.shd",
+              "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+              "bytes": 1557
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.shd",
+              "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+              "bytes": 1557
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.bnd",
+              "sha256": "2a74d3295dd901885e8c6c2dfab1af08acb488dc12487fd4332751ed46c42795",
+              "bytes": 6329
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.bnd",
+              "sha256": "2a74d3295dd901885e8c6c2dfab1af08acb488dc12487fd4332751ed46c42795",
+              "bytes": 6329
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.audit",
+              "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+              "bytes": 1569
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplusrs.audit",
+              "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+              "bytes": 1569
+            },
+            "whole_bytes_equal": true
+          }
+        ],
+        "tables": {
+          "files": [
+            {
+              "format": "csv",
+              "current": {
+                "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.csv",
+                "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+                "bytes": 84631
+              },
+              "prior47": {
+                "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.csv",
+                "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+                "bytes": 84631
+              },
+              "physical_lines": 1696
+            },
+            {
+              "format": "tab",
+              "current": {
+                "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.tab",
+                "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+                "bytes": 84628
+              },
+              "prior47": {
+                "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.tab",
+                "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+                "bytes": 84628
+              },
+              "physical_lines": 1696
+            },
+            {
+              "format": "txt",
+              "current": {
+                "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.txt",
+                "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+                "bytes": 163308
+              },
+              "prior47": {
+                "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.txt",
+                "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+                "bytes": 163308
+              },
+              "physical_lines": 1696
+            },
+            {
+              "format": "htm",
+              "current": {
+                "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.htm",
+                "sha256": "736bcfd348a2a082f2ab5b7bb419829f69ea1c469b45035af487f464e01161c2",
+                "bytes": 354250
+              },
+              "prior47": {
+                "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.htm",
+                "sha256": "0219168fadf9e3ca05bf6016e6f621501ba620aca1b1f605373c10dd3df05497",
+                "bytes": 354250
+              },
+              "physical_lines": 9542
+            },
+            {
+              "format": "xml",
+              "current": {
+                "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplustbl.xml",
+                "sha256": "4dcb4a69d98e59cffc7b96657e2823221ef57d584483ec64313a5b2a98758969",
+                "bytes": 226073
+              },
+              "prior47": {
+                "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/eplustbl.xml",
+                "sha256": "850bc2035f5f0c68526d7aaf92758a606a6804ed0a038f5940f765d173d25d4e",
+                "bytes": 226073
+              },
+              "physical_lines": 4682
+            }
+          ],
+          "physical_lines": 19312,
+          "all_nonmetadata_lines_whole_exact": true,
+          "exact_allowlist_authority": {
+            "Root13_checker": {
+              "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+              "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+              "bytes": 10019
+            },
+            "strict_metadata_function_Source": {
+              "path": ".runtime/porting/SRC-06/check-canonical-B-ingress-IO-A24-transfer-Peer-03.py",
+              "sha256": "0742d4694653c9f80e93e1ebe89ed80bf14696b148e39f8477f0c67c1cb50c74",
+              "bytes": 24774
+            },
+            "accepted_metadata_proof": {
+              "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/full-table-metadata-differences.json",
+              "sha256": "17ab6463df871616e6c4e66cfaa805a403d2bcc7e74025862c565ca4bdba2257",
+              "bytes": 28915
+            },
+            "original_accepted_peer": {
+              "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+              "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+              "bytes": 27122
+            }
+          },
+          "all_uncapped_metadata_differences": [
+            {
+              "format": "htm",
+              "line": 6,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "202032323a32323a31330d0a",
+              "prior47_complete_raw_hex": "202032313a33353a34320d0a"
+            },
+            {
+              "format": "htm",
+              "line": 18,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 25,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 1435,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 1832,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 2423,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 3262,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 3269,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 3292,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 4534,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 4563,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 5136,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 5430,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 5825,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 5880,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 5983,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 6747,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 6860,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7151,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7372,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7534,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7653,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7710,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 7921,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 8071,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 8446,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 8660,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 9431,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "htm",
+              "line": 9486,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "2020202032323a32323a31333c2f623e3c2f703e0d0a",
+              "prior47_complete_raw_hex": "2020202032313a33353a34323c2f623e3c2f703e0d0a"
+            },
+            {
+              "format": "xml",
+              "line": 12,
+              "classification": "actual wall clock",
+              "current_complete_raw_hex": "20202020202032323a32323a31330d0a",
+              "prior47_complete_raw_hex": "20202020202032313a33353a34320d0a"
+            }
+          ],
+          "unequal_metadata_lines": 30,
+          "no_file_wide_regex_or_other_normalization": true
+        },
+        "whole_CSV": [
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-eso.csv",
+              "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+              "bytes": 1621144
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-eso.csv",
+              "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+              "bytes": 1621144
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-mtr.csv",
+              "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+              "bytes": 17976
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-mtr.csv",
+              "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+              "bytes": 17976
+            },
+            "whole_bytes_equal": true
+          }
+        ],
+        "current_JSON": {
+          "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/results/source-reported-results.json",
+          "sha256": "5436e70ac31bf82b563e5c29cf1558a77fcc3c226018d2aa73d2af966af12573",
+          "bytes": 1679920
+        },
+        "prior47_JSON": {
+          "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-Root-47/output/results/source-reported-results.json",
+          "sha256": "d849ce8d06304653cb906868a9976f6d1006b8e011ba0f30efb6707749c976aa",
+          "bytes": 1679912
+        },
+        "whole_JSON_and_runtime_equal_after_two_exact_owner_path_bridges": true
+      },
+      "primary_ERR": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.err",
+        "sha256": "e1f8f815328f79f277d5d9a566eb78ae89de08139133e8c9b87ffe44eb6abdcc",
+        "bytes": 892
+      },
+      "primary_END": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/eplusrs.end",
+        "sha256": "cd68e7eb5dd85ef88de60d03fa5d5dd987193fae83dfde55bcc8c99c82222a80",
+        "bytes": 98
+      },
+      "verbatim_console_at_new_location": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-A-24H-Root-49/output/logs/source-console.log",
+        "sha256": "6d5ab27507392f20377c86a05c130cd66a691d84afe8a01277ad67d4a30152a4",
+        "bytes": 1883
+      },
+      "old_duplicate_error_and_console_prefixes_absent": true,
+      "exactly_owned_elapsed_runtime_bridge": true,
+      "current_elapsed": "00hr 00min  1.70sec",
+      "same_ERR_END_console_elapsed": true,
+      "normal_core_artifacts": {
+        "ep_runtime": {
+          "fresh": false,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_runtime-279e26aa69587c07.rlib",
+              "sha256": "9d1f629596ba9f763e957ecc1f254484b3a6452f38ab1c6b9acb245e7ffd21a5",
+              "bytes": 123669782
+            },
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_runtime-279e26aa69587c07.rmeta",
+              "sha256": "9370b808d6c3f9a6a8a0a135ceb443b9f63a4ec887007888fb69a3fd5cd7dec6",
+              "bytes": 53894147
+            }
+          ]
+        },
+        "ep_run": {
+          "fresh": false,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_run-336f5139156a61c0.rlib",
+              "sha256": "8f20cf91c07ccb7a9bb00e895365d5d5a1d27186b6237f3e409940f6ac146551",
+              "bytes": 33329270
+            },
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_run-336f5139156a61c0.rmeta",
+              "sha256": "77b54fd746ceeb174a473173f50e2b6d8cfe153613ccc58baad114f07d055c02",
+              "bytes": 6545978
+            }
+          ]
+        },
+        "eplus-rs": {
+          "fresh": false,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/eplus-rs.exe",
+              "sha256": "f3146f4d742c772df0479b1da5b96bb601471a9fd367a61413286c4126bfbe9d",
+              "bytes": 74412095
+            }
+          ]
+        }
+      }
+    },
+    {
+      "case": "B-NOLIMIT-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-command-Root-49/receipt.json",
+        "sha256": "8d31f3cdb9a036469f72c670c04911994fa63096e3fab9054bfe34b74711ff62",
+        "bytes": 3854
+      },
+      "actual_snapshot": {
+        "path": ".runtime/porting/source-objects/32/3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d",
+        "sha256": "3289da102ed172ab9a8f3bc3cc3ecf003d42c279dd864e3111761bc69ba2d82d"
+      },
+      "all4525_archived_inputs_exact": true,
+      "summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/run-summary.json",
+        "sha256": "502d563b3c4dfcc1d8a69fd8c4792b90825bf4f6b9379602c90204f1de3ce58a",
+        "bytes": 61306
+      },
+      "diagnostics": {
+        "current": {
+          "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/diagnostics.json",
+          "sha256": "12d53a576f4bc924300e883d26eca64604a90772d81f9445b0f315bf62c38e3b",
+          "bytes": 398
+        },
+        "prior47": {
+          "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/diagnostics.json",
+          "sha256": "855910631023626c2162eb90eece6065fa616375effc5ef1194d3ccc5aec26cc",
+          "bytes": 398
+        },
+        "all_rows_order_codes_severities_context_and_blocking_equal": true,
+        "sole_owned_conversion_time_message_bridge": true,
+        "current_actual_conversion_time": {
+          "decimal_payload": "0.219041000",
+          "seconds": 0.219041
+        },
+        "prior47_actual_conversion_time": {
+          "decimal_payload": "0.240574600",
+          "seconds": 0.2405746
+        }
+      },
+      "whole47_physics_and_export_transfer": {
+        "physical_streams": [
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.eso",
+              "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+              "bytes": 202668
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.eso",
+              "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+              "bytes": 202668
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "both_absent": true,
+            "current_path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.mtr",
+            "prior47_path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.mtr"
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.eio",
+              "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+              "bytes": 12652
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.eio",
+              "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+              "bytes": 12652
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.rdd",
+              "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+              "bytes": 24778
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.rdd",
+              "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+              "bytes": 24778
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.mdd",
+              "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+              "bytes": 1124
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.mdd",
+              "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+              "bytes": 1124
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.shd",
+              "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+              "bytes": 1401
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.shd",
+              "sha256": "d0b505eb09d6485131e7d4ee818bbd0b0dc29d83afaee0d439fbb8b86b23602a",
+              "bytes": 1401
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.bnd",
+              "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+              "bytes": 8559
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.bnd",
+              "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+              "bytes": 8559
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.audit",
+              "sha256": "2578d15e47d92880a70d2d0b037bdf292cfa6909ce5343212baa1af3c9dd5aa3",
+              "bytes": 1569
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/eplusrs.audit",
+              "sha256": "2578d15e47d92880a70d2d0b037bdf292cfa6909ce5343212baa1af3c9dd5aa3",
+              "bytes": 1569
+            },
+            "whole_bytes_equal": true
+          }
+        ],
+        "tables": {
+          "files": [
+            {
+              "format": "csv",
+              "both_absent": true
+            },
+            {
+              "format": "tab",
+              "both_absent": true
+            },
+            {
+              "format": "txt",
+              "both_absent": true
+            },
+            {
+              "format": "htm",
+              "both_absent": true
+            },
+            {
+              "format": "xml",
+              "both_absent": true
+            }
+          ],
+          "physical_lines": 0,
+          "all_nonmetadata_lines_whole_exact": true,
+          "exact_allowlist_authority": {
+            "Root13_checker": {
+              "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+              "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+              "bytes": 10019
+            },
+            "strict_metadata_function_Source": {
+              "path": ".runtime/porting/SRC-06/check-canonical-B-ingress-IO-A24-transfer-Peer-03.py",
+              "sha256": "0742d4694653c9f80e93e1ebe89ed80bf14696b148e39f8477f0c67c1cb50c74",
+              "bytes": 24774
+            },
+            "accepted_metadata_proof": {
+              "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/full-table-metadata-differences.json",
+              "sha256": "17ab6463df871616e6c4e66cfaa805a403d2bcc7e74025862c565ca4bdba2257",
+              "bytes": 28915
+            },
+            "original_accepted_peer": {
+              "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+              "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+              "bytes": 27122
+            }
+          },
+          "all_uncapped_metadata_differences": [],
+          "unequal_metadata_lines": 0,
+          "no_file_wide_regex_or_other_normalization": true
+        },
+        "whole_CSV": [
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-eso.csv",
+              "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+              "bytes": 2991866
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-eso.csv",
+              "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+              "bytes": 2991866
+            },
+            "whole_bytes_equal": true
+          },
+          {
+            "current": {
+              "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-mtr.csv",
+              "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+              "bytes": 251
+            },
+            "prior47": {
+              "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-mtr.csv",
+              "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+              "bytes": 251
+            },
+            "whole_bytes_equal": true
+          }
+        ],
+        "current_JSON": {
+          "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/results/source-reported-results.json",
+          "sha256": "292c3897f4206a90f1e8185d6b0d640cf4f1c5bb9c45ba38e7e2046a9ac04708",
+          "bytes": 3026097
+        },
+        "prior47_JSON": {
+          "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-Root-47/output/results/source-reported-results.json",
+          "sha256": "d9cec7534fab23f30352dc26404a08779ef3f1ede248605b3f2cb84201593206",
+          "bytes": 3026089
+        },
+        "whole_JSON_and_runtime_equal_after_two_exact_owner_path_bridges": true
+      },
+      "primary_ERR": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.err",
+        "sha256": "d47c074629d4574cb29937597af8b81a0f327a1bb77bfc0b405ea0e16ff112e1",
+        "bytes": 892
+      },
+      "primary_END": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/eplusrs.end",
+        "sha256": "65d8727f5d496ca33de85b54ee247bc03dd0571f77e38facca3511b55429bd01",
+        "bytes": 98
+      },
+      "verbatim_console_at_new_location": {
+        "path": ".runtime/porting/SRC-06/canonical-source-successful-log-layout-B-NOLIMIT-24H-Root-49/output/logs/source-console.log",
+        "sha256": "61cf4e97429bd2abbbc29590d952c03701c17a5600289a0c0864c4e36fd8a807",
+        "bytes": 1388
+      },
+      "old_duplicate_error_and_console_prefixes_absent": true,
+      "exactly_owned_elapsed_runtime_bridge": true,
+      "current_elapsed": "00hr 00min  0.53sec",
+      "same_ERR_END_console_elapsed": true,
+      "normal_core_artifacts": {
+        "ep_runtime": {
+          "fresh": true,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_runtime-279e26aa69587c07.rlib",
+              "sha256": "9d1f629596ba9f763e957ecc1f254484b3a6452f38ab1c6b9acb245e7ffd21a5",
+              "bytes": 123669782
+            },
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_runtime-279e26aa69587c07.rmeta",
+              "sha256": "9370b808d6c3f9a6a8a0a135ceb443b9f63a4ec887007888fb69a3fd5cd7dec6",
+              "bytes": 53894147
+            }
+          ]
+        },
+        "ep_run": {
+          "fresh": true,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_run-336f5139156a61c0.rlib",
+              "sha256": "8f20cf91c07ccb7a9bb00e895365d5d5a1d27186b6237f3e409940f6ac146551",
+              "bytes": 33329270
+            },
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/deps/libep_run-336f5139156a61c0.rmeta",
+              "sha256": "77b54fd746ceeb174a473173f50e2b6d8cfe153613ccc58baad114f07d055c02",
+              "bytes": 6545978
+            }
+          ]
+        },
+        "eplus-rs": {
+          "fresh": true,
+          "features": [],
+          "files": [
+            {
+              "path": ".runtime/porting/SRC-06/ordinary-provider-assembly-Root-55/workspace/.runtime/cargo-test-fresh/debug/eplus-rs.exe",
+              "sha256": "f3146f4d742c772df0479b1da5b96bb601471a9fd367a61413286c4126bfbe9d",
+              "bytes": 74412095
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "selected_Source_files": [
+    "crates/ep_run/src/ctf_initialization_outputs.rs",
+    "crates/ep_run/src/pipeline.rs"
+  ],
+  "parent47_actual": {
+    "path": ".runtime/porting/SRC-06/Root-source-normal-completion-actual-review-47/review.json",
+    "sha256": "43d8e0ed57d06aaa72fa7d2616cbdda9b32d5285ab07d050df992e62995eac58",
+    "bytes": 58160
+  },
+  "parent_P2_actual": {
+    "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-actual-review-P2/review.json",
+    "sha256": "3a023b7649744a15a0340053e4c08d3aaacb9a650ce8a1e2f9b632115246fde9",
+    "bytes": 4882
+  },
+  "limitations": [
+    "No new Native or scientific unit execution. Prior numerical proofs transfer only through exact physical/export/runtime equality.",
+    "A tables reuse only accepted Root13 format/line clock-date positions and exact typed_metadata shapes; every other one of19312 lines is exact47, and all raw unequal lines are retained uncapped.",
+    "The one actual InputResolved/input conversion wall-time decimal is separately retained; all other diagnostic bytes/order/fields are exact47. No warning filtering.",
+    "Only A24 and B-NOLIMIT24 current normal commands; no current limit/long-duration rerun claimed.",
+    "Console elapsed and ERR/END elapsed are actual and retained. Only exact own-runtime payloads are bridged against47; no Native runtime normalization or full ancillary IO PASS.",
+    "Failure/Legacy branches are covered by the accepted semantic peer, not by these two successful runtime cases."
+  ],
+  "incremental_environment_qualification": "Guard sets CARGO_INCREMENTAL=0; existing recorder omits that selected key. Exact authenticated launcher/guard prove intent, not a captured receipt value.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-successful-log-layout-49/evidence.zip",
+    "sha256": "01bcb6a4ab0726db9bd7467391847d9e7738ccc09382f542e337f19ccd783a59",
+    "bytes": 3611081
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-successful-log-layout-49/manifest.json",
+    "sha256": "50cc5d0ad462632c8ea35b75c4859bd216db3cffca8730c71cb5fb14044fd1af",
+    "bytes": 38887
+  },
+  "archive_entries": 166,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-successful-log-layout-Root-49.py",
+    "sha256": "d9c3e5c4881e5fd1d0e076e46c27d3709a40930bad6265f1c78807ef102fdb14",
+    "bytes": 8639
+  }
+}

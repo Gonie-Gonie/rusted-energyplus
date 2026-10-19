@@ -1477,7 +1477,10 @@ fn run_with_optional_porting_scope_impl(
                     })
                 });
         ctf_outputs
-            .persist(&config.output_dir)
+            .persist_after_runtime(
+                &config.output_dir,
+                matches!(&runtime_result, Ok(RuntimeExecutionOutcome::Source(_))),
+            )
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
         match runtime_result.and_then(|result| {
             if let RuntimeExecutionOutcome::Legacy(legacy) = &result {
