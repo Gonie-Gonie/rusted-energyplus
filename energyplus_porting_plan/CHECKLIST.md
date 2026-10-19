@@ -334,3 +334,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source42 controlled predefined entries](evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). 기존 Rust 파일 3개로 제어 존 최종 표 기입을 연결했다. 실제 B/A24 CLI 2회만 사용하고 실행 도구가 canonical 빌드 경로와 incremental0을 직접 지정한다. 새 테스트와 게이트 변경은 없다.
+
+
+[Source44 thermostat predefined reports](evidence/SRC-06-canonical-thermostat-predefined-44/summary.json). 기존 Rust 파일 4개와 신규 공통 helper 1개로 thermostat 최종 요약을 이었다. B/A24 CLI 2회로 확인하며 실행 도구가 canonical 빌드 경로와 incremental0을 강제한다. 새 테스트와 게이트 변경은 없다.

@@ -191,3 +191,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source42 controlled predefined entries](evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). Zone.isNominalOccupied는 Native 생성자의 false를 같은 존 소유자에 보관한다. 유일한 true 작성 경로인 양수 People 입력은 기존 실제 경계를 유지하며 실행 횟수나 예상 결과로 점유 플래그를 대체하지 않는다.
+
+
+[Source44 thermostat predefined reports](evidence/SRC-06-canonical-thermostat-predefined-44/summary.json). 기존 WeatherSession의 위도·윤년·시작 요일·DST를 같은 Schedule 주간·일간 객체와 함께 읽는다. 다섯 제어 정보 슬롯과 GCC 문자열 이동 의미, 정렬·연결 순서를 보존하며 값이나 일수를 미리 저장한 대체 소유자는 없다.

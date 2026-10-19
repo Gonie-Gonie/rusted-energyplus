@@ -503,3 +503,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source42 controlled predefined entries](../evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). 제어 존의 FillRemaining 표 항목과 누계를 같은 Config·Zone·ZonePreDefRep에 연결했다. 입력된 노드 순서와 나눗셈 묶음, 출력 자릿수를 보존한다. B 실행 결과: `GetHeatBalanceInput: actual thermostat DualHeatCool heatSched->Num6642`. A24의 기존 5,352개 보고값 증거는 전체 결과 비교 후 이어받는다.
+
+
+[Source44 thermostat predefined reports](../evidence/SRC-06-canonical-thermostat-predefined-44/summary.json). 온도조절기의 설정값과 스케줄 요약을 실제 Schedule 소유자에 연결했다. 날짜별 값·일수·월을 Native 순서대로 구한다. B 실행 결과: `Source B-NOLIMIT-24H completed through actual620`. A24의 기존 5,352개 보고값 증거는 전체 결과 비교 후 이어받는다.

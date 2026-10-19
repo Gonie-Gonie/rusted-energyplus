@@ -8,6 +8,7 @@ mod annual;
 mod compact;
 mod detailed;
 mod day_group;
+mod predefined;
 mod report;
 #[cfg(test)]
 mod compact_native_tests;

@@ -12936,6 +12936,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json",
         "sha256": "f21008edc08710f7801df688b6dd45df1a097b00f9dd1eff436a0b7112b61499",
         "size_bytes": 6256
+      },
+      "canonical_thermostat_predefined_44": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-predefined-44/summary.json",
+        "sha256": "60d011e9fb3a8726d9ab808dfe7e1a695f2ca7538ad7b4f4bb704d57377649f3",
+        "size_bytes": 6485
       }
     },
     {

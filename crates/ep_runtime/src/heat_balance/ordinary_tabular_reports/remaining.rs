@@ -20,6 +20,7 @@ pub(crate) struct SourceRemainingPredefinedOwners<'a> {
     pub(crate) gain_modules: &'a crate::heat_balance::selected_gain_modules::SourceGainModules,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) environment: &'a WeatherEnvironmentState,
+    pub(crate) weather: &'a crate::weather::day::WeatherOwnerState,
     pub(crate) clock: &'a crate::weather::day::WeatherGlobalState,
     pub(crate) gains: &'a SelectedInternalHeatGains,
     pub(crate) exterior: &'a SourceExteriorEnergyUse,
@@ -1599,8 +1600,12 @@ impl SourceTabularReports {
                 annual_nonzero,
             )?;
         }
-        o.controller.fill_source_predefined_table_on_thermostat_setpoints()?;
-        o.controller.fill_source_predefined_table_on_thermostat_schedules()?;
+        o.controller.fill_source_predefined_table_on_thermostat_setpoints(
+            o.schedules, o.environment, o.weather, o.clock, o.registry, o.table,
+        )?;
+        o.controller.fill_source_predefined_table_on_thermostat_schedules(
+            o.schedules, o.registry, o.table,
+        )?;
         const _FLOW_FRACTIONS: [f64; 10] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
         let save_night_vent_on = o.hvac.night_vent_on;
         let save_turn_fans_on = o.hvac.turn_fans_on;
