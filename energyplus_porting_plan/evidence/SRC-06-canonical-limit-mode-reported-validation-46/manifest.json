@@ -1,0 +1,956 @@
+{
+  "schema": "src06-nine-limit-mode-reported-finite-evidence46.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-limit-mode-reported-validation-46/evidence.zip",
+    "sha256": "f675c4897632e49763f858945f3bcdb94d6483c6d594e0d49fd19d0e5a8287e2",
+    "bytes": 1485141
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.end",
+      "sha256": "7d05f9fa1f2863137d9894ab01872173f0456008994c5f3a96d1002425882d58",
+      "bytes": 98
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.err",
+      "sha256": "ead5141affbc65217a502cc1a3a26127a6f2cad343822957597a0709dd731702",
+      "bytes": 897
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.eso",
+      "sha256": "3edad8e35ad4a7f13e6e76b20ac4159e72fe1a643fca17ab2863998284b53b87",
+      "bytes": 203165
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.mdd",
+      "sha256": "91d164d3710095cfd87d552085a76c14b458ce0cd5d53a36a5230d513840f18e",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.rdd",
+      "sha256": "d736d844884adabe170f81c82ecb8ec344d770454211f559609ad20898739946",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.end",
+      "sha256": "f698f2b4868ddb07a23960e53d8452655fe3627b8db7e39ea672b09cfb700ce1",
+      "bytes": 98
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.err",
+      "sha256": "5010cb888fb39fb3980f7b0024b06001211c025316dd4ddb8c05ae36e504ef84",
+      "bytes": 897
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.eso",
+      "sha256": "a90bba31795bffd59b65f81ad979b191100ecfe79d1625bc17b40a15ab0ef7de",
+      "bytes": 204997
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.mdd",
+      "sha256": "91d164d3710095cfd87d552085a76c14b458ce0cd5d53a36a5230d513840f18e",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.rdd",
+      "sha256": "d736d844884adabe170f81c82ecb8ec344d770454211f559609ad20898739946",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.end",
+      "sha256": "6307c0a44313523487242696a79e47fe5f23d3e100fa686cb2af9e6f11b8ff12",
+      "bytes": 98
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.err",
+      "sha256": "f6e9f34c9cce4100e5b6068652fb44dc36cf08a33fecef77aeb971f3db3abca7",
+      "bytes": 897
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.eso",
+      "sha256": "598f35e0b6ea1188f093400e3f1f752a005df1be5a5883d28836a8a7573a4288",
+      "bytes": 202215
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.mdd",
+      "sha256": "91d164d3710095cfd87d552085a76c14b458ce0cd5d53a36a5230d513840f18e",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.rdd",
+      "sha256": "d736d844884adabe170f81c82ecb8ec344d770454211f559609ad20898739946",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-hard-size43-commit-readback/receipt.json",
+      "sha256": "b688994d196024f7a04842d3125ea2001bd319516f66a6a4d982117403fbe86f",
+      "bytes": 385
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-hard-sized-purchased-air-cohort-application-43/receipt.json",
+      "sha256": "3ce67870fba913b8698076eb11f010635e55ce4c23c7410fb37c0892c63d8dc5",
+      "bytes": 81341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-limit-aggregate-reference-metadata-fix-46/checker-forward.diff",
+      "sha256": "cf5d72906afd3f6f9ac618293da75272854b464b4c904f2429fe6777d3f712c6",
+      "bytes": 1378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-limit-aggregate-reference-metadata-fix-46/receipt.json",
+      "sha256": "535fa98605a630f0dd3db16b060640551f30cbf73a09d9ff034d312e636d17ee",
+      "bytes": 1719
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-limit-mode-reported-actual-review-46/review.json",
+      "sha256": "3888e68eafd10fa2fa082416339611d88cd653b46a9dd6869ad5ea9bca400c48",
+      "bytes": 106593
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-six-limit-duration-pairs-driver-46/receipt.json",
+      "sha256": "47225b0b64f49e854dc131c192d6ad14ac382fffc1943e74b004a17661ab3517",
+      "bytes": 6781
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hard-size-cohort-actual-review-43/review.json",
+      "sha256": "4694e170a388c2cda1543b497ae2f7a23d85b3be4d541d2084071197fb35de2b",
+      "bytes": 7009
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/diagnostics.json",
+      "sha256": "d2e489c83bd158fd861116e2fdea7f53bda9e7cb6690d5d527319da81692f489",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/run-summary.json",
+      "sha256": "3a5dffa25a60472c4bb6ba164a4574ce253c7328920dbbd36bb810a6234cfed0",
+      "bytes": 60889
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/receipt.json",
+      "sha256": "40cfb8fdfaa484b74370baa841bc812a19c33aac33762371401a7950fb7f8cfc",
+      "bytes": 5526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/stderr.log",
+      "sha256": "9b987aef68057716745fb6a291d95e72710c4380ecefb47d29e6b74ebaa995e4",
+      "bytes": 2768
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/stdout.log",
+      "sha256": "9c8b7c431e453a4ff04eeb0d63ca05188b61343c393a4dab1135c12b2cc37883",
+      "bytes": 440341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/diagnostics.json",
+      "sha256": "8cf30cf4c71efb2c568a207ede0d1a63064f4b01e6a10d0128a1d91465c2e3e1",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/run-summary.json",
+      "sha256": "5af5684d8c9943f5875ae3ae37f32f2357083b273bf3ce4392a27b78b4d8d186",
+      "bytes": 61005
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/receipt.json",
+      "sha256": "dfcec4ecca0901677214d9d96fd7b84617b615fd798a373100992d3aae29fc1a",
+      "bytes": 5541
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/stderr.log",
+      "sha256": "ab171a2d08e21ff9cad059aab3cb8042b0c02b9f917a27a7df53a12874c74317",
+      "bytes": 2776
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/stdout.log",
+      "sha256": "32716b699faa7a4ecc673d1c2bd5ea97b747d9153ae6d3fb9e68fa9821ad76b4",
+      "bytes": 440357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/diagnostics.json",
+      "sha256": "e60d6dc33c4c028e9fb76d94098378b732f787bfbf428ad62540181be5095d30",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/run-summary.json",
+      "sha256": "680a6fa9df44f80db74538ebe1e4587da89095b4c3e7263d49b6ed1eecdfb7aa",
+      "bytes": 60898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/receipt.json",
+      "sha256": "43fc7c851985b830d5cc20d7e652b772cf458e43b96fb8d54df103de557c75d1",
+      "bytes": 5526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/stderr.log",
+      "sha256": "2ba24e2df9264d0eac122175a5ea0bc666e6873f36a58af6f79df4cfb7f16945",
+      "bytes": 2768
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/stdout.log",
+      "sha256": "83e87153096429479e21aae70241fedf7464697ff6ce597001c5e23abcd24885",
+      "bytes": 440341
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-limit-mode-reported-actual-Outer-46-02.py",
+      "sha256": "6c9499efced647d15da66250b8cccd312ecbf8bc71be1dc5704dc065cf7fe0ab",
+      "bytes": 14433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-limit-mode-reported-actual-Outer-46.py",
+      "sha256": "70c702efb318648aa03df2533dff69b2c189fba472291176d12e48b2464659a3",
+      "bytes": 14419
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compare-completed-limit-cases-Outer-after43.py",
+      "sha256": "91b1abfb84b559584851de2b602f3bd46bd5214630283335544fbf82db6f7e64",
+      "bytes": 4019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-24H-reported-Root-43/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-24H-reported-Root-43/comparison.json",
+      "sha256": "fd1fc80e435c905ef13da1e6a492389242760a02f518c685dfe5ec0548966d18",
+      "bytes": 146278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-72H-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-72H-reported-Root-46/comparison.json",
+      "sha256": "77ab8b0cde71287220a1c74b9248df8ddadfe5cfab292535e42415216de2cd84",
+      "bytes": 146374
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-ANNUAL-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-BOTH-ANNUAL-reported-Root-46/comparison.json",
+      "sha256": "103baff683088693a442a9c13bf47cc07501878186bd5008c408bac882b14974",
+      "bytes": 153813
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-24H-reported-Root-43/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-24H-reported-Root-43/comparison.json",
+      "sha256": "9da0259a8871f7bcb730fdbb8c5f7a158fa801eb69460850642b36a037450dd9",
+      "bytes": 148123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-72H-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-72H-reported-Root-46/comparison.json",
+      "sha256": "250ee208aab76ff2ae2751a884a112d78ee5551a6dd96351b541fd9f56cb9324",
+      "bytes": 148731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-ANNUAL-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-ANNUAL-reported-Root-46/comparison.json",
+      "sha256": "6933bbca9b80aff127800f4a65e3748c56ed370264f321b575bb08c544306c48",
+      "bytes": 153913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-24H-reported-Root-43/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-24H-reported-Root-43/comparison.json",
+      "sha256": "69d39a7afb0185640a1ba4cc7473bfb2eb0829d80867311cc24fb330f5fa9d0d",
+      "bytes": 146278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-72H-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-72H-reported-Root-46/comparison.json",
+      "sha256": "6d98deb398d6ded7fc6bdb5857ccfe32c7e355774fb8044dfcd614d01d38dc2b",
+      "bytes": 146374
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-ANNUAL-reported-Root-46/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-FLOW-ANNUAL-reported-Root-46/comparison.json",
+      "sha256": "0c9eb101e849b9974043ee576cbd2e5023573f5301009226b4aa3c6ae40924e6",
+      "bytes": 153653
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-source-native-limit-durations-Outer-after43.py",
+      "sha256": "97cf234a299e28d679d0326542cec3823b7fefd08344038263080be5b5ca8e11",
+      "bytes": 8308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-READY-Outer-after43/plan.json",
+      "sha256": "6e5789c75393cccb003ae6e204135a68c57e4cd4309d1dd9835091994419510c",
+      "bytes": 47786
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/comparer-forward.diff",
+      "sha256": "01479582b2521c285d25f7b7ce3d00f568e508d46a32875e16c4dea37f12b976",
+      "bytes": 5344
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/comparer-inverse.diff",
+      "sha256": "88f7a14455fd620e7d1e2958cf2f1c58eecb2c347c96f742704eadb7ce3e3fe3",
+      "bytes": 5344
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/comparer-public-before.py",
+      "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+      "bytes": 24664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/plan.json",
+      "sha256": "53014634337bae51915d98d32fee3c1e5f7437d0fa6928a0ee540c36398b34c5",
+      "bytes": 45126
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/strict-API24-adapter-proof.json",
+      "sha256": "50f9e1d484a5f058b6109e64b4dac4ceeeb8ec2a12f73015e1af4dc6fcd9088e",
+      "bytes": 1655
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-duration-launch-WAIT-Outer-after43/strict-API24-comparer.py",
+      "sha256": "ec8d0f6f6945f6bdec8cfcf422fd27b11a5f2e4d185b839e8877972ccd4bca9d",
+      "bytes": 26462
+    },
+    {
+      "path": ".runtime/porting/SRC-06/limit-mode-publication-READY-Outer-46/publication-template.json",
+      "sha256": "44d9d72c7ef6d5cb5679ed4e76834399fcf28db6a98dd9b8ed9d6d8c8bed8242",
+      "bytes": 15479
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-Root-46/output/energyplusout.mdd",
+      "sha256": "c0d9f7682bb4fa62fed28e73c1ddb0317011c1e754837f075d1076c0c5c384f9",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-Root-46/output/energyplusout.rdd",
+      "sha256": "4c818370200cc7d108c7a1ddb78d8086fe586b85d924486b0e3c08b69fe49bf1",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-command-Root-46/receipt.json",
+      "sha256": "32a4e12bc331ecdd8c9689d7d4248f6bea497c814f71f26efa7124536af3119a",
+      "bytes": 3336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-command-Root-46/stdout.log",
+      "sha256": "99e47c24fed823ff0d76bc5c246726ef9f4b6653e9c583bd21c563124224cd7e",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-custody-Root-46/custody.json",
+      "sha256": "eec504fd6d102822b3b1add0894e6b27e89bdb5a5fb0942d71137a26fd7aa7d6",
+      "bytes": 25631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-Root-46/output/energyplusout.mdd",
+      "sha256": "e08b4a63ca25538e19d5ade467d1bd8ae5bdf1225c8150e703533c478b9f03b7",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-Root-46/output/energyplusout.rdd",
+      "sha256": "3e79c6fb23f9565efa8076d3ec933c2d0c20c081850b8d35528b836ea09a8d41",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "5a76a681e54b5e2825876a9b4798eb22a7ae5e43fb5238c7f0466a396591dee6",
+      "bytes": 3348
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "f026131ad8bb8c1e723914d7ac6ab298cf1af7dc0f9a48bfda1a984e0e2c1246",
+      "bytes": 2440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "5db031b2da253ca8b503fcc89451e80a67402c5bfb338dc706ca7de8b74351c8",
+      "bytes": 25645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-Root-46/output/energyplusout.mdd",
+      "sha256": "e428771d3eb957a15d3d74f2cb5f7cffd75e41ddd45d62d415c0c8fdfd117894",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-Root-46/output/energyplusout.rdd",
+      "sha256": "674e24bebff3a64565230c9eb14dbb617ba64cd61c1ada4cdafcc08d7ed832bd",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-command-Root-46/receipt.json",
+      "sha256": "6ee894ddec9a97f2fa59bbee52be5a040361116a8174f0763fca49bd222ab738",
+      "bytes": 3352
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-command-Root-46/stdout.log",
+      "sha256": "417a04411ab1575c7d8680ee8c93e2d2e50fa8d2aba3dd8b75dc9255651893c5",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-custody-Root-46/custody.json",
+      "sha256": "c535d8997f7180e2948744458d9f1e4610c3d4a0fbfce64fa474d98222a2ee3b",
+      "bytes": 25647
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/energyplusout.mdd",
+      "sha256": "a23d4e2e8b5d26395f7aab731a2ebc9418cdaee1df181090bfc8af1a7673b86c",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/energyplusout.rdd",
+      "sha256": "cea6ee94d14fcd8850aaaec23834c767ddf281a8ec195b8f3de84eb739ab2799",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "13b07140971e4cffce360c6b4711ffbede498a2fc4ec63330c2db8cfee79cac8",
+      "bytes": 3364
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "f946df26077b7771d3baaf035d7a27ab9b72eba018ad8f965f48cb29b330d6a4",
+      "bytes": 2440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "945e73d1be780c688dc4532acab4ac196f4b56a64fab78c462f0137826a74afb",
+      "bytes": 25661
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-Root-46/output/energyplusout.mdd",
+      "sha256": "73f8045493ad45554a490adfa712e8a45634673156eaa8fc38d947773e1028a2",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-Root-46/output/energyplusout.rdd",
+      "sha256": "456ac4f1ca153dc46be2780f1321a0a7b13ea943bfe61221e491c0ee058ec0e2",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-command-Root-46/receipt.json",
+      "sha256": "99132cd07477ab7dcacfb06cf8adf13fa58075d4d1899b9bd0735035024689b8",
+      "bytes": 3336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-command-Root-46/stdout.log",
+      "sha256": "9e7f7ef0711bed539a26352bc5be5e7762c058e950279b73aedec2dee9a04bc8",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-custody-Root-46/custody.json",
+      "sha256": "1ed999100111b1409c1907bb87cd393f767b432cb1d255633fc1aa41833b36ba",
+      "bytes": 25631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-Root-46/output/energyplusout.mdd",
+      "sha256": "b0d06d6e8648ef14bb76b8cf4fe06600dadfa029ec7f502243f6dc345b3e815a",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-Root-46/output/energyplusout.rdd",
+      "sha256": "477cd1381da3c836b7fd4c064763a7ef30d96983a56937c18fe2b0fe5e7f9a49",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "b8f5819a78d882b3fbb9a4dbf9f08a5beb2a71f510a4182a075c3eaeff2f5d4f",
+      "bytes": 3348
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "257b7f39c89a572fd8b9e2c2e16b9fe5603db2d4fcb425b051bc456a757306de",
+      "bytes": 2440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "441acc8116d24acb07cfb5728d50e5cbcbb76804beb7033b92951ef25d7e475f",
+      "bytes": 25645
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-limit-duration-launch-Outer-after43.py",
+      "sha256": "18414938e983d060cfc3b921afff3e9529b8ae2b995368573e49cfdb3995f740",
+      "bytes": 16276
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-limit-mode-publication-Outer-46-02.py",
+      "sha256": "da06d46bd5223cfb6774aee4be2ad0edced216b636adacfc686630d177eb5463",
+      "bytes": 6887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-limit-mode-publication-Outer-46-03.py",
+      "sha256": "948c74f515a5ac8ad56745fe9b5e5e828a1229de7d6d8abd48804e615f15f2b6",
+      "bytes": 7350
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-limit-mode-publication-Outer-46.py",
+      "sha256": "21b6cdf7e8bd80b141726f4a9901f0276a59a389cec38e79c8992c292f40f8a3",
+      "bytes": 6884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-limit-mode-reported-Outer-46.py",
+      "sha256": "a5e38ebec6f88a65195d2efbacdeb7d07bce3834c6bf5210dc8f5c929af4b49c",
+      "bytes": 7406
+    },
+    {
+      "path": ".runtime/porting/SRC-06/run-six-limit-duration-pairs-Root-46.py",
+      "sha256": "887781d8efe791d2eb875a40d9bfe9d00d7972caaecd160d0e7d42446579be06",
+      "bytes": 3940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/complete-final-compiler-Source-plan.json",
+      "sha256": "0e375beed2838380d857e424b6215c937d8a2b163945647e44a18eaf91280958",
+      "bytes": 2642502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-Root-46/output/diagnostics.json",
+      "sha256": "a23a8ee591d501e5b31cd9a2ce0a64e71fac7e6ebcef7aca05347f0418ba4624",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-Root-46/output/run-summary.json",
+      "sha256": "bff0b439121307fa99e0a2a99a3ade17cdcf2d4427fea217172e8e9c445b3406",
+      "bytes": 60454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-command-Root-46/receipt.json",
+      "sha256": "21cf70552e80b6b3fa37b8e63994ab73aa2822680826360d50d56e35d54e3ffb",
+      "bytes": 3602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-command-Root-46/stderr.log",
+      "sha256": "26e5ff26e74e947b2e849f77f931213f291c35004829efea1284eb59477d4d31",
+      "bytes": 2748
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-command-Root-46/stdout.log",
+      "sha256": "5cc0b610c4681149409aaf938c49610f9c4913ec73a2be9034c15d30a6fe14b5",
+      "bytes": 440261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-custody-Root-46/custody.json",
+      "sha256": "79a329cf4d77eb487a69fef347cfc7d38ed7f4c355355e29beb61c5ce7c5d8de",
+      "bytes": 25843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-Root-46/output/diagnostics.json",
+      "sha256": "f28f77897f0389fde75c95bafb3ae17d81e1cfc5905be533e6339602e53bc39e",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-Root-46/output/run-summary.json",
+      "sha256": "4dae993a7617a06fca1fce84e4ca83da1071b19801343bc86d6f016b48691627",
+      "bytes": 60753
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "de0585f2ce0e42210f9f2e5a33688273dc92d7c7b30a81f9c3a1d953df78ea49",
+      "bytes": 3613
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "954bae63516f37e1272ca6eb3259ccf14bf0174dc3a22d011356f7b52e3183a8",
+      "bytes": 2754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "70a51d08286d4bcdc471433b39221602e41f12daceca8200fc7c03306f7cb66e",
+      "bytes": 440273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "bffabed07d4fa898e17812a605a37c4cbc071c986f93cb519e6b164c750dc88f",
+      "bytes": 25857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-Root-46/output/diagnostics.json",
+      "sha256": "8ee2ffa539323f8076ac559be7b3b0aa4ff6828b21e862b2bcae60463fdb564a",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-Root-46/output/run-summary.json",
+      "sha256": "1798135c3cc5322da8bf006de7e722d70555bed4c48ca0b1cce9f2d48193efc4",
+      "bytes": 60562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-command-Root-46/receipt.json",
+      "sha256": "f7e948398b314c17516e7820f5728a26bd7b25ddaebe83a3050795637d548c41",
+      "bytes": 3618
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-command-Root-46/stderr.log",
+      "sha256": "3a0456afd23775289b2d515903523b7d99860bd224545bbeb22ba44800b44a0e",
+      "bytes": 2756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-command-Root-46/stdout.log",
+      "sha256": "fe7e1e45f1264ce174a7de0a2cda2f0898a1d8c7d724d8055372bc6f6f5c8b7a",
+      "bytes": 440277
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-custody-Root-46/custody.json",
+      "sha256": "08d2148562f9509da6f3df79d8dd885d47e85de530048a2bac0bcf4624e56eaa",
+      "bytes": 25863
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/diagnostics.json",
+      "sha256": "32929382e269b6f3f9a4a1ecb880e1e39b342ad9802a810324e5ef1e50b921ce",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/run-summary.json",
+      "sha256": "128f1ee66075846de9147ce5193b828a0bacbc40204a3e020ef1da1750af30dc",
+      "bytes": 60861
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "55ab759e9cc31e031fb9040cfab2d6b493e0387af4732336b7ed479d228222e1",
+      "bytes": 3629
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "b83bfa0632bffd48e0fb3490969d50c6830e5eb350d6839ce1835f49becc1598",
+      "bytes": 2762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "ac5d1352f8312a10009bceb49e4bb85d87d1c45deb4f21976bf6800dcc788373",
+      "bytes": 440289
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "4544d5c1c9eda6ef0d454585b9762239f70945f296378d4e337d80c550a7ee2b",
+      "bytes": 25877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-Root-46/output/diagnostics.json",
+      "sha256": "a0045d2bc782622eb421a5078ef02832beb4044689b87c3ebee75623f3d82c92",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-Root-46/output/run-summary.json",
+      "sha256": "5bb2c3d074d6d321ebcf3e8ced7d90772e33058b2f63bde2d32f2ca319517711",
+      "bytes": 60452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-command-Root-46/receipt.json",
+      "sha256": "96caa2eb09a03127a89b1ed84c2c04d8f5e9061cbe230972c5db1c0cb0245526",
+      "bytes": 3602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-command-Root-46/stderr.log",
+      "sha256": "51ac90d9868ceb47336ac8f08c0f3a9becfc9da7fa8fcb35cc6f64b2ab45656d",
+      "bytes": 2748
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-command-Root-46/stdout.log",
+      "sha256": "ad28b9a882b7ec1b025df98b5c3ffdc0c60c1586adec4e0b698e9c1dff0adbaa",
+      "bytes": 440261
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-custody-Root-46/custody.json",
+      "sha256": "3b1960e37f63c89aed94ba5515d6cc60012d005160d04a4fab00fc992f662e9c",
+      "bytes": 25843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-Root-46/output/diagnostics.json",
+      "sha256": "fe2ab85d51e55fe0e67e9aa8307b2d02d056ad0cc3a5976f072a74d8df4eeddc",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-Root-46/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-Root-46/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-Root-46/output/run-summary.json",
+      "sha256": "ec9a6d3dba802b1b7cf46bb7b92659b60c65c1bee60a57bf20b4c1154550cb75",
+      "bytes": 60753
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-command-Root-46/receipt.json",
+      "sha256": "008eec8a61b90b47e24b49d223c00e3d8dafde818688c150fccbdd1f4acfcb1c",
+      "bytes": 3614
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-command-Root-46/stderr.log",
+      "sha256": "4ab1f024227ab7a02518fcede45e0a47bf7f444ec28712e99f3ed5e243f8236e",
+      "bytes": 2754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-command-Root-46/stdout.log",
+      "sha256": "cafda11c7389560fd186dc87351db45334ad251cf7e903387c9130ec9e3989cb",
+      "bytes": 440273
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-custody-Root-46/custody.json",
+      "sha256": "71255de9bbe2e7e3d645438f0acf0f00b43f1e63399db66890b71b5768f2b3d3",
+      "bytes": 25857
+    },
+    {
+      "path": ".runtime/porting/source-objects/ab/ab6937befbd7f5bed66d26ad70e47125e0b210954a51074bb7451f44789ec311",
+      "sha256": "ab6937befbd7f5bed66d26ad70e47125e0b210954a51074bb7451f44789ec311",
+      "bytes": 1852403
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+      "bytes": 13070
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656",
+      "bytes": 22328
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+      "bytes": 13070
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993",
+      "bytes": 23224
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+      "bytes": 13075
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4",
+      "bytes": 22692
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+      "bytes": 13044
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4",
+      "bytes": 23246
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+      "bytes": 13044
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd",
+      "bytes": 24142
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+      "bytes": 13049
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3",
+      "bytes": 23610
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+      "bytes": 13042
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828",
+      "bytes": 23218
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+      "bytes": 13042
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29",
+      "bytes": 24114
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+      "bytes": 13047
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6",
+      "bytes": 23582
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+      "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0",
+      "bytes": 47113
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+      "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef",
+      "bytes": 40997
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+      "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d",
+      "bytes": 41968
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+      "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08",
+      "bytes": 38121
+    },
+    {
+      "path": "tools/porting/check_completed_reported_streams.py",
+      "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+      "bytes": 24664
+    }
+  ],
+  "scope": "Nine strict full-value comparison reports; genuine original API24 summaries and their small physical ESO/RDD/MDD/ERR/END, future actual Source/Native command/custody/log/snapshot metadata, source-scope/policy/adapter proof. No Source result JSON/CSV bodies, annual physical streams, runtime binaries, full Source archive trees or recursive ZIP bundles."
+}

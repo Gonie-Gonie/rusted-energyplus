@@ -512,3 +512,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source43 hard-sized PurchasedAir](../evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json). Combined16 files (production13 plus six test successors with three shared paths) retain the existing test target/feature and old Air/report helpers. Actual59case science and five Source CLI runs are separate proofs; NoLimit9792/A5352 regressions transfer by whole outputs, and three limit24h reported comparisons pass with CAPACITY25 raw/bit differences preserved. Limit72h/annual, remaining card obligations and ancillary full-I/O equivalence stay open.
+
+
+[Source46 limit-mode reported validation](../evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json). 유량·용량·동시 제한 B의 24시간·72시간·연간 9개 케이스를 각각 같은 Native 기준과 전체 비교했다. 기존 허용오차와 RMSE 조건을 모두 통과했으며 원시값·비트 차이는 보고서에 남겼다.

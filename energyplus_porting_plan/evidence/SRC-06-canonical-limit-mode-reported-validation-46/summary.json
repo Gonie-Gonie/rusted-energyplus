@@ -1,0 +1,1887 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "new_production_Sources": 0,
+  "production_Source_changed": false,
+  "validation_tool_changed": false,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "Source43_4517_inputs_4504_Rust_preserved": true,
+  "reported_scope_cases": 9,
+  "existing_true_Native_API24_baselines_reused": 3,
+  "fresh_duration_Source_CLI_invocations": 6,
+  "fresh_duration_Native_CLI_invocations": 6,
+  "Source59_scientific_cohort_separate": true,
+  "NoLimit45_and_A_regression_separate": true,
+  "qualification": "Only FLOW/CAPACITY/BOTH24/72/annual physical reported values. Actual decimal/binary64 differences remain preserved per real unit and are checked against original named atols and sequential RMSE. No cross-unit global maximum, causality, own JSON/CSV, ancillary IO, full15 or64-card completion claim. No Native24 or NoLimit engine is rerun for this validation; no numerical/tolerance/cache logic changes.",
+  "schema": "src06-canonical-limit-mode-reported-validation46.v1",
+  "status": "Nine completed Source620/matching true Native limit-mode cases; unchanged-policy reported-value comparisons passed",
+  "Root_actual_aggregate": {
+    "path": ".runtime/porting/SRC-06/Root-limit-mode-reported-actual-review-46/review.json",
+    "sha256": "3888e68eafd10fa2fa082416339611d88cd653b46a9dd6869ad5ea9bca400c48",
+    "bytes": 106593
+  },
+  "base_HEAD": "9d7f3b884f1ccf4073928ef222b824f645dcf9f3",
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-hard-sized-purchased-air-cohort-combined-held-Peer-43/complete-final-compiler-Source-plan.json",
+    "sha256": "0e375beed2838380d857e424b6215c937d8a2b163945647e44a18eaf91280958",
+    "bytes": 2642502
+  },
+  "cases": [
+    {
+      "case": "B-FLOW-24H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-command-Root-43/receipt.json",
+        "sha256": "43fc7c851985b830d5cc20d7e652b772cf458e43b96fb8d54df103de557c75d1",
+        "bytes": 5526
+      },
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+        "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+      },
+      "Native_authority_kind": "historical actual read-only API-observer engine summary; not a recorded CLI receipt",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-FLOW-24H-reported-Root-43/comparison.json",
+        "sha256": "69d39a7afb0185640a1ba4cc7473bfb2eb0829d80867311cc24fb330f5fa9d0d",
+        "bytes": 146278
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-FLOW-24H-Root-43/output/run-summary.json",
+        "sha256": "680a6fa9df44f80db74538ebe1e4587da89095b4c3e7263d49b6ed1eecdfb7aa",
+        "bytes": 60898
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+        "bytes": 13042
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828",
+        "bytes": 23218
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 24,
+      "metrics": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 0,
+        "parsed_binary64_unequal": 0,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Drybulb Temperature",
+          "units": "C",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Drybulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-FLOW-72H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-command-Root-46/receipt.json",
+        "sha256": "96caa2eb09a03127a89b1ed84c2c04d8f5e9061cbe230972c5db1c0cb0245526",
+        "bytes": 3602
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-command-Root-46/receipt.json",
+        "sha256": "99132cd07477ab7dcacfb06cf8adf13fa58075d4d1899b9bd0735035024689b8",
+        "bytes": 3336
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-FLOW-72H-reported-Root-46/comparison.json",
+        "sha256": "6d98deb398d6ded7fc6bdb5857ccfe32c7e355774fb8044dfcd614d01d38dc2b",
+        "bytes": 146374
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-Root-46/output/run-summary.json",
+        "sha256": "5bb2c3d074d6d321ebcf3e8ced7d90772e33058b2f63bde2d32f2ca319517711",
+        "bytes": 60452
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+        "bytes": 13042
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29",
+        "bytes": 24114
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 72,
+      "metrics": {
+        "series": 102,
+        "samples": 29376,
+        "raw_operand_unequal": 4,
+        "parsed_binary64_unequal": 4,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Wetbulb Temperature",
+          "units": "C",
+          "max_abs_delta": 3.552713678800501e-15,
+          "rmse_delta": 2.7693827873701494e-16,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Wetbulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-72H-custody-Root-46/custody.json",
+          "sha256": "3b1960e37f63c89aed94ba5515d6cc60012d005160d04a4fab00fc992f662e9c",
+          "bytes": 25843
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-72H-custody-Root-46/custody.json",
+          "sha256": "1ed999100111b1409c1907bb87cd393f767b432cb1d255633fc1aa41833b36ba",
+          "bytes": 25631
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-FLOW-ANNUAL",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "008eec8a61b90b47e24b49d223c00e3d8dafde818688c150fccbdd1f4acfcb1c",
+        "bytes": 3614
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "b8f5819a78d882b3fbb9a4dbf9f08a5beb2a71f510a4182a075c3eaeff2f5d4f",
+        "bytes": 3348
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-FLOW-ANNUAL-reported-Root-46/comparison.json",
+        "sha256": "0c9eb101e849b9974043ee576cbd2e5023573f5301009226b4aa3c6ae40924e6",
+        "bytes": 153653
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-Root-46/output/run-summary.json",
+        "sha256": "ec9a6d3dba802b1b7cf46bb7b92659b60c65c1bee60a57bf20b4c1154550cb75",
+        "bytes": 60753
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+        "bytes": 13047
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6",
+        "bytes": 23582
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 8760,
+      "metrics": {
+        "series": 102,
+        "samples": 3574080,
+        "raw_operand_unequal": 157142,
+        "parsed_binary64_unequal": 157142,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "ZONE ONE",
+          "name": "Zone Mean Air Temperature",
+          "units": "C",
+          "max_abs_delta": 1.2789769243681803e-13,
+          "rmse_delta": 2.435695730685254e-15,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          }
+        },
+        "W/m2": {
+          "key": "FLOOR",
+          "name": "Surface Heat Storage Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 1.3642420526593924e-12,
+          "rmse_delta": 8.154989637872223e-14,
+          "policy": {
+            "key": "FLOOR",
+            "variable": "Surface Heat Storage Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "ZONE ONE",
+          "name": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 1.226396761921933e-11,
+          "rmse_delta": 1.3475959461721793e-13,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 4.683753385137379e-17,
+          "rmse_delta": 1.016244160208558e-17,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Zone Sensible Cooling Energy",
+          "units": "J",
+          "max_abs_delta": 2.3283064365386963e-09,
+          "rmse_delta": 4.037280629349665e-11,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Zone Sensible Cooling Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 6.071532165918825e-17,
+          "rmse_delta": 1.860574209878601e-18,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 6.245004513516506e-17,
+          "rmse_delta": 1.9294245324047823e-18,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 4.683753385137379e-17,
+          "rmse_delta": 1.0161882512789734e-17,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-FLOW-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "71255de9bbe2e7e3d645438f0acf0f00b43f1e63399db66890b71b5768f2b3d3",
+          "bytes": 25857
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-FLOW-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "441acc8116d24acb07cfb5728d50e5cbcbb76804beb7033b92951ef25d7e475f",
+          "bytes": 25645
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-CAPACITY-24H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-command-Root-43/receipt.json",
+        "sha256": "dfcec4ecca0901677214d9d96fd7b84617b615fd798a373100992d3aae29fc1a",
+        "bytes": 5541
+      },
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+        "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+      },
+      "Native_authority_kind": "historical actual read-only API-observer engine summary; not a recorded CLI receipt",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-24H-reported-Root-43/comparison.json",
+        "sha256": "9da0259a8871f7bcb730fdbb8c5f7a158fa801eb69460850642b36a037450dd9",
+        "bytes": 148123
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-CAPACITY-24H-Root-43/output/run-summary.json",
+        "sha256": "5af5684d8c9943f5875ae3ae37f32f2357083b273bf3ce4392a27b78b4d8d186",
+        "bytes": 61005
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+        "bytes": 13044
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4",
+        "bytes": 23246
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 24,
+      "metrics": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 25,
+        "parsed_binary64_unequal": 25,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Drybulb Temperature",
+          "units": "C",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Drybulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Rate",
+          "units": "W",
+          "max_abs_delta": 9.947598300641403e-14,
+          "rmse_delta": 1.0152725001145203e-14,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 4.336808689942018e-19,
+          "rmse_delta": 4.426236834344135e-20,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 1.0186340659856796e-10,
+          "rmse_delta": 1.0396390401172688e-11,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 3.0357660829594124e-18,
+          "rmse_delta": 3.0983657840408946e-19,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 3.469446951953614e-18,
+          "rmse_delta": 3.540989467475308e-19,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 4.336808689942018e-19,
+          "rmse_delta": 4.426236834344135e-20,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-CAPACITY-72H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-command-Root-46/receipt.json",
+        "sha256": "f7e948398b314c17516e7820f5728a26bd7b25ddaebe83a3050795637d548c41",
+        "bytes": 3618
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-command-Root-46/receipt.json",
+        "sha256": "6ee894ddec9a97f2fa59bbee52be5a040361116a8174f0763fca49bd222ab738",
+        "bytes": 3352
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-72H-reported-Root-46/comparison.json",
+        "sha256": "250ee208aab76ff2ae2751a884a112d78ee5551a6dd96351b541fd9f56cb9324",
+        "bytes": 148731
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-Root-46/output/run-summary.json",
+        "sha256": "1798135c3cc5322da8bf006de7e722d70555bed4c48ca0b1cce9f2d48193efc4",
+        "bytes": 60562
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+        "bytes": 13044
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd",
+        "bytes": 24142
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 72,
+      "metrics": {
+        "series": 102,
+        "samples": 29376,
+        "raw_operand_unequal": 55,
+        "parsed_binary64_unequal": 55,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "ZONE ONE",
+          "name": "Zone Mean Air Temperature",
+          "units": "C",
+          "max_abs_delta": 1.4210854715202004e-14,
+          "rmse_delta": 8.373826446313467e-16,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          }
+        },
+        "W/m2": {
+          "key": "FLOOR",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 2.2737367544323206e-13,
+          "rmse_delta": 1.3398122314101547e-14,
+          "policy": {
+            "key": "FLOOR",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "FLOOR",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 2.2737367544323206e-13,
+          "rmse_delta": 1.3398122314101547e-14,
+          "policy": {
+            "key": "FLOOR",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+          "units": "J",
+          "max_abs_delta": 1.3096723705530167e-10,
+          "rmse_delta": 7.764810091651997e-12,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 6.938893903907228e-18,
+          "rmse_delta": 4.57139774554258e-19,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-72H-custody-Root-46/custody.json",
+          "sha256": "08d2148562f9509da6f3df79d8dd885d47e85de530048a2bac0bcf4624e56eaa",
+          "bytes": 25863
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-72H-custody-Root-46/custody.json",
+          "sha256": "c535d8997f7180e2948744458d9f1e4610c3d4a0fbfce64fa474d98222a2ee3b",
+          "bytes": 25647
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-CAPACITY-ANNUAL",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "55ab759e9cc31e031fb9040cfab2d6b493e0387af4732336b7ed479d228222e1",
+        "bytes": 3629
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "13b07140971e4cffce360c6b4711ffbede498a2fc4ec63330c2db8cfee79cac8",
+        "bytes": 3364
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-CAPACITY-ANNUAL-reported-Root-46/comparison.json",
+        "sha256": "6933bbca9b80aff127800f4a65e3748c56ed370264f321b575bb08c544306c48",
+        "bytes": 153913
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-Root-46/output/run-summary.json",
+        "sha256": "128f1ee66075846de9147ce5193b828a0bacbc40204a3e020ef1da1750af30dc",
+        "bytes": 60861
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+        "bytes": 13049
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3",
+        "bytes": 23610
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 8760,
+      "metrics": {
+        "series": 102,
+        "samples": 3574080,
+        "raw_operand_unequal": 1488768,
+        "parsed_binary64_unequal": 1488768,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "ZONE ONE",
+          "name": "Zone Mean Air Temperature",
+          "units": "C",
+          "max_abs_delta": 1.0160761121369433e-11,
+          "rmse_delta": 6.581886337211089e-14,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          }
+        },
+        "W/m2": {
+          "key": "ROOF",
+          "name": "Surface Heat Storage Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 2.2930635168449953e-10,
+          "rmse_delta": 1.2824819500489084e-12,
+          "policy": {
+            "key": "ROOF",
+            "variable": "Surface Heat Storage Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "ZONE ONE",
+          "name": "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 2.842170943040401e-10,
+          "rmse_delta": 2.182772518191703e-12,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 2.1206994493816467e-16,
+          "rmse_delta": 1.2097830654009354e-16,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+          "units": "J",
+          "max_abs_delta": 3.1452145776711404e-08,
+          "rmse_delta": 1.9205379903757186e-10,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 3.060269052057585e-15,
+          "rmse_delta": 2.906178750450719e-17,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 3.1708576736511063e-15,
+          "rmse_delta": 3.0020758096549847e-17,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 2.1206994493816467e-16,
+          "rmse_delta": 1.2097705134334178e-16,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-CAPACITY-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "4544d5c1c9eda6ef0d454585b9762239f70945f296378d4e337d80c550a7ee2b",
+          "bytes": 25877
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-CAPACITY-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "945e73d1be780c688dc4532acab4ac196f4b56a64fab78c462f0137826a74afb",
+          "bytes": 25661
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-BOTH-24H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-command-Root-43/receipt.json",
+        "sha256": "40cfb8fdfaa484b74370baa841bc812a19c33aac33762371401a7950fb7f8cfc",
+        "bytes": 5526
+      },
+      "Native_authority": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+        "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+      },
+      "Native_authority_kind": "historical actual read-only API-observer engine summary; not a recorded CLI receipt",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-BOTH-24H-reported-Root-43/comparison.json",
+        "sha256": "fd1fc80e435c905ef13da1e6a492389242760a02f518c685dfe5ec0548966d18",
+        "bytes": 146278
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-hard-sized-purchased-air-B-BOTH-24H-Root-43/output/run-summary.json",
+        "sha256": "3a5dffa25a60472c4bb6ba164a4574ce253c7328920dbbd36bb810a6234cfed0",
+        "bytes": 60889
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+        "bytes": 13070
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656",
+        "bytes": 22328
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 24,
+      "metrics": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 0,
+        "parsed_binary64_unequal": 0,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Drybulb Temperature",
+          "units": "C",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Drybulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-BOTH-72H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-command-Root-46/receipt.json",
+        "sha256": "21cf70552e80b6b3fa37b8e63994ab73aa2822680826360d50d56e35d54e3ffb",
+        "bytes": 3602
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-command-Root-46/receipt.json",
+        "sha256": "32a4e12bc331ecdd8c9689d7d4248f6bea497c814f71f26efa7124536af3119a",
+        "bytes": 3336
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-BOTH-72H-reported-Root-46/comparison.json",
+        "sha256": "77ab8b0cde71287220a1c74b9248df8ddadfe5cfab292535e42415216de2cd84",
+        "bytes": 146374
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-Root-46/output/run-summary.json",
+        "sha256": "bff0b439121307fa99e0a2a99a3ade17cdcf2d4427fea217172e8e9c445b3406",
+        "bytes": 60454
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+        "bytes": 13070
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993",
+        "bytes": 23224
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 72,
+      "metrics": {
+        "series": 102,
+        "samples": 29376,
+        "raw_operand_unequal": 4,
+        "parsed_binary64_unequal": 4,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Wetbulb Temperature",
+          "units": "C",
+          "max_abs_delta": 3.552713678800501e-15,
+          "rmse_delta": 2.7693827873701494e-16,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Wetbulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-72H-custody-Root-46/custody.json",
+          "sha256": "79a329cf4d77eb487a69fef347cfc7d38ed7f4c355355e29beb61c5ce7c5d8de",
+          "bytes": 25843
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-72H-custody-Root-46/custody.json",
+          "sha256": "eec504fd6d102822b3b1add0894e6b27e89bdb5a5fb0942d71137a26fd7aa7d6",
+          "bytes": 25631
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    },
+    {
+      "case": "B-BOTH-ANNUAL",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "de0585f2ce0e42210f9f2e5a33688273dc92d7c7b30a81f9c3a1d953df78ea49",
+        "bytes": 3613
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-command-Root-46/receipt.json",
+        "sha256": "5a76a681e54b5e2825876a9b4798eb22a7ae5e43fb5238c7f0466a396591dee6",
+        "bytes": 3348
+      },
+      "Native_authority_kind": "actual recorded installedNative CLI receipt0, explicit IDD, exact59 runtime file pins before/after",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-BOTH-ANNUAL-reported-Root-46/comparison.json",
+        "sha256": "103baff683088693a442a9c13bf47cc07501878186bd5008c408bac882b14974",
+        "bytes": 153813
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-Root-46/output/run-summary.json",
+        "sha256": "4dae993a7617a06fca1fce84e4ca83da1071b19801343bc86d6f016b48691627",
+        "bytes": 60753
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+        "bytes": 13075
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4",
+        "bytes": 22692
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "duration_hours": 8760,
+      "metrics": {
+        "series": 102,
+        "samples": 3574080,
+        "raw_operand_unequal": 1445200,
+        "parsed_binary64_unequal": 1445200,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "ZONE ONE",
+          "name": "Zone Mean Air Temperature",
+          "units": "C",
+          "max_abs_delta": 2.3447910280083306e-12,
+          "rmse_delta": 3.0754254112369695e-14,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          }
+        },
+        "W/m2": {
+          "key": "ROOF",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 4.501998773775995e-11,
+          "rmse_delta": 4.936179923201112e-13,
+          "policy": {
+            "key": "ROOF",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "ZONE ONE",
+          "name": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 9.43458644542261e-11,
+          "rmse_delta": 1.2810104098895194e-12,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 1.474514954580286e-16,
+          "rmse_delta": 8.82546812703474e-17,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 3.8176949601620436e-08,
+          "rmse_delta": 2.1691299541755804e-10,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 1.9936309547663456e-15,
+          "rmse_delta": 1.4759351891848314e-17,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 2.065621979019383e-15,
+          "rmse_delta": 1.5292413658120755e-17,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 1.474514954580286e-16,
+          "rmse_delta": 8.825441695093937e-17,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "actual_duration_custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-limit-duration-B-BOTH-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "bffabed07d4fa898e17812a605a37c4cbc071c986f93cb519e6b164c750dc88f",
+          "bytes": 25857
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-limit-duration-B-BOTH-ANNUAL-custody-Root-46/custody.json",
+          "sha256": "5db031b2da253ca8b503fcc89451e80a67402c5bfb338dc706ca7de8b74351c8",
+          "bytes": 25645
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_full_reported_comparison_pass": true,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_verified": false
+    }
+  ],
+  "totals": {
+    "case_series": 918,
+    "reported_scalar_samples": 10839744,
+    "raw_operand_unequal": 3091198,
+    "parsed_binary64_unequal": 3091198,
+    "tolerance_failures": 0,
+    "rmse_failures": 0,
+    "all_nine_strict_comparisons_pass": true
+  },
+  "own_export_scope": {
+    "verified_cases": [],
+    "unverified_cases": [
+      "B-FLOW-24H",
+      "B-FLOW-72H",
+      "B-FLOW-ANNUAL",
+      "B-CAPACITY-24H",
+      "B-CAPACITY-72H",
+      "B-CAPACITY-ANNUAL",
+      "B-BOTH-24H",
+      "B-BOTH-72H",
+      "B-BOTH-ANNUAL"
+    ],
+    "qualification": "No limit-mode JSON/CSV own-value readback is claimed. No large result JSON/CSV body was loaded or included."
+  },
+  "ancillary_IO_scope": {
+    "overall_IO_PASS": false,
+    "verified_cases": [],
+    "qualification": "Ancillary transport, ERR/END/finalization and all other physical artifacts remain separate."
+  },
+  "separate_scope_qualifications": [
+    "Source43 one-body59-case Sizer scientific proof is separate and is not rerun or appropriated by this operational aggregate.",
+    "Earlier NoLimit45 and A regression remain separate; no aggregate full15 case or64-card completion/gate claim.",
+    "Raw/binary64 differences are preserved by per-case/per-unit metrics; no cross-unit global maximum or causality claim."
+  ],
+  "true_historical_API24_baselines_reused": 3,
+  "fresh_duration_Source_commands": 6,
+  "fresh_duration_Native_commands": 6,
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-limit-mode-reported-validation-46/evidence.zip",
+    "sha256": "f675c4897632e49763f858945f3bcdb94d6483c6d594e0d49fd19d0e5a8287e2",
+    "bytes": 1485141
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-limit-mode-reported-validation-46/manifest.json",
+    "sha256": "7c32f9208694cce666cf5fe9baede9caf20e28f87aee9086c820a0c0be97bc33",
+    "bytes": 42188
+  },
+  "archive_entries": 189,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-limit-mode-reported-Outer-46.py",
+    "sha256": "a5e38ebec6f88a65195d2efbacdeb7d07bce3834c6bf5210dc8f5c929af4b49c",
+    "bytes": 7406
+  }
+}

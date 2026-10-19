@@ -343,3 +343,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source43 hard-sized PurchasedAir](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json). One existing process-main selector passed all59 genuine full-Native sizing cases (19,781 raw binary64 fields); four B24h modes and A24h all completed Source620. Separate reported-stream comparisons passed original tolerances. Gates remain A14/54 and B14/64.
+
+
+[Source46 limit-mode reported validation](evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json). 기존 Native API 24시간 기준 3건을 출처 그대로 재사용하고, 누락된 72시간·연간 6건만 새로 실행했다. 동일한 Source43 빌드를 유지했으며 새 테스트와 게이트 변경은 없다.
