@@ -176,3 +176,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source37 energy report structure](evidence/SRC-06-canonical-energy-report-structure-37/summary.json). GetComponentData와 계량변수 조회는 같은 Branch·OutputRegistration·장비 소유자를 빌린다. Native의 임시 배열 초기화·복사·EquipmentData 기록 순서를 유지하며, 보고용 대체 소유자나 계산값 캐시는 추가하지 않는다.
+
+
+[Source38 energy report initialization](evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 두 번의 정확한 목록 검색은 실제 Config 인덱스를 각각 갱신한다. 같은 Equipment·OutputRegistration·표 소유자를 빌리며, 일회성 플래그와 표 기록 순서 및 매 반복의 직접 Which 읽기를 보존한다. 보고값 사본이나 대체 상태는 추가하지 않는다.

@@ -92,190 +92,60 @@ impl SourceSystemReports {
         Ok(())
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn initialize_source_energy_reports(
         &mut self,
-        o: &mut SourceSystemReportOwners<'_>,
+        globals: &SelectedHeatBalanceGlobals,
+        hvac: &SelectedHvacGlobals,
+        equipment: &mut OrdinaryEquipment,
+        air_loop: &SourceAirLoopData,
+        zones: &SelectedZoneInputOwners,
+        registry: &PredefinedRegistry,
+        table: &mut PredefinedStringTable,
+        registration: &SourceOutputRegistration,
     ) -> Result<(), Error> {
-        if !self.vent_report_structure_created {
-            return Ok(());
-        }
+        if !self.vent_report_structure_created { return Ok(()); }
         if self.one_time_flag_init_energy_reports {
-            for zone in 1..=o.globals.num_of_zones {
-                if !*o
-                    .equipment
-                    .source_zone_equipment_config(zone)?
-                    .is_controlled()
-                {
-                    continue;
-                }
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports145 FindItemInList/EquipListIndex assignment",
-                ));
-            }
-            for zone in 1..=o.globals.num_of_zones {
-                if !*o
-                    .equipment
-                    .source_zone_equipment_config(zone)?
-                    .is_controlled()
-                {
-                    continue;
-                }
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports303 FindItemInList/EquipListIndex assignment",
-                ));
-            }
-            let zone_comps = o.air_loop.zone_comp_to_plant.as_ref().map_or(0, Vec::len);
-            let zone_subcomps = o
-                .air_loop
-                .zone_sub_comp_to_plant
-                .as_ref()
-                .map_or(0, Vec::len);
-            let zone_subsubcomps = o
-                .air_loop
-                .zone_sub_sub_comp_to_plant
-                .as_ref()
-                .map_or(0, Vec::len);
-            let air_comps = o
-                .air_loop
-                .air_sys_comp_to_plant
-                .as_ref()
-                .map_or(0, Vec::len);
-            let air_subcomps = o
-                .air_loop
-                .air_sys_sub_comp_to_plant
-                .as_ref()
-                .map_or(0, Vec::len);
-            let air_subsubcomps = o
-                .air_loop
-                .air_sys_sub_sub_comp_to_plant
-                .as_ref()
-                .map_or(0, Vec::len);
+            equipment.initialize_source_equipment_energy_connections(globals.num_of_zones, hvac, air_loop)?;
+            // Native783-800 captures all six actual arrays after both passes.
+            let zone_comps = air_loop.zone_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let zone_subcomps = air_loop.zone_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let zone_subsubcomps = air_loop.zone_sub_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let air_comps = air_loop.air_sys_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let air_subcomps = air_loop.air_sys_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let air_subsubcomps = air_loop.air_sys_sub_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
             self.one_time_flag_init_energy_reports = false;
-            if zone_comps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports805 ZoneCompToPlant.PlantLoopType",
-                ));
-            }
-            if zone_subcomps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports826 ZoneSubCompToPlant.PlantLoopType",
-                ));
-            }
-            if zone_subsubcomps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports847 ZoneSubSubCompToPlant.PlantLoopType",
-                ));
-            }
-            if air_comps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports867 AirSysCompToPlant.PlantLoopType",
-                ));
-            }
-            if air_subcomps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports888 AirSysSubCompToPlant.PlantLoopType",
-                ));
-            }
-            if air_subsubcomps > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports909 AirSysSubSubCompToPlant.PlantLoopType",
-                ));
-            }
-            self.report_source_air_loop_topology(o)?;
-            self.report_source_zone_equipment_topology(o)?;
-            self.report_source_air_distribution_units(o)?;
+            for _row in 1..=zone_comps { return Err(Error::Unavailable("actual InitEnergyReports805 ZoneCompToPlant.PlantLoopType")); }
+            for _row in 1..=zone_subcomps { return Err(Error::Unavailable("actual InitEnergyReports826 ZoneSubCompToPlant.PlantLoopType")); }
+            for _row in 1..=zone_subsubcomps { return Err(Error::Unavailable("actual InitEnergyReports847 ZoneSubSubCompToPlant.PlantLoopType")); }
+            for _row in 1..=air_comps { return Err(Error::Unavailable("actual InitEnergyReports867 AirSysCompToPlant.PlantLoopType")); }
+            for _row in 1..=air_subcomps { return Err(Error::Unavailable("actual InitEnergyReports888 AirSysSubCompToPlant.PlantLoopType")); }
+            for _row in 1..=air_subsubcomps { return Err(Error::Unavailable("actual InitEnergyReports909 AirSysSubSubCompToPlant.PlantLoopType")); }
+            self.report_source_air_loop_topology(hvac)?;
+            equipment.report_source_zone_energy_topology(globals.num_of_zones, zones, registry, table)?;
+            self.report_source_air_distribution_units(equipment)?;
             self.one_time_flag_init_energy_reports = false;
         }
-        if o.hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable(
-                "actual InitEnergyReports940 PrimaryAirSystems live row",
-            ));
+        if hvac.number_of_primary_air_systems > 0 {
+            return Err(Error::Unavailable("actual InitEnergyReports940 PrimaryAirSystems live row"));
         }
-        for zone in 1..=o.globals.num_of_zones {
-            if !*o
-                .equipment
-                .source_zone_equipment_config(zone)?
-                .is_controlled()
-            {
-                continue;
-            }
-            return Err(Error::Unavailable(
-                "actual InitEnergyReports978 ZoneEquipList live row",
-            ));
-        }
-        // Native LoopSideKeys is Demand0, Supply1, retaining both count checks.
+        equipment.load_source_zone_equipment_energy_readings(globals.num_of_zones, registration)?;
+        // Native LoopSideKeys is Demand0, Supply1; both count loops remain real.
         for _loop_side in [0_i32, 1_i32] {
-            if o.hvac.number_plant_loops > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports1011 VentRepPlant live row",
-                ));
-            }
-            if o.hvac.number_condenser_loops > 0 {
-                return Err(Error::Unavailable(
-                    "actual InitEnergyReports1028 VentRepCond live row",
-                ));
-            }
+            for _plant in 1..=hvac.number_plant_loops { return Err(Error::Unavailable("actual InitEnergyReports1011 VentRepPlant live row")); }
+            for _plant in 1..=hvac.number_condenser_loops { return Err(Error::Unavailable("actual InitEnergyReports1028 VentRepCond live row")); }
         }
         Ok(())
     }
-    fn report_source_air_loop_topology(
-        &self,
-        o: &SourceSystemReportOwners<'_>,
-    ) -> Result<(), Error> {
-        if o.hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable(
-                "actual reportAirLoopToplogy4947 PrimaryAirSystems live row",
-            ));
+    fn report_source_air_loop_topology(&self, hvac: &SelectedHvacGlobals) -> Result<(), Error> {
+        if hvac.number_of_primary_air_systems > 0 {
+            return Err(Error::Unavailable("actual reportAirLoopToplogy4947 PrimaryAirSystems live row"));
         }
         Ok(())
     }
-    fn report_source_zone_equipment_topology(
-        &self,
-        o: &mut SourceSystemReportOwners<'_>,
-    ) -> Result<(), Error> {
-        let mut row_counter = 1_i32;
-        for zone in 1..=o.globals.num_of_zones {
-            let name = &o
-                .zones
-                .zones
-                .as_deref()
-                .and_then(|v| v.get(at(zone).ok()?))
-                .ok_or(Error::Unavailable("actual topology5227 Zone.Name"))?
-                .name;
-            let column = *o
-                .predefined_registry
-                .named_indices
-                .get("pdchTopZnEqpName")
-                .ok_or(Error::Unavailable("actual topology pdchTopZnEqpName"))?;
-            o.predefined_table
-                .string_entry(column, &format!("{row_counter}"), name)?;
-            row_counter = row_counter
-                .checked_add(1)
-                .ok_or(Error::Unavailable("undefined topology row counter5229"))?;
-            if !*o
-                .equipment
-                .source_zone_equipment_config(zone)?
-                .is_controlled()
-            {
-                continue;
-            }
-            return Err(Error::Unavailable(
-                "actual topology5233 ZoneEquipList live row",
-            ));
-        }
-        Ok(())
-    }
-    fn report_source_air_distribution_units(
-        &self,
-        o: &SourceSystemReportOwners<'_>,
-    ) -> Result<(), Error> {
-        if o.equipment
-            .source_air_distribution_units()
-            .is_some_and(|v| !v.is_empty())
-        {
-            return Err(Error::Unavailable(
-                "actual reportAirDistributionUnits5282 ADU.Name/ZoneName first table entry",
-            ));
+    fn report_source_air_distribution_units(&self, equipment: &OrdinaryEquipment) -> Result<(), Error> {
+        if equipment.source_air_distribution_units().is_some_and(|rows| !rows.is_empty()) {
+            return Err(Error::Unavailable("actual reportAirDistributionUnits5282 ADU.Name/ZoneName first table entry"));
         }
         Ok(())
     }

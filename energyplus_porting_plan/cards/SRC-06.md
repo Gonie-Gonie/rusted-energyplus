@@ -488,3 +488,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source37 energy report structure](../evidence/SRC-06-canonical-energy-report-structure-37/summary.json). 제어 구역 장비 목록과 실제 연결·계량변수 조회 결과로 에너지 보고 구조를 만들도록 연결했다. 같은 EquipmentData에 기록하며 미구현 부모·자식·다른 계통은 실제 연산 경계로 남긴다. B 실행 결과: `GetHeatBalanceInput: actual InitEnergyReports145 FindItemInList/EquipListIndex assignment`. A24의 기존 5,352개 보고값 증거를 이어받고 새 테스트나 계산식 변경은 없다. 각 파일의 정확한 Program Version 첫 줄만 제외한 BND 본문 8,518바이트·106줄이 보존된 Native 결과와 일치했다. 이 비교는 보고 I/O에 한정한다.
+
+
+[Source38 energy report initialization](../evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 실제 장비 목록과 연결 정보를 사용해 에너지 보고 초기화의 두 순회와 표 기록 순서를 연결했다. 반복 보고에서는 같은 Which 참조의 현재 값을 읽어 기존 MeterData에 기록한다. B 실행 결과: `GetHeatBalanceInput: actual ReportSystemEnergyUse3155 ZoneSysEnergyDemand.TotalOutputRequired`. A24의 기존 5,352개 보고값 증거를 이어받으며 새 테스트나 계산식 변경은 없다.

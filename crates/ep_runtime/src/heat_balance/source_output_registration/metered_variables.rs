@@ -93,3 +93,21 @@ impl SourceOutputRegistration {
         Ok(number)
     }
 }
+
+impl SourceOutputRegistration {
+    /// Native4208-4257 for the actual Invalid/Integer/Real metadata domain.
+    /// Existing getters dereference the retained live Which, never Value.
+    pub(crate) fn get_source_internal_variable_value<L: super::SourceRealOutputOwners + super::SourceIntegerOutputOwners>(
+        &self, variable_type: Option<SourceOutputVariableType>, variable_index: i32, owners: &L,
+    ) -> Result<f64, Error> {
+        let Some(variable_type) = variable_type else { return Ok(0.0); };
+        if variable_index < 0 || usize::try_from(variable_index).map_or(true, |n| n >= self.out_vars.len()) {
+            return Err(Error::Unavailable("actual GetInternalVariableValue4241 index fatal diagnostic"));
+        }
+        let index = usize::try_from(variable_index).map_err(|_|Error::Unavailable("actual GetInternalVariableValue zero-based index"))?;
+        match variable_type {
+            SourceOutputVariableType::Integer => Ok(f64::from(*self.read_registered_integer(index, owners).map_err(Error::Output)?)),
+            SourceOutputVariableType::Real => Ok(*self.read_registered_real(index, owners).map_err(Error::Output)?),
+        }
+    }
+}

@@ -372,10 +372,10 @@ impl<
             C::InitializeEnergyReports => manager
                 .ancillary
                 .system_reports
-                .initialize_source_energy_reports(&mut Self::system_owners(
-                    o,
-                    &manager.simulation.air_loop,
-                )),
+                .initialize_source_energy_reports(
+                    o.globals, o.hvac, o.equipment, &manager.simulation.air_loop,
+                    o.zones, o.predefined_registry, o.predefined_table, &*output.registration,
+                ),
             C::ReportSystemEnergyUse => manager
                 .ancillary
                 .system_reports

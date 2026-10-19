@@ -12911,6 +12911,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-structure-37/summary.json",
         "sha256": "2a4daefe84cccba881b743c119e3d1c46dd5e11e33ae02328dc46cba6e375bf5",
         "size_bytes": 6410
+      },
+      "canonical_energy_report_initialization_38": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-initialization-38/summary.json",
+        "sha256": "37821510cc834fbc1f20992f3ca51a73a73907cfabd679152d4aa8a7d8ab8852",
+        "size_bytes": 9102
       }
     },
     {

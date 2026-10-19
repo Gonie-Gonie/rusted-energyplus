@@ -1,0 +1,167 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "selected_existing_production_Sources": 4,
+  "new_production_Source_files": 1,
+  "selected_production_Sources": 5,
+  "actual_same_Equipment_OutputRegistration_Which_owners": true,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "scope": "Controlled InitEnergyReports uses both exact full allocated-list searches and Config index writes, cooling then heating comparisons, all actual per-inlet connection-array and plant guards, genuine once-flag and predefined topology order, and per-iteration live Which values assigned into the same MeterData. Unrepresented positive children remain typed boundaries.",
+  "qualification": "The original38 actual CLI compile failed with two E0609 nonexistent member accesses before engine execution. Corrected02 changes exactly two field identifiers; original full semantic peer and narrow correction peer retain distinct scope. Only accepted Root38-02 B/A execution supplies current frontier and BND observation. Accepted37 A24 original5352 proof transfers only after strict equal37 comparisons. No new test, Native run, cohort, formula/cache/tolerance or gate change.",
+  "schema": "src06-canonical-energy-report-initialization.v1",
+  "status": "Genuine Source energy report initialization and live Which readings on the same actual equipment owners; actual B result recorded",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-init-energy-reports-held-Outer-38-02/manifest.json",
+    "sha256": "768f053e86b0ef874ca8f9d139a4cd9144c34d462bca60e33504d90b9c4f791f",
+    "bytes": 27601
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-init-energy-reports-field-Source-review-38-02/review.json",
+    "sha256": "3f9e4860b4f2cf7558e0398c8e3221ce156346c0b85a910cbbb31493909c5d4e",
+    "bytes": 5225
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-init-energy-reports-held-Outer-38-02/complete-final-compiler-Source-plan.json",
+    "sha256": "92ec6ebe383467845eaa11fb8af461f65bf1cb5fa7b174af4ee327b76524d763",
+    "bytes": 2636279
+  },
+  "accepted_parent_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/review.json",
+    "sha256": "8cb34d64a3103bd6467d08bedd13082e2e14f2fe793ff8edfb20787781049c24",
+    "bytes": 20024
+  },
+  "accepted_parent_plan": {
+    "path": ".runtime/porting/SRC-06/source-energy-report-structure-held-Outer-37/complete-final-compiler-Source-plan.json",
+    "sha256": "8c6b325dd5f1ce54433d430823ae8c6e21366e6fbb96a91102cad117aa1bc14c",
+    "bytes": 2634549
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-B-NOLIMIT-24H-command-Root-38-02/receipt.json",
+    "sha256": "4ac502623e2f447155b5c9d49ee5b09787c60ca4634787909cd50c98f1616d8b",
+    "bytes": 4522
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-A-24H-command-Root-38-02/receipt.json",
+    "sha256": "5ed29538f0b36e1eb73b83e52233294054b456545976e9e481579efb03140367",
+    "bytes": 4471
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-energy-report-initialization-actual-review-38-02/review.json",
+    "sha256": "89c5d59260a6c137aee3768e2a6ae772b8805ebd98528c0549ace5ca105918b2",
+    "bytes": 21867
+  },
+  "actual_B_completed": false,
+  "actual_B_result": "GetHeatBalanceInput: actual ReportSystemEnergyUse3155 ZoneSysEnergyDemand.TotalOutputRequired",
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted37_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-structure-actual-review-37/review.json",
+      "sha256": "8cb34d64a3103bd6467d08bedd13082e2e14f2fe793ff8edfb20787781049c24",
+      "bytes": 20024
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal37": 7,
+    "CSV_files_whole_equal37": 2,
+    "scope": "Accepted37 A24 proof transfer. No new Native/72H/annual or internal-state comparison."
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-initialization-38/evidence.zip",
+    "sha256": "968fd3cadcd3c014e208280127825702a6de2c9739b6350edfdc032e2933821c",
+    "bytes": 2653175
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-initialization-38/manifest.json",
+    "sha256": "826fcfba4d9c632fed6ed70e25cf59b7fb851271ad3ebcf66e2ca35e201fcf27",
+    "bytes": 35247
+  },
+  "archive_entries": 145,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-energy-report-initialization-checkpoint-Outer-38-02.py",
+    "sha256": "f03775c2d9ffbecd7c307e752e967d4ab3a3e685db7583a581913c6d496f786e",
+    "bytes": 11725
+  },
+  "initial_failed_compilation": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-B-NOLIMIT-24H-command-Root-38/receipt.json",
+      "sha256": "f5eff2ad1af4d9c973e309514e25e6326195e92b3a5c50a23769f47dda5ed673",
+      "bytes": 4516
+    },
+    "stdout": {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-B-NOLIMIT-24H-command-Root-38/stdout.log",
+      "sha256": "424fb4d285b83eddfab595377b626db2bc28c87120ccf1801d7a419b5c39ad92",
+      "bytes": 166867
+    },
+    "stderr": {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-B-NOLIMIT-24H-command-Root-38/stderr.log",
+      "sha256": "825a04958af42b378507328a6aa92b6b1b5ba581db57714dd71d3d1245c97d34",
+      "bytes": 5018
+    },
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/42/42f8df47fd47cb088c71b55364156d85df165879831cf9ed1306a7ec5f7cbab6",
+      "sha256": "42f8df47fd47cb088c71b55364156d85df165879831cf9ed1306a7ec5f7cbab6"
+    },
+    "initial_application": {
+      "path": ".runtime/porting/SRC-06/Root-energy-report-initialization-application-38/receipt.json",
+      "sha256": "e2416c083d8548ded868dd540c8f72584f01cfa2f4c67b745da687f719d4369f",
+      "bytes": 14193
+    },
+    "initial_application_Source": {
+      "path": ".runtime/porting/SRC-06/apply-energy-report-initialization-Root-38.py",
+      "sha256": "158c70e2ec8fbbd79f06208eccb72b99dea0758ddeebe4d9180bfe23d4bda51e",
+      "bytes": 7003
+    },
+    "exit_code": 101,
+    "engine_executed": false,
+    "compiler_errors": 2,
+    "error_code": "E0609",
+    "scope": "Original38 failed actual CLI compilation before engine execution. Preserved unmodified; not described as successful execution."
+  },
+  "compile_correction": {
+    "path": ".runtime/porting/SRC-06/source-init-energy-reports-draft-Outer-38-02/correction.json",
+    "sha256": "8ec26c6a6addc8e0be581c90ceedc2d71d214ad2df5e47518f3e15b4107cd08a",
+    "bytes": 3067
+  },
+  "original_full_semantic_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-init-energy-reports-Source-review-38/review.json",
+    "sha256": "a96263b1e642b31573c5fab4d6ee696bce15b642a3ecc9bf82b3282922477d71",
+    "bytes": 21172
+  },
+  "independent_correction_peer_scope": "The independent02 peer verifies exactly two member identifiers and carries original a962 full semantic review for all unchanged formulas/branches/API. It is not relabeled as a second full independent semantic review.",
+  "Native_BND_reported_IO_comparison": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-energy-report-initialization-B-NOLIMIT-24H-Root-38-02/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    "BND_bytes": 8559,
+    "BND_node_block_present": true,
+    "Native_paired_Node_state_or_IO_claim": "Entire BND reported IO body only; no internal thermodynamic Node state claim",
+    "Native_capture": {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    "Native_original_BND": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    "full_BND_body_bytes_equal": true,
+    "compared_body_bytes": 8518,
+    "compared_body_lines": 106,
+    "excluded_headers": [
+      "Program Version,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.10.19 14:12\r",
+      "Program Version,rusted-energyplus 0.1.0\r"
+    ],
+    "Native_BND_finite_copy": {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-initialization-actual-review-38-02/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    }
+  },
+  "Native_BND_qualification": "Entire reported BND body only, with only the exact two engine-specific Program Version first lines excluded. Retained genuine Native21 capture and finite whole BND copy; no new engine run or internal thermodynamic Node-state equivalence claim."
+}

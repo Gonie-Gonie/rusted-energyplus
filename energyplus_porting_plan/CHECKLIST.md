@@ -319,3 +319,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source37 energy report structure](evidence/SRC-06-canonical-energy-report-structure-37/summary.json). 에너지 보고 구조 생성 경로를 기존 파일 6개와 새 파일 3개로 연결했다. 실제 B/A24 한 쌍을 확인하며, 추가 테스트나 별도 Native 실행은 없다. 게이트 수는 그대로다.
+
+
+[Source38 energy report initialization](evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 에너지 보고 초기화와 현재 계량값 읽기를 기존 파일 4개와 새 파일 1개로 연결했다. 실제 B/A24 한 쌍으로 확인하고, 추가 테스트나 Native 재실행 없이 게이트 수를 유지한다.
