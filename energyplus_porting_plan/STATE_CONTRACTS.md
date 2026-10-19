@@ -110,3 +110,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source Compact 스케줄 검증](evidence/SRC-06-canonical-compact-schedules-13/summary.json). Compact는 동일 InputProcessor·Schedule·Week·Day 소유자와 실제 시계를 사용합니다. Native1269의 같은 MissingDay0 재할당을 보존하며, 실제 A/B의 시간당 4단계에서는 24→96개 값으로 바뀝니다. 후속 B 연산은 미완료입니다.
+
+
+[Source Zone·Node 입력 검증](evidence/SRC-06-canonical-Zone-Node-14/summary.json). Zone 제어 여부는 같은 InputProcessor의 실제 필드 조회로 설정하며, 알려진 부재 연결 유형에는 Native와 같은 Null을 삽입합니다. Node의 실제 개수·할당·NodeID0/Undefined·첫 확장 순서를 보존하고, 검증되지 않은 다중 IDF 순서는 명시적으로 중단합니다.

@@ -3,13 +3,16 @@ mod heat_to_return_air;
 pub(crate) mod management;
 mod node_reporting;
 mod source_input;
+mod source_nodes;
+mod source_node_lists;
 mod source_endrun;
 mod source_marked_nodes;
 mod source_reset;
 mod source_setup_reporting;
 
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
-use crate::node::NodeStateStore;
+use source_nodes::{SourceNodeData, SourceNodeSetpointCheck};
+use source_node_lists::SourceNodeList;
 use ep_model::{SpaceId, ZoneId};
 
 /// Unsupported input or an unavailable represented equipment owner.
@@ -239,13 +242,17 @@ impl InternalGainStorage {
 
 #[derive(Clone, Debug, PartialEq)]
 struct NodeOwner {
-    /// Independent of counters and diagnostic typed-node projection length.
-    physical: Option<NodeStateStore>,
+    /// Genuine DataLoopNode.Node storage, independent of native counters.
+    physical: Option<Vec<SourceNodeData>>,
+    /// Native NodeID has lower bound0; only index0 is Undefined.
+    node_ids: Option<Vec<String>>,
+    default_node_values: SourceNodeData,
+    node_setpoint_checks: Option<Vec<SourceNodeSetpointCheck>>,
     number_of_nodes: usize,
     number_of_unique_node_names: usize,
     number_of_node_lists: usize,
     get_input: bool,
-    node_lists: Option<Vec<()>>,
+    node_lists: Option<Vec<SourceNodeList>>,
     unique_names: Option<Vec<String>>,
     context_name: String,
     number_of_check_nodes: usize,
@@ -261,6 +268,9 @@ impl Default for NodeOwner {
     fn default() -> Self {
         Self {
             physical: None,
+            node_ids: None,
+            default_node_values: SourceNodeData::default(),
+            node_setpoint_checks: None,
             number_of_nodes: 0,
             number_of_unique_node_names: 0,
             number_of_node_lists: 0,

@@ -195,6 +195,45 @@ impl SelectedInputProcessor {
             .map(Vec::as_slice).ok_or(SelectedInputUnavailable::Association)
     }
 
+    /// Native getObjectItemNum1298 field overload on the same retained IP.
+    /// Known absent families acquire the actual epJSON operator[] null; raw
+    /// operands, object usage, shared arguments and defaults remain untouched.
+    /// Direct epJSON retains JSON ordinals. A positive IDF match is admitted
+    /// only for one object, where getIDFObjNum is the exact identity conversion.
+    pub(crate) fn get_object_item_num_by_field(
+        &mut self, object_type: &str, field: &str, object_name: &str,
+        source_is_epjson: bool,
+    ) -> Result<i32, SelectedInputUnavailable> {
+        let Ok(canonical) = self.canonical_type(object_type) else { return Ok(-1); };
+        match self.families.entry(canonical.clone()).or_insert(SourceInputFamily::Null) {
+            SourceInputFamily::Null => return Ok(0),
+            SourceInputFamily::Objects(objects) if objects.is_empty() => return Ok(0),
+            SourceInputFamily::Objects(_) => {}
+        }
+        let raw = self.statistics_input.as_ref().ok_or(SelectedInputUnavailable::Association)?;
+        let objects = raw.objects.get(&canonical).ok_or(SelectedInputUnavailable::Association)?;
+        // Native JSON map traversal precedes getIDFObjNum: duplicate field
+        // values select the first lexical object, not the first IDF object.
+        for (json_index, (name, fields)) in objects.iter().enumerate() {
+            let Some(value) = fields.get(field) else { continue; };
+            let SourceInputStatisticsValue::String(value) = value else {
+                return Err(SelectedInputUnavailable::Association);
+            };
+            if value.eq_ignore_ascii_case(object_name) {
+                // EquipmentConnections has no validated IDF-order overlay.
+                // Its actual finite single-object domain has ordinal 1 in
+                // both orders; multi-object IDF conversion stays unavailable.
+                if !source_is_epjson && objects.len() != 1 {
+                    return Err(SelectedInputUnavailable::Association);
+                }
+                let index = json_index;
+                return i32::try_from(index.checked_add(1).ok_or(SelectedInputUnavailable::Size)?)
+                    .map_err(|_| SelectedInputUnavailable::Size);
+            }
+        }
+        Ok(0)
+    }
+
     /// Actual Native322 child, after the six real shared shortcut allocations.
     /// Counters belong to the same DataOutputs owner used by later TAB reports.
     ///

@@ -185,14 +185,18 @@ impl SelectedZoneInputOwners {
                     .map_err(HeatBalanceInputError::Output)?;
             }
         }
-        // Actual getObjectItemNum(field="zone_name") has no positive candidate
-        // in this admitted family. Do not replace it with a mutating query.
-        if owners.input.family("ZoneHVAC:EquipmentConnections").is_some_and(|family| matches!(family, super::super::selected_input_processor::SourceInputFamily::Objects(rows) if !rows.is_empty())) {
-            return Err(HeatBalanceInputError::Unavailable("positive nominal controlled Zone lookup"));
-        }
+        // Native GetZoneData1903: query the actual raw connection field for
+        // each retained Zone; this does not consume the equipment object.
         if let Some(zones) = self.zones.as_mut() {
             for zone in zones {
-                zone.is_nominal_controlled = false;
+                zone.is_nominal_controlled = owners.input.get_object_item_num_by_field(
+                    "ZoneHVAC:EquipmentConnections",
+                    "zone_name",
+                    &zone.name,
+                    raw.source_is_epjson,
+                ).map_err(|_| HeatBalanceInputError::Unavailable(
+                    "actual nominal controlled Zone raw field lookup",
+                ))? > 0;
             }
         }
         owners.shortcut.current_module_object = "ZoneList".into();

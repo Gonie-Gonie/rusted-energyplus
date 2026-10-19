@@ -253,3 +253,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source Compact 스케줄 검증](evidence/SRC-06-canonical-compact-schedules-13/summary.json). Compact 포팅의 Native 대조 단일 테스트와 A-24H 회귀를 통과했습니다. B는 제어 대상 Zone 조회에서 미완료이며 A14/54·B14/64 게이트는 유지합니다.
+
+
+[Source Zone·Node 입력 검증](evidence/SRC-06-canonical-Zone-Node-14/summary.json). Zone·Node 입력 경로의 기존 소유자 테스트와 A-24H 회귀를 통과했습니다. B는 장비 연결 입력 조회에서 미완료이며 A14/54·B14/64 게이트는 유지합니다.

@@ -129,7 +129,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         );
         assert_shape(
             owner.nodes.physical.is_some(),
-            owner.nodes.physical.as_ref().map_or(0, NodeStateStore::len),
+            owner.nodes.physical.as_ref().map_or(0, Vec::len),
             &n["Node"],
         );
         assert_eq!(owner.nodes.get_input, boolean(&n["GetNodeInputFlag"]));
@@ -282,9 +282,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         [false, false, true]
     );
     owner.config_view()?.set_active_elements(0, [false; 3]);
-    owner.nodes.physical = Some(NodeStateStore {
-        air_nodes: Vec::new(),
-    });
+    owner.nodes.physical = Some(vec![SourceNodeData::default()]);
+    assert_eq!(owner.nodes.physical.as_ref().map_or(0, Vec::len), 1);
     assert_eq!(owner.nodes.number_of_nodes, 0);
     assert_eq!(
         owner.validate_initialized(&zones, &spaces),

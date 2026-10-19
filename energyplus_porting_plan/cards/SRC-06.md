@@ -422,3 +422,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source Compact 스케줄 검증](../evidence/SRC-06-canonical-compact-schedules-13/summary.json). 무보간 Compact의 분별 값·타임스텝 합계·최솟값/최댓값·현재 시계 조회를 Native 순서로 연결했습니다. 단일 테스트에서 기본 입력과 빈 시각(:15) 변형의 96×5×2개 스케줄 값이 Native와 비트 단위로 일치했고, A-24H 종료·내보내기와 기존 5,352개 보고값 검증도 유지했습니다. B는 Compact 처리를 마친 뒤 GetHeatBalanceInput의 제어 대상 Zone 조회에서 중단합니다. 추가 보간·진단 분기와 후속 B 장비 포팅은 남아 있으며 A14/54·B14/64 게이트는 유지합니다.
+
+
+[Source Zone·Node 입력 검증](../evidence/SRC-06-canonical-Zone-Node-14/summary.json). 같은 입력 소유자의 제어 Zone 조회와 NodeList·Assign·InitUnique 경로를 연결했습니다. 기존 Native 비제어 입력 1쌍(pair7)·소유자 전이 테스트 및 A-24H 회귀를 통과했고 5,352개 보고값의 기존 검증도 유지했습니다. B는 GetZoneEquipmentData308의 EquipmentConnections getObjectItem에서 중단합니다. 입력된 Node의 Native 상태 대조와 후속 B 장비 포팅은 남아 있으며 A14/54·B14/64 게이트는 유지합니다.

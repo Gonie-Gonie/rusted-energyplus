@@ -72,11 +72,6 @@ impl OrdinaryEquipment {
         let controlled_zones = input.get_num_objects_found("ZoneHVAC:EquipmentConnections");
         let controlled_spaces = input.get_num_objects_found("SpaceHVAC:EquipmentConnections");
         self.number_of_equipment_lists = input.get_num_objects_found("ZoneHVAC:EquipmentList");
-        if controlled_zones != 0 || controlled_spaces != 0 || self.number_of_equipment_lists != 0 {
-            return Err(Unavailable::Input(
-                "positive controlled equipment input".into(),
-            ));
-        }
         let node = definition(input, "NodeList")?;
         let _node_numbers = vec![0_i32; node.total().map_err(|_| Unavailable::InconsistentOwner)?];
         let first = definition(input, "ZoneHVAC:EquipmentList")?;
@@ -128,8 +123,28 @@ impl OrdinaryEquipment {
         self.equipment_availability = Some(vec![0; self.zone_ids.len()]);
         self.unique_equipment_list_names
             .reserve(self.zone_ids.len());
+        // Native281-297 diagnostics precede InitUniqueNodeCheck and node input.
+        if self.number_of_equipment_lists != controlled_zones {
+            return Err(Unavailable::Input("actual GetZoneEquipmentData282 equipment-list/count severe diagnostic".into()));
+        }
+        if controlled_zones > num_zones {
+            return Err(Unavailable::Input("actual GetZoneEquipmentData292 controlled-zone/count severe diagnostic".into()));
+        }
         self.nodes
             .init_unique_check_source("ZoneHVAC:EquipmentConnections", input)?;
+        let _overall_equipment_count = 0_i32;
+        let _local_term_unit_sizing_counter = 0_i32;
+        // The genuine NodeList producer has returned. Stop at the first real
+        // unported controlled-zone getObjectItem, before any copied zone flags.
+        if controlled_zones > 0 {
+            return Err(Unavailable::Input("actual GetZoneEquipmentData308 ZoneHVAC:EquipmentConnections getObjectItem".into()));
+        }
+        if controlled_spaces > 0 {
+            if !space_simulation {
+                return Err(Unavailable::Input("actual GetZoneEquipmentData361 ignored-controlled-space warning diagnostic".into()));
+            }
+            return Err(Unavailable::Input("actual GetZoneEquipmentData369 controlled-space getObjectItem".into()));
+        }
         // All controlled/space/term-unit/duplicate loops are genuinely empty.
         let configs = self
             .zone_config
@@ -187,17 +202,8 @@ impl NodeOwner {
         input: &mut SelectedInputProcessor,
     ) -> Result<(), Unavailable> {
         if self.get_input {
-            let counts = definition(input, "NodeList")?;
-            let alpha_args = vec![String::new(); counts.alphas];
-            let numeric_args = vec![0.0_f64; counts.numerics];
-            self.number_of_node_lists = input.get_num_objects_found("NodeList");
-            if self.number_of_node_lists != 0 {
-                return Err(Unavailable::Input("positive NodeList input".into()));
-            }
-            self.node_lists = Some(Vec::new());
-            // Both nested validation loops are empty at zero count.
-            drop(alpha_args);
-            drop(numeric_args);
+            let mut errors_found = false;
+            self.get_source_node_lists_input(input, &mut errors_found)?;
             self.get_input = false;
         }
         self.begin_unique_check_context(context)
