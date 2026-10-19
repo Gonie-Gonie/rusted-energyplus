@@ -5,9 +5,25 @@ use crate::heat_balance::selected_project_data::{
 };
 #[derive(Clone, Debug, Default)]
 struct AirloopZone {
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc InitAirLoops keeps the original AirloopZone scratch-row layout; selected zero-primary-loop traversal does not read these members."
+    )]
     controlled_zone_number: i32,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc InitAirLoops keeps the original AirloopZone scratch-row layout; selected zero-primary-loop traversal does not read these members."
+    )]
     zone_inlet_node: i32,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc InitAirLoops keeps the original AirloopZone scratch-row layout; selected zero-primary-loop traversal does not read these members."
+    )]
     terminal_unit_inlet_node: i32,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc InitAirLoops keeps the original AirloopZone scratch-row layout; selected zero-primary-loop traversal does not read these members."
+    )]
     terminal_unit_sizing_index: i32,
 }
 impl SourceAirLoopData {
@@ -58,11 +74,19 @@ impl SourceAirLoopData {
                     target.inlet_nodes =
                         Some(vec![SourceNodeConvergenceLog::default(); inlet_count]);
                     for ordinal in 1..=inlet_count {
-                        let actual = *config.inlet_node_number(ordinal)
+                        let actual = *config
+                            .inlet_node_number(ordinal)
                             .ok_or(Error::Unavailable("actual ZoneEquipConfig InletNode1939"))?;
-                        target.inlet_nodes.as_mut().and_then(|rows| rows.get_mut(ordinal - 1))
-                            .ok_or(Error::Unavailable("actual ZoneInletConvergence InletNode1939"))?.node_number =
-                            i32::try_from(actual).map_err(|_| Error::Unavailable("actual convergence NodeNum integer domain1939"))?;
+                        target
+                            .inlet_nodes
+                            .as_mut()
+                            .and_then(|rows| rows.get_mut(ordinal - 1))
+                            .ok_or(Error::Unavailable(
+                                "actual ZoneInletConvergence InletNode1939",
+                            ))?
+                            .node_number = i32::try_from(actual).map_err(|_| {
+                            Error::Unavailable("actual convergence NodeNum integer domain1939")
+                        })?;
                     }
                 }
             }
@@ -84,7 +108,8 @@ impl SourceAirLoopData {
                     continue;
                 }
                 for ordinal in 1..=*config.number_return_nodes() {
-                    let air_loop = *config.return_node_air_loop_number(ordinal)
+                    let air_loop = *config
+                        .return_node_air_loop_number(ordinal)
                         .ok_or(Error::Unavailable("actual ReturnNodeAirLoopNum2133"))?;
                     if air_loop > 0 {
                         return Err(Error::Unavailable("actual AirLoopFlow DesSupply2135"));
@@ -119,12 +144,20 @@ impl SourceAirLoopData {
                 continue;
             }
             for ordinal in 1..=*config.number_return_nodes() {
-                let _this_return_node = *config.return_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ConnectReturnNodes ReturnNode2333"))?;
+                let _this_return_node =
+                    *config
+                        .return_node_number(ordinal)
+                        .ok_or(Error::Unavailable(
+                            "actual ConnectReturnNodes ReturnNode2333",
+                        ))?;
                 // Native starts this local at0 and only the following actual
                 // return-path child may produce a positive airloop association.
+                // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+                #[allow(clippy::never_loop)]
                 for _return_path in 1..=*o.equipment.source_number_return_paths() {
-                    return Err(Error::Unavailable("actual ConnectReturnNodes ReturnAirPath2336"));
+                    return Err(Error::Unavailable(
+                        "actual ConnectReturnNodes ReturnAirPath2336",
+                    ));
                 }
                 // No return-path child executed: actual local airLoopNum remains0.
                 // Its positive matching-inlet branch therefore performs no writes.

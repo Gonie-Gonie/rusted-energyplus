@@ -241,7 +241,9 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         for entry in &assessment.source_consumed_objects {
             report.push_str(&format!(
                 "| {} | {} | {} |\n",
-                markdown_cell(&entry.object_type), entry.count, markdown_cell(&entry.note)
+                markdown_cell(&entry.object_type),
+                entry.count,
+                markdown_cell(&entry.note)
             ));
         }
         report.push('\n');

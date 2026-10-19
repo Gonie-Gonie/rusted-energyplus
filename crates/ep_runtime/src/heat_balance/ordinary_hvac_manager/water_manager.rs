@@ -11,10 +11,18 @@ use std::convert::Infallible;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceRainfallMode {
+    #[allow(
+        dead_code,
+        reason = "DataWater.hh rainfall/irrigation enums retain their exact Native invalid/count sentinels independently of the finite selected input modes."
+    )]
     Invalid = -1,
     None,
     RainSchedDesign,
     EpwPrecipitation,
+    #[allow(
+        dead_code,
+        reason = "DataWater.hh rainfall/irrigation enums retain their exact Native invalid/count sentinels independently of the finite selected input modes."
+    )]
     Num,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -22,6 +30,10 @@ pub(crate) enum SourceIrrigationMode {
     Invalid = -1,
     SchedDesign,
     SmartSched,
+    #[allow(
+        dead_code,
+        reason = "DataWater.hh rainfall/irrigation enums retain their exact Native invalid/count sentinels independently of the finite selected input modes."
+    )]
     Num,
 }
 #[derive(Clone, Debug, PartialEq)]

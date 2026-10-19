@@ -41,6 +41,8 @@ pub(super) fn safe_divide(a: f64, b: f64) -> f64 {
         a / if b >= 0.0 { 1.0e-10 } else { -1.0e-10 }
     }
 }
+// Keep the explicit owner-borrow relationship in this Native-facing helper signature.
+#[allow(clippy::needless_lifetimes)]
 pub(super) fn zone<'a>(
     zones: &'a SelectedZoneInputOwners,
     number: i32,

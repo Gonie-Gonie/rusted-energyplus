@@ -31,11 +31,15 @@ impl Default for SourceIceThermalStorage {
 impl SourceIceThermalStorage {
     pub(super) fn update_source_ice_fractions(&self) -> Result<(), Error> {
         if let Some(rows) = self.simple.as_deref() {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }
         }
         if let Some(rows) = self.detailed.as_deref() {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }
@@ -58,6 +62,8 @@ impl Default for SourceEirPlantLoopHeatPumps {
 }
 impl SourceEirPlantLoopHeatPumps {
     pub(super) fn check_source_concurrent_operation(&self) -> Result<(), Error> {
+        // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+        #[allow(clippy::never_loop)]
         for heat_pump in &self.heat_pumps {
             match *heat_pump {}
         }

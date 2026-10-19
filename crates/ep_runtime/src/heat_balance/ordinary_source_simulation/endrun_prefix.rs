@@ -164,7 +164,10 @@ impl SourceInitializationFiles {
         self.write_source_tabular_reports_prefix_on_session(session, reports, weather, backend)?;
         // The Native children below are outside WriteTabularReports and run
         // after its unconditional audit suffix, even if WriteTabularFiles=false.
-        let session = required(session.as_mut(), "actual same session before tariff reports598")?;
+        let session = required(
+            session.as_mut(),
+            "actual same session before tariff reports598",
+        )?;
         let globals = required(
             reports.selected_heat_balance_globals.as_ref(),
             "actual same Globals before tariff reports598",
@@ -173,32 +176,44 @@ impl SourceInitializationFiles {
             reports.selected_project_data.as_ref(),
             "actual same SysVars before outer endrun598",
         )?;
-        reports.economic_tariff.write_source_tabular_tariff_reports(
-            &mut session.tabular,
-            globals,
-            required(
-                reports.selected_zone_input.as_ref(),
-                "actual same Zones before tariff floor-area prerequisite598",
-            )?,
-            &mut *backend,
-            &SourceDiagnosticFlags {
-                kickoff: &globals.kickoff_simulation,
-                developer: &project.system.developer_flag,
-                warmup: &weather.state.global.warmup_flag,
-                doing_sizing: &globals.doing_sizing,
-            },
-        ).map_err(hb_input_error)?;
-        reports.source_life_cycle_cost.compute_source_life_cycle_cost_and_report(
-            &mut *backend,
-            &SourceDiagnosticFlags {
-                kickoff: &globals.kickoff_simulation,
-                developer: &project.system.developer_flag,
-                warmup: &weather.state.global.warmup_flag,
-                doing_sizing: &globals.doing_sizing,
-            },
-        ).map_err(hb_input_error)?;
-        session.tabular.close_source_tabular_files().map_err(hb_input_error)?;
-        session.hvac.dump_source_air_loop_statistics(&project.system).map_err(hb_input_error)?;
+        reports
+            .economic_tariff
+            .write_source_tabular_tariff_reports(
+                &mut session.tabular,
+                globals,
+                required(
+                    reports.selected_zone_input.as_ref(),
+                    "actual same Zones before tariff floor-area prerequisite598",
+                )?,
+                &mut *backend,
+                &SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.state.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                },
+            )
+            .map_err(hb_input_error)?;
+        reports
+            .source_life_cycle_cost
+            .compute_source_life_cycle_cost_and_report(
+                &mut *backend,
+                &SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.state.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                },
+            )
+            .map_err(hb_input_error)?;
+        session
+            .tabular
+            .close_source_tabular_files()
+            .map_err(hb_input_error)?;
+        session
+            .hvac
+            .dump_source_air_loop_statistics(&project.system)
+            .map_err(hb_input_error)?;
         self.close_source_output_files(
             &mut crate::heat_balance::source_initialization::SourceCloseOutputFilesOwners {
                 registration: &reports.output_registration,
@@ -213,7 +228,8 @@ impl SourceInitializationFiles {
                 runtime_language: &required(
                     reports.selected_simulation_startup.as_ref(),
                     "actual same RuntimeLanguage before CloseOutputFiles606",
-                )?.runtime_language,
+                )?
+                .runtime_language,
                 connections: &session.hvac.ancillary.branch_node_connections,
                 heat_balance: &reports.heat_balance_input_state,
                 standard_output_record_count: &reports.source_standard_output_record_count,
@@ -221,7 +237,8 @@ impl SourceInitializationFiles {
                 shading_stream: &mut session.shading_stream,
                 output_control: &reports.source_output_control,
             },
-        ).map_err(hb_input_error)?;
+        )
+        .map_err(hb_input_error)?;
         // Actual609 child first tests this same database pointer. Null has no
         // further reads/effects; positive first needs its real DB predicate.
         if reports.source_sqlite.present() {
@@ -230,15 +247,17 @@ impl SourceInitializationFiles {
             ));
         }
         if reports.source_sqlite.present() {
-            backend.display_source_string(
-                "Writing final SQL reports",
-                &SourceDiagnosticFlags {
-                    kickoff: &globals.kickoff_simulation,
-                    developer: &project.system.developer_flag,
-                    warmup: &weather.state.global.warmup_flag,
-                    doing_sizing: &globals.doing_sizing,
-                },
-            ).map_err(hb_input_error)?;
+            backend
+                .display_source_string(
+                    "Writing final SQL reports",
+                    &SourceDiagnosticFlags {
+                        kickoff: &globals.kickoff_simulation,
+                        developer: &project.system.developer_flag,
+                        warmup: &weather.state.global.warmup_flag,
+                        doing_sizing: &globals.doing_sizing,
+                    },
+                )
+                .map_err(hb_input_error)?;
             return Err(unavailable(
                 "actual final SQL sqliteCommit613 before initializeIndexes614",
             ));
@@ -289,7 +308,10 @@ impl SourceInitializationFiles {
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), RuntimeError> {
         self.fill_source_weather_predefined_entries_on_session(session, reports)?;
-        let session = required(session.as_mut(), "actual Source TAB before FillRemaining5213")?;
+        let session = required(
+            session.as_mut(),
+            "actual Source TAB before FillRemaining5213",
+        )?;
         session
             .tabular
             .fill_source_remaining_predefined_entries(
@@ -392,19 +414,22 @@ impl SourceInitializationFiles {
                     },
                 },
             ).map_err(hb_input_error)?;
-            session.tabular.write_source_table_of_contents(
-                &crate::heat_balance::ordinary_tabular_reports::SourceTabularTocOwners {
-                    registry: &reports.registry,
-                    life_cycle_cost: &reports.source_life_cycle_cost,
-                    monetary: &reports.cost_estimate_monetary,
-                    clock: &weather.state.global,
-                    weather: &weather.state.weather,
-                    schedules: required(
-                        reports.selected_schedule_manager.as_ref(),
-                        "actual same schedules before TOC5231",
-                    )?,
-                },
-            ).map_err(hb_input_error)?;
+            session
+                .tabular
+                .write_source_table_of_contents(
+                    &crate::heat_balance::ordinary_tabular_reports::SourceTabularTocOwners {
+                        registry: &reports.registry,
+                        life_cycle_cost: &reports.source_life_cycle_cost,
+                        monetary: &reports.cost_estimate_monetary,
+                        clock: &weather.state.global,
+                        weather: &weather.state.weather,
+                        schedules: required(
+                            reports.selected_schedule_manager.as_ref(),
+                            "actual same schedules before TOC5231",
+                        )?,
+                    },
+                )
+                .map_err(hb_input_error)?;
             session.tabular.write_source_verification_summary(
                 &mut crate::heat_balance::ordinary_tabular_reports::SourceVeriSumOwners {
                     globals,
@@ -499,7 +524,9 @@ impl SourceInitializationFiles {
                     },
                 },
             ).map_err(hb_input_error)?;
-            session.tabular.write_source_component_sizing(&mut reports.registry)
+            session
+                .tabular
+                .write_source_component_sizing(&mut reports.registry)
                 .map_err(hb_input_error)?;
             session.tabular.write_source_surface_shadowing(
                 &mut crate::heat_balance::ordinary_tabular_reports::SourceSurfaceShadowingReportOwners {
@@ -523,9 +550,13 @@ impl SourceInitializationFiles {
                     },
                 },
             ).map_err(hb_input_error)?;
-            session.tabular.write_source_component_cost_table(&reports.cost_estimate_monetary)
+            session
+                .tabular
+                .write_source_component_cost_table(&reports.cost_estimate_monetary)
                 .map_err(hb_input_error)?;
-            session.tabular.write_source_adaptive_comfort_table(&reports.selected_internal_heat_gains)
+            session
+                .tabular
+                .write_source_adaptive_comfort_table(&reports.selected_internal_heat_gains)
                 .map_err(hb_input_error)?;
             {
                 let mut next_owners = crate::heat_balance::ordinary_tabular_reports::SourcePostSummaryReportOwners {
@@ -551,11 +582,17 @@ impl SourceInitializationFiles {
                         backend: &mut *backend,
                     },
                 };
-                session.tabular.write_source_eio_tables(self, &mut next_owners)
+                session
+                    .tabular
+                    .write_source_eio_tables(self, &mut next_owners)
                     .map_err(hb_input_error)?;
-                session.tabular.write_source_load_component_summary(&next_owners)
+                session
+                    .tabular
+                    .write_source_load_component_summary(&next_owners)
                     .map_err(hb_input_error)?;
-                session.tabular.write_source_heat_emission_table(&mut next_owners)
+                session
+                    .tabular
+                    .write_source_heat_emission_table(&mut next_owners)
                     .map_err(hb_input_error)?;
             }
             if session.tabular.display_thermal_resilience_summary && !globals.do_pure_load_calc {
@@ -637,25 +674,39 @@ impl SourceInitializationFiles {
                 ).map_err(hb_input_error)?;
             }
             if weather.state.weather.tot_report_periods > 0 {
-                return Err(unavailable("actual WriteTabularReports5253 WriteReportPeriodTimeConsumption12480 local array allocation entry"));
+                return Err(unavailable(
+                    "actual WriteTabularReports5253 WriteReportPeriodTimeConsumption12480 local array allocation entry",
+                ));
             }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _period in 1..=weather.state.weather.tot_thermal_report_periods {
-                return Err(unavailable("actual WriteTabularReports5256 WriteThermalResilienceTablesRepPeriod12539 actual WriteTabularFiles and styles entry"));
+                return Err(unavailable(
+                    "actual WriteTabularReports5256 WriteThermalResilienceTablesRepPeriod12539 actual WriteTabularFiles and styles entry",
+                ));
             }
             for _period in 1..=weather.state.weather.tot_co2_report_periods {
                 // Native13690 intentionally returns when WriteTabularFiles is
                 // true. Preserve that original guard, including its TODO bug.
                 if !*session.tabular.source_write_tabular_files_mut() {
-                    return Err(unavailable("actual CO2ResilienceRepPeriod13692 tabularReportPasses first header operation"));
+                    return Err(unavailable(
+                        "actual CO2ResilienceRepPeriod13692 tabularReportPasses first header operation",
+                    ));
                 }
             }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _period in 1..=weather.state.weather.tot_visual_report_periods {
-                return Err(unavailable("actual WriteTabularReports5262 WriteVisualResilienceTablesRepPeriod13801 actual WriteTabularFiles and styles entry"));
+                return Err(unavailable(
+                    "actual WriteTabularReports5262 WriteVisualResilienceTablesRepPeriod13801 actual WriteTabularFiles and styles entry",
+                ));
             }
             required(
                 reports.coil_selection_report.as_mut(),
                 "actual same coilSelectionReportObj before finishCoilSummary5265",
-            )?.finish_source_coil_summary_report_table().map_err(hb_input_error)?;
+            )?
+            .finish_source_coil_summary_report_table()
+            .map_err(hb_input_error)?;
             session.tabular.write_source_predefined_tables(
                 &mut crate::heat_balance::ordinary_tabular_reports::SourcePredefinedReportOwners {
                     registry: &reports.registry,
@@ -675,17 +726,29 @@ impl SourceInitializationFiles {
                 },
             ).map_err(hb_input_error)?;
             if weather.state.global.do_weath_sim {
-                session.tabular.write_source_monthly_tables().map_err(hb_input_error)?;
-                session.tabular.write_source_time_bin_tables().map_err(hb_input_error)?;
-                session.tabular.write_source_annual_tables().map_err(hb_input_error)?;
+                session
+                    .tabular
+                    .write_source_monthly_tables()
+                    .map_err(hb_input_error)?;
+                session
+                    .tabular
+                    .write_source_time_bin_tables()
+                    .map_err(hb_input_error)?;
+                session
+                    .tabular
+                    .write_source_annual_tables()
+                    .map_err(hb_input_error)?;
             }
         }
-        session.tabular.write_source_tabular_audit(
-            self,
-            &reports.source_output_control,
-            &reports.registry,
-            &reports.table,
-        ).map_err(hb_input_error)?;
+        session
+            .tabular
+            .write_source_tabular_audit(
+                self,
+                &reports.source_output_control,
+                &reports.registry,
+                &reports.table,
+            )
+            .map_err(hb_input_error)?;
         Ok(())
     }
 }

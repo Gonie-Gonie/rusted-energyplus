@@ -16,6 +16,8 @@ use crate::heat_balance::source_output_registration::{
 };
 use std::io::Write;
 
+// Keep the explicit checked borrow that witnesses the physical output-report cell.
+#[allow(clippy::borrow_deref_ref)]
 pub(crate) fn register_source_surface_outputs(
     owners: &SourceSurfaceOutputOwners<'_>,
     constructions: &SelectedHeatBalanceInputState,

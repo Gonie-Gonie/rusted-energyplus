@@ -12,10 +12,18 @@ pub(crate) use controls::{
     SourceZoneListGroupLoadReports,
 };
 pub(crate) enum SourceAirUpdate {
+    #[allow(
+        dead_code,
+        reason = "DataHeatBalFanSys.hh PredictorCorrectorCtrl retains invalid/revert dispatch identities even when the selected production caller uses the other update routes."
+    )]
     Invalid,
     GetZoneSetPoints,
     PredictStep,
     CorrectStep,
+    #[allow(
+        dead_code,
+        reason = "DataHeatBalFanSys.hh PredictorCorrectorCtrl retains invalid/revert dispatch identities even when the selected production caller uses the other update routes."
+    )]
     RevertZoneHistories,
     PushZoneHistories,
     PushSystemHistories,

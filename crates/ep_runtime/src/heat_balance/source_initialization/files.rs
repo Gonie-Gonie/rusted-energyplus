@@ -28,13 +28,19 @@ pub struct SourceInitializationFilePaths {
     pub debug: PathBuf,
     /// Actual local END, native-style ERR, and retained DFS paths from this frontend.
     pub end: PathBuf,
+    /// Actual native-style ERR path owned by the frontend error backend.
     pub error: PathBuf,
+    /// Actual DFS diagnostic output path selected by the frontend.
     pub dfs: PathBuf,
     /// Actual caller-selected paths for Native DataStringGlobals five table formats.
     pub tabular_csv: PathBuf,
+    /// Tab-separated tabular output path selected by the real output caller.
     pub tabular_tab: PathBuf,
+    /// Fixed-width tabular output path selected by the real output caller.
     pub tabular_fixed: PathBuf,
+    /// HTML tabular output path selected by the real output caller.
     pub tabular_html: PathBuf,
+    /// XML tabular output path selected by the real output caller.
     pub tabular_xml: PathBuf,
 }
 
@@ -170,7 +176,13 @@ impl SourceInitializationFiles {
             error: paths.error,
             dfs: SourceOutputStream::new(paths.dfs),
             dxf: paths.dxf,
-            tabular_paths: [paths.tabular_csv, paths.tabular_tab, paths.tabular_fixed, paths.tabular_html, paths.tabular_xml],
+            tabular_paths: [
+                paths.tabular_csv,
+                paths.tabular_tab,
+                paths.tabular_fixed,
+                paths.tabular_html,
+                paths.tabular_xml,
+            ],
             dictionaries: [
                 dictionaries::SourceDictionaryStream::new(paths.rdd),
                 dictionaries::SourceDictionaryStream::new(paths.mdd),
@@ -179,7 +191,13 @@ impl SourceInitializationFiles {
     }
     /// Native format chooses a path; the separate TAB stream is ordinal-indexed.
     pub(crate) fn source_tabular_output_path(&self, style: i32) -> &Path {
-        &self.tabular_paths[match style { 0 => 0, 1 => 1, 3 => 3, 4 => 4, _ => 2 }]
+        &self.tabular_paths[match style {
+            0 => 0,
+            1 => 1,
+            3 => 3,
+            4 => 4,
+            _ => 2,
+        }]
     }
     pub(crate) fn source_stat_input_path(&self) -> &Path {
         &self.stat_input
@@ -267,9 +285,9 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
 }
 
 mod dictionaries;
-mod reporting;
-mod endrun_audit;
 mod endrun;
+mod endrun_audit;
+mod reporting;
 pub(crate) use endrun::SourceCloseOutputFilesOwners;
 pub(crate) use reporting::{SourceRuntimeMeterStreams, SourceRuntimeReportStreams};
 
@@ -279,13 +297,13 @@ impl crate::weather::day::source_weather_initialization::SourceWeatherEio for So
     }
 }
 
-
 impl SourceInitializationFiles {
     /// Native InputOutputFile::getLines296-316 on the same physical EIO handle.
     /// Flushes, saves/restores its position, and never opens a second stream.
     pub(crate) fn source_eio_lines(
         &mut self,
-    ) -> Result<Vec<Vec<u8>>, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    ) -> Result<Vec<Vec<u8>>, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>
+    {
         use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
         use std::io::{Read, Seek, SeekFrom};
         let stream = &mut self.outputs[1];

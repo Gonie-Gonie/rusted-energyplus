@@ -143,8 +143,9 @@ impl SourceAvailability {
                         Error::Unavailable("actual availability component count int domain")
                     })?;
                 if row.total_components > 0 {
-                    let count = usize::try_from(row.total_components)
-                        .map_err(|_| Error::Unavailable("actual ZoneCompAvailMgrs allocation405 integer domain"))?;
+                    let count = usize::try_from(row.total_components).map_err(|_| {
+                        Error::Unavailable("actual ZoneCompAvailMgrs allocation405 integer domain")
+                    })?;
                     row.managers = Some(vec![SourceZoneComponentManager::default(); count]);
                 }
             }
@@ -176,6 +177,8 @@ impl SourceAvailability {
         // Source reset order: Sched/On/Off/NightCycle/NightVent/Diff/HiOff/HiOn/LoOff/LoOn/OptimumStart.
         for index in [0, 1, 2, 3, 10, 5, 6, 7, 8, 9, 4] {
             if let Some(rows) = &self.managers[index] {
+                // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                #[allow(clippy::never_loop)]
                 for row in rows {
                     match *row {}
                 }
@@ -241,25 +244,38 @@ impl SourceHvacManager {
                 continue;
             };
             for component_number in 1..=row.total_components {
-                let at = component_number.checked_sub(1)
+                let at = component_number
+                    .checked_sub(1)
                     .and_then(|number| usize::try_from(number).ok())
-                    .ok_or(Error::Unavailable("actual zone availability component ordinal257"))?;
-                let manager = managers.get_mut(at)
+                    .ok_or(Error::Unavailable(
+                        "actual zone availability component ordinal257",
+                    ))?;
+                let manager = managers
+                    .get_mut(at)
                     .ok_or(Error::Unavailable("actual same ZoneCompAvailMgrs259"))?;
                 if manager.number_managers > 0 {
                     let _previous_status = manager.status;
                     manager.status = 0; // Native Status::NoAction265 precedes first manager record.
-                    return Err(Error::Unavailable("positive zone availability availManagers first record268"));
+                    return Err(Error::Unavailable(
+                        "positive zone availability availManagers first record268",
+                    ));
                 } else {
                     manager.status = 0; // Literal no-manager branch287, not a forced readiness flag.
                 }
                 if manager.zone_number == 0 {
                     continue;
                 }
-                if self.ancillary.hybrid_ventilation.number_hybrid_ventilation_managers == 0 {
+                if self
+                    .ancillary
+                    .hybrid_ventilation
+                    .number_hybrid_ventilation_managers
+                    == 0
+                {
                     continue;
                 }
-                return Err(Error::Unavailable("positive zone availability HybridVentData first record298"));
+                return Err(Error::Unavailable(
+                    "positive zone availability HybridVentData first record298",
+                ));
             }
         }
         // The hybrid count is borrowed from the same retained ancillary owner only after real ZoneNum != 0.
@@ -283,46 +299,76 @@ impl SourceAvailability {
 
 impl SourceAvailability {
     /// Native GetSysAvailManagerListInputs1219: same input flag and real list count.
-    fn get_source_manager_list_inputs(&mut self, input: &mut SelectedInputProcessor) -> Result<(), Error> {
+    fn get_source_manager_list_inputs(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+    ) -> Result<(), Error> {
         if self.get_input_flag {
             self.get_source_inputs(input)?;
             self.get_input_flag = false;
         }
-        self.number_manager_lists = i32::try_from(input.get_num_objects_found("AvailabilityManagerAssignmentList"))
-            .map_err(|_|Error::Unavailable("actual availability list count integer domain1240"))?;
+        self.number_manager_lists =
+            i32::try_from(input.get_num_objects_found("AvailabilityManagerAssignmentList"))
+                .map_err(|_| {
+                    Error::Unavailable("actual availability list count integer domain1240")
+                })?;
         if self.number_manager_lists > 0 {
             // Native only allocates ListData for positive count. No represented
             // positive List record or empty allocated substitute is invented.
-            return Err(Error::Unavailable("actual AvailabilityManager ListData.allocate1244"));
+            return Err(Error::Unavailable(
+                "actual AvailabilityManager ListData.allocate1244",
+            ));
         }
         Ok(())
     }
 
     /// Native1448-1512. The real no-list branch intentionally takes two calls to clear Input.
-    pub(super) fn get_source_zone_equipment_availability(&mut self, equipment_type: i32, component: i32,
-        input: &mut SelectedInputProcessor, _errors_found: &mut bool) -> Result<(), Error> {
+    pub(super) fn get_source_zone_equipment_availability(
+        &mut self,
+        equipment_type: i32,
+        component: i32,
+        input: &mut SelectedInputProcessor,
+        _errors_found: &mut bool,
+    ) -> Result<(), Error> {
         if self.get_lists_input {
             self.get_source_manager_list_inputs(input)?;
             self.get_lists_input = false;
         }
-        let type_index = equipment_type.checked_sub(1).and_then(|v|usize::try_from(v).ok())
-            .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager type ordinal1471"))?;
-        let component_index = component.checked_sub(1).and_then(|v|usize::try_from(v).ok())
-            .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager component ordinal1472"))?;
-        let row = self.zone_components.as_mut().and_then(|rows|rows.get_mut(type_index))
-            .and_then(|row|row.managers.as_mut()).and_then(|rows|rows.get_mut(component_index))
+        let type_index = equipment_type
+            .checked_sub(1)
+            .and_then(|v| usize::try_from(v).ok())
+            .ok_or(Error::Unavailable(
+                "actual GetZoneEqAvailabilityManager type ordinal1471",
+            ))?;
+        let component_index = component
+            .checked_sub(1)
+            .and_then(|v| usize::try_from(v).ok())
+            .ok_or(Error::Unavailable(
+                "actual GetZoneEqAvailabilityManager component ordinal1472",
+            ))?;
+        let row = self
+            .zone_components
+            .as_mut()
+            .and_then(|rows| rows.get_mut(type_index))
+            .and_then(|row| row.managers.as_mut())
+            .and_then(|rows| rows.get_mut(component_index))
             .ok_or(Error::Unavailable("actual same ZoneCompAvailMgrs1472"))?;
         if row.input {
             let _availability_list_name = &row.manager_list_name;
             let found = 0;
             if self.number_manager_lists > 0 {
-                return Err(Error::Unavailable("actual GetZoneEqAvailabilityManager ListData FindItemInList1478"));
+                return Err(Error::Unavailable(
+                    "actual GetZoneEqAvailabilityManager ListData FindItemInList1478",
+                ));
             }
             // A positive Found cannot arise before the actual unrepresented
             // list lookup above. Its manager-copy operations remain unclaimed.
-            if row.count > 0 || found > 0 { row.input = false; }
-            row.count = row.count.checked_add(1)
-                .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager Count integer domain1509"))?;
+            if row.count > 0 || found > 0 {
+                row.input = false;
+            }
+            row.count = row.count.checked_add(1).ok_or(Error::Unavailable(
+                "actual GetZoneEqAvailabilityManager Count integer domain1509",
+            ))?;
         }
         Ok(())
     }

@@ -1,12 +1,12 @@
 //! Ordered allocations/local arguments and admitted OtherEquipment getter.
 use super::{
-    index, unavailable, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject,
-    SourceOtherEquipment, SourceOtherFuel, E,
+    E, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject, SourceOtherEquipment,
+    SourceOtherFuel, index, unavailable,
 };
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
-    zone::SelectedZoneInputOwners, SelectedHeatBalanceInput,
+    SelectedHeatBalanceInput, zone::SelectedZoneInputOwners,
 };
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputFamily, SourceInputProcessorShortCut,
@@ -379,7 +379,7 @@ impl SelectedInternalHeatGains {
                     _ => {
                         return Err(unavailable(
                             "actual OtherEquipment unrepresented fuel lookup/diagnostics1868",
-                        ))
+                        ));
                     }
                 };
                 if row.fuel != SourceOtherFuel::None {

@@ -35,14 +35,14 @@ impl SourceDesignDayInputState {
             if input.dry_bulb_range_type != 0 {
                 schedule.outdoor_dry_bulb_temperature = modifier.outdoor_dry_bulb_temperature;
             }
-            if matches!(input.humidity_indicator_type, 5 | 6 | 7 | 4) {
+            if matches!(input.humidity_indicator_type, 4..=7) {
                 schedule.outdoor_relative_humidity = modifier.outdoor_relative_humidity;
             }
             if input.solar_model == 2 {
                 schedule.beam_solar_radiation = modifier.beam_solar_radiation;
                 schedule.diffuse_solar_radiation = modifier.diffuse_solar_radiation;
             }
-            if matches!(env.sky_temperature_model, 1 | 2 | 3) {
+            if matches!(env.sky_temperature_model, 1..=3) {
                 schedule.sky_temperature = modifier.sky_temperature;
             }
         } else if environment.tot_des_days > 0 {

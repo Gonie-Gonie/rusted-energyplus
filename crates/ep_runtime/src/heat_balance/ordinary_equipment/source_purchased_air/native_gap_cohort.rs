@@ -384,8 +384,12 @@ fn report_inputs(factory: &Value) -> Result<(ep_model::ReportInputs, SourceRepor
     // Production reporting_prescan::resolve walks raw object maps lexically.
     // Getter rows above retain their genuine IDF order; these raw pre-scan
     // associations are distinct and must match SelectedInputProcessor shapes.
-    prescan.variables.sort_by(|a, b| a.object_name.cmp(&b.object_name));
-    prescan.summaries.sort_by(|a, b| a.object_name.cmp(&b.object_name));
+    prescan
+        .variables
+        .sort_by(|a, b| a.object_name.cmp(&b.object_name));
+    prescan
+        .summaries
+        .sort_by(|a, b| a.object_name.cmp(&b.object_name));
     Ok((out, prescan))
 }
 fn identity_model(
@@ -2159,9 +2163,8 @@ fn registration(s: &Factory) -> Result<Value> {
     let report = hb::ordinary_air_heat_balance::predictor_corrector::simple_air::SourceAirReportOutputOwners {
         controller: &s.controller,
     };
-    let resilience = hb::ordinary_surface_management::SourceResilienceOutputOwners {
-        zones: &s.zones,
-    };
+    let resilience =
+        hb::ordinary_surface_management::SourceResilienceOutputOwners { zones: &s.zones };
     let owners = RegisteredOutputOwners {
         equipment: &s.equipment,
         air: hb::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners {
@@ -2404,7 +2407,9 @@ pub(crate) fn run(fixture: &Value) -> Result<usize> {
         assert_eq!(member(expected, "factory")?, member(named, "name")?);
         let factory_name = text(member(definition, "name")?)?;
         let mut source = Box::new(Factory::new(definitions, definition).map_err(|error| {
-            invalid(&format!("Source P1 factory {factory_name} phase Factory::new/preparation: {error}"))
+            invalid(&format!(
+                "Source P1 factory {factory_name} phase Factory::new/preparation: {error}"
+            ))
         })?);
         let mut ids = Identities::default();
         ids.check(&snapshot(&source)?, member(expected, "setup")?, "setup")?;

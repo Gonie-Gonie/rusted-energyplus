@@ -13,7 +13,10 @@ pub(crate) struct SourceTabularBody {
 impl SourceTabularBody {
     // Actual local Array2D_string whole-value assignment, same existing cells.
     pub(crate) fn fill(&mut self, value: &[u8]) {
-        for cell in &mut self.values { cell.clear(); cell.extend_from_slice(value); }
+        for cell in &mut self.values {
+            cell.clear();
+            cell.extend_from_slice(value);
+        }
     }
     pub(crate) fn allocate(columns: usize, rows: usize) -> Result<Self, Error> {
         let size = columns.checked_mul(rows).ok_or(Error::Unavailable(
@@ -150,6 +153,8 @@ impl SourceTabularReports {
                         stream.bytes(&currency(&line, false, o.monetary)?)?;
                         stream.bytes(b"\n")?;
                     }
+                    // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                    #[allow(clippy::needless_range_loop)]
                     for row in 0..rows {
                         let mut line = del.to_vec();
                         line.extend_from_slice(&row_labels[row]);
@@ -168,6 +173,8 @@ impl SourceTabularReports {
                 }
                 2 => {
                     for col in 0..cols_column_labels as usize {
+                        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                        #[allow(clippy::needless_range_loop)]
                         for row in 0..max_label_rows {
                             labels[col][row].truncate(width(widths[col])?);
                         }
@@ -178,6 +185,8 @@ impl SourceTabularReports {
                             max_row_width = label.len();
                         }
                     }
+                    // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                    #[allow(clippy::needless_range_loop)]
                     for row in 0..max_label_rows {
                         let mut line = Vec::new();
                         let col1start = (max_row_width + 2).max(3);
@@ -194,9 +203,13 @@ impl SourceTabularReports {
                         stream.bytes(&currency(&line, false, o.monetary)?)?;
                         stream.bytes(b"\n")?;
                     }
+                    // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                    #[allow(clippy::needless_range_loop)]
                     for row in 0..rows {
                         let mut line = b"  ".to_vec();
                         line.extend_from_slice(&right_sized(&row_labels[row], max_row_width));
+                        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                        #[allow(clippy::needless_range_loop)]
                         for col in 0..cols {
                             line.extend_from_slice(if col == 0 { b"   " } else { b"  " });
                             line.extend_from_slice(&right_sized(
@@ -217,6 +230,8 @@ impl SourceTabularReports {
                     stream.bytes(b"<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n  <tr><td></td>\n")?;
                     for label in labels.iter().take(cols_column_labels as usize) {
                         let mut line = b"    <td align=\"right\">".to_vec();
+                        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                        #[allow(clippy::needless_range_loop)]
                         for row in 0..max_label_rows {
                             line.extend_from_slice(&escape(&label[row], false)?);
                             if row + 1 < max_label_rows {
@@ -227,6 +242,8 @@ impl SourceTabularReports {
                         stream.bytes(b"</td>\n")?;
                     }
                     stream.bytes(b"  </tr>\n")?;
+                    // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                    #[allow(clippy::needless_range_loop)]
                     for row in 0..rows {
                         stream.bytes(b"  <tr>\n")?;
                         cell(stream, &row_labels[row], o)?;
@@ -295,6 +312,8 @@ impl SourceTabularReports {
                             }
                         }
                         if !transpose_xml {
+                            // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                            #[allow(clippy::needless_range_loop)]
                             for row in 0..rows {
                                 let mut blank = true;
                                 for col in 0..cols {

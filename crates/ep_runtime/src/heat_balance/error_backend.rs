@@ -7,8 +7,8 @@ use std::convert::Infallible;
 use std::fmt::{Display, Formatter};
 use std::io::{self, Write};
 
-mod live_flags;
 mod inside_diagnostics;
+mod live_flags;
 mod scoped;
 pub(crate) use live_flags::SourceDiagnosticFlags;
 
@@ -293,6 +293,8 @@ impl SourceErrorBackend<'_> {
         )
     }
 
+    // Keep the explicit short mutable stream reborrow at the error-output boundary.
+    #[allow(clippy::needless_option_as_deref)]
     fn write_error_message<'error_object, 'output1_object, 'output2_object>(
         state: &mut SourceErrorState,
         mut error_stream: Option<&mut (dyn Write + 'error_object)>,

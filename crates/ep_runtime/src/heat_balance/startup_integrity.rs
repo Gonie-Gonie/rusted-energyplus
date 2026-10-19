@@ -12,7 +12,10 @@ pub(crate) use connection_reports::{
     report_source_loop_connections,
 };
 pub(crate) use mixed_air::SourceMixedAir;
-pub(crate) use nodes::{SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
+pub(crate) use nodes::{
+    SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
+    SourceNodeObjectType,
+};
 
 // These are independent real native module slices, not Branch connector counts.
 // Their positive input writers remain unavailable at the actual child call.
@@ -20,6 +23,8 @@ pub(crate) use nodes::{SourceBranchNodeConnections, SourceCompFluidStream, Sourc
 pub(crate) struct SourceSplitterComponentCounts {
     pub(crate) number_splitters: i32,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceSplitterComponentCounts {
     fn default() -> Self {
         Self {
@@ -31,6 +36,8 @@ impl Default for SourceSplitterComponentCounts {
 pub(crate) struct SourceMixerComponentCounts {
     pub(crate) number_mixers: i32,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceMixerComponentCounts {
     fn default() -> Self {
         Self { number_mixers: 0 }
@@ -41,6 +48,8 @@ pub(crate) struct SourceZonePlenumCounts {
     pub(crate) number_return_plenums: i32,
     pub(crate) number_supply_plenums: i32,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceZonePlenumCounts {
     fn default() -> Self {
         Self {

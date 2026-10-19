@@ -33,7 +33,7 @@ use hb::selected_schedule_manager::{
 };
 use hb::source_output_prescan::{SourceOutputPreScan, SourceReportingPreScanInput};
 use hb::source_output_registration::{SourceOutputFileHost, SourceOutputRegistration};
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 use std::{collections::BTreeMap, io};
 mod beam_observe;
 mod gains_observe;

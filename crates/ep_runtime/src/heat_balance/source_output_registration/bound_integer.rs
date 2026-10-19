@@ -4,8 +4,12 @@ use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceIntegerOutputTarget {
     #[cfg(all(test, feature = "native-controlled-air-cohort"))]
-    CohortInteger { slot: u8 },
-    PurchasedAirAvailabilityStatus { index: i32 },
+    CohortInteger {
+        slot: u8,
+    },
+    PurchasedAirAvailabilityStatus {
+        index: i32,
+    },
     Weather {
         field: super::SourceWeatherIntegerOutputField,
     },
@@ -42,6 +46,10 @@ impl<'a> SourceIntegerOutputBinding<'a> {
         })
     }
 }
+#[allow(
+    dead_code,
+    reason = "Retain the genuine borrowed integer Which projection entry; the live report path currently reads the same actual owner through its direct interface."
+)]
 pub(crate) struct SourceRequestedIntegerValue<'a> {
     pub(crate) out_var_number: usize,
     pub(crate) report_id: i32,
@@ -181,6 +189,10 @@ impl SourceOutputRegistration {
             .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
         owners.integer_output(target)
     }
+    #[allow(
+        dead_code,
+        reason = "Retain the genuine borrowed integer Which projection entry; the live report path currently reads the same actual owner through its direct interface."
+    )]
     pub(crate) fn requested_integer_values<'a>(
         &self,
         owners: &'a impl SourceIntegerOutputOwners,

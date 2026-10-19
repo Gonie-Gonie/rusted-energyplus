@@ -9,6 +9,9 @@ fn allocated(n: i32) -> Result<SourceSolarArray<f64, 1>, Error> {
     Ok(a)
 }
 impl SourceTabularReports {
+    // Keep Original declaration and branch-assignment order at this owner boundary.
+    // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+    #[allow(clippy::needless_late_init, unused_assignments)]
     pub(super) fn veri_spaces(
         &mut self,
         pass: usize,

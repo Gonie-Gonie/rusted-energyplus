@@ -9,31 +9,31 @@ use crate::heat_balance::{
         FacilityElectricService, SourceFacilityElectricOwners, SourceFacilityOutputContext,
     },
     ordinary_air_heat_balance::{
+        SourceAirHeatBalance,
         environment::SourceZoneFanHeatBalanceArrays,
         output_registration::SourceAirOutputOwners,
         predictor_corrector::{
+            SourceZoneAirPredictorCorrector,
             oscillation::{SourceOscillationOutputContext, SourceOscillationOwners},
             simple_air::SourceAirReportOutputOwners,
-            SourceZoneAirPredictorCorrector,
         },
-        SourceAirHeatBalance,
     },
     ordinary_equipment::OrdinaryEquipment,
     ordinary_exterior_energy_use::SourceExteriorEnergyUse,
     ordinary_pollution::SourcePollutionModule,
     ordinary_surface_initialization::{
-        output::SourceSurfaceOutputOwners, SourceSurfaceHeatBalanceArrays,
+        SourceSurfaceHeatBalanceArrays, output::SourceSurfaceOutputOwners,
     },
     ordinary_surface_management::SourceResilienceOutputOwners,
     ordinary_system_reports::SourceSystemReports,
     ordinary_thermal_comfort::SourceThermalComfort,
     radiation::ordinary::{
-        solar_output_registration::SourceSolarOutputOwners, OrdinaryRadiationError,
-        OrdinaryRadiationUnavailable, OrdinarySolarRadiation,
+        OrdinaryRadiationError, OrdinaryRadiationUnavailable, OrdinarySolarRadiation,
+        solar_output_registration::SourceSolarOutputOwners,
     },
     selected_heat_balance_input::{
-        surface::SurfaceGeometryInputState, zone::SelectedZoneInputOwners,
-        SelectedHeatBalanceInputState,
+        SelectedHeatBalanceInputState, surface::SurfaceGeometryInputState,
+        zone::SelectedZoneInputOwners,
     },
     selected_schedule_manager::SelectedScheduleManager,
     source_output_registration::{
@@ -256,10 +256,10 @@ impl SourceOrdinaryHvacRemaining {
     }
 }
 impl<
-        H: SourceOutputFileHost,
-        D: SourceOutputDictionaryHost
-            + crate::heat_balance::source_output_registration::SourceOutputReportStreams,
-    > SourceHvacRemainingChildren<H, D> for SourceOrdinaryHvacRemaining
+    H: SourceOutputFileHost,
+    D: SourceOutputDictionaryHost
+        + crate::heat_balance::source_output_registration::SourceOutputReportStreams,
+> SourceHvacRemainingChildren<H, D> for SourceOrdinaryHvacRemaining
 {
     fn manage_electric_facility(
         &mut self,

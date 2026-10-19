@@ -26,6 +26,10 @@ pub(crate) trait SourceManageHeatBalanceBodyChildren {
     fn check_warmup_convergence(&mut self) -> Result<(), Error>;
     fn report_warmup_convergence(&mut self) -> Result<(), Error>;
 }
+#[allow(
+    dead_code,
+    reason = "Keep the full HeatBalanceManager first-call/body entry contract; the real session deliberately invokes its input prefix and same body separately to acquire live owners."
+)]
 pub(crate) trait SourceManageHeatBalanceChildren:
     SourceManageHeatBalanceFirstCallChildren + SourceManageHeatBalanceBodyChildren
 {
@@ -35,6 +39,10 @@ impl<T: SourceManageHeatBalanceFirstCallChildren + SourceManageHeatBalanceBodyCh
 {
 }
 
+#[allow(
+    dead_code,
+    reason = "Keep the full HeatBalanceManager first-call/body entry contract; the real session deliberately invokes its input prefix and same body separately to acquire live owners."
+)]
 pub(crate) fn manage_source_heat_balance(
     children: &mut impl SourceManageHeatBalanceChildren,
 ) -> Result<(), Error> {

@@ -118,6 +118,8 @@ fn text(
         .string_entry(column(registry, name)?, object, value)
         .map_err(Error::from)
 }
+// Preserve Original explicit signed-integer boundary predicates and branch order.
+#[allow(clippy::manual_range_contains)]
 pub(super) fn source_date_to_string(coded_date: i32) -> Result<String, Error> {
     const MONTHS: [&str; 12] = [
         "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
@@ -189,7 +191,6 @@ impl SourceTabularReports {
                     start_of_week,
                     o.environment.current_year_is_leap_year,
                     o.clock.time_steps_in_hour,
-
                 )?;
                 real2(
                     o.table,
@@ -287,111 +288,330 @@ impl SourceTabularReports {
                     let air_loop_name = String::new();
                     let config = o.equipment.source_zone_equipment_config(number)?;
                     for inlet in 1..=*config.number_inlet_nodes() {
-                        let air_loop_number = *config.inlet_node_air_loop_number(inlet)
-                            .ok_or(Error::Unavailable("actual FillRemaining Config.InletNodeAirLoopNum6371"))?;
+                        let air_loop_number =
+                            *config
+                                .inlet_node_air_loop_number(inlet)
+                                .ok_or(Error::Unavailable(
+                                    "actual FillRemaining Config.InletNodeAirLoopNum6371",
+                                ))?;
                         if air_loop_number > 0 {
                             // The first genuine PrimaryAirSystems.Name request occurs
                             // here, after all earlier AFN writes; no count/name proxy.
-                            return Err(Error::Unavailable("actual FillRemaining PrimaryAirSystems.Name6374"));
+                            return Err(Error::Unavailable(
+                                "actual FillRemaining PrimaryAirSystems.Name6374",
+                            ));
                         }
                     }
-                    text(o.table, o.registry, "pdchOaMvAirLpNm", &zone.name, &air_loop_name)?;
+                    text(
+                        o.table,
+                        o.registry,
+                        "pdchOaMvAirLpNm",
+                        &zone.name,
+                        &air_loop_name,
+                    )?;
 
                     let multiplier = f64::from(zone_multiplier);
                     if zone.is_nominal_occupied && predefined.num_occ_accum_time > 0.0 {
-                        let average_occupants = predefined.num_occ_accum / predefined.num_occ_accum_time;
-                        for name in ["pdchOaoAvgNumOcc1", "pdchOaoAvgNumOcc2", "pdchOaMvAvgNumOcc"] {
+                        let average_occupants =
+                            predefined.num_occ_accum / predefined.num_occ_accum_time;
+                        for name in [
+                            "pdchOaoAvgNumOcc1",
+                            "pdchOaoAvgNumOcc2",
+                            "pdchOaMvAvgNumOcc",
+                        ] {
                             real2(o.table, o.registry, name, &zone.name, average_occupants)?;
                         }
                         total_average_occupants += average_occupants * multiplier;
                     } else {
-                        for name in ["pdchOaoAvgNumOcc1", "pdchOaoAvgNumOcc2", "pdchOaMvAvgNumOcc"] {
+                        for name in [
+                            "pdchOaoAvgNumOcc1",
+                            "pdchOaoAvgNumOcc2",
+                            "pdchOaMvAvgNumOcc",
+                        ] {
                             real2(o.table, o.registry, name, &zone.name, 0.0)?;
                         }
                     }
-                    real2(o.table, o.registry, "pdchOaMvNomNumOcc", &zone.name, zone.total_occupants)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaMvNomNumOcc",
+                        &zone.name,
+                        zone.total_occupants,
+                    )?;
                     total_occupants += zone.total_occupants * multiplier;
 
                     for name in ["pdchOaoZoneVol1", "pdchOaoZoneVol2", "pdchOaMvZoneVol"] {
                         real2(o.table, o.registry, name, &zone.name, zone.volume)?;
                     }
                     self.input_state.total_volume += zone.volume * multiplier;
-                    real2(o.table, o.registry, "pdchOaMvZoneArea", &zone.name, zone.floor_area)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaMvZoneArea",
+                        &zone.name,
+                        zone.floor_area,
+                    )?;
                     total_area += zone.floor_area * multiplier;
-                    real3(o.table, o.registry, "pdchOaMvMinDynTrgVent", &zone.name, predefined.voz_min / multiplier)?;
-                    integer(o.table, o.registry, "pdchOaMvZoneMult", &zone.name, zone_multiplier)?;
+                    real3(
+                        o.table,
+                        o.registry,
+                        "pdchOaMvMinDynTrgVent",
+                        &zone.name,
+                        predefined.voz_min / multiplier,
+                    )?;
+                    integer(
+                        o.table,
+                        o.registry,
+                        "pdchOaMvZoneMult",
+                        &zone.name,
+                        zone_multiplier,
+                    )?;
                     total_voz_min += predefined.voz_min;
 
                     if zone.volume > 0.0 && predefined.tot_time_occ > 0.0 {
-                        real3(o.table, o.registry, "pdchOaoAvgMechVent", &zone.name,
-                            predefined.mech_vent_vol_total_occ / (predefined.tot_time_occ * zone.volume * multiplier))?;
-                        real3(o.table, o.registry, "pdchOaoMinMechVent", &zone.name,
-                            predefined.mech_vent_vol_min / (zone.volume * multiplier))?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoAvgMechVent",
+                            &zone.name,
+                            predefined.mech_vent_vol_total_occ
+                                / (predefined.tot_time_occ * zone.volume * multiplier),
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoMinMechVent",
+                            &zone.name,
+                            predefined.mech_vent_vol_min / (zone.volume * multiplier),
+                        )?;
                     }
-                    real2(o.table, o.registry, "pdchOaTaBzMechVent", &zone.name,
-                        predefined.mech_vent_vol_total_std_den / multiplier)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzMechVent",
+                        &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier,
+                    )?;
                     total_mech_vent_vol += predefined.mech_vent_vol_total_std_den;
 
-                    real2(o.table, o.registry, "pdchOaTaBzNatVent", &zone.name,
-                        predefined.simp_vent_vol_total_std_den + predefined.afn_vent_vol_total_std_den)?;
-                    total_nat_vent_vol += (predefined.simp_vent_vol_total_std_den + predefined.afn_vent_vol_total_std_den) * multiplier;
-                    real2(o.table, o.registry, "pdchOaTaBzTotVent", &zone.name,
-                        predefined.mech_vent_vol_total_std_den / multiplier + predefined.simp_vent_vol_total_std_den
-                            + predefined.afn_vent_vol_total_std_den)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzNatVent",
+                        &zone.name,
+                        predefined.simp_vent_vol_total_std_den
+                            + predefined.afn_vent_vol_total_std_den,
+                    )?;
+                    total_nat_vent_vol += (predefined.simp_vent_vol_total_std_den
+                        + predefined.afn_vent_vol_total_std_den)
+                        * multiplier;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTotVent",
+                        &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier
+                            + predefined.simp_vent_vol_total_std_den
+                            + predefined.afn_vent_vol_total_std_den,
+                    )?;
 
                     if zone.volume > 0.0 && predefined.tot_time_occ > 0.0 {
-                        real3(o.table, o.registry, "pdchOaoAvgInfil", &zone.name,
-                            predefined.infil_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
-                        real3(o.table, o.registry, "pdchOaoMinInfil", &zone.name,
-                            predefined.infil_vol_min / zone.volume)?;
-                        real3(o.table, o.registry, "pdchOaoAvgAFNInfil", &zone.name,
-                            predefined.afn_infil_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
-                        real3(o.table, o.registry, "pdchOaoMinAFNInfil", &zone.name,
-                            predefined.afn_infil_vol_min / zone.volume)?;
-                        real3(o.table, o.registry, "pdchOaoAvgSimpVent", &zone.name,
-                            predefined.simp_vent_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
-                        real3(o.table, o.registry, "pdchOaoMinSimpVent", &zone.name,
-                            predefined.simp_vent_vol_min / zone.volume)?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoAvgInfil",
+                            &zone.name,
+                            predefined.infil_vol_total_occ
+                                / (predefined.tot_time_occ * zone.volume),
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoMinInfil",
+                            &zone.name,
+                            predefined.infil_vol_min / zone.volume,
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoAvgAFNInfil",
+                            &zone.name,
+                            predefined.afn_infil_vol_total_occ
+                                / (predefined.tot_time_occ * zone.volume),
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoMinAFNInfil",
+                            &zone.name,
+                            predefined.afn_infil_vol_min / zone.volume,
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoAvgSimpVent",
+                            &zone.name,
+                            predefined.simp_vent_vol_total_occ
+                                / (predefined.tot_time_occ * zone.volume),
+                        )?;
+                        real3(
+                            o.table,
+                            o.registry,
+                            "pdchOaoMinSimpVent",
+                            &zone.name,
+                            predefined.simp_vent_vol_min / zone.volume,
+                        )?;
                     }
-                    real2(o.table, o.registry, "pdchOaTaBzInfil", &zone.name,
-                        predefined.infil_vol_total_std_den + predefined.afn_infil_vol_total_std_den)?;
-                    total_infil_vol += (predefined.infil_vol_total_std_den + predefined.afn_infil_vol_total_std_den) * multiplier;
-                    real2(o.table, o.registry, "pdchOaTaBzTotVentInfil", &zone.name,
-                        predefined.mech_vent_vol_total_std_den / multiplier + predefined.simp_vent_vol_total_std_den
-                            + predefined.afn_vent_vol_total_std_den + predefined.afn_infil_vol_total_std_den
-                            + predefined.infil_vol_total_std_den)?;
-                    real2(o.table, o.registry, "pdchOaTaBzDynTrgVent", &zone.name,
-                        predefined.voz_target_total / multiplier)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzInfil",
+                        &zone.name,
+                        predefined.infil_vol_total_std_den + predefined.afn_infil_vol_total_std_den,
+                    )?;
+                    total_infil_vol += (predefined.infil_vol_total_std_den
+                        + predefined.afn_infil_vol_total_std_den)
+                        * multiplier;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTotVentInfil",
+                        &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier
+                            + predefined.simp_vent_vol_total_std_den
+                            + predefined.afn_vent_vol_total_std_den
+                            + predefined.afn_infil_vol_total_std_den
+                            + predefined.infil_vol_total_std_den,
+                    )?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzDynTrgVent",
+                        &zone.name,
+                        predefined.voz_target_total / multiplier,
+                    )?;
                     total_voz_dyn += predefined.voz_target_total;
-                    real2(o.table, o.registry, "pdchOaTaBzTmBelow", &zone.name, predefined.voz_target_time_below)?;
-                    real2(o.table, o.registry, "pdchOaTaBzTmAt", &zone.name, predefined.voz_target_time_at)?;
-                    real2(o.table, o.registry, "pdchOaTaBzTmAbove", &zone.name, predefined.voz_target_time_above)?;
-                    real2(o.table, o.registry, "pdchOaTaBzTmAboveUnocc", &zone.name, predefined.tot_vent_time_non_zero_unocc)?;
-                    integer(o.table, o.registry, "pdchOaTaBzZoneMult", &zone.name, zone_multiplier)?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTmBelow",
+                        &zone.name,
+                        predefined.voz_target_time_below,
+                    )?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTmAt",
+                        &zone.name,
+                        predefined.voz_target_time_at,
+                    )?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTmAbove",
+                        &zone.name,
+                        predefined.voz_target_time_above,
+                    )?;
+                    real2(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzTmAboveUnocc",
+                        &zone.name,
+                        predefined.tot_vent_time_non_zero_unocc,
+                    )?;
+                    integer(
+                        o.table,
+                        o.registry,
+                        "pdchOaTaBzZoneMult",
+                        &zone.name,
+                        zone_multiplier,
+                    )?;
 
                     if zone.is_nominal_occupied && predefined.tot_time_occ > 0.0 {
                         let total_time_occ_seconds = predefined.tot_time_occ * 3600.0;
-                        let mech_vent = predefined.mech_vent_vol_total_occ_std_den / total_time_occ_seconds;
-                        real4(o.table, o.registry, "pdchOaOccBzMechVent", &zone.name, mech_vent / multiplier)?;
+                        let mech_vent =
+                            predefined.mech_vent_vol_total_occ_std_den / total_time_occ_seconds;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzMechVent",
+                            &zone.name,
+                            mech_vent / multiplier,
+                        )?;
                         total_mech_vent_rate_occ += mech_vent;
                         let natural_vent = (predefined.simp_vent_vol_total_occ_std_den
-                            + predefined.afn_vent_vol_total_occ_std_den) / total_time_occ_seconds;
-                        real4(o.table, o.registry, "pdchOaOccBzNatVent", &zone.name, natural_vent)?;
+                            + predefined.afn_vent_vol_total_occ_std_den)
+                            / total_time_occ_seconds;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzNatVent",
+                            &zone.name,
+                            natural_vent,
+                        )?;
                         total_nat_vent_rate_occ += natural_vent * multiplier;
-                        real4(o.table, o.registry, "pdchOaOccBzTotVent", &zone.name, mech_vent / multiplier + natural_vent)?;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzTotVent",
+                            &zone.name,
+                            mech_vent / multiplier + natural_vent,
+                        )?;
                         let infiltration = (predefined.infil_vol_total_occ_std_den
-                            + predefined.afn_infil_vol_total_occ_std_den) / total_time_occ_seconds;
-                        real4(o.table, o.registry, "pdchOaOccBzInfil", &zone.name, infiltration)?;
+                            + predefined.afn_infil_vol_total_occ_std_den)
+                            / total_time_occ_seconds;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzInfil",
+                            &zone.name,
+                            infiltration,
+                        )?;
                         total_infil_rate_occ += infiltration * multiplier;
-                        real4(o.table, o.registry, "pdchOaOccBzTotVentInfil", &zone.name,
-                            mech_vent / multiplier + natural_vent + infiltration)?;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzTotVentInfil",
+                            &zone.name,
+                            mech_vent / multiplier + natural_vent + infiltration,
+                        )?;
                         let average_voz = predefined.voz_target_total_occ / total_time_occ_seconds;
-                        real4(o.table, o.registry, "pdchOaOccBzDynTrgVent", &zone.name, average_voz / multiplier)?;
+                        real4(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzDynTrgVent",
+                            &zone.name,
+                            average_voz / multiplier,
+                        )?;
                         total_voz_dyn_occ += average_voz;
-                        real2(o.table, o.registry, "pdchOaOccBzTmBelow", &zone.name, predefined.voz_target_time_below_occ)?;
-                        real2(o.table, o.registry, "pdchOaOccBzTmAt", &zone.name, predefined.voz_target_time_at_occ)?;
-                        real2(o.table, o.registry, "pdchOaOccBzTmAbove", &zone.name, predefined.voz_target_time_above_occ)?;
-                        integer(o.table, o.registry, "pdchOaOccBzZoneMult", &zone.name, zone_multiplier)?;
+                        real2(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzTmBelow",
+                            &zone.name,
+                            predefined.voz_target_time_below_occ,
+                        )?;
+                        real2(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzTmAt",
+                            &zone.name,
+                            predefined.voz_target_time_at_occ,
+                        )?;
+                        real2(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzTmAbove",
+                            &zone.name,
+                            predefined.voz_target_time_above_occ,
+                        )?;
+                        integer(
+                            o.table,
+                            o.registry,
+                            "pdchOaOccBzZoneMult",
+                            &zone.name,
+                            zone_multiplier,
+                        )?;
                     }
                 }
             }
@@ -840,14 +1060,14 @@ impl SourceTabularReports {
                 o.registry,
                 "pdchSHGSClHvacHt",
                 &zone.name,
-                (predefined.shgs_cl_hvac_ht - predefined.shgs_cl_hvac_atu_ht),
+                predefined.shgs_cl_hvac_ht - predefined.shgs_cl_hvac_atu_ht,
             )?;
             real2(
                 o.table,
                 o.registry,
                 "pdchSHGSClHvacCl",
                 &zone.name,
-                (predefined.shgs_cl_hvac_cl - predefined.shgs_cl_hvac_atu_cl),
+                predefined.shgs_cl_hvac_cl - predefined.shgs_cl_hvac_atu_cl,
             )?;
             real2(
                 o.table,
@@ -973,14 +1193,14 @@ impl SourceTabularReports {
                 o.registry,
                 "pdchSHGSHtHvacHt",
                 &zone.name,
-                (predefined.shgs_ht_hvac_ht - predefined.shgs_ht_hvac_atu_ht),
+                predefined.shgs_ht_hvac_ht - predefined.shgs_ht_hvac_atu_ht,
             )?;
             real2(
                 o.table,
                 o.registry,
                 "pdchSHGSHtHvacCl",
                 &zone.name,
-                (predefined.shgs_ht_hvac_cl - predefined.shgs_ht_hvac_atu_cl),
+                predefined.shgs_ht_hvac_cl - predefined.shgs_ht_hvac_atu_cl,
             )?;
             real2(
                 o.table,
@@ -1261,16 +1481,16 @@ impl SourceTabularReports {
             o.registry,
             "pdchSHGSClHvacHt",
             "Total Facility",
-            (o.zones.building_predefined.shgs_cl_hvac_ht
-                - o.zones.building_predefined.shgs_cl_hvac_atu_ht),
+            o.zones.building_predefined.shgs_cl_hvac_ht
+                - o.zones.building_predefined.shgs_cl_hvac_atu_ht,
         )?;
         real2(
             o.table,
             o.registry,
             "pdchSHGSClHvacCl",
             "Total Facility",
-            (o.zones.building_predefined.shgs_cl_hvac_cl
-                - o.zones.building_predefined.shgs_cl_hvac_atu_cl),
+            o.zones.building_predefined.shgs_cl_hvac_cl
+                - o.zones.building_predefined.shgs_cl_hvac_atu_cl,
         )?;
         real2(
             o.table,
@@ -1396,16 +1616,16 @@ impl SourceTabularReports {
             o.registry,
             "pdchSHGSHtHvacHt",
             "Total Facility",
-            (o.zones.building_predefined.shgs_ht_hvac_ht
-                - o.zones.building_predefined.shgs_ht_hvac_atu_ht),
+            o.zones.building_predefined.shgs_ht_hvac_ht
+                - o.zones.building_predefined.shgs_ht_hvac_atu_ht,
         )?;
         real2(
             o.table,
             o.registry,
             "pdchSHGSHtHvacCl",
             "Total Facility",
-            (o.zones.building_predefined.shgs_ht_hvac_cl
-                - o.zones.building_predefined.shgs_ht_hvac_atu_cl),
+            o.zones.building_predefined.shgs_ht_hvac_cl
+                - o.zones.building_predefined.shgs_ht_hvac_atu_cl,
         )?;
         real2(
             o.table,
@@ -1574,8 +1794,7 @@ impl SourceTabularReports {
                 schedule.number,
                 start_of_week,
                 o.environment.current_year_is_leap_year,
-                    o.clock.time_steps_in_hour,
-
+                o.clock.time_steps_in_hour,
             )?;
             real0(
                 o.table,
@@ -1588,9 +1807,8 @@ impl SourceTabularReports {
                 schedule.number,
                 start_of_week,
                 o.environment.current_year_is_leap_year,
-                    o.clock.time_steps_in_hour,
-                    o.clock.time_step_zone,
-
+                o.clock.time_steps_in_hour,
+                o.clock.time_step_zone,
             )?;
             real0(
                 o.table,
@@ -1600,26 +1818,51 @@ impl SourceTabularReports {
                 annual_nonzero,
             )?;
         }
-        o.controller.fill_source_predefined_table_on_thermostat_setpoints(
-            o.schedules, o.environment, o.weather, o.clock, o.registry, o.table,
-        )?;
-        o.controller.fill_source_predefined_table_on_thermostat_schedules(
-            o.schedules, o.registry, o.table,
-        )?;
+        o.controller
+            .fill_source_predefined_table_on_thermostat_setpoints(
+                o.schedules,
+                o.environment,
+                o.weather,
+                o.clock,
+                o.registry,
+                o.table,
+            )?;
+        o.controller
+            .fill_source_predefined_table_on_thermostat_schedules(
+                o.schedules,
+                o.registry,
+                o.table,
+            )?;
         const _FLOW_FRACTIONS: [f64; 10] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
         let save_night_vent_on = o.hvac.night_vent_on;
         let save_turn_fans_on = o.hvac.turn_fans_on;
         o.hvac.night_vent_on = false;
         o.hvac.turn_fans_on = true;
-        if o.hvac_manager.ancillary.heat_emission.fans.as_deref().and_then(|rows| rows.first()).is_some() {
-            return Err(Error::Unavailable("actual Fan Operating Points first fan Name/type PreDefTableEntry before simulation"));
+        if o.hvac_manager
+            .ancillary
+            .heat_emission
+            .fans
+            .as_deref()
+            .and_then(|rows| rows.first())
+            .is_some()
+        {
+            return Err(Error::Unavailable(
+                "actual Fan Operating Points first fan Name/type PreDefTableEntry before simulation",
+            ));
         }
         o.hvac.night_vent_on = save_night_vent_on;
         o.hvac.turn_fans_on = save_turn_fans_on;
-        o.gain_modules.water_use.fill_source_predefined_water_equipment_tables()?;
-        o.hvac_manager.fill_source_predefined_setpoint_manager_tables()?;
-        o.hvac_manager.ancillary.availability.fill_source_predefined_availability_manager_tables(o.hvac)?;
-        o.hvac_manager.fill_source_plant_equipment_operation_load()?;
+        o.gain_modules
+            .water_use
+            .fill_source_predefined_water_equipment_tables()?;
+        o.hvac_manager
+            .fill_source_predefined_setpoint_manager_tables()?;
+        o.hvac_manager
+            .ancillary
+            .availability
+            .fill_source_predefined_availability_manager_tables(o.hvac)?;
+        o.hvac_manager
+            .fill_source_plant_equipment_operation_load()?;
         Ok(())
     }
 }

@@ -6,7 +6,15 @@ use std::io::Write;
 
 #[derive(Default)]
 struct BranchUniqueNodes {
+    #[allow(
+        dead_code,
+        reason = "BranchInputManager.cc TestBranchIntegrity retains its original BranchUniqueNodes scratch-row fields; the finite zero-branch domain does not read them."
+    )]
     number_nodes: i32,
+    #[allow(
+        dead_code,
+        reason = "BranchInputManager.cc TestBranchIntegrity retains its original BranchUniqueNodes scratch-row fields; the finite zero-branch domain does not read them."
+    )]
     unique_node_names: Option<Vec<String>>,
 }
 impl SelectedBranches {

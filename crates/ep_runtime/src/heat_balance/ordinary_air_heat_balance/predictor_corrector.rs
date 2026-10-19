@@ -57,8 +57,10 @@ pub(crate) struct SourceZoneAirOwners<'a, 'b> {
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) source_is_epjson: &'a bool,
     pub(crate) faults: &'a crate::heat_balance::source_initialization::SourceFaultsManager,
-    pub(crate) schedules: &'a mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
-    pub(crate) availability: &'a crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability,
+    pub(crate) schedules:
+        &'a mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+    pub(crate) availability:
+        &'a crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'b>,
 }
@@ -96,6 +98,8 @@ fn zone<'a>(
         .and_then(|rows| rows.get(index(number).ok()?))
         .ok_or(Error::Unavailable("same actual Source Zone ordinal"))
 }
+// Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+#[allow(clippy::manual_range_contains)]
 fn relative_humidity(
     psy: &mut SourcePsychrometricAccess,
     temperature: f64,

@@ -121,20 +121,38 @@ impl SourceZoneAirPredictorCorrector {
             self.flags.my_day = true;
         }
         for number in 1..=self.controls.number_temperature_zones {
-            let row = self.controls.temperature_controlled_zones.as_ref()
+            let row = self
+                .controls
+                .temperature_controlled_zones
+                .as_ref()
                 .and_then(|rows| rows.get(index(number).ok()?))
                 .ok_or(Error::Unavailable("actual Init TempControlledZone2682"))?;
-            if *owners.equipment.source_equipment_inputs_filled() && !self.flags.controlled_zones_checked {
-                if !owners.equipment.verify_source_controlled_zone_for_thermostat(&row.zone_name) {
-                    return Err(Error::Unavailable("actual uncontrolled thermostat ShowSevereError2685"));
+            if *owners.equipment.source_equipment_inputs_filled()
+                && !self.flags.controlled_zones_checked
+            {
+                if !owners
+                    .equipment
+                    .verify_source_controlled_zone_for_thermostat(&row.zone_name)
+                {
+                    return Err(Error::Unavailable(
+                        "actual uncontrolled thermostat ShowSevereError2685",
+                    ));
                 }
             }
             if row.manage_demand {
                 let at = index(row.actual_zone_number)?;
-                let setpoint = owners.fan.thermostat.zone_tstat_setpoints.as_mut()
+                let setpoint = owners
+                    .fan
+                    .thermostat
+                    .zone_tstat_setpoints
+                    .as_mut()
                     .and_then(|rows| rows.get_mut(at))
                     .ok_or(Error::Unavailable("actual demand zoneTstatSetpts2697"))?;
-                let mode = *owners.fan.thermostat.temp_control_type.as_ref()
+                let mode = *owners
+                    .fan
+                    .thermostat
+                    .temp_control_type
+                    .as_ref()
                     .and_then(|rows| rows.get(at))
                     .ok_or(Error::Unavailable("actual demand TempControlType2699"))?;
                 match mode {
@@ -151,22 +169,45 @@ impl SourceZoneAirPredictorCorrector {
                         }
                     }
                     3 => {
-                        if setpoint.setpt > row.heating_reset_limit || setpoint.setpt < row.cooling_reset_limit {
-                            *owners.fan.thermostat.temp_control_type.as_mut().and_then(|rows| rows.get_mut(at))
-                                .ok_or(Error::Unavailable("actual demand TempControlType2715"))? = 4;
-                            *owners.fan.thermostat.temp_control_type_report.as_mut().and_then(|rows| rows.get_mut(at))
-                                .ok_or(Error::Unavailable("actual demand TempControlTypeRpt2716"))? = 4;
+                        if setpoint.setpt > row.heating_reset_limit
+                            || setpoint.setpt < row.cooling_reset_limit
+                        {
+                            *owners
+                                .fan
+                                .thermostat
+                                .temp_control_type
+                                .as_mut()
+                                .and_then(|rows| rows.get_mut(at))
+                                .ok_or(Error::Unavailable("actual demand TempControlType2715"))? =
+                                4;
+                            *owners
+                                .fan
+                                .thermostat
+                                .temp_control_type_report
+                                .as_mut()
+                                .and_then(|rows| rows.get_mut(at))
+                                .ok_or(Error::Unavailable(
+                                    "actual demand TempControlTypeRpt2716",
+                                ))? = 4;
                             setpoint.setpt_lo = setpoint.setpt;
                             setpoint.setpt_hi = setpoint.setpt;
-                            if setpoint.setpt_lo > row.heating_reset_limit { setpoint.setpt_lo = row.heating_reset_limit; }
-                            if setpoint.setpt_hi < row.cooling_reset_limit { setpoint.setpt_hi = row.cooling_reset_limit; }
+                            if setpoint.setpt_lo > row.heating_reset_limit {
+                                setpoint.setpt_lo = row.heating_reset_limit;
+                            }
+                            if setpoint.setpt_hi < row.cooling_reset_limit {
+                                setpoint.setpt_hi = row.cooling_reset_limit;
+                            }
                         }
                     }
                     4 => {
-                        if setpoint.setpt_lo > row.heating_reset_limit { setpoint.setpt_lo = row.heating_reset_limit; }
-                        if setpoint.setpt_hi < row.cooling_reset_limit { setpoint.setpt_hi = row.cooling_reset_limit; }
+                        if setpoint.setpt_lo > row.heating_reset_limit {
+                            setpoint.setpt_lo = row.heating_reset_limit;
+                        }
+                        if setpoint.setpt_hi < row.cooling_reset_limit {
+                            setpoint.setpt_hi = row.cooling_reset_limit;
+                        }
                     }
-                    _ => {},
+                    _ => {}
                 }
             }
         }

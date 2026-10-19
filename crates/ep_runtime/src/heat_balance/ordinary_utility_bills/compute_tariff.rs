@@ -8,6 +8,8 @@ use crate::heat_balance::ordinary_tabular_reports::SourceTabularReports;
 
 impl SourceEconomicTariff {
     /// Actual SimulationManager587 child. Input is not replayed at endrun.
+    // Keep the explicit retained work-vector allocation and indexing used by the Original tariff algorithm.
+    #[allow(clippy::useless_vec)]
     pub(crate) fn compute_source_tariff(
         &mut self,
         output_control: &SourceOutputControl,

@@ -17,7 +17,15 @@ mod frequency;
 pub(crate) trait SourceMeterReportingHost: super::SourceOutputReportStreams {
     fn write_mtd(&mut self, bytes: &[u8]) -> io::Result<()>;
     fn results_framework_output_variables(&mut self) -> &mut Vec<String>;
+    #[allow(
+        dead_code,
+        reason = "The meter host retains the real ESO/MTR pathname contract from OutputProcessor error/report children even when the selected caller does not query both paths."
+    )]
     fn eso_file_path(&self) -> &std::path::Path;
+    #[allow(
+        dead_code,
+        reason = "The meter host retains the real ESO/MTR pathname contract from OutputProcessor error/report children even when the selected caller does not query both paths."
+    )]
     fn mtr_file_path(&self) -> &std::path::Path;
 }
 pub(crate) struct SourceMeterReportingOwners<'a, 'backend> {

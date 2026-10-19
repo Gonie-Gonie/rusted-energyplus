@@ -472,11 +472,19 @@ impl OrdinaryEquipment {
 
 // Test-only sibling access: the accepted history observer/caller/checker above
 // stays whole and remains the only implementation of these shared operations.
-pub(super) fn multiplier_state(factory: &Factory) -> Result<Value> { state(factory) }
-pub(super) fn multiplier_history_call(factory: &mut Factory, operation: &str) -> Result { call(factory, operation) }
+pub(super) fn multiplier_state(factory: &Factory) -> Result<Value> {
+    state(factory)
+}
+pub(super) fn multiplier_history_call(factory: &mut Factory, operation: &str) -> Result {
+    call(factory, operation)
+}
 #[derive(Default)]
 pub(super) struct MultiplierObservations(HistoryIdentities);
 impl MultiplierObservations {
-    pub(super) fn check(&mut self, source: &Value, native: &Value, path: &str) -> Result { self.0.check(source, native, path) }
-    pub(super) fn raw_bits(&self) -> usize { self.0.raw_bits }
+    pub(super) fn check(&mut self, source: &Value, native: &Value, path: &str) -> Result {
+        self.0.check(source, native, path)
+    }
+    pub(super) fn raw_bits(&self) -> usize {
+        self.0.raw_bits
+    }
 }

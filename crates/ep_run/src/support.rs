@@ -358,8 +358,14 @@ pub fn assess_support(
     trace_level: TraceLevel,
 ) -> SupportAssessment {
     assess_support_with_source_admission(
-        raw_model, compile_report, typed_model, mode, partial_policy,
-        output_format, trace_level, None,
+        raw_model,
+        compile_report,
+        typed_model,
+        mode,
+        partial_policy,
+        output_format,
+        trace_level,
+        None,
     )
 }
 
@@ -418,7 +424,8 @@ pub(crate) fn assess_support_with_source_admission(
                 note: "compiled into the current TypedModel subset".to_string(),
             }),
             ObjectCoverageStatus::RawOnly
-                if source_admission.is_some_and(|admission| admission.consumes(&coverage.object_type)) =>
+                if source_admission
+                    .is_some_and(|admission| admission.consumes(&coverage.object_type)) =>
             {
                 source_consumed_objects.push(SupportObjectEntry {
                     object_type: coverage.object_type.clone(),

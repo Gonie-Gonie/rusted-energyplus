@@ -1,10 +1,12 @@
 //! Sole OutputReportTabular owner and genuine first-call input/initialization chain.
 //! Pollution factors borrow the same module that actual simulation startup uses.
+mod audit;
 mod beps;
-mod beps_report;
 mod beps_gather;
+mod beps_report;
 mod constants;
 mod date_time;
+mod endrun_files;
 mod fuel_factors;
 mod gather;
 mod getters;
@@ -13,18 +15,16 @@ mod heat_gain;
 mod input;
 mod monthly_initialization;
 mod output_files;
-mod endrun_files;
-mod audit;
 pub(crate) mod remaining;
-mod weather_stat;
 mod source_demand;
 mod state;
 mod style;
 mod style_passes;
-mod writers;
 mod summary;
 mod table_of_contents;
 mod unit_conversions;
+mod weather_stat;
+mod writers;
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_output_control::{

@@ -53,7 +53,8 @@ fn project(
         .collect();
     let mut input = SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
         .map_err(|error| error.to_string())?;
-    input.retain_source_input_statistics(statistics)
+    input
+        .retain_source_input_statistics(statistics)
         .map_err(|error| error.to_string())?;
     Ok(input)
 }

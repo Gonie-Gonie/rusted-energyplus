@@ -20,6 +20,10 @@ impl ProductionWeatherTimestepSeries {
             WeatherSession::from_source_project_state(bytes, configuration, state)?,
         ))
     }
+    #[allow(
+        dead_code,
+        reason = "Retain the original GetNextEnvironment and live-weather-owner borrowing entries; selected frontend code uses the corresponding output-aware/session interfaces."
+    )]
     pub(crate) fn get_next_source_environment(
         &self,
         owners: &mut SourceWeatherInitializationOwners<'_, '_>,
@@ -33,6 +37,10 @@ impl ProductionWeatherTimestepSeries {
     /// Reborrow the sole actual weather global/environment/WeatherManager owners
     /// for one caller, with the session guard held until all operations return.
     /// No copied clock, weather snapshot or live references escape this scope.
+    #[allow(
+        dead_code,
+        reason = "Retain the original GetNextEnvironment and live-weather-owner borrowing entries; selected frontend code uses the corresponding output-aware/session interfaces."
+    )]
     pub(crate) fn with_source_weather_owners_mut<T>(
         &self,
         consume: impl FnOnce(

@@ -453,6 +453,10 @@ impl SourceCtfInitialization {
     }
     /// Borrow the actual phase-owned header; never read stale reset-prefix
     /// dt/history after the initial/retry contexts became their live owners.
+    #[allow(
+        dead_code,
+        reason = "This retained CTF phase-header borrowing entry preserves the genuine active coefficient owner API; production now reads the phase-owned values through its narrower caller views."
+    )]
     pub(crate) fn active_header(&self) -> Result<(&f64, &i32, &i32), Error> {
         let index = self
             .active_index

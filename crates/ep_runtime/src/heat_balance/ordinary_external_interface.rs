@@ -217,9 +217,11 @@ impl SourceExternalInterface {
 }
 
 impl SourceExternalInterface {
-    pub(crate) fn close_source_socket_at_success(&self) -> Result<(),Error> {
-        if self.number_external_interfaces>0 && self.have_bcvtb {
-            return Err(Error::Unavailable("actual EndEnergyPlus ExternalInterface.CloseSocket592"));
+    pub(crate) fn close_source_socket_at_success(&self) -> Result<(), Error> {
+        if self.number_external_interfaces > 0 && self.have_bcvtb {
+            return Err(Error::Unavailable(
+                "actual EndEnergyPlus ExternalInterface.CloseSocket592",
+            ));
         }
         Ok(())
     }

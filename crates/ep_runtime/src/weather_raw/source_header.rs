@@ -26,6 +26,8 @@ fn fatal(backend: &mut SourceErrorBackend<'_>, text: &str) -> Failure {
     }
 }
 
+// These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn process_source_epw_header(
     kind: HeaderKind,
     line: &mut String,

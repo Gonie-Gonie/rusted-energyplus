@@ -176,9 +176,15 @@ impl PredefinedRegistry {
         description: &str,
         value: f64,
     ) -> Result<(), CtfReportUnavailable> {
-        let index = next_slot(&mut self.component_sizing_entries,
-            &mut self.component_sizing_capacity, &mut self.component_sizing_count)?;
-        let row = self.component_sizing_entries.as_mut().and_then(|rows| rows.get_mut(index))
+        let index = next_slot(
+            &mut self.component_sizing_entries,
+            &mut self.component_sizing_capacity,
+            &mut self.component_sizing_count,
+        )?;
+        let row = self
+            .component_sizing_entries
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
             .ok_or(CtfReportUnavailable::TableOwner)?;
         row.component_type = component_type.to_owned();
         row.component_name = component_name.to_owned();

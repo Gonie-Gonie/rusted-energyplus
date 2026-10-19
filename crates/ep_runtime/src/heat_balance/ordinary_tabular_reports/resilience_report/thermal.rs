@@ -1,6 +1,8 @@
 //! Full Native13417-13656 annual thermal body; SI and same live format passes.
 use super::*;
 impl SourceTabularReports {
+    // Retain this real Native operand/local and its initialization/request timing for the unrepresented child path.
+    #[allow(unused_variables)]
     pub(crate) fn write_source_thermal_resilience_tables(
         &mut self,
         o: &mut SourceResilienceTableOwners<'_, '_>,

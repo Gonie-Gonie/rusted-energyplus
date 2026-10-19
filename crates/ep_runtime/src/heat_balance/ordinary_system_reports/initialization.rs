@@ -56,7 +56,12 @@ impl SourceSystemReports {
             let config = o.equipment.source_zone_equipment_config(zone)?;
             let name = config.zone_name();
             self.register_source_zone_ventilation_outputs(
-                zone, name, registration, input, backend, output,
+                zone,
+                name,
+                registration,
+                input,
+                backend,
+                output,
             )?;
         }
         self.register_source_facility_ventilation_outputs(registration, input, backend, output)
@@ -79,10 +84,16 @@ impl SourceSystemReports {
         }
         // Both actual primary-system outer loops have zero rows here.
         equipment.create_source_zone_equipment_energy_report_structure(
-            globals.num_of_zones, branch, registration,
+            globals.num_of_zones,
+            branch,
+            registration,
         )?;
-        let total = hvac.number_plant_loops.checked_add(hvac.number_condenser_loops)
-            .ok_or(Error::Unavailable("undefined plant plus condenser loop count2747"))?;
+        let total = hvac
+            .number_plant_loops
+            .checked_add(hvac.number_condenser_loops)
+            .ok_or(Error::Unavailable(
+                "undefined plant plus condenser loop count2747",
+            ))?;
         if total > 0 {
             return Err(Error::Unavailable(
                 "actual CreateEnergyReportStructure2755/2758 live VentRepPlant/VentRepCond row",
@@ -104,48 +115,128 @@ impl SourceSystemReports {
         table: &mut PredefinedStringTable,
         registration: &SourceOutputRegistration,
     ) -> Result<(), Error> {
-        if !self.vent_report_structure_created { return Ok(()); }
+        if !self.vent_report_structure_created {
+            return Ok(());
+        }
         if self.one_time_flag_init_energy_reports {
-            equipment.initialize_source_equipment_energy_connections(globals.num_of_zones, hvac, air_loop)?;
+            equipment.initialize_source_equipment_energy_connections(
+                globals.num_of_zones,
+                hvac,
+                air_loop,
+            )?;
             // Native783-800 captures all six actual arrays after both passes.
             let zone_comps = air_loop.zone_comp_to_plant.as_ref().map_or(0, Vec::len);
             let zone_subcomps = air_loop.zone_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
-            let zone_subsubcomps = air_loop.zone_sub_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let zone_subsubcomps = air_loop
+                .zone_sub_sub_comp_to_plant
+                .as_ref()
+                .map_or(0, Vec::len);
             let air_comps = air_loop.air_sys_comp_to_plant.as_ref().map_or(0, Vec::len);
-            let air_subcomps = air_loop.air_sys_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
-            let air_subsubcomps = air_loop.air_sys_sub_sub_comp_to_plant.as_ref().map_or(0, Vec::len);
+            let air_subcomps = air_loop
+                .air_sys_sub_comp_to_plant
+                .as_ref()
+                .map_or(0, Vec::len);
+            let air_subsubcomps = air_loop
+                .air_sys_sub_sub_comp_to_plant
+                .as_ref()
+                .map_or(0, Vec::len);
             self.one_time_flag_init_energy_reports = false;
-            for _row in 1..=zone_comps { return Err(Error::Unavailable("actual InitEnergyReports805 ZoneCompToPlant.PlantLoopType")); }
-            for _row in 1..=zone_subcomps { return Err(Error::Unavailable("actual InitEnergyReports826 ZoneSubCompToPlant.PlantLoopType")); }
-            for _row in 1..=zone_subsubcomps { return Err(Error::Unavailable("actual InitEnergyReports847 ZoneSubSubCompToPlant.PlantLoopType")); }
-            for _row in 1..=air_comps { return Err(Error::Unavailable("actual InitEnergyReports867 AirSysCompToPlant.PlantLoopType")); }
-            for _row in 1..=air_subcomps { return Err(Error::Unavailable("actual InitEnergyReports888 AirSysSubCompToPlant.PlantLoopType")); }
-            for _row in 1..=air_subsubcomps { return Err(Error::Unavailable("actual InitEnergyReports909 AirSysSubSubCompToPlant.PlantLoopType")); }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=zone_comps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports805 ZoneCompToPlant.PlantLoopType",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=zone_subcomps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports826 ZoneSubCompToPlant.PlantLoopType",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=zone_subsubcomps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports847 ZoneSubSubCompToPlant.PlantLoopType",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=air_comps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports867 AirSysCompToPlant.PlantLoopType",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=air_subcomps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports888 AirSysSubCompToPlant.PlantLoopType",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _row in 1..=air_subsubcomps {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports909 AirSysSubSubCompToPlant.PlantLoopType",
+                ));
+            }
             self.report_source_air_loop_topology(hvac)?;
-            equipment.report_source_zone_energy_topology(globals.num_of_zones, zones, registry, table)?;
+            equipment.report_source_zone_energy_topology(
+                globals.num_of_zones,
+                zones,
+                registry,
+                table,
+            )?;
             self.report_source_air_distribution_units(equipment)?;
             self.one_time_flag_init_energy_reports = false;
         }
         if hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable("actual InitEnergyReports940 PrimaryAirSystems live row"));
+            return Err(Error::Unavailable(
+                "actual InitEnergyReports940 PrimaryAirSystems live row",
+            ));
         }
         equipment.load_source_zone_equipment_energy_readings(globals.num_of_zones, registration)?;
         // Native LoopSideKeys is Demand0, Supply1; both count loops remain real.
         for _loop_side in [0_i32, 1_i32] {
-            for _plant in 1..=hvac.number_plant_loops { return Err(Error::Unavailable("actual InitEnergyReports1011 VentRepPlant live row")); }
-            for _plant in 1..=hvac.number_condenser_loops { return Err(Error::Unavailable("actual InitEnergyReports1028 VentRepCond live row")); }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _plant in 1..=hvac.number_plant_loops {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports1011 VentRepPlant live row",
+                ));
+            }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
+            for _plant in 1..=hvac.number_condenser_loops {
+                return Err(Error::Unavailable(
+                    "actual InitEnergyReports1028 VentRepCond live row",
+                ));
+            }
         }
         Ok(())
     }
     fn report_source_air_loop_topology(&self, hvac: &SelectedHvacGlobals) -> Result<(), Error> {
         if hvac.number_of_primary_air_systems > 0 {
-            return Err(Error::Unavailable("actual reportAirLoopToplogy4947 PrimaryAirSystems live row"));
+            return Err(Error::Unavailable(
+                "actual reportAirLoopToplogy4947 PrimaryAirSystems live row",
+            ));
         }
         Ok(())
     }
-    fn report_source_air_distribution_units(&self, equipment: &OrdinaryEquipment) -> Result<(), Error> {
-        if equipment.source_air_distribution_units().is_some_and(|rows| !rows.is_empty()) {
-            return Err(Error::Unavailable("actual reportAirDistributionUnits5282 ADU.Name/ZoneName first table entry"));
+    fn report_source_air_distribution_units(
+        &self,
+        equipment: &OrdinaryEquipment,
+    ) -> Result<(), Error> {
+        if equipment
+            .source_air_distribution_units()
+            .is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(Error::Unavailable(
+                "actual reportAirDistributionUnits5282 ADU.Name/ZoneName first table entry",
+            ));
         }
         Ok(())
     }

@@ -91,26 +91,60 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
         surface: &mut OrdinarySurfaceInitialization,
         owners: &mut SourceInitSurfaceOwners<'_, '_, H, D>,
     ) -> Result<(), Error> {
-        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::InitializeHistories, crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations));
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(
+            crate::heat_balance::source_surface_cadence::Procedure::InitializeHistories,
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                surface,
+                owners.clock,
+                owners.globals,
+                owners.environment,
+                owners.backend.state.kickoff_simulation,
+                surface.inside_surface_iterations,
+            ),
+        );
+        // Keep the once-invoked observer closure: local Result propagation must not bypass the after-call exit observation.
+        #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
-        initialize_source_air_surface_environment(
-            surface,
-            owners.air,
-            self.fan_zone,
-            owners.radiation,
-            owners.geometry,
-            owners.zones,
-            owners.constructions,
-            owners.public_ctf,
-            owners.history,
-            owners.physical_surfaces,
-            owners.globals,
-            owners.clock,
-            owners.environment,
-        )
+            initialize_source_air_surface_environment(
+                surface,
+                owners.air,
+                self.fan_zone,
+                owners.radiation,
+                owners.geometry,
+                owners.zones,
+                owners.constructions,
+                owners.public_ctf,
+                owners.history,
+                owners.physical_surfaces,
+                owners.globals,
+                owners.clock,
+                owners.environment,
+            )
         })();
-        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations), cadence_result.is_ok());
-        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_InitThermalAndFluxHistories_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations)); }
+        cadence_scope.finish(
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                surface,
+                owners.clock,
+                owners.globals,
+                owners.environment,
+                owners.backend.state.kickoff_simulation,
+                surface.inside_surface_iterations,
+            ),
+            cadence_result.is_ok(),
+        );
+        if cadence_result.is_ok() {
+            crate::heat_balance::source_surface_cadence::record(
+                "actual_InitThermalAndFluxHistories_return",
+                crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                    surface,
+                    owners.clock,
+                    owners.globals,
+                    owners.environment,
+                    owners.backend.state.kickoff_simulation,
+                    surface.inside_surface_iterations,
+                ),
+            );
+        }
         cadence_result
     }
     fn evaluate_outside_movable_insulation(

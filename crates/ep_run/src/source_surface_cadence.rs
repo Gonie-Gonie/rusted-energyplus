@@ -78,7 +78,7 @@ pub(crate) fn observe(
             artifact.map_err(|error| {
                 diagnostic(format!("Source surface cadence ancillary export: {error}"))
             })?;
-            if !trace.complete() || trace.calls[..6].iter().any(|count| *count == 0) {
+            if !trace.complete() || trace.calls[..6].contains(&0) {
                 return Err(diagnostic(
                     "Source surface cadence is incomplete or did not observe all six actual surface procedures",
                 ));

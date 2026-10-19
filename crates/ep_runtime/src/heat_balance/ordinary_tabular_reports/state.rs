@@ -409,8 +409,14 @@ impl Default for SourceTabularInputState {
             leed_site_srv_watr: 0.0,
             leed_site_recept: 0.0,
             leed_site_total: 0.0,
-            need_other_row_leed45: SourceSolarArray { dimensions: Some([14]), values: vec![None;14] },
-            need_other_row_end_use: SourceSolarArray { dimensions: Some([14]), values: vec![None;14] },
+            need_other_row_leed45: SourceSolarArray {
+                dimensions: Some([14]),
+                values: vec![None; 14],
+            },
+            need_other_row_end_use: SourceSolarArray {
+                dimensions: Some([14]),
+                values: vec![None; 14],
+            },
             total_volume: 0.0,
             num_uncond_zones: 0,
             num_cond_zones: 0,
@@ -508,15 +514,42 @@ impl Default for SourceTabularInputState {
             m2_unit_conv_wvst: 0.0,
             m3_unit_conv: 0.0,
             wm2_unit_conv: 0.0,
-            zst_area: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_volume: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_wall_area: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_und_wall_area: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_window_area: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_opening_area: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_light: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_people: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
-            zst_plug: SourceSolarArray { dimensions: Some([4]), values: vec![None;4] },
+            zst_area: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_volume: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_wall_area: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_und_wall_area: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_window_area: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_opening_area: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_light: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_people: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
+            zst_plug: SourceSolarArray {
+                dimensions: Some([4]),
+                values: vec![None; 4],
+            },
             m_unit_name: Vec::new(),
             m2_unit_name: Vec::new(),
             m3_unit_name: Vec::new(),

@@ -13,7 +13,6 @@ use crate::heat_balance::source_output_registration::{
 };
 use crate::weather::day::{ProductionWeatherTimestepSeries, WeatherSession};
 use std::collections::BTreeSet;
-use std::io::Write;
 #[path = "program_completion_tables.rs"]
 mod tables;
 

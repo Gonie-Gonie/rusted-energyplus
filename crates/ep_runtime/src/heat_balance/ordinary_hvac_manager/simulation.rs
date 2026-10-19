@@ -27,6 +27,8 @@ impl SourceHvacManager {
         if self.simulation.air_loop.inputs_filled {
             // The genuine EPVector traversal is empty before positive GetAirPathData allocation.
             if let Some(rows) = &self.simulation.air_loop.control_info {
+                // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                #[allow(clippy::never_loop)]
                 for row in rows {
                     match *row {}
                 }
@@ -438,26 +440,49 @@ impl SourceHvacManager {
         // humidity, mass flow, then temperature. Unwritten slots stay unknown;
         // copying them does not invent initial numeric history values.
         for number in 1..=o.globals.num_of_zones {
-            let row = o.project.convergence.zone_inlet_convergence.as_mut()
+            let row = o
+                .project
+                .convergence
+                .zone_inlet_convergence
+                .as_mut()
                 .and_then(|rows| rows.get_mut(super::index(number).ok()?))
-                .ok_or(Error::Unavailable("actual ZoneInletConvergence allocation3024"))?;
+                .ok_or(Error::Unavailable(
+                    "actual ZoneInletConvergence allocation3024",
+                ))?;
             for ordinal in 1..=row.number_inlet_nodes {
-                let entry = row.inlet_nodes.as_mut()
+                let entry = row
+                    .inlet_nodes
+                    .as_mut()
                     .and_then(|rows| rows.get_mut(super::index(ordinal).ok()?))
-                    .ok_or(Error::Unavailable("actual ZoneInletConvergence InletNode3025"))?;
+                    .ok_or(Error::Unavailable(
+                        "actual ZoneInletConvergence InletNode3025",
+                    ))?;
                 let node = o.equipment.source_zone_air_node_mut(entry.node_number)?;
                 let previous = entry.humidity_ratio;
                 entry.humidity_ratio[0] = Some(*node.humidity_ratio);
-                for log in 1..10 { entry.humidity_ratio[log] = previous[log - 1]; }
+                // Preserve Original per-row history-copy ordering and physical array accesses.
+                #[allow(clippy::manual_memcpy)]
+                for log in 1..10 {
+                    entry.humidity_ratio[log] = previous[log - 1];
+                }
                 let previous = entry.mass_flow_rate;
                 // The existing temperature/humidity Node borrow intentionally
                 // has no mass-flow projection; read the same physical field.
-                entry.mass_flow_rate[0] = Some(o.equipment.source_node_mass_flow(entry.node_number)?);
-                for log in 1..10 { entry.mass_flow_rate[log] = previous[log - 1]; }
+                entry.mass_flow_rate[0] =
+                    Some(o.equipment.source_node_mass_flow(entry.node_number)?);
+                // Preserve Original per-row history-copy ordering and physical array accesses.
+                #[allow(clippy::manual_memcpy)]
+                for log in 1..10 {
+                    entry.mass_flow_rate[log] = previous[log - 1];
+                }
                 let previous = entry.temperature;
                 let node = o.equipment.source_zone_air_node_mut(entry.node_number)?;
                 entry.temperature[0] = Some(*node.temperature);
-                for log in 1..10 { entry.temperature[log] = previous[log - 1]; }
+                // Preserve Original per-row history-copy ordering and physical array accesses.
+                #[allow(clippy::manual_memcpy)]
+                for log in 1..10 {
+                    entry.temperature[log] = previous[log - 1];
+                }
             }
         }
         Ok(())

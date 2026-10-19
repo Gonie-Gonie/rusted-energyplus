@@ -4,17 +4,17 @@ use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
 mod accessors;
-#[cfg(all(test, feature = "native-controlled-air-cohort"))]
-mod native_gap_cohort;
 mod annual;
 mod compact;
-pub(crate) mod minute;
-mod detailed;
-mod day_group;
-mod predefined;
-mod report;
 #[cfg(test)]
 mod compact_native_tests;
+mod day_group;
+mod detailed;
+pub(crate) mod minute;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
+mod predefined;
+mod report;
 
 /// Actual source-ordered ScheduleTypeLimits getter values after raw admission.
 #[derive(Clone, Debug, PartialEq)]
@@ -86,6 +86,8 @@ pub(crate) struct SelectedSchedule {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+// Retain the actual owned schedule representation; boxing solely for this lint would alter physical owner layout.
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum SelectedScheduleData {
     Constant { timestep_values: Vec<f64> },
     Detailed(SelectedDetailedSchedule),
@@ -228,7 +230,9 @@ impl SelectedScheduleManager {
             ems_actuated_on: false,
             ems_value: 0.0,
             current_value: value,
-            data: SelectedScheduleData::Constant { timestep_values: vec![value; slots] },
+            data: SelectedScheduleData::Constant {
+                timestep_values: vec![value; slots],
+            },
         });
         self.schedule_map.insert(name.to_ascii_uppercase(), number);
         number
@@ -240,7 +244,10 @@ impl SelectedScheduleManager {
         &mut self,
         time_steps_in_hour: usize,
     ) -> Result<(), SelectedScheduleError> {
-        if !self.schedules.is_empty() || !self.day_schedules.is_empty() || !self.week_schedules.is_empty() {
+        if !self.schedules.is_empty()
+            || !self.day_schedules.is_empty()
+            || !self.week_schedules.is_empty()
+        {
             return Err(SelectedScheduleError::Unavailable(
                 "repeated init_constant_state outside caller guard",
             ));
@@ -281,6 +288,10 @@ impl SelectedScheduleManager {
     }
 
     /// Existing callers without a diagnostic owner stop at the first requested warning.
+    #[allow(
+        dead_code,
+        reason = "Keep the explicit no-diagnostic-owner ProcessScheduleInput entry; normal production uses the same getter with its actual diagnostic backend."
+    )]
     pub(crate) fn process_schedule_input(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -360,7 +371,10 @@ impl SelectedScheduleManager {
                         .checked_add(extra_alpha)
                         .ok_or(SelectedScheduleError::Unavailable("local alpha size"))?,
                 );
-                if !matches!(family, "ScheduleTypeLimits" | "Schedule:Constant" | "Schedule:Compact") {
+                if !matches!(
+                    family,
+                    "ScheduleTypeLimits" | "Schedule:Constant" | "Schedule:Compact"
+                ) {
                     return Err(SelectedScheduleError::Unavailable(
                         "nonconstant schedule input",
                     ));
@@ -385,8 +399,9 @@ impl SelectedScheduleManager {
             let alphas = Self::get_source_compact_object_item(input, number, &mut locals, false)?;
             for field in 2..alphas {
                 if locals.0[field].starts_with("UNTIL") {
-                    max_compact_numbers = max_compact_numbers.checked_add(1)
-                        .ok_or(SelectedScheduleError::Unavailable("actual Compact Until count"))?;
+                    max_compact_numbers = max_compact_numbers.checked_add(1).ok_or(
+                        SelectedScheduleError::Unavailable("actual Compact Until count"),
+                    )?;
                 }
             }
         }
@@ -493,9 +508,12 @@ impl SelectedScheduleManager {
             .checked_mul(time_steps_in_hour)
             .ok_or(SelectedScheduleError::Unavailable("timestep storage size"))?;
         // Native1269 resizes the same MissingDaySchedule before Compact input.
-        self.day_schedules.get_mut(0).ok_or(SelectedScheduleError::Unavailable(
-            "actual MissingDaySchedule0 before Compact",
-        ))?.timestep_values = vec![0.0; slots];
+        self.day_schedules
+            .get_mut(0)
+            .ok_or(SelectedScheduleError::Unavailable(
+                "actual MissingDaySchedule0 before Compact",
+            ))?
+            .timestep_values = vec![0.0; slots];
         self.process_source_compacts(input, time_steps_in_hour, &mut locals)?;
         for row in &declarations.constants {
             // getObjectItem resets all six getter-local arrays before unused erase.
@@ -580,5 +598,10 @@ impl SelectedScheduleManager {
 }
 
 type SourceScheduleGetterLocals = (
-    Vec<String>, Vec<String>, Vec<String>, Vec<f64>, Vec<bool>, Vec<bool>,
+    Vec<String>,
+    Vec<String>,
+    Vec<String>,
+    Vec<f64>,
+    Vec<bool>,
+    Vec<bool>,
 );

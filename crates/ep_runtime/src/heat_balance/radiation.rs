@@ -5,8 +5,8 @@ use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{SurfaceId, SurfaceType, ZoneId};
 use std::collections::BTreeMap;
 
-pub mod ordinary;
 mod fix_view_factors;
+pub mod ordinary;
 
 /// Current longwave/solar source-order owner for outside-face inputs.
 pub const EXTERIOR_RADIATION_OWNER_STAGE: &str = "CalcHeatBalanceOutsideSurf";
@@ -593,6 +593,8 @@ pub(crate) fn fix_energyplus_approximate_view_factors(
         .map(|outcome| outcome.view_factors)
 }
 
+// Retain this real Native operand/local and its initialization/request timing for the unrepresented child path.
+#[allow(unused_variables)]
 fn fix_energyplus_approximate_view_factors_with_outcome(
     areas: &[f64],
     view_factors: &[f64],
@@ -626,13 +628,25 @@ fn fix_energyplus_approximate_view_factors_with_outcome(
     let mut factors = view_factors.to_vec();
     let mut largest_surface = 0;
     let mut checks = fix_view_factors::SourceViewFactorChecks {
-        original: f64::NAN, fixed: f64::NAN, final_value: f64::NAN,
-        iterations: -1, row_sum: f64::NAN,
+        original: f64::NAN,
+        fixed: f64::NAN,
+        final_value: f64::NAN,
+        iterations: -1,
+        row_sum: f64::NAN,
     };
     fix_view_factors::fix_kernel(
-        areas, &mut factors, &mut largest_surface, "", &[], &mut checks, false,
-        |_| Err(()), |_| Err(()), |_, _| Err(()),
-    ).ok()?;
+        areas,
+        &mut factors,
+        &mut largest_surface,
+        "",
+        &[],
+        &mut checks,
+        false,
+        |_| Err(()),
+        |_| Err(()),
+        |_, _| Err(()),
+    )
+    .ok()?;
     if checks.iterations > 400 || factors.iter().any(|value| !value.is_finite()) {
         return None;
     }
@@ -678,11 +692,17 @@ pub(crate) fn energyplus_scriptf_from_view_factors(
     emissivities: &mut [f64],
 ) -> Option<Vec<f64>> {
     // Preserve the existing warning-free primitive admission and no-write stop.
-    if emissivities.iter().any(|value| !value.is_finite() || *value < 0.0 || *value > 0.99999) {
+    if emissivities
+        .iter()
+        .any(|value| !value.is_finite() || *value < 0.0 || *value > 0.99999)
+    {
         return None;
     }
     match energyplus_scriptf_from_view_factors_with_warning(
-        areas, view_factors, emissivities, || Ok::<(), std::convert::Infallible>(()),
+        areas,
+        view_factors,
+        emissivities,
+        || Ok::<(), std::convert::Infallible>(()),
     ) {
         Ok(value) => value.filter(|values| values.iter().all(|value| value.is_finite())),
         Err(never) => match never {},
@@ -696,7 +716,9 @@ pub(crate) fn energyplus_scriptf_from_view_factors_with_warning<E>(
     mut warning: impl FnMut() -> Result<(), E>,
 ) -> Result<Option<Vec<f64>>, E> {
     let surface_count = areas.len();
-    let Some(extent) = surface_count.checked_mul(surface_count) else { return Ok(None); };
+    let Some(extent) = surface_count.checked_mul(surface_count) else {
+        return Ok(None);
+    };
     if surface_count == 0
         || view_factors.len() != extent
         || emissivities.len() != surface_count
@@ -730,7 +752,9 @@ pub(crate) fn energyplus_scriptf_from_view_factors_with_warning<E>(
         coefficient_matrix[offset] -= factor;
         offset += surface_count + 1;
     }
-    let Some(mut inverse) = invert_square_matrix(&mut coefficient_matrix, surface_count) else { return Ok(None); };
+    let Some(mut inverse) = invert_square_matrix(&mut coefficient_matrix, surface_count) else {
+        return Ok(None);
+    };
     offset = 0;
     for excite in excitation {
         for _i in 0..surface_count {

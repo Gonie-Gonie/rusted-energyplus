@@ -276,21 +276,52 @@ pub(crate) struct SourceSolarTimestepState {
 impl Default for SourceSolarTimestepState {
     fn default() -> Self {
         Self {
-            num_too_many_figures: 0, num_too_many_vertices: 0, num_base_sub_surround: 0,
-            shading: SourceSolarShadingArrays::default(), heat_balance: SourceSolarHeatBalanceArrays::default(),
-            shadow_combinations: None, casting_surface: None, penumbra_ids: Vec::new(), complex: SourceComplexSolarState::default(), max_hcv: 15,
-            max_hc_array_bounds: 0, max_hc_array_increment: 0, max_number_of_figures: 0,
+            num_too_many_figures: 0,
+            num_too_many_vertices: 0,
+            num_base_sub_surround: 0,
+            shading: SourceSolarShadingArrays::default(),
+            heat_balance: SourceSolarHeatBalanceArrays::default(),
+            shadow_combinations: None,
+            casting_surface: None,
+            penumbra_ids: Vec::new(),
+            complex: SourceComplexSolarState::default(),
+            max_hcv: 15,
+            max_hc_array_bounds: 0,
+            max_hc_array_increment: 0,
+            max_number_of_figures: 0,
             tol_value: 0.0003,
-            max_gss: 50, max_bks: 50, max_sbs: 50, max_dim: 0,
-            ngsshc: 0, nbkshc: 0, nrvlhc: 0, nsbshc: 0, lochca: 0,
-            calc_sky_dif_shading: false, shadowing_days_left: 0,
-            get_input_flag: true, first_time: true, init_complex_once: true, shadow_one_time_flag: true,
-            sun_cosines: [Some(3.0); 3], sin_phi: Vec::new(), cos_phi: Vec::new(),
-            sin_theta: Vec::new(), cos_theta: Vec::new(),
-            x_vrt: SourceSolarArray::default(), y_vrt: SourceSolarArray::default(), z_vrt: SourceSolarArray::default(),
-            hc_a: SourceSolarArray::default(), hc_b: SourceSolarArray::default(), hc_c: SourceSolarArray::default(),
-            hc_x: SourceSolarArray::default(), hc_y: SourceSolarArray::default(), hc_area: SourceSolarArray::default(),
-            hc_ns: SourceSolarArray::default(), hc_nv: SourceSolarArray::default(), hc_t: SourceSolarArray::default(),
+            max_gss: 50,
+            max_bks: 50,
+            max_sbs: 50,
+            max_dim: 0,
+            ngsshc: 0,
+            nbkshc: 0,
+            nrvlhc: 0,
+            nsbshc: 0,
+            lochca: 0,
+            calc_sky_dif_shading: false,
+            shadowing_days_left: 0,
+            get_input_flag: true,
+            first_time: true,
+            init_complex_once: true,
+            shadow_one_time_flag: true,
+            sun_cosines: [Some(3.0); 3],
+            sin_phi: Vec::new(),
+            cos_phi: Vec::new(),
+            sin_theta: Vec::new(),
+            cos_theta: Vec::new(),
+            x_vrt: SourceSolarArray::default(),
+            y_vrt: SourceSolarArray::default(),
+            z_vrt: SourceSolarArray::default(),
+            hc_a: SourceSolarArray::default(),
+            hc_b: SourceSolarArray::default(),
+            hc_c: SourceSolarArray::default(),
+            hc_x: SourceSolarArray::default(),
+            hc_y: SourceSolarArray::default(),
+            hc_area: SourceSolarArray::default(),
+            hc_ns: SourceSolarArray::default(),
+            hc_nv: SourceSolarArray::default(),
+            hc_t: SourceSolarArray::default(),
         }
     }
 }
@@ -306,9 +337,17 @@ pub(crate) struct SourceComplexSolarState {
 }
 impl Default for SourceComplexSolarState {
     fn default() -> Self {
-        Self { total_complex_fenestration_states: 0, first_bsdf: 0,
-            max_back_surface: 20, total_thermal_models: 0,
-            sun_costs: SourceSolarArray { dimensions: Some([60,24]), values: vec![None; 60 * 24] },
-            number_complex_windows: 0, init_complex_windows_once: true }
+        Self {
+            total_complex_fenestration_states: 0,
+            first_bsdf: 0,
+            max_back_surface: 20,
+            total_thermal_models: 0,
+            sun_costs: SourceSolarArray {
+                dimensions: Some([60, 24]),
+                values: vec![None; 60 * 24],
+            },
+            number_complex_windows: 0,
+            init_complex_windows_once: true,
+        }
     }
 }

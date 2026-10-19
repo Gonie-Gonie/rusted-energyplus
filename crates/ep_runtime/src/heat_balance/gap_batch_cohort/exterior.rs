@@ -411,12 +411,16 @@ pub(super) fn run_category(fixture: &Value, category: Option<&str>) -> Result<us
         let (selected_records, selected_excluded, selected_checks) = match key {
             "solar_clock" => {
                 let checks = WeatherDayState::run_native_gap_solar_clock(named, observed)?;
-                same(checks, array(member(named, "solar_clock")?)?.len() + counts[0] * 2,
-                    "Weather phase checks distinguished from records")?;
+                same(
+                    checks,
+                    array(member(named, "solar_clock")?)?.len() + counts[0] * 2,
+                    "Weather phase checks distinguished from records",
+                )?;
                 (counts[0], 0, checks)
             }
             "exterior_coefficients" => {
-                let records = SourceInsideConvection::native_gap_external_convection_cases(named, observed)?;
+                let records =
+                    SourceInsideConvection::native_gap_external_convection_cases(named, observed)?;
                 same(records, counts[1], "InitExt all repeated records")?;
                 (records, 0, 0)
             }
@@ -437,7 +441,11 @@ pub(super) fn run_category(fixture: &Value, category: Option<&str>) -> Result<us
             }
             "beam_producer" => {
                 let (records, outside) = beam(ingress, scope, named, observed, &files)?;
-                same(records + outside, counts[5], "all Native beam records retained with explicit classification")?;
+                same(
+                    records + outside,
+                    counts[5],
+                    "all Native beam records retained with explicit classification",
+                )?;
                 (records, outside, 0)
             }
             "surface_internal_gains" => {
@@ -447,17 +455,41 @@ pub(super) fn run_category(fixture: &Value, category: Option<&str>) -> Result<us
             }
             _ => return Err(invalid("unreachable admitted Exterior category").into()),
         };
-        same(selected_records + selected_excluded, counts[at], "complete selected category record accounting")?;
-        admitted = admitted.checked_add(selected_records).ok_or("selected record overflow")?;
-        excluded = excluded.checked_add(selected_excluded).ok_or("selected exclusion overflow")?;
-        weather_checks = weather_checks.checked_add(selected_checks).ok_or("selected Weather check overflow")?;
-        println!("Source Exterior category complete: category={key}; admitted_records={selected_records}; Native_retained_records={}; excluded_records={selected_excluded}; Weather_phase_checks={selected_checks}", counts[at]);
+        same(
+            selected_records + selected_excluded,
+            counts[at],
+            "complete selected category record accounting",
+        )?;
+        admitted = admitted
+            .checked_add(selected_records)
+            .ok_or("selected record overflow")?;
+        excluded = excluded
+            .checked_add(selected_excluded)
+            .ok_or("selected exclusion overflow")?;
+        weather_checks = weather_checks
+            .checked_add(selected_checks)
+            .ok_or("selected Weather check overflow")?;
+        println!(
+            "Source Exterior category complete: category={key}; admitted_records={selected_records}; Native_retained_records={}; excluded_records={selected_excluded}; Weather_phase_checks={selected_checks}",
+            counts[at]
+        );
     }
     if let Some(category) = category {
-        println!("Source Exterior selected category: {category}; admitted call records {admitted}; Native retained records {}; excluded exploratory records {excluded}; Weather phase checks {weather_checks}; Source output directory {}", admitted + excluded, files.display());
+        println!(
+            "Source Exterior selected category: {category}; admitted call records {admitted}; Native retained records {}; excluded exploratory records {excluded}; Weather phase checks {weather_checks}; Source output directory {}",
+            admitted + excluded,
+            files.display()
+        );
     } else {
-        same((admitted, excluded), (170, 9), "declared finite admitted and outside-CON records")?;
-        println!("Source Exterior cohort: {admitted} admitted call records; Native full {full_records} retained; {excluded} exploratory shading records outside CON-01; Weather phase checks {weather_checks}; same-process owner assertions only; Source output directory {}", files.display());
+        same(
+            (admitted, excluded),
+            (170, 9),
+            "declared finite admitted and outside-CON records",
+        )?;
+        println!(
+            "Source Exterior cohort: {admitted} admitted call records; Native full {full_records} retained; {excluded} exploratory shading records outside CON-01; Weather phase checks {weather_checks}; same-process owner assertions only; Source output directory {}",
+            files.display()
+        );
     }
     Ok(admitted)
 }

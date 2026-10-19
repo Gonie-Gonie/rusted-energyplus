@@ -111,9 +111,11 @@ impl SourceOutputRegistration {
             };
             let annual = match meter.ip_units {
                 Some(SourceMeterIpUnits::OtherKG) => period.value,
-                Some(SourceMeterIpUnits::Electricity | SourceMeterIpUnits::Cooling | SourceMeterIpUnits::OtherJ) => {
-                    period.value * 1.0E-9
-                }
+                Some(
+                    SourceMeterIpUnits::Electricity
+                    | SourceMeterIpUnits::Cooling
+                    | SourceMeterIpUnits::OtherJ,
+                ) => period.value * 1.0E-9,
                 None => return Err(Error::Unavailable("actual initialized meter RT_forIPUnits")),
             };
             table.fixed_real_entry_2(column(registry, names[0])?, &meter.name, annual)?;

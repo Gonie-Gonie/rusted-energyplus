@@ -107,9 +107,15 @@ fn surface_row(
 }
 
 impl SourceDaylighting {
-    pub(crate) fn close_source_illuminance_maps(&self) -> Result<(),Error> {
-        if self.illuminance_maps.as_ref().is_some_and(|v|!v.is_empty()) {
-            return Err(Error::Unavailable("actual CloseReportIllumMaps MapColSep9329"));
+    pub(crate) fn close_source_illuminance_maps(&self) -> Result<(), Error> {
+        if self
+            .illuminance_maps
+            .as_ref()
+            .is_some_and(|v| !v.is_empty())
+        {
+            return Err(Error::Unavailable(
+                "actual CloseReportIllumMaps MapColSep9329",
+            ));
         }
         Ok(())
     }

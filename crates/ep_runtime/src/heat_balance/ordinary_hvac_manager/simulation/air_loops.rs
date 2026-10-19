@@ -62,12 +62,10 @@ impl SourceAirLoopData {
         self.simulate_source_air_loops(first_hvac_iteration, o, output)?;
         // Actual any_of sees the authentic empty/unallocated EPVector. Positive
         // AirLoopControlData constructors remain unavailable at GetAirPath393.
-        o.hvac.sim_air_loops = self
-            .control_info
-            .as_deref()
-            .unwrap_or(&[])
-            .iter()
-            .any(|row| match *row {});
+        o.hvac.sim_air_loops = match self.control_info.as_deref().and_then(|rows| rows.first()) {
+            Some(row) => match *row {},
+            None => false,
+        };
         Ok(())
     }
 }

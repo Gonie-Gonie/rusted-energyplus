@@ -185,9 +185,11 @@ impl Caller {
         }
     }
     pub(super) fn snapshot(&self) -> Result<Value, std::str::Utf8Error> {
-        Ok(json!({"reports":reports(&self.reports)?,"backend":backend(&self.state),
+        Ok(
+            json!({"reports":reports(&self.reports)?,"backend":backend(&self.state),
             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
-            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false}))
+            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false}),
+        )
     }
     fn context(&mut self) -> CtfInitializationContext<'_> {
         CtfInitializationContext {

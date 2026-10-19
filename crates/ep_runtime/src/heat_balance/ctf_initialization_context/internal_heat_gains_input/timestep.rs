@@ -60,7 +60,15 @@ pub(crate) trait SourceGainRadiationOwners {
 /// Source unallocated differs from Rust unable to represent allocation state.
 pub(crate) enum SourceZoneGenericGainAllocation<'a> {
     Unavailable,
+    #[allow(
+        dead_code,
+        reason = "The Source gain-allocation view preserves Native allocated/unallocated state separately from an unavailable owner; the selected caller currently constructs only Unavailable."
+    )]
     Unallocated,
+    #[allow(
+        dead_code,
+        reason = "The Source gain-allocation view preserves Native allocated/unallocated state separately from an unavailable owner; the selected caller currently constructs only Unavailable."
+    )]
     Allocated(&'a mut [f64]),
 }
 

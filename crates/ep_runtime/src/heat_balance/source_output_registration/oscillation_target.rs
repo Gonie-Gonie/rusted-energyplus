@@ -1,6 +1,8 @@
 //! Actual DetectOscillatingZoneTemp output field identities and ReportingThisVariable.
 use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+// Retain the Native output-field enum names and their existing domain mapping.
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum SourceOscillationOutputField {
     ZoneTime,
     ZoneOccupiedTime,

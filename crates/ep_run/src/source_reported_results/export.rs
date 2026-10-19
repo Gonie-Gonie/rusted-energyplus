@@ -31,7 +31,10 @@ impl Serialize for BundleJson<'_> {
         map.serialize_entry("mtr", &StreamJson(&self.0.mtr))?;
         map.serialize_entry("schema", "rusted-energyplus.source-reported-streams.v1")?;
         map.serialize_entry("timestamp_boundary", "actual ESO/MTR tuples; no civil year inferred for interval/daily/monthly/run-period records")?;
-        map.serialize_entry("value_boundary", "exact reported decimal tokens plus parsed binary64; not unformatted internal state")?;
+        map.serialize_entry(
+            "value_boundary",
+            "exact reported decimal tokens plus parsed binary64; not unformatted internal state",
+        )?;
         map.end()
     }
 }

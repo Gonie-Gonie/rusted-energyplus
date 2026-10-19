@@ -11,14 +11,18 @@ use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 mod environment;
 mod inside_ctf;
 mod inside_driver;
-#[cfg(all(test, feature = "native-controlled-air-cohort"))]
-mod native_convergence_branch;
 mod inside_entry;
 pub(crate) mod inside_providers;
 mod manager;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_convergence_branch;
 pub(crate) mod provider_host;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use inside_driver::{SourceInsideCtfOutcome, SourceInsideCtfProviders};
 pub use manager::SourceInitSurfaceError;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use manager::{SourceInitSurfaceOwners, SourceInitSurfaceProviders};
 pub(crate) mod output;
 pub(crate) mod outside_driver;

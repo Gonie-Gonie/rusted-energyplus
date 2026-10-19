@@ -5,8 +5,6 @@
 //! use source-owned state. Alternative sky and current-solar models are separate.
 
 mod auxiliary_input;
-#[cfg(all(test, feature = "native-controlled-air-cohort"))]
-mod native_gap_cohort;
 mod configuration;
 mod current;
 mod daylighting;
@@ -17,6 +15,8 @@ pub mod handoff;
 mod hourly;
 mod lifecycle;
 mod location;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 pub(crate) mod output_bindings;
 mod output_headers;
 pub(crate) mod output_registration;

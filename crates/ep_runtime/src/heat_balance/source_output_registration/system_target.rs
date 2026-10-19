@@ -19,8 +19,12 @@ impl SourceIntegerOutputOwners for SourceAllIntegerOutputOwners<'_> {
     ) -> Result<&i32, OrdinaryRadiationError> {
         match target {
             #[cfg(all(test, feature = "native-controlled-air-cohort"))]
-            SourceIntegerOutputTarget::CohortInteger { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
-            SourceIntegerOutputTarget::PurchasedAirAvailabilityStatus { .. } => self.equipment.integer_output(target),
+            SourceIntegerOutputTarget::CohortInteger { .. } => {
+                Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
+            }
+            SourceIntegerOutputTarget::PurchasedAirAvailabilityStatus { .. } => {
+                self.equipment.integer_output(target)
+            }
             SourceIntegerOutputTarget::Weather { .. } => self.weather.integer_output(target),
             SourceIntegerOutputTarget::ZoneThermostatControlType { .. } => {
                 self.air.integer_output(target)

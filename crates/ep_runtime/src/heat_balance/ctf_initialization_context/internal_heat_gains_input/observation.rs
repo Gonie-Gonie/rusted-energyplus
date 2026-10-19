@@ -461,11 +461,31 @@ impl super::SelectedInternalHeatGains {
     pub(crate) fn native_gap_device_bindings(
         &self,
     ) -> Result<Vec<Vec<[Option<OrdinaryGainRateTarget>; 7]>>, HeatBalanceInputError> {
-        self.allocations.space_devices.as_deref().unwrap_or_default().iter().map(|owner| {
-            if owner.number_of_devices == 0 { return Ok(Vec::new()); }
-            let rows=owner.devices.as_deref().ok_or(HeatBalanceInputError::Unavailable("actual device target storage"))?;
-            if rows.len()<owner.number_of_devices {return Err(HeatBalanceInputError::Unavailable("actual device target active bounds"));}
-            Ok(rows[..owner.number_of_devices].iter().map(|row|row.targets.map(|v|v.map(target))).collect())
-        }).collect()
+        self.allocations
+            .space_devices
+            .as_deref()
+            .unwrap_or_default()
+            .iter()
+            .map(|owner| {
+                if owner.number_of_devices == 0 {
+                    return Ok(Vec::new());
+                }
+                let rows = owner
+                    .devices
+                    .as_deref()
+                    .ok_or(HeatBalanceInputError::Unavailable(
+                        "actual device target storage",
+                    ))?;
+                if rows.len() < owner.number_of_devices {
+                    return Err(HeatBalanceInputError::Unavailable(
+                        "actual device target active bounds",
+                    ));
+                }
+                Ok(rows[..owner.number_of_devices]
+                    .iter()
+                    .map(|row| row.targets.map(|v| v.map(target)))
+                    .collect())
+            })
+            .collect()
     }
 }

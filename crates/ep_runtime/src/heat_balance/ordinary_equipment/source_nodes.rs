@@ -6,12 +6,20 @@ use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub(super) enum SourceNodeFluidType {
+    #[allow(
+        dead_code,
+        reason = "DataLoopNode.hh FluidType preserves the original invalid/count sentinel ordinals rather than renumbering the live physical-node types."
+    )]
     Invalid = -1,
     Blank = 0,
     Air = 1,
     Water = 2,
     Steam = 3,
     Electric = 4,
+    #[allow(
+        dead_code,
+        reason = "DataLoopNode.hh FluidType preserves the original invalid/count sentinel ordinals rather than renumbering the live physical-node types."
+    )]
     Num = 5,
 }
 
@@ -129,72 +137,132 @@ pub(super) struct SourceNodeSetpointCheck {
     pub(super) needs_setpoint_checking: bool,
     pub(super) check_setpoint: [bool; 9],
 }
-fn unavailable(text: &'static str) -> Unavailable { Unavailable::Input(text.into()) }
+fn unavailable(text: &'static str) -> Unavailable {
+    Unavailable::Input(text.into())
+}
 impl NodeOwner {
     pub(super) fn assign_source_node_number(
-        &mut self, name: &str, fluid_type: SourceNodeFluidType,
+        &mut self,
+        name: &str,
+        fluid_type: SourceNodeFluidType,
         _errors_found: &mut bool,
     ) -> Result<usize, Unavailable> {
-        if matches!(fluid_type, SourceNodeFluidType::Invalid | SourceNodeFluidType::Num) {
-            return Err(unavailable("actual AssignNodeNumber675 invalid-fluid severe diagnostic"));
+        if matches!(
+            fluid_type,
+            SourceNodeFluidType::Invalid | SourceNodeFluidType::Num
+        ) {
+            return Err(unavailable(
+                "actual AssignNodeNumber675 invalid-fluid severe diagnostic",
+            ));
         }
         if self.number_of_unique_node_names > 0 {
-            let names = self.node_ids.as_ref().ok_or(Unavailable::InconsistentOwner)?;
+            let names = self
+                .node_ids
+                .as_ref()
+                .ok_or(Unavailable::InconsistentOwner)?;
             let mut found = None;
             for number in 1..=self.number_of_unique_node_names {
                 let entry = names.get(number).ok_or(Unavailable::InconsistentOwner)?;
                 // Util::FindItemInList is explicitly case-sensitive; the
                 // actual IP getter already uppercases non-retaincase alphas.
-                if entry == name { found = Some(number); break; }
+                if entry == name {
+                    found = Some(number);
+                    break;
+                }
             }
             if let Some(number) = found {
-                let reference = self.node_references.as_mut().and_then(|rows| rows.get_mut(number - 1))
+                let reference = self
+                    .node_references
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number - 1))
                     .ok_or(Unavailable::InconsistentOwner)?;
-                *reference = reference.checked_add(1).ok_or(Unavailable::InconsistentOwner)?;
-                let row = self.physical.as_mut().and_then(|rows| rows.get_mut(number - 1))
+                *reference = reference
+                    .checked_add(1)
+                    .ok_or(Unavailable::InconsistentOwner)?;
+                let row = self
+                    .physical
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(number - 1))
                     .ok_or(Unavailable::InconsistentOwner)?;
                 if fluid_type != SourceNodeFluidType::Blank
-                    && row.fluid_type != fluid_type && row.fluid_type != SourceNodeFluidType::Blank {
-                    return Err(unavailable("actual AssignNodeNumber694 existing-fluid severe diagnostic"));
+                    && row.fluid_type != fluid_type
+                    && row.fluid_type != SourceNodeFluidType::Blank
+                {
+                    return Err(unavailable(
+                        "actual AssignNodeNumber694 existing-fluid severe diagnostic",
+                    ));
                 }
-                if row.fluid_type == SourceNodeFluidType::Blank { row.fluid_type = fluid_type; }
+                if row.fluid_type == SourceNodeFluidType::Blank {
+                    row.fluid_type = fluid_type;
+                }
                 return Ok(number);
             }
-            self.number_of_unique_node_names = self.number_of_unique_node_names.checked_add(1)
-                .filter(|&count| i32::try_from(count).is_ok()).ok_or(Unavailable::InconsistentOwner)?;
+            self.number_of_unique_node_names = self
+                .number_of_unique_node_names
+                .checked_add(1)
+                .filter(|&count| i32::try_from(count).is_ok())
+                .ok_or(Unavailable::InconsistentOwner)?;
             self.number_of_nodes = self.number_of_unique_node_names;
             // Native redimension order711-715, preserving every prior row.
-            self.physical.as_mut().ok_or(Unavailable::InconsistentOwner)?
+            self.physical
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
                 .resize(self.number_of_nodes, SourceNodeData::default());
-            self.node_ids.as_mut().ok_or(Unavailable::InconsistentOwner)?
+            self.node_ids
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
                 .resize(self.number_of_nodes + 1, String::new());
-            self.node_references.as_mut().ok_or(Unavailable::InconsistentOwner)?
+            self.node_references
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
                 .resize(self.number_of_nodes, 0);
-            self.marked_nodes.as_mut().ok_or(Unavailable::InconsistentOwner)?
+            self.marked_nodes
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
                 .resize(self.number_of_nodes, SourceMarkedNode::default());
-            self.node_setpoint_checks.as_mut().ok_or(Unavailable::InconsistentOwner)?
+            self.node_setpoint_checks
+                .as_mut()
+                .ok_or(Unavailable::InconsistentOwner)?
                 .resize(self.number_of_nodes, SourceNodeSetpointCheck::default());
-            self.physical.as_mut().and_then(|rows| rows.get_mut(self.number_of_nodes - 1))
-                .ok_or(Unavailable::InconsistentOwner)?.fluid_type = fluid_type;
-            *self.node_references.as_mut().and_then(|rows| rows.get_mut(self.number_of_nodes - 1))
+            self.physical
+                .as_mut()
+                .and_then(|rows| rows.get_mut(self.number_of_nodes - 1))
+                .ok_or(Unavailable::InconsistentOwner)?
+                .fluid_type = fluid_type;
+            *self
+                .node_references
+                .as_mut()
+                .and_then(|rows| rows.get_mut(self.number_of_nodes - 1))
                 .ok_or(Unavailable::InconsistentOwner)? = 0;
-            *self.node_ids.as_mut().and_then(|rows| rows.get_mut(self.number_of_unique_node_names))
+            *self
+                .node_ids
+                .as_mut()
+                .and_then(|rows| rows.get_mut(self.number_of_unique_node_names))
                 .ok_or(Unavailable::InconsistentOwner)? = name.into();
             return Ok(self.number_of_unique_node_names);
         }
         self.physical = Some(vec![SourceNodeData::default()]);
-        self.physical.as_mut().and_then(|rows| rows.first_mut())
-            .ok_or(Unavailable::InconsistentOwner)?.fluid_type = fluid_type;
+        self.physical
+            .as_mut()
+            .and_then(|rows| rows.first_mut())
+            .ok_or(Unavailable::InconsistentOwner)?
+            .fluid_type = fluid_type;
         self.number_of_nodes = 1;
         self.node_ids = Some(vec![String::new(); 2]);
         self.node_references = Some(vec![0]);
         self.marked_nodes = Some(vec![SourceMarkedNode::default()]);
         self.node_setpoint_checks = Some(vec![SourceNodeSetpointCheck::default()]);
         self.number_of_unique_node_names = 1;
-        let names = self.node_ids.as_mut().ok_or(Unavailable::InconsistentOwner)?;
+        let names = self
+            .node_ids
+            .as_mut()
+            .ok_or(Unavailable::InconsistentOwner)?;
         names[0] = "Undefined".into();
         names[1] = name.into();
-        *self.node_references.as_mut().and_then(|rows| rows.first_mut())
+        *self
+            .node_references
+            .as_mut()
+            .and_then(|rows| rows.first_mut())
             .ok_or(Unavailable::InconsistentOwner)? = 0;
         Ok(1)
     }

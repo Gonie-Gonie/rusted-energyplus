@@ -14,6 +14,8 @@ fn next_row(row: &mut usize) -> Result<(), Error> {
     Ok(())
 }
 impl SourceTabularReports {
+    // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+    #[allow(unused_assignments)]
     pub(super) fn source_beps_subcategory_table(
         &mut self,
         pass: usize,

@@ -1,6 +1,6 @@
 //! Reached DataZoneEquipment/ZoneEquipmentManager constructor records.
-use std::convert::Infallible;
 use crate::heat_balance::source_output_registration::SourceMeterData;
+use std::convert::Infallible;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct SourceAirIn {
@@ -18,12 +18,23 @@ pub(super) struct SourceAirIn {
     pub(super) supply_air_path_outlet_node_index: Option<i32>,
     pub(super) coils: Option<Vec<Infallible>>,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceAirIn {
     fn default() -> Self {
-        Self { inlet_node: 0, outlet_node: 0, supply_air_path_exists: false,
-            air_loop_number: 0, main_branch_index: 0, supply_branch_index: 0,
-            air_distribution_unit_index: 0, terminal_unit_sizing_index: 0,
-            supply_air_path_index: 0, supply_air_path_outlet_node_index: None, coils: None }
+        Self {
+            inlet_node: 0,
+            outlet_node: 0,
+            supply_air_path_exists: false,
+            air_loop_number: 0,
+            main_branch_index: 0,
+            supply_branch_index: 0,
+            air_distribution_unit_index: 0,
+            terminal_unit_sizing_index: 0,
+            supply_air_path_index: 0,
+            supply_air_path_outlet_node_index: None,
+            coils: None,
+        }
     }
 }
 
@@ -52,12 +63,26 @@ pub(super) struct SourceEquipmentData {
 }
 impl Default for SourceEquipmentData {
     fn default() -> Self {
-        Self { parent: false, number_sub_equipment: 0, type_of: String::new(), name: String::new(),
-            on: true, number_inlets: 0, number_outlets: 0, inlet_node_numbers: None,
-            outlet_node_numbers: None, number_metered_variables: 0, metered_variables: None,
-            sub_equipment: None, energy_transfer_component: 0, zone_equipment_to_plant_pointer: 0,
-            total_plant_supply_electricity: 0.0, total_plant_supply_gas: 0.0,
-            total_plant_supply_purchased: 0.0, operating_mode: 0 }
+        Self {
+            parent: false,
+            number_sub_equipment: 0,
+            type_of: String::new(),
+            name: String::new(),
+            on: true,
+            number_inlets: 0,
+            number_outlets: 0,
+            inlet_node_numbers: None,
+            outlet_node_numbers: None,
+            number_metered_variables: 0,
+            metered_variables: None,
+            sub_equipment: None,
+            energy_transfer_component: 0,
+            zone_equipment_to_plant_pointer: 0,
+            total_plant_supply_electricity: 0.0,
+            total_plant_supply_gas: 0.0,
+            total_plant_supply_purchased: 0.0,
+            operating_mode: 0,
+        }
     }
 }
 
@@ -73,7 +98,13 @@ pub(super) struct SourceSimulationOrder {
 }
 impl Default for SourceSimulationOrder {
     fn default() -> Self {
-        Self { equipment_type_name: String::new(), equipment_type: -1,
-            equipment_name: String::new(), equipment_pointer: 0, cooling_priority: 0, heating_priority: 0 }
+        Self {
+            equipment_type_name: String::new(),
+            equipment_type: -1,
+            equipment_name: String::new(),
+            equipment_pointer: 0,
+            cooling_priority: 0,
+            heating_priority: 0,
+        }
     }
 }

@@ -60,6 +60,10 @@ pub(crate) enum SourceSolarOutputField {
 }
 
 /// The actual reporting consumer borrows both live groups; no value is retained.
+#[allow(
+    dead_code,
+    reason = "Retain the combined live surface/solar resolver interface; narrower active caller views preserve the same borrowed owners without copying registered values."
+)]
 pub(crate) struct SourceCombinedOutputOwners<'a> {
     pub(crate) surface: &'a dyn SourceRealOutputOwners,
     pub(crate) solar: &'a dyn SourceRealOutputOwners,
@@ -68,7 +72,9 @@ impl SourceRealOutputOwners for SourceCombinedOutputOwners<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         match target {
             #[cfg(all(test, feature = "native-controlled-air-cohort"))]
-            SourceRealOutputTarget::CohortReal { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
+            SourceRealOutputTarget::CohortReal { .. } => {
+                Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
+            }
             SourceRealOutputTarget::SurfaceHeatBalance { .. } => self.surface.real_output(target),
             SourceRealOutputTarget::Solar { .. } => self.solar.real_output(target),
             SourceRealOutputTarget::Air { .. } => {

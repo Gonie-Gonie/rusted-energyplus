@@ -1,6 +1,6 @@
 //! Actual selected ManageInternalHeatGains input and timestep owners.
 //! Genuine timestep producers retain explicit unported provider boundaries.
-use super::{hb_input_error, CtfInitializationContext};
+use super::{CtfInitializationContext, hb_input_error};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 use ep_model::TypedModel;

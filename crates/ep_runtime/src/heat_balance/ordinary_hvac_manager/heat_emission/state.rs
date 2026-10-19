@@ -37,6 +37,8 @@ pub(crate) struct SourceHeatEmissionDeviceModules {
     /// EvaporativeCoolers.hh445 NumEvapCool constructor0.
     pub(crate) number_evaporative_coolers: i32,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceHeatEmissionDeviceModules {
     fn default() -> Self {
         Self {

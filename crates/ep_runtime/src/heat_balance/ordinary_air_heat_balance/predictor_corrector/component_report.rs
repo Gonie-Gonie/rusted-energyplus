@@ -53,25 +53,35 @@ impl SourceZoneSpaceHeatBalanceData {
         if zone(owners, number)?.is_controlled {
             let config = owners.equipment.source_zone_equipment_config(number)?;
             for ordinal in 1..=*config.number_inlet_nodes() {
-                let node_number = *config.inlet_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual component ZoneEquip InletNode5491"))?;
-                let native_node_number = i32::try_from(node_number)
-                    .map_err(|_| Error::Unavailable("actual component InletNode native integer domain"))?;
+                let node_number = *config.inlet_node_number(ordinal).ok_or(Error::Unavailable(
+                    "actual component ZoneEquip InletNode5491",
+                ))?;
+                let native_node_number = i32::try_from(node_number).map_err(|_| {
+                    Error::Unavailable("actual component InletNode native integer domain")
+                })?;
                 let node = owners.equipment.source_zone_air_node(native_node_number)?;
                 let node_temperature = *node.temperature;
                 let mass_flow_rate = *node.mass_flow_rate;
                 // GeneralRoutines1679-1703: no normal Cp/cache call and no
                 // multiplier division; the delta-H kernel runs only for flow>0.
                 let sensible_rate = if mass_flow_rate > 0.0 {
-                    mass_flow_rate * crate::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w(
-                        node_temperature, self.mat, self.air_hum_rat,
-                    )
-                } else { 0.0 };
+                    mass_flow_rate
+                        * crate::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w(
+                            node_temperature,
+                            self.mat,
+                            self.air_hum_rat,
+                        )
+                } else {
+                    0.0
+                };
                 report.sum_m_cp_d_tsystem += sensible_rate;
-                let adu_number = *config.inlet_node_air_distribution_unit_number(ordinal)
+                let adu_number = *config
+                    .inlet_node_air_distribution_unit_number(ordinal)
                     .ok_or(Error::Unavailable("actual component InletNodeADUNum5496"))?;
                 if adu_number > 0 {
-                    return Err(Error::Unavailable("actual component positive AirDistUnit5497"));
+                    return Err(Error::Unavailable(
+                        "actual component positive AirDistUnit5497",
+                    ));
                 }
             }
         } else if zone(owners, number)?.is_return_plenum {

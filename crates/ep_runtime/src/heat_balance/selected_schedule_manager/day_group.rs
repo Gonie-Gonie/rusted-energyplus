@@ -8,9 +8,10 @@ impl SelectedScheduleManager {
         index: SourceScheduleIndex,
         group: usize,
     ) -> Result<(f64, f64), Error> {
-        let schedule = self.schedules.get(index.0).ok_or(Error::Unavailable(
-            "actual Schedule day-group pointer",
-        ))?;
+        let schedule = self
+            .schedules
+            .get(index.0)
+            .ok_or(Error::Unavailable("actual Schedule day-group pointer"))?;
         if let SelectedScheduleData::Constant { .. } = &schedule.data {
             // Native Constant ignores the day group and does not set min/max.
             return Ok((schedule.current_value, schedule.current_value));
@@ -21,17 +22,32 @@ impl SelectedScheduleManager {
         let SelectedScheduleData::Detailed(detailed) = &self.schedules[index.0].data else {
             return Err(Error::Unavailable("actual Detailed day-group payload"));
         };
-        let cached = *detailed.max_min_by_day_type_set.get(group).ok_or(
-            Error::Unavailable("actual Detailed MaxMinByDayTypeSet group index"),
-        )?;
+        let cached = *detailed
+            .max_min_by_day_type_set
+            .get(group)
+            .ok_or(Error::Unavailable(
+                "actual Detailed MaxMinByDayTypeSet group index",
+            ))?;
         if !cached {
             let mut first_set = true;
             // Unused,Sun,Mon,Tue,Wed,Thu,Fri,Sat,Hol,SumDes,WinDes,Cus1,Cus2.
             const FILTERS: [[bool; 13]; 4] = [
-                [false, false, true, true, true, true, true, false, false, false, false, false, false],
-                [false, true, false, false, false, false, false, true, true, false, false, false, false],
-                [false, false, false, false, false, false, false, false, false, true, false, false, false],
-                [false, false, false, false, false, false, false, false, false, false, true, false, false],
+                [
+                    false, false, true, true, true, true, true, false, false, false, false, false,
+                    false,
+                ],
+                [
+                    false, true, false, false, false, false, false, true, true, false, false,
+                    false, false,
+                ],
+                [
+                    false, false, false, false, false, false, false, false, false, true, false,
+                    false, false,
+                ],
+                [
+                    false, false, false, false, false, false, false, false, false, false, true,
+                    false, false,
+                ],
             ];
             let filter = FILTERS.get(group).ok_or(Error::Unavailable(
                 "actual Detailed dayTypeFilters group index",
@@ -50,15 +66,20 @@ impl SelectedScheduleManager {
                 let week_index = detailed.week_schedules[day].ok_or(Error::Unavailable(
                     "actual Detailed day-group weekScheds[iDay] pointer",
                 ))?;
-                let week = self.week_schedules.get(week_index).ok_or(Error::Unavailable(
-                    "actual Detailed day-group WeekSchedule pointer",
-                ))?;
+                let week = self
+                    .week_schedules
+                    .get(week_index)
+                    .ok_or(Error::Unavailable(
+                        "actual Detailed day-group WeekSchedule pointer",
+                    ))?;
                 let week_number = week.number;
                 if *week_checked.get(week_number).ok_or(Error::Unavailable(
                     "actual Detailed weekSchedChecked[weekSched->Num] index",
                 ))? {
                     continue;
                 }
+                // Preserve Original index order and same-row checked accesses across the retained work arrays.
+                #[allow(clippy::needless_range_loop)]
                 for day_type in 1..13 {
                     if !filter[day_type] {
                         continue;
@@ -80,7 +101,9 @@ impl SelectedScheduleManager {
                     }
                     let day_schedule = &self.day_schedules[day_index];
                     let (minimum, maximum) = (day_schedule.min_value, day_schedule.max_value);
-                    let SelectedScheduleData::Detailed(detailed) = &mut self.schedules[index.0].data else {
+                    let SelectedScheduleData::Detailed(detailed) =
+                        &mut self.schedules[index.0].data
+                    else {
                         return Err(Error::Unavailable("actual Detailed day-group payload"));
                     };
                     if first_set {
@@ -115,6 +138,9 @@ impl SelectedScheduleManager {
         let SelectedScheduleData::Detailed(detailed) = &self.schedules[index.0].data else {
             return Err(Error::Unavailable("actual Detailed day-group payload"));
         };
-        Ok((detailed.min_by_day_type[group], detailed.max_by_day_type[group]))
+        Ok((
+            detailed.min_by_day_type[group],
+            detailed.max_by_day_type[group],
+        ))
     }
 }

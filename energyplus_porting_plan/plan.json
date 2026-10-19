@@ -13012,6 +13012,31 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json",
         "sha256": "bfa2b6ae9dbefb4a9b84dd697b775cc6fcf1e5cfc8d1da1d171cae235ca96e0f",
         "size_bytes": 8216
+      },
+      "canonical_source_quality_hygiene_57": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-source-quality-hygiene-57/summary.json",
+        "actual_review": {
+          "path": ".runtime/porting/SRC-06/Root-quality-hygiene-review-57/review.json",
+          "sha256": "5c15a7741dadb448bfa9cabad5cb650dc056caccb5bc501923ba24ab56aa4bfa",
+          "bytes": 9027
+        },
+        "current_facts": {
+          "same_Source_snapshot": "d603624a13a65800c62e273e0928910ea2d2809c7f2c6f8d2e2988a9027ba6f8",
+          "fmt_exit": 0,
+          "default_feature_workspace_all_targets_strict_Clippy_exit": 0,
+          "workspace_passed": 4975,
+          "workspace_existing_ignored": 2,
+          "selected_beam_admitted_records": 18,
+          "selected_beam_retained_records": 27,
+          "selected_beam_excluded_exploratory_records": 9,
+          "featured_process_main_unused_helper_warnings_preserved": 3419,
+          "earlier_failed_Clippy_attempts_preserved": 2,
+          "new_scientific_formulas_or_test_bodies": 0,
+          "gate_changes": 0,
+          "remaining": "HVAC01 required error paths EH7, then actual Source Surface cadence/handoff, final15 and complete output reread. Historical science retains its own snapshot scope."
+        },
+        "sha256": "7acc4887606df00415bec219a0bedab1c060a005926b21ce44be3bd3b917b1cc",
+        "size_bytes": 10589
       }
     },
     {

@@ -1,7 +1,6 @@
 //! ReportScheduleVals3612–3643 and UpdateScheduleVals2465–2488.
 //! Retained Which reads currentVal; getCurrentVal EMS semantics are separate.
 use super::{SelectedScheduleManager, SourceScheduleIndex};
-use crate::weather::day::{WeatherGlobalState, WeatherEnvironmentState};
 use crate::heat_balance::{
     radiation::ordinary::{OrdinaryRadiationError, OrdinaryRadiationUnavailable},
     selected_heat_balance_input::HeatBalanceInputError as Error,
@@ -13,6 +12,7 @@ use crate::heat_balance::{
         SourceReportVariableInput,
     },
 };
+use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 impl SourceRealOutputOwners for SelectedScheduleManager {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         let SourceRealOutputTarget::Schedule { index } = target else {
@@ -76,14 +76,21 @@ impl SelectedScheduleManager {
     }
     /// Actual UpdateScheduleVals2465 uses the same live global/environment.
     pub(crate) fn update_source_schedule_values(
-        &mut self, clock: &WeatherGlobalState, environment: &WeatherEnvironmentState,
+        &mut self,
+        clock: &WeatherGlobalState,
+        environment: &WeatherEnvironmentState,
     ) -> Result<(), Error> {
         for index in 0..self.schedules.len() {
             let value = if self.schedules[index].ems_actuated_on {
                 self.schedules[index].ems_value
             } else {
-                self.source_hr_ts_value(SourceScheduleIndex(index), clock.hour_of_day,
-                    clock.time_step, clock, environment)?
+                self.source_hr_ts_value(
+                    SourceScheduleIndex(index),
+                    clock.hour_of_day,
+                    clock.time_step,
+                    clock,
+                    environment,
+                )?
             };
             self.schedules[index].current_value = value;
         }

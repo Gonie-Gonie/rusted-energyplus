@@ -9,6 +9,8 @@ fn total(a: &[f64; 4]) -> f64 {
     a[0] + a[1] + a[2] + a[3]
 }
 impl SourceTabularReports {
+    // Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+    #[allow(clippy::manual_range_contains)]
     pub(super) fn veri_envelope(
         &mut self,
         pass: usize,
@@ -21,10 +23,10 @@ impl SourceTabularReports {
         let mut t = self.veri_wwr_table()?;
         let mut wall = [0.0; 4];
         let mut above = [0.0; 4];
-        let mut window = [0.0; 4];
+        let window = [0.0; 4];
         let mut wall_cond = [0.0; 4];
         let mut above_cond = [0.0; 4];
-        let mut window_cond = [0.0; 4];
+        let window_cond = [0.0; 4];
         let mut roof = 0.0;
         let skylight = 0.0;
         let detailed = o

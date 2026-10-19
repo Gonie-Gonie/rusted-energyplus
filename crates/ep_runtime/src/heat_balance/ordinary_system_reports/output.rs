@@ -31,7 +31,9 @@ impl SourceRealOutputOwners for SourceSystemReports {
         };
         Ok(match field {
             Field::Zone { index, field } => {
-                let row = self.zone_vent_rep_vars.as_ref()
+                let row = self
+                    .zone_vent_rep_vars
+                    .as_ref()
                     .and_then(|rows| rows.get(at(index).ok()?))
                     .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
                 match field {
@@ -80,38 +82,138 @@ impl SourceSystemReports {
     ) -> Result<(), Error> {
         if self.vent_loads_report_enabled {
             for (field, output_name) in [
-                (ZoneField::NoLoadCoolingByVent, "Zone Mechanical Ventilation No Load Heat Removal Energy"),
-                (ZoneField::CoolingLoadAddedByVent, "Zone Mechanical Ventilation Cooling Load Increase Energy"),
-                (ZoneField::OverheatingByVent, "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy"),
-                (ZoneField::CoolingLoadMetByVent, "Zone Mechanical Ventilation Cooling Load Decrease Energy"),
-                (ZoneField::NoLoadHeatingByVent, "Zone Mechanical Ventilation No Load Heat Addition Energy"),
-                (ZoneField::HeatingLoadAddedByVent, "Zone Mechanical Ventilation Heating Load Increase Energy"),
-                (ZoneField::OvercoolingByVent, "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy"),
-                (ZoneField::HeatingLoadMetByVent, "Zone Mechanical Ventilation Heating Load Decrease Energy"),
+                (
+                    ZoneField::NoLoadCoolingByVent,
+                    "Zone Mechanical Ventilation No Load Heat Removal Energy",
+                ),
+                (
+                    ZoneField::CoolingLoadAddedByVent,
+                    "Zone Mechanical Ventilation Cooling Load Increase Energy",
+                ),
+                (
+                    ZoneField::OverheatingByVent,
+                    "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
+                ),
+                (
+                    ZoneField::CoolingLoadMetByVent,
+                    "Zone Mechanical Ventilation Cooling Load Decrease Energy",
+                ),
+                (
+                    ZoneField::NoLoadHeatingByVent,
+                    "Zone Mechanical Ventilation No Load Heat Addition Energy",
+                ),
+                (
+                    ZoneField::HeatingLoadAddedByVent,
+                    "Zone Mechanical Ventilation Heating Load Increase Energy",
+                ),
+                (
+                    ZoneField::OvercoolingByVent,
+                    "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
+                ),
+                (
+                    ZoneField::HeatingLoadMetByVent,
+                    "Zone Mechanical Ventilation Heating Load Decrease Energy",
+                ),
             ] {
                 self.register_source_zone_ventilation_output(
-                    zone, name, field, output_name, SourceOutputUnits::J,
-                    SourceOutputStoreType::Sum, registration, input, backend, o,
+                    zone,
+                    name,
+                    field,
+                    output_name,
+                    SourceOutputUnits::J,
+                    SourceOutputStoreType::Sum,
+                    registration,
+                    input,
+                    backend,
+                    o,
                 )?;
             }
         }
         for (field, output_name, units, store_type) in [
-            (ZoneField::OaMassFlow, "Zone Mechanical Ventilation Mass Flow Rate", SourceOutputUnits::KgPerSecond, SourceOutputStoreType::Average),
-            (ZoneField::OaMass, "Zone Mechanical Ventilation Mass", SourceOutputUnits::Kg, SourceOutputStoreType::Sum),
-            (ZoneField::OaVolFlowStdRho, "Zone Mechanical Ventilation Standard Density Volume Flow Rate", SourceOutputUnits::M3PerSecond, SourceOutputStoreType::Average),
-            (ZoneField::OaVolStdRho, "Zone Mechanical Ventilation Standard Density Volume", SourceOutputUnits::M3, SourceOutputStoreType::Sum),
-            (ZoneField::OaVolFlowCrntRho, "Zone Mechanical Ventilation Current Density Volume Flow Rate", SourceOutputUnits::M3PerSecond, SourceOutputStoreType::Average),
-            (ZoneField::OaVolCrntRho, "Zone Mechanical Ventilation Current Density Volume", SourceOutputUnits::M3, SourceOutputStoreType::Sum),
-            (ZoneField::MechAch, "Zone Mechanical Ventilation Air Changes per Hour", SourceOutputUnits::Ach, SourceOutputStoreType::Average),
-            (ZoneField::TargetVentilationFlowVoz, "Zone Target Voz Ventilation Flow Rate", SourceOutputUnits::M3PerSecond, SourceOutputStoreType::Average),
-            (ZoneField::TimeBelowVozDyn, "Zone Ventilation Below Target Voz Time", SourceOutputUnits::Hr, SourceOutputStoreType::Sum),
-            (ZoneField::TimeAtVozDyn, "Zone Ventilation At Target Voz Time", SourceOutputUnits::Hr, SourceOutputStoreType::Sum),
-            (ZoneField::TimeAboveVozDyn, "Zone Ventilation Above Target Voz Time", SourceOutputUnits::Hr, SourceOutputStoreType::Sum),
-            (ZoneField::TimeVentUnocc, "Zone Ventilation When Unoccupied Time", SourceOutputUnits::Hr, SourceOutputStoreType::Sum),
+            (
+                ZoneField::OaMassFlow,
+                "Zone Mechanical Ventilation Mass Flow Rate",
+                SourceOutputUnits::KgPerSecond,
+                SourceOutputStoreType::Average,
+            ),
+            (
+                ZoneField::OaMass,
+                "Zone Mechanical Ventilation Mass",
+                SourceOutputUnits::Kg,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::OaVolFlowStdRho,
+                "Zone Mechanical Ventilation Standard Density Volume Flow Rate",
+                SourceOutputUnits::M3PerSecond,
+                SourceOutputStoreType::Average,
+            ),
+            (
+                ZoneField::OaVolStdRho,
+                "Zone Mechanical Ventilation Standard Density Volume",
+                SourceOutputUnits::M3,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::OaVolFlowCrntRho,
+                "Zone Mechanical Ventilation Current Density Volume Flow Rate",
+                SourceOutputUnits::M3PerSecond,
+                SourceOutputStoreType::Average,
+            ),
+            (
+                ZoneField::OaVolCrntRho,
+                "Zone Mechanical Ventilation Current Density Volume",
+                SourceOutputUnits::M3,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::MechAch,
+                "Zone Mechanical Ventilation Air Changes per Hour",
+                SourceOutputUnits::Ach,
+                SourceOutputStoreType::Average,
+            ),
+            (
+                ZoneField::TargetVentilationFlowVoz,
+                "Zone Target Voz Ventilation Flow Rate",
+                SourceOutputUnits::M3PerSecond,
+                SourceOutputStoreType::Average,
+            ),
+            (
+                ZoneField::TimeBelowVozDyn,
+                "Zone Ventilation Below Target Voz Time",
+                SourceOutputUnits::Hr,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::TimeAtVozDyn,
+                "Zone Ventilation At Target Voz Time",
+                SourceOutputUnits::Hr,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::TimeAboveVozDyn,
+                "Zone Ventilation Above Target Voz Time",
+                SourceOutputUnits::Hr,
+                SourceOutputStoreType::Sum,
+            ),
+            (
+                ZoneField::TimeVentUnocc,
+                "Zone Ventilation When Unoccupied Time",
+                SourceOutputUnits::Hr,
+                SourceOutputStoreType::Sum,
+            ),
         ] {
             self.register_source_zone_ventilation_output(
-                zone, name, field, output_name, units, store_type,
-                registration, input, backend, o,
+                zone,
+                name,
+                field,
+                output_name,
+                units,
+                store_type,
+                registration,
+                input,
+                backend,
+                o,
             )?;
         }
         Ok(())
@@ -134,18 +236,36 @@ impl SourceSystemReports {
         o: &mut SourceSystemReportsOutputContext<'_, H, D>,
     ) -> Result<(), Error> {
         let binding = SourceRealOutputBinding::new(
-            Target::SystemReports { field: Field::Zone { index: zone, field } }, self,
-        ).map_err(Error::Output)?;
-        let mut report_input = SourceReportVariableInput::new(
-            o.reports, input, o.minimum_report_frequency,
-        );
-        registration.setup_bound_general_real(
-            &mut report_input, o.prescan,
-            SourceRealOutputDeclaration { name, key, units, store_type },
-            o.minutes_in_time_step, o.host, o.eio, binding, o.dictionary_host,
-            SourceGeneralRealRegistrationOptions { time_step: TimeStepKind::System, meter: None },
-            backend,
-        ).map_err(Error::Output)?;
+            Target::SystemReports {
+                field: Field::Zone { index: zone, field },
+            },
+            self,
+        )
+        .map_err(Error::Output)?;
+        let mut report_input =
+            SourceReportVariableInput::new(o.reports, input, o.minimum_report_frequency);
+        registration
+            .setup_bound_general_real(
+                &mut report_input,
+                o.prescan,
+                SourceRealOutputDeclaration {
+                    name,
+                    key,
+                    units,
+                    store_type,
+                },
+                o.minutes_in_time_step,
+                o.host,
+                o.eio,
+                binding,
+                o.dictionary_host,
+                SourceGeneralRealRegistrationOptions {
+                    time_step: TimeStepKind::System,
+                    meter: None,
+                },
+                backend,
+            )
+            .map_err(Error::Output)?;
         Ok(())
     }
 

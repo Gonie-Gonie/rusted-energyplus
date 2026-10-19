@@ -3,7 +3,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 mod input_statistics;
-pub use input_statistics::{SourceInputStatisticsFields, SourceInputStatisticsInput, SourceInputStatisticsValue};
+pub use input_statistics::{
+    SourceInputStatisticsFields, SourceInputStatisticsInput, SourceInputStatisticsValue,
+};
 
 /// Literal legacy_idd field counts; not an object-admission allowlist.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -327,7 +329,9 @@ impl SourceInputProcessorShortCut {
 
 impl SelectedInputProcessor {
     /// Same ordered unusedInputs set after every actual getter/markObjectAsUsed.
-    pub(crate) fn source_unused_objects(&self) -> impl Iterator<Item=(&str,&str)> {
-        self.unused_inputs.iter().map(|(kind,name)|(kind.as_str(),name.as_str()))
+    pub(crate) fn source_unused_objects(&self) -> impl Iterator<Item = (&str, &str)> {
+        self.unused_inputs
+            .iter()
+            .map(|(kind, name)| (kind.as_str(), name.as_str()))
     }
 }

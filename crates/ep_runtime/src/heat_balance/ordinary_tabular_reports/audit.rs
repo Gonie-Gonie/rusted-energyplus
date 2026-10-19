@@ -4,7 +4,6 @@ use crate::heat_balance::ctf_reports::PredefinedStringTable;
 use crate::heat_balance::ordinary_output_control::SourceOutputControl;
 use crate::heat_balance::predefined_tables::PredefinedRegistry;
 use crate::heat_balance::source_initialization::SourceInitializationFiles;
-use std::io::Write;
 
 impl SourceTabularReports {
     /// This suffix is outside the WriteTabularFiles block; the actual caller

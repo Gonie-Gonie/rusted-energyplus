@@ -12,7 +12,9 @@ pub enum RuntimeError {
     /// Actual ordinary initialization owner/backend/fatal stop, with its original error retained.
     CtfInitialization(Box<crate::heat_balance::ctf_initialization_context::CtfInitializationError>),
     /// Actual SimulationManager initialization cause, retained without string conversion.
-    SourceInitialization(Box<crate::heat_balance::source_initialization::SourceInitializationError>),
+    SourceInitialization(
+        Box<crate::heat_balance::source_initialization::SourceInitializationError>,
+    ),
     /// Actual selected public/history lifecycle stopped; no fallback or Native fatal is inferred.
     CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
     /// Reached ordinary warmup output or backend stop with the original cause.

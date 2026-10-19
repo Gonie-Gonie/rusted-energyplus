@@ -112,7 +112,7 @@ pub(super) fn complete(
     }
     let mut source =
         SourceReportScanInput::new(owners.input, owners.shortcut, owners.report_inputs)
-            .map_err(|e| CtfInitPostludeError::Scan(e))?;
+            .map_err(CtfInitPostludeError::Scan)?;
     let do_report = try_scan_for_reports_with_input(
         owners.report_inputs,
         owners.scan,

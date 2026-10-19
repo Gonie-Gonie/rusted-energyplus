@@ -3,6 +3,8 @@ use super::helpers::{category, column, predef_bytes, predef_real_id, subcategory
 use super::prepare::{SourceBepsLocals, SourceBepsPass};
 use super::{Error, SourceBepsReportOwners, SourceTabularBody, SourceTabularReports};
 impl SourceTabularReports {
+    // Retain Original match/inner-guard nesting and diagnostic/output write order.
+    #[allow(clippy::collapsible_match)]
     pub(super) fn source_beps_end_use_tables(
         &mut self,
         pass: usize,

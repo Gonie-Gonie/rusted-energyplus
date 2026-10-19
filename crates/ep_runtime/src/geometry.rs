@@ -31,6 +31,8 @@ pub use zone_volume::{
     ZoneVolumeError, ZoneVolumeFace, calculate_zone_volume, prepare_zone_height,
     zone_geometry_input_value, zone_geometry_properties,
 };
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use zone_volume::{
     bounded_topology_rejection, calculated_zone_height, initial_enclosure, polyhedron_volume,
     surface_orientation, wall_heights_same,

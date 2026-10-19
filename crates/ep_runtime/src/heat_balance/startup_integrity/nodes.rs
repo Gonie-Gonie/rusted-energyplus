@@ -1,11 +1,13 @@
 //! Actual shared BranchNodeConnections module slice and two finite checks.
-mod reporting;
-mod registration;
-mod component_data;
 mod check_connections;
-pub(crate) use registration::{SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
-use registration::SourceNodeConnection;
+mod component_data;
+mod registration;
+mod reporting;
 use super::{Error, extent};
+use registration::SourceNodeConnection;
+pub(crate) use registration::{
+    SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType,
+};
 use std::convert::Infallible;
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceBranchNodeConnections {
@@ -21,6 +23,8 @@ pub(crate) struct SourceBranchNodeConnections {
     parent_node_list: Option<Vec<Infallible>>,
     non_connected_nodes: Option<Vec<bool>>,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceBranchNodeConnections {
     fn default() -> Self {
         Self {

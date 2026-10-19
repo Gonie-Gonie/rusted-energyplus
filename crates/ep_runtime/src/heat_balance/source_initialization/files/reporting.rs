@@ -147,9 +147,24 @@ impl SourceInitializationFiles {
 impl SourceInitializationFiles {
     /// Same opened report streams and disjoint EIO/BND for node registration.
     pub(crate) fn source_node_reporting_streams<'a>(
-        &'a mut self, sqlite: &'a SourceSqliteState, output_variables: &'a mut Vec<String>,
-    ) -> (SourceRuntimeReportStreams<'a>, &'a mut dyn Write, &'a mut dyn Write) {
+        &'a mut self,
+        sqlite: &'a SourceSqliteState,
+        output_variables: &'a mut Vec<String>,
+    ) -> (
+        SourceRuntimeReportStreams<'a>,
+        &'a mut dyn Write,
+        &'a mut dyn Write,
+    ) {
         let [eso, eio, mtr, bnd] = &mut self.outputs;
-        (SourceRuntimeReportStreams {eso, mtr, sqlite, output_variables}, eio, bnd)
+        (
+            SourceRuntimeReportStreams {
+                eso,
+                mtr,
+                sqlite,
+                output_variables,
+            },
+            eio,
+            bnd,
+        )
     }
 }

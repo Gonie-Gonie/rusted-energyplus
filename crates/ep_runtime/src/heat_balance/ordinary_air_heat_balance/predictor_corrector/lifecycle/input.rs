@@ -1,8 +1,8 @@
 //! Actual GetZoneAirSetPoints with genuine finite positive Thermostat input.
 use super::*;
 use std::io::Write;
-mod thermostat;
 mod current;
+mod thermostat;
 impl SourceZoneAirPredictorCorrector {
     pub(crate) fn get_source_zone_air_setpoints(
         &mut self,
@@ -38,7 +38,9 @@ impl SourceZoneAirPredictorCorrector {
                 owners.input.get_num_objects_found(family);
             if self.flags.number_temperature_controls[kind] > 0 {
                 i32::try_from(self.flags.number_temperature_controls[kind]).map_err(|_| {
-                    Error::Unavailable("actual positive thermostat allocation native int count domain")
+                    Error::Unavailable(
+                        "actual positive thermostat allocation native int count domain",
+                    )
                 })?;
                 self.flags.temperature_setpoint_schedules[kind] = Some(vec![
                     controls::SourceZoneSetpointSchedule::default();

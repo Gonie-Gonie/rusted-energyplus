@@ -1,9 +1,8 @@
 //! Actual eight-getter ManageSizing path for the admitted empty-sizing domain.
 //! Input DoSizing switches and calculation globals are separate borrowed owners.
-mod terminal_unit;
 pub(crate) mod autosizing;
 pub(crate) mod sizer_output;
-pub(crate) use terminal_unit::SourceTerminalUnitSizingData;
+mod terminal_unit;
 use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
 use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_input_processor::{
@@ -16,6 +15,7 @@ use super::selected_schedule_manager::{
 use super::selected_simulation_startup::SelectedHvacGlobals;
 use crate::weather::day::SetupSimulationControls;
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
+pub(crate) use terminal_unit::SourceTerminalUnitSizingData;
 
 /// Actual ordered Output:Table:SummaryReports strings, not a precomputed request flag.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -82,6 +82,8 @@ impl Default for SelectedOARequirement {
 
 /// Exact DataSizing.hh708–764 ZoneEqSizingData defaults; both array members stay unallocated.
 #[derive(Clone, Debug, Default, PartialEq)]
+// Retain existing Native local/member spellings to keep sizing/report formula and field correspondence direct.
+#[allow(non_snake_case)]
 pub(crate) struct SourceZoneEquipmentSizing {
     pub(crate) air__vol__flow: f64,                   // Native AirVolFlow
     pub(crate) max_hw_vol__flow: f64,                 // Native MaxHWVolFlow
@@ -571,19 +573,37 @@ impl SelectedSizingManager {
     /// Actual DataSizing634-671 helper: a real zero DSOA pointer returns the
     /// local initial value before touching any OARequirements/zone operands.
     pub(crate) fn calculate_source_design_specification_outdoor_air(
-        &self, dsoa_pointer: i32, _actual_zone: i32,
-        _use_occupancy_schedule: bool, _use_minimum_oa_schedule: bool,
+        &self,
+        dsoa_pointer: i32,
+        _actual_zone: i32,
+        _use_occupancy_schedule: bool,
+        _use_minimum_oa_schedule: bool,
     ) -> Result<f64, super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
         let total_oa_flow_rate = 0.0;
-        if dsoa_pointer == 0 { return Ok(total_oa_flow_rate); }
-        let index = dsoa_pointer.checked_sub(1).and_then(|v| usize::try_from(v).ok())
-            .ok_or(E::Unavailable("actual calcDesignSpecificationOutdoorAir650 OARequirements ordinal"))?;
-        let requirement = self.oa_requirements.as_ref().and_then(|rows| rows.get(index))
-            .ok_or(E::Unavailable("actual calcDesignSpecificationOutdoorAir650 OARequirements"))?;
-        if requirement.number_of_dsoa == 0 {
-            return Err(E::Unavailable("actual OARequirements.calcOAFlowRate655 positive DSOA child"));
+        if dsoa_pointer == 0 {
+            return Ok(total_oa_flow_rate);
         }
-        Err(E::Unavailable("actual calcDesignSpecificationOutdoorAir659 positive DSOA SpaceList child"))
+        let index = dsoa_pointer
+            .checked_sub(1)
+            .and_then(|v| usize::try_from(v).ok())
+            .ok_or(E::Unavailable(
+                "actual calcDesignSpecificationOutdoorAir650 OARequirements ordinal",
+            ))?;
+        let requirement = self
+            .oa_requirements
+            .as_ref()
+            .and_then(|rows| rows.get(index))
+            .ok_or(E::Unavailable(
+                "actual calcDesignSpecificationOutdoorAir650 OARequirements",
+            ))?;
+        if requirement.number_of_dsoa == 0 {
+            return Err(E::Unavailable(
+                "actual OARequirements.calcOAFlowRate655 positive DSOA child",
+            ));
+        }
+        Err(E::Unavailable(
+            "actual calcDesignSpecificationOutdoorAir659 positive DSOA SpaceList child",
+        ))
     }
 }

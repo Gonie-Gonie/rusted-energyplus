@@ -1066,6 +1066,8 @@ fn run_with_optional_porting_scope_observed(
     outcome
 }
 
+// Retain the existing nested input/trace guards and their error or diagnostic order.
+#[allow(clippy::collapsible_if)]
 fn run_with_optional_porting_scope_impl(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
@@ -1519,8 +1521,12 @@ fn run_with_optional_porting_scope_impl(
                     }
                     RuntimeExecutionOutcome::Source(source) => {
                         crate::source_reported_results::write_source_reported_artifacts(
-                            &config.output_dir.join("results"), &source.reports,
-                        ).map_err(|error| RunError::new(RunExitCode::OutputExport, error.to_string()))?;
+                            &config.output_dir.join("results"),
+                            &source.reports,
+                        )
+                        .map_err(|error| {
+                            RunError::new(RunExitCode::OutputExport, error.to_string())
+                        })?;
                     }
                 }
                 timing.push(
@@ -1554,18 +1560,32 @@ fn run_with_optional_porting_scope_impl(
     // Source reported identities/tuples cannot enter the legacy key/name-only
     // comparator or its default-output-request fallback. Keep its legacy API.
     if (config.oracle_baseline || config.compare_oracle)
-        && matches!(rust_runtime_result.as_ref(), Some(RuntimeExecutionOutcome::Source(_)))
+        && matches!(
+            rust_runtime_result.as_ref(),
+            Some(RuntimeExecutionOutcome::Source(_))
+        )
     {
         diagnostics.error(
             "SourceReportedOracleComparisonUnsupported", "oracle",
             "completed Source artifacts were exported; Source-specific oracle request/comparison identity and timestamp handling is not connected",
         );
         return finish_successful_summary(
-            config, &prepared_input, &assessment, diagnostics, timing,
-            rust_runtime_result.as_ref(), None,
+            config,
+            &prepared_input,
+            &assessment,
+            diagnostics,
+            timing,
+            rust_runtime_result.as_ref(),
+            None,
             "unsupported-source-reported-results".to_owned(),
-            if config.compare_oracle { "unsupported-source-reported-results" } else { "not-requested" }.to_owned(),
-            None, RunExitCode::Unsupported,
+            if config.compare_oracle {
+                "unsupported-source-reported-results"
+            } else {
+                "not-requested"
+            }
+            .to_owned(),
+            None,
+            RunExitCode::Unsupported,
             "Source oracle comparison is unsupported; completed Source results are retained",
         );
     }
@@ -1576,7 +1596,9 @@ fn run_with_optional_porting_scope_impl(
         match run_requested_oracle_baseline(
             config,
             &prepared_input,
-            rust_runtime_result.as_ref().and_then(RuntimeExecutionOutcome::legacy_results),
+            rust_runtime_result
+                .as_ref()
+                .and_then(RuntimeExecutionOutcome::legacy_results),
         ) {
             Ok(summary) => {
                 timing.push(
@@ -1614,7 +1636,9 @@ fn run_with_optional_porting_scope_impl(
     if config.compare_oracle {
         let compare_start = Instant::now();
         match (
-            rust_runtime_result.as_ref().and_then(RuntimeExecutionOutcome::legacy_results),
+            rust_runtime_result
+                .as_ref()
+                .and_then(RuntimeExecutionOutcome::legacy_results),
             oracle_summary.as_ref(),
         ) {
             (Some(results), Some(summary)) => match compare_with_oracle(results, summary) {
@@ -2109,7 +2133,10 @@ fn finish_successful_summary(
 ) -> Result<RunOutcome, RunError> {
     write_json(&config.output_dir.join("diagnostics.json"), &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-    if !matches!(rust_runtime_result,Some(RuntimeExecutionOutcome::Source(_))) {
+    if !matches!(
+        rust_runtime_result,
+        Some(RuntimeExecutionOutcome::Source(_))
+    ) {
         write_error_summary(
             &config.output_dir,
             &render_eplusrs_err(&diagnostics, exit_code),
@@ -3534,11 +3561,15 @@ fn prepare_runtime_inputs(
     match (scope, runtime_class) {
         (None, _)
         | (Some(crate::PortingScope::A), RuntimeClass::OneZoneHeatBalanceCompatibility)
-        | (Some(crate::PortingScope::B), RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility) => {}
-        (Some(selected), actual) => return Err(format!(
-            "porting scope {} cannot execute selected runtime class {} through Source",
-            selected.id(), actual.id(),
-        )),
+        | (Some(crate::PortingScope::B), RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility) => {
+        }
+        (Some(selected), actual) => {
+            return Err(format!(
+                "porting scope {} cannot execute selected runtime class {} through Source",
+                selected.id(),
+                actual.id(),
+            ));
+        }
     }
     let source_initialization_required =
         runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility || scope.is_some();
@@ -3682,8 +3713,7 @@ fn prepare_runtime_inputs(
         Some(cache)
     };
 
-    let selected_input_processor = if source_initialization_required
-    {
+    let selected_input_processor = if source_initialization_required {
         Some(if scope == Some(crate::PortingScope::B) {
             crate::ordinary_input_processor::resolve_source_b(raw_model)?
         } else {
@@ -3692,42 +3722,41 @@ fn prepare_runtime_inputs(
     } else {
         None
     };
-    let source_initialization_input =
-        if source_initialization_required {
-            // Pure raw projection only; actual counts/getters still use the moved IP.
-            Some(
-                ep_runtime::heat_balance::source_initialization::SourceInitializationInput {
-                    project: crate::ordinary_project_data::resolve(
-                        raw_model,
-                        raw_model.is_epjson(),
-                        selected_input_processor
-                            .as_ref()
-                            .ok_or("missing real IP projection")?,
-                    )?,
-                    schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
-                    sizing: crate::ordinary_sizing_input::resolve(raw_model)?,
-                    tabular: crate::ordinary_tabular_input::resolve(
-                        raw_model,
-                        selected_input_processor
-                            .as_ref()
-                            .ok_or("missing real IP projection")?,
-                    )?,
-                    input_weather_file_path: config
-                        .weather_path
-                        .clone()
-                        .ok_or("actual weather path missing")?,
-                    cli_dd_only: false,
-                    cli_annual: false,
-                    reverse_design_days: pending_ordinary_weather
+    let source_initialization_input = if source_initialization_required {
+        // Pure raw projection only; actual counts/getters still use the moved IP.
+        Some(
+            ep_runtime::heat_balance::source_initialization::SourceInitializationInput {
+                project: crate::ordinary_project_data::resolve(
+                    raw_model,
+                    raw_model.is_epjson(),
+                    selected_input_processor
                         .as_ref()
-                        .ok_or("missing actual pending weather")?
-                        .configuration
-                        .reverse_design_days,
-                },
-            )
-        } else {
-            None
-        };
+                        .ok_or("missing real IP projection")?,
+                )?,
+                schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
+                sizing: crate::ordinary_sizing_input::resolve(raw_model)?,
+                tabular: crate::ordinary_tabular_input::resolve(
+                    raw_model,
+                    selected_input_processor
+                        .as_ref()
+                        .ok_or("missing real IP projection")?,
+                )?,
+                input_weather_file_path: config
+                    .weather_path
+                    .clone()
+                    .ok_or("actual weather path missing")?,
+                cli_dd_only: false,
+                cli_annual: false,
+                reverse_design_days: pending_ordinary_weather
+                    .as_ref()
+                    .ok_or("missing actual pending weather")?
+                    .configuration
+                    .reverse_design_days,
+            },
+        )
+    } else {
+        None
+    };
     let (heat_balance_input, material_input) =
         if let Some(input) = selected_input_processor.as_ref() {
             (
@@ -3757,13 +3786,18 @@ fn prepare_runtime_inputs(
         } else {
             None
         },
-        ordinary_warmup_reporting: if source_initialization_required
-        {
+        ordinary_warmup_reporting: if source_initialization_required {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
             let (equipment, radiation) = if scope == Some(crate::PortingScope::B) {
-                crate::ordinary_equipment_input::resolve_with_radiation_source_b(raw_model, input.advanced_report_variables)?
+                crate::ordinary_equipment_input::resolve_with_radiation_source_b(
+                    raw_model,
+                    input.advanced_report_variables,
+                )?
             } else {
-                crate::ordinary_equipment_input::resolve_with_radiation(raw_model, input.advanced_report_variables)?
+                crate::ordinary_equipment_input::resolve_with_radiation(
+                    raw_model,
+                    input.advanced_report_variables,
+                )?
             };
             input.equipment_input = Some(equipment);
             input.radiation_input = Some(radiation);
@@ -3774,6 +3808,8 @@ fn prepare_runtime_inputs(
     })
 }
 
+// These are the actual independently borrowed execution inputs and owners; retain the established call interface.
+#[allow(clippy::too_many_arguments)]
 fn execute_rust_runtime(
     simulation_model: Option<&mut SimulationModel>,
     runtime_class: RuntimeClass,
@@ -3794,7 +3830,7 @@ fn execute_rust_runtime(
             .ok_or("actual source initialization input missing")?;
         ctf_outputs.prepare_source_environment(output_dir, input)?;
         {
-            let mut initialization = ctf_outputs.context();
+            let initialization = ctf_outputs.context();
             if let Some(input) = runtime_inputs.selected_input_processor.take() {
                 initialization
                     .reports
@@ -3839,23 +3875,37 @@ fn execute_rust_runtime(
                     .ok_or("same actual Source reporting controls before continuation268")?;
                 let shading_path = output_dir.join("eplusrs.shd");
                 ctf_outputs
-                    .source_simulation_through_primary(weather, &model.typed, reporting, &shading_path)
+                    .source_simulation_through_primary(
+                        weather,
+                        &model.typed,
+                        reporting,
+                        &shading_path,
+                    )
                     .map_err(|error| error.to_string())?;
                 ctf_outputs
                     .source_simulation_endrun_prefix(weather)
                     .map_err(|error| error.to_string())?;
                 // This branch is reachable only after the same actual Native620
                 // success. Do not fall through to the legacy schedule-cache route.
-                let scope = ctf_outputs.reports().source_reported_run_scope(weather)
+                let scope = ctf_outputs
+                    .reports()
+                    .source_reported_run_scope(weather)
                     .map_err(|error| error.to_string())?;
-                let native_hour_scope = source_outcome::validate_requested_hours(&scope, requested_hours)
-                    .map_err(|error| error.to_string())?;
+                let native_hour_scope =
+                    source_outcome::validate_requested_hours(&scope, requested_hours)
+                        .map_err(|error| error.to_string())?;
                 ctf_outputs.complete_source_program(weather)?;
                 let reports = ctf_outputs.read_completed_source_reports()?;
-                return Ok(RuntimeExecutionOutcome::Source(Box::new(SourceRuntimeResult {
-                    reports, scope, native_hour_scope, requested_hours,
-                    runtime_class, source_order_gate,
-                })));
+                return Ok(RuntimeExecutionOutcome::Source(Box::new(
+                    SourceRuntimeResult {
+                        reports,
+                        scope,
+                        native_hour_scope,
+                        requested_hours,
+                        runtime_class,
+                        source_order_gate,
+                    },
+                )));
             }
             let weather =
                 ctf_outputs.initialize_source_weather(pending.bytes, pending.configuration)?;
@@ -4822,164 +4872,166 @@ fn execute_rust_runtime(
                         .summary
                         .calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
                 );
-            Ok(RuntimeExecutionOutcome::Legacy(Box::new(RustRuntimeResult {
-                geometry_snapshot: capture_geometry
-                    .then(|| {
-                        crate::geometry_trace::runtime_projection_with_source(
-                            &model.typed,
-                            &simulation.state,
-                            ctf_outputs.reports(),
-                        )
-                    })
-                    .transpose()?,
-                results: simulation.results,
-                runtime_class,
-                sample_count,
-                schedule_cache_sample_count,
-                schedule_cache_profile,
-                source_order_gate,
-                zone_demand_source,
-                fixture_demand_injection_used,
-                purchased_air_branch,
-                recirculation_node,
-                recirculation_state_source,
-                actual_coupled_source_order,
-                purchased_air_coupling_call_count,
-                purchased_air_init_lifecycle,
-                purchased_air_calc_entry_lifecycle,
-                purchased_air_calc_minimum_oa_prefix_lifecycle,
-                purchased_air_calc_cooling_entry_gate_lifecycle,
-                purchased_air_calc_cooling_oa_max_flow_gate_lifecycle,
-                purchased_air_calc_cooling_oa_max_flow_body_lifecycle,
-                purchased_air_calc_cooling_economizer_guard_lifecycle,
-                purchased_air_calc_cooling_economizer_condition_lifecycle,
-                purchased_air_calc_cooling_economizer_body_lifecycle,
-                purchased_air_calc_cooling_sensible_flow_lifecycle,
-                purchased_air_calc_cooling_dehumidification_flow_lifecycle,
-                purchased_air_calc_cooling_humidification_flow_lifecycle,
-                purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle,
-                purchased_air_calc_cooling_mixed_air_call_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle,
-                purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle,
-                purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle,
-                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
-                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
-                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle,
-                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_constant_shr_case_break_lifecycle,
-                purchased_air_calc_cooling_humidistat_case_entry_lifecycle,
-                purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle,
-                purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle,
-                purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle,
-                purchased_air_calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_humidistat_case_break_lifecycle,
-                purchased_air_calc_cooling_constant_supply_humidity_ratio_case_entry_lifecycle,
-                purchased_air_calc_cooling_constant_supply_humidity_ratio_assignment_lifecycle,
-                purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle,
-                purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_default_supply_humidity_ratio_case_break_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_humidity_ratio_saturation_limit_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_switch_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_lifecycle,
-                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_lifecycle,
-                purchased_air_calc_cooling_supply_mass_flow_positive_guard_else_branch_entry_lifecycle,
-                purchased_air_calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle,
-                purchased_air_calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle,
-                purchased_air_calc_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_lifecycle,
-                purchased_air_calc_heating_or_no_load_case_entry_lifecycle,
-                purchased_air_calc_heating_mode_guard_lifecycle,
-                purchased_air_calc_heating_operating_mode_heat_assignment_lifecycle,
-                purchased_air_calc_heating_mode_guard_else_branch_entry_lifecycle,
-                purchased_air_calc_heating_operating_mode_deadband_assignment_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle,
-                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
-            })))
+            Ok(RuntimeExecutionOutcome::Legacy(Box::new(
+                RustRuntimeResult {
+                    geometry_snapshot: capture_geometry
+                        .then(|| {
+                            crate::geometry_trace::runtime_projection_with_source(
+                                &model.typed,
+                                &simulation.state,
+                                ctf_outputs.reports(),
+                            )
+                        })
+                        .transpose()?,
+                    results: simulation.results,
+                    runtime_class,
+                    sample_count,
+                    schedule_cache_sample_count,
+                    schedule_cache_profile,
+                    source_order_gate,
+                    zone_demand_source,
+                    fixture_demand_injection_used,
+                    purchased_air_branch,
+                    recirculation_node,
+                    recirculation_state_source,
+                    actual_coupled_source_order,
+                    purchased_air_coupling_call_count,
+                    purchased_air_init_lifecycle,
+                    purchased_air_calc_entry_lifecycle,
+                    purchased_air_calc_minimum_oa_prefix_lifecycle,
+                    purchased_air_calc_cooling_entry_gate_lifecycle,
+                    purchased_air_calc_cooling_oa_max_flow_gate_lifecycle,
+                    purchased_air_calc_cooling_oa_max_flow_body_lifecycle,
+                    purchased_air_calc_cooling_economizer_guard_lifecycle,
+                    purchased_air_calc_cooling_economizer_condition_lifecycle,
+                    purchased_air_calc_cooling_economizer_body_lifecycle,
+                    purchased_air_calc_cooling_sensible_flow_lifecycle,
+                    purchased_air_calc_cooling_dehumidification_flow_lifecycle,
+                    purchased_air_calc_cooling_humidification_flow_lifecycle,
+                    purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle,
+                    purchased_air_calc_cooling_mixed_air_call_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle,
+                    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
+                    purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
+                    purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle,
+                    purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_constant_shr_case_break_lifecycle,
+                    purchased_air_calc_cooling_humidistat_case_entry_lifecycle,
+                    purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle,
+                    purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle,
+                    purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle,
+                    purchased_air_calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_humidistat_case_break_lifecycle,
+                    purchased_air_calc_cooling_constant_supply_humidity_ratio_case_entry_lifecycle,
+                    purchased_air_calc_cooling_constant_supply_humidity_ratio_assignment_lifecycle,
+                    purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle,
+                    purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_default_supply_humidity_ratio_case_break_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_humidity_ratio_saturation_limit_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_switch_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_lifecycle,
+                    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_lifecycle,
+                    purchased_air_calc_cooling_supply_mass_flow_positive_guard_else_branch_entry_lifecycle,
+                    purchased_air_calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle,
+                    purchased_air_calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle,
+                    purchased_air_calc_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_lifecycle,
+                    purchased_air_calc_heating_or_no_load_case_entry_lifecycle,
+                    purchased_air_calc_heating_mode_guard_lifecycle,
+                    purchased_air_calc_heating_operating_mode_heat_assignment_lifecycle,
+                    purchased_air_calc_heating_mode_guard_else_branch_entry_lifecycle,
+                    purchased_air_calc_heating_operating_mode_deadband_assignment_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle,
+                    purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
+                },
+            )))
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
             let simulation = simulate_ideal_loads_purchased_air_compat(

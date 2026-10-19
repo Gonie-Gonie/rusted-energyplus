@@ -40,10 +40,14 @@ impl OrdinaryEquipment {
                     .ok_or(Error::Unavailable("actual same ZoneEquipConfig2930"))?;
                 let mut air_loop_found = false;
                 for ordinal in 0..config.inlet_nodes {
-                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                    let air_loop = *config
+                        .inlet_node_air_loop_numbers
+                        .as_ref()
                         .and_then(|rows| rows.get(ordinal))
                         .ok_or(Error::Unavailable("actual same InletNodeAirLoopNum2934"))?;
-                    if air_loop > 0 { air_loop_found = true; }
+                    if air_loop > 0 {
+                        air_loop_found = true;
+                    }
                 }
                 if !air_loop_found && config.inlet_nodes == config.exhaust_nodes {
                     config.zonal_system_only = true;
@@ -62,11 +66,15 @@ impl OrdinaryEquipment {
                 }
                 let cycling_fan = false;
                 for ordinal in 0..config.inlet_nodes {
-                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                    let air_loop = *config
+                        .inlet_node_air_loop_numbers
+                        .as_ref()
                         .and_then(|rows| rows.get(ordinal))
                         .ok_or(Error::Unavailable("actual cycling InletNodeAirLoopNum2951"))?;
                     if air_loop > 0 {
-                        return Err(Error::Unavailable("actual cycling AirLoopControlInfo cycFanSched2953"));
+                        return Err(Error::Unavailable(
+                            "actual cycling AirLoopControlInfo cycFanSched2953",
+                        ));
                     }
                 }
                 if config.zonal_system_only || cycling_fan {
@@ -106,11 +114,15 @@ impl OrdinaryEquipment {
             zone.no_heat_to_return_air = true;
             if !config.zonal_system_only {
                 for ordinal in 0..config.inlet_nodes {
-                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                    let air_loop = *config
+                        .inlet_node_air_loop_numbers
+                        .as_ref()
                         .and_then(|rows| rows.get(ordinal))
                         .ok_or(Error::Unavailable("actual final InletNodeAirLoopNum3009"))?;
                     if air_loop > 0 {
-                        return Err(Error::Unavailable("actual continuous AirLoopControlInfo fanOp3011"));
+                        return Err(Error::Unavailable(
+                            "actual continuous AirLoopControlInfo fanOp3011",
+                        ));
                     }
                 }
             }

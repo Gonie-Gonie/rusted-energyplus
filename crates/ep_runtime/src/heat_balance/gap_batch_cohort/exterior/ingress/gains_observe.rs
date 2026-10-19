@@ -990,7 +990,7 @@ impl GainFactory {
                                     _ => {
                                         return Err(
                                             invalid("actual finite rate binding position").into()
-                                        )
+                                        );
                                     }
                                 },
                                 "actual stored rate target field",

@@ -15,6 +15,10 @@ pub(crate) trait SourceOutputDictionaryHost {
 }
 
 /// Borrowed stream and actual ResultsFramework outputVariables, with no values.
+#[allow(
+    dead_code,
+    reason = "Retain the optional physical-stream dictionary host for direct registered-output consumers; current production supplies the same genuine host trait through its existing stream owner."
+)]
 pub(crate) struct SourceOutputDictionaryStreams<'a> {
     /// Some only when the actual Source ESO stream is open and good.
     pub(crate) eso: Option<&'a mut dyn Write>,

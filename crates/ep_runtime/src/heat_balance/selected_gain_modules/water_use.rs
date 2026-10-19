@@ -45,6 +45,8 @@ impl SourceWaterUseModule {
         if begin_environment && self.environment_flag {
             if *number_equipment > 0 {
                 if let Some(rows) = self.equipment.as_ref() {
+                    // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                    #[allow(clippy::never_loop)]
                     for row in rows {
                         match *row {}
                     }
@@ -52,6 +54,8 @@ impl SourceWaterUseModule {
             }
             if self.number_connections > 0 {
                 if let Some(rows) = self.connections.as_ref() {
+                    // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                    #[allow(clippy::never_loop)]
                     for row in rows {
                         match *row {}
                     }
@@ -63,6 +67,8 @@ impl SourceWaterUseModule {
             self.environment_flag = true;
         }
         if let Some(rows) = self.equipment.as_ref() {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }
@@ -74,6 +80,8 @@ impl SourceWaterUseModule {
             ));
         }
         if let Some(rows) = self.connections.as_ref() {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }
@@ -108,6 +116,8 @@ impl SourceWaterUseModule {
         // Genuine zero connections skip CheckEquipName, peak-flow and plant registration.
         // Final allowHotControl traversal uses the same default-unallocated equipment vector.
         if let Some(rows) = self.equipment.as_ref() {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }

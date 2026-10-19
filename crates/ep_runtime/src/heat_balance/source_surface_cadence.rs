@@ -10,17 +10,27 @@ const MAX_RECORDS: usize = 200_000;
 const MAX_DEPTH: usize = 16;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+/// Actual surface-manager scopes, including separately labeled Source-only warmup scopes.
 pub enum Procedure {
+    /// ManageSurfaceHeatBalance entry and return.
     Manage,
+    /// InitSurfaceHeatBalance entry and return.
     Initialize,
+    /// Initial temperature and flux-history setup.
     InitializeHistories,
+    /// Accepted surface temperature and flux-history update.
     UpdateHistories,
+    /// Opaque CTF inside-surface iteration.
     InsideCtf,
+    /// Surface report calculation and output.
     Report,
+    /// Source-only warmup heat-balance recording.
     SourceRecord,
+    /// Source-only warmup convergence check.
     SourceCheck,
 }
 impl Procedure {
+    /// Stable Native method name or explicitly Source-only tag written into the trace.
     pub fn name(self) -> &'static str {
         match self {
             Self::Manage => "ManageSurfaceHeatBalance",
@@ -39,22 +49,39 @@ impl Procedure {
 /// inner-loop updates read every current clock/global operand again.
 #[derive(Clone, Copy, Debug)]
 pub struct Frame {
+    /// Identity of the currently borrowed Source owner; valid within this call, not across moves.
     pub owner: usize,
+    /// Actual current environment ordinal.
     pub environment_index: i32,
+    /// Actual simulation calendar year.
     pub calendar_year: i32,
+    /// Actual weather-environment month.
     pub month: i32,
+    /// Actual weather-environment day of month.
     pub day_of_month: i32,
+    /// Actual simulation day counter, including the warmup transition reset.
     pub day_of_sim: i32,
+    /// Actual hour-of-day counter.
     pub hour: i32,
+    /// Actual zone-timestep ordinal within the hour.
     pub timestep: i32,
+    /// Actual kickoff state supplied by the caller.
     pub kickoff: bool,
+    /// Actual warmup flag.
     pub warmup: bool,
+    /// Actual beginning-of-simulation flag.
     pub begin_sim: bool,
+    /// Actual beginning-of-environment flag.
     pub begin_environment: bool,
+    /// Actual beginning-of-day flag.
     pub begin_day: bool,
+    /// Actual beginning-of-hour flag.
     pub begin_hour: bool,
+    /// Actual beginning-of-zone-timestep flag.
     pub begin_timestep: bool,
+    /// Actual ZoneSizingCalc state, distinct from DoingSizing.
     pub sizing: bool,
+    /// Completed inside-surface iterations at this observation point.
     pub completed_inside_iterations: i32,
     /// Additional Source-only field, absent from the retained Native collector.
     pub end_day: bool,
@@ -115,12 +142,19 @@ impl Frame {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
+/// Optional passive operands attached to one actual surface-cadence event.
 pub struct Detail {
+    /// Actual physical surface ordinal when this checkpoint names a surface.
     pub surface: Option<i32>,
+    /// Raw binary64 bits of the actual inside convection coefficient.
     pub convection_bits: Option<u64>,
+    /// Address of the borrowed convection-array element for within-call storage checks.
     pub convection_storage: Option<usize>,
+    /// Raw binary64 bits of the actual maximum convergence temperature delta.
     pub maximum_delta_bits: Option<u64>,
+    /// Actual convergence decision when present at this checkpoint.
     pub converged: Option<bool>,
+    /// Actual pre-solve or temperature-only surface observation.
     pub inside_snapshot: Option<InsideSnapshot>,
     /// True only for an early exit where live owners are no longer borrowed.
     pub entry_frame_on_failure: bool,
@@ -128,13 +162,21 @@ pub struct Detail {
 /// Only actual retained fields. Full first-two pre-solve snapshots have the
 /// same21 reals/three flags as the existing Native Copy::Inside observer.
 #[derive(Clone, Copy, Debug)]
+// Retain the actual observer snapshot payload layout; boxing solely for this lint would alter its ownership representation.
+#[allow(clippy::large_enum_variant)]
 pub enum InsideSnapshot {
+    /// First-two pre-solve fields in the retained Native inside-observer order.
     Full {
+        /// Raw bits for the21 actual real fields; None preserves unavailable storage.
         values: [Option<u64>; 21],
+        /// Actual adiabatic, pool and source/sink flags in the retained Native order.
         flags: [Option<i32>; 3],
     },
+    /// Actual inside and temporary temperatures after assignment or at loop exit.
     Temperature {
+        /// Raw binary64 bits of SurfTempIn, if its actual owner row exists.
         inside: Option<u64>,
+        /// Raw binary64 bits of SurfTempInTmp, if its actual owner row exists.
         temporary: Option<u64>,
     },
 }
@@ -249,14 +291,23 @@ impl InsideSnapshot {
     }
 }
 #[derive(Clone, Copy, Debug)]
+/// One bounded passive event from the currently executing Source scope.
 pub struct Event {
+    /// Monotonic observation sequence within this capture.
     pub sequence: u64,
+    /// Static checkpoint tag identifying the real entry, return or loop point.
     pub checkpoint: &'static str,
+    /// Actual active surface-manager procedure, when a scope is open.
     pub procedure: Option<Procedure>,
+    /// Actual invocation ordinal within that procedure.
     pub invocation: Option<u64>,
+    /// Actual enclosing procedure, when nested in another observed scope.
     pub parent_procedure: Option<Procedure>,
+    /// Actual invocation ordinal of the enclosing procedure.
     pub parent_invocation: Option<u64>,
+    /// Actual clock and borrowed-owner identity at the checkpoint.
     pub frame: Frame,
+    /// Optional actual operands observed at the checkpoint.
     pub detail: Detail,
 }
 #[derive(Clone, Copy)]
@@ -281,26 +332,41 @@ struct Buffer {
     handoff_error: bool,
 }
 thread_local! {
+    // Initializer is already const; constrain the Rust1.96 macro-expansion lint to this exact thread-local declaration.
+    #[allow(clippy::missing_const_for_thread_local)]
     static ACTIVE: RefCell<Option<Buffer>> = const { RefCell::new(None) };
+    // Initializer is already const; constrain the Rust1.96 macro-expansion lint to this exact thread-local declaration.
+    #[allow(clippy::missing_const_for_thread_local)]
     static GENERATION: Cell<u64> = const { Cell::new(0) };
 }
 
 /// Bounded results only. A complete trace requires no omissions, errors or open scopes.
 pub struct Trace {
+    /// Configured bound on retained cadence events.
     pub record_limit: usize,
+    /// Number of attempted cadence-event records.
     pub attempted: u64,
+    /// Number of cadence events omitted after the configured bound.
     pub omitted: u64,
+    /// Whether an observation counter overflowed.
     pub counter_overflow: bool,
+    /// Whether scope order or capture-generation validation failed.
     pub stack_error: bool,
+    /// Number of scopes that exited without a successful completion marker.
     pub failed_scopes: u64,
+    /// Number of scopes still open when capture ended.
     pub remaining_scope_depth: usize,
+    /// Actual invocation counts in Procedure discriminant order.
     pub calls: [u64; 8],
+    /// Cadence events retained in their actual observation order.
     pub events: Vec<Event>,
-    /// Exactly two selected transition observations, separate from old events.
+    /// Up to two transition observations; the finite A24 comparer requires both.
     pub handoffs: Vec<serde_json::Value>,
+    /// Whether a selected transition had invalid order, shape or excess observations.
     pub handoff_error: bool,
 }
 impl Trace {
+    /// Whether capture ended without omissions, errors or open scopes; does not require two handoffs.
     pub fn complete(&self) -> bool {
         !self.handoff_error
             && self.omitted == 0
@@ -309,8 +375,8 @@ impl Trace {
             && self.failed_scopes == 0
             && self.remaining_scope_depth == 0
     }
-    /// Fixed ASCII field names and static procedure/tag strings need no generic
-    /// JSON dependency. No arbitrary model string is serialized by this writer.
+    /// Cadence rows use fixed field/tag names; handoff values use serde_json.
+    /// This writer serializes retained observations without a scientific call.
     pub fn write_json(&self, out: &mut impl Write) -> io::Result<()> {
         write!(
             out,

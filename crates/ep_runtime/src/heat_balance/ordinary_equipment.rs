@@ -2,29 +2,29 @@
 mod heat_to_return_air;
 pub(crate) mod management;
 mod node_reporting;
-mod source_input;
-mod source_equipment_types;
-mod source_energy_report;
-mod source_energy_initialization;
-mod source_equipment_initialization;
-mod source_equipment_getter;
 mod source_controlled_equipment;
-mod source_node_connections;
-mod source_nodes;
-mod source_node_lists;
 mod source_endrun;
+mod source_energy_initialization;
+mod source_energy_report;
+mod source_equipment_getter;
+mod source_equipment_initialization;
+mod source_equipment_types;
+mod source_input;
 mod source_marked_nodes;
+mod source_node_connections;
+mod source_node_lists;
+mod source_nodes;
+pub(crate) mod source_purchased_air;
 mod source_reset;
 mod source_setup_reporting;
-pub(crate) mod source_purchased_air;
 
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
-use source_nodes::{SourceNodeData, SourceNodeSetpointCheck};
-use source_node_lists::SourceNodeList;
-use source_equipment_types::{SourceAirIn, SourceEquipmentData, SourceSimulationOrder};
 use super::selected_schedule_manager::SourceScheduleIndex;
-pub(crate) use source_input::SourceEquipmentInputOwners;
 use ep_model::{SpaceId, ZoneId};
+use source_equipment_types::{SourceAirIn, SourceEquipmentData, SourceSimulationOrder};
+pub(crate) use source_input::SourceEquipmentInputOwners;
+use source_node_lists::SourceNodeList;
+use source_nodes::{SourceNodeData, SourceNodeSetpointCheck};
 
 /// Unsupported input or an unavailable represented equipment owner.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -80,11 +80,16 @@ impl OrdinaryEquipmentInput {
         let mut supplied = [None; 9];
         for (family, count) in inventory {
             if let Some(index) = Self::FAMILIES.iter().position(|&name| name == family) {
-                if supplied[index].is_some() { return Err(Unavailable::Input(family.into())); }
+                if supplied[index].is_some() {
+                    return Err(Unavailable::Input(family.into()));
+                }
                 supplied[index] = Some(count);
             }
         }
-        Ok(Self { supplied, timesteps_per_hour })
+        Ok(Self {
+            supplied,
+            timesteps_per_hour,
+        })
     }
 
     /// Five count-query families, NodeList, then three actual .find families.
@@ -486,24 +491,56 @@ pub(crate) struct SourceZoneEquipmentConfigRef<'a> {
 }
 impl SourceZoneEquipmentConfigRef<'_> {
     /// Actual retained indices read by normal SystemReports controlled-zone bodies.
-    pub(crate) fn equipment_list_index(&self) -> &usize { &self.row.equipment_list_index }
-    pub(crate) fn zone_design_specification_outdoor_air_index(&self) -> &i32 { &self.row.zone_design_specification_outdoor_air_index }
-    pub(crate) fn zone_air_distribution_index(&self) -> &i32 { &self.row.zone_air_distribution_index }
+    pub(crate) fn equipment_list_index(&self) -> &usize {
+        &self.row.equipment_list_index
+    }
+    pub(crate) fn zone_design_specification_outdoor_air_index(&self) -> &i32 {
+        &self.row.zone_design_specification_outdoor_air_index
+    }
+    pub(crate) fn zone_air_distribution_index(&self) -> &i32 {
+        &self.row.zone_air_distribution_index
+    }
     pub(crate) fn inlet_node_air_loop_number(&self, ordinal: usize) -> Option<&i32> {
-        self.row.inlet_node_air_loop_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .inlet_node_air_loop_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     /// Actual names and physical node ordinals consumed by startup reports.
-    pub(crate) fn equipment_list_name(&self) -> &str { &self.row.equipment_list_name }
-    pub(crate) fn control_list_name(&self) -> &str { &self.row.control_list_name }
-    pub(crate) fn zone_node_number(&self) -> &usize { &self.row.zone_node }
+    pub(crate) fn equipment_list_name(&self) -> &str {
+        &self.row.equipment_list_name
+    }
+    pub(crate) fn control_list_name(&self) -> &str {
+        &self.row.control_list_name
+    }
+    pub(crate) fn zone_node_number(&self) -> &usize {
+        &self.row.zone_node
+    }
     pub(crate) fn exhaust_node_number(&self, ordinal: usize) -> Option<&usize> {
-        self.row.exhaust_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .exhaust_node_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn heating_distribution_inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
-        Some(&self.row.air_distribution_units_heat.as_ref()?.get(ordinal.checked_sub(1)?)?.inlet_node)
+        Some(
+            &self
+                .row
+                .air_distribution_units_heat
+                .as_ref()?
+                .get(ordinal.checked_sub(1)?)?
+                .inlet_node,
+        )
     }
     pub(crate) fn cooling_distribution_inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
-        Some(&self.row.air_distribution_units_cool.as_ref()?.get(ordinal.checked_sub(1)?)?.inlet_node)
+        Some(
+            &self
+                .row
+                .air_distribution_units_cool
+                .as_ref()?
+                .get(ordinal.checked_sub(1)?)?
+                .inlet_node,
+        )
     }
     /// Same retained Config.ZoneName read by SystemReports1994.
     pub(crate) fn zone_name(&self) -> &str {
@@ -520,17 +557,29 @@ impl SourceZoneEquipmentConfigRef<'_> {
     }
     /// Actual stored physical ordinals, read in Native InitAirLoops/ConnectReturnNodes.
     pub(crate) fn inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
-        self.row.inlet_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .inlet_node_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn return_node_number(&self, ordinal: usize) -> Option<&usize> {
-        self.row.return_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .return_node_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn return_node_air_loop_number(&self, ordinal: usize) -> Option<&i32> {
-        self.row.return_node_air_loop_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .return_node_air_loop_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     /// Actual stored InletNodeADUNum, consumed after each component-report sum.
     pub(crate) fn inlet_node_air_distribution_unit_number(&self, ordinal: usize) -> Option<&i32> {
-        self.row.inlet_node_air_distribution_unit_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .inlet_node_air_distribution_unit_numbers
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn number_exhaust_nodes(&self) -> &usize {
         &self.row.exhaust_nodes
@@ -541,27 +590,53 @@ impl SourceZoneEquipmentConfigRef<'_> {
 }
 
 /// A short borrow of the same actual EquipmentList row, not a report projection.
-pub(crate) struct SourceZoneEquipmentListRef<'a> { row: &'a EquipmentList }
+pub(crate) struct SourceZoneEquipmentListRef<'a> {
+    row: &'a EquipmentList,
+}
 impl SourceZoneEquipmentListRef<'_> {
     pub(crate) fn equipment_type(&self, ordinal: usize) -> Option<&i32> {
-        self.row.equipment_types.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .equipment_types
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn equipment_index(&self, ordinal: usize) -> Option<&i32> {
-        self.row.equipment_indices.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .equipment_indices
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
-    pub(crate) fn name(&self) -> &str { &self.row.name }
-    pub(crate) fn number_equipment_types(&self) -> &usize { &self.row.number_of_equipment_types }
+    pub(crate) fn name(&self) -> &str {
+        &self.row.name
+    }
+    pub(crate) fn number_equipment_types(&self) -> &usize {
+        &self.row.number_of_equipment_types
+    }
     pub(crate) fn equipment_type_name(&self, ordinal: usize) -> Option<&str> {
-        self.row.equipment_type_names.as_ref()?.get(ordinal.checked_sub(1)?).map(String::as_str)
+        self.row
+            .equipment_type_names
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
+            .map(String::as_str)
     }
     pub(crate) fn equipment_name(&self, ordinal: usize) -> Option<&str> {
-        self.row.equipment_names.as_ref()?.get(ordinal.checked_sub(1)?).map(String::as_str)
+        self.row
+            .equipment_names
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
+            .map(String::as_str)
     }
     pub(crate) fn cooling_priority(&self, ordinal: usize) -> Option<&i32> {
-        self.row.cooling_priorities.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .cooling_priorities
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
     pub(crate) fn heating_priority(&self, ordinal: usize) -> Option<&i32> {
-        self.row.heating_priorities.as_ref()?.get(ordinal.checked_sub(1)?)
+        self.row
+            .heating_priorities
+            .as_ref()?
+            .get(ordinal.checked_sub(1)?)
     }
 }
 
@@ -618,8 +693,9 @@ impl OrdinaryEquipment {
     ) -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
         if self.nodes.number_of_nodes > 0 {
-            for node in self.nodes.physical.as_mut()
-                .ok_or(E::Unavailable("actual Node thermal-history physical array2958"))? {
+            for node in self.nodes.physical.as_mut().ok_or(E::Unavailable(
+                "actual Node thermal-history physical array2958",
+            ))? {
                 node.temperature_last_timestep = node.temperature;
                 node.enthalpy_last_timestep = node.enthalpy;
             }
@@ -627,20 +703,32 @@ impl OrdinaryEquipment {
         Ok(())
     }
     /// Native HVACManager1769-1784 on the same complete Node array and default row.
-    pub(crate) fn source_node_mass_flow(&self, ordinal: i32)
-        -> Result<f64, super::selected_heat_balance_input::HeatBalanceInputError> {
+    pub(crate) fn source_node_mass_flow(
+        &self,
+        ordinal: i32,
+    ) -> Result<f64, super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let index = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
-            .ok_or(E::Unavailable("actual convergence physical Node ordinal3035"))?;
-        self.nodes.physical.as_ref().and_then(|rows| rows.get(index)).map(|row| row.mass_flow_rate)
+        let index = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
+            .ok_or(E::Unavailable(
+                "actual convergence physical Node ordinal3035",
+            ))?;
+        self.nodes
+            .physical
+            .as_ref()
+            .and_then(|rows| rows.get(index))
+            .map(|row| row.mass_flow_rate)
             .ok_or(E::Unavailable("actual convergence same physical Node3035"))
     }
-    pub(crate) fn reset_source_hvac_node_setpoints(&mut self)
-        -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+    pub(crate) fn reset_source_hvac_node_setpoints(
+        &mut self,
+    ) -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
         if self.nodes.number_of_nodes > 0 {
-            let rows = self.nodes.physical.as_mut()
-                .ok_or(E::Unavailable("actual SimHVAC Node array setpoint reset1770"))?;
+            let rows = self.nodes.physical.as_mut().ok_or(E::Unavailable(
+                "actual SimHVAC Node array setpoint reset1770",
+            ))?;
             for row in rows {
                 row.temperature_setpoint = -999.0;
                 row.humidity_ratio_setpoint = -999.0;
@@ -659,11 +747,18 @@ impl OrdinaryEquipment {
     pub(crate) fn source_zone_air_node(
         &self,
         ordinal: i32,
-    ) -> Result<SourceZoneAirNodeRef<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
+    ) -> Result<SourceZoneAirNodeRef<'_>, super::selected_heat_balance_input::HeatBalanceInputError>
+    {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let at = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
+        let at = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
             .ok_or(E::Unavailable("actual air Node positive ordinal"))?;
-        let row = self.nodes.physical.as_deref().and_then(|rows| rows.get(at))
+        let row = self
+            .nodes
+            .physical
+            .as_deref()
+            .and_then(|rows| rows.get(at))
             .ok_or(E::Unavailable("actual same physical air Node allocation"))?;
         Ok(SourceZoneAirNodeRef {
             temperature: &row.temperature,
@@ -674,12 +769,21 @@ impl OrdinaryEquipment {
     pub(crate) fn source_zone_air_node_mut(
         &mut self,
         ordinal: i32,
-    ) -> Result<SourceZoneAirNodeMut<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
+    ) -> Result<SourceZoneAirNodeMut<'_>, super::selected_heat_balance_input::HeatBalanceInputError>
+    {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let at = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
+        let at = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
             .ok_or(E::Unavailable("actual prediction Node positive ordinal"))?;
-        let row = self.nodes.physical.as_deref_mut().and_then(|rows| rows.get_mut(at))
-            .ok_or(E::Unavailable("actual prediction same physical Node allocation"))?;
+        let row = self
+            .nodes
+            .physical
+            .as_deref_mut()
+            .and_then(|rows| rows.get_mut(at))
+            .ok_or(E::Unavailable(
+                "actual prediction same physical Node allocation",
+            ))?;
         Ok(SourceZoneAirNodeMut {
             temperature: &mut row.temperature,
             humidity_ratio: &mut row.humidity_ratio,
@@ -690,7 +794,9 @@ impl OrdinaryEquipment {
     }
     /// Actual VerifyControlledZoneForThermostat5702 exact-name search.
     pub(crate) fn verify_source_controlled_zone_for_thermostat(&self, name: &str) -> bool {
-        self.zone_config.as_ref().is_some_and(|rows| rows.iter().any(|row| row.zone_name == name))
+        self.zone_config
+            .as_ref()
+            .is_some_and(|rows| rows.iter().any(|row| row.zone_name == name))
     }
     /// Actual ReportLoopConnections2656 allocated(ZoneEquipConfig), not an input-count inference.
     pub(crate) fn source_zone_equipment_config_allocated(&self) -> bool {
@@ -707,18 +813,52 @@ impl OrdinaryEquipment {
     }
     /// Native NodeID has physical lower bound0. Index0 is read from actual
     /// allocator storage (Undefined), never synthesized for missing owners.
-    pub(crate) fn source_node_id(&self, number: usize) -> Result<&str, super::selected_heat_balance_input::HeatBalanceInputError> {
-        i32::try_from(number).map_err(|_| super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual NodeID signed ordinal"))?;
-        self.nodes.node_ids.as_ref().and_then(|rows| rows.get(number)).map(String::as_str)
-            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual allocated physical NodeID"))
+    pub(crate) fn source_node_id(
+        &self,
+        number: usize,
+    ) -> Result<&str, super::selected_heat_balance_input::HeatBalanceInputError> {
+        i32::try_from(number).map_err(|_| {
+            super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                "actual NodeID signed ordinal",
+            )
+        })?;
+        self.nodes
+            .node_ids
+            .as_ref()
+            .and_then(|rows| rows.get(number))
+            .map(String::as_str)
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual allocated physical NodeID",
+                ),
+            )
     }
     /// Native2737 uses the actual parallel controlled-zone Count, without an
     /// EquipListIndex remap or name search.
-    pub(crate) fn source_zone_equipment_list(&self, ordinal: i32) -> Result<SourceZoneEquipmentListRef<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
-        let index=ordinal.checked_sub(1).and_then(|n|usize::try_from(n).ok())
-            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual ZoneEquipList report ordinal"))?;
-        let row=self.equipment_lists.as_ref().and_then(|rows|rows.get(index))
-            .ok_or(super::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same ZoneEquipList report allocation"))?;
+    pub(crate) fn source_zone_equipment_list(
+        &self,
+        ordinal: i32,
+    ) -> Result<
+        SourceZoneEquipmentListRef<'_>,
+        super::selected_heat_balance_input::HeatBalanceInputError,
+    > {
+        let index = ordinal
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual ZoneEquipList report ordinal",
+                ),
+            )?;
+        let row = self
+            .equipment_lists
+            .as_ref()
+            .and_then(|rows| rows.get(index))
+            .ok_or(
+                super::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual same ZoneEquipList report allocation",
+                ),
+            )?;
         Ok(SourceZoneEquipmentListRef { row })
     }
     pub(crate) fn source_zone_equipment_config(
@@ -891,7 +1031,10 @@ impl OrdinaryEquipment {
                     maximum_equipment_types.max(list.number_of_equipment_types);
             }
         }
-        self.priority_simulation_order = Some(vec![SourceSimulationOrder::default(); maximum_equipment_types]);
+        self.priority_simulation_order = Some(vec![
+            SourceSimulationOrder::default();
+            maximum_equipment_types
+        ]);
         Ok(())
     }
 
@@ -1023,7 +1166,11 @@ impl OrdinaryEquipment {
         source_gains:Option<&crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains>,
     ) -> Result<(), Unavailable> {
         if let Some(gains) = source_gains {
-            if self.zone_config.as_ref().is_some_and(|rows| rows.iter().any(|row| row.is_controlled)) {
+            if self
+                .zone_config
+                .as_ref()
+                .is_some_and(|rows| rows.iter().any(|row| row.is_controlled))
+            {
                 return self.validate_source_controlled_equipment_storage(zones, spaces, gains);
             }
         }
@@ -1212,18 +1359,43 @@ impl OrdinaryEquipment {
 // Test-only restoration of captured function-entry operands after genuine getter allocation.
 #[cfg(test)]
 impl OrdinaryEquipment {
-    pub(crate) fn restore_native_cohort_node(&mut self, ordinal:i32, node_id:&str, values:[f64;5])
-        -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+    #[allow(
+        dead_code,
+        reason = "Captured-entry restoration is used only by the feature-gated Native cohort; ordinary test targets intentionally do not invoke this test-only physical Node owner method."
+    )]
+    pub(crate) fn restore_native_cohort_node(
+        &mut self,
+        ordinal: i32,
+        node_id: &str,
+        values: [f64; 5],
+    ) -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let number=usize::try_from(ordinal).map_err(|_|E::Unavailable("cohort positive physical Node ordinal"))?;
-        let at=number.checked_sub(1).ok_or(E::Unavailable("cohort positive physical Node ordinal"))?;
-        if self.nodes.node_ids.as_ref().and_then(|rows|rows.get(number)).map(String::as_str)!=Some(node_id) {
+        let number = usize::try_from(ordinal)
+            .map_err(|_| E::Unavailable("cohort positive physical Node ordinal"))?;
+        let at = number
+            .checked_sub(1)
+            .ok_or(E::Unavailable("cohort positive physical Node ordinal"))?;
+        if self
+            .nodes
+            .node_ids
+            .as_ref()
+            .and_then(|rows| rows.get(number))
+            .map(String::as_str)
+            != Some(node_id)
+        {
             return Err(E::Unavailable("cohort exact getter-created NodeID/ordinal"));
         }
-        let row=self.nodes.physical.as_mut().and_then(|rows|rows.get_mut(at))
+        let row = self
+            .nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(at))
             .ok_or(E::Unavailable("cohort existing physical Node allocation"))?;
-        row.temperature=values[0];row.mass_flow_rate=values[1];row.humidity_ratio=values[2];
-        row.enthalpy=values[3];row.temperature_setpoint=values[4];
+        row.temperature = values[0];
+        row.mass_flow_rate = values[1];
+        row.humidity_ratio = values[2];
+        row.enthalpy = values[3];
+        row.temperature_setpoint = values[4];
         Ok(())
     }
 }
@@ -1231,49 +1403,136 @@ impl OrdinaryEquipment {
 // Only genuine captured/unit-variant report-entry operands; no production API.
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 impl OrdinaryEquipment {
-    pub(crate) fn restore_native_report_config(&mut self, zone:i32, name:&str,
-        controlled:bool, inlets:Option<&[i32]>, reporting_indices:Option<(i32,i32,i32)>)
-        -> Result<usize, super::selected_heat_balance_input::HeatBalanceInputError> {
+    pub(crate) fn restore_native_report_config(
+        &mut self,
+        zone: i32,
+        name: &str,
+        controlled: bool,
+        inlets: Option<&[i32]>,
+        reporting_indices: Option<(i32, i32, i32)>,
+    ) -> Result<usize, super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let index=zone.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort Config ordinal"))?;
-        let row=self.zone_config.as_mut().and_then(|rows|rows.get_mut(index)).ok_or(E::Unavailable("report cohort getter-created Config"))?;
-        if row.zone_name!=name {return Err(E::Unavailable("report cohort actual Zone identity"));}
-        if controlled { match (row.inlet_node_air_loop_numbers.as_mut(),inlets) {
-            (Some(actual),Some(captured)) if actual.len()==captured.len() && row.inlet_nodes==captured.len()=>actual.copy_from_slice(captured),
-            (None,None) if row.inlet_nodes==0=>{},
-            _=>return Err(E::Unavailable("report cohort actual inlet allocation/extent")),
-        }}
-        row.is_controlled=controlled;
-        if let Some((list,dsoa,distribution))=reporting_indices {
-            let at=list.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort captured List ordinal"))?;
-            let actual=self.equipment_lists.as_ref().and_then(|rows|rows.get(at)).ok_or(E::Unavailable("report cohort getter-created List"))?;
-            if actual.name!=row.equipment_list_name {return Err(E::Unavailable("report cohort actual Config/List name association"));}
-            row.equipment_list_index=usize::try_from(list).map_err(|_|E::Unavailable("report cohort List integer"))?;
-            row.zone_design_specification_outdoor_air_index=dsoa;row.zone_air_distribution_index=distribution;
+        let index = zone
+            .checked_sub(1)
+            .and_then(|n| usize::try_from(n).ok())
+            .ok_or(E::Unavailable("report cohort Config ordinal"))?;
+        let row = self
+            .zone_config
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(E::Unavailable("report cohort getter-created Config"))?;
+        if row.zone_name != name {
+            return Err(E::Unavailable("report cohort actual Zone identity"));
+        }
+        if controlled {
+            match (row.inlet_node_air_loop_numbers.as_mut(), inlets) {
+                (Some(actual), Some(captured))
+                    if actual.len() == captured.len() && row.inlet_nodes == captured.len() =>
+                {
+                    actual.copy_from_slice(captured)
+                }
+                (None, None) if row.inlet_nodes == 0 => {}
+                _ => {
+                    return Err(E::Unavailable(
+                        "report cohort actual inlet allocation/extent",
+                    ));
+                }
+            }
+        }
+        row.is_controlled = controlled;
+        if let Some((list, dsoa, distribution)) = reporting_indices {
+            let at = list
+                .checked_sub(1)
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or(E::Unavailable("report cohort captured List ordinal"))?;
+            let actual = self
+                .equipment_lists
+                .as_ref()
+                .and_then(|rows| rows.get(at))
+                .ok_or(E::Unavailable("report cohort getter-created List"))?;
+            if actual.name != row.equipment_list_name {
+                return Err(E::Unavailable(
+                    "report cohort actual Config/List name association",
+                ));
+            }
+            row.equipment_list_index =
+                usize::try_from(list).map_err(|_| E::Unavailable("report cohort List integer"))?;
+            row.zone_design_specification_outdoor_air_index = dsoa;
+            row.zone_air_distribution_index = distribution;
         }
         Ok(std::ptr::from_ref(row) as usize)
     }
-    pub(crate) fn restore_native_report_equipment_index(&mut self,list:i32,pointer:i32,kind:i32,index:i32)
-        -> Result<usize,super::selected_heat_balance_input::HeatBalanceInputError> {
+    pub(crate) fn restore_native_report_equipment_index(
+        &mut self,
+        list: i32,
+        pointer: i32,
+        kind: i32,
+        index: i32,
+    ) -> Result<usize, super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let at=|n:i32|n.checked_sub(1).and_then(|n|usize::try_from(n).ok()).ok_or(E::Unavailable("report cohort equipment ordinal"));
-        let row=self.equipment_lists.as_mut().and_then(|rows|rows.get_mut(at(list).ok()?)).ok_or(E::Unavailable("report cohort genuine equipment List"))?;
-        let i=at(pointer)?;
-        if row.equipment_types.as_ref().and_then(|rows|rows.get(i))!=Some(&kind) {return Err(E::Unavailable("report cohort getter-created equipment type"));}
-        *row.equipment_indices.as_mut().and_then(|rows|rows.get_mut(i)).ok_or(E::Unavailable("report cohort actual EquipIndex cell"))?=index;
+        let at = |n: i32| {
+            n.checked_sub(1)
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or(E::Unavailable("report cohort equipment ordinal"))
+        };
+        let row = self
+            .equipment_lists
+            .as_mut()
+            .and_then(|rows| rows.get_mut(at(list).ok()?))
+            .ok_or(E::Unavailable("report cohort genuine equipment List"))?;
+        let i = at(pointer)?;
+        if row.equipment_types.as_ref().and_then(|rows| rows.get(i)) != Some(&kind) {
+            return Err(E::Unavailable(
+                "report cohort getter-created equipment type",
+            ));
+        }
+        *row.equipment_indices
+            .as_mut()
+            .and_then(|rows| rows.get_mut(i))
+            .ok_or(E::Unavailable("report cohort actual EquipIndex cell"))? = index;
         Ok(std::ptr::from_ref(row) as usize)
     }
-    pub(crate) fn restore_native_report_node(&mut self,ordinal:i32,name:&str,
-        temperature:Option<f64>,humidity_ratio:Option<f64>,mass_flow_rate:Option<f64>)
-        -> Result<usize,super::selected_heat_balance_input::HeatBalanceInputError> {
+    pub(crate) fn restore_native_report_node(
+        &mut self,
+        ordinal: i32,
+        name: &str,
+        temperature: Option<f64>,
+        humidity_ratio: Option<f64>,
+        mass_flow_rate: Option<f64>,
+    ) -> Result<usize, super::selected_heat_balance_input::HeatBalanceInputError> {
         use super::selected_heat_balance_input::HeatBalanceInputError as E;
-        let n=usize::try_from(ordinal).map_err(|_|E::Unavailable("report cohort Node ordinal"))?;
-        let at=n.checked_sub(1).ok_or(E::Unavailable("report cohort positive Node"))?;
-        if self.nodes.node_ids.as_ref().and_then(|rows|rows.get(n)).map(String::as_str)!=Some(name) {return Err(E::Unavailable("report cohort NativeBND/genuine getter NodeID"));}
-        let row=self.nodes.physical.as_mut().and_then(|rows|rows.get_mut(at)).ok_or(E::Unavailable("report cohort physical Node"))?;
-        if let Some(v)=temperature {row.temperature=v;}
-        if let Some(v)=humidity_ratio {row.humidity_ratio=v;}
-        if let Some(v)=mass_flow_rate {row.mass_flow_rate=v;}
+        let n =
+            usize::try_from(ordinal).map_err(|_| E::Unavailable("report cohort Node ordinal"))?;
+        let at = n
+            .checked_sub(1)
+            .ok_or(E::Unavailable("report cohort positive Node"))?;
+        if self
+            .nodes
+            .node_ids
+            .as_ref()
+            .and_then(|rows| rows.get(n))
+            .map(String::as_str)
+            != Some(name)
+        {
+            return Err(E::Unavailable(
+                "report cohort NativeBND/genuine getter NodeID",
+            ));
+        }
+        let row = self
+            .nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(at))
+            .ok_or(E::Unavailable("report cohort physical Node"))?;
+        if let Some(v) = temperature {
+            row.temperature = v;
+        }
+        if let Some(v) = humidity_ratio {
+            row.humidity_ratio = v;
+        }
+        if let Some(v) = mass_flow_rate {
+            row.mass_flow_rate = v;
+        }
         // A stable real field identifies this physical Node through the borrowed view.
         Ok(std::ptr::from_ref(&row.temperature) as usize)
     }

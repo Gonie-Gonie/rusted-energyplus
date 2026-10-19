@@ -189,14 +189,20 @@ impl SelectedZoneInputOwners {
         // each retained Zone; this does not consume the equipment object.
         if let Some(zones) = self.zones.as_mut() {
             for zone in zones {
-                zone.is_nominal_controlled = owners.input.get_object_item_num_by_field(
-                    "ZoneHVAC:EquipmentConnections",
-                    "zone_name",
-                    &zone.name,
-                    raw.source_is_epjson,
-                ).map_err(|_| HeatBalanceInputError::Unavailable(
-                    "actual nominal controlled Zone raw field lookup",
-                ))? > 0;
+                zone.is_nominal_controlled = owners
+                    .input
+                    .get_object_item_num_by_field(
+                        "ZoneHVAC:EquipmentConnections",
+                        "zone_name",
+                        &zone.name,
+                        raw.source_is_epjson,
+                    )
+                    .map_err(|_| {
+                        HeatBalanceInputError::Unavailable(
+                            "actual nominal controlled Zone raw field lookup",
+                        )
+                    })?
+                    > 0;
             }
         }
         owners.shortcut.current_module_object = "ZoneList".into();

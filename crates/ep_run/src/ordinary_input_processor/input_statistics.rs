@@ -55,15 +55,26 @@ fn full_value(raw: &RawValue) -> SourceInputStatisticsValue {
         RawValue::Bool(value) => SourceInputStatisticsValue::Bool(*value),
         RawValue::Number(text) => SourceInputStatisticsValue::Number(text.clone()),
         RawValue::String(text) => SourceInputStatisticsValue::String(text.clone()),
-        RawValue::Array(items) => SourceInputStatisticsValue::Array(items.iter().map(full_value).collect()),
-        RawValue::Object(fields) => SourceInputStatisticsValue::Object(fields.iter().map(|(name, value)| (name.0.clone(), full_value(value))).collect()),
+        RawValue::Array(items) => {
+            SourceInputStatisticsValue::Array(items.iter().map(full_value).collect())
+        }
+        RawValue::Object(fields) => SourceInputStatisticsValue::Object(
+            fields
+                .iter()
+                .map(|(name, value)| (name.0.clone(), full_value(value)))
+                .collect(),
+        ),
     }
 }
 pub(super) fn resolve_source_b(raw: &RawModel) -> Result<SourceInputStatisticsInput, String> {
     let mut object_order = std::collections::BTreeMap::new();
     for family in raw.objects.keys() {
-        let names = raw.ordered_instances(&family.0).map_err(|error| error.to_string())?
-            .into_iter().map(|(name, _)| name.0.clone()).collect();
+        let names = raw
+            .ordered_instances(&family.0)
+            .map_err(|error| error.to_string())?
+            .into_iter()
+            .map(|(name, _)| name.0.clone())
+            .collect();
         object_order.insert(family.0.clone(), names);
     }
     Ok(SourceInputStatisticsInput {

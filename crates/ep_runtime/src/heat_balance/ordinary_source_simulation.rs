@@ -1,12 +1,12 @@
 //! Genuine simulation caller orchestration, requiring same retained Source children.
+mod endrun_prefix;
 pub(crate) mod prelude;
+mod prelude_host;
 pub(crate) mod primary;
 mod primary_host;
-mod prelude_host;
 pub(crate) mod setup;
 mod setup_host;
 mod through_primary;
-mod endrun_prefix;
 
 /// Actual ManageSimulation180 locals retained across setup and the primary loop.
 ///

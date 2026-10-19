@@ -1,6 +1,8 @@
 //! Actual NonZoneEquipmentManager86–136 caller and same shared WaterUse child.
 use super::{Error, SourceHvacManager, SourceHvacOwners};
 impl SourceHvacManager {
+    // Keep Original explicit branch assignments and request order.
+    #[allow(clippy::needless_bool_assign)]
     pub(crate) fn manage_source_non_zone_equipment(
         &mut self,
         first_hvac_iteration: bool,

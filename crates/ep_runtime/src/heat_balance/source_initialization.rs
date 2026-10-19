@@ -18,8 +18,8 @@ use ep_model::ReportInputs;
 use std::io;
 
 mod files;
-pub(crate) use files::native_text_bytes;
 pub(crate) use files::SourceCloseOutputFilesOwners;
+pub(crate) use files::native_text_bytes;
 mod kickoff_postlude;
 pub(crate) use kickoff_postlude::SourceFaultsManager;
 mod output_reporting;
@@ -34,6 +34,8 @@ pub(crate) use output_reporting::SourceSqliteState;
 pub(crate) mod primary_startup_surfaces;
 mod run_prefix;
 mod unopened_weather;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use files::{
     ScheduleAuditFileHost, SourceRuntimeMeterStreams, SourceRuntimeReportStreams,
 };
@@ -114,13 +116,18 @@ impl PartialEq for SourceInitializationError {
             (Self::Project(a), Self::Project(b)) => std::ptr::eq(a, b),
             (Self::Io(a), Self::Io(b)) => std::ptr::eq(a, b),
             (
-                Self::Handler { handler: a, source: x },
-                Self::Handler { handler: b, source: y },
+                Self::Handler {
+                    handler: a,
+                    source: x,
+                },
+                Self::Handler {
+                    handler: b,
+                    source: y,
+                },
             ) => a == b && std::ptr::eq(x.as_ref(), y.as_ref()),
-            (
-                Self::Fatal { source: a, stop: x },
-                Self::Fatal { source: b, stop: y },
-            ) => std::ptr::eq(a, b) && std::ptr::eq(x, y),
+            (Self::Fatal { source: a, stop: x }, Self::Fatal { source: b, stop: y }) => {
+                std::ptr::eq(a, b) && std::ptr::eq(x, y)
+            }
             _ => false,
         }
     }
@@ -397,7 +404,13 @@ impl CtfInitializationReports {
             fluid.get_fluid_properties_data(input)?;
             let steps = usize::try_from(weather.global.time_steps_in_hour)
                 .map_err(|_| SourceInitializationError::Association("effective timestep"))?;
-            match schedules.process_schedule_input_with_backend(input, &raw.schedules, steps, files, backend) {
+            match schedules.process_schedule_input_with_backend(
+                input,
+                &raw.schedules,
+                steps,
+                files,
+                backend,
+            ) {
                 Err(SelectedScheduleError::AuditOpen { path, source }) => {
                     let message = format!(
                         "ProcessScheduleInput: Could not open file {} for output (write).",

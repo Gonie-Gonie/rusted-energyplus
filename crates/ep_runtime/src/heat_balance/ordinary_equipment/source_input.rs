@@ -66,7 +66,14 @@ impl OrdinaryEquipment {
         if !self.get_equipment_input {
             return Ok(());
         }
-        self.get_zone_equipment_data_source(input, space_sizing, space_simulation, globals, gains, &mut owners)?;
+        self.get_zone_equipment_data_source(
+            input,
+            space_sizing,
+            space_simulation,
+            globals,
+            gains,
+            &mut owners,
+        )?;
         self.finish_get_zone_equipment(clock.timesteps_per_hour)?;
         self.validate_initialized_storage(
             &self.zone_ids.clone(),
@@ -89,7 +96,8 @@ impl OrdinaryEquipment {
         let controlled_spaces = input.get_num_objects_found("SpaceHVAC:EquipmentConnections");
         self.number_of_equipment_lists = input.get_num_objects_found("ZoneHVAC:EquipmentList");
         let node = definition(input, "NodeList")?;
-        let mut node_numbers = vec![0_usize; node.total().map_err(|_| Unavailable::InconsistentOwner)?];
+        let mut node_numbers =
+            vec![0_usize; node.total().map_err(|_| Unavailable::InconsistentOwner)?];
         let first = definition(input, "ZoneHVAC:EquipmentList")?;
         let mut max_alphas = first.alphas;
         let mut max_numbers = first.numerics;
@@ -143,10 +151,14 @@ impl OrdinaryEquipment {
             .reserve(self.zone_ids.len());
         // Native281-297 diagnostics precede InitUniqueNodeCheck and node input.
         if self.number_of_equipment_lists != controlled_zones {
-            return Err(Unavailable::Input("actual GetZoneEquipmentData282 equipment-list/count severe diagnostic".into()));
+            return Err(Unavailable::Input(
+                "actual GetZoneEquipmentData282 equipment-list/count severe diagnostic".into(),
+            ));
         }
         if controlled_zones > num_zones {
-            return Err(Unavailable::Input("actual GetZoneEquipmentData292 controlled-zone/count severe diagnostic".into()));
+            return Err(Unavailable::Input(
+                "actual GetZoneEquipmentData292 controlled-zone/count severe diagnostic".into(),
+            ));
         }
         self.nodes
             .init_unique_check_source("ZoneHVAC:EquipmentConnections", input)?;
@@ -154,38 +166,86 @@ impl OrdinaryEquipment {
         let mut local_terminal_unit_sizing_counter = 0_usize;
         for _controlled_zone in 0..controlled_zones {
             locals.get_connections(input, owners.source_is_epjson)?;
-            let zone = owners.zones.iter().position(|zone| zone.name == locals.alphas[0])
-                .ok_or_else(|| Unavailable::Input("actual controlled Zone name-not-found severe diagnostic".into()))?;
+            let zone = owners
+                .zones
+                .iter()
+                .position(|zone| zone.name == locals.alphas[0])
+                .ok_or_else(|| {
+                    Unavailable::Input(
+                        "actual controlled Zone name-not-found severe diagnostic".into(),
+                    )
+                })?;
             if owners.zones[zone].is_controlled {
-                return Err(Unavailable::Input("actual duplicate controlled Zone severe diagnostic".into()));
+                return Err(Unavailable::Input(
+                    "actual duplicate controlled Zone severe diagnostic".into(),
+                ));
             }
             owners.zones[zone].is_controlled = true;
-            self.process_source_zone_equipment_input(zone, input,
-                owners.branch.as_deref_mut().ok_or_else(|| Unavailable::Input("actual existing BranchNodeConnections owner required".into()))?,
-                owners.schedules, &locals, &mut node_numbers,
-                &mut local_terminal_unit_sizing_counter, &mut overall_equipment_count)?;
+            self.process_source_zone_equipment_input(
+                zone,
+                input,
+                owners.branch.as_deref_mut().ok_or_else(|| {
+                    Unavailable::Input(
+                        "actual existing BranchNodeConnections owner required".into(),
+                    )
+                })?,
+                owners.schedules,
+                &locals,
+                &mut node_numbers,
+                &mut local_terminal_unit_sizing_counter,
+                &mut overall_equipment_count,
+            )?;
             owners.zones[zone].system_zone_node_number = i32::try_from(
-                self.zone_config.as_ref().and_then(|rows| rows.get(zone)).ok_or(Unavailable::InconsistentOwner)?.zone_node
-            ).map_err(|_| Unavailable::InconsistentOwner)?;
+                self.zone_config
+                    .as_ref()
+                    .and_then(|rows| rows.get(zone))
+                    .ok_or(Unavailable::InconsistentOwner)?
+                    .zone_node,
+            )
+            .map_err(|_| Unavailable::InconsistentOwner)?;
         }
         if controlled_spaces > 0 {
-            return Err(Unavailable::Input("actual controlled-space ignored-input warning or positive getter".into()));
+            return Err(Unavailable::Input(
+                "actual controlled-space ignored-input warning or positive getter".into(),
+            ));
         }
         // Space sizing/simulation was bounded at its earlier actual allocation.
         if local_terminal_unit_sizing_counter > 0 {
             owners.sizing.number_of_air_terminal_units = local_terminal_unit_sizing_counter;
-            owners.sizing.terminal_unit_sizing = Some(vec![SourceTerminalUnitSizingData::default(); local_terminal_unit_sizing_counter]);
-            for (zone, config) in self.zone_config.as_ref().ok_or(Unavailable::InconsistentOwner)?.iter().enumerate() {
+            owners.sizing.terminal_unit_sizing = Some(vec![
+                SourceTerminalUnitSizingData::default();
+                local_terminal_unit_sizing_counter
+            ]);
+            for (zone, config) in self
+                .zone_config
+                .as_ref()
+                .ok_or(Unavailable::InconsistentOwner)?
+                .iter()
+                .enumerate()
+            {
                 for number in 0..config.inlet_nodes {
-                    let terminal = config.air_distribution_units_cool.as_ref().and_then(|rows| rows.get(number))
-                        .map(|row| row.terminal_unit_sizing_index).and_then(|n| n.checked_sub(1)).ok_or(Unavailable::InconsistentOwner)?;
-                    owners.sizing.terminal_unit_sizing.as_mut().and_then(|rows| rows.get_mut(terminal))
-                        .ok_or(Unavailable::InconsistentOwner)?.controlled_zone_number = i32::try_from(zone + 1).map_err(|_| Unavailable::InconsistentOwner)?;
+                    let terminal = config
+                        .air_distribution_units_cool
+                        .as_ref()
+                        .and_then(|rows| rows.get(number))
+                        .map(|row| row.terminal_unit_sizing_index)
+                        .and_then(|n| n.checked_sub(1))
+                        .ok_or(Unavailable::InconsistentOwner)?;
+                    owners
+                        .sizing
+                        .terminal_unit_sizing
+                        .as_mut()
+                        .and_then(|rows| rows.get_mut(terminal))
+                        .ok_or(Unavailable::InconsistentOwner)?
+                        .controlled_zone_number =
+                        i32::try_from(zone + 1).map_err(|_| Unavailable::InconsistentOwner)?;
                 }
             }
         }
         if self.equipment_data_errors_found {
-            return Err(Unavailable::Input("actual duplicate-items-not-checked warning diagnostic".into()));
+            return Err(Unavailable::Input(
+                "actual duplicate-items-not-checked warning diagnostic".into(),
+            ));
         }
         if overall_equipment_count > 0 {
             // Native ObjectType is std::string (initially empty), assigned
@@ -193,21 +253,43 @@ impl OrdinaryEquipment {
             let mut audit = vec![(String::new(), String::new(), 0usize); overall_equipment_count];
             overall_equipment_count = 0;
             for zone in 0..controlled_zones {
-                let list = self.equipment_lists.as_ref().and_then(|rows| rows.get(zone)).ok_or(Unavailable::InconsistentOwner)?;
+                let list = self
+                    .equipment_lists
+                    .as_ref()
+                    .and_then(|rows| rows.get(zone))
+                    .ok_or(Unavailable::InconsistentOwner)?;
                 for number in 0..list.number_of_equipment_types {
-                    let row = audit.get_mut(overall_equipment_count).ok_or(Unavailable::InconsistentOwner)?;
+                    let row = audit
+                        .get_mut(overall_equipment_count)
+                        .ok_or(Unavailable::InconsistentOwner)?;
                     overall_equipment_count += 1;
-                    let kind = *list.equipment_types.as_ref().and_then(|rows| rows.get(number)).ok_or(Unavailable::InconsistentOwner)?;
-                    let character = u8::try_from(kind).ok().filter(u8::is_ascii).ok_or(Unavailable::InconsistentOwner)?;
+                    let kind = *list
+                        .equipment_types
+                        .as_ref()
+                        .and_then(|rows| rows.get(number))
+                        .ok_or(Unavailable::InconsistentOwner)?;
+                    let character = u8::try_from(kind)
+                        .ok()
+                        .filter(u8::is_ascii)
+                        .ok_or(Unavailable::InconsistentOwner)?;
                     row.0 = char::from(character).to_string();
-                    row.1 = list.equipment_names.as_ref().and_then(|rows| rows.get(number)).ok_or(Unavailable::InconsistentOwner)?.clone();
+                    row.1 = list
+                        .equipment_names
+                        .as_ref()
+                        .and_then(|rows| rows.get(number))
+                        .ok_or(Unavailable::InconsistentOwner)?
+                        .clone();
                     row.2 = zone + 1;
                 }
             }
             for first in 0..overall_equipment_count {
                 for other in first + 1..overall_equipment_count {
-                    if audit[first].0 != audit[other].0 || audit[first].1 != audit[other].1 { continue; }
-                    return Err(Unavailable::Input("actual duplicate equipment-list item severe diagnostic".into()));
+                    if audit[first].0 != audit[other].0 || audit[first].1 != audit[other].1 {
+                        continue;
+                    }
+                    return Err(Unavailable::Input(
+                        "actual duplicate equipment-list item severe diagnostic".into(),
+                    ));
                 }
             }
             drop(audit);

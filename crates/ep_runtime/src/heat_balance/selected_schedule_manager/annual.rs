@@ -23,6 +23,8 @@ impl SelectedScheduleManager {
         )? / weeks_in_year)
     }
 
+    // Preserve Original explicit signed-integer boundary predicates and branch order.
+    #[allow(clippy::manual_range_contains)]
     pub(crate) fn source_annual_hours_full_load(
         &self,
         index: SourceScheduleIndex,
@@ -49,20 +51,22 @@ impl SelectedScheduleManager {
                     return Ok(total_hours);
                 }
                 for day in 1..=days_in_year {
-                    let week_index = detailed.week_schedules[day as usize].ok_or(Error::Unavailable(
-                        "actual Detailed annual weekScheds[iDay] pointer",
-                    ))?;
-                    let week = self.week_schedules.get(week_index).ok_or(Error::Unavailable(
-                        "actual Detailed annual WeekSchedule pointer",
-                    ))?;
+                    let week_index = detailed.week_schedules[day as usize].ok_or(
+                        Error::Unavailable("actual Detailed annual weekScheds[iDay] pointer"),
+                    )?;
+                    let week = self
+                        .week_schedules
+                        .get(week_index)
+                        .ok_or(Error::Unavailable(
+                            "actual Detailed annual WeekSchedule pointer",
+                        ))?;
                     let day_index = week.day_schedules[day_type as usize].ok_or(
                         Error::Unavailable("actual Detailed annual dayScheds[DayT] pointer"),
                     )?;
                     let day_schedule = self.day_schedules.get(day_index).ok_or(
                         Error::Unavailable("actual Detailed annual DaySchedule pointer"),
                     )?;
-                    total_hours +=
-                        day_schedule.sum_timestep_values / f64::from(time_steps_in_hour);
+                    total_hours += day_schedule.sum_timestep_values / f64::from(time_steps_in_hour);
                     day_type += 1;
                     if day_type > 7 {
                         day_type = 1;
@@ -73,6 +77,8 @@ impl SelectedScheduleManager {
         }
     }
 
+    // Preserve Original explicit signed-integer boundary predicates and branch order.
+    #[allow(clippy::manual_range_contains)]
     pub(crate) fn source_annual_hours_greater_than_1_percent(
         &self,
         index: SourceScheduleIndex,
@@ -103,21 +109,29 @@ impl SelectedScheduleManager {
                     return Ok(total_hours);
                 }
                 for day in 1..=days_in_year {
-                    let week_index = detailed.week_schedules[day as usize].ok_or(Error::Unavailable(
-                        "actual Detailed nonzero annual weekScheds[iDay] pointer",
-                    ))?;
-                    let week = self.week_schedules.get(week_index).ok_or(Error::Unavailable(
-                        "actual Detailed nonzero annual WeekSchedule pointer",
-                    ))?;
-                    let day_index = week.day_schedules[day_type as usize].ok_or(
-                        Error::Unavailable("actual Detailed nonzero annual dayScheds[DayT] pointer"),
-                    )?;
+                    let week_index =
+                        detailed.week_schedules[day as usize].ok_or(Error::Unavailable(
+                            "actual Detailed nonzero annual weekScheds[iDay] pointer",
+                        ))?;
+                    let week = self
+                        .week_schedules
+                        .get(week_index)
+                        .ok_or(Error::Unavailable(
+                            "actual Detailed nonzero annual WeekSchedule pointer",
+                        ))?;
+                    let day_index =
+                        week.day_schedules[day_type as usize].ok_or(Error::Unavailable(
+                            "actual Detailed nonzero annual dayScheds[DayT] pointer",
+                        ))?;
                     let day_schedule = self.day_schedules.get(day_index).ok_or(
                         Error::Unavailable("actual Detailed nonzero annual DaySchedule pointer"),
                     )?;
-                    let slots = 24_i32.checked_mul(time_steps_in_hour).ok_or(
-                        Error::Unavailable("actual Detailed annual signed timestep loop domain"),
-                    )?;
+                    let slots =
+                        24_i32
+                            .checked_mul(time_steps_in_hour)
+                            .ok_or(Error::Unavailable(
+                                "actual Detailed annual signed timestep loop domain",
+                            ))?;
                     for timestep in 0..slots {
                         let value = day_schedule.timestep_values.get(timestep as usize).ok_or(
                             Error::Unavailable("actual Detailed annual tsVals[i] operand"),

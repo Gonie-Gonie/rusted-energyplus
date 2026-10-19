@@ -63,6 +63,8 @@ fn sun_direction_cosines(
     }
     [x, y, z]
 }
+// These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn write(
     input: &SourceDesignDayData,
     modifiers: &SourceDesignDayModifierGrid,
@@ -99,7 +101,7 @@ pub(super) fn write(
             } else {
                 slot.out_dry_bulb_temp = modifier.outdoor_dry_bulb_temperature;
             }
-            if matches!(input.humidity_indicator_type, 5 | 6 | 7) {
+            if matches!(input.humidity_indicator_type, 5..=7) {
                 let mut wet_bulb = input.humidity_indicator_value
                     - modifier.outdoor_relative_humidity * wet_bulb_range;
                 wet_bulb = properties::source_min(wet_bulb, slot.out_dry_bulb_temp);

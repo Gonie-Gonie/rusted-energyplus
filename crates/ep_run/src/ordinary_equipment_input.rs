@@ -40,6 +40,8 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
 pub(crate) fn resolve_source_b(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
     resolve_raw(raw, true)
 }
+// Preserve first general admission then Source-B fallback evaluation and rejection order.
+#[allow(clippy::nonminimal_bool)]
 fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipmentInput, String> {
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
@@ -81,7 +83,8 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "Schedule:Constant"
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
-        ) && !source_b_family {
+        ) && !source_b_family
+        {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
                 family.0
@@ -289,13 +292,17 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                             .find(|(name, _)| name.0.eq_ignore_ascii_case(schedule))
                     })
                     .map(|(_, object)| object);
-                if constant.is_none() && source_b_ingress && source_b::has_compact_reference(raw, schedule) {
+                if constant.is_none()
+                    && source_b_ingress
+                    && source_b::has_compact_reference(raw, schedule)
+                {
                     // Reference only: all ordered Compact fields remain raw on
                     // the same IP. Native ProcessScheduleInput stops at its real
                     // positive count before any cache/value can be consumed.
                     continue;
                 }
-                let schedule = constant.ok_or("ordinary schedule reference is not a real Constant input")?;
+                let schedule =
+                    constant.ok_or("ordinary schedule reference is not a real Constant input")?;
                 // Original Schedule:Constant's absent hourly value is 0.0.
                 if !field(schedule, "hourly_value")
                     .filter(|value| !blank(value))
@@ -309,12 +316,16 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             }
         }
     }
-    let inventory = raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len()));
+    let inventory = raw
+        .objects
+        .iter()
+        .map(|(family, objects)| (family.0.as_str(), objects.len()));
     if source_b_ingress {
         OrdinaryEquipmentInput::from_source_family_inventory(inventory, timestep)
     } else {
         OrdinaryEquipmentInput::from_family_inventory(inventory, timestep)
-    }.map_err(|error| error.to_string())
+    }
+    .map_err(|error| error.to_string())
 }
 
 /// Reuse the one existing complete positive-family/field admission once, then

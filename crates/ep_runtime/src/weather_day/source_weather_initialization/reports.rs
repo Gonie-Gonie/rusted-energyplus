@@ -5,6 +5,8 @@ use crate::weather::day::source_initialization::SourceWeatherInitializationOwner
 use crate::weather::day::{WeatherDayState, WeatherOwnerState, WeatherSession};
 
 impl WeatherSession {
+    // Retain Original nested guards and their diagnostic/output sequencing.
+    #[allow(clippy::collapsible_if)]
     pub(crate) fn report_source_weather_and_time(
         &mut self,
         owners: &mut SourceWeatherInitializationOwners<'_, '_>,

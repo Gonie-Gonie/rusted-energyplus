@@ -2,9 +2,25 @@
 use super::*;
 #[derive(Clone, Debug, Default)]
 struct AirUniqueNode {
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc GetAirPathData keeps the original AirUniqueNodes scratch-row layout; selected zero-primary-loop allocation does not read these members."
+    )]
     node_name: String,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc GetAirPathData keeps the original AirUniqueNodes scratch-row layout; selected zero-primary-loop allocation does not read these members."
+    )]
     air_loop_name: String,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc GetAirPathData keeps the original AirUniqueNodes scratch-row layout; selected zero-primary-loop allocation does not read these members."
+    )]
     field_name: String,
+    #[allow(
+        dead_code,
+        reason = "SimAirServingZones.cc GetAirPathData keeps the original AirUniqueNodes scratch-row layout; selected zero-primary-loop allocation does not read these members."
+    )]
     node_name_used: bool,
 }
 impl SourceAirLoopData {

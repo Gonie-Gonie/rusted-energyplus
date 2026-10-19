@@ -241,6 +241,8 @@ impl SourceTabularReports {
             t.cols[0] = b"Hybrid Modeling (Y/N)".to_vec();
             t.cols[1] = b"Temperature Capacitance Multiplier ".to_vec();
             t.body.fill(b"");
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for number in 1..=o.globals.num_of_zones {
                 let zone = helpers::zone(o.zones, number)?;
                 t.rows[(number - 1) as usize] = zone.name.as_bytes().to_vec();

@@ -29,7 +29,8 @@ pub(crate) struct SourceOrdinaryInsideCtfHost<'a> {
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
     pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
-    pub(crate) recurring_errors: &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    pub(crate) recurring_errors:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
 }
 fn index(number: i32) -> Result<usize, Error> {
     number
@@ -67,6 +68,8 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
         )
     }
 
+    // Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+    #[allow(clippy::manual_range_contains)]
     fn test_surface_temperature(
         &mut self,
         temperature: f64,
@@ -130,8 +133,15 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
         maximum_allowed_cond_fd: f64,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
-        source_inside_nonconvergence_warning(maximum_difference, maximum_allowed_cond_fd,
-            self.clock, self.globals, self.environment, self.hvac, backend)
+        source_inside_nonconvergence_warning(
+            maximum_difference,
+            maximum_allowed_cond_fd,
+            self.clock,
+            self.globals,
+            self.environment,
+            self.hvac,
+            backend,
+        )
     }
 
     fn recurring_nonconvergence(
@@ -140,8 +150,14 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
         error_pointer: &mut i32,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
-        source_inside_nonconvergence_recurring(maximum_difference, error_pointer,
-            self.recurring_errors, self.clock, self.globals, backend)
+        source_inside_nonconvergence_recurring(
+            maximum_difference,
+            error_pointer,
+            self.recurring_errors,
+            self.clock,
+            self.globals,
+            backend,
+        )
     }
 }
 

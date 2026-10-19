@@ -7,13 +7,25 @@ use std::io::Write;
 fn connection_type_name(kind: SourceNodeConnectionType) -> Result<&'static str, Error> {
     use SourceNodeConnectionType::*;
     match kind {
-        Blank => Ok("blank"), Inlet => Ok("Inlet"), Outlet => Ok("Outlet"),
-        Internal => Ok("Internal"), ZoneNode => Ok("ZoneNode"), Sensor => Ok("Sensor"),
-        Actuator => Ok("Actuator"), OutsideAir => Ok("OutdoorAir"), ReliefAir => Ok("ReliefAir"),
-        ZoneInlet => Ok("ZoneInlet"), ZoneReturn => Ok("ZoneReturn"), ZoneExhaust => Ok("ZoneExhaust"),
-        SetPoint => Ok("Setpoint"), Electric => Ok("Electric"), OutsideAirReference => Ok("OutsideAirReference"),
+        Blank => Ok("blank"),
+        Inlet => Ok("Inlet"),
+        Outlet => Ok("Outlet"),
+        Internal => Ok("Internal"),
+        ZoneNode => Ok("ZoneNode"),
+        Sensor => Ok("Sensor"),
+        Actuator => Ok("Actuator"),
+        OutsideAir => Ok("OutdoorAir"),
+        ReliefAir => Ok("ReliefAir"),
+        ZoneInlet => Ok("ZoneInlet"),
+        ZoneReturn => Ok("ZoneReturn"),
+        ZoneExhaust => Ok("ZoneExhaust"),
+        SetPoint => Ok("Setpoint"),
+        Electric => Ok("Electric"),
+        OutsideAirReference => Ok("OutsideAirReference"),
         InducedAir => Ok("InducedAir"),
-        Invalid | Num => Err(Error::Unavailable("actual ReportNodeConnections ConnectionTypeNames index domain")),
+        Invalid | Num => Err(Error::Unavailable(
+            "actual ReportNodeConnections ConnectionTypeNames index domain",
+        )),
     }
 }
 
@@ -44,12 +56,24 @@ impl SourceBranchNodeConnections {
         self.non_connected_nodes = Some(vec![true; nodes]);
         let mut number_non_parents: i32 = 0;
         for number in 1..=self.number_node_connections {
-            let row = self.node_connections.as_ref()
-                .and_then(|rows| extent(number).ok().and_then(|n| n.checked_sub(1)).and_then(|i| rows.get(i)))
-                .ok_or(Error::Unavailable("actual ReportNodeConnections2088 live NodeConnections"))?;
-            if row.object_is_parent { continue; }
-            number_non_parents = number_non_parents.checked_add(1)
-                .ok_or(Error::Unavailable("actual ReportNodeConnections2091 NumNonParents signed addition"))?;
+            let row = self
+                .node_connections
+                .as_ref()
+                .and_then(|rows| {
+                    extent(number)
+                        .ok()
+                        .and_then(|n| n.checked_sub(1))
+                        .and_then(|i| rows.get(i))
+                })
+                .ok_or(Error::Unavailable(
+                    "actual ReportNodeConnections2088 live NodeConnections",
+                ))?;
+            if row.object_is_parent {
+                continue;
+            }
+            number_non_parents = number_non_parents.checked_add(1).ok_or(Error::Unavailable(
+                "actual ReportNodeConnections2091 NumNonParents signed addition",
+            ))?;
         }
         let number_parents = self.number_node_connections - number_non_parents;
         let parent_count = extent(number_parents)?;
@@ -71,15 +95,27 @@ impl SourceBranchNodeConnections {
         writeln!(bnd, " #Parent Node Connections,{number_parents}")?;
         writeln!(
             bnd,
-            "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
-            "Parent"
+            "! <Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>"
         )?;
         for number in 1..=self.number_node_connections {
-            let row = self.node_connections.as_ref()
-                .and_then(|rows| extent(number).ok().and_then(|n|n.checked_sub(1)).and_then(|i|rows.get(i)))
-                .ok_or(Error::Unavailable("actual ReportNodeConnections2103 live NodeConnections"))?;
-            if !row.object_is_parent { continue; }
-            return Err(Error::Unavailable("actual ReportNodeConnections2106 positive parent NonConnectedNodes write"));
+            let row = self
+                .node_connections
+                .as_ref()
+                .and_then(|rows| {
+                    extent(number)
+                        .ok()
+                        .and_then(|n| n.checked_sub(1))
+                        .and_then(|i| rows.get(i))
+                })
+                .ok_or(Error::Unavailable(
+                    "actual ReportNodeConnections2103 live NodeConnections",
+                ))?;
+            if !row.object_is_parent {
+                continue;
+            }
+            return Err(Error::Unavailable(
+                "actual ReportNodeConnections2106 positive parent NonConnectedNodes write",
+            ));
         }
         writeln!(
             bnd,
@@ -93,21 +129,42 @@ impl SourceBranchNodeConnections {
         writeln!(bnd, " #Non-Parent Node Connections,{number_non_parents}")?;
         writeln!(
             bnd,
-            "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
-            "Non-Parent"
+            "! <Non-Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>"
         )?;
         for number in 1..=self.number_node_connections {
-            let row = self.node_connections.as_ref()
-                .and_then(|rows| extent(number).ok().and_then(|n|n.checked_sub(1)).and_then(|i|rows.get(i)))
-                .ok_or(Error::Unavailable("actual ReportNodeConnections2169 live NodeConnections"))?;
-            if row.object_is_parent { continue; }
-            *self.non_connected_nodes.as_mut()
-                .and_then(|rows|row.node_number.checked_sub(1).and_then(|i|rows.get_mut(i)))
-                .ok_or(Error::Unavailable("actual ReportNodeConnections2172 NonConnectedNodes(NodeNumber)"))? = false;
+            let row = self
+                .node_connections
+                .as_ref()
+                .and_then(|rows| {
+                    extent(number)
+                        .ok()
+                        .and_then(|n| n.checked_sub(1))
+                        .and_then(|i| rows.get(i))
+                })
+                .ok_or(Error::Unavailable(
+                    "actual ReportNodeConnections2169 live NodeConnections",
+                ))?;
+            if row.object_is_parent {
+                continue;
+            }
+            *self
+                .non_connected_nodes
+                .as_mut()
+                .and_then(|rows| row.node_number.checked_sub(1).and_then(|i| rows.get_mut(i)))
+                .ok_or(Error::Unavailable(
+                    "actual ReportNodeConnections2172 NonConnectedNodes(NodeNumber)",
+                ))? = false;
             let object_type = row.object_type.source_name()?.to_ascii_uppercase();
             let connection_type = connection_type_name(row.connection_type)?;
-            writeln!(bnd, " Non-Parent Node Connection,{},{},{},{},{}", row.node_name,
-                object_type, row.object_name, connection_type, row.fluid_stream as i32)?;
+            writeln!(
+                bnd,
+                " Non-Parent Node Connection,{},{},{},{},{}",
+                row.node_name,
+                object_type,
+                row.object_name,
+                connection_type,
+                row.fluid_stream as i32
+            )?;
         }
         let mut number_non_connected: i32 = 0;
         for number in 1..=*equipment.source_number_of_nodes() {
@@ -152,7 +209,12 @@ impl SourceBranchNodeConnections {
                 {
                     continue;
                 }
-                writeln!(bnd, " NonConnected Node,{},{}", number, equipment.source_node_id(number)?)?;
+                writeln!(
+                    bnd,
+                    " NonConnected Node,{},{}",
+                    number,
+                    equipment.source_node_id(number)?
+                )?;
             }
         }
         self.non_connected_nodes = None;

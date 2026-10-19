@@ -3,6 +3,9 @@
 //! These are Rust-owned header strings and explicit absent optional adapters;
 //! Native version/header/callback/SQLite byte parity is not claimed.
 
+// Retain the existing test module and later completion impl order; this exception concerns only this file-module layout.
+#![allow(clippy::items_after_test_module)]
+
 use ep_runtime::heat_balance::ctf_initialization_context::{
     CtfInitializationContext, CtfInitializationReports,
 };
@@ -233,6 +236,8 @@ impl CtfRunOutputs {
     }
 
     /// Explicit genuine Source entry; legacy pipeline does not invoke it yet.
+    // Retain the genuine direct Source timestep entry API without deleting its real owner/caller path.
+    #[allow(dead_code)]
     pub(crate) fn source_ordinary_timestep(
         &mut self,
         weather: &ep_runtime::weather::day::ProductionWeatherTimestepSeries,
@@ -368,9 +373,13 @@ impl CtfRunOutputs {
     pub(crate) fn read_completed_source_reports(
         &self,
     ) -> Result<crate::source_reported_results::SourceReportedStreams, String> {
-        let catalog = self.reports.source_reported_catalog()
+        let catalog = self
+            .reports
+            .source_reported_catalog()
             .map_err(|error| error.to_string())?;
-        let files = self.initialization_files.as_ref()
+        let files = self
+            .initialization_files
+            .as_ref()
             .ok_or("actual retained Source file owner after620 is missing")?;
         let (eso, mtr) = files.source_reported_paths();
         crate::source_reported_results::read_completed_source_reports(eso, mtr, &catalog)
@@ -443,6 +452,8 @@ impl CtfRunOutputs {
         ))
     }
 
+    // Retain the existing output-prefix compatibility entry used by tests; production uses persist_after_runtime.
+    #[allow(dead_code)]
     pub(crate) fn persist(&mut self, output_dir: &Path) -> Result<(), String> {
         self.persist_after_runtime(output_dir, false)
     }
@@ -796,12 +807,37 @@ mod tests {
 }
 
 impl CtfRunOutputs {
-    pub(crate) fn complete_source_program(&mut self,weather:&ep_runtime::weather::day::ProductionWeatherTimestepSeries)->Result<(),String> {
-        let files=self.initialization_files.as_mut().ok_or("actual files before normal program completion")?;
+    pub(crate) fn complete_source_program(
+        &mut self,
+        weather: &ep_runtime::weather::day::ProductionWeatherTimestepSeries,
+    ) -> Result<(), String> {
+        let files = self
+            .initialization_files
+            .as_mut()
+            .ok_or("actual files before normal program completion")?;
         {
-        let mut backend=SourceErrorBackend{state:&mut self.state,error_stream:Some(&mut self.error),console:&mut self.console,out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None};
-        files.complete_source_program(&mut self.reports,&mut self.source_session,weather,&mut backend).map_err(|e|e.to_string())?;
+            let mut backend = SourceErrorBackend {
+                state: &mut self.state,
+                error_stream: Some(&mut self.error),
+                console: &mut self.console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            files
+                .complete_source_program(
+                    &mut self.reports,
+                    &mut self.source_session,
+                    weather,
+                    &mut backend,
+                )
+                .map_err(|e| e.to_string())?;
         }
-        files.persist_source_error(&self.error).map_err(|e|e.to_string())
+        files
+            .persist_source_error(&self.error)
+            .map_err(|e| e.to_string())
     }
 }

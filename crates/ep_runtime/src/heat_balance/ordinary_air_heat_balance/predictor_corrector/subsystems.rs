@@ -113,9 +113,9 @@ impl SourceAirflowNetwork {
                 return Err(Error::Unavailable("positive AFN duct-loss EIO1982"));
             } else {
                 self.control_type = 0; //1985; convenience flags2046/2049 are NOT reached.
-                write!(
+                writeln!(
                     eio,
-                    "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone without Distribution/Multizone with Distribution only during Fan Operation\n"
+                    "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone without Distribution/Multizone with Distribution only during Fan Operation"
                 )?;
                 writeln!(
                     eio,
@@ -240,9 +240,9 @@ impl SourceRoomAir {
                 "positive non-mixing RoomAir SpaceHB4462",
             ));
         }
-        write!(
+        writeln!(
             eio,
-            "! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n"
+            "! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined"
         )?;
         for number in 1..=globals.num_of_zones {
             let zone = zones

@@ -51,11 +51,13 @@ impl SourceZoneSpaceHeatBalanceData {
             if z.is_controlled {
                 let config = owners.equipment.source_zone_equipment_config(number)?;
                 for at in 0..*config.number_inlet_nodes() {
-                    let node_number = *config.inlet_node_numbers()
+                    let node_number = *config
+                        .inlet_node_numbers()
                         .and_then(|nodes| nodes.get(at))
                         .ok_or(Error::Unavailable("actual controlled Zone InletNode5207"))?;
-                    let ordinal = i32::try_from(node_number)
-                        .map_err(|_| Error::Unavailable("actual controlled InletNode native integer ordinal"))?;
+                    let ordinal = i32::try_from(node_number).map_err(|_| {
+                        Error::Unavailable("actual controlled InletNode native integer ordinal")
+                    })?;
                     let node = owners.equipment.source_zone_air_node(ordinal)?;
                     let cp_air = energyplus_psy_cp_air_fn_w(self.air_hum_rat);
                     let mass_flow_rate_cp_air = *node.mass_flow_rate * cp_air;

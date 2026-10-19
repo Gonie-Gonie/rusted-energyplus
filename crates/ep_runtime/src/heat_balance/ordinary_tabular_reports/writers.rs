@@ -66,7 +66,7 @@ impl SourceTabularReports {
             let stream = &mut self.output_streams.streams[i];
             let del = s.delimiters[i].as_bytes();
             match s.table_styles[i] {
-                0 | 1 | 2 => {
+                0..=2 => {
                     stream.bytes(b"----------------------------------------------------------------------------------------------------\n")?;
                     stream.bytes(if s.table_styles[i] == 2 {
                         b"REPORT:      "
@@ -122,7 +122,7 @@ impl SourceTabularReports {
         let s = &mut self.input_state;
         for i in 0..style_count(s.number_of_styles)? {
             match s.table_styles[i] {
-                0 | 1 | 2 => {
+                0..=2 => {
                     let stream = &mut self.output_streams.streams[i];
                     stream.bytes(subtitle)?;
                     stream.bytes(b"\n\n")?;
@@ -145,12 +145,14 @@ impl SourceTabularReports {
         }
         Ok(())
     }
+    // Retain Original match/inner-guard nesting and diagnostic/output write order.
+    #[allow(clippy::collapsible_match)]
     pub(crate) fn write_source_text_line(&mut self, line: &[u8], bold: bool) -> Result<(), Error> {
         let s = &self.input_state;
         for i in 0..style_count(s.number_of_styles)? {
             let stream = &mut self.output_streams.streams[i];
             match s.table_styles[i] {
-                0 | 1 | 2 => {
+                0..=2 => {
                     stream.bytes(line)?;
                     stream.bytes(b"\n")?;
                 }
@@ -181,12 +183,18 @@ pub(super) fn source_anchor(report: &[u8], object: &[u8]) -> Vec<u8> {
 }
 
 // Native stripped byte-string helper; no UTF8 re-encoding or numeric copy.
-pub(super) fn source_stripped_report_text(text: &[u8]) -> &[u8] { bytes::strip(text) }
+pub(super) fn source_stripped_report_text(text: &[u8]) -> &[u8] {
+    bytes::strip(text)
+}
 
 // Actual FillRowHead18171-18183 shared with BEPS/Demand temporary text rows.
 pub(super) fn source_fill_row_head(rows: &mut [Vec<u8>]) {
     let mut current = Vec::new();
     for row in rows {
-        if row.is_empty() { *row = current.clone(); } else { current = row.clone(); }
+        if row.is_empty() {
+            *row = current.clone();
+        } else {
+            current = row.clone();
+        }
     }
 }

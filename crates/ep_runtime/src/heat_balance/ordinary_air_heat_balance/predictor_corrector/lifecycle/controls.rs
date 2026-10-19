@@ -1,5 +1,4 @@
 //! DataZoneControls and DataHeatBalFanSys genuine retained constructor state.
-use super::*;
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceTStatObject {
     pub(crate) name: String,
@@ -59,8 +58,20 @@ pub(crate) enum SourceTemperatureControlMode {
     #[default]
     Invalid = -1,
     None = 0,
+    #[allow(
+        dead_code,
+        reason = "DataZoneControls.hh TempCtrl preserves all original control and count ordinals; retained thermostat constructors do not instantiate every alternative."
+    )]
     Constant = 1,
+    #[allow(
+        dead_code,
+        reason = "DataZoneControls.hh TempCtrl preserves all original control and count ordinals; retained thermostat constructors do not instantiate every alternative."
+    )]
     Scheduled = 2,
+    #[allow(
+        dead_code,
+        reason = "DataZoneControls.hh TempCtrl preserves all original control and count ordinals; retained thermostat constructors do not instantiate every alternative."
+    )]
     Num = 3,
 }
 /// Complete DataZoneControls.hh91-97 constructor, including null pointers.
@@ -68,8 +79,10 @@ pub(crate) enum SourceTemperatureControlMode {
 pub(crate) struct SourceTemperatureSetpointType {
     pub(crate) name: String,
     pub(crate) is_used: bool,
-    pub(crate) heat_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
-    pub(crate) cool_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) heat_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) cool_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
 }
 /// Sole actual TempControlledZone row; complete DataZoneControls.hh99-154.
 #[derive(Clone, Debug, PartialEq)]
@@ -77,7 +90,8 @@ pub(crate) struct SourceTemperatureControlledZone {
     pub(crate) name: String,
     pub(crate) zone_name: String,
     pub(crate) actual_zone_number: i32,
-    pub(crate) control_type_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) control_type_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
     pub(crate) setpoints: [SourceTemperatureSetpointType; 5],
     pub(crate) manage_demand: bool,
     pub(crate) heating_reset_limit: f64,
@@ -88,15 +102,18 @@ pub(crate) struct SourceTemperatureControlledZone {
     pub(crate) ems_override_cooling_value: f64,
     pub(crate) operative_control: SourceTemperatureControlMode,
     pub(crate) fixed_radiative_fraction: f64,
-    pub(crate) operative_radiative_fraction_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) operative_radiative_fraction_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
     pub(crate) adaptive_comfort_temperature_control: bool,
     pub(crate) adaptive_comfort_model_type_index: i32,
     pub(crate) zone_overcool_range: f64,
     pub(crate) overcool_control: SourceTemperatureControlMode,
     pub(crate) zone_overcool_constant_range: f64,
-    pub(crate) overcool_range_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) overcool_range_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
     pub(crate) zone_overcool_control_ratio: f64,
-    pub(crate) dehumidifying_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) dehumidifying_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
     pub(crate) delta_temperature_cutout_setpoint: f64,
     pub(crate) thermostat_setpoint_hi: f64,
     pub(crate) thermostat_setpoint_lo: f64,
@@ -110,23 +127,38 @@ pub(crate) struct SourceTemperatureControlledZone {
 impl Default for SourceTemperatureControlledZone {
     fn default() -> Self {
         Self {
-            name: String::new(), zone_name: String::new(), actual_zone_number: 0,
+            name: String::new(),
+            zone_name: String::new(),
+            actual_zone_number: 0,
             control_type_schedule: None,
             setpoints: std::array::from_fn(|_| SourceTemperatureSetpointType::default()),
-            manage_demand: false, heating_reset_limit: 0.0, cooling_reset_limit: 0.0,
-            ems_override_heating_on: false, ems_override_heating_value: 0.0,
-            ems_override_cooling_on: false, ems_override_cooling_value: 0.0,
+            manage_demand: false,
+            heating_reset_limit: 0.0,
+            cooling_reset_limit: 0.0,
+            ems_override_heating_on: false,
+            ems_override_heating_value: 0.0,
+            ems_override_cooling_on: false,
+            ems_override_cooling_value: 0.0,
             operative_control: SourceTemperatureControlMode::Invalid,
-            fixed_radiative_fraction: 0.0, operative_radiative_fraction_schedule: None,
-            adaptive_comfort_temperature_control: false, adaptive_comfort_model_type_index: 0,
-            zone_overcool_range: 0.0, overcool_control: SourceTemperatureControlMode::Invalid,
-            zone_overcool_constant_range: 0.0, overcool_range_schedule: None,
-            zone_overcool_control_ratio: 0.0, dehumidifying_schedule: None,
+            fixed_radiative_fraction: 0.0,
+            operative_radiative_fraction_schedule: None,
+            adaptive_comfort_temperature_control: false,
+            adaptive_comfort_model_type_index: 0,
+            zone_overcool_range: 0.0,
+            overcool_control: SourceTemperatureControlMode::Invalid,
+            zone_overcool_constant_range: 0.0,
+            overcool_range_schedule: None,
+            zone_overcool_control_ratio: 0.0,
+            dehumidifying_schedule: None,
             delta_temperature_cutout_setpoint: 0.0,
-            thermostat_setpoint_hi: 0.0, thermostat_setpoint_lo: 0.0,
-            cool_mode_last: false, heat_mode_last: false,
-            cool_mode_last_save: false, heat_mode_last_save: false,
-            cool_off: false, heat_off: false,
+            thermostat_setpoint_hi: 0.0,
+            thermostat_setpoint_lo: 0.0,
+            cool_mode_last: false,
+            heat_mode_last: false,
+            cool_mode_last_save: false,
+            heat_mode_last_save: false,
+            cool_off: false,
+            heat_off: false,
         }
     }
 }
@@ -135,8 +167,10 @@ impl Default for SourceTemperatureControlledZone {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceZoneSetpointSchedule {
     pub(crate) name: String,
-    pub(crate) heat_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
-    pub(crate) cool_schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) heat_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) cool_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
 }
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceZoneAirFlags {

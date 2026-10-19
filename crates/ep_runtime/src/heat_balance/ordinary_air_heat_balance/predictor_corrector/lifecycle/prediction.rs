@@ -35,7 +35,10 @@ impl SourceZoneSpaceHeatBalanceData {
             if node_number > 0 {
                 let node = owners.equipment.source_zone_air_node_mut(node_number)?;
                 *node.temperature = self.xmat[0];
-                *owners.fan.temp_tstat_air.as_mut()
+                *owners
+                    .fan
+                    .temp_tstat_air
+                    .as_mut()
                     .and_then(|rows| rows.get_mut(index(number).ok()?))
                     .ok_or(Error::Unavailable("actual rollback TempTstatAir6783"))? = self.xmat[0];
                 *node.humidity_ratio = self.w_prev_zone_ts[0];
@@ -135,6 +138,8 @@ impl SourceZoneSpaceHeatBalanceData {
         self.calculate_source_predicted_humidity(number, controller, owners)?;
         Ok(())
     }
+    // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+    #[allow(unused_assignments)]
     fn calculate_source_predicted_sensible(
         &mut self,
         rafn_fraction: f64,
@@ -142,7 +147,11 @@ impl SourceZoneSpaceHeatBalanceData {
         controller: &mut SourceZoneAirPredictorCorrector,
         owners: &mut SourceZoneAirOwners<'_, '_>,
     ) -> Result<(), Error> {
-        let setpoints = owners.fan.thermostat.zone_tstat_setpoints.as_ref()
+        let setpoints = owners
+            .fan
+            .thermostat
+            .zone_tstat_setpoints
+            .as_ref()
             .and_then(|rows| rows.get(index(number).ok()?))
             .ok_or(Error::Unavailable("actual predicted zoneTstatSetpts6841"))?;
         let mut deadband_or_setback = false;
@@ -151,14 +160,20 @@ impl SourceZoneSpaceHeatBalanceData {
         let mut heating_load = 0.0;
         let mut cooling_load = 0.0;
         let node_number = zone(owners, number)?.system_zone_node_number;
-        let kind = *owners.fan.thermostat.temp_control_type.as_ref()
+        let kind = *owners
+            .fan
+            .thermostat
+            .temp_control_type
+            .as_ref()
             .and_then(|rows| rows.get(index(number).ok()?))
             .ok_or(Error::Unavailable("actual predicted TempControlType6856"))?;
         match kind {
             0 => {} // Native Uncontrolled retains its actual zero procedure locals.
             1 => {
                 if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable("non-ThirdOrder predicted SingleHeat6870"));
+                    return Err(Error::Unavailable(
+                        "non-ThirdOrder predicted SingleHeat6870",
+                    ));
                 }
                 heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 if rafn_fraction > 0.0 {
@@ -173,7 +188,9 @@ impl SourceZoneSpaceHeatBalanceData {
             }
             2 => {
                 if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable("non-ThirdOrder predicted SingleCool6908"));
+                    return Err(Error::Unavailable(
+                        "non-ThirdOrder predicted SingleCool6908",
+                    ));
                 }
                 cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 if rafn_fraction > 0.0 {
@@ -194,7 +211,9 @@ impl SourceZoneSpaceHeatBalanceData {
             }
             3 => {
                 if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable("non-ThirdOrder predicted SingleHeatCool6949"));
+                    return Err(Error::Unavailable(
+                        "non-ThirdOrder predicted SingleHeatCool6949",
+                    ));
                 }
                 heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
@@ -211,7 +230,9 @@ impl SourceZoneSpaceHeatBalanceData {
                         - self.temp_ind_load;
                 }
                 if heating_load > cooling_load {
-                    return Err(Error::Unavailable("actual SingleHeatCool load inversion severe6995"));
+                    return Err(Error::Unavailable(
+                        "actual SingleHeatCool load inversion severe6995",
+                    ));
                 }
                 if heating_load > 0.0 && cooling_load > 0.0 {
                     total_load = heating_load;
@@ -220,18 +241,25 @@ impl SourceZoneSpaceHeatBalanceData {
                 } else if heating_load <= 0.0 && cooling_load >= 0.0 {
                     total_load = 0.0;
                     if node_number > 0 {
-                        zone_setpoint = *owners.equipment.source_zone_air_node_mut(node_number)?.temperature;
+                        zone_setpoint = *owners
+                            .equipment
+                            .source_zone_air_node_mut(node_number)?
+                            .temperature;
                         zone_setpoint = cpp_max(zone_setpoint, setpoints.setpt_lo);
                         zone_setpoint = cpp_min(zone_setpoint, setpoints.setpt_hi);
                     }
                     deadband_or_setback = true;
                 } else {
-                    return Err(Error::Unavailable("actual SingleHeatCool unanticipated-load severe7021"));
+                    return Err(Error::Unavailable(
+                        "actual SingleHeatCool unanticipated-load severe7021",
+                    ));
                 }
             }
             4 => {
                 if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable("non-ThirdOrder predicted DualHeatCool7041"));
+                    return Err(Error::Unavailable(
+                        "non-ThirdOrder predicted DualHeatCool7041",
+                    ));
                 }
                 heating_load = self.temp_dep_load * setpoints.setpt_lo - self.temp_ind_load;
                 cooling_load = self.temp_dep_load * setpoints.setpt_hi - self.temp_ind_load;
@@ -247,7 +275,9 @@ impl SourceZoneSpaceHeatBalanceData {
                         - self.temp_ind_load;
                 }
                 if heating_load > cooling_load {
-                    return Err(Error::Unavailable("actual DualHeatCool load inversion severe7083"));
+                    return Err(Error::Unavailable(
+                        "actual DualHeatCool load inversion severe7083",
+                    ));
                 }
                 if heating_load > 0.0 && cooling_load > 0.0 {
                     total_load = heating_load;
@@ -258,52 +288,101 @@ impl SourceZoneSpaceHeatBalanceData {
                 } else if heating_load <= 0.0 && cooling_load >= 0.0 {
                     total_load = 0.0;
                     if node_number > 0 {
-                        zone_setpoint = *owners.equipment.source_zone_air_node_mut(node_number)?.temperature;
+                        zone_setpoint = *owners
+                            .equipment
+                            .source_zone_air_node_mut(node_number)?
+                            .temperature;
                         zone_setpoint = cpp_max(zone_setpoint, setpoints.setpt_lo);
                         zone_setpoint = cpp_min(zone_setpoint, setpoints.setpt_hi);
                     }
                     deadband_or_setback = true;
                 } else {
-                    return Err(Error::Unavailable("actual DualHeatCool unanticipated-load severe7113"));
+                    return Err(Error::Unavailable(
+                        "actual DualHeatCool unanticipated-load severe7113",
+                    ));
                 }
             }
             _ => {} // Literal Native default performs no load/setpoint writes.
         }
-        let _stage_number = controller.demand.zones.as_ref()
+        let _stage_number = controller
+            .demand
+            .zones
+            .as_ref()
             .and_then(|rows| rows.get(index(number).ok()?))
-            .ok_or(Error::Unavailable("actual predicted ZoneSysEnergyDemand StageNum7141"))?
-            .base.stage_num;
+            .ok_or(Error::Unavailable(
+                "actual predicted ZoneSysEnergyDemand StageNum7141",
+            ))?
+            .base
+            .stage_num;
         if controller.flags.number_stage_zones > 0 {
-            let staged = *controller.controls.stage_zone_logic.as_ref()
+            let staged = *controller
+                .controls
+                .stage_zone_logic
+                .as_ref()
                 .and_then(|rows| rows.get(index(number).ok()?))
                 .ok_or(Error::Unavailable("actual StageZoneLogic7145"))?;
             if staged {
-                return Err(Error::Unavailable("positive staged predicted load StageNum7146"));
+                return Err(Error::Unavailable(
+                    "positive staged predicted load StageNum7146",
+                ));
             }
         }
         if node_number > 0 {
-            *owners.equipment.source_zone_air_node_mut(node_number)?.temperature_setpoint = zone_setpoint;
+            *owners
+                .equipment
+                .source_zone_air_node_mut(node_number)?
+                .temperature_setpoint = zone_setpoint;
         }
-        *controller.demand.setback.as_mut()
+        *controller
+            .demand
+            .setback
+            .as_mut()
             .and_then(|rows| rows.get_mut(index(number).ok()?))
-            .ok_or(Error::Unavailable("actual predicted Setback7228"))? = zone_setpoint > self.set_point_last;
+            .ok_or(Error::Unavailable("actual predicted Setback7228"))? =
+            zone_setpoint > self.set_point_last;
         self.set_point_last = zone_setpoint;
-        owners.fan.thermostat.zone_tstat_setpoints.as_mut()
+        owners
+            .fan
+            .thermostat
+            .zone_tstat_setpoints
+            .as_mut()
             .and_then(|rows| rows.get_mut(index(number).ok()?))
-            .ok_or(Error::Unavailable("actual predicted Zone setpoint7231"))?.setpt = zone_setpoint;
-        *controller.demand.deadband_or_setback.as_mut()
+            .ok_or(Error::Unavailable("actual predicted Zone setpoint7231"))?
+            .setpt = zone_setpoint;
+        *controller
+            .demand
+            .deadband_or_setback
+            .as_mut()
             .and_then(|rows| rows.get_mut(index(number).ok()?))
             .ok_or(Error::Unavailable("actual predicted DeadBand7232"))? = deadband_or_setback;
-        *controller.demand.current_deadband_or_setback.as_mut()
+        *controller
+            .demand
+            .current_deadband_or_setback
+            .as_mut()
             .and_then(|rows| rows.get_mut(index(number).ok()?))
             .ok_or(Error::Unavailable("actual predicted CurDeadBand7233"))? = deadband_or_setback;
         let zone = zone(owners, number)?;
-        let correction = value(&owners.fan.thermostat.load_correction_factor, index(number)?)?;
-        controller.demand.zones.as_mut()
+        let correction = value(
+            &owners.fan.thermostat.load_correction_factor,
+            index(number)?,
+        )?;
+        controller
+            .demand
+            .zones
+            .as_mut()
             .and_then(|rows| rows.get_mut(index(number).ok()?))
-            .ok_or(Error::Unavailable("actual predicted ZoneSysEnergyDemand7240"))?
-            .report_source_predicted_sensible(total_load, heating_load, cooling_load, correction,
-                zone.multiplier, zone.list_multiplier, zone.is_controlled)?;
+            .ok_or(Error::Unavailable(
+                "actual predicted ZoneSysEnergyDemand7240",
+            ))?
+            .report_source_predicted_sensible(
+                total_load,
+                heating_load,
+                cooling_load,
+                correction,
+                zone.multiplier,
+                zone.list_multiplier,
+                zone.is_controlled,
+            )?;
         Ok(())
     }
     fn calculate_source_predicted_humidity(
@@ -405,10 +484,21 @@ mod native_cohort;
 impl SourceZoneSpaceHeatBalanceData {
     /// Caller bridge only; the original full member body above owns all math.
     pub(crate) fn predict_native_multiplier_cohort(
-        &mut self, number: i32, shorten: bool, use_zone_history: bool,
-        prior_step: f64, controller: &mut SourceZoneAirPredictorCorrector,
+        &mut self,
+        number: i32,
+        shorten: bool,
+        use_zone_history: bool,
+        prior_step: f64,
+        controller: &mut SourceZoneAirPredictorCorrector,
         owners: &mut SourceZoneAirOwners<'_, '_>,
     ) -> Result<(), Error> {
-        self.predict_source_system_load(number, shorten, use_zone_history, prior_step, controller, owners)
+        self.predict_source_system_load(
+            number,
+            shorten,
+            use_zone_history,
+            prior_step,
+            controller,
+            owners,
+        )
     }
 }

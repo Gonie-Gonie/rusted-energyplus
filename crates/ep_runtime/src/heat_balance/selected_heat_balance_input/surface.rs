@@ -14,8 +14,6 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod boundary_inputs;
-#[cfg(all(test, feature = "native-controlled-air-cohort"))]
-mod native_gap_cohort;
 pub(crate) mod computed_geometry;
 mod convexity;
 mod derived_arrays;
@@ -27,6 +25,8 @@ mod floor_areas;
 mod foundation;
 mod geometry_rules;
 mod lists;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 mod opaque;
 mod parallel_arrays;
 mod raw;
@@ -473,13 +473,23 @@ impl SurfaceGeometryInputState {
 // Test-only function-entry restoration, not a production geometry-getter execution claim.
 #[cfg(test)]
 impl SurfaceGeometryInputState {
-    pub(crate) fn restore_native_cohort_opaque_surfaces(&mut self, rows:&[(f64,SurfaceClass,i32)]) {
-        self.final_surfaces=Some(vec![final_mapping::FinalSurface::default();rows.len()]);
-        self.parallel_arrays=Some(parallel_arrays::SurfaceParallelArrays::allocate(rows.len()));
-        if let (Some(surfaces),Some(parallel))=(&mut self.final_surfaces,&mut self.parallel_arrays) {
-            for (at,(area,class,reference)) in rows.iter().enumerate() {
-                surfaces[at].row.area=*area;surfaces[at].row.class=*class;
-                parallel.surf_t_air_ref[at]=*reference;
+    #[allow(
+        dead_code,
+        reason = "Captured-entry restoration is used only by the feature-gated Native cohort; ordinary test targets intentionally do not invoke this test-only physical surface owner method."
+    )]
+    pub(crate) fn restore_native_cohort_opaque_surfaces(
+        &mut self,
+        rows: &[(f64, SurfaceClass, i32)],
+    ) {
+        self.final_surfaces = Some(vec![final_mapping::FinalSurface::default(); rows.len()]);
+        self.parallel_arrays = Some(parallel_arrays::SurfaceParallelArrays::allocate(rows.len()));
+        if let (Some(surfaces), Some(parallel)) =
+            (&mut self.final_surfaces, &mut self.parallel_arrays)
+        {
+            for (at, (area, class, reference)) in rows.iter().enumerate() {
+                surfaces[at].row.area = *area;
+                surfaces[at].row.class = *class;
+                parallel.surf_t_air_ref[at] = *reference;
             }
         }
     }

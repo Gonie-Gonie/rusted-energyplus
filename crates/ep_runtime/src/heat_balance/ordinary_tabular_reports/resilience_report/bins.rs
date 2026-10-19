@@ -20,6 +20,8 @@ impl SourceTabularReports {
         let mut max = vec![0.0; n];
         let mut min = vec![0.0; n];
         let mut sum = vec![0.0; n];
+        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+        #[allow(clippy::needless_range_loop)]
         for j in 0..n {
             min[j] = value(o.zones, 1, field, j)? * multiplier;
         }
@@ -86,6 +88,8 @@ impl SourceTabularReports {
         let mut max = vec![0.0; n];
         let mut min = vec![0.0; n];
         let mut sum = vec![0.0; n];
+        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+        #[allow(clippy::needless_range_loop)]
         for j in 0..n {
             min[j] = value(o.zones, 1, field, j)?;
         }

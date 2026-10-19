@@ -126,6 +126,8 @@ fn register<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
 /// Native default-build cache calls, not the legacy stateless RH/dewpoint helpers.
 /// Diagnostic-positive RH stops after the real Psat call and algebra, before its
 /// unported native error child. EP_psych_stats is outside this selected build.
+// Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+#[allow(clippy::manual_range_contains)]
 fn relative_humidity(
     psy: &mut SourcePsychrometricAccess,
     tdb: f64,

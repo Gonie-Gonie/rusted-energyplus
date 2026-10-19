@@ -209,6 +209,8 @@ pub(crate) fn check_glazing_shading_status_change(
 pub(crate) fn update_source_variable_absorptances(
     geometry: &SurfaceGeometryInputState,
 ) -> Result<(), Error> {
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for _number in &geometry.surface_lists.all_vary_absorptance_opaque {
         return Err(Error::Unavailable(
             "positive actual dynamic-coating Surface/Material owner",
@@ -280,6 +282,8 @@ pub(crate) fn window_source_shading_manager(
             let space = spaces
                 .get(index(number)?)
                 .ok_or(Error::Unavailable("actual Source window Space association"))?;
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _surface in space.window_first..=space.window_last {
                 return Err(Error::Unavailable(
                     "positive WindowShadingManager first shade-status write",

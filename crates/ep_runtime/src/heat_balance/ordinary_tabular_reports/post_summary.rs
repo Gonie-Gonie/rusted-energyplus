@@ -32,6 +32,8 @@ fn ordinal(value: i32) -> Result<usize, Error> {
 }
 
 impl SourceTabularReports {
+    // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+    #[allow(unused_assignments)]
     pub(crate) fn write_source_component_sizing(
         &mut self,
         registry: &mut PredefinedRegistry,
@@ -56,14 +58,22 @@ impl SourceTabularReports {
             let _unique_desc = vec![String::new(); count];
             let _unique_obj = vec![String::new(); count];
             let mut loop_limit = 0;
+            // Preserve the Original while suffix and its partial writes before the actual first unsupported child.
+            #[allow(clippy::never_loop)]
             while loop_limit <= 100 {
                 let mut found_entry = 0;
                 loop_limit += 1;
                 for number in 1..=registry.component_sizing_count {
-                    let index = usize::try_from(number - 1)
-                        .map_err(|_| Error::Unavailable("actual WriteComponentSizing entry ordinal14268"))?;
-                    let entry = registry.component_sizing_entries.as_ref().and_then(|rows| rows.get(index))
-                        .ok_or(Error::Unavailable("actual WriteComponentSizing entry allocation14268"))?;
+                    let index = usize::try_from(number - 1).map_err(|_| {
+                        Error::Unavailable("actual WriteComponentSizing entry ordinal14268")
+                    })?;
+                    let entry = registry
+                        .component_sizing_entries
+                        .as_ref()
+                        .and_then(|rows| rows.get(index))
+                        .ok_or(Error::Unavailable(
+                            "actual WriteComponentSizing entry allocation14268",
+                        ))?;
                     if !entry.written {
                         found_entry = number;
                         break;
@@ -72,7 +82,9 @@ impl SourceTabularReports {
                 if found_entry == 0 {
                     break;
                 }
-                return Err(Error::Unavailable("actual WriteComponentSizing positive grouped-table child14276"));
+                return Err(Error::Unavailable(
+                    "actual WriteComponentSizing positive grouped-table child14276",
+                ));
             }
         }
         Ok(())
@@ -305,6 +317,8 @@ impl SourceTabularReports {
             return Ok(());
         }
         let _people_indices = vec![None::<i32>; extent(gains.totals[0])?];
+        // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+        #[allow(clippy::never_loop)]
         for _person in 1..=gains.totals[0] {
             return Err(Error::Unavailable(
                 "actual WriteAdaptiveComfortTable12380 People AdaptiveASH55/AdaptiveCEN15251 read",

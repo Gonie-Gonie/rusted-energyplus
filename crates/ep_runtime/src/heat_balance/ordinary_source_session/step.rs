@@ -24,6 +24,8 @@ impl SourceInitializationFiles {
     /// # Errors
     /// Original child/backend errors preserve their same owned typed causes and
     /// partial persistent owners; no legacy simulator fallback is invoked.
+    // Keep the explicit dereference/reborrow at the persistent same-owner call boundary.
+    #[allow(clippy::explicit_auto_deref)]
     pub fn source_heat_balance_step(
         &mut self,
         session: &mut Option<OrdinarySourceSession>,

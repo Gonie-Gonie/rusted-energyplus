@@ -189,6 +189,14 @@ impl crate::weather::day::WeatherDayState {
     pub(crate) fn native_gap_daily_solar_coefficients(&mut self, day: i32) -> [f64; 7] {
         self.today_variables.day_of_year = day;
         let v = source_daily_coefficients(&mut self.today_variables, self.environment.latitude);
-        [v.a, v.b, v.c, v.annual_variation, v.equation_of_time, v.sin_declination, v.cos_declination]
+        [
+            v.a,
+            v.b,
+            v.c,
+            v.annual_variation,
+            v.equation_of_time,
+            v.sin_declination,
+            v.cos_declination,
+        ]
     }
 }

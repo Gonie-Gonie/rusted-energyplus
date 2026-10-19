@@ -266,10 +266,12 @@ impl Caller {
         action(&mut context)
     }
     pub(super) fn snapshot(&self) -> Result<Value, std::str::Utf8Error> {
-        Ok(json!({"reports":reports(&self.reports)?,"backend":backend(&self.state),
+        Ok(
+            json!({"reports":reports(&self.reports)?,"backend":backend(&self.state),
             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
             "backend_callbacks":self.callbacks,"actual_backend_callback_count":self.callbacks.len(),
-            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false}))
+            "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false}),
+        )
     }
     pub(super) fn prepare(&mut self, input: &DirectReportInputs) -> Result<bool, SetupError> {
         self.with_context(|context| {

@@ -21,6 +21,10 @@ pub(crate) enum SourceShadingOutput {
         file: File,
         failure: Option<io::Error>,
     },
+    #[allow(
+        dead_code,
+        reason = "Keep the actual failed-open IO error as owned diagnostic state; preserving Native allocation-versus-stream-failure behavior must not discard its failure payload."
+    )]
     FailedOpen(io::Error),
 }
 #[derive(Default)]

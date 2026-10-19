@@ -5,6 +5,8 @@ use super::helpers::{
 };
 use super::{Error, Locals, SourceTabularReports, SourceVeriSumOwners};
 impl SourceTabularReports {
+    // Keep Original declaration and branch-assignment order at this owner boundary.
+    #[allow(clippy::needless_late_init)]
     pub(super) fn veri_zones(
         &mut self,
         pass: usize,

@@ -97,7 +97,7 @@ impl SourceTabularReports {
         }
         let mut process_elec_cost: f64 = 0.0;
         if l.use_val.read([1, 15])? != 0.0 {
-            let mut process_fraction: f64 =
+            let process_fraction: f64 =
                 (l.use_val.read([1, 5])? + l.use_val.read([1, 13])?) / l.use_val.read([1, 15])?;
             process_elec_cost = o.predefined_summary.leed_electric_cost_total * process_fraction;
         }
@@ -163,14 +163,14 @@ impl SourceTabularReports {
         }
         let mut process_gas_cost: f64 = 0.0;
         if l.use_val.read([2, 15])? != 0.0 {
-            let mut process_fraction: f64 =
+            let process_fraction: f64 =
                 (l.use_val.read([2, 5])? + l.use_val.read([2, 13])?) / l.use_val.read([2, 15])?;
             process_gas_cost = o.predefined_summary.leed_gas_cost_total * process_fraction;
         }
         if self.input_state.tabular_report_passes[pass].produce_tabular {
             predef_real(o, "pdchLeedEcsProc", b"Natural Gas", process_gas_cost, 2)?;
         }
-        let mut use_val_col_add_fuel15: f64 = l.use_val.read([3, 15])?
+        let use_val_col_add_fuel15: f64 = l.use_val.read([3, 15])?
             + l.use_val.read([4, 15])?
             + l.use_val.read([5, 15])?
             + l.use_val.read([6, 15])?
@@ -178,7 +178,7 @@ impl SourceTabularReports {
             + l.use_val.read([8, 15])?
             + l.use_val.read([9, 15])?
             + l.use_val.read([10, 15])?;
-        let mut use_val_col_add_fuel5: f64 = l.use_val.read([3, 5])?
+        let use_val_col_add_fuel5: f64 = l.use_val.read([3, 5])?
             + l.use_val.read([4, 5])?
             + l.use_val.read([5, 5])?
             + l.use_val.read([6, 5])?
@@ -186,7 +186,7 @@ impl SourceTabularReports {
             + l.use_val.read([8, 5])?
             + l.use_val.read([9, 5])?
             + l.use_val.read([10, 5])?;
-        let mut use_val_col_add_fuel13: f64 = l.use_val.read([3, 13])?
+        let use_val_col_add_fuel13: f64 = l.use_val.read([3, 13])?
             + l.use_val.read([4, 13])?
             + l.use_val.read([5, 13])?
             + l.use_val.read([6, 13])?
@@ -219,10 +219,10 @@ impl SourceTabularReports {
                 o,
                 "pdchLeedEusTotal",
                 b"Additional",
-                (use_val_col_add_fuel15
+                use_val_col_add_fuel15
                     + l.use_val.read([11, 15])?
                     + l.use_val.read([12, 15])?
-                    + l.use_val.read([13, 15])?),
+                    + l.use_val.read([13, 15])?,
                 2,
             )?;
             predef_real(
@@ -248,7 +248,7 @@ impl SourceTabularReports {
             + l.use_val.read([13, 15])?)
             > 0.001
         {
-            let mut process_fraction: f64 = (use_val_col_add_fuel5
+            let process_fraction: f64 = (use_val_col_add_fuel5
                 + use_val_col_add_fuel13
                 + l.use_val.read([11, 5])?
                 + l.use_val.read([11, 13])?

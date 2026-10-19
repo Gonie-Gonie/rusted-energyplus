@@ -67,6 +67,8 @@ impl SourceHvacManager {
         if *o.equipment.source_equipment_inputs_filled() && self.simulation.air_loop.inputs_filled {
             if self.simulation.setpoints.init_one_time_flag {
                 if let Some(rows) = &self.simulation.setpoints.managers {
+                    // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                    #[allow(clippy::never_loop)]
                     for row in rows {
                         match *row {}
                     }
@@ -80,6 +82,8 @@ impl SourceHvacManager {
         {
             self.simulation.setpoints.manager_on = false;
             if let Some(rows) = &self.simulation.setpoints.managers {
+                // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+                #[allow(clippy::never_loop)]
                 for row in rows {
                     match *row {}
                 }
@@ -106,6 +110,8 @@ impl SourceHvacManager {
     }
     fn traverse_source_empty_setpoint_managers(&self) -> Result<(), Error> {
         if let Some(rows) = &self.simulation.setpoints.managers {
+            // This real owner has uninhabited rows; preserve its literal traversal instead of inventing a populated row or count.
+            #[allow(clippy::never_loop)]
             for row in rows {
                 match *row {}
             }

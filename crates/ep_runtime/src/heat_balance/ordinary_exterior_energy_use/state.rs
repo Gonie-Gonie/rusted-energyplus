@@ -3,9 +3,17 @@ use super::SourceScheduleIndex;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub(super) enum SourceLightControlType {
+    #[allow(
+        dead_code,
+        reason = "ExteriorEnergyUse.hh LightControlType retains the original invalid/count sentinels without changing the live schedule/clock identities."
+    )]
     Invalid = -1,
     ScheduleOnly = 1,
     AstroClockOverride = 2,
+    #[allow(
+        dead_code,
+        reason = "ExteriorEnergyUse.hh LightControlType retains the original invalid/count sentinels without changing the live schedule/clock identities."
+    )]
     Num = 3,
 }
 #[derive(Clone, Debug, PartialEq)]

@@ -13,8 +13,8 @@ pub use input::{
     ProjectDiagnosticsObject, ProjectInputObject, ProjectInputValue, SelectedProjectDataInput,
 };
 mod environment;
-mod threading;
 mod getter;
+mod threading;
 
 /// Genuine backend/OS failure or explicit unsupported input boundary.
 #[derive(Debug)]

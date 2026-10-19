@@ -178,6 +178,10 @@ impl SourceTabularReports {
 }
 
 // Same accepted Actual RealToStr18578-18624 kernel shared with VeriSum.
-pub(super) fn source_report_real(formatted: bool, value: f64, digits: i32) -> Result<Vec<u8>, Error> {
+pub(super) fn source_report_real(
+    formatted: bool,
+    value: f64,
+    digits: i32,
+) -> Result<Vec<u8>, Error> {
     helpers::real(formatted, value, digits)
 }

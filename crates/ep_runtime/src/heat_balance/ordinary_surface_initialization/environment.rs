@@ -331,6 +331,8 @@ impl OrdinarySurfaceInitialization {
                     }
                 }
                 if space.window_first >= 0 {
+                    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+                    #[allow(clippy::never_loop)]
                     for _number in space.window_first..=space.window_last {
                         return Err(Error::Unavailable(
                             "positive InitThermalAndFluxHistories window-frame prefix2306",

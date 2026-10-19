@@ -96,29 +96,51 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
     }
     fn setup_node_variables_for_reporting(&mut self) -> Result<(), RuntimeError> {
         self.backend.with_scoped(
-            &mut (&mut *self.reports, &mut *self.files, &mut *self.output_host, &mut *self.weather),
+            &mut (
+                &mut *self.reports,
+                &mut *self.files,
+                &mut *self.output_host,
+                &mut *self.weather,
+            ),
             |mut backend, (reports, files, output_host, weather)| {
-                let globals = required(reports.selected_heat_balance_globals.as_ref(),
-                    "actual globals before Node reporting setup")?;
-                let project = required(reports.selected_project_data.as_ref(),
-                    "actual Project before Node reporting setup")?;
-                let input = required(reports.selected_input_processor.as_mut(),
-                    "actual same IP before Node reporting setup")?;
+                let globals = required(
+                    reports.selected_heat_balance_globals.as_ref(),
+                    "actual globals before Node reporting setup",
+                )?;
+                let project = required(
+                    reports.selected_project_data.as_ref(),
+                    "actual Project before Node reporting setup",
+                )?;
+                let input = required(
+                    reports.selected_input_processor.as_mut(),
+                    "actual same IP before Node reporting setup",
+                )?;
                 let (mut dictionary, eio, bnd) = files.source_node_reporting_streams(
-                    &reports.source_sqlite, &mut reports.source_results_output_variables,
+                    &reports.source_sqlite,
+                    &mut reports.source_results_output_variables,
                 );
-                required(reports.source_zone_equipment.as_mut(),
-                    "actual sole NodeOwner before reporting setup")?
-                    .setup_source_node_variables_for_reporting(
-                        globals, &reports.heat_balance_input_state, &mut backend,
-                        &mut SourceNodeReportingOutputContext {
-                            registration: &mut reports.output_registration, input,
-                            prescan: &reports.output_prescan, reports: &self.model.report_inputs,
-                            minimum_report_frequency: &project.system.minimum_report_frequency,
-                            minutes_in_time_step: weather.state.global.minutes_in_time_step,
-                            host: &mut **output_host, dictionary_host: &mut dictionary, eio,
-                        }, bnd,
-                    ).map_err(hb_input_error)
+                required(
+                    reports.source_zone_equipment.as_mut(),
+                    "actual sole NodeOwner before reporting setup",
+                )?
+                .setup_source_node_variables_for_reporting(
+                    globals,
+                    &reports.heat_balance_input_state,
+                    &mut backend,
+                    &mut SourceNodeReportingOutputContext {
+                        registration: &mut reports.output_registration,
+                        input,
+                        prescan: &reports.output_prescan,
+                        reports: &self.model.report_inputs,
+                        minimum_report_frequency: &project.system.minimum_report_frequency,
+                        minutes_in_time_step: weather.state.global.minutes_in_time_step,
+                        host: &mut **output_host,
+                        dictionary_host: &mut dictionary,
+                        eio,
+                    },
+                    bnd,
+                )
+                .map_err(hb_input_error)
             },
         )
     }
@@ -490,7 +512,8 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
     }
     fn create_energy_report_structure(&mut self) -> Result<(), RuntimeError> {
         let session = required(
-            self.session.as_mut(), "actual SystemReports before energy structure",
+            self.session.as_mut(),
+            "actual SystemReports before energy structure",
         )?;
         let globals = required(
             self.reports.selected_heat_balance_globals.as_ref(),
@@ -499,16 +522,23 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
         let hvac = &required(
             self.reports.selected_simulation_startup.as_ref(),
             "actual HVAC globals before energy structure",
-        )?.hvac_globals;
+        )?
+        .hvac_globals;
         let equipment = required(
             self.reports.source_zone_equipment.as_mut(),
             "actual zone equipment before energy structure",
         )?;
         let ancillary = &mut session.hvac.ancillary;
-        ancillary.system_reports.create_source_energy_report_structure(
-            globals, hvac, equipment, &ancillary.branch_node_connections,
-            &self.reports.output_registration,
-        ).map_err(hb_input_error)
+        ancillary
+            .system_reports
+            .create_source_energy_report_structure(
+                globals,
+                hvac,
+                equipment,
+                &ancillary.branch_node_connections,
+                &self.reports.output_registration,
+            )
+            .map_err(hb_input_error)
     }
     fn produce_rdd_mdd(&mut self) -> Result<(), RuntimeError> {
         self.reports

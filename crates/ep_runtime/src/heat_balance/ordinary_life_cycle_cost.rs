@@ -1,7 +1,7 @@
 //! Genuine EconomicLifeCycleCost input wrapper on one retained native module slice.
 //! Positive object getters stop at their first actual unported operation.
-mod input;
 mod endrun;
+mod input;
 mod state;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
@@ -68,5 +68,7 @@ impl SourceEconomicLifeCycleCost {
 
 impl SourceEconomicLifeCycleCost {
     // Actual LCCparamPresent operand read by WriteTableOfContents3251.
-    pub(crate) fn source_parameters_present(&self) -> &bool { &self.parameters_present }
+    pub(crate) fn source_parameters_present(&self) -> &bool {
+        &self.parameters_present
+    }
 }

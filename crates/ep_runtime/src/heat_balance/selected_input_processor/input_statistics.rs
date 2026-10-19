@@ -157,12 +157,19 @@ impl SelectedInputProcessor {
             }
         }
         if !raw.object_order.is_empty() {
-            if raw.object_order.len() != raw.objects.len() { return Err(SelectedInputUnavailable::Association); }
+            if raw.object_order.len() != raw.objects.len() {
+                return Err(SelectedInputUnavailable::Association);
+            }
             for (family, objects) in &raw.objects {
-                let order = raw.object_order.get(family).ok_or(SelectedInputUnavailable::Association)?;
+                let order = raw
+                    .object_order
+                    .get(family)
+                    .ok_or(SelectedInputUnavailable::Association)?;
                 let names: std::collections::BTreeSet<_> = order.iter().collect();
-                if order.len() != objects.len() || names.len() != objects.len()
-                    || order.iter().any(|name| !objects.contains_key(name)) {
+                if order.len() != objects.len()
+                    || names.len() != objects.len()
+                    || order.iter().any(|name| !objects.contains_key(name))
+                {
                     return Err(SelectedInputUnavailable::Association);
                 }
             }
@@ -178,9 +185,12 @@ impl SelectedInputProcessor {
     /// # Errors
     /// Rejects a missing raw owner, family or object association.
     pub fn source_raw_object_fields(
-        &self, family: &str, object: &str,
+        &self,
+        family: &str,
+        object: &str,
     ) -> Result<&SourceInputStatisticsFields, SelectedInputUnavailable> {
-        self.statistics_input.as_ref()
+        self.statistics_input
+            .as_ref()
             .and_then(|raw| raw.objects.get(family))
             .and_then(|objects| objects.get(object))
             .ok_or(SelectedInputUnavailable::Association)
@@ -190,9 +200,15 @@ impl SelectedInputProcessor {
     ///
     /// # Errors
     /// Rejects a missing raw order/family instead of inventing lexical order.
-    pub fn source_raw_object_names(&self, family: &str) -> Result<&[String], SelectedInputUnavailable> {
-        self.statistics_input.as_ref().and_then(|raw| raw.object_order.get(family))
-            .map(Vec::as_slice).ok_or(SelectedInputUnavailable::Association)
+    pub fn source_raw_object_names(
+        &self,
+        family: &str,
+    ) -> Result<&[String], SelectedInputUnavailable> {
+        self.statistics_input
+            .as_ref()
+            .and_then(|raw| raw.object_order.get(family))
+            .map(Vec::as_slice)
+            .ok_or(SelectedInputUnavailable::Association)
     }
 
     /// Native getObjectItemNum1298 field overload on the same retained IP.
@@ -200,22 +216,41 @@ impl SelectedInputProcessor {
     /// operands, object usage, shared arguments and defaults remain untouched.
     /// Direct epJSON retains JSON ordinals. A positive IDF match is admitted
     /// only for one object, where getIDFObjNum is the exact identity conversion.
+    // Retain this real Native operand/local and its initialization/request timing for the unrepresented child path.
+    #[allow(unused_variables)]
     pub(crate) fn get_object_item_num_by_field(
-        &mut self, object_type: &str, field: &str, object_name: &str,
+        &mut self,
+        object_type: &str,
+        field: &str,
+        object_name: &str,
         source_is_epjson: bool,
     ) -> Result<i32, SelectedInputUnavailable> {
-        let Ok(canonical) = self.canonical_type(object_type) else { return Ok(-1); };
-        match self.families.entry(canonical.clone()).or_insert(SourceInputFamily::Null) {
+        let Ok(canonical) = self.canonical_type(object_type) else {
+            return Ok(-1);
+        };
+        match self
+            .families
+            .entry(canonical.clone())
+            .or_insert(SourceInputFamily::Null)
+        {
             SourceInputFamily::Null => return Ok(0),
             SourceInputFamily::Objects(objects) if objects.is_empty() => return Ok(0),
             SourceInputFamily::Objects(_) => {}
         }
-        let raw = self.statistics_input.as_ref().ok_or(SelectedInputUnavailable::Association)?;
-        let objects = raw.objects.get(&canonical).ok_or(SelectedInputUnavailable::Association)?;
+        let raw = self
+            .statistics_input
+            .as_ref()
+            .ok_or(SelectedInputUnavailable::Association)?;
+        let objects = raw
+            .objects
+            .get(&canonical)
+            .ok_or(SelectedInputUnavailable::Association)?;
         // Native JSON map traversal precedes getIDFObjNum: duplicate field
         // values select the first lexical object, not the first IDF object.
         for (json_index, (name, fields)) in objects.iter().enumerate() {
-            let Some(value) = fields.get(field) else { continue; };
+            let Some(value) = fields.get(field) else {
+                continue;
+            };
             let SourceInputStatisticsValue::String(value) = value else {
                 return Err(SelectedInputUnavailable::Association);
             };

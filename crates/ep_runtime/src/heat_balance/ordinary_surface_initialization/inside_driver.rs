@@ -268,11 +268,15 @@ impl OrdinarySurfaceInitialization {
                     value(&self.arrays.ref_air_temp, i)?,
                 )?;
             }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _number in space.windows.clone() {
                 return Err(Error::Unavailable(
                     "inside positive window first report reset8751",
                 ));
             }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _number in &geometry.surface_lists.all_inside_source {
                 return Err(Error::Unavailable(
                     "inside positive inside-source schedule8768",
@@ -309,17 +313,36 @@ impl OrdinarySurfaceInitialization {
                 backend,
             )?;
             if self.inside_surface_iterations > 0 && self.inside_surface_iterations % 30 == 0 {
-                crate::heat_balance::source_surface_cadence::inside_event("inside_convection_entry", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
-                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
-                    crate::heat_balance::source_surface_cadence::Detail {
-                        surface,
-                        convection_bits: surface.and_then(|number| index(number).ok())
-                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
-                            .map(|value| value.to_bits()),
-                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
-                        ..crate::heat_balance::source_surface_cadence::Detail::default()
-                    }
-                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
+                crate::heat_balance::source_surface_cadence::inside_event(
+                    "inside_convection_entry",
+                    clock,
+                    globals,
+                    backend.state.kickoff_simulation,
+                    self.inside_surface_iterations,
+                    if crate::heat_balance::source_surface_cadence::active() {
+                        let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                        crate::heat_balance::source_surface_cadence::Detail {
+                            surface,
+                            convection_bits: surface
+                                .and_then(|number| index(number).ok())
+                                .and_then(|i| {
+                                    self.arrays
+                                        .surf_h_conv_int
+                                        .as_deref()
+                                        .and_then(|v| v.get(i))
+                                })
+                                .map(|value| value.to_bits()),
+                            convection_storage: self
+                                .arrays
+                                .surf_h_conv_int
+                                .as_ref()
+                                .map(|v| v.as_ptr() as usize),
+                            ..crate::heat_balance::source_surface_cadence::Detail::default()
+                        }
+                    } else {
+                        crate::heat_balance::source_surface_cadence::Detail::default()
+                    },
+                );
                 providers.initialize_inside_convection(
                     geometry,
                     &mut self.arrays,
@@ -329,51 +352,111 @@ impl OrdinarySurfaceInitialization {
                     clock,
                     backend,
                 )?;
-                crate::heat_balance::source_surface_cadence::inside_event("inside_convection_return", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
-                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
-                    crate::heat_balance::source_surface_cadence::Detail {
-                        surface,
-                        convection_bits: surface.and_then(|number| index(number).ok())
-                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
-                            .map(|value| value.to_bits()),
-                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
-                        ..crate::heat_balance::source_surface_cadence::Detail::default()
-                    }
-                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
+                crate::heat_balance::source_surface_cadence::inside_event(
+                    "inside_convection_return",
+                    clock,
+                    globals,
+                    backend.state.kickoff_simulation,
+                    self.inside_surface_iterations,
+                    if crate::heat_balance::source_surface_cadence::active() {
+                        let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                        crate::heat_balance::source_surface_cadence::Detail {
+                            surface,
+                            convection_bits: surface
+                                .and_then(|number| index(number).ok())
+                                .and_then(|i| {
+                                    self.arrays
+                                        .surf_h_conv_int
+                                        .as_deref()
+                                        .and_then(|v| v.get(i))
+                                })
+                                .map(|value| value.to_bits()),
+                            convection_storage: self
+                                .arrays
+                                .surf_h_conv_int
+                                .as_ref()
+                                .map(|v| v.as_ptr() as usize),
+                            ..crate::heat_balance::source_surface_cadence::Detail::default()
+                        }
+                    } else {
+                        crate::heat_balance::source_surface_cadence::Detail::default()
+                    },
+                );
                 self.arrays.precalculate_source_inside_terms(
                     geometry,
                     zones,
                     clock.time_step_zone_sec,
                     globals,
                 )?;
-                crate::heat_balance::source_surface_cadence::inside_event("inside_precalculation_return", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
-                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
-                    crate::heat_balance::source_surface_cadence::Detail {
-                        surface,
-                        convection_bits: surface.and_then(|number| index(number).ok())
-                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
-                            .map(|value| value.to_bits()),
-                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
-                        ..crate::heat_balance::source_surface_cadence::Detail::default()
-                    }
-                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
+                crate::heat_balance::source_surface_cadence::inside_event(
+                    "inside_precalculation_return",
+                    clock,
+                    globals,
+                    backend.state.kickoff_simulation,
+                    self.inside_surface_iterations,
+                    if crate::heat_balance::source_surface_cadence::active() {
+                        let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                        crate::heat_balance::source_surface_cadence::Detail {
+                            surface,
+                            convection_bits: surface
+                                .and_then(|number| index(number).ok())
+                                .and_then(|i| {
+                                    self.arrays
+                                        .surf_h_conv_int
+                                        .as_deref()
+                                        .and_then(|v| v.get(i))
+                                })
+                                .map(|value| value.to_bits()),
+                            convection_storage: self
+                                .arrays
+                                .surf_h_conv_int
+                                .as_ref()
+                                .map(|v| v.as_ptr() as usize),
+                            ..crate::heat_balance::source_surface_cadence::Detail::default()
+                        }
+                    } else {
+                        crate::heat_balance::source_surface_cadence::Detail::default()
+                    },
+                );
             }
             let mut cadence_first_solve = crate::heat_balance::source_surface_cadence::active();
             for space in &spaces {
                 for number in space.opaque.clone() {
                     if cadence_first_solve {
-                        crate::heat_balance::source_surface_cadence::inside_event("inside_first_immediate_solve", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface: Some(number),
-                            convection_bits: self.arrays.surf_h_conv_int.as_deref().and_then(|v| index(number).ok().and_then(|i|v.get(i))).map(|v|v.to_bits()),
-                            convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v|v.as_ptr() as usize),
-                            ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                        crate::heat_balance::source_surface_cadence::inside_event(
+                            "inside_first_immediate_solve",
+                            clock,
+                            globals,
+                            backend.state.kickoff_simulation,
+                            self.inside_surface_iterations,
+                            crate::heat_balance::source_surface_cadence::Detail {
+                                surface: Some(number),
+                                convection_bits: self
+                                    .arrays
+                                    .surf_h_conv_int
+                                    .as_deref()
+                                    .and_then(|v| index(number).ok().and_then(|i| v.get(i)))
+                                    .map(|v| v.to_bits()),
+                                convection_storage: self
+                                    .arrays
+                                    .surf_h_conv_int
+                                    .as_ref()
+                                    .map(|v| v.as_ptr() as usize),
+                                ..crate::heat_balance::source_surface_cadence::Detail::default()
+                            },
+                        );
                         cadence_first_solve = false;
                     }
-                    if crate::heat_balance::source_surface_cadence::active() && self.inside_surface_iterations < 2 {
+                    if crate::heat_balance::source_surface_cadence::active()
+                        && self.inside_surface_iterations < 2
+                    {
                         crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_before_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
                     }
                     self.arrays
                         .solve_source_inside_opaque_ctf_at(index(number)?)?;
-                    if crate::heat_balance::source_surface_cadence::active() && self.inside_surface_iterations < 2 {
+                    if crate::heat_balance::source_surface_cadence::active()
+                        && self.inside_surface_iterations < 2
+                    {
                         crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_after_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::temperature(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
                     }
                 }
@@ -406,6 +489,8 @@ impl OrdinarySurfaceInitialization {
                         }
                     }
                 }
+                // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+                #[allow(clippy::never_loop)]
                 for _number in space.windows.clone() {
                     return Err(Error::Unavailable(
                         "inside positive actual window thermal solve9021",
@@ -493,12 +578,18 @@ impl OrdinarySurfaceInitialization {
                 }
             }
             if let Some(outcome) = self.check_source_inside_convergence(
-                maximum_difference, &mut converged, globals, clock, providers, backend,
-            )? { return Ok(outcome); }
+                maximum_difference,
+                &mut converged,
+                globals,
+                clock,
+                providers,
+                backend,
+            )? {
+                return Ok(outcome);
+            }
         }
     }
 }
-
 
 impl OrdinarySurfaceInitialization {
     /// Same actual production suffix; no max/min/tolerance override. The loop

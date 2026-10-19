@@ -124,6 +124,8 @@ impl SourceTabularReports {
         let mut max = vec![0.0; columns.len()];
         let mut min = vec![0.0; columns.len()];
         let mut sum = vec![0.0; columns.len()];
+        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+        #[allow(clippy::needless_range_loop)]
         for j in 0..columns.len() {
             min[j] = value(o.zones, 1, field, j)? * 1.0;
         }

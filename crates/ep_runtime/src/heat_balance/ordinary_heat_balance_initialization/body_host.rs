@@ -66,8 +66,11 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             crate::heat_balance::source_surface_cadence::record_handoff(
                 "before_first_run_init",
                 crate::heat_balance::source_surface_cadence::Frame::from_owners(
-                    self.surface, self.owners.clock, self.owners.globals,
-                    self.owners.environment, self.owners.backend.state.kickoff_simulation,
+                    self.surface,
+                    self.owners.clock,
+                    self.owners.globals,
+                    self.owners.environment,
+                    self.owners.backend.state.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),
                 self.owners.clock.kind_of_sim,
@@ -124,46 +127,90 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     }
 
     fn manage_surface_heat_balance(&mut self) -> Result<(), Error> {
-        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::Manage, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(
+            crate::heat_balance::source_surface_cadence::Procedure::Manage,
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+        );
+        // Keep the once-invoked observer closure: local Result propagation must not bypass the after-call exit observation.
+        #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
-        let mut remaining = SourceOrdinaryHvacRemaining;
-        let mut air_child = SourceOrdinaryAirProvider {
-            hvac: self.hvac,
-            remaining: &mut remaining,
-        };
-        self.surface_management.manage_source_surface_heat_balance(
-            &mut SourceOrdinaryManageSurfaceHost {
-                surface: self.surface,
-                controller: self.controller,
-                owners: self.owners,
-                air_child: &mut air_child,
-            },
-        )
+            let mut remaining = SourceOrdinaryHvacRemaining;
+            let mut air_child = SourceOrdinaryAirProvider {
+                hvac: self.hvac,
+                remaining: &mut remaining,
+            };
+            self.surface_management.manage_source_surface_heat_balance(
+                &mut SourceOrdinaryManageSurfaceHost {
+                    surface: self.surface,
+                    controller: self.controller,
+                    owners: self.owners,
+                    air_child: &mut air_child,
+                },
+            )
         })();
-        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_scope.finish(
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+            cadence_result.is_ok(),
+        );
         cadence_result
     }
 
     fn record_heat_balance(&mut self) -> Result<(), Error> {
-        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::SourceRecord, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(
+            crate::heat_balance::source_surface_cadence::Procedure::SourceRecord,
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+        );
+        // Keep the once-invoked observer closure: local Result propagation must not bypass the after-call exit observation.
+        #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
-        let o = &mut self.owners;
-        o.heat_balance
-            .record_source_heat_balance(&mut SourceWarmupRecordOwners {
-                air: o.air,
-                demand: &self.controller.demand,
-                geometry: o.geometry,
-                history: o.history,
-                radiation: o.radiation,
-                zones: o.zones,
-                control: o.control,
-                globals: o.globals,
-                clock: o.clock,
-                project: o.project,
-                eio: o.eio,
-            })
+            let o = &mut self.owners;
+            o.heat_balance
+                .record_source_heat_balance(&mut SourceWarmupRecordOwners {
+                    air: o.air,
+                    demand: &self.controller.demand,
+                    geometry: o.geometry,
+                    history: o.history,
+                    radiation: o.radiation,
+                    zones: o.zones,
+                    control: o.control,
+                    globals: o.globals,
+                    clock: o.clock,
+                    project: o.project,
+                    eio: o.eio,
+                })
         })();
-        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_scope.finish(
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+            cadence_result.is_ok(),
+        );
         cadence_result
     }
 
@@ -188,21 +235,43 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     }
 
     fn check_warmup_convergence(&mut self) -> Result<(), Error> {
-        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::SourceCheck, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(
+            crate::heat_balance::source_surface_cadence::Procedure::SourceCheck,
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+        );
+        // Keep the once-invoked observer closure: local Result propagation must not bypass the after-call exit observation.
+        #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
-        let o = &mut self.owners;
-        o.heat_balance
-            .check_source_warmup_convergence(&mut SourceWarmupCheckOwners {
-                zones: o.zones,
-                control: o.control,
-                project: o.project,
-                globals: o.globals,
-                clock: o.clock,
-                environment: o.environment,
-                backend: o.backend,
-            })
+            let o = &mut self.owners;
+            o.heat_balance
+                .check_source_warmup_convergence(&mut SourceWarmupCheckOwners {
+                    zones: o.zones,
+                    control: o.control,
+                    project: o.project,
+                    globals: o.globals,
+                    clock: o.clock,
+                    environment: o.environment,
+                    backend: o.backend,
+                })
         })();
-        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_scope.finish(
+            crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                self.surface,
+                self.owners.clock,
+                self.owners.globals,
+                self.owners.environment,
+                self.owners.backend.state.kickoff_simulation,
+                self.surface.inside_surface_iterations,
+            ),
+            cadence_result.is_ok(),
+        );
         cadence_result
     }
 

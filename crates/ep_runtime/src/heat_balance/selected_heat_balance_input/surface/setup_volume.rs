@@ -1,8 +1,8 @@
 //! Actual548 selected closed-zone call; return precedes550 centroid/bounds.
 use super::{Error, SelectedInputProcessor, SourceErrorBackend, SurfaceGeometryInputState};
 use crate::geometry::{
-    InitializedZoneGeometry, ZoneGeometryProperties, initial_enclosure,
-    polyhedron_volume, surface_orientation, wall_heights_same,
+    InitializedZoneGeometry, ZoneGeometryProperties, initial_enclosure, polyhedron_volume,
+    surface_orientation, wall_heights_same,
 };
 use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
 

@@ -11,6 +11,10 @@ pub(crate) enum SourcePurchasedAirLimit {
     FlowRate = 1,
     Capacity = 2,
     FlowRateAndCapacity = 3,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 4,
 }
 
@@ -23,6 +27,10 @@ pub(crate) enum SourcePurchasedAirHumidityControl {
     ConstantSensibleHeatRatio = 1,
     Humidistat = 2,
     ConstantSupplyHumidityRatio = 3,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 4,
 }
 
@@ -32,8 +40,20 @@ pub(crate) enum SourcePurchasedAirDcv {
     #[default]
     Invalid = -1,
     None = 0,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     OccupancySchedule = 1,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     CO2SetPoint = 2,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 3,
 }
 
@@ -43,8 +63,20 @@ pub(crate) enum SourcePurchasedAirEconomizer {
     #[default]
     Invalid = -1,
     NoEconomizer = 0,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     DifferentialDryBulb = 1,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     DifferentialEnthalpy = 2,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 3,
 }
 
@@ -54,8 +86,20 @@ pub(crate) enum SourcePurchasedAirHeatRecovery {
     #[default]
     Invalid = -1,
     None = 0,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Sensible = 1,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Enthalpy = 2,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 3,
 }
 
@@ -79,6 +123,10 @@ pub(crate) enum SourcePurchasedAirFuel {
     DistrictHeatingSteam = 12,
     Water = 13,
     None = 14,
+    #[allow(
+        dead_code,
+        reason = "PurchasedAirManager.hh and DataGlobalConstants.hh enum identities retain their original alternatives and count sentinels; finite no-OA IdealLoads does not construct every mode."
+    )]
     Num = 15,
 }
 
@@ -86,7 +134,7 @@ pub(crate) enum SourcePurchasedAirFuel {
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceZonePurchasedAir {
     pub(crate) c_object_name: String, // Native cObjectName
-    pub(crate) name: String, // Native Name
+    pub(crate) name: String,          // Native Name
     pub(crate) avail_sched: Option<SourceScheduleIndex>, // Native availSched
     pub(crate) zone_supply_air_node_num: i32, // Native ZoneSupplyAirNodeNum
     pub(crate) zone_exhaust_air_node_num: i32, // Native ZoneExhaustAirNodeNum
@@ -108,16 +156,16 @@ pub(crate) struct SourceZonePurchasedAir {
     pub(crate) heat_avail_sched: Option<SourceScheduleIndex>, // Native heatAvailSched
     pub(crate) cool_avail_sched: Option<SourceScheduleIndex>, // Native coolAvailSched
     pub(crate) dehumid_ctrl_type: SourcePurchasedAirHumidityControl, // Native DehumidCtrlType
-    pub(crate) cool_shr: f64, // Native CoolSHR
+    pub(crate) cool_shr: f64,         // Native CoolSHR
     pub(crate) humid_ctrl_type: SourcePurchasedAirHumidityControl, // Native HumidCtrlType
     pub(crate) oa_requirements_ptr: i32, // Native OARequirementsPtr
     pub(crate) dcv_type: SourcePurchasedAirDcv, // Native DCVType
     pub(crate) economizer_type: SourcePurchasedAirEconomizer, // Native EconomizerType
-    pub(crate) outdoor_air: bool, // Native OutdoorAir
+    pub(crate) outdoor_air: bool,     // Native OutdoorAir
     pub(crate) outdoor_air_node_num: i32, // Native OutdoorAirNodeNum
     pub(crate) ht_rec_type: SourcePurchasedAirHeatRecovery, // Native HtRecType
-    pub(crate) ht_rec_sen_eff: f64, // Native HtRecSenEff
-    pub(crate) ht_rec_lat_eff: f64, // Native HtRecLatEff
+    pub(crate) ht_rec_sen_eff: f64,   // Native HtRecSenEff
+    pub(crate) ht_rec_lat_eff: f64,   // Native HtRecLatEff
     pub(crate) oa_flow_frac_sched: Option<SourceScheduleIndex>, // Native oaFlowFracSched
     pub(crate) max_heat_mass_flow_rate: f64, // Native MaxHeatMassFlowRate
     pub(crate) max_cool_mass_flow_rate: f64, // Native MaxCoolMassFlowRate
@@ -136,27 +184,27 @@ pub(crate) struct SourceZonePurchasedAir {
     pub(crate) supply_air_vol_flow_rate_std_rho: f64, // Native SupplyAirVolFlowRateStdRho
     pub(crate) ht_rec_sen_output: f64, // Native HtRecSenOutput
     pub(crate) ht_rec_lat_output: f64, // Native HtRecLatOutput
-    pub(crate) oa_sen_output: f64, // Native OASenOutput
-    pub(crate) oa_lat_output: f64, // Native OALatOutput
+    pub(crate) oa_sen_output: f64,    // Native OASenOutput
+    pub(crate) oa_lat_output: f64,    // Native OALatOutput
     pub(crate) sen_output_to_zone: f64, // Native SenOutputToZone
     pub(crate) lat_output_to_zone: f64, // Native LatOutputToZone
-    pub(crate) sen_coil_load: f64, // Native SenCoilLoad
-    pub(crate) lat_coil_load: f64, // Native LatCoilLoad
+    pub(crate) sen_coil_load: f64,    // Native SenCoilLoad
+    pub(crate) lat_coil_load: f64,    // Native LatCoilLoad
     pub(crate) oa_flow_max_cool_output_error: i32, // Native OAFlowMaxCoolOutputError
     pub(crate) oa_flow_max_heat_output_error: i32, // Native OAFlowMaxHeatOutputError
     pub(crate) saturation_output_error: i32, // Native SaturationOutputError
     pub(crate) oa_flow_max_cool_output_index: i32, // Native OAFlowMaxCoolOutputIndex
     pub(crate) oa_flow_max_heat_output_index: i32, // Native OAFlowMaxHeatOutputIndex
     pub(crate) saturation_output_index: i32, // Native SaturationOutputIndex
-    pub(crate) avail_status: i32, // Native availStatus
-    pub(crate) cool_err_index: i32, // Native CoolErrIndex
-    pub(crate) heat_err_index: i32, // Native HeatErrIndex
-    pub(crate) sen_heat_energy: f64, // Native SenHeatEnergy
-    pub(crate) lat_heat_energy: f64, // Native LatHeatEnergy
-    pub(crate) tot_heat_energy: f64, // Native TotHeatEnergy
-    pub(crate) sen_cool_energy: f64, // Native SenCoolEnergy
-    pub(crate) lat_cool_energy: f64, // Native LatCoolEnergy
-    pub(crate) tot_cool_energy: f64, // Native TotCoolEnergy
+    pub(crate) avail_status: i32,     // Native availStatus
+    pub(crate) cool_err_index: i32,   // Native CoolErrIndex
+    pub(crate) heat_err_index: i32,   // Native HeatErrIndex
+    pub(crate) sen_heat_energy: f64,  // Native SenHeatEnergy
+    pub(crate) lat_heat_energy: f64,  // Native LatHeatEnergy
+    pub(crate) tot_heat_energy: f64,  // Native TotHeatEnergy
+    pub(crate) sen_cool_energy: f64,  // Native SenCoolEnergy
+    pub(crate) lat_cool_energy: f64,  // Native LatCoolEnergy
+    pub(crate) tot_cool_energy: f64,  // Native TotCoolEnergy
     pub(crate) zone_sen_heat_energy: f64, // Native ZoneSenHeatEnergy
     pub(crate) zone_lat_heat_energy: f64, // Native ZoneLatHeatEnergy
     pub(crate) zone_tot_heat_energy: f64, // Native ZoneTotHeatEnergy
@@ -175,12 +223,12 @@ pub(crate) struct SourceZonePurchasedAir {
     pub(crate) ht_rec_sen_cool_energy: f64, // Native HtRecSenCoolEnergy
     pub(crate) ht_rec_lat_cool_energy: f64, // Native HtRecLatCoolEnergy
     pub(crate) ht_rec_tot_cool_energy: f64, // Native HtRecTotCoolEnergy
-    pub(crate) sen_heat_rate: f64, // Native SenHeatRate
-    pub(crate) lat_heat_rate: f64, // Native LatHeatRate
-    pub(crate) tot_heat_rate: f64, // Native TotHeatRate
-    pub(crate) sen_cool_rate: f64, // Native SenCoolRate
-    pub(crate) lat_cool_rate: f64, // Native LatCoolRate
-    pub(crate) tot_cool_rate: f64, // Native TotCoolRate
+    pub(crate) sen_heat_rate: f64,    // Native SenHeatRate
+    pub(crate) lat_heat_rate: f64,    // Native LatHeatRate
+    pub(crate) tot_heat_rate: f64,    // Native TotHeatRate
+    pub(crate) sen_cool_rate: f64,    // Native SenCoolRate
+    pub(crate) lat_cool_rate: f64,    // Native LatCoolRate
+    pub(crate) tot_cool_rate: f64,    // Native TotCoolRate
     pub(crate) zone_sen_heat_rate: f64, // Native ZoneSenHeatRate
     pub(crate) zone_lat_heat_rate: f64, // Native ZoneLatHeatRate
     pub(crate) zone_tot_heat_rate: f64, // Native ZoneTotHeatRate
@@ -201,11 +249,11 @@ pub(crate) struct SourceZonePurchasedAir {
     pub(crate) ht_rec_tot_cool_rate: f64, // Native HtRecTotCoolRate
     pub(crate) time_econo_active: f64, // Native TimeEconoActive
     pub(crate) time_ht_rec_active: f64, // Native TimeHtRecActive
-    pub(crate) zone_ptr: i32, // Native ZonePtr
+    pub(crate) zone_ptr: i32,         // Native ZonePtr
     pub(crate) hvac_sizing_index: i32, // Native HVACSizingIndex
-    pub(crate) supply_temp: f64, // Native SupplyTemp
-    pub(crate) supply_hum_rat: f64, // Native SupplyHumRat
-    pub(crate) mixed_air_temp: f64, // Native MixedAirTemp
+    pub(crate) supply_temp: f64,      // Native SupplyTemp
+    pub(crate) supply_hum_rat: f64,   // Native SupplyHumRat
+    pub(crate) mixed_air_temp: f64,   // Native MixedAirTemp
     pub(crate) mixed_air_hum_rat: f64, // Native MixedAirHumRat
     pub(crate) heat_fuel_eff_sched: Option<SourceScheduleIndex>, // Native heatFuelEffSched
     pub(crate) cool_fuel_eff_sched: Option<SourceScheduleIndex>, // Native coolFuelEffSched
@@ -379,8 +427,8 @@ pub(crate) struct SourcePurchasedAirPlenumArrayData {
 /// Complete actual PurchasedAirManagerData.hh391-404 constructor state.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourcePurchasedAirManager {
-    pub(crate) number_purchased_air: i32, // Native NumPurchAir
-    pub(crate) number_plenum_arrays: i32, // Native NumPlenumArrays
+    pub(crate) number_purchased_air: i32,     // Native NumPurchAir
+    pub(crate) number_plenum_arrays: i32,     // Native NumPlenumArrays
     pub(crate) get_purchased_air_input: bool, // Native GetPurchAirInputFlag
     pub(crate) check_equipment_name: Option<Vec<bool>>, // Native CheckEquipName
     pub(crate) units: Option<Vec<SourceZonePurchasedAir>>, // Native PurchAir

@@ -31,6 +31,8 @@ impl SourceTabularReports {
                     3 => (b"GJ".to_vec(), 1.0 / 1000000000.0),
                     _ => (b"J".to_vec(), 1.0),
                 };
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _input in 1..=self.input_state.monthly_input_count {
                 // MonthlyInput is a distinct Native record array. Existing
                 // MonthlyTables/Columns empty allocations are not that owner.
@@ -63,6 +65,8 @@ impl SourceTabularReports {
             for (row, label) in row_head.iter_mut().zip(BIN_ROWS) {
                 *row = label.as_bytes().to_vec();
             }
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for input in 1..=self.input_state.output_table_binned_count {
                 let index = input
                     .checked_sub(1)
@@ -98,6 +102,8 @@ impl SourceTabularReports {
         // Native643-655 has no preloop report-array allocation or flag guard.
         // Reborrow the existing single AnnualData.annualTables projection.
         for _current_style in &self.input_state.tabular_report_passes {
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _annual_table in &mut self.input_state.annual_tables {
                 return Err(Error::Unavailable(
                     "actual AnnualTable::writeTable677 setupAggString1059 local vector allocation first operation",

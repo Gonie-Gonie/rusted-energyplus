@@ -66,6 +66,8 @@ pub(super) const SKY_NAMES: [&str; 7] = [
     "Berdahl and Martin",
 ];
 
+// These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn initialize_source_run_environment(
     row: &mut SourceEnvironmentData,
     environment: &mut WeatherEnvironmentState,

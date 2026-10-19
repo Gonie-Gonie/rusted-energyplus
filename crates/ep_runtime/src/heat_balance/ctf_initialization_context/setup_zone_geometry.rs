@@ -3,7 +3,8 @@ use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_equipment::{
-    OrdinaryEquipment, OrdinaryEquipmentInput, OrdinaryEquipmentUnavailable, SourceEquipmentInputOwners,
+    OrdinaryEquipment, OrdinaryEquipmentInput, OrdinaryEquipmentUnavailable,
+    SourceEquipmentInputOwners,
 };
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 
@@ -114,15 +115,27 @@ impl CtfInitializationContext<'_> {
                 globals,
                 &mut reports.selected_internal_heat_gains,
                 SourceEquipmentInputOwners {
-                    zones: reports.selected_zone_input.as_mut()
+                    zones: reports
+                        .selected_zone_input
+                        .as_mut()
                         .and_then(|state| state.zones.as_deref_mut())
-                        .ok_or_else(|| hb_input_error(E::Unavailable("same actual mutable equipment Zone rows")))?,
-                    schedules: reports.selected_schedule_manager.as_mut()
-                        .ok_or_else(|| hb_input_error(E::Unavailable("same equipment ScheduleManager owner")))?,
+                        .ok_or_else(|| {
+                            hb_input_error(E::Unavailable(
+                                "same actual mutable equipment Zone rows",
+                            ))
+                        })?,
+                    schedules: reports.selected_schedule_manager.as_mut().ok_or_else(|| {
+                        hb_input_error(E::Unavailable("same equipment ScheduleManager owner"))
+                    })?,
                     sizing: &mut reports.selected_sizing_manager,
                     branch,
-                    source_is_epjson: reports.heat_balance_input.as_ref()
-                        .ok_or_else(|| hb_input_error(E::Unavailable("actual equipment input format custody")))?.source_is_epjson,
+                    source_is_epjson: reports
+                        .heat_balance_input
+                        .as_ref()
+                        .ok_or_else(|| {
+                            hb_input_error(E::Unavailable("actual equipment input format custody"))
+                        })?
+                        .source_is_epjson,
                 },
             )
             .map_err(|error| equipment_error(error, &mut self.backend))?;

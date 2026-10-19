@@ -14,6 +14,10 @@ pub(crate) enum SourceComputedShapeCategory {
     Rectangular = 1,
     Convex = 2,
     Nonconvex = 3,
+    #[allow(
+        dead_code,
+        reason = "Keep the Native shape-category count sentinel so computed shape ordinals and constructor identities remain unchanged."
+    )]
     Num = 4,
 }
 /// Actual Surface2DSlab ctor: xl/xu0, borrowed constructor yl/yu values, empty vectors.
@@ -147,6 +151,8 @@ fn computed_surface_2d(
     SourceComputedSurface2D::construct(category, axis, projected, [xl, yl], [xu, yu])
 }
 impl SourceComputedSurface2D {
+    // The Original negated comparison deliberately retains its unordered/NaN branch.
+    #[allow(clippy::neg_cmp_op_on_partial_ord)]
     fn construct(
         category: SourceComputedShapeCategory,
         axis: i32,

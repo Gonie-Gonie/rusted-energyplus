@@ -3,6 +3,8 @@ use super::{Error, Failure, ordinal};
 use crate::psychrometrics::{EnergyPlusPsychrometricFunction, SourcePsychrometricAccess};
 use crate::weather::day::SourceEnvironmentData;
 
+// These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn calc_source_sky(
     environments: &Option<Vec<SourceEnvironmentData>>,
     current_environment: &i32,

@@ -72,6 +72,10 @@ pub(crate) enum SourceComfortOutputField {
     FacilityNotMetCoolingOccupied,
 }
 /// Reporting borrows each actual owner group on every read.
+#[allow(
+    dead_code,
+    reason = "Retain the all-owner borrowed output resolver interface; live production may choose narrower owner views without replacing registered Which targets with copied values."
+)]
 pub(crate) struct SourceAllOutputOwners<'a> {
     pub(crate) weather: &'a dyn SourceRealOutputOwners,
     pub(crate) schedules: &'a dyn SourceRealOutputOwners,
@@ -90,7 +94,9 @@ impl SourceRealOutputOwners for SourceAllOutputOwners<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         match target {
             #[cfg(all(test, feature = "native-controlled-air-cohort"))]
-            SourceRealOutputTarget::CohortReal { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
+            SourceRealOutputTarget::CohortReal { .. } => {
+                Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
+            }
             SourceRealOutputTarget::InternalGain { .. }
             | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::PurchasedAir { .. } => {

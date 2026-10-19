@@ -117,6 +117,8 @@ fn class_number(class: SurfaceClass) -> Result<usize, Error> {
         }
     })
 }
+// Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+#[allow(clippy::manual_range_contains)]
 fn direction(azimuth: f64) -> Option<&'static str> {
     if azimuth >= 315.0 || azimuth < 45.0 {
         Some("N")
@@ -131,6 +133,8 @@ fn direction(azimuth: f64) -> Option<&'static str> {
     }
 }
 
+// Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+#[allow(clippy::manual_range_contains)]
 pub(crate) fn gather_source_surface_predefined_report(
     geometry: &SurfaceGeometryInputState,
     constructions: &SelectedHeatBalanceInputState,

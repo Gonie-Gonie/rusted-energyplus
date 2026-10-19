@@ -353,7 +353,7 @@ pub(super) fn process_source_hour(
     } else {
         tomorrow.is_rain = false;
     }
-    tomorrow.is_snow = (*snow_depth > 0.0);
+    tomorrow.is_snow = *snow_depth > 0.0;
 
     if tomorrow.is_rain && tomorrow.liquid_precip == 0.0 {
         tomorrow.liquid_precip = 2.0;

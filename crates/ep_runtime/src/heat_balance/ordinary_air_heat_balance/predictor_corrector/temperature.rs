@@ -56,13 +56,16 @@ impl SourceZoneSpaceHeatBalanceData {
             let system_node = owners.equipment.source_zone_air_node_mut(node)?;
             self.temp_dep_coef = self.sum_ha + self.sum_m_cp + self.sum_sys_m_cp;
             self.temp_ind_coef = self.sum_int_gain + self.sum_ha_tsurf - self.sum_ha_tref
-                + self.sum_m_cp_t + self.sum_sys_m_cp_t
+                + self.sum_m_cp_t
+                + self.sum_sys_m_cp_t
                 + (self.non_air_system_response / zone_multiplier + self.sys_dep_zone_loads_lagged);
             if controller.subsystems.airflow_network.distribution_simulated {
                 return Err(Error::Unavailable("positive controlled AFN TotalSen3943"));
             }
             if controller.subsystems.duct_loss.simulated {
-                return Err(Error::Unavailable("positive controlled DuctLoss ZoneSen3946"));
+                return Err(Error::Unavailable(
+                    "positive controlled DuctLoss ZoneSen3946",
+                ));
             }
             match owners.control.zone_air_solution {
                 SelectedZoneAirSolution::ThirdOrder => {
@@ -75,37 +78,65 @@ impl SourceZoneSpaceHeatBalanceData {
                         );
                 }
                 SelectedZoneAirSolution::Euler => {
-                    return Err(Error::Unavailable("non-ThirdOrder controlled Source air solve3964"));
+                    return Err(Error::Unavailable(
+                        "non-ThirdOrder controlled Source air solve3964",
+                    ));
                 }
             }
             if !controller.subsystems.room_air.any_non_mixing {
                 *system_node.temperature = self.zt;
-                *owners.fan.temp_tstat_air.as_mut()
+                *owners
+                    .fan
+                    .temp_tstat_air
+                    .as_mut()
                     .and_then(|rows| rows.get_mut(index(number).ok()?))
                     .ok_or(Error::Unavailable("actual controlled TempTstatAir3976"))? = self.zt;
-                *owners.fan.thermostat.load_correction_factor.as_mut()
+                *owners
+                    .fan
+                    .thermostat
+                    .load_correction_factor
+                    .as_mut()
                     .and_then(|rows| rows.get_mut(index(number).ok()?))
-                    .ok_or(Error::Unavailable("actual controlled LoadCorrectionFactor3978"))? = 1.0;
+                    .ok_or(Error::Unavailable(
+                        "actual controlled LoadCorrectionFactor3978",
+                    ))? = 1.0;
             } else {
-                let air_model = controller.subsystems.room_air.air_models.as_ref()
+                let air_model = controller
+                    .subsystems
+                    .room_air
+                    .air_models
+                    .as_ref()
                     .and_then(|rows| rows.get(index(number).ok()?))
                     .ok_or(Error::Unavailable("actual controlled RoomAir AirModel3980"))?;
                 if air_model.model == 1 || !air_model.simulate_air_model {
                     *system_node.temperature = self.zt;
-                    *owners.fan.temp_tstat_air.as_mut()
+                    *owners
+                        .fan
+                        .temp_tstat_air
+                        .as_mut()
                         .and_then(|rows| rows.get_mut(index(number).ok()?))
                         .ok_or(Error::Unavailable("actual controlled TempTstatAir3986"))? = self.zt;
-                    *owners.fan.thermostat.load_correction_factor.as_mut()
+                    *owners
+                        .fan
+                        .thermostat
+                        .load_correction_factor
+                        .as_mut()
                         .and_then(|rows| rows.get_mut(index(number).ok()?))
-                        .ok_or(Error::Unavailable("actual controlled LoadCorrectionFactor3988"))? = 1.0;
+                        .ok_or(Error::Unavailable(
+                            "actual controlled LoadCorrectionFactor3988",
+                        ))? = 1.0;
                 } else {
-                    return Err(Error::Unavailable("positive controlled IsZoneDispVent3Node3989"));
+                    return Err(Error::Unavailable(
+                        "positive controlled IsZoneDispVent3Node3989",
+                    ));
                 }
             }
             let cp_air = energyplus_psy_cp_air_fn_w(self.air_hum_rat);
             let zone_enthalpy_in = self.sum_sys_m_cp_t;
             zone_enthalpy_in
-                - (*system_node.mass_flow_rate / zone_multiplier) * cp_air * *system_node.temperature
+                - (*system_node.mass_flow_rate / zone_multiplier)
+                    * cp_air
+                    * *system_node.temperature
                 + self.non_air_system_response / zone_multiplier
                 + self.sys_dep_zone_loads_lagged
         } else {
@@ -155,7 +186,9 @@ impl SourceZoneSpaceHeatBalanceData {
         // Same conservative boundary at the actual RH/Psat invocation, after
         // preceding humidity and Node writes; no diagnostic/cache-hit proxy.
         if self.zt <= -100.0 || self.zt >= 200.0 {
-            return Err(Error::Unavailable("actual corrector RH/Psat diagnostic-aware normal-temperature domain4129"));
+            return Err(Error::Unavailable(
+                "actual corrector RH/Psat diagnostic-aware normal-temperature domain4129",
+            ));
         }
         self.air_rel_hum = 100.0
             * relative_humidity(
@@ -183,7 +216,9 @@ impl SourceZoneSpaceHeatBalanceData {
 impl SourceZoneSpaceHeatBalanceData {
     /// Caller bridge only; the original full member body above owns all math.
     pub(crate) fn correct_native_multiplier_cohort(
-        &mut self, number: i32, use_zone_history: bool,
+        &mut self,
+        number: i32,
+        use_zone_history: bool,
         controller: &mut SourceZoneAirPredictorCorrector,
         owners: &mut SourceZoneAirOwners<'_, '_>,
     ) -> Result<f64, Error> {

@@ -78,7 +78,7 @@ fn source_min(a: f64, b: f64) -> f64 {
     if a < b { a } else { b }
 }
 fn normalize_name(name: &str) -> String {
-    name.replace(' ', "_").replace(':', "_")
+    name.replace([' ', ':'], "_")
 }
 fn color(colors: &SourceSurfaceColors, index: Option<usize>) -> Result<i32, Error> {
     index

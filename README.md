@@ -91,7 +91,7 @@ recorded execution stages and unchanged-code bridges. The final fifteen-case
 run on one current Source, full Surface cadence and warmup handoff comparison
 remain separate work; card gates remain A 14/54 and B 14/64.
 
-The latest [surface unit checkpoint](energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) verifies 24 selected outside-surface calls and 30 convergence-suffix evaluations. Workspace tests pass (4,975 passed, two existing exclusions); formatting and strict Clippy still require cleanup. Final current-Source Surface cadence, handoff and fifteen-case verification remain pending.
+The [surface unit checkpoint](energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) verifies 24 selected outside-surface calls and 30 convergence-suffix evaluations. The subsequent [quality checkpoint](energyplus_porting_plan/evidence/SRC-06-source-quality-hygiene-57/summary.json) passes formatting, strict workspace Clippy under default features, 4,975 workspace tests (two existing exclusions), and 18 admitted beam records on one Source snapshot. Earlier failed checks and the featured cohort target's unused-helper warnings remain in the evidence. Next are the seven HVAC01 error paths (EH7), followed by current-Source Surface cadence, handoff and final fifteen-case verification; card gates remain unchanged.
 
 ## How To Run And Verify
 

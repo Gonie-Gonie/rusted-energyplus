@@ -41,6 +41,8 @@ pub(super) fn subcategory(
         .as_bytes()
         .to_vec())
 }
+// Preserve Original integer min/max ordering and explicit boundary grouping.
+#[allow(clippy::manual_clamp)]
 pub(super) fn real(format_reals: bool, value: f64, digits: i32) -> Result<Vec<u8>, Error> {
     if !format_reals {
         return Err(Error::Unavailable(

@@ -278,6 +278,8 @@ fn corrected_weekday(
 }
 
 impl WeatherSession {
+    // Keep Original explicit branch assignments and request order.
+    #[allow(clippy::needless_bool_assign)]
     pub(super) fn get_source_run_period_data(
         &mut self,
         mut n_run_periods: i32,

@@ -37,6 +37,8 @@ fn add_thermal_chimney(row: &mut SourceZoneSpaceHeatBalanceData) {
 impl SourceHvacManager {
     /// Native optional SysTimestepLoop default0; both adjustment arguments are
     /// actually absent at the two ManageHVAC calls and use their Source false defaults.
+    // Retain the explicit Original absent-system-step branch; no default owner substitute.
+    #[allow(clippy::manual_unwrap_or_default, clippy::manual_unwrap_or)]
     pub(crate) fn calculate_source_simple_airflow(
         &mut self,
         system_step: Option<i32>,

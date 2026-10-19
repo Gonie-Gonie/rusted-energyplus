@@ -97,5 +97,7 @@ impl CtfInitializationReports {
 }
 
 impl SourceSqliteState {
-    pub(crate) fn reset_source_pointer(&mut self) { self.database=None; }
+    pub(crate) fn reset_source_pointer(&mut self) {
+        self.database = None;
+    }
 }

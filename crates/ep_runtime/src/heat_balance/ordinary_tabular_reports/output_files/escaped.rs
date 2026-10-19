@@ -78,6 +78,8 @@ fn hexadecimal_prefix(bytes: &[u8]) -> Result<u64, Error> {
     })
 }
 
+// Original tests decimal176 and hexadecimal0xb0 in order; preserve that literal compatibility mapping.
+#[allow(clippy::ifs_same_cond)]
 pub(super) fn convert_to_escaped(input: &[u8], is_xml: bool) -> Result<Vec<u8>, Error> {
     if input.is_empty() {
         return Ok(Vec::new());

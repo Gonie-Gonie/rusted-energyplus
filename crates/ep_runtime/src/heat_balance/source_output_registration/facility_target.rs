@@ -16,6 +16,10 @@ pub(crate) enum SourceFacilityOutputField {
 
 /// Temporary actual other-owner view for a mutable facility callback. The own
 /// facility is deliberately borrowed only inside each instantaneous read.
+#[allow(
+    dead_code,
+    reason = "Retain the non-facility owner facade for a separately borrowed facility callback; selected live callers can compose their narrower actual-owner views."
+)]
 pub(crate) struct SourceNonFacilityOutputOwners<'a> {
     pub(crate) weather: &'a dyn super::SourceRealOutputOwners,
     pub(crate) schedules: &'a dyn super::SourceRealOutputOwners,

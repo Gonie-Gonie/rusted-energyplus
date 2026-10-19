@@ -68,6 +68,10 @@ impl SourceSurfaceHeatBalanceArrays {
     /// HBSM8913-8933. The next surface solve reads the same array written by
     /// exchange_source_inside_iteration. No compatibility longwave probe,
     /// copied Surface radiation field, outside solve or zone correction runs.
+    #[allow(
+        dead_code,
+        reason = "Retain the genuine selected HBSM inside-surface consumer entry; the live iteration driver and paired callers use narrower methods on the same arrays."
+    )]
     pub(crate) fn solve_source_inside_opaque_ctf(
         &mut self,
         geometry: &SurfaceGeometryInputState,

@@ -24,6 +24,8 @@ pub(crate) struct SourceProgressCallbacks {
     pub(crate) progress_callback: Option<SourceCapturedProgressCallback>,
 }
 
+// Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+#[allow(unused_assignments)]
 pub(super) fn display_source_simulation_days(
     globals: &SelectedHeatBalanceGlobals,
     system: &ProjectSystemVariables,

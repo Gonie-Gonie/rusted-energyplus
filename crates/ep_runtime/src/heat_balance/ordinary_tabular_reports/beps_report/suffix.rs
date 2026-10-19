@@ -3,6 +3,8 @@ use super::helpers::{predef_bytes, predef_real};
 use super::prepare::{SourceBepsLocals, SourceBepsPass};
 use super::{Error, SourceBepsReportOwners, SourceTabularBody, SourceTabularReports};
 impl SourceTabularReports {
+    // Retain this real Native operand/local and its initialization/request timing for the unrepresented child path.
+    #[allow(unused_variables)]
     pub(super) fn source_beps_electric_table(
         &mut self,
         pass: usize,
@@ -254,6 +256,8 @@ impl SourceTabularReports {
             o,
         )
     }
+    // Retain existing Native local/member spellings to keep sizing/report formula and field correspondence direct.
+    #[allow(non_snake_case)]
     pub(super) fn source_beps_thermal_table(
         &mut self,
         pass: usize,
@@ -405,6 +409,8 @@ impl SourceTabularReports {
             o,
         )
     }
+    // Retain existing Native local/member spellings to keep sizing/report formula and field correspondence direct.
+    #[allow(non_snake_case)]
     pub(super) fn source_beps_water_table(
         &mut self,
         pass: usize,

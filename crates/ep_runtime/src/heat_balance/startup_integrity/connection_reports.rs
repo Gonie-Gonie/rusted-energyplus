@@ -34,6 +34,8 @@ pub(crate) struct SourceDualDuctData {
     number_air_terminals: i32,
     air_terminals: Option<Vec<Infallible>>,
 }
+// Keep the explicit Native constructor/default literals and ordered member initialization.
+#[allow(clippy::derivable_impls)]
 impl Default for SourceDualDuctData {
     fn default() -> Self {
         Self {
@@ -70,9 +72,13 @@ impl SourceDualDuctData {
             bnd,
             "! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>",
         )?;
+        // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+        #[allow(clippy::never_loop)]
         for _terminal in 1..=self.number_air_terminals {
             let mut found = 0;
             let mut supply_air_path_number = 0;
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for path in 1..=*equipment.source_number_supply_paths() {
                 supply_air_path_number = path;
                 found = 0;
@@ -85,6 +91,8 @@ impl SourceDualDuctData {
                 supply_air_path_number = 0;
             }
             found = 0;
+            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+            #[allow(clippy::never_loop)]
             for _system in 1..=number_primary_air_systems {
                 return Err(Error::Unavailable(
                     "actual DualDuct1928 AirToZoneNodeInfo.AirLoopName",
@@ -135,6 +143,8 @@ pub(crate) fn report_source_loop_connections(
     if o.outdoor_air_nodes.number_outside_air_nodes > 0 {
         line(bnd, "! <Outdoor Air Node>,<NodeNumber>,<Node Name>")?;
     }
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for ordinal in 1..=o.outdoor_air_nodes.number_outside_air_nodes {
         let _node = o
             .outdoor_air_nodes
@@ -156,6 +166,8 @@ pub(crate) fn report_source_loop_connections(
         o.connections.source_number_component_sets()
     )?;
     line(bnd, LOOP_FORMAT_702)?;
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for _set in 1..=*o.connections.source_number_component_sets() {
         return Err(Error::Unavailable(
             "actual ReportLoopConnections2257 CompSets.ParentObjectType",
@@ -190,6 +202,8 @@ pub(crate) fn report_source_loop_connections(
         bnd,
         "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
     )?;
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for _loop_number in 1..=o.hvac.number_plant_loops {
         return Err(Error::Unavailable(
             "actual ReportLoopConnections2380 PlantLoop.Name",
@@ -229,6 +243,8 @@ pub(crate) fn report_source_loop_connections(
         .ok_or(Error::Unavailable(
             "actual ReportLoopConnections2520 NumPlantLoops+1 signed domain",
         ))?;
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for _loop_number in condenser_first..=o.plant.total_loops {
         return Err(Error::Unavailable(
             "actual ReportLoopConnections2536 PlantLoop.Name",
@@ -277,36 +293,76 @@ pub(crate) fn report_source_loop_connections(
                 continue;
             }
             let config = o.equipment.source_zone_equipment_config(number)?;
-            writeln!(bnd, " Controlled Zone,{},{},{},{},{},{},{}",
-                config.zone_name(), config.equipment_list_name(), config.control_list_name(),
+            writeln!(
+                bnd,
+                " Controlled Zone,{},{},{},{},{},{},{}",
+                config.zone_name(),
+                config.equipment_list_name(),
+                config.control_list_name(),
                 o.equipment.source_node_id(*config.zone_node_number())?,
-                config.number_inlet_nodes(), config.number_exhaust_nodes(), config.number_return_nodes())?;
+                config.number_inlet_nodes(),
+                config.number_exhaust_nodes(),
+                config.number_return_nodes()
+            )?;
             for ordinal in 1..=*config.number_inlet_nodes() {
                 // Native reads heat-node name first, and only this exact name
                 // is replaced. Cooling NodeID0 remains the real Undefined.
-                let heat_node = *config.heating_distribution_inlet_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2692 AirDistUnitHeat.InNode"))?;
+                let heat_node = *config
+                    .heating_distribution_inlet_node_number(ordinal)
+                    .ok_or(Error::Unavailable(
+                        "actual ReportLoopConnections2692 AirDistUnitHeat.InNode",
+                    ))?;
                 let heat_name = o.equipment.source_node_id(heat_node)?;
-                let chr_name = if heat_name == "Undefined" { "N/A" } else { heat_name };
-                let inlet = *config.inlet_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2700 InletNode"))?;
-                let cool = *config.cooling_distribution_inlet_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2701 AirDistUnitCool.InNode"))?;
-                writeln!(bnd, "   Controlled Zone Inlet,{},{},{},{},{}", ordinal,
-                    config.zone_name(), o.equipment.source_node_id(inlet)?,
-                    o.equipment.source_node_id(cool)?, chr_name)?;
+                let chr_name = if heat_name == "Undefined" {
+                    "N/A"
+                } else {
+                    heat_name
+                };
+                let inlet = *config.inlet_node_number(ordinal).ok_or(Error::Unavailable(
+                    "actual ReportLoopConnections2700 InletNode",
+                ))?;
+                let cool = *config
+                    .cooling_distribution_inlet_node_number(ordinal)
+                    .ok_or(Error::Unavailable(
+                        "actual ReportLoopConnections2701 AirDistUnitCool.InNode",
+                    ))?;
+                writeln!(
+                    bnd,
+                    "   Controlled Zone Inlet,{},{},{},{},{}",
+                    ordinal,
+                    config.zone_name(),
+                    o.equipment.source_node_id(inlet)?,
+                    o.equipment.source_node_id(cool)?,
+                    chr_name
+                )?;
             }
             for ordinal in 1..=*config.number_exhaust_nodes() {
-                let node = *config.exhaust_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2709 ExhaustNode"))?;
-                writeln!(bnd, "   Controlled Zone Exhaust,{},{},{}", ordinal,
-                    config.zone_name(), o.equipment.source_node_id(node)?)?;
+                let node = *config
+                    .exhaust_node_number(ordinal)
+                    .ok_or(Error::Unavailable(
+                        "actual ReportLoopConnections2709 ExhaustNode",
+                    ))?;
+                writeln!(
+                    bnd,
+                    "   Controlled Zone Exhaust,{},{},{}",
+                    ordinal,
+                    config.zone_name(),
+                    o.equipment.source_node_id(node)?
+                )?;
             }
             for ordinal in 1..=*config.number_return_nodes() {
-                let node = *config.return_node_number(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2716 ReturnNode"))?;
-                writeln!(bnd, "   Controlled Zone Return,{},{},{}", ordinal,
-                    config.zone_name(), o.equipment.source_node_id(node)?)?;
+                let node = *config
+                    .return_node_number(ordinal)
+                    .ok_or(Error::Unavailable(
+                        "actual ReportLoopConnections2716 ReturnNode",
+                    ))?;
+                writeln!(
+                    bnd,
+                    "   Controlled Zone Return,{},{},{}",
+                    ordinal,
+                    config.zone_name(),
+                    o.equipment.source_node_id(node)?
+                )?;
             }
         }
         line(bnd, SEPARATOR)?;
@@ -324,21 +380,39 @@ pub(crate) fn report_source_loop_connections(
             }
             let list = o.equipment.source_zone_equipment_list(number)?;
             let config = o.equipment.source_zone_equipment_config(number)?;
-            writeln!(bnd, " Zone Equipment List,{},{},{},{}", number,
-                list.name(), config.zone_name(), list.number_equipment_types())?;
+            writeln!(
+                bnd,
+                " Zone Equipment List,{},{},{},{}",
+                number,
+                list.name(),
+                config.zone_name(),
+                list.number_equipment_types()
+            )?;
             for ordinal in 1..=*list.number_equipment_types() {
-                let equipment_type = list.equipment_type_name(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2745 EquipTypeName"))?;
-                let name = list.equipment_name(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2746 EquipName"))?;
+                let equipment_type = list.equipment_type_name(ordinal).ok_or(
+                    Error::Unavailable("actual ReportLoopConnections2745 EquipTypeName"),
+                )?;
+                let name = list.equipment_name(ordinal).ok_or(Error::Unavailable(
+                    "actual ReportLoopConnections2746 EquipName",
+                ))?;
                 // Preserve actual Native argument order, although the existing
                 // descriptive header names the opposite priority ordering.
-                let cooling = list.cooling_priority(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2748 CoolingPriority"))?;
-                let heating = list.heating_priority(ordinal)
-                    .ok_or(Error::Unavailable("actual ReportLoopConnections2749 HeatingPriority"))?;
-                writeln!(bnd, "   Zone Equipment Component,{},{},{},{},{},{}", ordinal,
-                    equipment_type, name, config.zone_name(), cooling, heating)?;
+                let cooling = list.cooling_priority(ordinal).ok_or(Error::Unavailable(
+                    "actual ReportLoopConnections2748 CoolingPriority",
+                ))?;
+                let heating = list.heating_priority(ordinal).ok_or(Error::Unavailable(
+                    "actual ReportLoopConnections2749 HeatingPriority",
+                ))?;
+                writeln!(
+                    bnd,
+                    "   Zone Equipment Component,{},{},{},{},{},{}",
+                    ordinal,
+                    equipment_type,
+                    name,
+                    config.zone_name(),
+                    cooling,
+                    heating
+                )?;
             }
         }
     }
@@ -392,6 +466,8 @@ pub(crate) fn report_source_air_loop_connections(
         bnd,
         "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
     )?;
+    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+    #[allow(clippy::never_loop)]
     for _number in 1..=hvac.number_of_primary_air_systems {
         return Err(Error::Unavailable(
             "actual ReportAirLoopConnections4774 AirToOANodeInfo.OASysExists",

@@ -143,7 +143,7 @@ pub(super) fn interpolate_source_day(
             .ok_or(Error::Unavailable(
                 "actual WPSkyTemperature indexed read3144",
             ))?;
-        if matches!(property.sky_temperature_model, 1 | 2 | 3) {
+        if matches!(property.sky_temperature_model, 1..=3) {
             return Err(
                 Error::Unavailable("actual positive weather-sky getDayVals3148/3162/3176").into(),
             );

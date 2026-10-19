@@ -69,6 +69,10 @@ pub(crate) struct SourceSolarChildOwners<'a, H, D> {
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) zones: &'a SelectedZoneInputOwners,
+    #[allow(
+        dead_code,
+        reason = "The InitSolar child view retains its actual ShadowCalculation owner borrow; the selected child paths do not read this member directly."
+    )]
     pub(crate) shadowing: &'a SourceShadowingInput,
     pub(crate) daylighting: &'a mut SourceDaylighting,
     pub(crate) gain_modules: &'a SourceGainModules,
@@ -193,11 +197,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
             eio: self.eio,
             dictionary_host: self.dictionary_host,
         };
-        register_source_sky_diffuse_debug_outputs(
-            &live,
-            detailed_shading,
-            &mut output,
-        )
+        register_source_sky_diffuse_debug_outputs(&live, detailed_shading, &mut output)
     }
 
     fn calc_daylight_coefficients(

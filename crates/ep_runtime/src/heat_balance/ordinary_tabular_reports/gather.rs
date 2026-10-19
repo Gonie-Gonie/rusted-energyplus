@@ -2,6 +2,8 @@
 //! Positive report records remain explicit missing-operation boundaries.
 use super::*;
 impl SourceTabularReports {
+    // The Original negated comparison deliberately retains its unordered/NaN branch.
+    #[allow(clippy::neg_cmp_op_on_partial_ord)]
     pub(crate) fn gather_source_monthly_results(
         &mut self,
         time_step: TimeStepKind,

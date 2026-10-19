@@ -39,6 +39,8 @@ impl SourceTabularReports {
     }
 
     /// Native13868-13946 on the existing, actually gathered BuildingPreDefRep cells.
+    // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
+    #[allow(unused_assignments)]
     pub(crate) fn write_source_heat_emission_table(
         &mut self,
         o: &mut SourcePostSummaryReportOwners<'_, '_>,

@@ -67,6 +67,8 @@ impl WeatherDayState {
         }
         Ok(())
     }
+    // Retain Original nested guards and their diagnostic/output sequencing.
+    #[allow(clippy::collapsible_if)]
     pub(crate) fn resolve_source_location_information(
         &mut self,
         header: &RawEpwHeaderState,

@@ -122,6 +122,8 @@ mod metered_variables;
 mod meters;
 pub(crate) use metered_variables::{SourceMeterData, SourceMeterHeatOrCool, SourceMeteredVariable};
 mod weather_target;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use facility_target::{SourceFacilityOutputField, SourceNonFacilityOutputOwners};
 pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRealOutputField};
 mod instant_meter;
@@ -140,9 +142,11 @@ mod results_meter;
 mod update_data;
 mod update_meters;
 pub(crate) use report_streams::SourceOutputReportStreams;
-pub(crate) use results_meter::{add_source_report_meter, SourceMeterDataFrame};
+pub(crate) use results_meter::{SourceMeterDataFrame, add_source_report_meter};
 pub(crate) use update_data::{SourceOutputUpdateEnvironment, SourceOutputUpdateOwners};
 mod pollution_target;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use air_target::{
     SourceAirOutputField, SourceAllOutputOwners, SourceComfortOutputField,
 };
@@ -152,6 +156,8 @@ pub(crate) use general_real::{
 pub(crate) use meters::{SourceEnergyTransferMeterArguments, SourceMeterEndUse};
 pub(crate) use meters::{SourceGeneralMeterArguments, SourceMeterGroup, SourceMeterResource};
 mod solar_target;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use solar_target::{SourceCombinedOutputOwners, SourceSolarOutputField};
 mod bound_integer;
 mod dictionary;
@@ -162,14 +168,20 @@ mod host;
 mod integer;
 mod oscillation_target;
 mod requested_input;
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use bound_integer::{
     SourceIntegerOutputBinding, SourceIntegerOutputOwners, SourceIntegerOutputTarget,
     SourceRequestedIntegerValue,
 };
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use bound_real::{
     SourceOutVarReal, SourceRealOutputBinding, SourceRealOutputOwners, SourceRealOutputTarget,
     SourceRequestedRealValue, SourceSurfaceOutputField,
 };
+// Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
+#[allow(unused_imports)]
 pub(crate) use dictionary::{SourceOutputDictionaryHost, SourceOutputDictionaryStreams};
 pub use host::SourceMtdFileHost;
 pub(crate) use integer::SourceIntegerOutputDeclaration;
@@ -647,4 +659,4 @@ impl SourceOutputRegistration {
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_p4;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
-pub(crate) use native_p4::{SourceP4Values,native_p4_results};
+pub(crate) use native_p4::{SourceP4Values, native_p4_results};

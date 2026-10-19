@@ -1,6 +1,6 @@
 //! Ordered None/Propane IHG declarations on the existing OutputProcessor owner.
 use super::getter::SourceGainInputOwners;
-use super::{index, unavailable, SelectedInternalHeatGains, E};
+use super::{E, SelectedInternalHeatGains, index, unavailable};
 use crate::heat_balance::source_output_registration::{
     SourceOutputFileHost, SourceOutputStoreType as Store, SourceOutputUnits as Units,
     SourceRealOutputDeclaration, SourceReportVariableInput,

@@ -14,6 +14,8 @@ pub(super) fn is_family(family: &str) -> bool {
             | "ZoneHVAC:IdealLoadsAirSystem"
     )
 }
+// Retain the ordered raw input-bound predicates without changing admission logic.
+#[allow(clippy::manual_range_contains)]
 pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
     if matches!(
         name,

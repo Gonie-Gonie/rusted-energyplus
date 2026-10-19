@@ -14,6 +14,8 @@ const SOLAR_NAMES: [&str; 5] = [
     "ASHRAETau",
     "ASHRAETau2017",
 ];
+// These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn write(
     input: &SourceDesignDayData,
     inputs: &[SourceDesignDayData],

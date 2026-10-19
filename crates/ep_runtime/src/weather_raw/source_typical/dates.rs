@@ -56,6 +56,8 @@ fn inverse_ordinal(number: i32, out: &mut SourceDateScratch) {
     out.month = Some(month as i32);
     out.day = Some(number - END[month - 1]);
 }
+// Preserve Original explicit signed-integer boundary predicates and branch order.
+#[allow(clippy::manual_range_contains)]
 pub(crate) fn process_source_date_string(
     text: &str,
     out: &mut SourceDateScratch,
@@ -112,6 +114,8 @@ fn lookup_prefix(text: &str, items: &[&str]) -> i32 {
         .position(|item| prefix == *item)
         .map_or(0, |n| n as i32 + 1)
 }
+// Preserve Original explicit signed-integer boundary predicates and branch order.
+#[allow(clippy::manual_range_contains)]
 fn validate_month_day(
     text: &str,
     day: i32,

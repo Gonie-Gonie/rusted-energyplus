@@ -84,6 +84,8 @@ pub(super) fn dew_point(
     let dew_pressure = pressure * limited / (0.62198 + limited);
     evaluate(psy, Function::TsatPb, &[dew_pressure])
 }
+// Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+#[allow(clippy::manual_range_contains)]
 pub(super) fn relative_humidity(
     psy: &mut SourcePsychrometricAccess,
     temperature: f64,

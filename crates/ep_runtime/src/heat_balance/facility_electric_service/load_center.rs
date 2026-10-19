@@ -1,5 +1,4 @@
 //! Actual default ElectPowerLoadCenter(state,0), including unwritten scalar mask.
-use super::*;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_input_processor::SourceInputProcessorShortCut;
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
@@ -9,31 +8,83 @@ use std::convert::Infallible;
 #[repr(i32)]
 pub(crate) enum SourceElectricBusType {
     Invalid = -1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     Ac = 0,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     DcInverter = 1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     AcStorage = 2,
     DcInverterDcStorage = 3,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     DcInverterAcStorage = 4,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub(crate) enum SourceGeneratorOperationScheme {
     Invalid = -1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     BaseLoad = 0,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     DemandLimit = 1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     TrackElectrical = 2,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     TrackSchedule = 3,
     TrackMeter = 4,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     ThermalFollow = 5,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     ThermalFollowLimitElectrical = 6,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub(crate) enum SourceStorageOperationScheme {
     Invalid = -1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     FacilityDemandStoreExcessOnSite = 0,
     MeterDemandStoreExcessOnSite = 1,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     ChargeDischargeSchedules = 2,
+    #[allow(
+        dead_code,
+        reason = "ElectricPowerServiceManager.hh retains the complete native bus/operation enum identities; the finite no-generator domain does not construct every alternative."
+    )]
     FacilityDemandLeveling = 3,
 }
 #[derive(Clone, Debug, PartialEq)]

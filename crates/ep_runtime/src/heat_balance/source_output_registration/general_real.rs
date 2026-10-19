@@ -166,6 +166,10 @@ pub(crate) struct SourceGeneralRealRegistrationOptions<'a> {
     pub(crate) meter: Option<SourceGeneralMeterArguments<'a>>,
 }
 impl SourceGeneralRealRegistrationOptions<'_> {
+    #[allow(
+        dead_code,
+        reason = "Keep the explicit unmetered constructor for the actual SetupOutputVariable argument contract; callers may supply the identical retained options directly."
+    )]
     pub(crate) fn unmetered(time_step: TimeStepKind) -> Self {
         Self {
             time_step,

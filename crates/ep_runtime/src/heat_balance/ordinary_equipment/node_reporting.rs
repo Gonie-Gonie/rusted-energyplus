@@ -1,7 +1,9 @@
 //! Genuine CalcMoreNodeInfo955-1206 on the sole Node/MoreNodeInfo owners.
 use super::{OrdinaryEquipment, source_nodes::SourceNodeFluidType};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
-use crate::heat_balance::selected_schedule_manager::{SelectedScheduleManager, SourceScheduleIndex};
+use crate::heat_balance::selected_schedule_manager::{
+    SelectedScheduleManager, SourceScheduleIndex,
+};
 use crate::heat_balance::selected_simulation_startup::SelectedRuntimeLanguage;
 use crate::heat_balance::source_output_registration::SourceOutputRegistration;
 use crate::psychrometrics::{
@@ -55,26 +57,43 @@ impl Default for SourceNodeReporting {
     }
 }
 fn initialized<T: Copy>(array: &Option<Vec<Option<T>>>, index: usize) -> Result<T, Error> {
-    array.as_ref().and_then(|rows| rows.get(index)).copied().flatten()
-        .ok_or(Error::Unavailable("actual initialized Node reporting array cell"))
+    array
+        .as_ref()
+        .and_then(|rows| rows.get(index))
+        .copied()
+        .flatten()
+        .ok_or(Error::Unavailable(
+            "actual initialized Node reporting array cell",
+        ))
 }
 fn write_cell<T>(array: &mut Option<Vec<Option<T>>>, index: usize, value: T) -> Result<(), Error> {
-    *array.as_mut().and_then(|rows| rows.get_mut(index))
-        .ok_or(Error::Unavailable("actual allocated Node reporting array cell"))? = Some(value);
+    *array
+        .as_mut()
+        .and_then(|rows| rows.get_mut(index))
+        .ok_or(Error::Unavailable(
+            "actual allocated Node reporting array cell",
+        ))? = Some(value);
     Ok(())
 }
-fn sensed_by_ems(runtime_language: &SelectedRuntimeLanguage, _node_number: usize, _variable_name: &str) -> Result<bool, Error> {
+fn sensed_by_ems(
+    runtime_language: &SelectedRuntimeLanguage,
+    _node_number: usize,
+    _variable_name: &str,
+) -> Result<bool, Error> {
     // Actual EMSManager1619 loops NumSensors, independently of AnyEMS.
     // With positive count, Sensor(1).UniqueKeyName is the first missing owner.
     if runtime_language.number_of_sensors > 0 {
-        return Err(Error::Unavailable("actual CheckIfNodeMoreInfoSensedByEMS Sensor(1).UniqueKeyName1620"));
+        return Err(Error::Unavailable(
+            "actual CheckIfNodeMoreInfoSensedByEMS Sensor(1).UniqueKeyName1620",
+        ));
     }
     Ok(false)
 }
 fn requested_now(
     requested: &Option<Vec<Option<bool>>>,
     reporting_schedule: &Option<Vec<Option<Option<SourceScheduleIndex>>>>,
-    index: usize, schedules: &SelectedScheduleManager,
+    index: usize,
+    schedules: &SelectedScheduleManager,
 ) -> Result<bool, Error> {
     if initialized(requested, index)? {
         if let Some(schedule) = initialized(reporting_schedule, index)? {
@@ -89,8 +108,10 @@ fn requested_now(
 
 impl OrdinaryEquipment {
     pub(crate) fn calculate_source_more_node_info(
-        &mut self, environment: &WeatherEnvironmentState,
-        registration: &SourceOutputRegistration, schedules: &SelectedScheduleManager,
+        &mut self,
+        environment: &WeatherEnvironmentState,
+        registration: &SourceOutputRegistration,
+        schedules: &SelectedScheduleManager,
         runtime_language: &SelectedRuntimeLanguage,
     ) -> Result<(), Error> {
         let number = self.nodes.number_of_nodes;
@@ -118,31 +139,73 @@ impl OrdinaryEquipment {
             fill_allocated(&mut report.specific_heat_requested, Some(false))?;
             fill_allocated(&mut report.specific_heat_schedules, Some(None))?;
             for i in 0..number {
-                let node_id = self.nodes.node_ids.as_ref().and_then(|rows| rows.get(i + 1))
+                let node_id = self
+                    .nodes
+                    .node_ids
+                    .as_ref()
+                    .and_then(|rows| rows.get(i + 1))
                     .ok_or(Error::Unavailable("actual CalcMoreNodeInfo NodeID1026"))?;
-                report.reporting_strings.push(format!("NodeReportingCalc:{node_id}"));
-                let node = self.nodes.physical.as_ref().and_then(|rows| rows.get(i))
-                    .ok_or(Error::Unavailable("actual CalcMoreNodeInfo Node.FluidIndex1028"))?;
+                report
+                    .reporting_strings
+                    .push(format!("NodeReportingCalc:{node_id}"));
+                let node = self
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .and_then(|rows| rows.get(i))
+                    .ok_or(Error::Unavailable(
+                        "actual CalcMoreNodeInfo Node.FluidIndex1028",
+                    ))?;
                 if node.fluid_index != 0 {
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo dataFluid.glycols(FluidIndex)1028"));
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo dataFluid.glycols(FluidIndex)1028",
+                    ));
                 }
                 report.fluids.push(None);
                 // Literal full reqVars order, including unused/frequency entries.
                 // Every matching assignment is retained; the last schedule wins.
                 for request in &registration.requested_variables {
                     if request.key.eq_ignore_ascii_case(node_id) || request.key.is_empty() {
-                        if request.name.eq_ignore_ascii_case("System Node Wetbulb Temperature") {
+                        if request
+                            .name
+                            .eq_ignore_ascii_case("System Node Wetbulb Temperature")
+                        {
                             write_cell(&mut report.wet_bulb_requested, i, true)?;
-                            write_cell(&mut report.wet_bulb_schedules, i, request.reporting_schedule)?;
-                        } else if request.name.eq_ignore_ascii_case("System Node Relative Humidity") {
+                            write_cell(
+                                &mut report.wet_bulb_schedules,
+                                i,
+                                request.reporting_schedule,
+                            )?;
+                        } else if request
+                            .name
+                            .eq_ignore_ascii_case("System Node Relative Humidity")
+                        {
                             write_cell(&mut report.relative_humidity_requested, i, true)?;
-                            write_cell(&mut report.relative_humidity_schedules, i, request.reporting_schedule)?;
-                        } else if request.name.eq_ignore_ascii_case("System Node Dewpoint Temperature") {
+                            write_cell(
+                                &mut report.relative_humidity_schedules,
+                                i,
+                                request.reporting_schedule,
+                            )?;
+                        } else if request
+                            .name
+                            .eq_ignore_ascii_case("System Node Dewpoint Temperature")
+                        {
                             write_cell(&mut report.dew_point_requested, i, true)?;
-                            write_cell(&mut report.dew_point_schedules, i, request.reporting_schedule)?;
-                        } else if request.name.eq_ignore_ascii_case("System Node Specific Heat") {
+                            write_cell(
+                                &mut report.dew_point_schedules,
+                                i,
+                                request.reporting_schedule,
+                            )?;
+                        } else if request
+                            .name
+                            .eq_ignore_ascii_case("System Node Specific Heat")
+                        {
                             write_cell(&mut report.specific_heat_requested, i, true)?;
-                            write_cell(&mut report.specific_heat_schedules, i, request.reporting_schedule)?;
+                            write_cell(
+                                &mut report.specific_heat_schedules,
+                                i,
+                                request.reporting_schedule,
+                            )?;
                         }
                     }
                 }
@@ -170,50 +233,119 @@ impl OrdinaryEquipment {
             let report_wet_bulb = if initialized(&report.wet_bulb_requested, i)? {
                 if let Some(schedule) = initialized(&report.wet_bulb_schedules, i)? {
                     schedules.source_current_schedule_value(schedule)? > 0.0
-                } else { true }
+                } else {
+                    true
+                }
             } else {
-                self.nodes.physical.as_ref().and_then(|rows| rows.get(i))
-                    .ok_or(Error::Unavailable("actual CalcMoreNodeInfo Node.SPMNodeWetBulbRepReq1076"))?
+                self.nodes
+                    .physical
+                    .as_ref()
+                    .and_then(|rows| rows.get(i))
+                    .ok_or(Error::Unavailable(
+                        "actual CalcMoreNodeInfo Node.SPMNodeWetBulbRepReq1076",
+                    ))?
                     .setpoint_manager_wet_bulb_reporting_required
             };
-            let report_relative_humidity = requested_now(&report.relative_humidity_requested, &report.relative_humidity_schedules, i, schedules)?;
-            let report_dew_point = requested_now(&report.dew_point_requested, &report.dew_point_schedules, i, schedules)?;
-            let report_specific_heat = requested_now(&report.specific_heat_requested, &report.specific_heat_schedules, i, schedules)?;
-            let node = self.nodes.physical.as_ref().and_then(|rows| rows.get(i))
-                .ok_or(Error::Unavailable("actual CalcMoreNodeInfo Node fluid branch1095"))?;
-            let more = self.nodes.more_node_info.as_mut().and_then(|rows| rows.get_mut(i))
-                .ok_or(Error::Unavailable("actual CalcMoreNodeInfo MoreNodeInfo allocation1096"))?;
+            let report_relative_humidity = requested_now(
+                &report.relative_humidity_requested,
+                &report.relative_humidity_schedules,
+                i,
+                schedules,
+            )?;
+            let report_dew_point = requested_now(
+                &report.dew_point_requested,
+                &report.dew_point_schedules,
+                i,
+                schedules,
+            )?;
+            let report_specific_heat = requested_now(
+                &report.specific_heat_requested,
+                &report.specific_heat_schedules,
+                i,
+                schedules,
+            )?;
+            let node = self
+                .nodes
+                .physical
+                .as_ref()
+                .and_then(|rows| rows.get(i))
+                .ok_or(Error::Unavailable(
+                    "actual CalcMoreNodeInfo Node fluid branch1095",
+                ))?;
+            let more = self
+                .nodes
+                .more_node_info
+                .as_mut()
+                .and_then(|rows| rows.get_mut(i))
+                .ok_or(Error::Unavailable(
+                    "actual CalcMoreNodeInfo MoreNodeInfo allocation1096",
+                ))?;
             if node.fluid_type == SourceNodeFluidType::Air {
-                more.volume_flow_rate_standard_density = node.mass_flow_rate / report.rho_air_standard_initial
-                    .ok_or(Error::Unavailable("actual RhoAirStdInit1096"))?;
-                let rho = energyplus_psy_rho_air_fn_pb_tdb_w(environment.current_weather.out_baro_press, node.temperature, node.humidity_ratio);
+                more.volume_flow_rate_standard_density = node.mass_flow_rate
+                    / report
+                        .rho_air_standard_initial
+                        .ok_or(Error::Unavailable("actual RhoAirStdInit1096"))?;
+                let rho = energyplus_psy_rho_air_fn_pb_tdb_w(
+                    environment.current_weather.out_baro_press,
+                    node.temperature,
+                    node.humidity_ratio,
+                );
                 if rho < 0.0 {
-                    return Err(Error::Unavailable("actual PsyRhoAirFnPbTdbW negative-density diagnostic Psychrometrics.hh543"));
+                    return Err(Error::Unavailable(
+                        "actual PsyRhoAirFnPbTdbW negative-density diagnostic Psychrometrics.hh543",
+                    ));
                 }
                 more.density = rho;
                 if rho != 0.0 {
                     more.volume_flow_rate_current_density = node.mass_flow_rate / rho;
                 }
-                more.report_enthalpy = energyplus_psy_h_fn_tdb_w(node.temperature, node.humidity_ratio);
+                more.report_enthalpy =
+                    energyplus_psy_h_fn_tdb_w(node.temperature, node.humidity_ratio);
                 if report_wet_bulb {
-                    let _called_from = report.reporting_strings.get(i).ok_or(Error::Unavailable("actual nodeReportingStrings1112"))?;
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo PsyTwbFnTdbWPb1108 Source CalledFrom/diagnostic boundary"));
-                } else { more.wet_bulb_temperature = 0.0; }
+                    let _called_from = report
+                        .reporting_strings
+                        .get(i)
+                        .ok_or(Error::Unavailable("actual nodeReportingStrings1112"))?;
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo PsyTwbFnTdbWPb1108 Source CalledFrom/diagnostic boundary",
+                    ));
+                } else {
+                    more.wet_bulb_temperature = 0.0;
+                }
                 if report_dew_point {
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo PsyTdpFnWPb1118 cached TsatPb/diagnostic Source boundary"));
-                } else { more.air_dew_point_temperature = 0.0; }
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo PsyTdpFnWPb1118 cached TsatPb/diagnostic Source boundary",
+                    ));
+                } else {
+                    more.air_dew_point_temperature = 0.0;
+                }
                 if report_relative_humidity {
-                    let _called_from = report.reporting_strings.get(i).ok_or(Error::Unavailable("actual nodeReportingStrings1129"))?;
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo PsyRhFnTdbWPb1125 cached Psat/diagnostic Source boundary"));
-                } else { more.relative_humidity = 0.0; }
-                more.specific_heat = if report_specific_heat { energyplus_psy_cp_air_fn_w(node.humidity_ratio) } else { 0.0 };
+                    let _called_from = report
+                        .reporting_strings
+                        .get(i)
+                        .ok_or(Error::Unavailable("actual nodeReportingStrings1129"))?;
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo PsyRhFnTdbWPb1125 cached Psat/diagnostic Source boundary",
+                    ));
+                } else {
+                    more.relative_humidity = 0.0;
+                }
+                more.specific_heat = if report_specific_heat {
+                    energyplus_psy_cp_air_fn_w(node.humidity_ratio)
+                } else {
+                    0.0
+                };
             } else if node.fluid_type == SourceNodeFluidType::Water {
                 // FluidIndex<=0 makes Native's left && operand false. A positive
                 // current index needs the actual glycols array size and pointer.
                 if node.fluid_index > 0 {
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo dataFluid.glycols.isize1141"));
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo dataFluid.glycols.isize1141",
+                    ));
                 }
-                let rho = report.rho_water_standard_initial.ok_or(Error::Unavailable("actual RhoWaterStdInit1142"))?;
+                let rho = report
+                    .rho_water_standard_initial
+                    .ok_or(Error::Unavailable("actual RhoWaterStdInit1142"))?;
                 let rho_standard = rho;
                 let cp = energyplus_cpcw(node.temperature);
                 more.volume_flow_rate_standard_density = node.mass_flow_rate / rho_standard;
@@ -225,10 +357,14 @@ impl OrdinaryEquipment {
                 more.relative_humidity = 100.0;
             } else if node.fluid_type == SourceNodeFluidType::Steam {
                 if node.quality == 1.0 {
-                    return Err(Error::Unavailable("actual CalcMoreNodeInfo Fluid::GetSteam1160"));
+                    return Err(Error::Unavailable(
+                        "actual CalcMoreNodeInfo Fluid::GetSteam1160",
+                    ));
                 } else if node.quality == 0.0 {
-                    more.volume_flow_rate_standard_density = node.mass_flow_rate / report.rho_water_standard_initial
-                        .ok_or(Error::Unavailable("actual RhoWaterStdInit1170"))?;
+                    more.volume_flow_rate_standard_density = node.mass_flow_rate
+                        / report
+                            .rho_water_standard_initial
+                            .ok_or(Error::Unavailable("actual RhoWaterStdInit1170"))?;
                     more.report_enthalpy = energyplus_cpcw(node.temperature) * node.temperature;
                     more.wet_bulb_temperature = 0.0;
                     more.relative_humidity = 0.0;
@@ -240,14 +376,25 @@ impl OrdinaryEquipment {
                 more.relative_humidity = 0.0;
                 more.specific_heat = 0.0;
             } else {
-                more.volume_flow_rate_standard_density = node.mass_flow_rate / report.rho_air_standard_initial
-                    .ok_or(Error::Unavailable("actual RhoAirStdInit1183"))?;
+                more.volume_flow_rate_standard_density = node.mass_flow_rate
+                    / report
+                        .rho_air_standard_initial
+                        .ok_or(Error::Unavailable("actual RhoAirStdInit1183"))?;
                 if node.humidity_ratio > 0.0 {
-                    more.report_enthalpy = energyplus_psy_h_fn_tdb_w(node.temperature, node.humidity_ratio);
+                    more.report_enthalpy =
+                        energyplus_psy_h_fn_tdb_w(node.temperature, node.humidity_ratio);
                     if report_wet_bulb {
-                        return Err(Error::Unavailable("actual CalcMoreNodeInfo PsyTwbFnTdbWPb1188 StdBaroPress Source boundary"));
-                    } else { more.wet_bulb_temperature = 0.0; }
-                    more.specific_heat = if report_specific_heat { energyplus_psy_cp_air_fn_w(node.humidity_ratio) } else { 0.0 };
+                        return Err(Error::Unavailable(
+                            "actual CalcMoreNodeInfo PsyTwbFnTdbWPb1188 StdBaroPress Source boundary",
+                        ));
+                    } else {
+                        more.wet_bulb_temperature = 0.0;
+                    }
+                    more.specific_heat = if report_specific_heat {
+                        energyplus_psy_cp_air_fn_w(node.humidity_ratio)
+                    } else {
+                        0.0
+                    };
                 } else {
                     more.report_enthalpy = energyplus_cpcw(node.temperature) * node.temperature;
                     more.wet_bulb_temperature = 0.0;

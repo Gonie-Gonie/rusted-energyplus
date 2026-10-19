@@ -31,8 +31,7 @@ use fixtures::*;
 mod output_manifest;
 
 use output_manifest::{
-    BLOCKED_AFTER_SUPPORT_MANIFEST, assert_ordinary_output_manifest,
-    assert_output_manifest,
+    BLOCKED_AFTER_SUPPORT_MANIFEST, assert_ordinary_output_manifest, assert_output_manifest,
 };
 
 #[test]

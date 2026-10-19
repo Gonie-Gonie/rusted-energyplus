@@ -405,6 +405,8 @@ impl SelectedInternalHeatGains {
                 + space_report.total[3];
             space_report.total[8] = space_report.total[9] * seconds;
         }
+        // Preserve Original index order and same-row checked accesses across the retained work arrays.
+        #[allow(clippy::needless_range_loop)]
         for zone_index in 0..usize::try_from(owners.globals.num_of_zones)
             .map_err(|_| unavailable("actual report NumOfZones"))?
         {

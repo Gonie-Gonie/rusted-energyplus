@@ -43,54 +43,91 @@ pub use zone_equipment::*;
 // Explicit test target only: keep the Native single-process-main FP context.
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let selection=std::env::args().skip(1).collect::<Vec<_>>();
-    if selection.first().is_some_and(|value|value=="--gap-batch-only") {
-        if selection.len()!=3 && selection.len()!=4 {
-            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"expected --gap-batch-only GROUP FIXTURE_JSON_PATH [EXTERIOR_CATEGORY]").into());
+    let selection = std::env::args().skip(1).collect::<Vec<_>>();
+    if selection
+        .first()
+        .is_some_and(|value| value == "--gap-batch-only")
+    {
+        if selection.len() != 3 && selection.len() != 4 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "expected --gap-batch-only GROUP FIXTURE_JSON_PATH [EXTERIOR_CATEGORY]",
+            )
+            .into());
         }
-        let group=&selection[1];
-        let fixture=std::path::Path::new(&selection[2]);
-        if let Some(category)=selection.get(3) {
-            if group!="exterior" {return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"category selection requires exterior group").into());}
-            println!("running 1 original-core gap cohort group={group} category={category} on process main");
-            let calls=crate::heat_balance::gap_batch_cohort::run_with_category(group,fixture,Some(category))?;
+        let group = &selection[1];
+        let fixture = std::path::Path::new(&selection[2]);
+        if let Some(category) = selection.get(3) {
+            if group != "exterior" {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "category selection requires exterior group",
+                )
+                .into());
+            }
+            println!(
+                "running 1 original-core gap cohort group={group} category={category} on process main"
+            );
+            let calls = crate::heat_balance::gap_batch_cohort::run_with_category(
+                group,
+                fixture,
+                Some(category),
+            )?;
             println!("cohort native_controlled_air_cohort ... ok");
-            println!("cohort result: ok. 1 passed; 0 failed; group={group}; category={category}; admitted-call records={calls}; private cache state unobserved");
+            println!(
+                "cohort result: ok. 1 passed; 0 failed; group={group}; category={category}; admitted-call records={calls}; private cache state unobserved"
+            );
             return Ok(());
         }
         println!("running 1 original-core gap cohort group={group} on process main");
-        let calls=crate::heat_balance::gap_batch_cohort::run(group,fixture)?;
+        let calls = crate::heat_balance::gap_batch_cohort::run(group, fixture)?;
         println!("cohort native_controlled_air_cohort ... ok");
-        println!("cohort result: ok. 1 passed; 0 failed; group={group}; full-call records={calls}; private cache state unobserved");
+        println!(
+            "cohort result: ok. 1 passed; 0 failed; group={group}; full-call records={calls}; private cache state unobserved"
+        );
         return Ok(());
     }
-    if selection.len()==1 && selection[0]=="--predictor-parent-only" {
+    if selection.len() == 1 && selection[0] == "--predictor-parent-only" {
         println!("running 1 full native predictor-parent cohort on process main");
         let cases=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_full_predictor_parent_cohort()?;
         println!("cohort native_controlled_air_cohort ... ok");
-        println!("cohort result: ok. 1 passed; 0 failed; genuine full predictor parents={cases}; code-derived literal postconditions=4 per call; private cache trace unobserved");
+        println!(
+            "cohort result: ok. 1 passed; 0 failed; genuine full predictor parents={cases}; code-derived literal postconditions=4 per call; private cache trace unobserved"
+        );
         return Ok(());
     }
-    if selection.len()==1 && selection[0]=="--sizer-only" {
+    if selection.len() == 1 && selection[0] == "--sizer-only" {
         println!("running 1 native hard-size cohort on process main");
         let cases=crate::heat_balance::selected_sizing::SelectedSizingManager::run_native_hard_size_cohort()?;
         println!("cohort native_controlled_air_cohort ... ok");
         println!("cohort result: ok. 1 passed; 0 failed; genuine Native hard-size cases={cases}");
         return Ok(());
     }
-    if selection.len()==1 && selection[0]=="--report-only" {
+    if selection.len() == 1 && selection[0] == "--report-only" {
         println!("running 1 native system-report cohort on process main");
         let (energy,vent,variants)=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_system_report_cohort()?;
         println!("cohort native_controlled_air_cohort ... ok");
-        println!("cohort result: ok. 1 passed; 0 failed; energy entries={energy}; ventilation entries={vent}; named Native-unit variants={variants}");
+        println!(
+            "cohort result: ok. 1 passed; 0 failed; energy entries={energy}; ventilation entries={vent}; named Native-unit variants={variants}"
+        );
         return Ok(());
     }
-    if !selection.is_empty() {return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"expected no arguments, --report-only or --sizer-only").into());}
+    if !selection.is_empty() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "expected no arguments, --report-only or --sizer-only",
+        )
+        .into());
+    }
     println!("running 1 native controlled-air cohort on process main");
     crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_controlled_air_cohort()?;
     let (energy,vent,variants)=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_system_report_cohort()?;
-    println!("system-report entries: energy={energy}; ventilation={vent}; named Native-unit variants={variants}");
+    println!(
+        "system-report entries: energy={energy}; ventilation={vent}; named Native-unit variants={variants}"
+    );
     println!("cohort native_controlled_air_cohort ... ok");
-    println!("cohort result: ok. 1 passed; 0 failed; predictor entries=1168; whole corrector entries=1168; positive inlet cases=810");
+    println!(
+        "cohort result: ok. 1 passed; 0 failed; predictor entries=1168; whole corrector entries=1168; positive inlet cases=810"
+    );
     Ok(())
 }

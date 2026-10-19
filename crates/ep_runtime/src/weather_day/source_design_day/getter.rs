@@ -16,6 +16,8 @@ const SOLAR_NAMES: [&str; 5] = [
     "ASHRAETAU2017",
 ];
 impl SourceDesignDayInputState {
+    // Preserve Original ordered bounds; range negation can change floating-point NaN behavior.
+    #[allow(clippy::manual_range_contains)]
     pub(crate) fn get_source_design_day_data(
         &mut self,
         count: i32,

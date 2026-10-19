@@ -115,8 +115,13 @@ impl OrdinarySourceSession {
                 ))?,
             shortcut: &mut reports.input_processor_shortcut,
             faults: &reports.source_faults_manager,
-            source_is_epjson: &reports.heat_balance_input.as_ref()
-                .ok_or(Error::Unavailable("same actual input format before thermostat getter"))?.source_is_epjson,
+            source_is_epjson: &reports
+                .heat_balance_input
+                .as_ref()
+                .ok_or(Error::Unavailable(
+                    "same actual input format before thermostat getter",
+                ))?
+                .source_is_epjson,
             scan: &mut reports.scan,
             report_inputs: &model.report_inputs,
             registration: &mut reports.output_registration,
@@ -164,19 +169,20 @@ impl OrdinarySourceSession {
             economic_tariff: &mut reports.economic_tariff,
             cost_estimate_monetary: &mut reports.cost_estimate_monetary,
         };
-        let cadence_warmup_entry = crate::heat_balance::source_surface_cadence::active()
-            && owners.clock.warmup_flag;
-        let cadence_result = manage_source_heat_balance_after_input(&mut SourceHeatBalanceBodyHost {
-            owners: &mut owners,
-            surface: &mut self.surface,
-            controller: &mut self.controller,
-            hvac: &mut self.hvac,
-            surface_management: &mut self.surface_management,
-            window: &mut self.window,
-            model,
-            shading_stream: &mut self.shading_stream,
-            shading_path,
-        });
+        let cadence_warmup_entry =
+            crate::heat_balance::source_surface_cadence::active() && owners.clock.warmup_flag;
+        let cadence_result =
+            manage_source_heat_balance_after_input(&mut SourceHeatBalanceBodyHost {
+                owners: &mut owners,
+                surface: &mut self.surface,
+                controller: &mut self.controller,
+                hvac: &mut self.hvac,
+                surface_management: &mut self.surface_management,
+                window: &mut self.window,
+                model,
+                shading_stream: &mut self.shading_stream,
+                shading_path,
+            });
         // Actual post-Check/day0/EMS return, before the same owners are released.
         // No input or scientific reset is introduced by this passive observer.
         if cadence_warmup_entry
@@ -190,7 +196,10 @@ impl OrdinarySourceSession {
             crate::heat_balance::source_surface_cadence::record_handoff(
                 "after_warmup_complete",
                 crate::heat_balance::source_surface_cadence::Frame::from_owners(
-                    &self.surface, owners.clock, owners.globals, owners.environment,
+                    &self.surface,
+                    owners.clock,
+                    owners.globals,
+                    owners.environment,
                     owners.backend.state.kickoff_simulation,
                     self.surface.inside_surface_iterations,
                 ),

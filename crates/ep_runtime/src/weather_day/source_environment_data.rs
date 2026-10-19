@@ -1,6 +1,7 @@
 //! Sole WeatherManager EnvironmentData; allocation belongs to actual4767.
 //! Kind=-1/ClarkAllen=0 follow pinned enum identities, not a prepared phase.
 #[derive(Clone, Debug, PartialEq)]
+/// One WeatherManager EnvironmentData row, allocated and initialized by its actual input getter.
 pub struct SourceEnvironmentData {
     /// Actual retained native EnvironmentData member.
     pub title: String,

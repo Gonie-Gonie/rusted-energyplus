@@ -11,6 +11,8 @@ use crate::{
 
 /// Source fields retained by the genuine surface heat-balance owner.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+// Retain the Native output-field enum names and their existing domain mapping.
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum SourceSurfaceOutputField {
     SurfTempIn,
     SurfTempOut,
@@ -199,6 +201,10 @@ impl Default for SourceOutVarReal {
 }
 
 /// A read borrows the real owner on this call, without a numeric registry copy.
+#[allow(
+    dead_code,
+    reason = "Retain the borrowed real-output projection and exact-frequency metadata bridge; current aggregation reads the same live Which owners through the direct reporting interface."
+)]
 pub(crate) struct SourceRequestedRealValue<'a> {
     pub(crate) out_var_number: usize,
     pub(crate) report_id: i32,
@@ -210,6 +216,10 @@ pub(crate) struct SourceRequestedRealValue<'a> {
 impl SourceRequestedRealValue<'_> {
     /// This metadata join does not certify Source aggregation/reporting.
     /// Frequencies must match exactly; TimeStep is never relabeled Hourly.
+    #[allow(
+        dead_code,
+        reason = "Retain the borrowed real-output projection and exact-frequency metadata bridge; current aggregation reads the same live Which owners through the direct reporting interface."
+    )]
     pub(crate) fn runtime_definition<'a>(
         &self,
         registry: &'a RuntimeOutputRegistry,
@@ -221,6 +231,10 @@ impl SourceRequestedRealValue<'_> {
     }
 }
 
+#[allow(
+    dead_code,
+    reason = "Retain the borrowed real-output projection and exact-frequency metadata bridge; current aggregation reads the same live Which owners through the direct reporting interface."
+)]
 pub(super) fn runtime_frequency(
     frequency: SourceReportFrequency,
 ) -> Result<RuntimeOutputFrequency, OrdinaryRadiationError> {
@@ -285,6 +299,10 @@ impl SourceOutputRegistration {
 
     /// Immediate requested-value projection, before the unported report tail.
     /// This never sets Stored/TSValue or simulates UpdateDataandReport completion.
+    #[allow(
+        dead_code,
+        reason = "Retain the borrowed real-output projection and exact-frequency metadata bridge; current aggregation reads the same live Which owners through the direct reporting interface."
+    )]
     pub(crate) fn requested_real_values<'a>(
         &self,
         owners: &'a impl SourceRealOutputOwners,
