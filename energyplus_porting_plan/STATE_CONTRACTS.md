@@ -137,3 +137,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 구역 설비 시뮬레이션 진입 검증](evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json). 기존 설비 목록·수요 배열·스케줄 상태를 공유하고, 실제 분기 순서대로 우선순위와 최초 크기 산정 상태를 갱신한다.
+
+
+[예측 상태와 Node 소유권 검증](evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json). 같은 실제 Node에서 이력 복원 결과를 먼저 확인한 뒤 세 계수 입력을 전달해 설정값과 수요를 비트 단위로 대조합니다. 전체 예측기·수정기와 캐시 검증은 별도 범위입니다.

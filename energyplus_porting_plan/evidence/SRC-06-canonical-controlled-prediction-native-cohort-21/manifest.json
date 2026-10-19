@@ -1,0 +1,916 @@
+{
+  "schema": "src06-compact-controlled-prediction-cohort-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/evidence.zip",
+    "sha256": "654861fd994265decd6f8bbf22c524cf9d37d3de969ece3f9a3927ebda60c2ed",
+    "bytes": 2552519
+  },
+  "entries": [
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+        "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+        "bytes": 46621
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+        "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21",
+        "bytes": 28491
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "bytes": 16816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "bytes": 13547
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+        "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+        "bytes": 24717
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+        "sha256": "47b8408ba71120bbfbe31e8c10c0e192872abebde7ba93918c643a69fcbf1298",
+        "bytes": 11610
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+        "sha256": "ffdf2d16d8b90ab091861614bc02922e2f76889b9e16ee7ee5edc376492729cb",
+        "bytes": 19511
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "bytes": 133816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+        "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+        "bytes": 26592
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+        "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+        "bytes": 45326
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "bytes": 113537
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneControls.hh",
+        "sha256": "4b2f121f26f28fa163e2149f34f6eebfb7f79daafd04e41e08ec2421648dca69",
+        "bytes": 17836
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneControls.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+        "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+        "bytes": 12483
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh",
+        "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+        "bytes": 31704
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DuctLoss.hh",
+        "sha256": "852851d965effadc13fc2c2aeb530bc33bbbe6bd653e2a07714db8fe27c523db",
+        "bytes": 7312
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DuctLoss.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+        "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+        "bytes": 11096
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HybridModel.hh",
+        "sha256": "c7aee172a33fcdd657b40181d79fa874b4a7d3489f517a3b6363fe2cab893046",
+        "bytes": 7169
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HybridModel.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InternalHeatGains.cc",
+        "sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+        "bytes": 536516
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InternalHeatGains.cc"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+        "bytes": 108928
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "bytes": 404705
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+        "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+        "bytes": 25280
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh"
+    },
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+        "bytes": 24694
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc"
+    },
+    {
+      "original": {
+        "path": ".runtime/energyplus/26.1.0/Energy+.idd",
+        "sha256": "7d30c281aa21d63555c753a953124da03d88b6b149dc19e3649f2cbe6c944c68",
+        "bytes": 4613646
+      },
+      "archive_path": ".runtime/energyplus/26.1.0/Energy+.idd"
+    },
+    {
+      "original": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "archive_path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Audit-controlled-prediction-cohort-Source-review-21/review.json",
+        "sha256": "0c3ced8d36513a23ece4404ef360ff05423dd9951f496363762e00b3aa7f13bc",
+        "bytes": 6715
+      },
+      "archive_path": ".runtime/porting/SRC-06/Audit-controlled-prediction-cohort-Source-review-21/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Audit-controlled-prediction-cohort-final-join-review-21/review.json",
+        "sha256": "0fd7ef65bf01f472bdbbae52d65f53be52cce0b13d0c54c01819435efbd6c1c9",
+        "bytes": 6441
+      },
+      "archive_path": ".runtime/porting/SRC-06/Audit-controlled-prediction-cohort-final-join-review-21/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Native-B-compact-schedule-reference-Root-13/reference.json",
+        "sha256": "999ecaaf89fb0484a74704075ad7455a713d3e63d2fb7e29bec9ec85cbc38fa5",
+        "bytes": 67200
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-B-compact-schedule-reference-Root-13/reference.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Peer-controlled-air-Native-harness-Source-review-21-02/review.json",
+        "sha256": "0d9e1a8ea7a011ff890582232a9c319f1f745050d14a54f1cd558cfa9952f8f8",
+        "bytes": 27913
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-controlled-air-Native-harness-Source-review-21-02/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Peer-controlled-prediction-cohort-fixture-review-21/review.json",
+        "sha256": "11a30f3b819b3e3a4363ebe3fc04865c70845ffc97b354cecad95ffba5930e9e",
+        "bytes": 5217
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-controlled-prediction-cohort-fixture-review-21/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-controlled-prediction-cohort-application-21/receipt.json",
+        "sha256": "255367f6ad026f21eb2319749744cab51fa72ffcb69e2cffac78bd539e61d55b",
+        "bytes": 9823
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-controlled-prediction-cohort-application-21/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-controlled-prediction-cohort-comment-correction-21/receipt.json",
+        "sha256": "f26e37c46fe4e1ec363a88d487bdc3e3d9b20f20cfd5d92684e2be9476701a07",
+        "bytes": 1737
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-controlled-prediction-cohort-comment-correction-21/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-source-controlled-prediction-cohort-actual-review-21/review.json",
+        "sha256": "29148090bfc5f96840193c24f168ac4b7733b0f07acd76141c6ab8c8db655925",
+        "bytes": 6160
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-controlled-prediction-cohort-actual-review-21/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-orchestration-actual-review-24/review.json",
+        "sha256": "f79231cea404f6c733cc5039340e697af04551319ebad97c4bc5d92b836b971e",
+        "bytes": 17505
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-zone-equipment-orchestration-actual-review-24/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-controlled-prediction-cohort-Root-21.py",
+        "sha256": "7c3758176f5e185e7913bf1780ffdf473ecad71997f3eb373d54da68b70bd3c9",
+        "bytes": 5629
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-controlled-prediction-cohort-Root-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/build-controlled-air-native-Outer-21.py",
+        "sha256": "af55811a546f5fa2b8ba0522192032ebd16e333f3ea2d3ffa09fb152008440ad",
+        "bytes": 13388
+      },
+      "archive_path": ".runtime/porting/SRC-06/build-controlled-air-native-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/receipt.json",
+        "sha256": "0692d22dbbf63b83f44982327f74f8600b5c2884a3f0c9ac06cda2b8fb30d4f3",
+        "bytes": 3566
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/stderr.log",
+        "sha256": "fde301a4998fc247fdd275f5fe0bdb400e67fdc27ecd042c61bd7db595ab98e8",
+        "bytes": 54094
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/stdout.log",
+        "sha256": "c8d8261cb1cb27cba7086c7b394202f81b5ec8f69e092219ed2581b910dc481f",
+        "bytes": 299
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21-02/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/receipt.json",
+        "sha256": "9f65f53184e20d52c518fae804a53794b8761f455fb94d23c020ab333a29a7ce",
+        "bytes": 3563
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/stderr.log",
+        "sha256": "e0103f82896c01140fc88289412bcc3321c7cbe1c7deccb98e429c3d7207bc2a",
+        "bytes": 16689
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-cohort-command-Root-21/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/receipt.json",
+        "sha256": "0cc0a6f9b0690d41b7c023f826ba7193a2c42552373a2c2dc82b2e394e115216",
+        "bytes": 4244
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-A-24H-command-Root-24/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/receipt.json",
+        "sha256": "b35cc057d92439bb8fa4c6ec67084661c2b8ec4d8314813a10c707ac052eac9c",
+        "bytes": 4296
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-orchestration-B-NOLIMIT-24H-command-Root-24/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/capture-controlled-air-native-Outer-21.py",
+        "sha256": "f063601af441bd997e08447d8843da0db778070bd38c909d1d4565ede129dce9",
+        "bytes": 28718
+      },
+      "archive_path": ".runtime/porting/SRC-06/capture-controlled-air-native-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/check-controlled-prediction-cohort-actual-Root-21.py",
+        "sha256": "5a264882240aae231069ecef6427965cabe7002ad408c7c0002b8a1f554b7406",
+        "bytes": 6380
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-controlled-prediction-cohort-actual-Root-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/compare-controlled-air-Native-reports-Outer-21-02.py",
+        "sha256": "93bc4884c2831d2656c389d8d49c75ba0bc84b25fb86e45af204eb2646bea571",
+        "bytes": 20404
+      },
+      "archive_path": ".runtime/porting/SRC-06/compare-controlled-air-Native-reports-Outer-21-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/all-original-policy-failures.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/all-original-policy-failures.jsonl"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/all-unequal-physical-rows.jsonl",
+        "sha256": "37f330e9397805ee4c81434027fb2b102028b24651a5449c2a0fe7764de495de",
+        "bytes": 1023
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/all-unequal-physical-rows.jsonl"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/comparison.json",
+        "sha256": "085799b03132dd5abb585068ef991c11c23f9bfb56d78c178b2daab4101bd910",
+        "bytes": 126720
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/comparison.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reports-comparison-prepared-Outer-21-02/plan.json",
+        "sha256": "76bf5e5b38b2acefe3529655b032d2f4285d72d7985e3ef4f0b5204f4aec9dd1",
+        "bytes": 10824
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reports-comparison-prepared-Outer-21-02/plan.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reports-comparison-prepared-Outer-21/finite-B-defined-read-note-02.json",
+        "sha256": "dfbdf05d72910e7b3da3e0ad103042482c9841f528d0272838e79dc01f5fc8f9",
+        "bytes": 5557
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reports-comparison-prepared-Outer-21/finite-B-defined-read-note-02.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/Native-after.json",
+        "sha256": "788cb90f6c919bb0ed5b4e6ce774d5381392dbb3e4453bdfb45828a4861f7440",
+        "bytes": 49094
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/Native-after.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/Native-before.json",
+        "sha256": "c2b5bc48ab3f7eb2f3b97c6d24b536c8339c6c7c3e674d0a6d9ae5473d389dc8",
+        "bytes": 46850
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/Native-before.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/native-build.json",
+        "sha256": "9ff0df8f49b91b5318a8bdc410c951be21378ae81ad2252f6efc05af50f858e3",
+        "bytes": 99070
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/native-build.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/receipt.json",
+        "sha256": "545d2f945cf2b474fc531333a3e0a8c27b8844ef1e5f56c661406b4e381c61d6",
+        "bytes": 2516
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/stdout.log",
+        "sha256": "97876e2f3ce095615c16a51a31226b3da6204c95a1b3a42672113eb7922c120f",
+        "bytes": 33782
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/Native-runtime-after.json",
+        "sha256": "e8906a1f77ee3ad7a1ad5545691d3f3989e5337efa9aba6eb81e513b2acf0b66",
+        "bytes": 4190
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/Native-runtime-after.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/Native-runtime-before.json",
+        "sha256": "21c4208abf682d58e2ba829fec31561e1f633c22af59cfd2d45e97ad2ddb39fe",
+        "bytes": 3954
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/Native-runtime-before.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/actual-child-modules.json",
+        "sha256": "2df38a676fefe328671b335dee41e0ea8e7e055f71212fbdf08682637753a8f4",
+        "bytes": 5882
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/actual-child-modules.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+        "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+        "bytes": 50963
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/stderr.log",
+        "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+        "bytes": 36
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/stdout.log",
+        "sha256": "95f3f804bd08d1eb64b6e3739edc33f55dbf3587fd8762d2bee84311622e8e82",
+        "bytes": 460
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-prepared-Outer-21/finite-B-defined-read-note.json",
+        "sha256": "1fbc26efbbfae6d2616159c462236f4659b3c7174a854de1b16595e6e2699485",
+        "bytes": 26436
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-prepared-Outer-21/finite-B-defined-read-note.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-configure-Root-21/preflight.json",
+        "sha256": "67dbb60729f0194b6bf6c9ff94a676b2104a0787b93510766c780d6e99d340e4",
+        "bytes": 86642
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-configure-Root-21/preflight.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/Native-literal-extents.json",
+        "sha256": "9d90f8d4b2086006ad6fc12a78c9b740d4e03ac4810fd882450902a074c4bb28",
+        "bytes": 91348
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/Native-literal-extents.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/ZoneTempPredictorCorrector.controlled_air.cc",
+        "sha256": "1354397f1697df8fb8c20c185390689b7a77d2a0683777efbc725be175638606",
+        "bytes": 409356
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/ZoneTempPredictorCorrector.controlled_air.cc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/additive-reference.cmake",
+        "sha256": "5cd254c17048297856c424eb59a9717b5ad97a17e5585087076fa5a375ff6f8a",
+        "bytes": 235
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/additive-reference.cmake"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/air_fields.inc",
+        "sha256": "5524b07a18225d2742007aaf737d89257ca1b619f71841a94d85dfb7b20daf63",
+        "bytes": 3030
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/air_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_main.cpp",
+        "sha256": "785b0f3e403f9cdcbcbc9752042f1582d4c789844dbacf271ae6c7c95bad146b",
+        "bytes": 2206
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_main.cpp"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.cc",
+        "sha256": "8ce5c0e9d69acf83953ed42fd00f05ef6728bb15f1f628a39a6473ec6214b59b",
+        "bytes": 18636
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.cc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.hh",
+        "sha256": "d3e302f177a4a6bcebf8c02dd7a8ab013f9196cfdacfde34d44bfd8c4d03559b",
+        "bytes": 1940
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.hh"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_reference.cmake",
+        "sha256": "0455c66bf9b00d349345b9b4935518fedd686f3afc777e105f10355ee04711b9",
+        "bytes": 2341
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_reference.cmake"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/demand_fields.inc",
+        "sha256": "8a45cc5cd47e6904b0615c260cea331f26054d8e6daced4c02e38b0bfbfe0632",
+        "bytes": 1315
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/demand_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/draft-status.json",
+        "sha256": "8cebedb24d06f8b9836868e7bc454e71e8ceba6a890a0675ab95331a9009be97",
+        "bytes": 2100
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/draft-status.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/fan_fields.inc",
+        "sha256": "bcaa391ac9ff85f3e58e102ee30ebb19e614341790da949a1eac53c844b09e69",
+        "bytes": 368
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/fan_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/forward.diff",
+        "sha256": "d0b0911cd806374b54ffc807e025439ad6dfc394977c4a818c666fad522b1687",
+        "bytes": 10209
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/integration-contract.json",
+        "sha256": "95618eddb91a3251ea63efe62b3a83fd123b598325bbd76716141c00341585a9",
+        "bytes": 4704
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/integration-contract.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/inverse.diff",
+        "sha256": "6afc52ed83a0ffbee5f2dcc70d4dbe26ae68fbe8b4da1f438e30ebfa1c3699ed",
+        "bytes": 10209
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/manifest.json",
+        "sha256": "762e68fa96b54fadc0860c6ffad4d3490456ed97e309dc759138ec1336f3784f",
+        "bytes": 20921
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/source-additions.json",
+        "sha256": "0a2639ea26723b84115096fb361a010ecb08c0138fe4f2c050e304c9f2badaa3",
+        "bytes": 9174
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/source-additions.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/surface_fields.inc",
+        "sha256": "0691d9cbbbe166cd9bfb22a8138f01c1936d356716f110d7a6eaec2ea8acbc36",
+        "bytes": 205
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/surface_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-prediction-native-cohort-publication-prepared-Outer-21/publication-template.json",
+        "sha256": "e3d15f7b8f7cc421f37758cc7c3f55e1f8f0d7bf972294f3615ce8d3ea1a298c",
+        "bytes": 31072
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-prediction-native-cohort-publication-prepared-Outer-21/publication-template.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/correct-Source21-cohort-include-comment-Outer-21-02.py",
+        "sha256": "2e1e4a6861080d03f4991779a29fc32e7e9a8b58e90e4b8863b3a6042ed10c2f",
+        "bytes": 6548
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-Source21-cohort-include-comment-Outer-21-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/derive-Source21-Native-cohort-Outer-21.py",
+        "sha256": "0b05103b51dbbf411b43a623ffda9934d4c4db8ec5d6bd38dbebfdb763712f79",
+        "bytes": 12654
+      },
+      "archive_path": ".runtime/porting/SRC-06/derive-Source21-Native-cohort-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/fix-controlled-prediction-cohort-comment-Root-21.py",
+        "sha256": "2c840bb4e32dcb52fb2388dc2cae7fd46510c411d1a6f7a94006c90d33c8b678",
+        "bytes": 2412
+      },
+      "archive_path": ".runtime/porting/SRC-06/fix-controlled-prediction-cohort-comment-Root-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.eso",
+        "sha256": "98e8547cb1791ac901d2ff5b73b28262b37e0556a81c67b941b03bae16d26e8f",
+        "bytes": 202704
+      },
+      "archive_path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.eso"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.mdd",
+        "sha256": "cf91059e279bb2394f0e0892c7f4b3120e34e20e3f981c77fa45569b1967c079",
+        "bytes": 1129
+      },
+      "archive_path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.mdd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.rdd",
+        "sha256": "94e6282fe122881f31fefc9339f6e827676f6493cab416dcd6ad1e540afc3a46",
+        "bytes": 24783
+      },
+      "archive_path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.rdd"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/receipt.json",
+        "sha256": "5e4c9f0ad0ca63bd3ba1a03e41373cbebf350a9d606071e6745dedbd4f794f2b",
+        "bytes": 4807
+      },
+      "archive_path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/ordinary-readiness-native-environment-02/frozen-environment.json",
+        "sha256": "46e23f75cf27a0213474147ea27d0e36ab91fbdd5f38296732993680cb49fa8d",
+        "bytes": 54196
+      },
+      "archive_path": ".runtime/porting/SRC-06/ordinary-readiness-native-environment-02/frozen-environment.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-controlled-prediction-native-cohort-publication-Outer-21.py",
+        "sha256": "bfde9fbdbe7d658d7c71511ac80c93b294aed5e83578fffed497320edf415fd2",
+        "bytes": 9451
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-controlled-prediction-native-cohort-publication-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/publish-controlled-prediction-native-cohort-Outer-21.py",
+        "sha256": "a4d76201cee685af994d62cefde8c68860526afd62cd5e17dc89f2bd21008c20",
+        "bytes": 11350
+      },
+      "archive_path": ".runtime/porting/SRC-06/publish-controlled-prediction-native-cohort-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/seal-Source21-Native-cohort-Outer-21.py",
+        "sha256": "9361825211117c6c467b4e09a605d3fcd251bd25dab8805f129121abc50eb677",
+        "bytes": 10854
+      },
+      "archive_path": ".runtime/porting/SRC-06/seal-Source21-Native-cohort-Outer-21.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-draft-Outer-21/derivation.json",
+        "sha256": "9f1c702d8185aaff8aa65f46b595d7af7634f16b52030fe4463ad2e9daa13188",
+        "bytes": 15972
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-draft-Outer-21/derivation.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-draft-Outer-21/draft.json",
+        "sha256": "27c3cc522090eb6bac995026a2025db2a863b9eb75825280f16bffc78aa981cc",
+        "bytes": 10432
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-draft-Outer-21/draft.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/complete-final-compiler-Source-plan.json",
+        "sha256": "4792a9fd32bbd4a0fc723be5a49b748b05fa76f855d4f5c91857cf8293db15a1",
+        "bytes": 2557205
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/complete-final-compiler-Source-plan.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/manifest.json",
+        "sha256": "3d19c6468d5669038e74518e89a70a3dfeb3d5674f185cf0725b9719f76b9e96",
+        "bytes": 16515
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs",
+        "sha256": "000a926c603f8ff0ec5ec71b7b1da7cdd74db780d1571d3828226d60656f09c3",
+        "bytes": 6954950
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/manifest.json",
+        "sha256": "8c830c24ffb9efb383a8690fafb0904ad10125bde2f8d1c1d5ed1de7930e0176",
+        "bytes": 12422
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs",
+        "sha256": "f90cb64edf02e0cd6dad11e8e7d0ec29cdd283e714b3acbd94e478c32cd95c7e",
+        "bytes": 18345
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+        "sha256": "b0a61e699166d280c17c2fa64632808e16ff103a5e92ea79f3446d55e1b29d8b",
+        "bytes": 25903
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/test-name-only-correction.diff",
+        "sha256": "91b6d06f51d4c009419287c782df33a3e57057a919678e1c14e80625c6adf6d4",
+        "bytes": 423
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-prediction-cohort-held-Outer-21/test-name-only-correction.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "bytes": 8557
+      },
+      "archive_path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/6c/6c89170243c8273a4a79aa5799d1d164309bdfbdd206b298ce05ea194fad6c2c",
+        "sha256": "6c89170243c8273a4a79aa5799d1d164309bdfbdd206b298ce05ea194fad6c2c",
+        "bytes": 1843543
+      },
+      "archive_path": ".runtime/porting/source-objects/6c/6c89170243c8273a4a79aa5799d1d164309bdfbdd206b298ce05ea194fad6c2c"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/85/857be5fa508c57e9194c877de7a4f7056f0395521fa8e83d4643939acc394995",
+        "sha256": "857be5fa508c57e9194c877de7a4f7056f0395521fa8e83d4643939acc394995",
+        "bytes": 1843543
+      },
+      "archive_path": ".runtime/porting/source-objects/85/857be5fa508c57e9194c877de7a4f7056f0395521fa8e83d4643939acc394995"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.eso",
+        "sha256": "82337b425c46b1cfc050025df66d3a16f0c8d6fb580dd83c44b6d077829828b7",
+        "bytes": 202704
+      },
+      "archive_path": "Native-capture-reported/eplusout.eso"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.mdd",
+        "sha256": "f9d451e796e8d869c19ce2b24d2254d61820929e6a9c86dd92c7756c8630162f",
+        "bytes": 1129
+      },
+      "archive_path": "Native-capture-reported/eplusout.mdd"
+    },
+    {
+      "original": {
+        "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.rdd",
+        "sha256": "0f8625428322335c41734da784621f8059c6fc5e081372206316fb0dee59914c",
+        "bytes": 24783
+      },
+      "archive_path": "Native-capture-reported/eplusout.rdd"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "bytes": 13025
+      },
+      "archive_path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+        "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+        "bytes": 45145
+      },
+      "archive_path": "energyplus_porting_plan/contracts/output-tolerances.json"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json",
+        "sha256": "6977d3a673f7fb48903e3fef7683b1183c70007b1a9af3fbea25f494bbe128b4",
+        "bytes": 4512
+      },
+      "archive_path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json"
+    },
+    {
+      "original": {
+        "path": "tools/porting/check_completed_reported_streams.py",
+        "sha256": "46a1b6f9081d9a0ff5a2d430b17ec647b88a41f5052c3bb1c95df98174ab754c",
+        "bytes": 24063
+      },
+      "archive_path": "tools/porting/check_completed_reported_streams.py"
+    }
+  ],
+  "scope": "Current full test fixture stored once with three Sources, reviewed derivation/harness/Native authority, actual Native build/capture/report comparison, original/corrected defined-read notes, rejected first compile and exact correction, successful one-test receipt/checker, direct Root application Sources and inherited24 references. No390MB raw observation,1.3GB executable/static core/DLLs/map/object files, recursive prior ZIP, annual JSON/CSV or duplicate full-fixture diffs. Three small D-drive reported files have explicit Native-capture-reported archive aliases.",
+  "large_binary_raw_or_recursive_archives_included": false
+}

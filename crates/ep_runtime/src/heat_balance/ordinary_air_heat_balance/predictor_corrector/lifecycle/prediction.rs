@@ -397,3 +397,6 @@ impl SourceZoneAirPredictorCorrector {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod native_cohort;

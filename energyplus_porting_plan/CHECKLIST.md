@@ -280,3 +280,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 구역 설비 시뮬레이션 진입 검증](evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json). 설비 우선순위와 부하 배분을 실제 실행 경로에 연결했다. B의 다음 경계와 A24 회귀 검증은 요약 자료에 기록한다.
+
+
+[Source 예측 수치 코호트 검증](evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json). Native 실제 호출 1,168개를 단일 테스트로 대조했습니다. 테스트 전용 변경의 운영 근거는 checkpoint 24의 B·A 실행 결과를 상속합니다.

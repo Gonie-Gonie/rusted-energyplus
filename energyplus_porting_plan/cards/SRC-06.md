@@ -449,3 +449,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 구역 설비 시뮬레이션 진입 검증](../evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json). B의 실제 미완료 경계는 `GetHeatBalanceInput: actual PurchasedAirManager SimPurchasedAir3871`이다. IdealLoads 본체와 B 전체 완료를 주장하지 않는다.
+
+
+[단일 Native 코호트 테스트](../evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json). 한 테스트에서 1,168개 호출과 시간 간격 축소 77회를 검증했습니다. 신규 CLI 실행을 주장하지 않으며 게이트는 A14/54·B14/64를 유지합니다.
