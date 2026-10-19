@@ -1,0 +1,123 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "tolerance_policy_changes": false,
+  "successful_process_main_cohort_invocations": 1,
+  "failed_or_diagnostic_worker_invocations": 3,
+  "total_cohort_invocations": 4,
+  "new_test_bodies": 0,
+  "existing_cohort_bodies": 1,
+  "normal_libtest_registration_delta": -1,
+  "selected_files": 7,
+  "actual_current_rewrites": 4,
+  "original_predictor_cases": 1168,
+  "original_shortened_predictor_cases": 77,
+  "whole_corrector_cases": 1168,
+  "positive_inlet_cases": 810,
+  "scope": "All captured numeric/owner writes exact binary64; Native property cache hit/miss/recurrence and full engine/geometry-input execution remain unclaimed.",
+  "runner": "Stable harness=false required-feature target executes the same body on process main without unsafe/FPU controls or science/fixture/tolerance/dependency changes.",
+  "production_scope": "Historical31 production5352 proof inherited for unchanged science bodies; historical CLI did not execute this updated test snapshot.",
+  "schema": "src06-canonical-predictor-corrector-Native-cohort.v1",
+  "status": "One dedicated safe process-main cohort passed: all1168 predictor and1168 whole-corrector entries",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/manifest.json",
+    "sha256": "6d45fb44ec142bb8ea3018223b92f063244dc1ceb9b0173742dbf245e2b10170",
+    "bytes": 30867
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/complete-final-compiler-Source-plan.json",
+    "sha256": "dd1cf40d8ec9723c0a49b7aa6421432264227ebf46df577787bdfdcb3d12733a",
+    "bytes": 2630981
+  },
+  "independent_peers": [
+    {
+      "path": ".runtime/porting/SRC-06/Peer-safe-main-controlled-cohort-Source-review-31-02-final/review.json",
+      "sha256": "32cba49a8b0c1a1e36a4a154c7fb26886a1efccbe29b93904f2240a769871cfa",
+      "bytes": 20800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-consolidated-corrector-cohort-Source-review-31/review.json",
+      "sha256": "b406ffed3551b031541474a8cfc78ea3b6481a6e253afc811f79605d78651b8d",
+      "bytes": 9596
+    }
+  ],
+  "actual_unit_receipt": {
+    "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/receipt.json",
+    "sha256": "125f3dad4e727798a3da6d35060ddb5e356bfefcd99da4154fa4739b95aaeeba",
+    "bytes": 4182
+  },
+  "Root_actual_unit_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-predictor-corrector-cohort-main-actual-review-31-02/review.json",
+    "sha256": "1d4f61a7dd41c1c3bd773f0fcd0c4972d56edf891630c68d76ce21b4cfd6397c",
+    "bytes": 7350
+  },
+  "Root_thread_context_diagnosis": {
+    "path": ".runtime/porting/SRC-06/corrector-thread-context-Root-31/diagnosis.json",
+    "sha256": "eed505a53c484b8e5fbf7f3b0ac76d872ce9558cd2e6c57bcf2d4dfb7aa33508",
+    "bytes": 3576
+  },
+  "preserved_failed_worker_invocations": [
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/receipt.json",
+      "sha256": "662663a3ea61fa8b9bfe1f792daa856e6e885d41b010f61249656b10d17b5aa8",
+      "bytes": 3940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/receipt.json",
+      "sha256": "92430e4e080074c442bba33c3d1e5aac637494a85bdf8631722dbfb4f9018cf2",
+      "bytes": 3932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/receipt.json",
+      "sha256": "4bcaf8b824ed108836a5e904c52f2b2fa88cb434797c2761defd064d52c1b580",
+      "bytes": 3837
+    }
+  ],
+  "inherited_production31": {
+    "accepted_actual_review": {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-zone-corrector-actual-review-31/review.json",
+      "sha256": "070e317a31abeeb22031948e6a4a9b28672794e6fc1396944ecfc667cc61affb",
+      "bytes": 17652
+    },
+    "B_receipt": {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-corrector-B-NOLIMIT-24H-command-Root-31/receipt.json",
+      "sha256": "2aa6261bf82ab53789ce3bfcd3550aa3854e22dadb43d240d5738ddd60e45882",
+      "bytes": 4412
+    },
+    "A24_receipt": {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-corrector-A-24H-command-Root-31/receipt.json",
+      "sha256": "f291e567a5375f71eab0c82342c3bb3e254ea8339ee07d0d44571b9bf6616674",
+      "bytes": 4361
+    },
+    "B_incomplete_boundary": "GetHeatBalanceInput: positive component ZoneEquip inlet5488",
+    "new_final_CLI_build_or_execution": false,
+    "scope": "Historical production31 B/A24 and5352 proof inherited for byte-exact production bodies. The updated test-only compiler snapshot was not used by those CLI executions."
+  },
+  "actual_Native_capture": {
+    "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+    "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+    "bytes": 50963
+  },
+  "actual_Native_reported_comparison": {
+    "path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/comparison.json",
+    "sha256": "085799b03132dd5abb585068ef991c11c23f9bfb56d78c178b2daab4101bd910",
+    "bytes": 126720
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/evidence.zip",
+    "sha256": "212fb7a48b75d852203e4028d602c0a5e63a2fa6903a8c16eda466b81a874430",
+    "bytes": 6737610
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/manifest.json",
+    "sha256": "eee10d0bb0e1e1a167d1b295839ab12d5527291ff631704400c03aff180b70f5",
+    "bytes": 46542
+  },
+  "archive_entries": 114,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-predictor-corrector-cohort-checkpoint-Audit-31-cohort-03.py",
+    "sha256": "218c0b62946a119528559dcc31c2957a7c71ac38707b80795487ecf3e7b0f4b3",
+    "bytes": 12708
+  }
+}

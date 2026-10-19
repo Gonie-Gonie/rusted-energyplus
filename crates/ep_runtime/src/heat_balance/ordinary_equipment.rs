@@ -1123,3 +1123,22 @@ impl OrdinaryEquipment {
         }
     }
 }
+
+// Test-only restoration of captured function-entry operands after genuine getter allocation.
+#[cfg(test)]
+impl OrdinaryEquipment {
+    pub(crate) fn restore_native_cohort_node(&mut self, ordinal:i32, node_id:&str, values:[f64;5])
+        -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let number=usize::try_from(ordinal).map_err(|_|E::Unavailable("cohort positive physical Node ordinal"))?;
+        let at=number.checked_sub(1).ok_or(E::Unavailable("cohort positive physical Node ordinal"))?;
+        if self.nodes.node_ids.as_ref().and_then(|rows|rows.get(number)).map(String::as_str)!=Some(node_id) {
+            return Err(E::Unavailable("cohort exact getter-created NodeID/ordinal"));
+        }
+        let row=self.nodes.physical.as_mut().and_then(|rows|rows.get_mut(at))
+            .ok_or(E::Unavailable("cohort existing physical Node allocation"))?;
+        row.temperature=values[0];row.mass_flow_rate=values[1];row.humidity_ratio=values[2];
+        row.enthalpy=values[3];row.temperature_setpoint=values[4];
+        Ok(())
+    }
+}

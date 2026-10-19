@@ -304,3 +304,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 구역 온습도 보정 검증](evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json). 제어 구역의 실제 공급 Node를 사용하는 ThirdOrder 온도·습도 보정 경로를 연결했습니다. 실제 B 경계와 A24 회귀 결과는 연결된 증거에 기록합니다.
+
+
+[SRC-06 통합 코호트 전용 타깃](evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json). 기존 본문 1개를 명시적 메인 스레드 테스트로 실행했다. 일반 단위 테스트에서는 큰 코호트를 제외하며, 실패·진단 3회와 성공 1회를 구분해 기록했다. 게이트 수는 그대로다.

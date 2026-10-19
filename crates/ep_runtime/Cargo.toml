@@ -16,3 +16,12 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 [lints]
 workspace = true
 
+
+[features]
+native-controlled-air-cohort = []
+
+[[test]]
+name = "native_controlled_air_cohort"
+path = "src/lib.rs"
+harness = false
+required-features = ["native-controlled-air-cohort"]

@@ -36,6 +36,7 @@ checks. Packaging and historical release verification are separate operations.
 | Change | During implementation | Before integration |
 | --- | --- | --- |
 | Runtime equation, branch or state update | `check -Package ep_runtime -Filter <module_or_test> -Lib` | Workspace tests once; the affected card's same-input Native comparison and connected execution |
+| Controlled zone air prediction or correction | Dedicated Native cohort command below | Same cohort once and the affected production case |
 | IDF/epJSON parsing or compilation | `check -Package ep_raw_model,ep_compiler -Filter <area> -Lib` | Workspace tests, including affected model/run consumers |
 | Run pipeline or CLI | `check -Package ep_run,ep_cli -Filter <area>` | Workspace tests; the affected end-to-end scenario |
 | Shared model, public API or Cargo configuration | Relevant package checks | Workspace Clippy and tests once |
@@ -46,6 +47,20 @@ Package lists use commas through `dev.cmd`. A filter that selects no tests is
 an error. Listing tests with `-List` does not count as executing them. Inspect
 the printed scope before relying on a quick check; a package test does not
 exercise every consumer of its public API.
+
+The controlled-air Native cohort uses one dedicated process-main target:
+
+```powershell
+cargo test --locked -p ep_runtime --features native-controlled-air-cohort --test native_controlled_air_cohort
+```
+
+It checks all 1,168 predictor entries and 1,168 whole-corrector entries, including
+810 positive inlet-flow cases. On Windows GNU, a libtest worker has a different
+x87 precision setting from process main; the dedicated target preserves the
+Native comparison context without changing floating-point controls or assertions.
+Its required feature excludes the large fixture from ordinary library tests.
+Run it when changing these calculations or their consumed state, and before
+closing their integration gates.
 
 Keep one behavioral regression for each distinct failure or contract. Cover
 parallel input cases in a named table where their setup and assertions match.

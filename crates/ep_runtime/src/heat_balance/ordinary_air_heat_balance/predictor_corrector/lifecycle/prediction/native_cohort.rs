@@ -1,5 +1,5 @@
-//! One complete actual-Native entry-state cohort for two production Source methods.
-//! No parent predictor, psychrometric cache, sums, corrector or full-run claim.
+//! One actual-Native cohort: original predictor children plus whole corrector.
+//! No parent predictor/full-engine or Native property cache/recurrence trace claim.
 use super::*;
 use crate::heat_balance::ordinary_equipment::{OrdinaryEquipment, OrdinaryEquipmentInput, SourceEquipmentInputOwners};
 use crate::heat_balance::selected_input_processor::{SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
@@ -263,7 +263,6 @@ fn check_state(air: &SourceZoneSpaceHeatBalanceData, controller: &SourceZoneAirP
     Ok(())
 }
 
-#[test]
 fn all_native_b_prediction_entries_match_source_rollback_and_sensible_bits() -> Result {
     let fixture:Value=serde_json::from_str(NATIVE_PREDICTION_COHORT_JSON)?;
     let cases=array(member(&fixture,"cases")?)?;
@@ -339,6 +338,321 @@ fn all_native_b_prediction_entries_match_source_rollback_and_sensible_bits() -> 
     assert_eq!(groups,BTreeMap::from([((false,false,false,false),57),((false,false,false,true),96),
         ((false,false,true,false),10),((true,false,false,false),359),((true,false,false,true),576),
         ((true,false,true,false),67),((true,true,false,true),3)]));
+    run_corrector_cohort(&fixture,&mut equipment,&mut input,&mut zones,&mut schedules,&mut controller,&mut fan,&mut gains,&globals,&mut backend)?;
     assert!(console.is_empty(),"the two bounded methods did not emit diagnostics");
     Ok(())
+}
+
+// Whole corrector numeric/observed-owner cohort. Cache hit/miss and recurrence history
+// are unobserved in Native21 and are not reconstructed or asserted here.
+fn corrector_snapshot(fixture:&Value,indexed:&Value)->Result<Value> {
+    let tables=member(fixture,"corrector_state_tables")?;
+    Ok(Value::Object(object(indexed)?.iter().map(|(name,index)| {
+        Ok((name.clone(),array(member(tables,name)?)?.get(count(index)?).ok_or_else(||invalid("corrector component index"))?.clone()))
+    }).collect::<Result<serde_json::Map<_,_>>>()?))
+}
+fn seed_corrector_air(air:&mut SourceZoneSpaceHeatBalanceData,raw:&Value)->Result {
+    seed_reals!(air,raw,{"MAT"=>mat,
+        "MRT"=>mrt,
+        "ZTAV"=>ztav,
+        "ZT"=>zt,
+        "ZTAVComf"=>ztav_comf,
+        "XMPT"=>xmpt,
+        "TMX"=>tmx,
+        "TM2"=>tm2,
+        "T1"=>t1,
+        "airHumRat"=>air_hum_rat,
+        "airHumRatAvg"=>air_hum_rat_avg,
+        "airHumRatTemp"=>air_hum_rat_temp,
+        "airHumRatAvgComf"=>air_hum_rat_avg_comf,
+        "WTimeMinusP"=>w_time_minus_p,
+        "WMX"=>wmx,
+        "WM2"=>wm2,
+        "W1"=>w1,
+        "SumIntGain"=>sum_int_gain,
+        "SumHA"=>sum_ha,
+        "SumHATsurf"=>sum_ha_tsurf,
+        "SumHATref"=>sum_ha_tref,
+        "SumMCp"=>sum_m_cp,
+        "SumMCpT"=>sum_m_cp_t,
+        "SumSysMCp"=>sum_sys_m_cp,
+        "SumSysMCpT"=>sum_sys_m_cp_t,
+        "SumIntGainExceptPeople"=>sum_int_gain_except_people,
+        "SumHmAW"=>sum_hm_aw,
+        "SumHmARa"=>sum_hm_a_ra,
+        "SumHmARaW"=>sum_hm_a_ra_w,
+        "SumHmARaZ"=>sum_hm_a_ra_z,
+        "TempDepCoef"=>temp_dep_coef,
+        "TempIndCoef"=>temp_ind_coef,
+        "TempHistoryTerm"=>temp_history_term,
+        "MCPI"=>mcpi,
+        "MCPTI"=>mcpti,
+        "MCPV"=>mcpv,
+        "MCPTV"=>mcptv,
+        "MCPM"=>mcpm,
+        "MCPTM"=>mcptm,
+        "MCPE"=>mcpe,
+        "EAMFL"=>eamfl,
+        "EAMFLxHumRat"=>eamf_lx_hum_rat,
+        "MCPTE"=>mcpte,
+        "MCPC"=>mcpc,
+        "CTMFL"=>ctmfl,
+        "MCPTC"=>mcptc,
+        "ThermChimAMFL"=>therm_chim_amfl,
+        "MCPTThermChim"=>mcpt_therm_chim,
+        "MCPThermChim"=>mcp_therm_chim,
+        "latentGain"=>latent_gain,
+        "latentGainExceptPeople"=>latent_gain_except_people,
+        "OAMFL"=>oamfl,
+        "VAMFL"=>vamfl,
+        "NonAirSystemResponse"=>non_air_system_response,
+        "SysDepZoneLoads"=>sys_dep_zone_loads,
+        "SysDepZoneLoadsLagged"=>sys_dep_zone_loads_lagged,
+        "MDotCPOA"=>m_dot_cpoa,
+        "MDotOA"=>m_dot_oa,
+        "MixingMAT"=>mixing_mat,
+        "MixingHumRat"=>mixing_hum_rat,
+        "MixingMassFlowZone"=>mixing_mass_flow_zone,
+        "MixingMassFlowXHumRat"=>mixing_mass_flow_x_hum_rat,
+        "setPointLast"=>set_point_last,
+        "tempIndLoad"=>temp_ind_load,
+        "tempDepLoad"=>temp_dep_load,
+        "airRelHum"=>air_rel_hum,
+        "AirPowerCap"=>air_power_cap});
+    air.xmat=four(member(raw,"XMAT")?)?;
+    air.dsxmat=four(member(raw,"DSXMAT")?)?;
+    air.w_prev_zone_ts=four(member(raw,"WPrevZoneTS")?)?;
+    air.dsw_prev_zone_ts=four(member(raw,"DSWPrevZoneTS")?)?;
+    air.ztm=four(member(raw,"ZTM")?)?;
+    air.w_prev_zone_ts_temp=four(member(raw,"WPrevZoneTSTemp")?)?;
+    Ok(())
+}
+fn check_corrector_air(air:&SourceZoneSpaceHeatBalanceData,raw:&Value,context:&str)->Result {
+    check_reals!(air,raw,context,{"MAT"=>mat,
+        "MRT"=>mrt,
+        "ZTAV"=>ztav,
+        "ZT"=>zt,
+        "ZTAVComf"=>ztav_comf,
+        "XMPT"=>xmpt,
+        "TMX"=>tmx,
+        "TM2"=>tm2,
+        "T1"=>t1,
+        "airHumRat"=>air_hum_rat,
+        "airHumRatAvg"=>air_hum_rat_avg,
+        "airHumRatTemp"=>air_hum_rat_temp,
+        "airHumRatAvgComf"=>air_hum_rat_avg_comf,
+        "WTimeMinusP"=>w_time_minus_p,
+        "WMX"=>wmx,
+        "WM2"=>wm2,
+        "W1"=>w1,
+        "SumIntGain"=>sum_int_gain,
+        "SumHA"=>sum_ha,
+        "SumHATsurf"=>sum_ha_tsurf,
+        "SumHATref"=>sum_ha_tref,
+        "SumMCp"=>sum_m_cp,
+        "SumMCpT"=>sum_m_cp_t,
+        "SumSysMCp"=>sum_sys_m_cp,
+        "SumSysMCpT"=>sum_sys_m_cp_t,
+        "SumIntGainExceptPeople"=>sum_int_gain_except_people,
+        "SumHmAW"=>sum_hm_aw,
+        "SumHmARa"=>sum_hm_a_ra,
+        "SumHmARaW"=>sum_hm_a_ra_w,
+        "SumHmARaZ"=>sum_hm_a_ra_z,
+        "TempDepCoef"=>temp_dep_coef,
+        "TempIndCoef"=>temp_ind_coef,
+        "TempHistoryTerm"=>temp_history_term,
+        "MCPI"=>mcpi,
+        "MCPTI"=>mcpti,
+        "MCPV"=>mcpv,
+        "MCPTV"=>mcptv,
+        "MCPM"=>mcpm,
+        "MCPTM"=>mcptm,
+        "MCPE"=>mcpe,
+        "EAMFL"=>eamfl,
+        "EAMFLxHumRat"=>eamf_lx_hum_rat,
+        "MCPTE"=>mcpte,
+        "MCPC"=>mcpc,
+        "CTMFL"=>ctmfl,
+        "MCPTC"=>mcptc,
+        "ThermChimAMFL"=>therm_chim_amfl,
+        "MCPTThermChim"=>mcpt_therm_chim,
+        "MCPThermChim"=>mcp_therm_chim,
+        "latentGain"=>latent_gain,
+        "latentGainExceptPeople"=>latent_gain_except_people,
+        "OAMFL"=>oamfl,
+        "VAMFL"=>vamfl,
+        "NonAirSystemResponse"=>non_air_system_response,
+        "SysDepZoneLoads"=>sys_dep_zone_loads,
+        "SysDepZoneLoadsLagged"=>sys_dep_zone_loads_lagged,
+        "MDotCPOA"=>m_dot_cpoa,
+        "MDotOA"=>m_dot_oa,
+        "MixingMAT"=>mixing_mat,
+        "MixingHumRat"=>mixing_hum_rat,
+        "MixingMassFlowZone"=>mixing_mass_flow_zone,
+        "MixingMassFlowXHumRat"=>mixing_mass_flow_x_hum_rat,
+        "setPointLast"=>set_point_last,
+        "tempIndLoad"=>temp_ind_load,
+        "tempDepLoad"=>temp_dep_load,
+        "airRelHum"=>air_rel_hum,
+        "AirPowerCap"=>air_power_cap});
+    assert_eq!(air.xmat.map(f64::to_bits),four(member(raw,"XMAT")?)?.map(f64::to_bits),"{context}: XMAT");
+    assert_eq!(air.dsxmat.map(f64::to_bits),four(member(raw,"DSXMAT")?)?.map(f64::to_bits),"{context}: DSXMAT");
+    assert_eq!(air.w_prev_zone_ts.map(f64::to_bits),four(member(raw,"WPrevZoneTS")?)?.map(f64::to_bits),"{context}: WPrevZoneTS");
+    assert_eq!(air.dsw_prev_zone_ts.map(f64::to_bits),four(member(raw,"DSWPrevZoneTS")?)?.map(f64::to_bits),"{context}: DSWPrevZoneTS");
+    assert_eq!(air.ztm.map(f64::to_bits),four(member(raw,"ZTM")?)?.map(f64::to_bits),"{context}: ZTM");
+    assert_eq!(air.w_prev_zone_ts_temp.map(f64::to_bits),four(member(raw,"WPrevZoneTSTemp")?)?.map(f64::to_bits),"{context}: WPrevZoneTSTemp");
+    Ok(())
+}
+fn captured_node_values(raw:&Value)->Result<[f64;5]> {
+    Ok([real(member(raw,"Temp")?)?,real(member(raw,"MassFlowRate")?)?,real(member(raw,"HumRat")?)?,
+        real(member(raw,"Enthalpy")?)?,real(member(raw,"TempSetPoint")?)?])
+}
+fn restore_corrector_surfaces(zones:&mut SelectedZoneInputOwners,geometry:&mut SurfaceGeometryInputState,
+    arrays:&mut SourceSurfaceHeatBalanceArrays,gains:&mut SelectedInternalHeatGains,spaces:&Value)->Result {
+    use crate::heat_balance::selected_heat_balance_input::surface::SurfaceClass;
+    let spaces=array(spaces)?;
+    zones.spaces=Some(vec![Default::default();spaces.len()]);
+    gains.allocations.space_devices=Some(vec![Default::default();spaces.len()]);
+    let mut surfaces=Vec::new();let mut h=Vec::new();let mut temp=Vec::new();let mut bulk=Vec::new();
+    for (at,raw) in spaces.iter().enumerate() {
+        assert_eq!(integer(member(raw,"index")?)?,i32::try_from(at+1)?);
+        let v=member(raw,"value")?;
+        let space=zones.spaces.as_mut().and_then(|rows|rows.get_mut(at)).ok_or_else(||invalid("captured Space row"))?;
+        space.volume=real(member(v,"Volume")?)?;space.fraction_zone_volume=real(member(v,"fracZoneVolume")?)?;
+        space.system_zone_node_number=integer(member(v,"SystemZoneNodeNumber")?)?;
+        space.ht_surface_first=integer(member(v,"HTSurfaceFirst")?)?;space.ht_surface_last=integer(member(v,"HTSurfaceLast")?)?;
+        for raw in array(member(v,"surfaces")?)? {
+            assert_eq!(integer(member(raw,"index")?)?,i32::try_from(surfaces.len()+1)?);
+            let v=member(raw,"value")?;
+            // Exact pinned Native SurfaceClass1/2/3; all actual cohort surfaces opaque.
+            let class=match integer(member(v,"Class")?)? {1=>SurfaceClass::Wall,2=>SurfaceClass::Floor,3=>SurfaceClass::Roof,
+                _=>return Err(invalid("cohort actual opaque Native class").into())};
+            let reference=integer(member(member(v,"SurfTAirRef")?,"value")?)?;
+            surfaces.push((real(member(v,"Area")?)?,class,reference));
+            h.push(real(member(member(v,"SurfHConvInt")?,"value")?)?);
+            temp.push(real(member(member(v,"SurfTempInTmp")?,"value")?)?);
+            bulk.push(real(member(member(v,"SurfTempEffBulkAir")?,"value")?)?);
+        }
+        let raw_gain=member(member(v,"gains")?,"value")?;let devices=member(raw_gain,"device")?;
+        assert!(boolean(member(devices,"allocated")?)?);
+        let owner=gains.allocations.space_devices.as_mut().and_then(|rows|rows.get_mut(at)).ok_or_else(||invalid("same gain allocation"))?;
+        owner.number_of_devices=count(member(raw_gain,"numberOfDevices")?)?;owner.max_number_of_devices=count(member(raw_gain,"maxNumberOfDevices")?)?;
+        assert_eq!(owner.max_number_of_devices,count(member(devices,"size")?)?);
+        owner.devices=Some(vec![Default::default();owner.max_number_of_devices]);
+        assert_eq!(array(member(devices,"values")?)?.len(),owner.number_of_devices);
+        for (number,raw) in array(member(devices,"values")?)?.iter().enumerate() {
+            assert_eq!(count(member(raw,"index")?)?,number+1);
+            let device=owner.devices.as_mut().and_then(|rows|rows.get_mut(number)).ok_or_else(||invalid("captured active gain device"))?;
+            device.component_name=text(member(raw,"CompObjectName")?)?.into();device.component_type=integer(member(raw,"CompType")?)?;
+            device.return_air_node=integer(member(raw,"ReturnAirNodeNum")?)?;
+            device.cached_rates[0]=real(member(raw,"ConvectGainRate")?)?;device.cached_rates[1]=real(member(raw,"ReturnAirConvGainRate")?)?;
+        }
+    }
+    geometry.restore_native_cohort_opaque_surfaces(&surfaces);
+    arrays.surf_h_conv_int=Some(h);arrays.surf_temp_in_tmp=Some(temp);arrays.surf_temp_eff_bulk_air=Some(bulk);
+    Ok(())
+}
+fn run_corrector_cohort(fixture:&Value,equipment:&mut OrdinaryEquipment,input:&mut SelectedInputProcessor,
+    zones:&mut SelectedZoneInputOwners,schedules:&mut SelectedScheduleManager,controller:&mut SourceZoneAirPredictorCorrector,
+    fan:&mut crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays,
+    gains:&mut SelectedInternalHeatGains,globals:&SelectedHeatBalanceGlobals,backend:&mut SourceErrorBackend<'_>)->Result {
+    let cases=array(member(fixture,"corrector_cases")?)?;
+    assert_eq!(cases.len(),1168);assert_eq!(count(member(fixture,"corrector_case_count")?)?,1168);
+    let mut geometry=SurfaceGeometryInputState::default();let mut surface_arrays=SourceSurfaceHeatBalanceArrays::default();
+    let mut control=SelectedHeatBalanceInputState::default();let space_controls=SelectedHeatBalanceSpaceControls::default();
+    let faults=crate::heat_balance::source_initialization::SourceFaultsManager::default();
+    let availability=crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability::default();
+    let mut shortcut=SourceInputProcessorShortCut::default();let mut psychrometrics=SourcePsychrometricAccess::default();
+    let source_is_epjson=false;let mut positive=0;let mut first_addresses=None;
+    // Run the genuine zero-input RoomAir getter; do not forge its input-read latch.
+    controller.subsystems.room_air.manage_source_air_model(1,input,&mut shortcut,backend)?;
+    crate::psychrometrics::with_fresh_psychrometric_state(||->Result {
+        for (at,case) in cases.iter().enumerate() {
+            assert_eq!(count(member(case,"invocation")?)?,at+1);
+            let context=format!("Native corrector{}",at+1);
+            let entry=corrector_snapshot(fixture,member(case,"entry")?)?;
+            let expected=corrector_snapshot(fixture,member(case,"exit")?)?;
+            let spaces=array(member(member(fixture,"corrector_state_tables")?,"spaces")?)?
+                .get(count(member(case,"sums_inputs")?)?).ok_or_else(||invalid("captured first-consumed Sums inputs"))?;
+            restore_corrector_surfaces(zones,&mut geometry,&mut surface_arrays,gains,spaces)?;
+            let flags=member(&entry,"flags")?;let z=member(&entry,"zone")?;let f=member(&entry,"fan")?;
+            assert!(!boolean(member(flags,"doSpaceHeatBalance")?)?);control.do_latent_sizing=boolean(member(flags,"DoLatentSizing")?)?;
+            assert_eq!(globals.hybrid_model_people_count,boolean(member(flags,"FlagHybridModel_PC")?)?);
+            controller.subsystems.hybrid_model.active=boolean(member(flags,"FlagHybridModel")?)?;
+            controller.subsystems.duct_loss.simulated=boolean(member(flags,"DuctLossSimu")?)?;
+            let afn=&mut controller.subsystems.airflow_network;
+            afn.multizone_always_simulated=boolean(member(flags,"multizone_always_simulated")?)?;
+            afn.control_type=integer(member(flags,"AFN_control_type")?)?;afn.fan_activated=boolean(member(flags,"AirflowNetworkFanActivated")?)?;
+            afn.distribution_simulated=boolean(member(flags,"distribution_simulated")?)?;
+            let room=member(flags,"roomAir")?;
+            controller.subsystems.room_air.air_models=Some(vec![Default::default()]);
+            let model=controller.subsystems.room_air.air_models.as_mut().and_then(|rows|rows.first_mut()).ok_or_else(||invalid("actual RoomAir row"))?;
+            model.model=integer(member(room,"AirModel")?)?;model.simulate_air_model=boolean(member(room,"SimAirModel")?)?;
+            let c=member(&entry,"clock")?;let mut clock=WeatherGlobalState::default();clock.begin_sim_flag=boolean(member(c,"BeginSimFlag")?)?;
+            let mut environment=WeatherEnvironmentState::default();
+            environment.current_weather.out_baro_press=real(member(c,"OutBaroPress")?)?;
+            environment.current_weather.out_hum_rat=real(member(c,"OutHumRat")?)?;
+            let mut hvac=SelectedHvacGlobals::default();hvac.time_step_sys_seconds=real(member(c,"TimeStepSysSec")?)?;
+            let mut air=SourceZoneSpaceHeatBalanceData::default();
+            let mut owners=SourceZoneAirOwners {zones,equipment,geometry:&geometry,surface_arrays:&surface_arrays,fan,gains,control:&mut control,
+                space_controls:&space_controls,globals,clock:&clock,environment:&environment,hvac:&mut hvac,input,shortcut:&mut shortcut,
+                source_is_epjson:&source_is_epjson,faults:&faults,schedules,availability:&availability,psychrometrics:&mut psychrometrics,backend};
+            seed_state(&mut air,controller,&mut owners,&entry)?;seed_corrector_air(&mut air,member(&entry,"air")?)?;
+            let zone=owners.zones.zones.as_mut().and_then(|rows|rows.first_mut()).ok_or_else(||invalid("same real Zone"))?;
+            seed_reals!(zone,z,{"Volume"=>volume,"ZoneVolCapMultpSens"=>sensible_capacity_multiplier,
+                "ZoneVolCapMultpMoist"=>moisture_capacity_multiplier,"OutDryBulbTemp"=>dry_bulb});
+            zone.no_heat_to_return_air=boolean(member(z,"NoHeatToReturnAir")?)?;zone.is_return_plenum=boolean(member(z,"IsReturnPlenum")?)?;
+            zone.is_supply_plenum=boolean(member(z,"IsSupplyPlenum")?)?;
+            zone.leakage_parallel_piu_numbers=array(member(z,"leakageParallelPIUNums")?)?.iter().map(real).collect::<Result<Vec<_>>>()?;
+            zone.space_indexes=array(member(z,"spaceIndexes")?)?.iter().map(integer).collect::<Result<Vec<_>>>()?;
+            owners.fan.sum_conv_ht_rad_sys=Some(vec![real(member(f,"SumConvHTRadSys")?)?]);owners.fan.sum_conv_pool=Some(vec![real(member(f,"SumConvPool")?)?]);
+            owners.fan.sum_latent_ht_rad_sys=Some(vec![real(member(f,"SumLatentHTRadSys")?)?]);owners.fan.sum_latent_pool=Some(vec![real(member(f,"SumLatentPool")?)?]);
+            let cfg=member(&entry,"config")?;let inlet=member(cfg,"InletNode")?;let inlets=array(member(inlet,"values")?)?;
+            let real_cfg=owners.equipment.source_zone_equipment_config(1)?;
+            assert_eq!(*real_cfg.is_controlled(),boolean(member(cfg,"IsControlled")?)?);
+            assert_eq!(*real_cfg.number_inlet_nodes(),count(member(cfg,"NumInletNodes")?)?);
+            assert_eq!(inlets.len(),*real_cfg.number_inlet_nodes());
+            for raw in inlets {
+                let slot=count(member(raw,"slot")?)?;let ordinal=integer(member(raw,"NodeNum")?)?;
+                assert_eq!(real_cfg.inlet_node_number(slot).copied(),Some(usize::try_from(ordinal)?));
+            }
+            let zone_ordinal=integer(member(&entry,"node_ordinal")?)?;
+            owners.equipment.restore_native_cohort_node(zone_ordinal,text(member(&entry,"node_name")?)?,captured_node_values(member(&entry,"node")?)?)?;
+            let mut has_positive=false;let mut addresses=Vec::new();
+            for raw in inlets {
+                let p=member(raw,"physical")?;let ordinal=integer(member(p,"index")?)?;let v=member(p,"value")?;
+                let values=captured_node_values(v)?;has_positive|=values[1]>0.0;
+                owners.equipment.restore_native_cohort_node(ordinal,text(member(p,"NodeID")?)?,values)?;
+                let n=owners.equipment.source_zone_air_node_mut(ordinal)?;addresses.push(std::ptr::from_ref(&*n.temperature) as usize);
+            }
+            let zone_address={let n=owners.equipment.source_zone_air_node_mut(zone_ordinal)?;std::ptr::from_ref(&*n.temperature) as usize};
+            addresses.push(zone_address);assert!(addresses[..addresses.len()-1].iter().all(|a|*a!=zone_address));
+            if let Some(first)=&first_addresses {assert_eq!(&addresses,first,"same genuine physical rows across cohort");}else{first_addresses=Some(addresses);}
+            if has_positive {positive+=1;}
+            let use_history=bool_integer(member(member(case,"arguments")?,"useZoneTimeStepHistory")?)?;
+            let change=air.correct_source_zone_temperature(1,use_history,controller,&mut owners)?;
+            check_state(&air,controller,&mut owners,&expected,&context)?;
+            check_corrector_air(&air,member(&expected,"air")?,&context)?;
+            assert_real(change,member(member(case,"return_value")?,"tempChange")?,&context,"actual returned temperature change")?;
+            let expected_node=member(&expected,"node")?;
+            assert_real(*owners.equipment.source_zone_air_node_mut(zone_ordinal)?.mass_flow_rate,member(expected_node,"MassFlowRate")?,&context,"same ZoneNode.Mdot")?;
+            for raw in inlets {
+                let p=member(raw,"physical")?;let n=owners.equipment.source_zone_air_node_mut(integer(member(p,"index")?)?)?;let v=member(p,"value")?;
+                assert_real(*n.temperature,member(v,"Temp")?,&context,"inlet Temp unchanged")?;
+                assert_real(*n.mass_flow_rate,member(v,"MassFlowRate")?,&context,"inlet Mdot unchanged")?;
+                assert_real(*n.humidity_ratio,member(v,"HumRat")?,&context,"inlet W unchanged")?;
+                assert_real(*n.enthalpy,member(v,"Enthalpy")?,&context,"inlet H unchanged")?;
+                assert_real(*n.temperature_setpoint,member(v,"TempSetPoint")?,&context,"inlet Tset unchanged")?;
+            }
+        }
+        assert_eq!(positive,810);
+        Ok(())
+    })
+}
+
+// Dedicated stable Cargo harness=false entry; this is the same cohort body.
+impl SourceZoneAirPredictorCorrector {
+    pub(crate) fn run_native_controlled_air_cohort() -> Result {
+        all_native_b_prediction_entries_match_source_rollback_and_sensible_bits()
+    }
 }

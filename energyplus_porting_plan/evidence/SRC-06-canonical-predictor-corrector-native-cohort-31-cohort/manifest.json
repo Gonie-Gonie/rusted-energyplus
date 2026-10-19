@@ -1,0 +1,924 @@
+{
+  "schema": "src06-compact-predictor-corrector-cohort-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/evidence.zip",
+    "sha256": "212fb7a48b75d852203e4028d602c0a5e63a2fa6903a8c16eda466b81a874430",
+    "bytes": 6737610
+  },
+  "entries": [
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Peer-consolidated-corrector-cohort-Source-review-31/review.json",
+        "sha256": "b406ffed3551b031541474a8cfc78ea3b6481a6e253afc811f79605d78651b8d",
+        "bytes": 9596
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-consolidated-corrector-cohort-Source-review-31/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Peer-safe-main-controlled-cohort-Source-review-31-02-final/review.json",
+        "sha256": "32cba49a8b0c1a1e36a4a154c7fb26886a1efccbe29b93904f2240a769871cfa",
+        "bytes": 20800
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-safe-main-controlled-cohort-Source-review-31-02-final/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-predictor-corrector-cohort-application-31-cohort/receipt.json",
+        "sha256": "448d926486657f40ef99ed30afab201bfaa1e4d7acaa12dcddc0738d7790b4cd",
+        "bytes": 14499
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-predictor-corrector-cohort-application-31-cohort/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-predictor-corrector-cohort-main-application-31-02/receipt.json",
+        "sha256": "dfde6d89dd4beb78a0812d8428a9d484c6b8ed33bfbe8f1b866e32680cb82a15",
+        "bytes": 26470
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-predictor-corrector-cohort-main-application-31-02/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-source-controlled-zone-corrector-actual-review-31/review.json",
+        "sha256": "070e317a31abeeb22031948e6a4a9b28672794e6fc1396944ecfc667cc61affb",
+        "bytes": 17652
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-controlled-zone-corrector-actual-review-31/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/Root-source-predictor-corrector-cohort-main-actual-review-31-02/review.json",
+        "sha256": "1d4f61a7dd41c1c3bd773f0fcd0c4972d56edf891630c68d76ce21b4cfd6397c",
+        "bytes": 7350
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-predictor-corrector-cohort-main-actual-review-31-02/review.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-consolidated-cohort-Root-31.py",
+        "sha256": "b14ecff50e402ae1842234cc2ee377c406e945dd9915c716a73d3d78def5e035",
+        "bytes": 6191
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-consolidated-cohort-Root-31.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/apply-main-thread-cohort-Root-31-02.py",
+        "sha256": "527b86222d5ea8e0a07dab7c228f3976eb375d9ccddb227fc18f7a03d2b18370",
+        "bytes": 6570
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-main-thread-cohort-Root-31-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/author-corrector-cohort-Audit-31.py",
+        "sha256": "adf1786443e5f9755e2cda0b9464f2f9d851198b14c55e5f4dd20fd3509f96e5",
+        "bytes": 22539
+      },
+      "archive_path": ".runtime/porting/SRC-06/author-corrector-cohort-Audit-31.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/receipt.json",
+        "sha256": "92430e4e080074c442bba33c3d1e5aac637494a85bdf8631722dbfb4f9018cf2",
+        "bytes": 3932
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/stderr.log",
+        "sha256": "43e50680559560760a7729fb8bc66182c7335fb7fa57fcc58587fcad64e81864",
+        "bytes": 61046
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/stdout.log",
+        "sha256": "0f44fc0a9162619fe106c9bf9f2007780b149c67d026080c829416ed2c253594",
+        "bytes": 505
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-corrector-property-diagnostic-Root-31/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/receipt.json",
+        "sha256": "662663a3ea61fa8b9bfe1f792daa856e6e885d41b010f61249656b10d17b5aa8",
+        "bytes": 3940
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/stderr.log",
+        "sha256": "cc52de10569e7c5a184d0e417a97ab05e5fd3405de4bba15d66238a9ea5dfd8a",
+        "bytes": 60876
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/stdout.log",
+        "sha256": "e7270e667ee0cf12f3f7202b490dbb37f15fda020b2d148e116d5b9e01aebb3a",
+        "bytes": 505
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-Root-31-cohort/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/receipt.json",
+        "sha256": "125f3dad4e727798a3da6d35060ddb5e356bfefcd99da4154fa4739b95aaeeba",
+        "bytes": 4182
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/stderr.log",
+        "sha256": "4c50a6dd41276745c3875cbf8683315c24e289b1a78184854da1bef640294c26",
+        "bytes": 1495021
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/stdout.log",
+        "sha256": "9117771b6c99851de05b5104799490b764d0bfedb3c284f3bb09e497fedbe59a",
+        "bytes": 216
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-predictor-corrector-cohort-main-Root-31-02/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/check-main-cohort-actual-Root-31-02.py",
+        "sha256": "2271bcb6e731198266927e0a8757d4c7e21e1c0f3cf76b5f169426d8c02ceac7",
+        "bytes": 7995
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-main-cohort-actual-Root-31-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/comparison.json",
+        "sha256": "085799b03132dd5abb585068ef991c11c23f9bfb56d78c178b2daab4101bd910",
+        "bytes": 126720
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-Native-reported-comparison-Root-21/comparison.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+        "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+        "bytes": 50963
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/air_fields.inc",
+        "sha256": "5524b07a18225d2742007aaf737d89257ca1b619f71841a94d85dfb7b20daf63",
+        "bytes": 3030
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/air_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.cc",
+        "sha256": "8ce5c0e9d69acf83953ed42fd00f05ef6728bb15f1f628a39a6473ec6214b59b",
+        "bytes": 18636
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.cc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.hh",
+        "sha256": "d3e302f177a4a6bcebf8c02dd7a8ab013f9196cfdacfde34d44bfd8c4d03559b",
+        "bytes": 1940
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/controlled_air_observer.hh"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/demand_fields.inc",
+        "sha256": "8a45cc5cd47e6904b0615c260cea331f26054d8e6daced4c02e38b0bfbfe0632",
+        "bytes": 1315
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/demand_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/fan_fields.inc",
+        "sha256": "bcaa391ac9ff85f3e58e102ee30ebb19e614341790da949a1eac53c844b09e69",
+        "bytes": 368
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/fan_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/manifest.json",
+        "sha256": "762e68fa96b54fadc0860c6ffad4d3490456ed97e309dc759138ec1336f3784f",
+        "bytes": 20921
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/surface_fields.inc",
+        "sha256": "0691d9cbbbe166cd9bfb22a8138f01c1936d356716f110d7a6eaec2ea8acbc36",
+        "bytes": 205
+      },
+      "archive_path": ".runtime/porting/SRC-06/controlled-air-native-held-Outer-21/surface_fields.inc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/receipt.json",
+        "sha256": "4bcaf8b824ed108836a5e904c52f2b2fa88cb434797c2761defd064d52c1b580",
+        "bytes": 3837
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/stderr.log",
+        "sha256": "7a07ab60a39e8ffd39a73a0a1dd0c460b862fc82813b99eddd31261c99127735",
+        "bytes": 694
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/stdout.log",
+        "sha256": "d7128141863c42b18dec8f7cec8ed2455bf06bee78fbda6c2d396dfbd7c64221",
+        "bytes": 505
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-test-serial-thread-diagnostic-Root-31/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-thread-context-Root-31/diagnosis.json",
+        "sha256": "eed505a53c484b8e5fbf7f3b0ac76d872ce9558cd2e6c57bcf2d4dfb7aa33508",
+        "bytes": 3576
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-thread-context-Root-31/diagnosis.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/receipt.json",
+        "sha256": "a6fc9ddad060ffd077f076462688ae1af86c2b6f605637500bc45448b6b87027",
+        "bytes": 3591
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/receipt.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/stderr.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/stdout.log",
+        "sha256": "a3120c81df95dc4ba7bb1fe7d3f128ff56ba1ed29aa9d57ad864a622161be46d",
+        "bytes": 178
+      },
+      "archive_path": ".runtime/porting/SRC-06/corrector-thread-context-command-Root-31/stdout.log"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/math-diagnostic-Root-31/linked-property-thread.rs",
+        "sha256": "3f4ce3a1b3adaace0935000259a5fa2b5a3b2cb697205268ea9764e515430c41",
+        "bytes": 661
+      },
+      "archive_path": ".runtime/porting/SRC-06/math-diagnostic-Root-31/linked-property-thread.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/math-diagnostic-Root-31/read-fpu.rs",
+        "sha256": "277bc21a6208c6be792b08d0591ac0bc3f5a813e662b3639e2d2b39286440eee",
+        "bytes": 369
+      },
+      "archive_path": ".runtime/porting/SRC-06/math-diagnostic-Root-31/read-fpu.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-READY-Audit-31-cohort-03/publication-template.json",
+        "sha256": "853720ee5ee708562f826fae5592a5dc84324e0b03693465d171794fa5909375",
+        "bytes": 27555
+      },
+      "archive_path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-READY-Audit-31-cohort-03/publication-template.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publication-template.json",
+        "sha256": "9cb6bac19afcdcef198a354d2c50d228eb7d010a9d716a1a496ab620cfd59f63",
+        "bytes": 26147
+      },
+      "archive_path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publication-template.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publisher-forward.diff",
+        "sha256": "7bf86b90ebd6773944525b2299e56af40e5366d12c6209b823a5b17be03b0624",
+        "bytes": 7920
+      },
+      "archive_path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publisher-forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publisher-inverse.diff",
+        "sha256": "def99b021d6a8cb3356b875d74a8b8175952842f117f2cb81f1f34a96b96befb",
+        "bytes": 7920
+      },
+      "archive_path": ".runtime/porting/SRC-06/predictor-corrector-cohort-publication-prepared-Audit-31-cohort-03/publisher-inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-corrector-cohort-Audit-31.py",
+        "sha256": "9d0aa81c3905f5c988124daab27145815f4911f599644576c89f2cd27cf683f3",
+        "bytes": 10317
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-corrector-cohort-Audit-31.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-main-cohort-publication-Audit-31-03.py",
+        "sha256": "a958b81f8cea9ab6e5c4bed7557964a06685b85c34c2da80f8696c0ee95226e4",
+        "bytes": 11395
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-main-cohort-publication-Audit-31-03.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/prepare-main-thread-cohort-Audit-31-02.py",
+        "sha256": "54540ed46476ab1cdbdb2ffed2d5f863dec2ead05daed98bc76bc447288307e5",
+        "bytes": 8169
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-main-thread-cohort-Audit-31-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/publish-predictor-corrector-cohort-checkpoint-Audit-31-cohort-02.py",
+        "sha256": "76da20387f76c79493a845143a7c62fb1b9a079de91ea20e034417525fbb1b05",
+        "bytes": 10858
+      },
+      "archive_path": ".runtime/porting/SRC-06/publish-predictor-corrector-cohort-checkpoint-Audit-31-cohort-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/publish-predictor-corrector-cohort-checkpoint-Audit-31-cohort-03.py",
+        "sha256": "218c0b62946a119528559dcc31c2957a7c71ac38707b80795487ecf3e7b0f4b3",
+        "bytes": 12708
+      },
+      "archive_path": ".runtime/porting/SRC-06/publish-predictor-corrector-cohort-checkpoint-Audit-31-cohort-03.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/record-corrector-thread-context-Root-31.py",
+        "sha256": "7f6953f3c71b6326b8804e25a5ec5a7ea34b668f1958ed83736ca913cbbe059b",
+        "bytes": 3607
+      },
+      "archive_path": ".runtime/porting/SRC-06/record-corrector-thread-context-Root-31.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/seal-main-thread-cohort-Audit-31-02.py",
+        "sha256": "7115789d41c43283e5597ba63300b7ea570937fa6c9423f5cd4c9d3e042dcfc9",
+        "bytes": 10233
+      },
+      "archive_path": ".runtime/porting/SRC-06/seal-main-thread-cohort-Audit-31-02.py"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-held-Audit-31/complete-final-compiler-Source-plan.json",
+        "sha256": "982f9138edc20f5104e7c3262eb6ef121cb5430c1162ee3b3c4911ace1fc33f1",
+        "bytes": 2630408
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-held-Audit-31/complete-final-compiler-Source-plan.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-held-Audit-31/manifest.json",
+        "sha256": "4689a118282b54227342ac1d216008cf0c30246bc4e736dd7efe2aefefa86411",
+        "bytes": 16463
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-held-Audit-31/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/cli.rs.256-266.txt",
+        "sha256": "49e27e8e91ab8bbf7e4657db934f78f7ec8d0d27f72a916a7042f7366501d89c",
+        "bytes": 636
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/cli.rs.256-266.txt"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/cli.rs.385-400.txt",
+        "sha256": "3f45b402ee75aa5d5aede91cf7eb458a721b98df181bfc1c524c32709ffb45d1",
+        "bytes": 579
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/cli.rs.385-400.txt"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.174-228.txt",
+        "sha256": "5482e8ee0ec83d048031d4f499aedc9196f61bf0a957e44e0a222b372703cf4e",
+        "bytes": 2203
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.174-228.txt"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.369-386.txt",
+        "sha256": "06b4586368c270301fee27844fc27b46d729fe7baed85dca7fe7572a79aabb71",
+        "bytes": 670
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.369-386.txt"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.627-656.txt",
+        "sha256": "0c400222d5dfb816b6a424e1bba4b3297782cb88e10f4dfcf721f5adf7bfb190",
+        "bytes": 1510
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/Rust-authority/lib.rs.627-656.txt"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/draft.json",
+        "sha256": "ea566824034dfa771dcf0d085dc2ea1bf8e630b96666d8ba18d7a1dd9b03cb53",
+        "bytes": 18753
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-draft-Audit-31-02/draft.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/Cargo.toml",
+        "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+        "bytes": 407
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/Cargo.toml"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs",
+        "sha256": "f90cb64edf02e0cd6dad11e8e7d0ec29cdd283e714b3acbd94e478c32cd95c7e",
+        "bytes": 18345
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs",
+        "sha256": "000a926c603f8ff0ec5ec71b7b1da7cdd74db780d1571d3828226d60656f09c3",
+        "bytes": 6954950
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+        "sha256": "b0a61e699166d280c17c2fa64632808e16ff103a5e92ea79f3446d55e1b29d8b",
+        "bytes": 25903
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+        "sha256": "e04dda94f317bc434cfe79c62e732125e4503b7d31e37c24dd36826bcd6ee546",
+        "bytes": 44683
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "a0744428a37abf409cc09f6b436a7181f0a686e3c82eee93ebdee4d27dc8105c",
+        "bytes": 20925
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "bytes": 868
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/before/crates/ep_runtime/src/lib.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/complete-final-compiler-Source-plan.json",
+        "sha256": "dd1cf40d8ec9723c0a49b7aa6421432264227ebf46df577787bdfdcb3d12733a",
+        "bytes": 2630981
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/complete-final-compiler-Source-plan.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/current-WIP-full-readback.json",
+        "sha256": "5c4feb4e2691f94767ba082b85d84e40478169a481cd10103911f78c56598db7",
+        "bytes": 3548000
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/current-WIP-full-readback.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/01.forward.diff",
+        "sha256": "f157e51ab4251870786fc17285f94b81dc5c672a1be149f08946b0cdcb4f60db",
+        "bytes": 1344
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/01.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/01.inverse.diff",
+        "sha256": "2b3a7673ffe9391beda03767d4c2b442e4d90967ac6ce9a19c1a9ff3c55d6390",
+        "bytes": 1344
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/01.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/02.forward.diff",
+        "sha256": "df97c6f4c2c25b59a335fd496ca7c5aeb4cf70ac7cd5b1fbd3715bcccf754f5f",
+        "bytes": 1049
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/02.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/02.inverse.diff",
+        "sha256": "8edba42c3e3c7e6988f6c65cecbc995354b35e6a712ecce1df9bfe47abaef3a7",
+        "bytes": 1049
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/02.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/03.forward.diff",
+        "sha256": "66e56a466252a8d27505d2657e29781733e7328bd088c94148c44cb7b882b076",
+        "bytes": 21498
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/03.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/03.inverse.diff",
+        "sha256": "4312abd02c0baa89a6ae495fb4e8a41b9b111ffb0cac9f1ce2d9a7ced67921d5",
+        "bytes": 21498
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/03.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/04.forward.diff",
+        "sha256": "3516ecb6e618e91e2d40e9bdf3407a962a82766d9c729f725bf6f3524d550ad1",
+        "bytes": 27904794
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/04.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/04.inverse.diff",
+        "sha256": "49992db0e215e273bcc6b75904aac9db00ae7655a737c6fc2cf2e89d7a78e203",
+        "bytes": 27904794
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/04.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/05.forward.diff",
+        "sha256": "0c0d86cbab23cfa3f8cc424348c813196d8f3d71f39392bc238cf21b8f2f8c94",
+        "bytes": 310
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/05.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/05.inverse.diff",
+        "sha256": "184ae67eeda34993214457aee75515f14efc287831b8f8725dd4ad5547300354",
+        "bytes": 310
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/05.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/06.forward.diff",
+        "sha256": "6083e57c501a125a5d6dfa2de1539d05aecf8f52e6fc7e52383fcf10f003db0f",
+        "bytes": 809
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/06.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/06.inverse.diff",
+        "sha256": "131ca4bca5fb62e098a17a6e89f93247f3691fafbc1c16f05632e2ae779d2e06",
+        "bytes": 809
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/06.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/07.forward.diff",
+        "sha256": "1a602deddc75193b8ab607a943a52d6bf6183260cd4652e6fbe2e871ee417216",
+        "bytes": 349
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/07.forward.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/07.inverse.diff",
+        "sha256": "6912179c7af106f654eb731e1431ab1dee750af99323f4ee96930d77b274af29",
+        "bytes": 349
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/diffs/07.inverse.diff"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/Cargo.toml",
+        "sha256": "95393531e0433cd13c3c7dd89793d9e693fd097362470868b0ef23336fc9ae80",
+        "bytes": 407
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/Cargo.toml"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs",
+        "sha256": "f90cb64edf02e0cd6dad11e8e7d0ec29cdd283e714b3acbd94e478c32cd95c7e",
+        "bytes": 18345
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs",
+        "sha256": "000a926c603f8ff0ec5ec71b7b1da7cdd74db780d1571d3828226d60656f09c3",
+        "bytes": 6954950
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+        "sha256": "b0a61e699166d280c17c2fa64632808e16ff103a5e92ea79f3446d55e1b29d8b",
+        "bytes": 25903
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+        "sha256": "e04dda94f317bc434cfe79c62e732125e4503b7d31e37c24dd36826bcd6ee546",
+        "bytes": 44683
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "a0744428a37abf409cc09f6b436a7181f0a686e3c82eee93ebdee4d27dc8105c",
+        "bytes": 20925
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "bytes": 868
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/literal-inverse/crates/ep_runtime/src/lib.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/manifest.json",
+        "sha256": "6d45fb44ec142bb8ea3018223b92f063244dc1ceb9b0173742dbf245e2b10170",
+        "bytes": 30867
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/manifest.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/01.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/01.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/01.stdout",
+        "sha256": "570d4989d96c8d0e8c382a03bb90a767ebe87e9510e1a06712638e046e64e6b7",
+        "bytes": 46746
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/01.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/02.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/02.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/02.stdout",
+        "sha256": "fdd5e3fb86e051465aebf22afcd6c32809a4c2db7654e691b3b2bca2762a1569",
+        "bytes": 21771
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/02.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/03.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/03.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/03.stdout",
+        "sha256": "8603fe5dc897eaf674213aa9ee03de855a5bc3d5baec4a32996fc5a954851dc6",
+        "bytes": 54322
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/03.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/04.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/04.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/04.stdout",
+        "sha256": "9cb98b1fab73a222e2be22e0add508c2d509ffdb6d7da7cdd822fe35a351f962",
+        "bytes": 20949544
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/04.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/06.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/06.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/06.stdout",
+        "sha256": "51eecd095c7dd4a7edd5abbd52f4cc6b4ee8d5dbd97ca90298ec8c6494dd25d1",
+        "bytes": 1511
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/06.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/07.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/07.stderr"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/07.stdout",
+        "sha256": "fd5b84053ddd99c674259b2e2b0b07eb998974abcb01b1f97a0c67c46ab6bb35",
+        "bytes": 19743
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/parse/07.stdout"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/Cargo.toml",
+        "sha256": "e91fc957199f5c5016a1f02ee0fcee614a654b1277e084aeec26350e9bb7cb9a",
+        "bytes": 590
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/Cargo.toml"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs",
+        "sha256": "a5b39c1fada74f0f81bc9ce92eba40464bfa56a67a919c20f7df7735400ce17d",
+        "bytes": 18392
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs",
+        "sha256": "9cb98b1fab73a222e2be22e0add508c2d509ffdb6d7da7cdd822fe35a351f962",
+        "bytes": 20949544
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_prediction_b.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+        "sha256": "2148fec1b68dd41f1201f44b62bf2392f1ddf33051bfa93beb308005102bb6d8",
+        "bytes": 45571
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+        "sha256": "a6d24b8087848b82a069c23140d8299bd5b9ef54d3171ad4eba336a9cc03dbc8",
+        "bytes": 45838
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "ac3bf87383189a9185000e5452d38f8ed209f028d98b3abb8c66effbdf7fbbbe",
+        "bytes": 21690
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/lib.rs",
+        "sha256": "cd28fb288cd1db3dc7bc1d903b7690950417b711575a0673eaee081219616f12",
+        "bytes": 1497
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-cohort-main-held-Audit-31-02/proposed/crates/ep_runtime/src/lib.rs"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-06/source-controlled-zone-corrector-held-Peer-31/complete-final-compiler-Source-plan.json",
+        "sha256": "a470c88d1f37eb13f5b6938292e508e286bd81ce5eed32d8192d1fb557bf3dd0",
+        "bytes": 2630033
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-controlled-zone-corrector-held-Peer-31/complete-final-compiler-Source-plan.json"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/10/10b42ceaf6351f6f94b726529e9b47f8575728bdc89563dacd91d580b7bdcdb1",
+        "sha256": "10b42ceaf6351f6f94b726529e9b47f8575728bdc89563dacd91d580b7bdcdb1",
+        "bytes": 45307
+      },
+      "archive_path": ".runtime/porting/source-objects/10/10b42ceaf6351f6f94b726529e9b47f8575728bdc89563dacd91d580b7bdcdb1"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "bytes": 8557
+      },
+      "archive_path": ".runtime/porting/source-objects/18/18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/2b/2b211bc3b575917b6a146c23ade339430bd56a400a39d51ad5e9bda0778748bc",
+        "sha256": "2b211bc3b575917b6a146c23ade339430bd56a400a39d51ad5e9bda0778748bc",
+        "bytes": 1847005
+      },
+      "archive_path": ".runtime/porting/source-objects/2b/2b211bc3b575917b6a146c23ade339430bd56a400a39d51ad5e9bda0778748bc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/2b/2b2fc6f05ca2395b2a2081d268769049683c3d0ff65750d874222f000462843e",
+        "sha256": "2b2fc6f05ca2395b2a2081d268769049683c3d0ff65750d874222f000462843e",
+        "bytes": 45931
+      },
+      "archive_path": ".runtime/porting/source-objects/2b/2b2fc6f05ca2395b2a2081d268769049683c3d0ff65750d874222f000462843e"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/78/78b1d94317b8f5a459385935a8dc6d32837b46a5fa6721da479869de8575c2bc",
+        "sha256": "78b1d94317b8f5a459385935a8dc6d32837b46a5fa6721da479869de8575c2bc",
+        "bytes": 1847005
+      },
+      "archive_path": ".runtime/porting/source-objects/78/78b1d94317b8f5a459385935a8dc6d32837b46a5fa6721da479869de8575c2bc"
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/8d/8df081f9466519da5660d85951038e3b91e122694166d6633cc0f2666ea50ec9",
+        "sha256": "8df081f9466519da5660d85951038e3b91e122694166d6633cc0f2666ea50ec9",
+        "bytes": 1847006
+      },
+      "archive_path": ".runtime/porting/source-objects/8d/8df081f9466519da5660d85951038e3b91e122694166d6633cc0f2666ea50ec9"
+    },
+    {
+      "original": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json",
+        "sha256": "8ee5e72982e35178e54798faf514019f046771641f48e0203f195bbb30963c2d",
+        "bytes": 4705
+      },
+      "archive_path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json"
+    }
+  ],
+  "scope": "Seven reviewed existing files, four actual rewrites, complete unchanged cohort fixture and safe runner, direct current custody, three preserved executed worker failures and one successful custom invocation. No previous ZIP/raw390MB/rlib/exe/Native or CLI replay.",
+  "large_binary_raw_or_recursive_archives_included": false
+}

@@ -398,5 +398,5 @@ impl SourceZoneAirPredictorCorrector {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_cohort;

@@ -467,3 +467,18 @@ impl SurfaceGeometryInputState {
         Ok(()) // End only of selected GetHT input loop; not GetSurfaceData.
     }
 }
+
+// Test-only function-entry restoration, not a production geometry-getter execution claim.
+#[cfg(test)]
+impl SurfaceGeometryInputState {
+    pub(crate) fn restore_native_cohort_opaque_surfaces(&mut self, rows:&[(f64,SurfaceClass,i32)]) {
+        self.final_surfaces=Some(vec![final_mapping::FinalSurface::default();rows.len()]);
+        self.parallel_arrays=Some(parallel_arrays::SurfaceParallelArrays::allocate(rows.len()));
+        if let (Some(surfaces),Some(parallel))=(&mut self.final_surfaces,&mut self.parallel_arrays) {
+            for (at,(area,class,reference)) in rows.iter().enumerate() {
+                surfaces[at].row.area=*area;surfaces[at].row.class=*class;
+                parallel.surf_t_air_ref[at]=*reference;
+            }
+        }
+    }
+}

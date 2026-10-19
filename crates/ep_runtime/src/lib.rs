@@ -39,3 +39,13 @@ pub use runtime::*;
 pub use simulation_state::*;
 pub use time_axis::*;
 pub use zone_equipment::*;
+
+// Explicit test target only: keep the Native single-process-main FP context.
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
+    println!("running 1 native controlled-air cohort on process main");
+    crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_controlled_air_cohort()?;
+    println!("cohort native_controlled_air_cohort ... ok");
+    println!("cohort result: ok. 1 passed; 0 failed; predictor entries=1168; whole corrector entries=1168; positive inlet cases=810");
+    Ok(())
+}

@@ -161,3 +161,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 구역 온습도 보정 검증](evidence/SRC-06-canonical-controlled-zone-corrector-31/summary.json). 공급 유량 합과 현열·수분 보정은 같은 Config·Node·AirHB 및 정상 Cp·포화압 캐시를 사용합니다. 계산값과 보고 필드의 쓰기 순서를 보존하며, 미구현 포화압 진단 경계는 실제 호출 직전에 명시합니다.
+
+
+[Native 코호트 실행 문맥](evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json). 안정 Rust의 전용 `harness=false` 타깃은 같은 실제 소유자·진입값·검증 본문을 프로세스 메인에서 실행한다. FPU 제어·생산 API·습공기 물성 계산·허용오차를 수정하지 않으며 Native의 캐시 적중·경고 이력이나 FPU 레지스터 일치는 주장하지 않는다.
