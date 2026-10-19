@@ -268,3 +268,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source 온도 설정값 경로 검증](evidence/SRC-06-canonical-thermostat-current-19/summary.json). 온도 제어 환경 초기화와 현재 설정값 경로를 연결했습니다. 실제 B 경계와 A24 검증 결과는 공개 요약에 기록합니다.
+
+
+[Source 제어 부하 예측 검증](evidence/SRC-06-canonical-controlled-prediction-21/summary.json). 제어 부하 예측과 실제 Node 설정값 갱신을 연결했습니다. B·A24 CLI 결과와 남은 경계는 공개 요약에 기록합니다.

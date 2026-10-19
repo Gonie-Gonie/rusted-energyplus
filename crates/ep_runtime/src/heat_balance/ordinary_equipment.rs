@@ -493,6 +493,15 @@ impl SourceZoneEquipmentConfigRef<'_> {
     }
 }
 
+/// Temporary disjoint references into the sole actual DataLoopNode.Node row.
+/// Prediction rollback and setpoint handoff mutate this same physical owner.
+pub(crate) struct SourceZoneAirNodeMut<'a> {
+    pub(crate) temperature: &'a mut f64,
+    pub(crate) humidity_ratio: &'a mut f64,
+    pub(crate) enthalpy: &'a mut f64,
+    pub(crate) temperature_setpoint: &'a mut f64,
+}
+
 /// A borrow of actual Config storage, never a flags projection or snapshot.
 pub(crate) struct ZoneEquipmentView<'a> {
     zone_ids: &'a [ZoneId],
@@ -523,6 +532,22 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    pub(crate) fn source_zone_air_node_mut(
+        &mut self,
+        ordinal: i32,
+    ) -> Result<SourceZoneAirNodeMut<'_>, super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let at = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
+            .ok_or(E::Unavailable("actual prediction Node positive ordinal"))?;
+        let row = self.nodes.physical.as_deref_mut().and_then(|rows| rows.get_mut(at))
+            .ok_or(E::Unavailable("actual prediction same physical Node allocation"))?;
+        Ok(SourceZoneAirNodeMut {
+            temperature: &mut row.temperature,
+            humidity_ratio: &mut row.humidity_ratio,
+            enthalpy: &mut row.enthalpy,
+            temperature_setpoint: &mut row.temperature_setpoint,
+        })
+    }
     /// Actual VerifyControlledZoneForThermostat5702 exact-name search.
     pub(crate) fn verify_source_controlled_zone_for_thermostat(&self, name: &str) -> bool {
         self.zone_config.as_ref().is_some_and(|rows| rows.iter().any(|row| row.zone_name == name))

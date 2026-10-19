@@ -437,3 +437,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 온도 설정값 경로 검증](../evidence/SRC-06-canonical-thermostat-current-19/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: positive controlled predicted load6862`입니다. 전체 B 완료와 내부 수치의 Native 동등성은 별도 검증 대상으로 남습니다.
+
+
+[Source 제어 부하 예측 검증](../evidence/SRC-06-canonical-controlled-prediction-21/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: actual ZoneCompAvailMgrs positive allocation405`입니다. 내부 수치의 Native 검증과 전체 B 완료는 별도 과제로 남습니다.

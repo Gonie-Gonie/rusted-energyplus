@@ -16,7 +16,7 @@ use crate::heat_balance::selected_input_processor::{
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
 use crate::psychrometrics::{
     EnergyPlusPsychrometricFunction, SourcePsychrometricAccess, energyplus_psy_cp_air_fn_w,
-    energyplus_psy_hg_air_fn_w_tdb, energyplus_psy_rho_air_fn_pb_tdb_w,
+    energyplus_psy_h_fn_tdb_w, energyplus_psy_hg_air_fn_w_tdb, energyplus_psy_rho_air_fn_pb_tdb_w,
 };
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 mod component_report;
@@ -42,7 +42,7 @@ pub(crate) use subsystems::SourceZoneAirSubsystems;
 
 pub(crate) struct SourceZoneAirOwners<'a, 'b> {
     pub(crate) zones: &'a mut SelectedZoneInputOwners,
-    pub(crate) equipment: &'a crate::heat_balance::ordinary_equipment::OrdinaryEquipment,
+    pub(crate) equipment: &'a mut crate::heat_balance::ordinary_equipment::OrdinaryEquipment,
     pub(crate) geometry: &'a SurfaceGeometryInputState,
     pub(crate) surface_arrays: &'a SourceSurfaceHeatBalanceArrays,
     pub(crate) fan: &'a mut super::environment::SourceZoneFanHeatBalanceArrays,

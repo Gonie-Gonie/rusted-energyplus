@@ -1,0 +1,89 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 4,
+  "existing_Rust_sources": 4,
+  "new_Rust_sources": 0,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Two actual CLI runs B then A24. No unrelated test-profile rerun or habitual alltargets check.",
+  "scope": "Genuine same-owner controlled predicted-load branches, live physical Node setpoint update and shortened-step Node/history rollback; exact existing demand reporting and ordered flags/multiplier/sequence writes. Controlled corrector/sums and MoreNode remain separate held work.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-controlled-prediction.v1",
+  "status": "Genuine Source controlled predicted-load path; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-prediction-held-Peer-21/manifest.json",
+    "sha256": "c9bef4b49d4c26bfd32a4a517e632a84ef43d95f51a6fe8919cbe90836c1c186",
+    "bytes": 32750
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-controlled-prediction-Source-review-21/review.json",
+    "sha256": "3e660012aacbf305cebf7e3ca7a8a4e0e515aa3dbebe0aac112896940fa92aa2",
+    "bytes": 31241
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-prediction-held-Peer-21/complete-final-compiler-Source-plan.json",
+    "sha256": "afb30134dd462b67e572dccc5293e692865c6001a983ba1a039efce6dad8a0ee",
+    "bytes": 2553038
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-B-NOLIMIT-24H-command-Root-21/receipt.json",
+    "sha256": "7f465ed1c71ef20cec1d96565e913c7d142ccb41b1f8f229ab9a305b8aa4b25f",
+    "bytes": 4344
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-A-24H-command-Root-21/receipt.json",
+    "sha256": "df920531202fb7743b38ed075f8f5ee78ce9ea5897362180acc49eecfafa1947",
+    "bytes": 4293
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-prediction-actual-review-21/review.json",
+    "sha256": "459bd7e7f37a7cb9528198687be451a7fecfc9e9155b83f246e2229a6a76195b",
+    "bytes": 17019
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: actual ZoneCompAvailMgrs positive allocation405",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted19_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-current-actual-review-19/review.json",
+      "sha256": "0f2c5abf5ed98916ca0bf78316c9a431ec9294be470026342e2452eb7db5632d",
+      "bytes": 16564
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal19": 7,
+    "CSV_files_whole_equal19": 2,
+    "scope": "Proof transfer from accepted19; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-prediction-B-NOLIMIT-24H-Root-21/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither positive controlled predicted-load Native numerical equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-prediction-21/evidence.zip",
+    "sha256": "76c6b69afdd423bb6d782fa0028905dcd54f30eb4a2bb38a1e5e6c3ecd85be30",
+    "bytes": 1389926
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-prediction-21/manifest.json",
+    "sha256": "ebce2588f51fc7e582ef9e7ec136f9f49beeb29ee3fab77df3ae1a6afdaaf8b2",
+    "bytes": 23779
+  },
+  "archive_entries": 97,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-controlled-prediction-checkpoint-Outer-21.py",
+    "sha256": "525f2b7a288a1e6c02ee11924eb851fcc74975de934fa2917c1f53399112e70f",
+    "bytes": 12031
+  }
+}

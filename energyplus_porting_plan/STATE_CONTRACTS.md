@@ -125,3 +125,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 온도 설정값 경로 검증](evidence/SRC-06-canonical-thermostat-current-19/summary.json). 현재 설정값은 같은 Schedule·OptStart·Faults 소유자를 참조합니다. Dual 냉방·난방 갱신과 EMS 대입 순서를 보존합니다.
+
+
+[Source 제어 부하 예측 검증](evidence/SRC-06-canonical-controlled-prediction-21/summary.json). 예측은 같은 Node·온도 제어·수요 소유자를 사용합니다. 단계 단축 시 상태 복원과 부하·설정값 대입 순서를 보존합니다.

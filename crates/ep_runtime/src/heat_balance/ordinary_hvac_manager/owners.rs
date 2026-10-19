@@ -91,7 +91,7 @@ impl SourceHvacOwners<'_, '_> {
         let use_zone_history = self.hvac.use_zone_time_step_history;
         let mut owners = SourceZoneAirOwners {
             zones: self.zones,
-            equipment: self.equipment,
+            equipment: &mut *self.equipment,
             geometry: self.geometry,
             surface_arrays: self.surface_arrays,
             fan: self.fan,
