@@ -12831,6 +12831,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-prediction-21/summary.json",
         "sha256": "cfcbc9d825f92087d563785a63c2a86335a48e12c1bb4a2906949aedf27854a8",
         "size_bytes": 4379
+      },
+      "canonical_component_availability_22": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-component-availability-22/summary.json",
+        "sha256": "a51099e9adc8f17fbf06a59eb2aa7817078a17ab8eee052b48a4594fb57bef92",
+        "size_bytes": 4402
       }
     },
     {

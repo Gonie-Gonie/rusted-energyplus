@@ -440,3 +440,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source 제어 부하 예측 검증](../evidence/SRC-06-canonical-controlled-prediction-21/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: actual ZoneCompAvailMgrs positive allocation405`입니다. 내부 수치의 Native 검증과 전체 B 완료는 별도 과제로 남습니다.
+
+
+[Source 설비 가용성 경로 검증](../evidence/SRC-06-canonical-component-availability-22/summary.json). 실제 B 미완료 경계는 `GetHeatBalanceInput: actual controlled ZoneEquipList count223`입니다. 전체 B 완료와 Node 상태의 Native 검증은 아직 주장하지 않습니다.

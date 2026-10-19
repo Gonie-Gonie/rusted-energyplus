@@ -128,3 +128,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 제어 부하 예측 검증](evidence/SRC-06-canonical-controlled-prediction-21/summary.json). 예측은 같은 Node·온도 제어·수요 소유자를 사용합니다. 단계 단축 시 상태 복원과 부하·설정값 대입 순서를 보존합니다.
+
+
+[Source 설비 가용성 경로 검증](evidence/SRC-06-canonical-component-availability-22/summary.json). 기존 가용성 소유자와 실제 생성자·입력 플래그를 사용합니다. 설비별 상태 초기화와 구역·하이브리드 조건의 원래 순서를 보존합니다.

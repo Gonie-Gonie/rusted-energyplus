@@ -1,0 +1,89 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 1,
+  "existing_Rust_sources": 1,
+  "new_Rust_sources": 0,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Two actual CLI runs B then A24. No unrelated test-profile rerun or habitual alltargets check.",
+  "scope": "Genuine same-owner positive component count-sized availability allocation, complete existing constructor rows and no-manager status lifecycle through return. Existing definitions/count order/GetInput latch and true ZoneNum/hybrid short circuits retained. No disconnected getter or readiness state.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-component-availability.v1",
+  "status": "Genuine Source component availability lifecycle; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-component-availability-held-Peer-22/manifest.json",
+    "sha256": "529c9857848d73f4177ac3d38571962bb78375029fc99044607470a7bf49af2a",
+    "bytes": 14013
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-component-availability-Source-review-22/review.json",
+    "sha256": "995536f44f1e3d576b1c9511183f6265c40f0910ea35da32e28819facc11c4f2",
+    "bytes": 21000
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-component-availability-held-Peer-22/complete-final-compiler-Source-plan.json",
+    "sha256": "913309454c730e896895f0fa1bfa58800c6d6dac19a511121ebd06e6f2cdb5f1",
+    "bytes": 2552898
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-component-availability-B-NOLIMIT-24H-command-Root-22/receipt.json",
+    "sha256": "6a4a14c6ebd68d78e9bd9acecfe777b09929f5e0ed6aa058db072b14dacb6705",
+    "bytes": 3847
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-component-availability-A-24H-command-Root-22/receipt.json",
+    "sha256": "8897e86c97099a093d7d4f63628a3dd9786b8bb52751363540b4bd6feb9b7bfe",
+    "bytes": 3796
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-component-availability-actual-review-22/review.json",
+    "sha256": "4bc5bb47687afbb5bc29334ce8ea52662be31d31542b1459e057bd191eb4eb05",
+    "bytes": 17101
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: actual controlled ZoneEquipList count223",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted21_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-prediction-actual-review-21/review.json",
+      "sha256": "459bd7e7f37a7cb9528198687be451a7fecfc9e9155b83f246e2229a6a76195b",
+      "bytes": 17019
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal21": 7,
+    "CSV_files_whole_equal21": 2,
+    "scope": "Proof transfer from accepted21; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-component-availability-B-NOLIMIT-24H-Root-22/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither positive component-availability Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-component-availability-22/evidence.zip",
+    "sha256": "581477e8d1ccd4dc85bbed521c1a947b611a9698efd23901a24a461f237ebb81",
+    "bytes": 1232466
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-component-availability-22/manifest.json",
+    "sha256": "72b5e2959cc48b2d6bafe974e419fb1cf29ec73d48c38dde1790c5f55617f547",
+    "bytes": 15790
+  },
+  "archive_entries": 65,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-component-availability-checkpoint-Peer-22.py",
+    "sha256": "2f384571fef963e31e0989c5cf001dd3cd1b6e7a6c49b1f929b7113b9ba6eaac",
+    "bytes": 12032
+  }
+}

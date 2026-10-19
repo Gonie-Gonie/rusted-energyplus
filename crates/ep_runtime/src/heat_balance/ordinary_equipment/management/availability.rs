@@ -1,4 +1,4 @@
-//! Actual SystemAvailabilityManager136–309/310–1220/1561–1680 empty-manager path.
+//! Actual same-owner SystemAvailabilityManager component allocation and no-manager lifecycle.
 use crate::heat_balance::ordinary_hvac_manager::{SourceHvacManager, SourceHvacOwners};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
@@ -138,9 +138,9 @@ impl SourceAvailability {
                         Error::Unavailable("actual availability component count int domain")
                     })?;
                 if row.total_components > 0 {
-                    return Err(Error::Unavailable(
-                        "actual ZoneCompAvailMgrs positive allocation405",
-                    ));
+                    let count = usize::try_from(row.total_components)
+                        .map_err(|_| Error::Unavailable("actual ZoneCompAvailMgrs allocation405 integer domain"))?;
+                    row.managers = Some(vec![SourceZoneComponentManager::default(); count]);
                 }
             }
         }
@@ -232,14 +232,32 @@ impl SourceHvacManager {
             if row.total_components == 0 {
                 continue;
             }
-            if row.managers.is_none() {
+            let Some(managers) = row.managers.as_mut() else {
                 continue;
+            };
+            for component_number in 1..=row.total_components {
+                let at = component_number.checked_sub(1)
+                    .and_then(|number| usize::try_from(number).ok())
+                    .ok_or(Error::Unavailable("actual zone availability component ordinal257"))?;
+                let manager = managers.get_mut(at)
+                    .ok_or(Error::Unavailable("actual same ZoneCompAvailMgrs259"))?;
+                if manager.number_managers > 0 {
+                    let _previous_status = manager.status;
+                    manager.status = 0; // Native Status::NoAction265 precedes first manager record.
+                    return Err(Error::Unavailable("positive zone availability availManagers first record268"));
+                } else {
+                    manager.status = 0; // Literal no-manager branch287, not a forced readiness flag.
+                }
+                if manager.zone_number == 0 {
+                    continue;
+                }
+                if self.ancillary.hybrid_ventilation.number_hybrid_ventilation_managers == 0 {
+                    continue;
+                }
+                return Err(Error::Unavailable("positive zone availability HybridVentData first record298"));
             }
-            return Err(Error::Unavailable(
-                "actual positive zone availability manager257",
-            ));
         }
-        // Hybrid flags/count remain sole existing ancillary.hybrid_ventilation; zero components never read its inner branch.
+        // The hybrid count is borrowed from the same retained ancillary owner only after real ZoneNum != 0.
         Ok(())
     }
 }
