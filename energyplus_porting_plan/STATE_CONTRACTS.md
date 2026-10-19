@@ -182,3 +182,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source39 controlled system reports](evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 보고 함수는 같은 수요·PurchasedAir·Node·평균 공기·ZonePreDefRep 소유자를 빌린다. 외기 유량 0의 습공기 물성 호출, 정수 배수 곱, 0.1 기준과 누적 순서를 보존하며, 실제 입력 플래그가 참인 장비 조회는 GetPurchasedAir 자식 경계에서 중단한다.
+
+
+[Source41 node setpoint endrun](evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). NodeSetpointCheck의 기존 선택적 저장소와 실제 노드별 플래그를 그대로 사용한다. 필요한 플래그를 먼저 지운 뒤 9개 제어의 복합 OR 순서를 보존하며, 같은 NodeID와 RuntimeLanguage를 빌린다. 대체 노드 목록이나 임의 초기값은 추가하지 않는다.

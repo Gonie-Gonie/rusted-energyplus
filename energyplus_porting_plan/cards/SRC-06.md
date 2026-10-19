@@ -494,3 +494,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source39 controlled system reports](../evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 실제 수요·장비·물리 노드·구역 평균 상태를 빌려 정상 제어 구역의 에너지·환기 보고 계산과 누적 순서를 연결했다. 외기 유량이 0이어도 혼합 공기와 현재 환류 상태를 읽고 밀도를 계산한다. B 실행 결과: `GetHeatBalanceInput: actual checkSetpointNodesAtEnd first NodeSetpointCheck1588`. A24는 기존 보고값 5,352개의 증거를 이어받으며, 새 보고 계산의 Native 수치 대조는 별도 관측·재생 검증 대기 상태다. 보존된 Native BND 본문 8,518바이트·106줄과 일치하며, 이 비교는 보고 I/O 범위다.
+
+
+[Source41 node setpoint endrun](../evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). 같은 노드 검사 상태와 RuntimeLanguage를 사용해 종료 시 setpoint 검사의 전체 정상 순회를 연결했다. 실제로 요청된 제어만 순서대로 검사하고, 미구현 액추에이터·경고·최종 오류는 해당 연산 경계로 남긴다. B 실행 결과: `GetHeatBalanceInput: actual FillRemaining controlled ZoneEquipConfig.NumInletNodes6370`. A24의 기존 5,352개 보고값 증거를 이어받으며 새 테스트나 수치 계산 변경은 없다.

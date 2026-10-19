@@ -141,10 +141,16 @@ impl SourceInitializationFiles {
         .check_source_unused_actuators_at_end()
         .map_err(hb_input_error)?;
         required(
-            reports.source_zone_equipment.as_ref(),
+            reports.source_zone_equipment.as_mut(),
             "actual same Node owner before setpoint nodes590",
         )?
-        .check_source_setpoint_nodes_at_end()
+        .check_source_setpoint_nodes_at_end(
+            &required(
+                reports.selected_simulation_startup.as_ref(),
+                "actual same RuntimeLanguage before setpoint node helper590",
+            )?
+            .runtime_language,
+        )
         .map_err(hb_input_error)?;
         reports
             .output_registration

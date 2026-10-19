@@ -325,3 +325,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source39 controlled system reports](evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 정상 제어 구역 보고 경로를 기존 Rust 파일 6개로 연결하고 실제 B/A24 경로를 확인했다. 이번 단위의 추가 테스트는 없으며 게이트 수는 유지한다. 보고 계산의 Native 수치 검증은 아직 완료로 표시하지 않는다.
+
+
+[Source41 node setpoint endrun](evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json). 노드 setpoint 종료 검사를 기존 Rust 파일 2개로 연결하고 실제 B/A24 실행 결과를 기록한다. 추가 테스트 없이 기존 게이트 수를 유지하며 별도 보고 수치 검증을 완료로 표시하지 않는다. 최초 A24의 빌드 경로 오류 기록은 보존하고, 교정된 A24-02를 승인된 결과로 사용한다.

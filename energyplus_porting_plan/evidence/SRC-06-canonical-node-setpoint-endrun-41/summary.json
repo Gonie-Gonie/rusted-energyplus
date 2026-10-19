@@ -1,0 +1,129 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "selected_existing_production_Sources": 2,
+  "new_production_Source_files": 0,
+  "selected_production_Sources": 2,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "scope": "Full actual NumOfNodes and retained deferred-check state traversal; exact nine positional controls/non-short-circuit OR, same NodeID and RuntimeLanguage count helper operands, actual available-record/warning/post-loop fatal child boundaries. No AnyEMS or zero-counter surrogate.",
+  "qualification": "No new mathematical kernel, property cache, owner, array or test. Prior Air prediction/correction cohort is unchanged and not rerun; separate report-unit40 work is neither executed nor claimed complete by this checkpoint. Actual B outcome may be a genuine later boundary or successful620, recorded only after Root actual. A24 inherited5352 proof transfers only after exact equal39 comparisons.",
+  "Native_BND_qualification": "Any retained Native BND comparison is taken only from the accepted actual41 record and is reported IO only; no internal Node-state equivalence or new Native engine run is claimed.",
+  "actual_engine_CLI_invocations": 3,
+  "accepted_engine_CLI_receipts": 2,
+  "supplemental_wrong_target_A24": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/canonical-source-node-setpoint-endrun-A-24H-command-Root-41/receipt.json",
+      "sha256": "a77e9af21958eec4ba81c0113a6d6c6e978bb3683494a2eab850a76c35c6ba9f",
+      "bytes": 3784
+    },
+    "qualification": "Historical actual A24 exit0/stable, but CARGO_TARGET_DIR was null and it compiled target/. It is excluded from the accepted canonical B-core reuse; accepted A24-02 uses the canonical Cargo target. This supplemental invocation is retained, not silently discarded."
+  },
+  "schema": "src06-canonical-node-setpoint-endrun.v1",
+  "status": "Genuine deferred node setpoint endrun traversal on the same actual retained owners; actual B result recorded",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-node-setpoint-endrun-held-Outer-41/manifest.json",
+    "sha256": "403299c451635cb22c1896d06a4904be6e364037242f663732eb0b1dfc228d93",
+    "bytes": 19213
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Root-node-setpoint-endrun-Source-review-41/review.json",
+    "sha256": "8b09ac5d3c6d04abb4df72cd4c10d2c27bd78281aebaa4252fa567e0840696fb",
+    "bytes": 19493
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-node-setpoint-endrun-held-Outer-41/complete-final-compiler-Source-plan.json",
+    "sha256": "112bcb894bf62b6e3d4cff07a8ef74f98cba6d9b4b39b7a7e4904095037e10f6",
+    "bytes": 2635390
+  },
+  "accepted_parent_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-system-report-actual-review-39/review.json",
+    "sha256": "123bca67176a27e8e40b8823fafb985ea61389d78374490e874b625e8eb8ced2",
+    "bytes": 19711
+  },
+  "accepted_parent_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/complete-final-compiler-Source-plan.json",
+    "sha256": "bce973594c3271e8b95d8d081d69ae4caf419a61d0b3a1ac45a1d3b25874de80",
+    "bytes": 2635279
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-node-setpoint-endrun-B-NOLIMIT-24H-command-Root-41/receipt.json",
+    "sha256": "32ee7b48215181cfdda4cca6fd71d932c66d6d7db50ed527102cb03d6979e9ad",
+    "bytes": 3995
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-node-setpoint-endrun-A-24H-command-Root-41-02/receipt.json",
+    "sha256": "7d1c4baaaa796e341ee228c4ecab26cef2e0cffb8dd9232b66d76c552069ff1c",
+    "bytes": 3952
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/review.json",
+    "sha256": "574277c9e4ca17c9007371f482ef7c02b3b38656a96ea394f3a8e21022e4e001",
+    "bytes": 20808
+  },
+  "actual_B_completed": false,
+  "actual_B_result": "GetHeatBalanceInput: actual FillRemaining controlled ZoneEquipConfig.NumInletNodes6370",
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted39_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-system-report-actual-review-39/review.json",
+      "sha256": "123bca67176a27e8e40b8823fafb985ea61389d78374490e874b625e8eb8ced2",
+      "bytes": 19711
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal39": 7,
+    "CSV_files_whole_equal39": 2,
+    "scope": "Accepted39 A24 proof transfer. No new Native/72H/annual or internal-state comparison."
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-node-setpoint-endrun-41/evidence.zip",
+    "sha256": "13a88b9cf6094d4cc16837eaded03261f85307b8d6098ac0e01902e74795ebc7",
+    "bytes": 1660267
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-node-setpoint-endrun-41/manifest.json",
+    "sha256": "1ef7b6d413c891be56e3e9fe27a2722ca887ed188d41e53fde27c3369285d199",
+    "bytes": 24824
+  },
+  "archive_entries": 102,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-node-setpoint-endrun-checkpoint-Outer-41-02.py",
+    "sha256": "750330a9382a021c52ec2a6c1068db3506b00c52c637a1bd5b0a71f993f88b07",
+    "bytes": 10970
+  },
+  "Native_BND_full_body_comparison": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-node-setpoint-endrun-B-NOLIMIT-24H-Root-41/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    "BND_bytes": 8559,
+    "BND_node_block_present": true,
+    "Native_paired_Node_state_or_IO_claim": "Entire BND reported IO body only; no internal thermodynamic Node state claim",
+    "Native_capture": {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    "Native_original_BND": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H/eplusout.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    "full_BND_body_bytes_equal": true,
+    "compared_body_bytes": 8518,
+    "compared_body_lines": 106,
+    "excluded_headers": [
+      "Program Version,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.10.19 14:12\r",
+      "Program Version,rusted-energyplus 0.1.0\r"
+    ],
+    "Native_BND_finite_copy": {
+      "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    }
+  }
+}

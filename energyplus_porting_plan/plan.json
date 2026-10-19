@@ -12921,6 +12921,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-system-report-39/summary.json",
         "sha256": "3d1d953849ab2681d0b94f2318870fc0c0abd85d67e4e366deef2c3929550bed",
         "size_bytes": 6706
+      },
+      "canonical_node_setpoint_endrun_41": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json",
+        "sha256": "b53b61f21d550acceabde113cbd02a770f39b63133deef5c02ce1d7ef8064278",
+        "size_bytes": 6841
       }
     },
     {
