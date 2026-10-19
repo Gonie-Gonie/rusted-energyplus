@@ -44,6 +44,13 @@ pub use zone_equipment::*;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let selection=std::env::args().skip(1).collect::<Vec<_>>();
+    if selection.len()==1 && selection[0]=="--predictor-parent-only" {
+        println!("running 1 full native predictor-parent cohort on process main");
+        let cases=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_full_predictor_parent_cohort()?;
+        println!("cohort native_controlled_air_cohort ... ok");
+        println!("cohort result: ok. 1 passed; 0 failed; genuine full predictor parents={cases}; code-derived literal postconditions=4 per call; private cache trace unobserved");
+        return Ok(());
+    }
     if selection.len()==1 && selection[0]=="--sizer-only" {
         println!("running 1 native hard-size cohort on process main");
         let cases=crate::heat_balance::selected_sizing::SelectedSizingManager::run_native_hard_size_cohort()?;

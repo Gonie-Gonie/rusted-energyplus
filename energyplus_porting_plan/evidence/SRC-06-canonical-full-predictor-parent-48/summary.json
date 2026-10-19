@@ -1,0 +1,126 @@
+{
+  "schema": "src06-canonical-full-predictor-parent48.v1",
+  "accepted": true,
+  "findings": [],
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-cohort-application-P2/receipt.json",
+    "sha256": "b93959d6f6f9f41ced24a3c7dbbf3c2d01c6329a66e8d73e963a1d0bc2be6d4a",
+    "bytes": 2072
+  },
+  "prepared": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-prepared-WAIT-Peer-P2/prepared.json",
+    "sha256": "df4315dcd0b9cf2bd3ef4fbd9dbd47d0ae27d867f9f1b4d0cfb0752f78b83aa5",
+    "bytes": 11380
+  },
+  "base_HEAD": "58b9d6adc2f24241f2d4cedd97de65e3a0703d41",
+  "parent_End47_actual": {
+    "path": ".runtime/porting/SRC-06/Root-source-normal-completion-actual-review-47/review.json",
+    "sha256": "43d8e0ed57d06aaa72fa7d2616cbdda9b32d5285ab07d050df992e62995eac58",
+    "bytes": 58160
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-prepared-WAIT-Peer-P2/complete-proposed-compiler-Source-plan.json",
+    "sha256": "70d6b6ab3943fe061735b3c6b1dab41b15244bb5f0664c5fd6b74edd6165b22f",
+    "bytes": 2573746
+  },
+  "actual_receipt": {
+    "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/receipt.json",
+    "sha256": "20a831f4e742b7cac7f0488f2a4596afa257e83a734e26fa10001b1afb1c1e93",
+    "bytes": 3909
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/73/739b71e79a723a3e46769d909635c8ed3ae24a1abe183c04b60780abb438e9de",
+    "sha256": "739b71e79a723a3e46769d909635c8ed3ae24a1abe183c04b60780abb438e9de"
+  },
+  "all4525_live_and_archived_inputs_exact": true,
+  "Rust_sources": 4512,
+  "independent_semantic_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-full-predictor-parent-Source-review-Outer-P2-01/review.json",
+    "sha256": "1e6624ddb409a48fc2a3337968343ca32a95feb3d3a26f4334e2b0fd80118e85",
+    "bytes": 18089
+  },
+  "original_draft": {
+    "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/draft.json",
+    "sha256": "5e8162c8cb3c3c68dd20321f5e0e7cccef3256c49169626e028e9b7602aedb72",
+    "bytes": 12129
+  },
+  "actual_focused_invocations": 1,
+  "actual_full_parent_cases": 1168,
+  "shortened_actual_parent_cases": 77,
+  "code_derived_unobserved_literal_postconditions_per_case": 4,
+  "code_derived_postconditions_counted_as_Native_observed_bits": false,
+  "Native_captured_binary64_comparison_denominator_claimed": false,
+  "retained_Native_projection": {
+    "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/projection.json",
+    "sha256": "62351c3473513356b219e14a0423a27fad5153d7fb13f1a15b939986fdaef6bc",
+    "bytes": 3460
+  },
+  "retained_Native_readset": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/readset.json",
+    "sha256": "f28ac4ac6f7b5b9a679af1dc2f960401a35364b33e10bd33f2a68c5c81d4255e",
+    "bytes": 211142
+  },
+  "separate_literal_proof": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/unobserved-literal-proof.json",
+    "sha256": "3a89488c710489fa919f6b498236239466c419225030bde1ad6154595358ad61",
+    "bytes": 9515
+  },
+  "raw_IDF_absent_family_proof": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/actual-IDF-zero-control-census.json",
+    "sha256": "e76e6556fdc76ef6034905abfe7e173c96df6a186e3c9dfde560f6c95fc171ae",
+    "bytes": 5467
+  },
+  "row_allocation_proof": {
+    "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/genuine-row-allocation-proof.json",
+    "sha256": "6040d7b2369143eee0b5229e1dca6e4edf551740577fc774aed6a2a43c4e4637",
+    "bytes": 5321
+  },
+  "stdout": {
+    "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/stdout.log",
+    "sha256": "c124215a103eb623011fd0024e6c2adc44bd82134ea33fc716135dd676d9cbe8",
+    "bytes": 260
+  },
+  "stderr": {
+    "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/stderr.log",
+    "sha256": "0d9fa691a7b329c8136e0c85acf64149e635bb06a27ed19da851884dcf4cfa95",
+    "bytes": 1503670
+  },
+  "selected_test_only_Source_files": 4,
+  "actual_existing2336_471_59_bodies_reexecuted": 0,
+  "new_test_functions": 0,
+  "new_targets_or_features": 0,
+  "normal_CLI_reruns": 0,
+  "compiler_artifact_capture_requested": false,
+  "private_cache_trace_observed": false,
+  "qualification": "Independent retained whole Native-parent entry replay on the same real Source owner allocations; no whole history/lifecycle integration claim. Four code-derived unobserved postconditions remain separate. This one actual main-context pass does not promote card gates or certify all branch inputs.",
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/check-full-predictor-parent-actual-Root-P2.py",
+    "sha256": "5b986c1b5f105c1a8080a352262c982ab51ee6067f4339c6c87464564d0c5028",
+    "bytes": 6667
+  },
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": 0,
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-full-predictor-parent-48/evidence.zip",
+    "sha256": "aff2b23df36300481f62082950b2991fc03edc5a2af1e1b6334e9d50b86f03dd",
+    "bytes": 2586669
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-full-predictor-parent-48/manifest.json",
+    "sha256": "976ab58a43369053a642878d1a921c37d45bb34927de769196d62fad8e0bec80",
+    "bytes": 18526
+  },
+  "archive_entries": 72,
+  "retained390MB_Native_whole_SHA_bytes_rechecked": true,
+  "actual_Native_engine_reruns": 0,
+  "normal_production_behavior_changed": false,
+  "selected_Source_files": [
+    "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/full_predictor.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_full_predictor_b.rs",
+    "crates/ep_runtime/src/lib.rs"
+  ],
+  "final_checkpoint": false
+}

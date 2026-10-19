@@ -349,3 +349,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source47 정상 완료](evidence/SRC-06-canonical-normal-completion-47/summary.json). 정상 Source 완료 경로와 7개 CLI/3개 A 기간 보고값 검증을 추가했다. 기존 게이트와 남은 과학 단위 의무는 유지한다.
+
+
+[Source48 full predictor parent](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json). 실제 Native 예측기 상위 호출 1,168건을 기존 단일 검증 대상에 추가했다. 기존 2,336/471/59건은 재실행하지 않았으며 게이트는 유지한다.

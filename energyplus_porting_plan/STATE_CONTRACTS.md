@@ -206,3 +206,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source47 정상 완료](evidence/SRC-06-canonical-normal-completion-47/summary.json). 실제 진단 6계수·runtimeTimer·SimInfo·END/ERR 호스트를 같은 수명으로 마감한다. 양수 미지원 자식 경계와 실제 elapsed/부속 파일 차이는 보존한다.
+
+
+[Source48 full predictor parent](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json). 상위 예측기가 세 계수를 직접 생성하고 실제 할당된 Air/Node/수요 소유자를 유지하는지 확인했다. 미관측 상수 후조건 4개는 Native 관측 비트수와 분리한다.

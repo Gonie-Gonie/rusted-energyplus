@@ -12961,6 +12961,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-normal-completion-47/summary.json",
         "sha256": "0a258a8a920c295ed39bccc69926953ff5e0dbbd10d7ea984e0100daca88c3fe",
         "size_bytes": 12006
+      },
+      "canonical_full_predictor_parent_48": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-full-predictor-parent-48/summary.json",
+        "sha256": "e532a5a8821076a6d8d28e74b187be85824149bee2ab77625c9c64e3dc409b86",
+        "bytes": 6096
       }
     },
     {

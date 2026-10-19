@@ -664,3 +664,11 @@ impl SourceZoneAirPredictorCorrector {
         report_cohort::run()
     }
 }
+
+// Test-only full predictSystemLoad parent. Existing 2336-body cohort is unchanged.
+mod full_predictor;
+impl SourceZoneAirPredictorCorrector {
+    pub(crate) fn run_native_full_predictor_parent_cohort() -> Result<usize> {
+        full_predictor::run()
+    }
+}

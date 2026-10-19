@@ -518,3 +518,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source47 정상 완료](../evidence/SRC-06-canonical-normal-completion-47/summary.json). 정상 완료 소유자 및 MTD CRLF 전송을 연결했다. 5개 24H의 선택된 7종 물리 파일과 자체 내보내기는 Source43과 동일하고 A24/A72/연간은 기존 허용오차·RMSE를 통과했다. 연간 자체 JSON/CSV 전수 왕복과 부속 IO 전체 일치·카드 완료는 아직 주장하지 않는다.
+
+
+[Source48 full predictor parent](../evidence/SRC-06-canonical-full-predictor-parent-48/summary.json). 예측기 상위 함수 1,168건이 첫 단일 실행에서 통과했다. 이 변경은 cfg(test) 경로에만 있으며 일반 CLI를 재실행하지 않았다. 연속 이력·배수·비공개 캐시 검증은 별도 의무로 남아 있다.

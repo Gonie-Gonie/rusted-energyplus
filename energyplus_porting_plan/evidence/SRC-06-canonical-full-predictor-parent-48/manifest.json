@@ -1,0 +1,376 @@
+{
+  "schema": "src06-full-predictor-parent-finite-archive48.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-full-predictor-parent-48/evidence.zip",
+    "sha256": "aff2b23df36300481f62082950b2991fc03edc5a2af1e1b6334e9d50b86f03dd",
+    "bytes": 2586669
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "bytes": 133816
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneControls.hh",
+      "sha256": "4b2f121f26f28fa163e2149f34f6eebfb7f79daafd04e41e08ec2421648dca69",
+      "bytes": 17836
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "bytes": 12483
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "bytes": 11096
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "bytes": 371103
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "bytes": 122929
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "bytes": 404705
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+      "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+      "bytes": 2385
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-full-predictor-parent-Source-review-Outer-P2-01/review.json",
+      "sha256": "1e6624ddb409a48fc2a3337968343ca32a95feb3d3a26f4334e2b0fd80118e85",
+      "bytes": 18089
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-actual-review-P2/review.json",
+      "sha256": "3a023b7649744a15a0340053e4c08d3aaacb9a650ce8a1e2f9b632115246fde9",
+      "bytes": 4882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-full-predictor-parent-cohort-application-P2/receipt.json",
+      "sha256": "b93959d6f6f9f41ced24a3c7dbbf3c2d01c6329a66e8d73e963a1d0bc2be6d4a",
+      "bytes": 2072
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-full-predictor-parent-Root-P2.py",
+      "sha256": "66e8ce70432fde8473988fafa322e0974a456b5d7d2d93e6f6e3fb567011cdf4",
+      "bytes": 6746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/receipt.json",
+      "sha256": "20a831f4e742b7cac7f0488f2a4596afa257e83a734e26fa10001b1afb1c1e93",
+      "bytes": 3909
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/stderr.log",
+      "sha256": "0d9fa691a7b329c8136e0c85acf64149e635bb06a27ed19da851884dcf4cfa95",
+      "bytes": 1503670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-full-predictor-parent-cohort-Root-P2/stdout.log",
+      "sha256": "c124215a103eb623011fd0024e6c2adc44bd82134ea33fc716135dd676d9cbe8",
+      "bytes": 260
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source82-B-NOLIMIT-24H-Root-11/output/input/converted.epJSON",
+      "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+      "bytes": 37726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/census-full-predictor-readset-Peer-P2.py",
+      "sha256": "5d5e80782337ee9cbfef062c4b1535bc997bcf01377a305ee08fa230b3dc1955",
+      "bytes": 16777
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-full-predictor-parent-actual-Root-P2.py",
+      "sha256": "5b986c1b5f105c1a8080a352262c982ab51ee6067f4339c6c87464564d0c5028",
+      "bytes": 6667
+    },
+    {
+      "path": ".runtime/porting/SRC-06/freeze-full-predictor-parent-draft-Peer-P2.py",
+      "sha256": "a46b000df9c6c761a1e74d7c182e6ef21a66910849c653fd1384d65414fba181",
+      "bytes": 7857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-prepared-WAIT-Peer-P2/complete-proposed-compiler-Source-plan.json",
+      "sha256": "70d6b6ab3943fe061735b3c6b1dab41b15244bb5f0664c5fd6b74edd6165b22f",
+      "bytes": 2573746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-prepared-WAIT-Peer-P2/prepared.json",
+      "sha256": "df4315dcd0b9cf2bd3ef4fbd9dbd47d0ae27d867f9f1b4d0cfb0752f78b83aa5",
+      "bytes": 11380
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/DataHeatBalance.hh.600-610.txt",
+      "sha256": "4bb0db386777cb01275fde34081b1005dc1fabcbdbd39ff55d6b78ba26ff65f2",
+      "bytes": 1359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/DataZoneControls.hh.270-280.txt",
+      "sha256": "232dbf9449a2022e9051fd42fa1bc1fcddca5664bdd34362faec33f14db2586a",
+      "bytes": 361
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/DataZoneEnergyDemands.hh.allocation-121-145.txt",
+      "sha256": "16d905ce66c858ac669e5ba2d1bd981c01917d4563932148beb005ef3faf7470",
+      "bytes": 2721
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/DataZoneEnergyDemands.hh.allocation-165-173.txt",
+      "sha256": "922c38d58a6032c3c91c69549a4564d213158dc6e291ea26a8160d625d63c0ec",
+      "bytes": 764
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/DataZoneEnergyDemands.hh.allocation-60-89.txt",
+      "sha256": "fb7e05da212dd0ab9a681741f8033eb87993c6c1948635708275045890cec8ae",
+      "bytes": 1950
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/EPVector.hh.allocation-52-106.txt",
+      "sha256": "2cefad062c1f77e33ffc6c37bce7ac516ca1799fa53dfded1213d15c0b6e302e",
+      "bytes": 1291
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/HeatBalanceManager.cc.allocation-1849-1854.txt",
+      "sha256": "c229ca7f0091d8c6d94644d397e418641e0190c4e7dcf866e401a2dfce10803c",
+      "bytes": 409
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/HeatBalanceManager.cc.allocation-2828-2834.txt",
+      "sha256": "32b572e70296c39679dc2413b9c6a4b719008671b90442b947e557f8401eadbb",
+      "bytes": 602
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/InputProcessing__InputProcessor.cc.505-541.txt",
+      "sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+      "bytes": 1502
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.3146-3257.txt",
+      "sha256": "41fc2383994843dc4fa58832dc65674e663d416e6b6a9e12a1e5d1e9b593e054",
+      "bytes": 6263
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.3462-3495.txt",
+      "sha256": "1e5cb7d59df5d33963ff731f9e4f5f6994933e142b2033244dfd3b682bd3fc7b",
+      "bytes": 1621
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.3625-3667.txt",
+      "sha256": "78c9e76239673af8b121799e0b672692e8bec735154463507796786cafd8d324",
+      "bytes": 2422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.3793-3815.txt",
+      "sha256": "3ed5d6c08d74d898cc40461589ffa8c4d07c0e8a371c067add0379c72aa5d754",
+      "bytes": 1225
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.6835-7243.txt",
+      "sha256": "2f4cfa8bfcb82283327d59445939be2cd6733d6d36d5c72de42887c5eca9aef2",
+      "bytes": 22119
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.809-855.txt",
+      "sha256": "b03e8509a43fc3e35f170528aa7f1b466db0a8f51f0648650e153ca7b171d326",
+      "bytes": 2762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/ZoneTempPredictorCorrector.cc.allocation-2376-2417.txt",
+      "sha256": "632f2ebe3239326f045c9f7340470ef8c793745bd8e63ce59d4d4b151e791c7d",
+      "bytes": 2881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/actual-IDF-zero-control-census.json",
+      "sha256": "e76e6556fdc76ef6034905abfe7e173c96df6a186e3c9dfde560f6c95fc171ae",
+      "bytes": 5467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/genuine-row-allocation-proof.json",
+      "sha256": "6040d7b2369143eee0b5229e1dca6e4edf551740577fc774aed6a2a43c4e4637",
+      "bytes": 5321
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/readset.json",
+      "sha256": "f28ac4ac6f7b5b9a679af1dc2f960401a35364b33e10bd33f2a68c5c81d4255e",
+      "bytes": 211142
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/representative-captured-parent.json",
+      "sha256": "0964655bfed3ee95bfd86c0bb576917a5cbb5193c19b826c60bf1e64d555eaeb",
+      "bytes": 75019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/full-predictor-parent-readset-Peer-P2-01/unobserved-literal-proof.json",
+      "sha256": "3a89488c710489fa919f6b498236239466c419225030bde1ad6154595358ad61",
+      "bytes": 9515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+      "sha256": "fc76790e89122784da36a9687c22079a2aefe67cdf498b0d55e32ac9d52b598e",
+      "bytes": 3087
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-full-predictor-parent-cohort-Root-P2.py",
+      "sha256": "862628f78d238328e1e28a342bbafc2589c6c92e4b60c087af2196d7c717d3fd",
+      "bytes": 2546
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-source-B-raw-ingress-held-Audit-01/actual-B-input-preservation.json",
+      "sha256": "7bfe801ac80cd19d259e94255544a472e5d7e35a9bf8ddeb954b644dd1da01ff",
+      "bytes": 5177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/project-full-predictor-parent-Peer-P2.py",
+      "sha256": "80459919d14f857062458580a158fe44d92eea9d5d528db2d52f135923c42435",
+      "bytes": 10081
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prove-predictor-literal-postconditions-Peer-P2.py",
+      "sha256": "42ba1ebea6f9e4419b1e4212612e62bacab878870dc1c0cc173a82cbc7c729ec",
+      "bytes": 6557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-full-predictor-parent-Root-P2.py",
+      "sha256": "dcc916140278514f1380b4e903558513f2bb4237279196866daa65f0d0e49643",
+      "bytes": 9593
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-full-predictor-parent-Outer-P2.py",
+      "sha256": "5d94f39abd56e5b8ab3cdca6354dcf5e693cdc9e3347ca5fcd97a196c11dc6de",
+      "bytes": 19709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/before/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "9d99166974fdb5b11a2d5e18345018deafe1f8dec4bf26c7c38bb6c548f04235",
+      "bytes": 45833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/before/crates/ep_runtime/src/lib.rs",
+      "sha256": "21cb22453edb82edc0ca452ffb9da2e47ec719c4e55d25cab706da8663bf5204",
+      "bytes": 2992
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__fixtures__native_full_predictor_b.rs.syntax.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort.rs.syntax.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort__full_predictor.rs.syntax.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/crates__ep_runtime__src__lib.rs.syntax.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__fixtures__native_full_predictor_b.rs.forward.diff",
+      "sha256": "8b73822237d2f17b1c1b9c7fa62244222ed19ba6db95891db30990d5ee12c992",
+      "bytes": 14392728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__fixtures__native_full_predictor_b.rs.inverse.diff",
+      "sha256": "52be7bb32485b07a9cc9973a71f3b1e06fdcba9b925b94cfefc7fb68f641a121",
+      "bytes": 14392728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort.rs.forward.diff",
+      "sha256": "f22c7d3a88b1c44ad8b798ab58e011b360861a2918c035367899dbb88700ae3e",
+      "bytes": 580
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort.rs.inverse.diff",
+      "sha256": "b42eba5a39d909394780ef7fdd4f4ba2e72dcc839161c1effeebcc7716f54406",
+      "bytes": 580
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort__full_predictor.rs.forward.diff",
+      "sha256": "db507cfdd99342f43288ebf681956847adaf5be5a8c283b3ad42b3de11f98d19",
+      "bytes": 23244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__heat_balance__ordinary_air_heat_balance__predictor_corrector__lifecycle__prediction__native_cohort__full_predictor.rs.inverse.diff",
+      "sha256": "7af538de20fb9a08f052698d0e1e2dd5c88904dc0c010cdb49cec2b71889ce12",
+      "bytes": 23244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__lib.rs.forward.diff",
+      "sha256": "6c382e8f326b73f0b44db33d22c2eb065820c26546cc92df72789e2fb8fdb002",
+      "bytes": 1125
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/diffs/crates__ep_runtime__src__lib.rs.inverse.diff",
+      "sha256": "d358404398cb790e340f9aa9e565d193e567dcc31f8b017ff8dc132ccadb12d0",
+      "bytes": 1125
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/draft.json",
+      "sha256": "5e8162c8cb3c3c68dd20321f5e0e7cccef3256c49169626e028e9b7602aedb72",
+      "bytes": 12129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/projection.json",
+      "sha256": "62351c3473513356b219e14a0423a27fad5153d7fb13f1a15b939986fdaef6bc",
+      "bytes": 3460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/fixtures/native_full_predictor_b.rs",
+      "sha256": "33faea78e3d18e2fd768a06493201245e8201a4bead29c2fd9c3407c2d391f36",
+      "bytes": 14392422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort.rs",
+      "sha256": "90cd6f7c6b636d163a52383d6dedde392fe320905175788fd1c3e0358a49712e",
+      "bytes": 46094
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction/native_cohort/full_predictor.rs",
+      "sha256": "b1f384360aef443a66bf519f74d6f92f3e244c67332a81c89b60145530bc03b4",
+      "bytes": 22392
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-full-predictor-parent-draft-Peer-P2-01/proposed/crates/ep_runtime/src/lib.rs",
+      "sha256": "975b46fa54d3ce3ee0332bb34fd139405ae3e9782a3f363ac036232961ca4b4c",
+      "bytes": 3582
+    },
+    {
+      "path": ".runtime/porting/source-objects/73/739b71e79a723a3e46769d909635c8ed3ae24a1abe183c04b60780abb438e9de",
+      "sha256": "739b71e79a723a3e46769d909635c8ed3ae24a1abe183c04b60780abb438e9de",
+      "bytes": 1855501
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs",
+      "sha256": "a5b39c1fada74f0f81bc9ce92eba40464bfa56a67a919c20f7df7735400ce17d",
+      "bytes": 18392
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+      "bytes": 8557
+    }
+  ],
+  "retained_large_Native_stream": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-06/controlled-air-native-capture-Root-21/B-NOLIMIT-24H.observation.json",
+    "sha256": "6e7139794cb91e630011e65a2e0498695640f012e9b51e9568182bfc6acafdac",
+    "bytes": 390806511
+  },
+  "retained_stream_copied": false
+}
