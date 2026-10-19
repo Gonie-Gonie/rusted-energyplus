@@ -65,11 +65,11 @@ SUR-03/04 반복 동안 고정되어야 할 항의 불변성
 | integration_gate | A: 통과 / B: 통과 |
 | production_gate | A: 통과 / B: 통과 |
 
-Literal489–536 ordered constant-term expressions and current-row exclusion establish isolated operand semantics; no new executed suffix impulse test is claimed. Direct finalP3 constants/histories and unchanged same arrays consumed inside iterations close current connection.
+The earlier static-only argument did not verify the requested isolated-history/impulse/current-row test execution. Executed comparison: 15 lifetimes, 178 calls, 368 exact binary64 output fields; all output bits equal and whole readsets unchanged. The prior literal-source argument remains historical. Genuine-owner P7 constants/history and production connection are retained without a new normal15 run.
 
 실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-직접 단위 근거: [최종증거팩: final64-existing-evidence-adjudication-Audit-03 b9f4ff21aee9](../evidence/SRC-06-final-current-source-validation-60/summary.json).
+직접 단위 근거: [실행한 격리 이력·impulse·현재항 검사](../evidence/SUR-02-isolated-history-impulse-61/summary.json). 이전 정적 논증은 [final60 증거팩](../evidence/SRC-06-final-current-source-validation-60/summary.json)에 보존합니다.
 
 선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 

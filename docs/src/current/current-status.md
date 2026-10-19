@@ -152,6 +152,8 @@ promoted release manifests. The final [current-Source validation](../../../energ
 binds actual same-Source fifteen-case results, internal Surface cadence,
 two warmup handoffs, own-output rereads and the five named input outcomes.
 
+The [SUR-02 unit supplement](../../../energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json) adds the previously unexecuted isolated-history, impulse and current-row checks: 178 calls, 368 exact binary64 output values. The production compiler inputs and retained fifteen-case results are unchanged.
+
 Current finite adjudication: **15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0**;
 **A 54/54, B 64/64 cards**;
 **15 scoped ancillary readbacks; owned termination/layout checked; raw physical inequalities preserved; overall ancillary IO PASS=false**. These actual references and individual

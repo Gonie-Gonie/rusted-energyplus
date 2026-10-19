@@ -15,12 +15,15 @@ rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 | 현재 Source·품질 | Source59; fmt/strict Clippy/workspace 4975 passed (2 existing ignored); retained-unit carry separately bound |
 | 일반 고정15·수치 및 자체 출력 | 15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0 |
 | Surface 반복·warmup 인계 | 34437 scope rows; 635375 exact binary64 observations; 2 direct handoffs; 4 same-owner convection connections |
+| SUR-02 격리 이력·impulse·현재항 검사 | 178회 호출, 368개 binary64 출력값 비트 일치; 입력·저장소 보존 |
 | 물리·부수 출력 | 15 scoped ancillary readbacks; owned termination/layout checked; raw physical inequalities preserved; overall ancillary IO PASS=false |
 | 오류 입력5·SCH01 결과 구분 | Five executed invalid outcomes: converter-stage3 and Rust structured compilation2; two Original abnormal afterstates remain unavailable; no82/82 numerical PASS |
 
 실제 단위·연결·생산 근거와 역사적 실패는 [최종 카드별 판정](evidence/SRC-06-final-current-source-validation-60/summary.json)에 모읍니다. 변경하지 않은 단위를 새 바이너리에서 다시 실행한 것으로 세지 않습니다. Exterior170은 도출한 앞137과 직접 성공33의 결합이고 차양기하9는 Native-only입니다. SUR05의30은 전체 내부 함수가 아닌 원문 종료 분기입니다. SCH01의 두 원본 수치 후상태는 계속 미확인으로 남깁니다.
 
 같은 코드·원인에 대한 불필요한 cohort/연간 재실행을 요구하지 않습니다. 변경 범위에 맞는 선택 검증 후 실제 fmt·Clippy·workspace를 한 번 기록하며, 현재 판정은 아래 정책·카드와 `plan.json`으로 확인합니다.
+
+[SUR-02 보충 근거](evidence/SUR-02-isolated-history-impulse-61/summary.json)는 정적 코드 비교만 했던 명시적 단위시험을 실제 실행으로 보완합니다. 생산 코드와 기존 15개 통합 실행 결과는 동일합니다.
 
 ## 범위
 

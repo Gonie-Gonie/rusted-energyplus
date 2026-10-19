@@ -23,6 +23,12 @@ lint/tests once, then the broader conformance, documentation, and claim guards.
 It rejects partial package/test selectors. Run it at integration milestones
 and before release validation; use focused checks while implementing a card.
 
+The [SUR-02 focused unit comparison](../../../energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json) is an explicit porting check outside the default suite. It needs the pinned EnergyPlus source, C++/Rust compilers and the retained Source59 compiler-input plan named in the checker. Use a fresh output directory:
+
+```powershell
+python tools/porting/check_sur02_units.py --output .runtime/porting/SUR-02/isolated-history-local
+```
+
 Documentation and generated specs:
 
 ```powershell

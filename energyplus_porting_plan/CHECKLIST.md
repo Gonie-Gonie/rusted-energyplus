@@ -181,3 +181,5 @@ B에서는 그 의존성을 적용한다.
 ## 현재 진행 상태
 
 카드별 네 gate와 해당 실제 근거는 [작업계획](README.md#현재-진행-상태) 및 [최종 판정](evidence/SRC-06-final-current-source-validation-60/summary.json)을 참조합니다. 위64행은 개별 plan 판정 후 기존 `sync_plan_views.py`로만 갱신합니다. 단위·보고 값·자체 출력·부수 출력의 검증 범위를 합치지 않습니다. 모든 과거 실패와 unavailable 상태는 기존 증거 및 Git에 유지합니다.
+
+[SUR-02 실행 보충](evidence/SUR-02-isolated-history-impulse-61/summary.json)은 격리 이력·impulse·현재항 검사의 단위 근거를 추가합니다. 나머지 63개 카드와 생산 실행 근거는 그대로 유지합니다.

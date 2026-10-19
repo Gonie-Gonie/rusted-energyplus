@@ -92916,7 +92916,7 @@
         "historical_completion_note": null,
         "historical_actual_booleans_rewritten": false
       },
-      "completion_note": "Literal489–536 ordered constant-term expressions and current-row exclusion establish isolated operand semantics; no new executed suffix impulse test is claimed. Direct finalP3 constants/histories and unchanged same arrays consumed inside iterations close current connection.",
+      "completion_note": "The earlier static-only argument did not verify the requested isolated-history/impulse/current-row test execution. Executed comparison: 15 lifetimes, 178 calls, 368 exact binary64 output fields; all output bits equal and whole readsets unchanged. The prior literal-source argument remains historical. Genuine-owner P7 constants/history and production connection are retained without a new normal15 run.",
       "evidence_by_scope": {
         "A": {
           "scopes": [
@@ -93029,6 +93029,11 @@
                 "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
                 "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
                 "bytes": 28233
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                "bytes": 13366
               }
             ],
             "declaration_supplement": null,
@@ -93090,6 +93095,16 @@
               "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
               "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb",
               "bytes": 18020
+            },
+            {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/primary-input.txt",
+              "sha256": "b014b3bbf35e5d1e6ce2c550df7802f0e4023b2fb0f2bab9806c0db84b337430",
+              "bytes": 265745
+            },
+            {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/policy.json",
+              "sha256": "8302179f7bbd126bfd988cc52036b6680d2968386cdeba120c40c2c4afb3026c",
+              "bytes": 752
             }
           ],
           "fixed_normal_scope_cases": [
@@ -93134,6 +93149,16 @@
                 "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
                 "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
                 "bytes": 188348
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                "bytes": 13366
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+                "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+                "bytes": 42839
               }
             ],
             "qualification": "Per-card selected method/branch units and separately identified normal connection traces. Actual helper extents and named unit inputs remain in these direct ledgers; declaration anchors do not certify an enclosing whole parent."
@@ -93208,67 +93233,100 @@
               "new_scientific_execution_claim": false
             },
             "unit_gate": {
-              "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
+              "command": "[\"C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe\", \"-X\", \"utf8\", \"tools/porting/check_sur02_units.py\", \"--output\", \".runtime/porting/SUR-02/history-impulse-61\"]",
               "command_argv": [
-                "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
                 "-X",
                 "utf8",
-                ".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py",
-                "--actual",
-                ".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
-                "--actual-static-peer",
-                ".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd",
-                "--selected-source-extents",
-                ".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780",
+                "tools/porting/check_sur02_units.py",
                 "--output",
-                ".runtime/porting/SRC-06/Root60-final64-gate-adjudication"
+                ".runtime/porting/SUR-02/history-impulse-61"
               ],
-              "command_kind": "read-only retained-unit/current-connection adjudication",
-              "gate": "unit_gate",
-              "card": "SUR-02",
-              "scope": "A",
-              "commit": "a2c512a246f73dc806805c6c4e277c2960fdda44",
+              "command_kind": "Actual recorded standalone C++/Rust selected-body unit comparison",
+              "commit": "9f679a74a7328e9345265d357273ff24cec73238",
               "exit_code": 0,
               "artifacts": [
                 {
-                  "path": ".runtime/porting/SRC-06/Root60-final64-gate-adjudication/adjudication.json",
-                  "sha256": "52f1069f7d83fe1eac67a585c44022beb96d2b88faed13a762f8747ac6c51a71",
-                  "bytes": 1262842
+                  "path": ".runtime/porting/SUR-02/history-impulse-61-command/receipt.json",
+                  "sha256": "86c6cddede30eb8b831ca525801542416dbad47d8d9a7ce870043071530000e5",
+                  "bytes": 3038
                 },
                 {
-                  "path": ".runtime/porting/SRC-06/Root60-final-actual-review/review.json",
-                  "sha256": "5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
-                  "bytes": 28866
+                  "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                  "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                  "bytes": 13366
                 },
                 {
-                  "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
-                  "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
-                  "bytes": 28233
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
-                  "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
-                  "bytes": 6828
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
-                  "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
-                  "bytes": 20756
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
-                  "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
-                  "bytes": 188348
+                  "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+                  "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+                  "bytes": 42839
                 }
               ],
-              "retained_original_scientific_commands_authority": [
-                {
-                  "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
-                  "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
-                  "bytes": 28233
-                }
-              ],
-              "new_scientific_execution_claim": false
+              "historical_static_only_check": {
+                "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
+                "command_argv": [
+                  "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                  "-X",
+                  "utf8",
+                  ".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py",
+                  "--actual",
+                  ".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
+                  "--actual-static-peer",
+                  ".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd",
+                  "--selected-source-extents",
+                  ".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780",
+                  "--output",
+                  ".runtime/porting/SRC-06/Root60-final64-gate-adjudication"
+                ],
+                "command_kind": "read-only retained-unit/current-connection adjudication",
+                "gate": "unit_gate",
+                "card": "SUR-02",
+                "scope": "A",
+                "commit": "a2c512a246f73dc806805c6c4e277c2960fdda44",
+                "exit_code": 0,
+                "artifacts": [
+                  {
+                    "path": ".runtime/porting/SRC-06/Root60-final64-gate-adjudication/adjudication.json",
+                    "sha256": "52f1069f7d83fe1eac67a585c44022beb96d2b88faed13a762f8747ac6c51a71",
+                    "bytes": 1262842
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Root60-final-actual-review/review.json",
+                    "sha256": "5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
+                    "bytes": 28866
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
+                    "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
+                    "bytes": 28233
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
+                    "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
+                    "bytes": 6828
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
+                    "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
+                    "bytes": 20756
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
+                    "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
+                    "bytes": 188348
+                  }
+                ],
+                "retained_original_scientific_commands_authority": [
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
+                    "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
+                    "bytes": 28233
+                  }
+                ],
+                "new_scientific_execution_claim": false
+              },
+              "new_scientific_execution_claim": true,
+              "harness_commit_qualification": "Exact executed standalone harness bytes are archived; the actual launch worktree status is retained in the outer receipt."
             },
             "integration_gate": {
               "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
@@ -93640,9 +93698,9 @@
               "bytes": 45145
             },
             "report": {
-              "path": "energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json",
-              "sha256": "9ca754332f74563b848db77a18452ab80d1ecbbe1ec309f03e708e3f3260e1af",
-              "bytes": 39429
+              "path": "energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json",
+              "sha256": "ad7ff9b1cf24a1c0233cab788193a3d7cfaf13989026629c19bab351509a2ef8",
+              "bytes": 3639
             },
             "contract_scope": "Unchanged per-variable reported-stream final15 policy only; never a generic kernel tolerance.",
             "unit_policy_authorities": [
@@ -93650,16 +93708,26 @@
                 "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
                 "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
                 "bytes": 28233
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/policy.json",
+                "sha256": "8302179f7bbd126bfd988cc52036b6680d2968386cdeba120c40c2c4afb3026c",
+                "bytes": 752
               }
             ],
             "original_card_numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
             "unit_policy_qualification": "Each direct unit ledger retains its own predeclared raw-bit/atol/rtol, shape, branch and availability rules. Zero-tolerance binary64 assertions remain zero where that ledger declares them. A reported-stream tolerance is not substituted for those rules.",
             "finite_unit_contract": "1개 이력 항만 nonzero; impulse; 현재항 혼입 검출",
-            "method_branch_state_order_qualification": "Literal489–536 ordered constant-term expressions and current-row exclusion establish isolated operand semantics; no new executed suffix impulse test is claimed. Direct finalP3 constants/histories and unchanged same arrays consumed inside iterations close current connection.",
+            "method_branch_state_order_qualification": "The earlier static-only argument did not verify the requested isolated-history/impulse/current-row test execution. Executed comparison: 15 lifetimes, 178 calls, 368 exact binary64 output fields; all output bits equal and whole readsets unchanged. The prior literal-source argument remains historical. Genuine-owner P7 constants/history and production connection are retained without a new normal15 run.",
             "current_source_lineage_mapping": {
               "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
               "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
               "bytes": 188348
+            },
+            "actual_supplementary_unit_comparison": {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+              "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+              "bytes": 42839
             }
           },
           "current_connection": {
@@ -93793,6 +93861,11 @@
                 "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
                 "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
                 "bytes": 28233
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                "bytes": 13366
               }
             ],
             "declaration_supplement": null,
@@ -93944,6 +94017,16 @@
               "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
               "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4",
               "bytes": 22692
+            },
+            {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/primary-input.txt",
+              "sha256": "b014b3bbf35e5d1e6ce2c550df7802f0e4023b2fb0f2bab9806c0db84b337430",
+              "bytes": 265745
+            },
+            {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/policy.json",
+              "sha256": "8302179f7bbd126bfd988cc52036b6680d2968386cdeba120c40c2c4afb3026c",
+              "bytes": 752
             }
           ],
           "fixed_normal_scope_cases": [
@@ -94042,6 +94125,16 @@
                 "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
                 "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
                 "bytes": 188348
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                "bytes": 13366
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+                "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+                "bytes": 42839
               }
             ],
             "qualification": "Per-card selected method/branch units and separately identified normal connection traces. Actual helper extents and named unit inputs remain in these direct ledgers; declaration anchors do not certify an enclosing whole parent."
@@ -94116,67 +94209,100 @@
               "new_scientific_execution_claim": false
             },
             "unit_gate": {
-              "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
+              "command": "[\"C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe\", \"-X\", \"utf8\", \"tools/porting/check_sur02_units.py\", \"--output\", \".runtime/porting/SUR-02/history-impulse-61\"]",
               "command_argv": [
-                "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                "C:/Users/GonieGonie/AppData/Local/Programs/Python/Python312/python.exe",
                 "-X",
                 "utf8",
-                ".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py",
-                "--actual",
-                ".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
-                "--actual-static-peer",
-                ".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd",
-                "--selected-source-extents",
-                ".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780",
+                "tools/porting/check_sur02_units.py",
                 "--output",
-                ".runtime/porting/SRC-06/Root60-final64-gate-adjudication"
+                ".runtime/porting/SUR-02/history-impulse-61"
               ],
-              "command_kind": "read-only retained-unit/current-connection adjudication",
-              "gate": "unit_gate",
-              "card": "SUR-02",
-              "scope": "B",
-              "commit": "a2c512a246f73dc806805c6c4e277c2960fdda44",
+              "command_kind": "Actual recorded standalone C++/Rust selected-body unit comparison",
+              "commit": "9f679a74a7328e9345265d357273ff24cec73238",
               "exit_code": 0,
               "artifacts": [
                 {
-                  "path": ".runtime/porting/SRC-06/Root60-final64-gate-adjudication/adjudication.json",
-                  "sha256": "52f1069f7d83fe1eac67a585c44022beb96d2b88faed13a762f8747ac6c51a71",
-                  "bytes": 1262842
+                  "path": ".runtime/porting/SUR-02/history-impulse-61-command/receipt.json",
+                  "sha256": "86c6cddede30eb8b831ca525801542416dbad47d8d9a7ce870043071530000e5",
+                  "bytes": 3038
                 },
                 {
-                  "path": ".runtime/porting/SRC-06/Root60-final-actual-review/review.json",
-                  "sha256": "5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
-                  "bytes": 28866
+                  "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+                  "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+                  "bytes": 13366
                 },
                 {
-                  "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
-                  "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
-                  "bytes": 28233
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
-                  "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
-                  "bytes": 6828
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
-                  "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
-                  "bytes": 20756
-                },
-                {
-                  "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
-                  "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
-                  "bytes": 188348
+                  "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+                  "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+                  "bytes": 42839
                 }
               ],
-              "retained_original_scientific_commands_authority": [
-                {
-                  "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
-                  "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
-                  "bytes": 28233
-                }
-              ],
-              "new_scientific_execution_claim": false
+              "historical_static_only_check": {
+                "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
+                "command_argv": [
+                  "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                  "-X",
+                  "utf8",
+                  ".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py",
+                  "--actual",
+                  ".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
+                  "--actual-static-peer",
+                  ".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd",
+                  "--selected-source-extents",
+                  ".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780",
+                  "--output",
+                  ".runtime/porting/SRC-06/Root60-final64-gate-adjudication"
+                ],
+                "command_kind": "read-only retained-unit/current-connection adjudication",
+                "gate": "unit_gate",
+                "card": "SUR-02",
+                "scope": "B",
+                "commit": "a2c512a246f73dc806805c6c4e277c2960fdda44",
+                "exit_code": 0,
+                "artifacts": [
+                  {
+                    "path": ".runtime/porting/SRC-06/Root60-final64-gate-adjudication/adjudication.json",
+                    "sha256": "52f1069f7d83fe1eac67a585c44022beb96d2b88faed13a762f8747ac6c51a71",
+                    "bytes": 1262842
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Root60-final-actual-review/review.json",
+                    "sha256": "5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43",
+                    "bytes": 28866
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
+                    "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
+                    "bytes": 28233
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Root59-quality-carry-review/review.json",
+                    "sha256": "7e55d4e870ccdb8f8d39646ef2f09e134b0082b070113220d21e102fabc7f8a1",
+                    "bytes": 6828
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/Peer-Source-Surface-live-kickoff-review-Outer-59-02/review.json",
+                    "sha256": "78856e1f3ff603b40a3d721baed337c91631955fee4ace7c460db905ef65f877",
+                    "bytes": 20756
+                  },
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
+                    "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
+                    "bytes": 188348
+                  }
+                ],
+                "retained_original_scientific_commands_authority": [
+                  {
+                    "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
+                    "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
+                    "bytes": 28233
+                  }
+                ],
+                "new_scientific_execution_claim": false
+              },
+              "new_scientific_execution_claim": true,
+              "harness_commit_qualification": "Exact executed standalone harness bytes are archived; the actual launch worktree status is retained in the outer receipt."
             },
             "integration_gate": {
               "command": "[\"C:\\\\Users\\\\GonieGonie\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\", \"-X\", \"utf8\", \".runtime/porting/SRC-06/adjudicate-final64-gates-Root-60-03.py\", \"--actual\", \".runtime/porting/SRC-06/Root60-final-actual-review/review.json#5cb09c4e0a5c04cc9d576dde2d492342e997c9073271b2f97aa8abd2cf3c2d43\", \"--actual-static-peer\", \".runtime/porting/SRC-06/Peer-final-current-Source-actual-join-review-Audit-60-03/review.json#4d32b2a364d1b441c9fd1518ddca4ed8968c175ab747c40e115027ddc567eabd\", \"--selected-source-extents\", \".runtime/porting/SRC-06/final64-selected-source-extents-combined-Audit-02/ledger.json#3d552e3f53c40fe984d50feaad0eca93f2967566d18bfa879958800e46e42780\", \"--output\", \".runtime/porting/SRC-06/Root60-final64-gate-adjudication\"]",
@@ -95220,9 +95346,9 @@
               "bytes": 45145
             },
             "report": {
-              "path": "energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json",
-              "sha256": "9ca754332f74563b848db77a18452ab80d1ecbbe1ec309f03e708e3f3260e1af",
-              "bytes": 39429
+              "path": "energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json",
+              "sha256": "ad7ff9b1cf24a1c0233cab788193a3d7cfaf13989026629c19bab351509a2ef8",
+              "bytes": 3639
             },
             "contract_scope": "Unchanged per-variable reported-stream final15 policy only; never a generic kernel tolerance.",
             "unit_policy_authorities": [
@@ -95230,16 +95356,26 @@
                 "path": ".runtime/porting/SRC-06/final64-existing-evidence-adjudication-Audit-03/review-03.json",
                 "sha256": "b9f4ff21aee9af87066425af06be8cd0b56a6f43c9189de86bb98275499bbee2",
                 "bytes": 28233
+              },
+              {
+                "path": ".runtime/porting/SUR-02/history-impulse-61/policy.json",
+                "sha256": "8302179f7bbd126bfd988cc52036b6680d2968386cdeba120c40c2c4afb3026c",
+                "bytes": 752
               }
             ],
             "original_card_numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
             "unit_policy_qualification": "Each direct unit ledger retains its own predeclared raw-bit/atol/rtol, shape, branch and availability rules. Zero-tolerance binary64 assertions remain zero where that ledger declares them. A reported-stream tolerance is not substituted for those rules.",
             "finite_unit_contract": "1개 이력 항만 nonzero; impulse; 현재항 혼입 검출",
-            "method_branch_state_order_qualification": "Literal489–536 ordered constant-term expressions and current-row exclusion establish isolated operand semantics; no new executed suffix impulse test is claimed. Direct finalP3 constants/histories and unchanged same arrays consumed inside iterations close current connection.",
+            "method_branch_state_order_qualification": "The earlier static-only argument did not verify the requested isolated-history/impulse/current-row test execution. Executed comparison: 15 lifetimes, 178 calls, 368 exact binary64 output fields; all output bits equal and whole readsets unchanged. The prior literal-source argument remains historical. Genuine-owner P7 constants/history and production connection are retained without a new normal15 run.",
             "current_source_lineage_mapping": {
               "path": ".runtime/porting/SRC-06/final64-row-proof-review-Audit-01/review.json",
               "sha256": "a3fea08b0d27a3a17d0a75a2032b256605a46e8560219c08538152dfb6cc8c03",
               "bytes": 188348
+            },
+            "actual_supplementary_unit_comparison": {
+              "path": ".runtime/porting/SUR-02/history-impulse-61/comparison.json",
+              "sha256": "79235fba93380ac62ec87dca39a7aa69a58cc6cebb716649fd1326ffd7974fa4",
+              "bytes": 42839
             }
           },
           "current_connection": {
@@ -95271,6 +95407,41 @@
             "A24_is_B_HVAC_invocation_proof": false
           }
         }
+      },
+      "final61_supplement": {
+        "schema": "sur02-final61-plan-supplement.v1",
+        "summary": {
+          "path": "energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json",
+          "sha256": "ad7ff9b1cf24a1c0233cab788193a3d7cfaf13989026629c19bab351509a2ef8",
+          "bytes": 3639
+        },
+        "actual_unit": {
+          "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+          "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+          "bytes": 13366
+        },
+        "actual_command": {
+          "path": ".runtime/porting/SUR-02/history-impulse-61-command/receipt.json",
+          "sha256": "86c6cddede30eb8b831ca525801542416dbad47d8d9a7ce870043071530000e5",
+          "bytes": 3038
+        },
+        "full64_adjudication": {
+          "path": ".runtime/porting/SRC-06/SUR02-final61-publication-and-adoption/adjudication.json",
+          "sha256": "909a46739f521cc0f3d480e1f5632204487f9fa7828401ed766ea4227c56e3dc",
+          "bytes": 283406
+        },
+        "compiler_input_carry": {
+          "path": ".runtime/porting/SRC-06/SUR02-final61-publication-and-adoption/compiler-input-carry.json",
+          "sha256": "47be6bac9034ebc866925990127ab23b540f3faae375c44e7d554c214ee0c4be",
+          "bytes": 1331884
+        },
+        "observed_HEAD": "9f679a74a7328e9345265d357273ff24cec73238",
+        "original_final60_adoption_unchanged": true,
+        "explicit_gate_cells": 472,
+        "changed_evidence_cells": [
+          "SUR-02/A/unit_gate",
+          "SUR-02/B/unit_gate"
+        ]
       }
     },
     {
@@ -157605,5 +157776,40 @@
     },
     "physical_ancillary_equivalence": false,
     "historical_scientific_results_rewritten": false
+  },
+  "final61_supplement": {
+    "schema": "sur02-final61-plan-supplement.v1",
+    "summary": {
+      "path": "energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json",
+      "sha256": "ad7ff9b1cf24a1c0233cab788193a3d7cfaf13989026629c19bab351509a2ef8",
+      "bytes": 3639
+    },
+    "actual_unit": {
+      "path": ".runtime/porting/SUR-02/history-impulse-61/review.json",
+      "sha256": "e76dbe969f3eb8e7e272b495b8d73d77b260da1dbd43983104897b312ce4c036",
+      "bytes": 13366
+    },
+    "actual_command": {
+      "path": ".runtime/porting/SUR-02/history-impulse-61-command/receipt.json",
+      "sha256": "86c6cddede30eb8b831ca525801542416dbad47d8d9a7ce870043071530000e5",
+      "bytes": 3038
+    },
+    "full64_adjudication": {
+      "path": ".runtime/porting/SRC-06/SUR02-final61-publication-and-adoption/adjudication.json",
+      "sha256": "909a46739f521cc0f3d480e1f5632204487f9fa7828401ed766ea4227c56e3dc",
+      "bytes": 283406
+    },
+    "compiler_input_carry": {
+      "path": ".runtime/porting/SRC-06/SUR02-final61-publication-and-adoption/compiler-input-carry.json",
+      "sha256": "47be6bac9034ebc866925990127ab23b540f3faae375c44e7d554c214ee0c4be",
+      "bytes": 1331884
+    },
+    "observed_HEAD": "9f679a74a7328e9345265d357273ff24cec73238",
+    "original_final60_adoption_unchanged": true,
+    "explicit_gate_cells": 472,
+    "changed_evidence_cells": [
+      "SUR-02/A/unit_gate",
+      "SUR-02/B/unit_gate"
+    ]
   }
 }

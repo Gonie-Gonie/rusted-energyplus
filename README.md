@@ -82,6 +82,8 @@ release-evidence series from broader declared conformance/output requests.
 
 The [finite card adjudication](energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json) records each of the64 contracts, its four gates, actual commands and remaining qualifications. Final fixed15 execution, internal Surface cadence/handoffs, output round trips and ancillary differences are recorded separately: A 54/54, B 64/64; 15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0; 34437 scope rows; 635375 exact binary64 observations; 2 direct handoffs; 4 same-owner convection connections.
 
+The [SUR-02 unit supplement](energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json) closes the remaining isolated-history, impulse and current-row test requirement: 178 calls and 368 exact binary64 output values. Production compiler inputs and the fifteen-case results remain unchanged.
+
 The admitted Exterior170 records join a verified137-record prefix with33 directly successful records; nine Native overhang records remain outside CON-01. The30 convergence evaluations exercise a literal Original suffix, not a full inside-solver parent. Two abnormal Original schedule processes have unavailable numerical afterstates; their named invalid-input outcomes do not become82/82 numerical passes. Earlier failures and unobserved cache/field limits remain in immutable evidence.
 
 ## How To Run And Verify

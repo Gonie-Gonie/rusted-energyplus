@@ -42,3 +42,5 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 ## 증거 해석
 
 최종 [카드별 근거](evidence/SRC-06-final-current-source-validation-60/summary.json)는 같은 입력·정책·관측 필드·Source의 유효한 연결을 명시합니다. 실제 ERR/END/콘솔 경과 시간은 보존하며, 미관측 private cache·통계·부동소수점 환경을 추정값으로 채우지 않습니다. 과거 CTF 이력의235,456 불일치와2,754 미확인, SCH01 원본 비정상 종료2건 및 모든 수정 전 실패는 해당 실행의 기록으로 유지합니다. 새 결과가 이를 과거 PASS로 바꾸지 않습니다.
+
+[SUR-02 보충 단위시험](evidence/SUR-02-isolated-history-impulse-61/summary.json)은 격리 이력·impulse·현재항 배제를 실제로 검사합니다. 타입 어댑터를 쓰는 선택 본문 시험과 기존 P7의 실제 소유자 연결 증거를 구분합니다.
