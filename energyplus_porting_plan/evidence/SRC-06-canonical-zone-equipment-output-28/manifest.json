@@ -1,0 +1,526 @@
+{
+  "schema": "src06-canonical28-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-output-28/evidence.zip",
+    "sha256": "15d3d71aeeca1eb240f0aa0a8b82431f3275d77dc3a655d9e3d2e1f1bcb196c5",
+    "bytes": 1672758
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-zone-equipment-output-Source-review-28-02/review.json",
+      "sha256": "9e432e32ed560e4e798e92afc2e196c6758ea551dd599dc0f37d4467983a2f88",
+      "bytes": 25796
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-purchased-air-calculation-actual-review-27/review.json",
+      "sha256": "ff63b47b136a03ef71025e46bb3d2eea8580d296fcd21bfc00e977563b4ae2b9",
+      "bytes": 17656
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-output-actual-review-28/review.json",
+      "sha256": "1241f905980f76fbf4fcfbd0dc6ab6a97d8990871d2508af7482e52c1fb9fabe",
+      "bytes": 17345
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-output-actual-review-28/table-clock-differences.json",
+      "sha256": "817d7ecfa9651c8e8d6959dba5ffda6637fe280e2f55405811ac4d923f97ae18",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-zone-equipment-output-application-28/receipt.json",
+      "sha256": "6512f9b5c66a81b8f2888a56b8cf56a1ce6ccdf7f5e4717834eef9dcf82ccd0d",
+      "bytes": 11231
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-zone-equipment-output-Root-28.py",
+      "sha256": "5cbbc55bc611cdee9e3b3587aec65517d577818b70ac8fba31f1668b77d9af57",
+      "bytes": 6211
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/diagnostics.json",
+      "sha256": "b2ef95dd4ad1b4e910f92e2c5e42c412335e25273b8ef8b6d1188da985df03f4",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplustbl.htm",
+      "sha256": "90f0c757a7c82d4f42f055015adb5e44fbd6bc8e88ad0a7d6ebca7a1467c7c68",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/eplustbl.xml",
+      "sha256": "ef664ce6a20955ad57911ca1da35ae2299a6d8ee88da1a17dd7c671f72fc6dfc",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/results/source-reported-results.json",
+      "sha256": "576d993246d333b19b69285dc45fceeff6d7283fded25eb06d83f95bdebd2e23",
+      "bytes": 1679920
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-Root-28/output/run-summary.json",
+      "sha256": "855a03da3041a90919e201ac10367e5ef8e7047182d0379e69a460b3bf30dff2",
+      "bytes": 32709
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-command-Root-28/receipt.json",
+      "sha256": "3088e7b40801f7b0291ebd7a586cf6ed11779dca2bcc006aa0d29806be6b41b1",
+      "bytes": 4129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-command-Root-28/stderr.log",
+      "sha256": "5b10b5af9c2e085a15818ae9cf4c190be69b649a43759873af5b1fc7ed8fbc04",
+      "bytes": 754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-command-Root-28/stdout.log",
+      "sha256": "bb35696dd4daedddf0d6b720c754240a34833e65702cd79da08df30a2371ce66",
+      "bytes": 403320
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-Root-28/output/diagnostics.json",
+      "sha256": "0142859893893db6c1e8eaa88d40caeb66edef73418fe09d6630353b17dc1479",
+      "bytes": 2972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-Root-28/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-Root-28/output/run-summary.json",
+      "sha256": "18b2ae78ab4eb90d2cc8c30f9981daef8c6d109a4599e4c2680742249c67788d",
+      "bytes": 25296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-command-Root-28/receipt.json",
+      "sha256": "ab0cbceb53b66b8d74fa174e053cf0c583f35ab66438cef62a977d5110e3a816",
+      "bytes": 4180
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-command-Root-28/stderr.log",
+      "sha256": "2ab198ebad2a7e124adbb7363c2e81bc58084895eb17d364f781cbe3d426e763",
+      "bytes": 10690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-command-Root-28/stdout.log",
+      "sha256": "d3633ff719971c6bc1ff47f9873c3e0f6e45d509bc60c01df0209c2f7ad0dbc8",
+      "bytes": 403355
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-zone-equipment-output-actual-Root-28.py",
+      "sha256": "8ca2ac22307bea6a167253b8728961da1ebedfc2e04581f8471525cb9b6f58f9",
+      "bytes": 6415
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-zone-equipment-output-Root-28.py",
+      "sha256": "64909618b344feb65efb4508550da700d47808c3dbcacf9c9fc9948d0ceafe1b",
+      "bytes": 1324
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-zone-equipment-output-draft-Peer-28-02.py",
+      "sha256": "9508b88d40e77bf8571aab50dc3bcccf1ac407618ceba9feb5be9e193ed8e8ba",
+      "bytes": 12923
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-zone-equipment-output-publication-Peer-28.py",
+      "sha256": "69244ed686fc09bb43c6f9465e1cb4b6592ca9d8a8c4ae49e5a05576f1b71ef5",
+      "bytes": 11312
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-purchased-air-calculation-checkpoint-Audit-27-02.py",
+      "sha256": "ba3b3181ce84dcd40ede4ce1ad363ac3b521c0c5c39e45614ade8240b579b87d",
+      "bytes": 13002
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-zone-equipment-output-checkpoint-Peer-28.py",
+      "sha256": "e35daa1a3beb4a70feb5a369b75877f1a4d4d32d170e77bbdcf7d32ea2ce01c4",
+      "bytes": 12203
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-zone-equipment-output-Outer-28-02.py",
+      "sha256": "2bb4613912d86d0b51e1961fd3bac87910a7aac47c7f035210f1f88de0038afb",
+      "bytes": 10040
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-zone-equipment-output-Peer-28-02.py",
+      "sha256": "07d02c77a4470e997ccfc970985b47aa3e8b4ef789b4626df8f555fc5070f794",
+      "bytes": 10767
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-calculation-held-Audit-27/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "2956fe3a58f16c973ae5a179713e68235917b2780402d2f2b3934343f72c0cfc",
+      "bytes": 25984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-draft-Peer-28-02/draft.json",
+      "sha256": "55c5f752d9b30c564c8ec1c660fe9b211638c649812dbf42cfdc0972f68f688b",
+      "bytes": 9643
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/API-census.json",
+      "sha256": "6311635a1ae41ecab9ad0c01396166e8411fd58e34f26ef2b749f7846ea81e8f",
+      "bytes": 749
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/DataZoneEquipment.cc.1807-1815.txt",
+      "sha256": "dc1a0870f16e32535a470f7b14f474f3b92c1d4905dbff7e886012a9342dd724",
+      "bytes": 359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/DataZoneEquipment.hh.182-192.txt",
+      "sha256": "6a1b922614414fb62cbece4e3dec4f48fcd65e0452c25ad9d0b818f5929b47e9",
+      "bytes": 205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/DataZoneEquipment.hh.413-448.txt",
+      "sha256": "c2dd917022a8f2fbe4b0917b1f3d1148209a95bff6fa5cf9015458f12329595b",
+      "bytes": 2386
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/SystemAvailabilityManager.cc.1219-1291.txt",
+      "sha256": "994813a8e52f6dc8694bfad4f7b4dbaa9792906d6b8315bd15fab5d4f7916339",
+      "bytes": 3834
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/SystemAvailabilityManager.cc.1448-1512.txt",
+      "sha256": "dc857729608c8086dc2f1d2afa54bfd54e6c522941e7b66f48605ff9695fca95",
+      "bytes": 3886
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/SystemAvailabilityManager.hh.412-431.txt",
+      "sha256": "9285c9fc1c3090a76e49e2bd7fc8b323de019772a6e69273e1f8f56886ab0775",
+      "bytes": 1128
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/SystemAvailabilityManager.hh.580-610.txt",
+      "sha256": "9e0bd3684d8322ecccd4795e37d863baa02d3bc99221715aeb1d826f4bf51448",
+      "bytes": 1697
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/SystemAvailabilityManager.hh.73-78.txt",
+      "sha256": "602f1f2a7b6a3a106e4d96d198f3aa57f447c15f47f1c1daa63db1f7840ca302",
+      "bytes": 103
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/ZoneEquipmentManager.cc.3538-3578.txt",
+      "sha256": "f61ae3b27f0086535ce0a968c5615c536bfdc3be7a0dcf6b9b87e738e4d2b922",
+      "bytes": 1943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/ZoneEquipmentManager.cc.3674-3746.txt",
+      "sha256": "1959656e7c176d12fef61e65278cec817fc055addbbaab512596f83b59a6cf34",
+      "bytes": 3847
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/ZoneEquipmentManager.cc.4084-4193.txt",
+      "sha256": "35a4ab66e3a37ad82e625052748092e2ffaa5dec7d842b3f97916f2cfb4a52a7",
+      "bytes": 6227
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native-extents/ZoneEquipmentManager.cc.4717-4908.txt",
+      "sha256": "cf4e80bfbe3b6651ed34dabfd31dfc6207615e9bfea17fdb3dcdf7a64703fb5a",
+      "bytes": 11457
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native/src/EnergyPlus/DataZoneEquipment.cc",
+      "sha256": "8d7eba6b146ad0b81312cbcfb32357b530ce6f5ec1716ed9e4dc8dd2901b3a6a",
+      "bytes": 142562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native/src/EnergyPlus/SystemAvailabilityManager.cc",
+      "sha256": "547edeea98d989496b604157ada3a6f4e47ba3be93d47a2546640f2ddf46d652",
+      "bytes": 288728
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native/src/EnergyPlus/SystemAvailabilityManager.hh",
+      "sha256": "5532cfe78d3bbf6cb8ed601393a9d005235f02f06141079302711f992b452cbd",
+      "bytes": 34058
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/Native/src/EnergyPlus/ZoneEquipmentManager.cc",
+      "sha256": "fa4a784f847e9d85a19b9f871c4c23a78b8de630a7300546a4a2551db0d257cd",
+      "bytes": 428353
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/actual27-parent-full-readback.json",
+      "sha256": "766ba727a3094080ed4b0cbbf4e56a382c2f0f569af408549b3b23af60af3a4b",
+      "bytes": 2373159
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "2956fe3a58f16c973ae5a179713e68235917b2780402d2f2b3934343f72c0cfc",
+      "bytes": 25984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "937c7daeffdf02a0e31cea897bf5f5aceaf29ee40915bcd8c34c62a5e67f74fb",
+      "bytes": 11427
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "8044155e379f144022e626c5be43e5e9758f0a72478eebb4a878b28971d6368b",
+      "bytes": 14368
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/complete-final-compiler-Source-plan.json",
+      "sha256": "5123652eedb9452475c5c91eea7ac01a3a839cf4d9e5279eba0005b0cb834156",
+      "bytes": 2628679
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/01-forward.diff",
+      "sha256": "bcd4bbd0ae0fe981ef3f54470dabf879f7dfe8bb34ed43d35b928334faee98ae",
+      "bytes": 8556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/01-inverse.diff",
+      "sha256": "9bc4e425dd59afee94e81b7b41c7266a96f0c56b6a35a8d70d1da3c30b36533c",
+      "bytes": 8556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/02-forward.diff",
+      "sha256": "6889134a8de5d931918e6bb1bff973c84d1aeca8e8f3f46abd2f703004ca1d00",
+      "bytes": 12182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/02-inverse.diff",
+      "sha256": "dde6b87ad31382acfe527fb31448e3daa9d3c1be597e3550cf8051ef7d20d4d6",
+      "bytes": 12182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/03-forward.diff",
+      "sha256": "c0d8112694164399a2256312e99a45561b3e122a1e59c369a4336fa2f35205cf",
+      "bytes": 3684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/diffs/03-inverse.diff",
+      "sha256": "1e0dea14f99b4b8e9100e10c98e725fb98c6e258007e17d0bec0564225782772",
+      "bytes": 3684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "2956fe3a58f16c973ae5a179713e68235917b2780402d2f2b3934343f72c0cfc",
+      "bytes": 25984
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "937c7daeffdf02a0e31cea897bf5f5aceaf29ee40915bcd8c34c62a5e67f74fb",
+      "bytes": 11427
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "8044155e379f144022e626c5be43e5e9758f0a72478eebb4a878b28971d6368b",
+      "bytes": 14368
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/manifest.json",
+      "sha256": "c9ada9aed00f572069fd7d8848019bf3122ee588f189afabcfec6555624133ca",
+      "bytes": 33137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/01.stdout",
+      "sha256": "69b3417d9f5ce342c00710b2f423714d0016649f4ed82566e355df9d186bdf85",
+      "bytes": 34748
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/02.stdout",
+      "sha256": "e3210c33938d4987a46d961c6a094334935e2a5e9306c61d3188e301f7583ec7",
+      "bytes": 27959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/parse/03.stdout",
+      "sha256": "cfff97ad064eca93bdf69856389c523dff2b70876fc6655d88c00a7c5c099bde",
+      "bytes": 15039
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "bytes": 29767
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "7860fc7e96bec9cb783a97a47de82b4f11acfb9637480d79fddd4693ebcc0e6d",
+      "bytes": 14340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "bcc93d96d6e982927582fc98b15e5499cfd17ca404b6a571a73c7aea753153ba",
+      "bytes": 24146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_run/src/ordinary_input_processor.rs",
+      "sha256": "0376a1617a10cf85d88aa6a964cfda83dc84b607c1cf6729bc71d60433872679",
+      "bytes": 2398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance.rs",
+      "sha256": "12b7516a96394761525211f84e27dea9a1c4e77888a9b1681c37fc50a70ea1c1",
+      "bytes": 13799
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/environment/fan_zone.rs",
+      "sha256": "b71c123101383ec99fa85609f85a241fb54b261163f99c8f5a86b4f7e1441679",
+      "bytes": 2760
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/demand.rs",
+      "sha256": "8320fb86e257a3574c87f6cc6e2ea6e038d7e7f16357a6ba7e17e643888726f6",
+      "bytes": 10642
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/simple_air.rs",
+      "sha256": "e67816e7f95cfe800e33448f86de3c9404d9b985fcb0431fc3c192dbf04e5ac3",
+      "bytes": 16982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/simple_air/state.rs",
+      "sha256": "5cd4e18de7a6b3e155cd08e52c9a480476d4f307c756743a2016784b882345f4",
+      "bytes": 5257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "937c7daeffdf02a0e31cea897bf5f5aceaf29ee40915bcd8c34c62a5e67f74fb",
+      "bytes": 11427
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "8044155e379f144022e626c5be43e5e9758f0a72478eebb4a878b28971d6368b",
+      "bytes": 14368
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/selected_input_processor.rs",
+      "sha256": "38c2a3279465d8401bd8413a1a1709949d07194c5639acd1786222892286be72",
+      "bytes": 13196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/selected_schedule_manager/report.rs",
+      "sha256": "9c72e6f2781ad03b421337fb0489a4578293399916c81e847e9c2dff220a89f9",
+      "bytes": 4404
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-closure-readonly-plan-Peer-28/Source-context/crates/ep_runtime/src/heat_balance/selected_simulation_startup.rs",
+      "sha256": "dcbba41ffdfcee821da71db1bdc9961c7a1d3867b6ac1dbfd4800207c3316f6e",
+      "bytes": 16684
+    },
+    {
+      "path": ".runtime/porting/SRC-06/zone-equipment-output-publication-prepared-Peer-28/publication-template.json",
+      "sha256": "ff22741a9ed4e64c77795f89190005d5eb62606ac7d9e2c18f6d808338b879cb",
+      "bytes": 22166
+    },
+    {
+      "path": ".runtime/porting/source-objects/99/9983e4461d0f0322c62cef8d52239acb3c012a7f645caf055736aace11f40cc8",
+      "sha256": "9983e4461d0f0322c62cef8d52239acb3c012a7f645caf055736aace11f40cc8",
+      "bytes": 1846625
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "85ee4905a01328845946a5cd624d0fbefd103264373ebdb7615466ba72e5d1b5",
+      "bytes": 29767
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management/availability.rs",
+      "sha256": "7860fc7e96bec9cb783a97a47de82b4f11acfb9637480d79fddd4693ebcc0e6d",
+      "bytes": 14340
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management/output_required.rs",
+      "sha256": "bcc93d96d6e982927582fc98b15e5499cfd17ca404b6a571a73c7aea753153ba",
+      "bytes": 24146
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json",
+      "sha256": "8c6b2c3d2614473fc9ecad39fd8205d1c97c08491d9a3e7c0407467d3553a2f6",
+      "bytes": 5034
+    }
+  ],
+  "scope": "3 coherent post-component output/demand/availability Sources, Native authority, accepted peer and actual B/A24. No checkpoint28 test execution. No historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}

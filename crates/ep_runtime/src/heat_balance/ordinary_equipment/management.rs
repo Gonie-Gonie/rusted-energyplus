@@ -153,7 +153,7 @@ impl SourceHvacManager {
         let _air_system_output = 0.0;
         let _non_air_system_output = 0.0;
         let mut _first_call = true;
-        let _error_flag = false;
+        let mut error_flag = false;
         if o.equipment.number_of_supply_paths > 0 {
             return Err(Error::Unavailable(
                 "actual SimZoneEquipment SupplyAirPath3578",
@@ -236,7 +236,7 @@ impl SourceHvacManager {
                     .ok_or(Error::Unavailable("actual PrioritySimOrder EquipPtr3697"))?.equipment_pointer;
                 let mut system_output_provided = 0.0;
                 let mut latent_output_provided = 0.0;
-                let _non_air_system_output = 0.0;
+                let non_air_system_output = 0.0;
                 o.sizing.data_cool_coil_capacity = 0.0;
                 if o.equipment.first_pass_zone_equipment_flag {
                     let sizing = o.sizing.zone_equipment_sizing.as_mut()
@@ -264,8 +264,9 @@ impl SourceHvacManager {
                 let equipment_type = o.equipment.priority_simulation_order.as_ref()
                     .and_then(|rows| rows.get(equipment_number - 1))
                     .ok_or(Error::Unavailable("actual PrioritySimOrder equipType3725"))?.equipment_type;
+                let current_equipment_zone = o.sizing.current_zone_equipment_number;
                 let list = o.equipment.equipment_lists.as_ref()
-                    .and_then(|rows| rows.get(at(o.sizing.current_zone_equipment_number).ok()?))
+                    .and_then(|rows| rows.get(at(current_equipment_zone).ok()?))
                     .ok_or(Error::Unavailable("actual current ZoneEquipList3727"))?;
                 let component_number = list.equipment_indices.as_ref()
                     .and_then(|rows| rows.get(at(equipment_pointer).ok()?)).copied()
@@ -273,9 +274,21 @@ impl SourceHvacManager {
                 let mut valid_availability_component = false;
                 if equipment_type <= 14 { valid_availability_component = true; }
                 if component_number > 0 && valid_availability_component {
-                    // Genuine positive cached CompIndex enters this call on later
-                    // iterations; no perpetual first-call/zero-count shortcut.
-                    return Err(Error::Unavailable("actual GetZoneEqAvailabilityManager3739"));
+                    self.ancillary.availability.get_source_zone_equipment_availability(
+                        equipment_type, component_number, o.input, &mut error_flag,
+                    )?;
+                    let type_index = equipment_type.checked_sub(1).and_then(|v|usize::try_from(v).ok())
+                        .ok_or(Error::Unavailable("actual ZoneComp availability type ordinal3730"))?;
+                    let status = self.ancillary.availability.zone_components.as_ref().and_then(|rows|rows.get(type_index))
+                        .and_then(|row|row.managers.as_ref()).and_then(|rows|rows.get(at(component_number).ok()?))
+                        .ok_or(Error::Unavailable("actual same ZoneCompAvailMgrs status3730"))?.status;
+                    if status == 2 {
+                        o.hvac.turn_fans_on = true;
+                        o.hvac.turn_fans_off = false;
+                    } else if status == 1 {
+                        o.hvac.turn_fans_on = false;
+                        o.hvac.turn_fans_off = true;
+                    }
                 }
                 if o.space_controls.simulation && !o.globals.doing_sizing {
                     let splitter = list.equipment_splitter_indices.as_ref()
@@ -301,7 +314,6 @@ impl SourceHvacManager {
                             dictionary_host: output.dictionary_host,
                             eio: &mut *eio,
                         };
-                        let current_equipment_zone = o.sizing.current_zone_equipment_number;
                         let mut purchased_initialization = super::source_purchased_air::SourcePurchasedAirInitOwners {
                             sizing: o.sizing,
                             fan: o.fan,
@@ -327,15 +339,45 @@ impl SourceHvacManager {
                             &mut purchased_output, &mut purchased_initialization, &mut purchased_calculation,
                             first_hvac_iteration, &mut system_output_provided, &mut latent_output_provided,
                         )?;
-                        // These are the actual returned sensible/moisture cells.
-                        // The next Native Config/output-distribution body remains explicit.
-                        return Err(Error::Unavailable("actual PurchasedAir post-callee output response4084"));
                     }
                     // Current real input admits only PurchasedAir. Any later
                     // represented positive type must enter its actual callee,
                     // never produce a fabricated zero equipment response.
                     _ => return Err(Error::Unavailable("actual SimZoneEquipment positive equipment callee switch3747")),
                 }
+                {
+                    let config = o.equipment.zone_config.as_mut().and_then(|rows|rows.get_mut(at(number).ok()?))
+                        .ok_or(Error::Unavailable("actual post-component ZoneEquipConfig4084"))?;
+                    config.zone_exhaust += o.hvac.unbalanced_exhaust_mass_flow + o.hvac.balanced_exhaust_mass_flow;
+                    config.zone_exhaust_balanced += o.hvac.balanced_exhaust_mass_flow;
+                    config.plenum_mass_flow += o.hvac.plenum_induced_mass_flow;
+                }
+                let scheme = o.equipment.equipment_lists.as_ref().and_then(|rows|rows.get(at(current_equipment_zone).ok()?))
+                    .ok_or(Error::Unavailable("actual post-component same ZoneEquipList4091"))?.load_distribution_scheme;
+                if first_hvac_iteration && scheme != 0 {
+                    let capacity = native_capacity_integer(system_output_provided)?;
+                    let list = o.equipment.equipment_lists.as_mut().and_then(|rows|rows.get_mut(at(current_equipment_zone).ok()?))
+                        .ok_or(Error::Unavailable("actual post-component same mutable ZoneEquipList4093"))?;
+                    let rows = if system_output_provided > 0.0 { &mut list.heating_capacities }
+                        else { &mut list.cooling_capacities };
+                    *rows.as_mut().and_then(|rows|rows.get_mut(at(equipment_pointer).ok()?))
+                        .ok_or(Error::Unavailable("actual ZoneEquipList integer Capacity4093"))? = capacity;
+                }
+                let use_splitter = if o.space_controls.simulation && !o.globals.doing_sizing {
+                    let splitter = o.equipment.equipment_lists.as_ref().and_then(|rows|rows.get(at(current_equipment_zone).ok()?))
+                        .and_then(|list|list.equipment_splitter_indices.as_ref()).and_then(|rows|rows.get(at(equipment_pointer).ok()?))
+                        .ok_or(Error::Unavailable("actual post-component zoneEquipSplitterIndex4101"))?;
+                    *splitter > -1
+                } else { false };
+                if use_splitter {
+                    return Err(Error::Unavailable("actual zoneEquipSplitter distributeOutput4102"));
+                } else {
+                    o.air.zones.as_mut().and_then(|rows|rows.get_mut(at(number).ok()?))
+                        .ok_or(Error::Unavailable("actual post-component same zoneHeatBalance4105"))?.air.non_air_system_response += non_air_system_output;
+                }
+                output_required::update(o, number, system_output_provided, latent_output_provided,
+                    i32::try_from(equipment_number).map_err(|_|Error::Unavailable("actual EquipTypeNum integer domain4114"))?)?;
+                o.sizing.current_terminal_unit_sizing_number = 0;
             }
         }
         if o.space_controls.simulation && !o.globals.doing_sizing {
@@ -498,4 +540,14 @@ impl SourceHvacManager {
         }
         Ok(())
     }
+}
+
+// Native capacities are Array1D_int. Preserve the defined finite C++ assignment
+// domain; Rust's saturating float cast is not a replacement for out-of-range UB.
+fn native_capacity_integer(value: f64) -> Result<i32, Error> {
+    let truncated = value.trunc();
+    if !truncated.is_finite() || truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX) {
+        return Err(Error::Unavailable("actual ZoneEquipList capacity integer assignment domain4093"));
+    }
+    Ok(truncated as i32)
 }

@@ -1,0 +1,89 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 3,
+  "existing_Rust_sources": 3,
+  "new_Rust_sources": 0,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Actual production B then A24 only. No unrelated test/profile, repeated cohort, new test or alltargets.",
+  "scope": "Same retained Config, equipment-list, sensible/moisture demand, priority order and live schedules: actual post-component output response and whole updateSystemOutputRequired, plus same component availability zero-list input/count/status lifecycle. Defined integer-capacity conversions preserve actual Array1D_int. Existing mass/return/leaving and positive manager-list/Sizer operations retain truthful boundaries.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-zone-equipment-output.v1",
+  "status": "Genuine Source zone-equipment output and demand update; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/manifest.json",
+    "sha256": "c9ada9aed00f572069fd7d8848019bf3122ee588f189afabcfec6555624133ca",
+    "bytes": 33137
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Outer-zone-equipment-output-Source-review-28-02/review.json",
+    "sha256": "9e432e32ed560e4e798e92afc2e196c6758ea551dd599dc0f37d4467983a2f88",
+    "bytes": 25796
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-zone-equipment-output-held-Peer-28-02/complete-final-compiler-Source-plan.json",
+    "sha256": "5123652eedb9452475c5c91eea7ac01a3a839cf4d9e5279eba0005b0cb834156",
+    "bytes": 2628679
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-command-Root-28/receipt.json",
+    "sha256": "ab0cbceb53b66b8d74fa174e053cf0c583f35ab66438cef62a977d5110e3a816",
+    "bytes": 4180
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-A-24H-command-Root-28/receipt.json",
+    "sha256": "3088e7b40801f7b0291ebd7a586cf6ed11779dca2bcc006aa0d29806be6b41b1",
+    "bytes": 4129
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-zone-equipment-output-actual-review-28/review.json",
+    "sha256": "1241f905980f76fbf4fcfbd0dc6ab6a97d8990871d2508af7482e52c1fb9fabe",
+    "bytes": 17345
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: actual controlled MassConservation5022",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted27_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-purchased-air-calculation-actual-review-27/review.json",
+      "sha256": "ff63b47b136a03ef71025e46bb3d2eea8580d296fcd21bfc00e977563b4ae2b9",
+      "bytes": 17656
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal27": 7,
+    "CSV_files_whole_equal27": 2,
+    "scope": "Proof transfer from accepted27; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-zone-equipment-output-B-NOLIMIT-24H-Root-28/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither internal numerical Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-output-28/evidence.zip",
+    "sha256": "15d3d71aeeca1eb240f0aa0a8b82431f3275d77dc3a655d9e3d2e1f1bcb196c5",
+    "bytes": 1672758
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-output-28/manifest.json",
+    "sha256": "915531073703393a7ad25ce19104c534c5084bb5d92996fc217c22b1d0776e09",
+    "bytes": 25946
+  },
+  "archive_entries": 103,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-zone-equipment-output-checkpoint-Peer-28.py",
+    "sha256": "e35daa1a3beb4a70feb5a369b75877f1a4d4d32d170e77bbdcf7d32ea2ce01c4",
+    "bytes": 12203
+  }
+}

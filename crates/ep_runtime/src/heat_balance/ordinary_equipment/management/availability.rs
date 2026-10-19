@@ -50,6 +50,9 @@ const QUERY_TYPES: [&str; 11] = [
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceAvailability {
     pub(crate) get_input_flag: bool,
+    /// Actual independent SystemAvailabilityManagerData.hh584/588 cold cells.
+    pub(crate) get_lists_input: bool,
+    pub(crate) number_manager_lists: i32,
     pub(crate) initialize_one_time_flag: bool,
     pub(crate) counts: [i32; 11],
     pub(crate) managers: [Option<Vec<Infallible>>; 11],
@@ -60,6 +63,8 @@ impl Default for SourceAvailability {
     fn default() -> Self {
         Self {
             get_input_flag: true,
+            get_lists_input: true,
+            number_manager_lists: 0,
             initialize_one_time_flag: true,
             counts: [0; 11],
             managers: std::array::from_fn(|_| None),
@@ -271,6 +276,53 @@ impl SourceAvailability {
             return Err(Error::Unavailable(
                 "actual FillPredefinedTablesForAvailManager first PriAirSysAvailMgr row",
             ));
+        }
+        Ok(())
+    }
+}
+
+impl SourceAvailability {
+    /// Native GetSysAvailManagerListInputs1219: same input flag and real list count.
+    fn get_source_manager_list_inputs(&mut self, input: &mut SelectedInputProcessor) -> Result<(), Error> {
+        if self.get_input_flag {
+            self.get_source_inputs(input)?;
+            self.get_input_flag = false;
+        }
+        self.number_manager_lists = i32::try_from(input.get_num_objects_found("AvailabilityManagerAssignmentList"))
+            .map_err(|_|Error::Unavailable("actual availability list count integer domain1240"))?;
+        if self.number_manager_lists > 0 {
+            // Native only allocates ListData for positive count. No represented
+            // positive List record or empty allocated substitute is invented.
+            return Err(Error::Unavailable("actual AvailabilityManager ListData.allocate1244"));
+        }
+        Ok(())
+    }
+
+    /// Native1448-1512. The real no-list branch intentionally takes two calls to clear Input.
+    pub(super) fn get_source_zone_equipment_availability(&mut self, equipment_type: i32, component: i32,
+        input: &mut SelectedInputProcessor, _errors_found: &mut bool) -> Result<(), Error> {
+        if self.get_lists_input {
+            self.get_source_manager_list_inputs(input)?;
+            self.get_lists_input = false;
+        }
+        let type_index = equipment_type.checked_sub(1).and_then(|v|usize::try_from(v).ok())
+            .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager type ordinal1471"))?;
+        let component_index = component.checked_sub(1).and_then(|v|usize::try_from(v).ok())
+            .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager component ordinal1472"))?;
+        let row = self.zone_components.as_mut().and_then(|rows|rows.get_mut(type_index))
+            .and_then(|row|row.managers.as_mut()).and_then(|rows|rows.get_mut(component_index))
+            .ok_or(Error::Unavailable("actual same ZoneCompAvailMgrs1472"))?;
+        if row.input {
+            let _availability_list_name = &row.manager_list_name;
+            let found = 0;
+            if self.number_manager_lists > 0 {
+                return Err(Error::Unavailable("actual GetZoneEqAvailabilityManager ListData FindItemInList1478"));
+            }
+            // A positive Found cannot arise before the actual unrepresented
+            // list lookup above. Its manager-copy operations remain unclaimed.
+            if row.count > 0 || found > 0 { row.input = false; }
+            row.count = row.count.checked_add(1)
+                .ok_or(Error::Unavailable("actual GetZoneEqAvailabilityManager Count integer domain1509"))?;
         }
         Ok(())
     }

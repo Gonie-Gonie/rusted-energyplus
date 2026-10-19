@@ -1,4 +1,4 @@
-//! Native ZoneEquipmentManager4195-4510, real retained demand/order path.
+//! Native ZoneEquipmentManager4195-4510/4717-4908, real retained demand/order path.
 use super::{at, Error, SourceHvacOwners};
 use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::{
     SourceSystemMoistureDemand, SourceSystemSensibleDemand, SourceZoneAirDemand,
@@ -160,13 +160,13 @@ fn init_output(
     Ok(())
 }
 
-fn fraction(o: &SourceHvacOwners<'_, '_>, zone: i32, equipment: i32, heating: bool) -> Result<f64, Error> {
-    let row = list(o.equipment, zone)?;
+fn fraction(owner: &OrdinaryEquipment, schedules: &crate::heat_balance::selected_schedule_manager::SelectedScheduleManager, zone: i32, equipment: i32, heating: bool) -> Result<f64, Error> {
+    let row = list(owner, zone)?;
     let schedule = if heating { &row.sequential_heating_fraction_schedules }
         else { &row.sequential_cooling_fraction_schedules };
     let schedule = scalar(schedule, at(equipment)?)?
         .ok_or(Error::Unavailable("actual EquipList sequential fraction schedule pointer1810"))?;
-    o.schedules.source_current_schedule_value(schedule)
+    schedules.source_current_schedule_value(schedule)
 }
 
 fn distribute_output(o: &mut SourceHvacOwners<'_, '_>, zone: i32, space: Option<i32>) -> Result<(), Error> {
@@ -177,8 +177,8 @@ fn distribute_output(o: &mut SourceHvacOwners<'_, '_>, zone: i32, space: Option<
                 .ok_or(Error::Unavailable("actual PrioritySimOrder first equipment4440"))?.equipment_pointer;
             // Native always evaluates heating before cooling, even when one
             // ratio is not selected by TotalOutputRequired's later sign test.
-            let heating = fraction(o, zone, equipment, true)?;
-            let cooling = fraction(o, zone, equipment, false)?;
+            let heating = fraction(o.equipment, o.schedules, zone, equipment, true)?;
+            let cooling = fraction(o.equipment, o.schedules, zone, equipment, false)?;
             let (e, _) = required(&mut o.controller.demand, zone, space)?;
             let ratio = if e.base.total_output_required >= 0.0 { heating } else { cooling };
             *cell(&mut e.sequenced_output_required, 0)? = e.base.total_output_required * ratio;
@@ -242,6 +242,142 @@ pub(super) fn initialize(
                 .ok_or(Error::Unavailable("actual DistributeSystemOutputRequired space ordinal4416"))?;
             distribute_output(o, zone, Some(space))?;
         }
+    }
+    Ok(())
+}
+
+/// Native4717: update the same demand rows after the actual component returns.
+pub(super) fn update(o: &mut SourceHvacOwners<'_, '_>, zone: i32, sensible: f64, latent: f64, priority: i32) -> Result<(), Error> {
+    let i = at(zone)?;
+    let controlled = o.zones.zones.as_ref().and_then(|rows|rows.get(i))
+        .ok_or(Error::Unavailable("actual updateOutputRequired Zone.IsControlled4733"))?.is_controlled;
+    let demand = &mut o.controller.demand;
+    let energy = demand.zones.as_mut().and_then(|rows|rows.get_mut(i))
+        .ok_or(Error::Unavailable("actual updateOutputRequired sensible demand"))?;
+    let moisture = demand.zone_moisture.as_mut().and_then(|rows|rows.get_mut(i))
+        .ok_or(Error::Unavailable("actual updateOutputRequired moisture demand"))?;
+    if !controlled {
+        energy.base.unadjusted_remaining_output_required -= sensible;
+        energy.base.remaining_output_required = energy.base.unadjusted_remaining_output_required;
+        energy.unadjusted_remaining_output_to_heat_sp -= sensible;
+        energy.remaining_output_to_heat_sp = energy.unadjusted_remaining_output_to_heat_sp;
+        energy.unadjusted_remaining_output_to_cool_sp -= sensible;
+        energy.remaining_output_to_cool_sp = energy.unadjusted_remaining_output_to_cool_sp;
+        moisture.base.unadjusted_remaining_output_required -= latent;
+        moisture.base.remaining_output_required = moisture.base.unadjusted_remaining_output_required;
+        moisture.unadjusted_remaining_output_to_humid_sp -= latent;
+        moisture.remaining_output_to_humid_sp = moisture.unadjusted_remaining_output_to_humid_sp;
+        moisture.unadjusted_remaining_output_to_dehumid_sp -= latent;
+        moisture.remaining_output_to_dehumid_sp = moisture.unadjusted_remaining_output_to_dehumid_sp;
+        let control = *o.fan.thermostat.temp_control_type.as_ref().and_then(|rows|rows.get(i))
+            .ok_or(Error::Unavailable("actual updateOutputRequired TempControlType4750"))?;
+        update_current_deadband(&mut demand.current_deadband_or_setback, i, control, energy)?;
+        if priority > -1 {
+            let next = next_priority(priority)?;
+            if next <= energy.base.num_zone_equipment {
+                *cell(&mut energy.sequenced_output_required, at(next)?)? = energy.base.remaining_output_required;
+                *cell(&mut moisture.sequenced_output_required, at(next)?)? = moisture.base.remaining_output_required;
+            }
+            let order = o.equipment.priority_simulation_order.as_ref().and_then(|rows|rows.get(at(priority).ok()?))
+                .ok_or(Error::Unavailable("actual updateOutputRequired current PrioritySimOrder4793"))?;
+            let heating = next_priority(order.heating_priority)?;
+            if heating <= energy.base.num_zone_equipment {
+                *cell(&mut energy.sequenced_output_to_heating_sp, at(heating)?)? = energy.remaining_output_to_heat_sp;
+                *cell(&mut moisture.sequenced_output_to_humid_sp, at(heating)?)? = moisture.remaining_output_to_humid_sp;
+            }
+            let cooling = next_priority(order.cooling_priority)?;
+            if cooling <= energy.base.num_zone_equipment {
+                *cell(&mut energy.sequenced_output_to_cooling_sp, at(cooling)?)? = energy.remaining_output_to_cool_sp;
+                *cell(&mut moisture.sequenced_output_to_dehumid_sp, at(cooling)?)? = moisture.remaining_output_to_dehumid_sp;
+            }
+        }
+        return Ok(());
+    }
+    let actual_list = list(o.equipment, zone)?;
+    match actual_list.load_distribution_scheme {
+        0 => {
+            energy.base.unadjusted_remaining_output_required -= sensible;
+            energy.unadjusted_remaining_output_to_heat_sp -= sensible;
+            energy.unadjusted_remaining_output_to_cool_sp -= sensible;
+            moisture.base.unadjusted_remaining_output_required -= latent;
+            moisture.unadjusted_remaining_output_to_humid_sp -= latent;
+            moisture.unadjusted_remaining_output_to_dehumid_sp -= latent;
+            let count = i32::try_from(actual_list.number_of_equipment_types)
+                .map_err(|_|Error::Unavailable("actual updateOutputRequired NumOfEquipTypes integer domain"))?;
+            if priority > -1 && priority < count {
+                let next = next_priority(priority)?;
+                let system = o.equipment.priority_simulation_order.as_ref().and_then(|rows|rows.get(at(next).ok()?))
+                    .ok_or(Error::Unavailable("actual updateOutputRequired next PrioritySimOrder4828"))?.equipment_pointer;
+                let ratio = if energy.base.total_output_required >= 0.0 {
+                    fraction(o.equipment, o.schedules, zone, system, true)?
+                } else {
+                    fraction(o.equipment, o.schedules, zone, system, false)?
+                };
+                energy.base.remaining_output_required = ratio * energy.base.unadjusted_remaining_output_required;
+                energy.remaining_output_to_heat_sp = ratio * energy.unadjusted_remaining_output_to_heat_sp;
+                energy.remaining_output_to_cool_sp = ratio * energy.unadjusted_remaining_output_to_cool_sp;
+                moisture.base.remaining_output_required = ratio * moisture.base.unadjusted_remaining_output_required;
+                moisture.remaining_output_to_humid_sp = ratio * moisture.unadjusted_remaining_output_to_humid_sp;
+                moisture.remaining_output_to_dehumid_sp = ratio * moisture.unadjusted_remaining_output_to_dehumid_sp;
+                *cell(&mut energy.sequenced_output_required, at(next)?)? = energy.base.remaining_output_required;
+                *cell(&mut energy.sequenced_output_to_heating_sp, at(next)?)? = energy.remaining_output_to_heat_sp;
+                *cell(&mut energy.sequenced_output_to_cooling_sp, at(next)?)? = energy.remaining_output_to_cool_sp;
+                *cell(&mut moisture.sequenced_output_required, at(next)?)? = moisture.base.remaining_output_required;
+                *cell(&mut moisture.sequenced_output_to_humid_sp, at(next)?)? = moisture.remaining_output_to_humid_sp;
+                *cell(&mut moisture.sequenced_output_to_dehumid_sp, at(next)?)? = moisture.remaining_output_to_dehumid_sp;
+            } else {
+                energy.base.remaining_output_required = energy.base.unadjusted_remaining_output_required;
+                energy.remaining_output_to_heat_sp = energy.unadjusted_remaining_output_to_heat_sp;
+                energy.remaining_output_to_cool_sp = energy.unadjusted_remaining_output_to_cool_sp;
+                moisture.base.remaining_output_required = moisture.base.unadjusted_remaining_output_required;
+                moisture.remaining_output_to_humid_sp = moisture.unadjusted_remaining_output_to_humid_sp;
+                moisture.remaining_output_to_dehumid_sp = moisture.unadjusted_remaining_output_to_dehumid_sp;
+            }
+            let control = *o.fan.thermostat.temp_control_type.as_ref().and_then(|rows|rows.get(i))
+                .ok_or(Error::Unavailable("actual updateOutputRequired TempControlType4863"))?;
+            update_current_deadband(&mut demand.current_deadband_or_setback, i, control, energy)?;
+        }
+        1..=3 => {
+            if priority > -1 {
+                let next = next_priority(priority)?;
+                if next <= energy.base.num_zone_equipment {
+                    energy.base.remaining_output_required = *cell(&mut energy.sequenced_output_required, at(next)?)?;
+                    moisture.base.remaining_output_required = *cell(&mut moisture.sequenced_output_required, at(next)?)?;
+                }
+                let order = o.equipment.priority_simulation_order.as_ref().and_then(|rows|rows.get(at(priority).ok()?))
+                    .ok_or(Error::Unavailable("actual updateOutputRequired current PrioritySimOrder4890"))?;
+                let heating = next_priority(order.heating_priority)?;
+                if heating <= energy.base.num_zone_equipment {
+                    energy.remaining_output_to_heat_sp = *cell(&mut energy.sequenced_output_to_heating_sp, at(heating)?)?;
+                    moisture.remaining_output_to_humid_sp = *cell(&mut moisture.sequenced_output_to_humid_sp, at(heating)?)?;
+                }
+                let cooling = next_priority(order.cooling_priority)?;
+                if cooling <= energy.base.num_zone_equipment {
+                    energy.remaining_output_to_cool_sp = *cell(&mut energy.sequenced_output_to_cooling_sp, at(cooling)?)?;
+                    moisture.remaining_output_to_dehumid_sp = *cell(&mut moisture.sequenced_output_to_dehumid_sp, at(cooling)?)?;
+                }
+            }
+        }
+        _ => return Err(Error::Unavailable("actual updateOutputRequired illegal LoadDist fatal4904")),
+    }
+    Ok(())
+}
+
+fn next_priority(value: i32) -> Result<i32, Error> {
+    value.checked_add(1).ok_or(Error::Unavailable("actual updateOutputRequired next priority integer domain"))
+}
+
+fn update_current_deadband(rows: &mut Option<Vec<bool>>, i: usize, control: i32, energy: &SourceSystemSensibleDemand) -> Result<(), Error> {
+    let value = match control {
+        0 => Some(false),
+        1 => Some((energy.base.remaining_output_required - 1.0) < 0.0),
+        2 => Some((energy.base.remaining_output_required + 1.0) > 0.0),
+        3 | 4 => Some(energy.remaining_output_to_heat_sp < 0.0 && energy.remaining_output_to_cool_sp > 0.0),
+        _ => None,
+    };
+    if let Some(value) = value {
+        *rows.as_mut().and_then(|rows|rows.get_mut(i))
+            .ok_or(Error::Unavailable("actual updateOutputRequired CurDeadBandOrSetback ordinal"))? = value;
     }
     Ok(())
 }

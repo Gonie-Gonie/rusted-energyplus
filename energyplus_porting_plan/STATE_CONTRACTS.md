@@ -149,3 +149,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source IdealLoads 계산·갱신·보고 검증](evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json). 반환되는 현열·수분 출력과 Node 상태는 실제 PurchasedAir 계산에서 쓰며, 보고 필드는 같은 보유 유닛에서 갱신합니다. 심리계산 진단 등 미구현 경계는 명시적으로 유지합니다.
+
+
+[Source 장비 출력·수요 갱신 검증](evidence/SRC-06-canonical-zone-equipment-output-28/summary.json). 장비 목록·우선순위와 현열·수분 수요는 기존 소유자에서 갱신하며, 다음 장비의 실제 스케줄 값을 Native 순서로 읽습니다. 가용성 입력 래치와 호출 횟수도 같은 컴포넌트 행에 보존합니다.
