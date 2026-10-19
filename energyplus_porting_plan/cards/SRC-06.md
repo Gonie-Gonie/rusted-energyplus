@@ -458,3 +458,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source IdealLoads 초기화 검증](../evidence/SRC-06-canonical-purchased-air-initialization-26/summary.json). IdealLoads 초기화의 실행 결과를 기록했다. B의 실제 경계는 `GetHeatBalanceInput: actual PurchasedAir CalcPurchAirLoads203`이며 Calc·Update·Report 및 B 전체 완료는 별도 작업이다.
+
+
+[Source IdealLoads 계산·갱신·보고 검증](../evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json). IdealLoads Calc·Update·Report 실행 결과를 기록합니다. B의 실제 경계는 `GetHeatBalanceInput: actual PurchasedAir post-callee output response4084`이며, 전체 B 및 내부 Native 수치 동등성 완료를 주장하지 않습니다.

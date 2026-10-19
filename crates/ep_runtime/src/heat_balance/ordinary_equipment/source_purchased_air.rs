@@ -4,6 +4,8 @@ mod getter;
 mod schema;
 mod registration;
 mod initialization;
+mod calculation;
+pub(super) use calculation::SourcePurchasedAirCalcOwners;
 pub(super) use initialization::SourcePurchasedAirInitOwners;
 use owners::*;
 use super::{OrdinaryEquipment, source_nodes::SourceNodeFluidType};
@@ -59,11 +61,13 @@ impl OrdinaryEquipment {
         &mut self,name:&str,current_equipment_zone:i32,equipment_pointer:i32,controlled_zone:i32,
         shortcut:&mut SourceInputProcessorShortCut,source_is_epjson:bool,schedules:&mut SelectedScheduleManager,
         number_zones:i32,branch:&mut SourceBranchNodeConnections,any_ems:bool,
-        backend:&mut SourceErrorBackend<'_>,output:&mut SourcePurchasedAirReportingOutputContext<'_,H,D>,
+        output:&mut SourcePurchasedAirReportingOutputContext<'_,H,D>,
         initialization:&mut SourcePurchasedAirInitOwners<'_>,
+        calculation:&mut SourcePurchasedAirCalcOwners<'_, '_>,
+        first_hvac_iteration:bool,system_output:&mut f64,moisture_output:&mut f64,
     )->Result<(),Error>{
         if self.purchased_air.get_purchased_air_input {
-            self.get_source_purchased_air(shortcut,source_is_epjson,schedules,number_zones,branch,any_ems,backend,output)?;
+            self.get_source_purchased_air(shortcut,source_is_epjson,schedules,number_zones,branch,any_ems,calculation.backend,output)?;
             self.purchased_air.get_purchased_air_input=false;
         }
         // Native passes the actual equipment-list cell by reference. This
@@ -96,7 +100,10 @@ impl OrdinaryEquipment {
             }
         }
         self.initialize_source_purchased_air(unit_number, controlled_zone, schedules, initialization)?;
-        Err(Error::Unavailable("actual PurchasedAir CalcPurchAirLoads203"))
+        self.calculate_source_purchased_air(unit_number,controlled_zone,system_output,moisture_output,schedules,calculation)?;
+        self.update_source_purchased_air(unit_number,first_hvac_iteration)?;
+        self.report_source_purchased_air(unit_number,schedules,calculation)?;
+        Ok(())
     }
     #[allow(clippy::too_many_arguments)]
     fn get_source_purchased_air<H:SourceOutputFileHost,D:SourceOutputDictionaryHost>(

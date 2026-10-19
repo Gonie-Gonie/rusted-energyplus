@@ -234,8 +234,8 @@ impl SourceHvacManager {
                 let equipment_pointer = o.equipment.priority_simulation_order.as_ref()
                     .and_then(|rows| rows.get(equipment_number - 1))
                     .ok_or(Error::Unavailable("actual PrioritySimOrder EquipPtr3697"))?.equipment_pointer;
-                let _system_output_provided = 0.0;
-                let _latent_output_provided = 0.0;
+                let mut system_output_provided = 0.0;
+                let mut latent_output_provided = 0.0;
                 let _non_air_system_output = 0.0;
                 o.sizing.data_cool_coil_capacity = 0.0;
                 if o.equipment.first_pass_zone_equipment_flag {
@@ -309,14 +309,26 @@ impl SourceHvacManager {
                             clock: o.clock,
                             environment: o.environment,
                         };
+                        let mut purchased_calculation = super::source_purchased_air::SourcePurchasedAirCalcOwners {
+                            availability: &mut self.ancillary.availability,
+                            controller: o.controller,
+                            air: o.air,
+                            fan: o.fan,
+                            hvac: o.hvac,
+                            environment: o.environment,
+                            control: o.control,
+                            psychrometrics: o.psychrometrics,
+                            backend: o.backend,
+                        };
                         o.equipment.simulate_source_purchased_air(
                             &name, current_equipment_zone, equipment_pointer, number,
                             o.shortcut, *o.source_is_epjson, o.schedules, purchased_initialization.globals.num_of_zones,
                             &mut self.ancillary.branch_node_connections, purchased_initialization.globals.any_energy_management_system_in_model,
-                            o.backend, &mut purchased_output, &mut purchased_initialization,
+                            &mut purchased_output, &mut purchased_initialization, &mut purchased_calculation,
+                            first_hvac_iteration, &mut system_output_provided, &mut latent_output_provided,
                         )?;
-                        // Actual Init/Calc/Update/Report has not returned in
-                        // this bounded producer; never forge its zero response.
+                        // These are the actual returned sensible/moisture cells.
+                        // The next Native Config/output-distribution body remains explicit.
                         return Err(Error::Unavailable("actual PurchasedAir post-callee output response4084"));
                     }
                     // Current real input admits only PurchasedAir. Any later

@@ -12861,6 +12861,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-initialization-26/summary.json",
         "sha256": "0e00b879b0ff10450d87e813f1d4d14f809aff3b5278ed9c8b100fe59769161d",
         "size_bytes": 4945
+      },
+      "canonical_purchased_air_calculation_27": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json",
+        "sha256": "8c6b2c3d2614473fc9ecad39fd8205d1c97c08491d9a3e7c0407467d3553a2f6",
+        "size_bytes": 5034
       }
     },
     {

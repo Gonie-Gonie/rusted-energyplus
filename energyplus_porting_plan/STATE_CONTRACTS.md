@@ -146,3 +146,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source IdealLoads 초기화 검증](evidence/SRC-06-canonical-purchased-air-initialization-26/summary.json). 유닛별 초기화 배열과 환경·크기 결정 플래그를 같은 PurchasedAir 소유자에 보존한다. 실제 sizing 필드와 thermostat 값을 읽으며, 미구현 Sizer는 실제 호출 지점에서 중단한다.
+
+
+[Source IdealLoads 계산·갱신·보고 검증](evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json). 반환되는 현열·수분 출력과 Node 상태는 실제 PurchasedAir 계산에서 쓰며, 보고 필드는 같은 보유 유닛에서 갱신합니다. 심리계산 진단 등 미구현 경계는 명시적으로 유지합니다.

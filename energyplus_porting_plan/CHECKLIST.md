@@ -289,3 +289,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source IdealLoads 초기화 검증](evidence/SRC-06-canonical-purchased-air-initialization-26/summary.json). IdealLoads 초기화를 실제 장비·노드·일정·환경 소유자에 연결했다. 실행 도달 범위와 A24 회귀 결과는 연결 증거에 기록한다.
+
+
+[Source IdealLoads 계산·갱신·보고 검증](evidence/SRC-06-canonical-purchased-air-calculation-27/summary.json). IdealLoads 계산·갱신·보고 경로를 같은 실제 소유자에 연결했습니다. 관측된 중단 지점과 A24 회귀 결과는 연결된 증거에 기록합니다.
