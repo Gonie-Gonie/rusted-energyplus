@@ -14,6 +14,8 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod boundary_inputs;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 pub(crate) mod computed_geometry;
 mod convexity;
 mod derived_arrays;

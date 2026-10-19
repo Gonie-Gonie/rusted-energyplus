@@ -63,8 +63,7 @@ RAD-03가 보정 전 F를 잘못 사용하지 않는지 검사
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+현재 검증: 전체 FixViewFactors의 작은 행렬·불균형·상호성 강제 분기, 출력 인자·진단·지속 scratch를 비교했습니다. 세 수명의 Fix→ScriptF→교환 21개 기록이며 CalcApproximateViewFactors 생산자는 별도입니다.
+
+[실제 명령·고정 원본 범위·입력 해시·독립 검토·실패 기록](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)에 모았습니다. 표면 검증 55개 기록은 IdealLoads 전용 시험 파일 한 개만 바뀐 것을 확인해 재사용했습니다. 이 단위 비교로 카드의 네 gate를 일괄 완료 처리하지 않습니다.
+

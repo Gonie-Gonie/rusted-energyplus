@@ -443,3 +443,13 @@ fn native_capacity_integer(value: f64) -> Result<i32, Error> {
     }
     Ok(truncated as i32)
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl SourceHvacManager {
+    /// Same real InitZoneEquipment; no copied initialization or state reset.
+    pub(crate) fn initialize_source_zone_equipment_cohort_bridge(
+        &mut self, first_hvac_iteration: bool, owners: &mut SourceHvacOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        self.initialize_source_zone_equipment(first_hvac_iteration, owners)
+    }
+}

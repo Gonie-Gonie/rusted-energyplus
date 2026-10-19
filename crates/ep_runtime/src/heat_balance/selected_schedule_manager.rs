@@ -4,8 +4,11 @@ use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
 mod accessors;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 mod annual;
 mod compact;
+pub(crate) mod minute;
 mod detailed;
 mod day_group;
 mod predefined;

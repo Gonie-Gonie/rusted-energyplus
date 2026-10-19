@@ -23,6 +23,8 @@ pub struct OrdinaryRadiantExchangeState {
     pub max_num_enclosure_surfaces: i32,
     /// Actual CalcInteriorRadExchangefirstTime; cleared after scratch allocation.
     pub first_exchange_call: bool,
+    /// Actual HeatBalanceIntRadExchgData LargestSurf, initialized0 and retained.
+    pub largest_surface: i32,
     /// Same ViewFactorReport field written by Solar and radiant report scans.
     pub view_factor_report: bool,
     /// None: unallocated; Some(None): allocated, not written by a producer.
@@ -38,6 +40,7 @@ impl Default for OrdinaryRadiantExchangeState {
         Self {
             max_num_enclosure_surfaces: 0,
             first_exchange_call: true,
+            largest_surface: 0,
             view_factor_report: false,
             surface_temp_rad: None,
             surface_temp_in_kelvin_fourth: None,

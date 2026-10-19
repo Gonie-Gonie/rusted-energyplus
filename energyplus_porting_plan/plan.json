@@ -12971,6 +12971,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-successful-log-layout-49/summary.json",
         "sha256": "807277c6cf526ea889021ee07bd4afb587c60b49997ea10621084ee435350f7b",
         "size_bytes": 45165
+      },
+      "canonical_purchased_air_surface_53": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/summary.json",
+        "sha256": "0d0aae827dc167ba12b02bc86229103812d5a33667709df3a421af90f0ade840",
+        "size_bytes": 10176
       }
     },
     {

@@ -327,3 +327,6 @@ impl OrdinaryEquipment {
         self.source_sizer_cohort_full_size(&mut o,report)
     }
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;

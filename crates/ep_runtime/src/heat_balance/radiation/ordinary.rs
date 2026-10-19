@@ -4,6 +4,8 @@
 //! diagnostic probe supplies a caller flag, iteration count or cache result.
 
 mod enclosure_setup;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 mod initialization;
 mod radiant_exchange;
 pub(crate) mod shading_report;

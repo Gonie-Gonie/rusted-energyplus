@@ -44,6 +44,18 @@ pub use zone_equipment::*;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let selection=std::env::args().skip(1).collect::<Vec<_>>();
+    if selection.first().is_some_and(|value|value=="--gap-batch-only") {
+        if selection.len()!=3 {
+            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"expected --gap-batch-only GROUP FIXTURE_JSON_PATH").into());
+        }
+        let group=&selection[1];
+        let fixture=std::path::Path::new(&selection[2]);
+        println!("running 1 original-core gap cohort group={group} on process main");
+        let calls=crate::heat_balance::gap_batch_cohort::run(group,fixture)?;
+        println!("cohort native_controlled_air_cohort ... ok");
+        println!("cohort result: ok. 1 passed; 0 failed; group={group}; full-call records={calls}; private cache state unobserved");
+        return Ok(());
+    }
     if selection.len()==1 && selection[0]=="--predictor-parent-only" {
         println!("running 1 full native predictor-parent cohort on process main");
         let cases=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::run_native_full_predictor_parent_cohort()?;

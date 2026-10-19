@@ -63,8 +63,7 @@ SYS-01이 commit을 호출한 시점·warmup 인계와 대조
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+현재 검증: 두 지속 수명·14개 기록에서 실제 UpdateThermalHistories kernel의 19×8 이력 배열과 counter·scratch·보고 상태를 비교했습니다. warmup 종료와 실제 표면 부모의 인계는 별도 조건입니다.
+
+[실제 명령·고정 원본 범위·입력 해시·독립 검토·실패 기록](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)에 모았습니다. 표면 검증 55개 기록은 IdealLoads 전용 시험 파일 한 개만 바뀐 것을 확인해 재사용했습니다. 이 단위 비교로 카드의 네 gate를 일괄 완료 처리하지 않습니다.
+

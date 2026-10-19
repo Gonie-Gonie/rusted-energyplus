@@ -6,6 +6,7 @@ use ep_model::{SurfaceId, SurfaceType, ZoneId};
 use std::collections::BTreeMap;
 
 pub mod ordinary;
+mod fix_view_factors;
 
 /// Current longwave/solar source-order owner for outside-face inputs.
 pub const EXTERIOR_RADIATION_OWNER_STAGE: &str = "CalcHeatBalanceOutsideSurf";
@@ -619,72 +620,30 @@ fn fix_energyplus_approximate_view_factors_with_outcome(
     if !total_area.is_finite() || largest_area > 0.99 * (total_area - largest_area) {
         return None;
     }
-    let mut area_factors = vec![0.0; extent];
-    for i in 0..surface_count {
-        for j in 0..surface_count {
-            area_factors[j * surface_count + i] = view_factors[j * surface_count + i] * areas[i];
-        }
+    // The admitted legacy primitive borrows the same full implementation.
+    // Its balanced guard proves LargestSurf and Zone reciprocity unconsumed;
+    // diagnostics remain unavailable under this established probe interface.
+    let mut factors = view_factors.to_vec();
+    let mut largest_surface = 0;
+    let mut checks = fix_view_factors::SourceViewFactorChecks {
+        original: f64::NAN, fixed: f64::NAN, final_value: f64::NAN,
+        iterations: -1, row_sum: f64::NAN,
+    };
+    fix_view_factors::fix_kernel(
+        areas, &mut factors, &mut largest_surface, "", &[], &mut checks, false,
+        |_| Err(()), |_| Err(()), |_, _| Err(()),
+    ).ok()?;
+    if checks.iterations > 400 || factors.iter().any(|value| !value.is_finite()) {
+        return None;
     }
-    let mut fixed_area_factors = average_with_transpose(&area_factors, surface_count);
-    let mut convergence_old = 10.0;
-    let mut iterations = 0;
-    loop {
-        iterations += 1;
-        for i in 0..surface_count {
-            let sum = (0..surface_count)
-                .map(|j| fixed_area_factors[j * surface_count + i])
-                .sum::<f64>();
-            let coefficient = if sum.abs() > 1.0e-10 {
-                areas[i] / sum
-            } else {
-                1.0
-            };
-            for j in 0..surface_count {
-                fixed_area_factors[j * surface_count + i] *= coefficient;
-            }
-        }
-        fixed_area_factors = average_with_transpose(&fixed_area_factors, surface_count);
-        let mut fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
-        for i in 0..surface_count {
-            for j in 0..surface_count {
-                let offset = j * surface_count + i;
-                if fixed_factors[offset].abs() < 1.0e-10 {
-                    fixed_factors[offset] = 0.0;
-                    fixed_area_factors[offset] = 0.0;
-                }
-            }
-        }
-        let convergence_new = (fixed_factors.iter().sum::<f64>() - surface_count as f64).abs();
-        let converged =
-            (convergence_old - convergence_new).abs() < 1.0e-5 || convergence_new <= 0.001;
-        convergence_old = convergence_new;
-        // Original increments before work, then tests >400 after convergence.
-        // Its iteration401 diagnostic/failure path is an unavailable boundary.
-        if iterations > 400 || fixed_factors.iter().any(|value| !value.is_finite()) {
-            return None;
-        }
-        if converged {
-            // RowSum is initialized to +0 and assigned only in Original's
-            // final fallback branch; retain it instead of recomputing a report.
-            let row_sum = if convergence_new < original_check {
-                0.0
-            } else {
-                fixed_factors.iter().sum::<f64>()
-            };
-            if convergence_new < original_check || (row_sum - surface_count as f64).abs() < 0.001 {
-                return Some(FixedViewFactors {
-                    view_factors: fixed_factors,
-                    original_check,
-                    fixed_check: convergence_new,
-                    final_check: convergence_new,
-                    iterations,
-                    row_sum,
-                });
-            }
-            // Original emits a completeness warning for the remaining branch.
-            return None;
-        }
-    }
+    Some(FixedViewFactors {
+        view_factors: factors,
+        original_check: checks.original,
+        fixed_check: checks.fixed,
+        final_check: checks.final_value,
+        iterations: usize::try_from(checks.iterations).ok()?,
+        row_sum: checks.row_sum,
+    })
 }
 
 fn average_with_transpose(matrix: &[f64], surface_count: usize) -> Vec<f64> {
@@ -797,7 +756,7 @@ pub(crate) fn energyplus_scriptf_from_view_factors_with_warning<E>(
     Ok(Some(script_f))
 }
 
-fn invert_square_matrix(matrix: &mut [f64], dimension: usize) -> Option<Vec<f64>> {
+pub(crate) fn invert_square_matrix(matrix: &mut [f64], dimension: usize) -> Option<Vec<f64>> {
     let matrix_extent = dimension.checked_mul(dimension)?;
     if dimension == 0 || matrix.len() != matrix_extent {
         return None;

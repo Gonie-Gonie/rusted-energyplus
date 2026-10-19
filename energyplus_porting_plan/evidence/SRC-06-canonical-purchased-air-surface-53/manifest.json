@@ -1,0 +1,3432 @@
+{
+  "schema": "src06-P1-Surface53-finite-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/evidence.zip",
+    "sha256": "6a7002b1a7092ed3d50f9d1a79a5860936d52c9daea2509e36ab32beac036051",
+    "bytes": 4145585
+  },
+  "entries": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "bytes": 24041
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "bytes": 336899
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+        "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf",
+        "bytes": 47387
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+        "sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+        "bytes": 29096
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "bytes": 60978
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+        "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21",
+        "bytes": 28491
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataContaminantBalance.hh",
+        "sha256": "1fbeba16b5a6b3208ea3ee2af4ebee9a1f529e65a84d846060cc4d6b1537aad7",
+        "bytes": 17770
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataContaminantBalance.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "bytes": 16816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+        "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+        "bytes": 18669
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+        "bytes": 35280
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "bytes": 13547
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+        "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+        "bytes": 24717
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+        "sha256": "47b8408ba71120bbfbe31e8c10c0e192872abebde7ba93918c643a69fcbf1298",
+        "bytes": 11610
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalFanSys.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+        "sha256": "ffdf2d16d8b90ab091861614bc02922e2f76889b9e16ee7ee5edc376492729cb",
+        "bytes": 19511
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "bytes": 133816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+        "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+        "bytes": 26592
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataLoopNode.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "bytes": 113537
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataViewFactorInformation.hh",
+        "sha256": "67d6252bcd2e42917302199840eadda2ad2f75cc23e863c2b57d80d6655b2d53",
+        "bytes": 7330
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataViewFactorInformation.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+        "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+        "bytes": 12483
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.cc",
+        "sha256": "8d7eba6b146ad0b81312cbcfb32357b530ce6f5ec1716ed9e4dc8dd2901b3a6a",
+        "bytes": 142562
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+        "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+        "bytes": 11096
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+        "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+        "bytes": 198904
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+        "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+        "bytes": 120027
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+        "sha256": "ef4fd977481582cc4ada7b140b97782af7a7945010bf3e36b440e7a6b0c3e3e5",
+        "bytes": 11786
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "bytes": 371103
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "bytes": 698972
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+        "sha256": "9f5a1b891eb0152f210f6b2f0cc0f882854439082e598446bb8dd23376309cc9",
+        "bytes": 14686
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+        "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+        "bytes": 32371
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "bytes": 122929
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+        "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d",
+        "bytes": 14108
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+        "sha256": "9f59a6937c224b6e0b50dab42d614e190696ee5bf3684b1b159907e6964f7b38",
+        "bytes": 43487
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+        "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+        "bytes": 225982
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+        "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+        "bytes": 55700
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+        "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+        "bytes": 209881
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+        "sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+        "bytes": 29562
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ReportCoilSelection.hh",
+        "sha256": "83c016add3ad919926bc920cf71e13146107295a12ed7a32518f15dcb84e1242",
+        "bytes": 30685
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ReportCoilSelection.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+        "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+        "bytes": 187792
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+        "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+        "bytes": 23158
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.cc",
+        "sha256": "547edeea98d989496b604157ada3a6f4e47ba3be93d47a2546640f2ddf46d652",
+        "bytes": 288728
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.hh",
+        "sha256": "5532cfe78d3bbf6cb8ed601393a9d005235f02f06141079302711f992b452cbd",
+        "bytes": 34058
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SystemAvailabilityManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+        "bytes": 490422
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc",
+        "bytes": 53352
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.cc",
+        "sha256": "fa4a784f847e9d85a19b9f871c4c23a78b8de630a7300546a4a2551db0d257cd",
+        "bytes": 428353
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.hh",
+        "sha256": "9b2bf21af8e1563591143948ff30cd5641d3b72bcfe135b1222daf98fdb592b8",
+        "bytes": 16204
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneEquipmentManager.hh",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "bytes": 404705
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/Fixtures/EnergyPlusFixture.cc",
+        "sha256": "cfb2a7173b12bfe6ac291bebaf6100a6351b0d05e4f81411a8c5a5c28b5baec9",
+        "bytes": 16731
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/Fixtures/EnergyPlusFixture.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/PurchasedAirManager.unit.cc",
+        "sha256": "ca42f6efb1ab1d918f228e6ccf2f8f1fc9cbcf8b17f168495938f91d2983bd13",
+        "bytes": 83574
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/PurchasedAirManager.unit.cc",
+      "purposes": [
+        "Pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/apply.forward_diff.diff",
+        "sha256": "bb1d9c3a12c7e5277fc394e770c35282c7d93520c7c57e1fd7571652139a5988",
+        "bytes": 2867
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/apply.forward_diff.diff",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/apply.inverse_diff.diff",
+        "sha256": "3cbc9cd76db9cb4e22529257e457d69a0f986efe5c7b79a5f3a0b4921f6e60c1",
+        "bytes": 2867
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/apply.inverse_diff.diff",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/launch.forward_diff.diff",
+        "sha256": "18873a020870bc7731bb66064fee2061e12d0820058fc9409c0dcf2f587ba87e",
+        "bytes": 788
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/launch.forward_diff.diff",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/launch.inverse_diff.diff",
+        "sha256": "ccddba76661eb0e687e1680404cd8f7fec81da264b2c661ea67f2f617d5367b0",
+        "bytes": 788
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/launch.inverse_diff.diff",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/prepared.json",
+        "sha256": "6113c2f6bbd5899e0f8e9501a48df4e8ceca6b2860d23382fa1dbd3ac94ff78f",
+        "bytes": 2910
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53-02/prepared.json",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53/prepared.json",
+        "sha256": "a5aecf18de05f0bef4102211d01089394598fd2a7bd1f64f4dfed44e139ae8a5",
+        "bytes": 2590
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-open-output-helpers-prepared-Peer-53/prepared.json",
+      "purposes": [
+        "Preserved helper metadata correction"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P1-static-shape-census-Audit-51/census.json",
+        "sha256": "d9578a1375ece94b4ed8d046c706575aac5622425a127272aa39fe54081a5e34",
+        "bytes": 26217
+      },
+      "archive_path": ".runtime/porting/SRC-06/P1-static-shape-census-Audit-51/census.json",
+      "purposes": [
+        "Bounded factory/schema/stream provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-P1-Node-shape-review-Audit-52/review.json",
+        "sha256": "89a29adb7ed1898a60453e38db3512eb5e5179cc7624258f8b0da5450580e218",
+        "bytes": 4706
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-P1-Node-shape-review-Audit-52/review.json",
+      "purposes": [
+        "Independent narrow correction peer"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-P1-open-output-review-Audit-53/review.json",
+        "sha256": "0fbeb1041d0016f9fea60e695bf4beec0555f6bbb88b28fb4fc4b721857ddc5f",
+        "bytes": 5256
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-P1-open-output-review-Audit-53/review.json",
+      "purposes": [
+        "Independent narrow correction peer"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-P1-raw-prescan-review-Audit-51/review.json",
+        "sha256": "74a2d20d903181a0347662a5e9e7b31917d66cc31046335fffb38dea0908c78e",
+        "bytes": 36249
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-P1-raw-prescan-review-Audit-51/review.json",
+      "purposes": [
+        "Independent narrow correction peer"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-Source-gap-runner-review-Audit-01/review.json",
+        "sha256": "72cb3249f17a4214febb204b97fdef6ac07da2faa93c0f1619042c447455cef5",
+        "bytes": 6004
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-Source-gap-runner-review-Audit-01/review.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-Source-surface-adapter-review-Audit-03/review.json",
+        "sha256": "d84891319778b0070ceff18a69ba651eab98b7e50d6cf5e43af269b6baf7f1f8",
+        "bytes": 24789
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-Source-surface-adapter-review-Audit-03/review.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-coherent-Source50-join-review-Audit-01/review.json",
+        "sha256": "33f9f959d4c41420ff206685d019546db0c4e9c1b0321e140da4ee82f42d7b61",
+        "bytes": 13557
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-coherent-Source50-join-review-Audit-01/review.json",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-Native-caller-review-P1-02/review.json",
+        "sha256": "c411827470ee1f93fe9f2fc95456996832645197dd099573a7aeb2d2ab8c8bf3",
+        "bytes": 14732
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-purchased-air-Native-caller-review-P1-02/review.json",
+      "purposes": [
+        "Independent original Native P1/Surface Source peer"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-Source-scaffold-review-Audit-P1-01/review.json",
+        "sha256": "71dbbf060a4250f757fa813e342912ab2aef15def0286595c2787edc2b3736f6",
+        "bytes": 19338
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-purchased-air-Source-scaffold-review-Audit-P1-01/review.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-surface-exterior-Native-leaf-review-03/review.json",
+        "sha256": "6369d6ed0989daafb8bd1ecaa0934f5af7d23455741a827ad0e43cfe58e70aae",
+        "bytes": 17350
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-surface-exterior-Native-leaf-review-03/review.json",
+      "purposes": [
+        "Independent original Native P1/Surface Source peer"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-P1-open-output-application-53/receipt.json",
+        "sha256": "1cbadad1b705d175c049043c38aa48e616860970f1c8b2bd1573aa241d5b520a",
+        "bytes": 2380
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-P1-open-output-application-53/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture",
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-P1-runtime-fixture-guard-53/after.json",
+        "sha256": "e2ab346bc81fc2f3dc104045dc91413515655b423dc232ec662bb7607aeeaa88",
+        "bytes": 4795
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-P1-runtime-fixture-guard-53/after.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-P1-two-bindings-independent-review-02/review.json",
+        "sha256": "9d8190701a5fc6366fb72c033105dc5d62a894b3900bf4027e63aab6bba36a4a",
+        "bytes": 1993
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-P1-two-bindings-independent-review-02/review.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-gap-batch-P1-Surface-application-50/receipt.json",
+        "sha256": "e6e55dc16a1b7c8a0c1891d99edf8f27eae97795f96f9116c7b7b94bbb302841",
+        "bytes": 4504
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-gap-batch-P1-Surface-application-50/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture",
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-runtime-fixture-surface-guard-50/after.json",
+        "sha256": "5289e25efdfe0d46b868c23405c57979750c412111ca0bce4bf739bbe071ea06",
+        "bytes": 4340
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-runtime-fixture-surface-guard-50/after.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-source-gap-batch-actual-review-53/review.json",
+        "sha256": "bbac4d29c940910b1f30d9f75811a1ca916521b37b6bce0903e67d26f006a940",
+        "bytes": 19739
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-gap-batch-actual-review-53/review.json",
+      "purposes": [
+        "Actual combined review/checker and preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/apply-P1-open-output-Root-53-02.py",
+        "sha256": "efcfa89f574e737536be89cda4596fb25b7635f4ae232f321c8547fa580adaa9",
+        "bytes": 3433
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-P1-open-output-Root-53-02.py",
+      "purposes": [
+        "Actual scoped application Source",
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/apply-P1-open-output-Root-53.py",
+        "sha256": "44c15e4d9522c73e75a97b01c2166d9cfe0f9da90df2e27eb6f51eadedd9862b",
+        "bytes": 3433
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-P1-open-output-Root-53.py",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/receipt.json",
+        "sha256": "eb6c94a9a34c1be3e15841a0cf477cefb6d7ca33c8a607b8058c9016341125a6",
+        "bytes": 6221
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/receipt.json",
+      "purposes": [
+        "Preserved real P1 compile/setup failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/stderr.log",
+        "sha256": "263eecd55744a3af752da19ae25d731b18ad29f6d00db6e694e39401f88ef5fd",
+        "bytes": 1508156
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/stderr.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/stdout.log",
+        "sha256": "5ca55d4f3e64db2195b6f00ea13c9584ad39d95cf1c9e816fa4542db8c769536",
+        "bytes": 71
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/stdout.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/receipt.json",
+        "sha256": "d64617036434151abc51f911eac58c1f68b0a8cf6450edb3c7bb2feb10b9a8ce",
+        "bytes": 6201
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/stderr.log",
+        "sha256": "47dcd7e96849eb7051c096a0c5250e4cea40dfa0db2c6f385d8bc10c83f6affd",
+        "bytes": 1507463
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/stderr.log",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/stdout.log",
+        "sha256": "edbc6d03533bb77ba1ad3f4e20249bc9a009372f8210f24110b6aeff526d125f",
+        "bytes": 215
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/stdout.log",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/receipt.json",
+        "sha256": "39383e843642d8594acbcf1c763b813133551a0baa23db7a61075e22be07f697",
+        "bytes": 6226
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/receipt.json",
+      "purposes": [
+        "Preserved real P1 compile/setup failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/stderr.log",
+        "sha256": "916b167a46feb6c092b54a5603b103160ea1a142b8eb6271b31f2e5caeb52888",
+        "bytes": 1508044
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/stderr.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/stdout.log",
+        "sha256": "5ca55d4f3e64db2195b6f00ea13c9584ad39d95cf1c9e816fa4542db8c769536",
+        "bytes": 71
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/stdout.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/receipt.json",
+        "sha256": "5d0b2cf442f38a0a59b9f1eca03da583b1ae9f19c3264794ad7d8788dcffd46c",
+        "bytes": 6226
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/receipt.json",
+      "purposes": [
+        "Preserved real P1 compile/setup failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/stderr.log",
+        "sha256": "128ab354fda0906572838450cb19e88aec17b0bc35492b762981562f4e881275",
+        "bytes": 1510145
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/stderr.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/stdout.log",
+        "sha256": "5ca55d4f3e64db2195b6f00ea13c9584ad39d95cf1c9e816fa4542db8c769536",
+        "bytes": 71
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/stdout.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/receipt.json",
+        "sha256": "eaaecb147b5146b165c6347443c52341ae92058650ac1bef6d2e3d966d4dd6a6",
+        "bytes": 6224
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/stderr.log",
+        "sha256": "bbd9c2d8c940283ccd3af5b57433e2fe178e78ade2991865350886b8a1121a9e",
+        "bytes": 1507570
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/stderr.log",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/stdout.log",
+        "sha256": "466de06236652ca1ece665ed4afe6ee85beba441d7b03e61500febfc7b6a6945",
+        "bytes": 367
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/stdout.log",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/receipt.json",
+        "sha256": "867ac589a7f20c836696a90bec5507d82e5741dfbe817e116933d721188ad982",
+        "bytes": 4207
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/receipt.json",
+      "purposes": [
+        "Preserved real P1 compile/setup failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/stderr.log",
+        "sha256": "6d790ed1b242317d63aef2562b95f478944d382a737bf69d7c9a6a9f0be93cf3",
+        "bytes": 900842
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/stderr.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/stdout.log",
+      "purposes": [
+        "Preserved actual failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/check-Source-gap-batch-actual-Root-53-02.py",
+        "sha256": "3ab0ed3b16885220255623909566c7a93fe4fc902b678e35aba26fb78e1eb3a3",
+        "bytes": 12360
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-Source-gap-batch-actual-Root-53-02.py",
+      "purposes": [
+        "Actual combined review/checker and preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/check-Source-gap-batch-actual-Root-53.py",
+        "sha256": "315bfb757108418251279c8386482c9678a57b33ef853ee0a0bdd9b205b3981d",
+        "bytes": 12356
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-Source-gap-batch-actual-Root-53.py",
+      "purposes": [
+        "Actual combined review/checker and preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/correct-Source-P1-Node-shape-Peer-52.py",
+        "sha256": "0c65622a2273571564330c8cb0f0fe0ff720a6c6da2829598ddc1e9409d1db10",
+        "bytes": 6228
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-Source-P1-Node-shape-Peer-52.py",
+      "purposes": [
+        "Correction author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/correct-Source-P1-open-output-Peer-53.py",
+        "sha256": "00af725018067e4c38153817cb8183dd7504f23d1079c634ae5eec4bd31b9981",
+        "bytes": 6755
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-Source-P1-open-output-Peer-53.py",
+      "purposes": [
+        "Correction author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/correct-Source-P1-raw-prescan-Peer-51.py",
+        "sha256": "028301d8edb0e88b02948e6f5d51d6ab6a0db92a83658643b14db922a5b98a56",
+        "bytes": 7983
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-Source-P1-raw-prescan-Peer-51.py",
+      "purposes": [
+        "Correction author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/gap-actual-checker-correction-Peer-53-02/correction.json",
+        "sha256": "f40f95f09cb75a4b69fdba2e64649b470b44c78a3d7a7c1e6dce220759a70394",
+        "bytes": 1330
+      },
+      "archive_path": ".runtime/porting/SRC-06/gap-actual-checker-correction-Peer-53-02/correction.json",
+      "purposes": [
+        "Actual combined review/checker and preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+        "sha256": "fc76790e89122784da36a9687c22079a2aefe67cdf498b0d55e32ac9d52b598e",
+        "bytes": 3087
+      },
+      "archive_path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/launch-P1-open-output-Root-53-02.py",
+        "sha256": "5dbeb61dddc6ebecaf692aaf85ff1317e409ef59d069258e0f0f3e870035bc51",
+        "bytes": 2943
+      },
+      "archive_path": ".runtime/porting/SRC-06/launch-P1-open-output-Root-53-02.py",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/launch-P1-open-output-Root-53.py",
+        "sha256": "c48c92c48236f6afb02a057c9ec6ff12f560e9dd7857990f33ae39ca51df7d32",
+        "bytes": 2940
+      },
+      "archive_path": ".runtime/porting/SRC-06/launch-P1-open-output-Root-53.py",
+      "purposes": [
+        "Scoped53 helper sources/diffs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/native-gap-batch-common-draft-Audit-01/native_gap_batches.hh",
+        "sha256": "3551eb5d79a41e15c45f899b64ee45c494c638065c5afecfedfed13f80ce32ec",
+        "bytes": 397
+      },
+      "archive_path": ".runtime/porting/SRC-06/native-gap-batch-common-draft-Audit-01/native_gap_batches.hh",
+      "purposes": [
+        "Actual Native P1/Surface/common producer Source or named primary inputs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-04/native-build.json",
+        "sha256": "ecc451d0987f16aeab059ff79df59dded4abedf67921cda493606825bdd1a075",
+        "bytes": 30201
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-04/native-build.json",
+      "purposes": [
+        "Shared actual original-core build metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-recipes-ready-Peer-04/named-inputs.json",
+        "sha256": "dd52631ef6788c61a568ac44cfdf3531885e47d01355fb00c73d181565e19569",
+        "bytes": 240864
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-recipes-ready-Peer-04/named-inputs.json",
+      "purposes": [
+        "Actual Native P1/Surface/common producer Source or named primary inputs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/Native-after.json",
+        "sha256": "59f7894a04e382b4571cf07ddb2a81d4809d683b2aefb068f70ec293eb3d8597",
+        "bytes": 56245
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/Native-after.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/Native-before.json",
+        "sha256": "bb143191dda4f0bb9571481d77de58abad815b82918a638ea5d0c74c96ed35aa",
+        "bytes": 56485
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/Native-before.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/actual-child-modules.json",
+        "sha256": "6eabb0d2c7de8d4292c1152c77c9a757bb23655ac481140746c02a73adcb5b73",
+        "bytes": 4421
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/actual-child-modules.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/receipt.json",
+        "sha256": "b32ed10a1eca54fd5171b70ff42adffffccff443854475a53ba3c4700b0a8a36",
+        "bytes": 11064
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/stderr.log",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-purchased_air/stdout.log",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/Native-after.json",
+        "sha256": "59f7894a04e382b4571cf07ddb2a81d4809d683b2aefb068f70ec293eb3d8597",
+        "bytes": 56245
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/Native-after.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/Native-before.json",
+        "sha256": "bb143191dda4f0bb9571481d77de58abad815b82918a638ea5d0c74c96ed35aa",
+        "bytes": 56485
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/Native-before.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/actual-child-modules.json",
+        "sha256": "1e194e2d6cce2d7175ab37f561a54079c889525a8514b17a0b57b85b2fed6018",
+        "bytes": 4305
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/actual-child-modules.json",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/receipt.json",
+        "sha256": "1ee35e418813720481dbeddd12914eedb12e5f4cd78c5373bbdcd6b27ef10d00",
+        "bytes": 9185
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/receipt.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/stderr.log",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-04-surface/stdout.log",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/purchased_air_batch.cpp",
+        "sha256": "3f1e0e286f4fe451672e5fc2673c0dc5004a74714b00281fea9506f1b4d01e4b",
+        "bytes": 50921
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/purchased_air_batch.cpp",
+      "purposes": [
+        "Actual Native P1/Surface/common producer Source or named primary inputs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/surface_gap_batch.cpp",
+        "sha256": "9a8de92b905f9ec32d5594478fdb5313bf83bfe2754c0cf4ea60cf14122287c2",
+        "bytes": 16626
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/surface_gap_batch.cpp",
+      "purposes": [
+        "Actual Native P1/Surface/common producer Source or named primary inputs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-three-group-driver-draft-Outer-10/native_gap_batch_main.cpp",
+        "sha256": "b6d7cae5eac4967a744c59f2c9ce319d26874f17a20d376fa6c3de9fc7a518f2",
+        "bytes": 4799
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-three-group-driver-draft-Outer-10/native_gap_batch_main.cpp",
+      "purposes": [
+        "Actual Native P1/Surface/common producer Source or named primary inputs"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-purchased-air-surface-publication-Peer-53.py",
+        "sha256": "87a4889c6c43179c9085f42050f10bdcb2077685522bbfd96e63414150b03369",
+        "bytes": 13363
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-purchased-air-surface-publication-Peer-53.py",
+      "purposes": [
+        "Actual combined review/checker and preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataContaminantBalance.hh.77-91.txt",
+        "sha256": "ffcca63082b0ce592c1d122ab0ba8b3ea8169f4ba4fd8f978c57a23d88435706",
+        "bytes": 910
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataContaminantBalance.hh.77-91.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobalConstants.hh.99-187.txt",
+        "sha256": "f31644690045c74c637b855bf75367834056ad0a5f417064d6e47cbdecd7afc8",
+        "bytes": 2947
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobalConstants.hh.99-187.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHVACGlobals.hh.112-122.txt",
+        "sha256": "42b80541d7572e5d3d6fe2bfd3790d6da983c4975f0e98a7e85c444d8d8ad7b7",
+        "bytes": 181
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHVACGlobals.hh.112-122.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHeatBalFanSys.hh.101-109.txt",
+        "sha256": "3ea108be371b236ac30111d54115ca138ea438dc18be01e2a8624ccf6e81527d",
+        "bytes": 238
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHeatBalFanSys.hh.101-109.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHeatBalFanSys.hh.154-168.txt",
+        "sha256": "c82d2e061ac3b4faefbe527fe1496c47089d8f97b7b19fd7722af9e79a3302fc",
+        "bytes": 927
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataHeatBalFanSys.hh.154-168.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEnergyDemands.hh.72-143.txt",
+        "sha256": "418c9d1e166b2d8d4c96b7bdf9ed75b3cf9ecc369e979f589fd3aed5e11e4d61",
+        "bytes": 5867
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEnergyDemands.hh.72-143.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.167-813.txt",
+        "sha256": "0297d8ea84cc4116152c09a489846c764c373081ff4c7fab854f75d97aa2f2fa",
+        "bytes": 39017
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.167-813.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.2234-2327.txt",
+        "sha256": "96478018c7a492c16bf45df1fcc4deca2bf34863b19d8f837600d3f251f62d20",
+        "bytes": 4070
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.2234-2327.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.814-1261.txt",
+        "sha256": "9a383468fdcd139c3a4b5b259280d18043395427e874ab00464dfbbe4b110f85",
+        "bytes": 27844
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.814-1261.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__EPVector.hh.56-155.txt",
+        "sha256": "9c5b5dedef6f07db13b786142b4eee9d01e5a4f028650a2a2b4a53c124250627",
+        "bytes": 2274
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__EPVector.hh.56-155.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.1822-2082.txt",
+        "sha256": "dcd7eab9fd1d15943d090043c6b24055bfef72a7f2a15b7c63ac56d578c9921d",
+        "bytes": 16297
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.1822-2082.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.2179-2592.txt",
+        "sha256": "97a8eedda1a91d4f8d7c7592e0a0386c80606a014bc6b459b5365c27889e046d",
+        "bytes": 24154
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.2179-2592.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.397-596.txt",
+        "sha256": "df9308aa273afc6c0eb8884511d09a88c65c08002f19623ae8523fc9aed347fe",
+        "bytes": 9007
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.397-596.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.947-970.txt",
+        "sha256": "1c872c1c24c9a383af7c9a979262ac67c4697fb24aab57013710bd9c4ceaf84f",
+        "bytes": 1103
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.947-970.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__ReportCoilSelection.hh.443-458.txt",
+        "sha256": "c5f757a935b842b0f62da6548af78895a9435c911125036e45f873bd4fdfe36d",
+        "bytes": 436
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__ReportCoilSelection.hh.443-458.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__ZoneEquipmentManager.hh.269-284.txt",
+        "sha256": "7d8a8a74fee6c8e8eb09c950c90cff7ff31e98a1cafc235258be64b34215e6dc",
+        "bytes": 713
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-01/Native-extents/src__EnergyPlus__ZoneEquipmentManager.hh.269-284.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-02/draft.json",
+        "sha256": "e2c4d1bb286593665b2b5e4ba5ba57f188fb543384bf10bdae94f6e948edb19f",
+        "bytes": 58013
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-02/draft.json",
+      "purposes": [
+        "Original Native P1/Surface bounded readset"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataLoopNode.hh.439-511.txt",
+        "sha256": "3fea88f4eaf1dbb35875b3c91b41854f8f5b0330bd469eb4802374fd3ac6b76b",
+        "bytes": 4580
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataLoopNode.hh.439-511.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.167-210.txt",
+        "sha256": "1ba31e3fd70cb7abd9e8c20d83248de776c5c55493d212e4884b87127fc77c7a",
+        "bytes": 1517
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.167-210.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.814-855.txt",
+        "sha256": "47796d4ffd735bef15c7c1b930c09af004598aca449c1f2b6af11fd611489482",
+        "bytes": 2455
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__DataZoneEquipment.cc.814-855.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.55-307.txt",
+        "sha256": "8af38121cabb7ce12227efab723727f73eaaa86ad6c18189b24cbc6de2cb6adf",
+        "bytes": 18273
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.55-307.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.579-595.txt",
+        "sha256": "4791a94d500e6995e61b686dadb0b4ba7c88ba1effab55b12551ec073bc629a4",
+        "bytes": 658
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.579-595.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.840-862.txt",
+        "sha256": "a2a612c2b9f029948f25a5779e4cd2542d9d3694d30365f4f8fbbad14028d4d4",
+        "bytes": 1003
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__Data__EnergyPlusData.cc.840-862.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HVACManager.cc.277-401.txt",
+        "sha256": "edfa16230d443fd4855c02a4604b9a6331f29f52ecf790346bb2f12286a044ce",
+        "bytes": 8258
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HVACManager.cc.277-401.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HVACManager.cc.559-592.txt",
+        "sha256": "c72db977fe46372951c11fa4dee153ec55afd204cd4c4802318f5e4af7dcc003",
+        "bytes": 2063
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HVACManager.cc.559-592.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.1822-1879.txt",
+        "sha256": "b07d83fd642a01b71061e962f67a9843c79dacfd54c3f46f34532b824b2074af",
+        "bytes": 3254
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.1822-1879.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.2824-2853.txt",
+        "sha256": "1fe3c4eb63e61d5416587425361e6b0737ffae63417a6950dc108c193df5cbd7",
+        "bytes": 2130
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__HeatBalanceManager.cc.2824-2853.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__InputProcessing__InputProcessor.cc.259-323.txt",
+        "sha256": "2c253b8931957d0d342ade6ae81a92b32d5f786f856da91bba15adf61776b935",
+        "bytes": 3005
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__InputProcessing__InputProcessor.cc.259-323.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__OutputProcessor.cc.253-281.txt",
+        "sha256": "55e4c22d4d4625742e96d9278091a6b5771f3a7934fe732e18949ece051e7aa1",
+        "bytes": 1404
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__OutputProcessor.cc.253-281.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__OutputProcessor.cc.3245-3277.txt",
+        "sha256": "15145e87f86257f25af605eb40401162768fec2a633867427399a30e5c8d8b93",
+        "bytes": 1677
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__OutputProcessor.cc.3245-3277.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.1054-1324.txt",
+        "sha256": "eaf96ceb5aa473b5d4e912789fa86064f38c7ef47b2faedaa0f659ddcc2b567f",
+        "bytes": 16391
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.1054-1324.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.144-210.txt",
+        "sha256": "8e6a84112cc07d5fc0fb0a62d8308b907772f2bf0168e028dfc26cfd85670ac8",
+        "bytes": 3025
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.144-210.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.1906-2760.txt",
+        "sha256": "1e06efbf2db231e65e313ddf5e1e52a4e405e8d0eee4b9c9144ee531d0ee5325",
+        "bytes": 54042
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.1906-2760.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.212-1053.txt",
+        "sha256": "2de343f6db05063f12852ab93cfb0210cdebdefbab28e6c5a629cdb4c2905198",
+        "bytes": 50879
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.212-1053.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2762-2810.txt",
+        "sha256": "dc057ce00e6ec8f1c3359eed12dfa7f0b8b67f0a919395c1e453dcca0206cfdd",
+        "bytes": 2000
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2762-2810.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2812-2939.txt",
+        "sha256": "985f9ee86f509c023baf60debbae2815d0a1c24e9322d7b0e7345d394bc62b82",
+        "bytes": 6611
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2812-2939.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2941-2984.txt",
+        "sha256": "f4b55b9877fd034333d222856a35fb35794cb7d7914968fcb8a9f407fd416b2d",
+        "bytes": 1869
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2941-2984.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2986-3097.txt",
+        "sha256": "565b3340a1f1104fa3b4a1916e1c08b4ed2e82e42f529d16e4f2a18f4968d33b",
+        "bytes": 5740
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.cc.2986-3097.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.hh.329-405.txt",
+        "sha256": "e48fd226eb1843303d15bd6be603cdcbe8d375f98275c1c28750b00792c145b7",
+        "bytes": 4154
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.hh.329-405.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.hh.66-327.txt",
+        "sha256": "ec49adb1021a8a2bd65b208565878d53abd4586218e06326293b0f397322d9c6",
+        "bytes": 20787
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__PurchasedAirManager.hh.66-327.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.211-239.txt",
+        "sha256": "f8e2b35080f00c40966b384a3709593a936565e94db1d253c76aa89a8f7d4f83",
+        "bytes": 1590
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.211-239.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.2465-2532.txt",
+        "sha256": "358d294100cef5bc65a701a23900e45a76917d44fc525a98a0ff436113d99e82",
+        "bytes": 2834
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.2465-2532.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.2733-3073.txt",
+        "sha256": "5ca6fcaabafdb47b65d6ffeddff73a7f92365c7f97fdfd3629b9a59226f40030",
+        "bytes": 16919
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.cc.2733-3073.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.136-144.txt",
+        "sha256": "537ed80b264149b7589e0ce4c1832a3619fd04be5ec6ff2e4fde2e5f62ee33a8",
+        "bytes": 355
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.136-144.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.177-232.txt",
+        "sha256": "ad19dd0432a16b9954803f25b51d42c6d413cd20715ab4876ea287357bf6cd1e",
+        "bytes": 2228
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.177-232.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.249-286.txt",
+        "sha256": "6007a4e7b2284509188f2d53c88e36f22164eb3a5af13c0d38552ceaabf41195",
+        "bytes": 1706
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.249-286.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.369-414.txt",
+        "sha256": "31765c11e395fe31746658a0e1a8bfb9290e115788ad4f9c42274d2c5d236189",
+        "bytes": 2418
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ScheduleManager.hh.369-414.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.136-176.txt",
+        "sha256": "f7919bf5299363230ffc36008e23efb95a28ada819f71bff70eb70a30312a53b",
+        "bytes": 1974
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.136-176.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.245-309.txt",
+        "sha256": "aaf424bcb04025ec83634a17afc5b803a7873d31ba578b574f3c5fcfb40b6bee",
+        "bytes": 3356
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.245-309.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.375-411.txt",
+        "sha256": "64f4feca2191a79d271222e604ae306840dafa0de206bfc330609e1653897830",
+        "bytes": 1996
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.cc.375-411.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.hh.412-431.txt",
+        "sha256": "9285c9fc1c3090a76e49e2bd7fc8b323de019772a6e69273e1f8f56886ab0775",
+        "bytes": 1128
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.hh.412-431.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.hh.453-458.txt",
+        "sha256": "aef87576f0f616cc2747fb8c72319d29066c7b780747239c05b1a21879fcdeda",
+        "bytes": 380
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__SystemAvailabilityManager.hh.453-458.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneEquipmentManager.cc.169-342.txt",
+        "sha256": "f9d6484f972348ae8a77130c831f1c8d8ad26edb32beedba23faad29734af2c4",
+        "bytes": 9331
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneEquipmentManager.cc.169-342.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneEquipmentManager.cc.3718-3742.txt",
+        "sha256": "9eb9ce9f39fdd48166df22fc3be72f7600229aa12abe8305ebb6c1f9aedbbd87",
+        "bytes": 1351
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneEquipmentManager.cc.3718-3742.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.2373-2426.txt",
+        "sha256": "ece9f357b0bf8b2d95d3566a9509f039391c0d2079fa1fe72af5a248c9be979a",
+        "bytes": 3549
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.2373-2426.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.3817-3861.txt",
+        "sha256": "4d2f634442285c403fc889497b0ba62f8bb13cde97859f96d751e5d3ccff5b55",
+        "bytes": 2776
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.3817-3861.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4187-4275.txt",
+        "sha256": "a516383c59a8028badd62dcfcaba3974e118d2b4794b8330551693c2d8836621",
+        "bytes": 5069
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4187-4275.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4297-4370.txt",
+        "sha256": "137d38544a16d80a9c7e22a09845090f31c651729b923357902a245af340bce2",
+        "bytes": 4534
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4297-4370.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4391-4431.txt",
+        "sha256": "2f81f5f0dd3ecb3190b1e671be3e08747f24a1c5db219e1e475e624d14d7cf55",
+        "bytes": 2132
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4391-4431.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__Fixtures__EnergyPlusFixture.cc.104-136.txt",
+        "sha256": "f5a8b0fbbad543f38edc72bcbf57feb35a55247891d66ead84a005be0b951edb",
+        "bytes": 980
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__Fixtures__EnergyPlusFixture.cc.104-136.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__Fixtures__EnergyPlusFixture.cc.360-428.txt",
+        "sha256": "453ff5f670fa2944146fc9423356eb8c49b12f308ede9597902cc14b198ad3df",
+        "bytes": 3753
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__Fixtures__EnergyPlusFixture.cc.360-428.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.1464-1554.txt",
+        "sha256": "b64c1a3d44eb3b6a2bbbf6b6a37876bdf829344c690a1ab96e16742e8e369f08",
+        "bytes": 4037
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.1464-1554.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.254-310.txt",
+        "sha256": "6be69761ba68d4accea764d8c0a54ed4a0da0b2cbd7949d66a1f74263c70bfe4",
+        "bytes": 2849
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.254-310.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.87-139.txt",
+        "sha256": "a61fd59024dc63434a69598f6696254976287cf3d89d3f66dc62dc37fec4fe87",
+        "bytes": 2404
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.87-139.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.923-968.txt",
+        "sha256": "dbe110e7883356a0520b5934ad218795236927c58b1ceff1aad07fd7f8a91fef",
+        "bytes": 1899
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-scientific-batch-design-Audit-02/Native-extents/tst__EnergyPlus__unit__PurchasedAirManager.unit.cc.923-968.txt",
+      "purposes": [
+        "Pinned strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-05.py",
+        "sha256": "70e6abb2268806e7033091b9d73273c329b80970ae1150fe96ebe73b84fc1e71",
+        "bytes": 23503
+      },
+      "archive_path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-05.py",
+      "purposes": [
+        "Native actual admission/modules/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/forward_diff.diff",
+        "sha256": "27b0cfe159f0ab9106b90489e0bd8ff790530dde648a2c7e4e737ad285d58ece",
+        "bytes": 570
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/forward_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/inverse_diff.diff",
+        "sha256": "f32a966419215c44326121d3d2cccd519e5814d8d2a3d1819fc363383f02cbbb",
+        "bytes": 570
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/inverse_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/manifest.json",
+        "sha256": "66522e690f853d19fa8f6e6568157287902d96d1bb6f3f6b68c471a08ee64424",
+        "bytes": 5351
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/manifest.json",
+      "purposes": [
+        "Actual cfg-only correction packet"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "14a0ef1475b004202daee5fe2f2ef3eac8368bde7598f218e39b2c5351b3e2d7",
+        "bytes": 96347
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/static-schema-audit.json",
+        "sha256": "9e824793dd94071e60cc8a494ceb520b5de340f1d7e4e89f4dab49ec79413262",
+        "bytes": 19702
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Node-shape-fix-Peer-52/static-schema-audit.json",
+      "purposes": [
+        "Bounded factory/schema/stream provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/complete-proposed-compiler-Source-plan.json",
+        "sha256": "6fa41d549ca3df3ab074b663c2b0c9bae34529db74e9cc910bb90b7c3a8d417e",
+        "bytes": 2580486
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/complete-proposed-compiler-Source-plan.json",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort.rs.forward_diff.diff",
+        "sha256": "d34030231bb881dfc09e46d48b496bb108080108fdc4d1b82807e486dafa7df7",
+        "bytes": 2296
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort.rs.inverse_diff.diff",
+        "sha256": "47b91abee346a5a74ade1a4478642c10c8da6125ddbc3ea9269a66d94164be59",
+        "bytes": 2296
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort__surface.rs.forward_diff.diff",
+        "sha256": "94401951747e1c350f48319ec78c4a8461499d6d484e6cbed30a4c0d3348e34f",
+        "bytes": 9840
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort__surface.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort__surface.rs.inverse_diff.diff",
+        "sha256": "6218690bcf75c21e637015e4ce43ae6775b0e419ae6d78b0820a556fbe4f79d9",
+        "bytes": 9840
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__gap_batch_cohort__surface.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__mod.rs.forward_diff.diff",
+        "sha256": "d10e6b506c550f9d45981732c139f8564922388b6ebe76bd9ba23c6d627820ae",
+        "bytes": 283
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__mod.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__mod.rs.inverse_diff.diff",
+        "sha256": "57f4c4d3c2e0b3706e457c5a2705c34991c9389a0c6c488f4434d336d40557f7",
+        "bytes": 283
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__mod.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__management.rs.forward_diff.diff",
+        "sha256": "2cc99b019a410830ca8f4b8fe21959b46ce012e3dbe4c502498b49c82b472269",
+        "bytes": 640
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__management.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__management.rs.inverse_diff.diff",
+        "sha256": "27c8f6308faaf2dce6e19f24b447e46a6114bb61472965a59fced96774a0acd6",
+        "bytes": 640
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__management.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air.rs.forward_diff.diff",
+        "sha256": "242c9ead7b76fde29288910091aa8cd0d2d20ca2f8c881f2731619b783868196",
+        "bytes": 340
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air.rs.inverse_diff.diff",
+        "sha256": "5e9d5fe2c3889ce25e7b4f2c726ace46f582e0f0295184bf303d006ea09be120",
+        "bytes": 340
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort.rs.forward_diff.diff",
+        "sha256": "a8d8b483370ff8d9478565538e12a8317b067de3948eb1b3b905fcbc3f73b56a",
+        "bytes": 98396
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort.rs.inverse_diff.diff",
+        "sha256": "9342dd060a097d63c8fc787690b84966df32cc675f2e43a4c891394bbbcdc1fd",
+        "bytes": 98396
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort__input.rs.forward_diff.diff",
+        "sha256": "40bf2c1de17ce43cc34fde01a6ba96e8ca8cd6912197054cf5fcc657f3823258",
+        "bytes": 139743
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort__input.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort__input.rs.inverse_diff.diff",
+        "sha256": "14bb5ef54d90214d8a9f47bd78878966f7e2798999431c8f8005f21900b18cd8",
+        "bytes": 139743
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__ordinary_equipment__source_purchased_air__native_gap_cohort__input.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation.rs.forward_diff.diff",
+        "sha256": "2bebed65e103ef122694a1fe78a80c2e4aa6d96ef819c6b1977a5b70bd45fbdb",
+        "bytes": 4902
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation.rs.inverse_diff.diff",
+        "sha256": "14d8ba314f244d6e4c7805f29c7e69cf081e1766200217e2ee49242ffc7c9855",
+        "bytes": 4902
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__fix_view_factors.rs.forward_diff.diff",
+        "sha256": "d3075977f64d146750b3433f421ac6004879eb4653cb37e6adaf186fef7e2820",
+        "bytes": 12696
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__fix_view_factors.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__fix_view_factors.rs.inverse_diff.diff",
+        "sha256": "4c3e38e3be7abab674f2601d28572b30b30c27feff53353dc9f6f65bb20126e1",
+        "bytes": 12696
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__fix_view_factors.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary.rs.forward_diff.diff",
+        "sha256": "66f6b444b1c936bda6c772241e92ca70c037951487793bcb5c41dc988c430cc4",
+        "bytes": 402
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary.rs.inverse_diff.diff",
+        "sha256": "56aa4da7a180e5d044f899853e2c1ec90bb6dbba1e4ea0bb365579d3e1480067",
+        "bytes": 402
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__native_gap_cohort.rs.forward_diff.diff",
+        "sha256": "670db1b5e9344ffd2754b0f3ba6dbf002612e6a8a35d37787934b22d66a65be5",
+        "bytes": 17253
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__native_gap_cohort.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__native_gap_cohort.rs.inverse_diff.diff",
+        "sha256": "814830548b2b0aa5531226f06d8782037f83cfb12db30a58d7829cccc5cf1725",
+        "bytes": 17253
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__native_gap_cohort.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__radiant_exchange.rs.forward_diff.diff",
+        "sha256": "810a9f9b5ac437cc58c425bcec3dc8e868782bfee3255289facc35eaeed631e5",
+        "bytes": 921
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__radiant_exchange.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__radiant_exchange.rs.inverse_diff.diff",
+        "sha256": "eb0b6e38918eb88c1dfe8b477b42cc99ce9fc6f53d22322a28dd51f97af7c185",
+        "bytes": 921
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__radiation__ordinary__radiant_exchange.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.forward_diff.diff",
+        "sha256": "7d679f8338d5e8d1809401d18fb168683c08f54d9f3550114d8a02b2f161f4a3",
+        "bytes": 376
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.inverse_diff.diff",
+        "sha256": "edee9e6cc5f9e3864bcb0ba7b9363ba8b014a896ffdee45f1db92667a4d23e76",
+        "bytes": 376
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__native_gap_cohort.rs.forward_diff.diff",
+        "sha256": "c902edced2e1c2f79b92fc6e523a7292c1d49951339fb77d413d468487c4c0bd",
+        "bytes": 1470
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__native_gap_cohort.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__native_gap_cohort.rs.inverse_diff.diff",
+        "sha256": "a839ec166a58015405888172dc8add1269f8eeb9f525b5ba0c42b9abfd9d345d",
+        "bytes": 1470
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__surface__native_gap_cohort.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.forward_diff.diff",
+        "sha256": "25410dd7c088fdf86cf73d5499d5cc8bf9f1bb51b3ac19c014f543dd1af8d6c0",
+        "bytes": 959
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.inverse_diff.diff",
+        "sha256": "4c67b8b6623cb643b9f802baa81565d37051b5de0bb0f8452a2f7f3114a1a82b",
+        "bytes": 959
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_heat_balance_input__zone__storage.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager.rs.forward_diff.diff",
+        "sha256": "2215509e76c2310451ebc3589db0b22c026ea7380b5e6d9460d40fd32fdea10e",
+        "bytes": 419
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager.rs.inverse_diff.diff",
+        "sha256": "a88b02ccba44963ca53743b3280d2c0d5bb8786457e0fc9a903529ad4d9327d1",
+        "bytes": 419
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__compact.rs.forward_diff.diff",
+        "sha256": "2bad9241344f3b9b67b10d8eea6d07d3f76eafdcb480ca846b5c1d3a6b3707eb",
+        "bytes": 5401
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__compact.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__compact.rs.inverse_diff.diff",
+        "sha256": "8c37e3695ecb071d244a8e5d347c633c30b18344055df8fb852c886202cd3c96",
+        "bytes": 5401
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__compact.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__minute.rs.forward_diff.diff",
+        "sha256": "9b20d0e799f6d67e5a6c8bdd004b3da13c55f76c604b45c408fdbca98153fc8d",
+        "bytes": 14721
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__minute.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__minute.rs.inverse_diff.diff",
+        "sha256": "4df2838a8b097eb5b32c122320e67b6a142c324c73953dd14b91472e0b31b0fd",
+        "bytes": 14721
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__minute.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__native_gap_cohort.rs.forward_diff.diff",
+        "sha256": "65f8a4d5fce4346481d573f2efcc039a5c442c1a7ef3a217b286d2f7363d6547",
+        "bytes": 9216
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__native_gap_cohort.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__native_gap_cohort.rs.inverse_diff.diff",
+        "sha256": "065b7325ae44833dca252b44aa26bad7984e4e5fc37b9119fe5b45b4f7331aca",
+        "bytes": 9216
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__heat_balance__selected_schedule_manager__native_gap_cohort.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__lib.rs.forward_diff.diff",
+        "sha256": "7bd4096eaaf2b8bebae63bfa9004c7ab0adb4de8ec6665e25c41adf6b8f0f8ef",
+        "bytes": 1345
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__lib.rs.forward_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__lib.rs.inverse_diff.diff",
+        "sha256": "d6f337a1302d5b6940e08f25ead2ae9cfaa3e08ff6e88588bc00c747f2743dbf",
+        "bytes": 1345
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/diffs/base49_to_final/crates__ep_runtime__src__lib.rs.inverse_diff.diff",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/draft.json",
+        "sha256": "349822d74e9150118fb7fbb8fc9a5230241367c1c5f84564fe5d02059756d050",
+        "bytes": 53484
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/draft.json",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+        "sha256": "2695383e35a3600ed2e862c8616bcb9816df8e5d776598e8b0d3b55535ac4128",
+        "bytes": 2580714
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/forward_diff.diff",
+        "sha256": "3a114b4aeb416533513ea1eedef8dfaff03ceea16e4c3ac21de24e81afd9d91f",
+        "bytes": 1234
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/forward_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/initial-stream-provenance.json",
+        "sha256": "9977997acd5df9d015becb8717c359d7a866b2883cd5ecc3688272294ebed5cb",
+        "bytes": 4425
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/initial-stream-provenance.json",
+      "purposes": [
+        "Bounded factory/schema/stream provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/inverse_diff.diff",
+        "sha256": "b1f2177c6d248cd34e00ad375b67930320e9ce0306789374a8fb82cf3286ba76",
+        "bytes": 1234
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/inverse_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/manifest.json",
+        "sha256": "1ba7ef0f2b6aaaa026b5953af46e30038c967a0552cc53c6d379da8a48dc505d",
+        "bytes": 5066
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/manifest.json",
+      "purposes": [
+        "Actual cfg-only correction packet"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "bc920cfbe1ec1791543b6de522f380b3589bff0156de7dfd86a97875d85b68b8",
+        "bytes": 96640
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/all4-raw-association-proof.json",
+        "sha256": "f5b1ba6a510bda2860790e321a9722324ce3bdfd42e5949abd7fd6acf57110e3",
+        "bytes": 45108
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/all4-raw-association-proof.json",
+      "purposes": [
+        "Bounded factory/schema/stream provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/forward_diff.diff",
+        "sha256": "7de88cde5d7c8052ac0a4a4f9b625b2939c692c461c1e8282a00d74724a0afbb",
+        "bytes": 1489
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/forward_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/inverse_diff.diff",
+        "sha256": "0e99ab6e6a04fc37000bfd671addecc7ceb6611f6c69a2ad1957f9e21fdc99e4",
+        "bytes": 1489
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/inverse_diff.diff",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/manifest.json",
+        "sha256": "ec573bb69a5aeb4a9659a42f6cbe78c68082b48516b0e95326855ad602e1bb74",
+        "bytes": 6007
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/manifest.json",
+      "purposes": [
+        "Actual cfg-only correction packet"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "769e079251856d42cc7580eeefc3b87f1d5d28fbcb28391d72ae86e19e0214f8",
+        "bytes": 96346
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-raw-prescan-fix-Peer-51/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/draft.json",
+        "sha256": "ce41e6a8286cc0a62d4374acfc94da325e856b128d4b182a207169e6480f1ca0",
+        "bytes": 3683
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/draft.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/gap_batch_cohort.rs",
+        "sha256": "37d124e788cffe930444a03f1e03278cf94379f6e58397f3712830bc8df3e6bf",
+        "bytes": 2128
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/gap_batch_cohort.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/surface.fixture.json",
+        "sha256": "527121c611f527c9cc3b9038542df38e36326e1574d0c139957c2cfc7fdd9442",
+        "bytes": 5860194
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Surface-hub-fixture-Outer-01/surface.fixture.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "cd80badd6f88a79a51d1eaa127b673f5bf64622415bd8791844dc731bf074ca7",
+        "bytes": 34234
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+        "sha256": "fbcf27d5f07cdb8a58af3488b0d15f0e1ed57b1fc3f10df3f933174a40ae6fa6",
+        "bytes": 12429
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "319c545b97f0cb885ad804c52581108bbfe9180fd1d036d34f322b07fce9e05f",
+        "bytes": 23204
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "5d9fa875ff5d3ef3aaba2c7d74b54f65d56b06aa40580574f810330de85e3d2a",
+        "bytes": 32510
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+        "sha256": "5116f1b0b95e05d084629a36b5306e6dec5f40015e13372e6e1a91493fc895a3",
+        "bytes": 12306
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+        "sha256": "a0e96832ab2da9448bcc9fdb2beb8d5d44289c61be7a75d204077e5b45ab4b5c",
+        "bytes": 12573
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "e68a859f7eb50516f7ddbaf75d3698f9c4ff7112498375f3064f579388913042",
+        "bytes": 23370
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-full-view-factor-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "606fe4724422534f86d09f0f4dc86d77a002c024839afb4a2a2bde1c03c86756",
+        "bytes": 4043
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/before/crates/ep_runtime/src/lib.rs",
+        "sha256": "975b46fa54d3ce3ee0332bb34fd139405ae3e9782a3f363ac036232961ca4b4c",
+        "bytes": 3582
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/before/crates/ep_runtime/src/lib.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/draft.json",
+        "sha256": "7cde392b875874e1c1ef50f4b59fef151fd94db70375aff908d09367aac8947c",
+        "bytes": 6784
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/draft.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs.stdout.rs",
+        "sha256": "9d2a615cee56906d1a98454e6e4a160ff4ec6c66f46566299875b417ec4f98d7",
+        "bytes": 2360
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/mod.rs.stdout.rs",
+        "sha256": "5b3cebf916b6d4a909698a2fa8699477fcc22134aec9cb39fbc38c15b2fb34bf",
+        "bytes": 4137
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/mod.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/lib.rs.stdout.rs",
+        "sha256": "bbbe52a45e7f54db225ed6ca26588c773d97afd476bc2af304c7a6b7c413e11b",
+        "bytes": 4577
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/parse/crates/ep_runtime/src/lib.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5b3cebf916b6d4a909698a2fa8699477fcc22134aec9cb39fbc38c15b2fb34bf",
+        "bytes": 4137
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/proposed/crates/ep_runtime/src/lib.rs",
+        "sha256": "5a8bc101e2e305be38ac1e75c5b26d0178ce95e75e50d3494bff1297ac1d5cdd",
+        "bytes": 4315
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-gap-batch-runner-scaffold-Peer-01/proposed/crates/ep_runtime/src/lib.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-compile-fix-Peer-02/manifest.json",
+        "sha256": "d79f6b3bc08ef49ff83c6dee68fead9b0ef9b89359c4ab065c176da810df3258",
+        "bytes": 5528
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-compile-fix-Peer-02/manifest.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-compile-fix-Peer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "3777cf32c3949e6f3bfb62363c10605814a7c1057d3744ed80a40829bba5a124",
+        "bytes": 95769
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-compile-fix-Peer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Exact cfg-only correction before/proposed/forward/inverse",
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+        "sha256": "a938c5ea495408809ef261cb225aac07534127ba999539d49764ec26634ac7fe",
+        "bytes": 25783
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+        "sha256": "9ef10e8a49e6bfba7a1b553f5bb5795218a011ea0ca04fd4ff3fbee61eba6f5f",
+        "bytes": 24839
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/draft.json",
+        "sha256": "0c88fafa5dc3871b0394b584dd322bc9be34bbbf770efe40c67550e103483f8c",
+        "bytes": 15144
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/draft.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-transport-proof.json",
+        "sha256": "11b1850b8cce5c99db27522aff9921340670defb696d5eb160cc678b3a343010",
+        "bytes": 157009
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-transport-proof.json",
+      "purposes": [
+        "Genuine raw47 input transport proof"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs.stdout.rs",
+        "sha256": "73bf5a711d9705486088f287e41532184930dbf39b7c18d4bf7fff83ca4aa022",
+        "bytes": 31291
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs.stdout.rs",
+        "sha256": "0d3c24e2b42434a1b542da552940764bb0d39124d349980eb7272954711e75dd",
+        "bytes": 32163
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs.stdout.rs",
+        "sha256": "4bbbab51bc666573c6a9b11f94ff1e42b651ea1d6d29bd5d997d6f874d2b42ae",
+        "bytes": 95770
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs.stdout.rs",
+        "sha256": "99257a14dd9e35e5a0d3280e31c8c451f606ac3e0aeb83240ebaadae0356c05a",
+        "bytes": 139513
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/parse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs.stdout.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+        "sha256": "3c87e0c1fdc616c19850526841e51fe80fbad0df9884356bfa72fe49fdda2247",
+        "bytes": 26212
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+        "sha256": "fe2f3a264d5504882672f538aa0a7c32cf9645fb9c4fe4652a5c6443496473db",
+        "bytes": 24923
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+        "sha256": "99257a14dd9e35e5a0d3280e31c8c451f606ac3e0aeb83240ebaadae0356c05a",
+        "bytes": 139513
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-runtime-fixture-Peer-P1-01/fixture.json",
+        "sha256": "f307fdec8d9dd55720653ee767b4e08b3e02a6276656d559c060b8e59224b456",
+        "bytes": 10880386
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-runtime-fixture-Peer-P1-01/fixture.json",
+      "purposes": [
+        "Accepted selected group actual/custody/whole fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-runtime-fixture-Peer-P1-01/projection.json",
+        "sha256": "b76e2182d378c1d49f309ae87467454b8fd55ffee3821e6537fdcbe2f8265ae0",
+        "bytes": 2637
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-runtime-fixture-Peer-P1-01/projection.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+        "sha256": "5168e5a3a22e105083bf779b8cca489a7bfe2f0948003727e28f339c38256551",
+        "bytes": 17786
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+        "sha256": "1591407808f8d113df013d5c88111add66233d1e4241fb5ae3b88293ffa4fae1",
+        "bytes": 15342
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+        "sha256": "9264c5818494d2ea185fd4cced28fd9888a151df033138491ad7c4a4fc213dab",
+        "bytes": 14282
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-schedule-minute-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-02/proposed/crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+        "sha256": "e79e216accdeae949a54ffcdf6a9575dd618084bfccce9b351985cf55af52ba9",
+        "bytes": 9565
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-02/proposed/crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/draft.json",
+        "sha256": "eeb9cfb9a2bdecbe26997687750f14475eab410d82c6f265ab32b5befce95d09",
+        "bytes": 33849
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/draft.json",
+      "purposes": [
+        "Accepted original bounded Source/fixture/caller lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+        "sha256": "ae34e52fbcb88853f71c441e35260f990349f8b12de7e94c74c27063906041b4",
+        "bytes": 16849
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+        "sha256": "a9192022667334e6220eeedbf7d5473e82f7ccfd1eb5a8d32125a94286c64ac2",
+        "bytes": 8895
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-adapter-draft-Outer-03/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "sha256": "eaf7719fe64797859486cfbaf0272d0471b03deb790ba633a555cd24a82d6262",
+        "bytes": 18218
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "ac3bf87383189a9185000e5452d38f8ed209f028d98b3abb8c66effbdf7fbbbe",
+        "bytes": 21690
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+        "sha256": "e8ebafbcd5b0f2a0cff6dc656ed5318c75ceea7f87af8db089c67246af0d9b4f",
+        "bytes": 20674
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/before/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "sha256": "fcc9662cfbc372e3528bc5202120aa863fa15e2e2f32cff743c2e271e232aa05",
+        "bytes": 18301
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "1aae5dbfcdf70e66e31ad4ae8dd62f0a59252322d596c02d7c6e0fe7c568ba85",
+        "bytes": 21773
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+        "sha256": "f58afbe9de10e5c9dbebb47a7689af59d7d007ee8c9e885811f233f8db9b9184",
+        "bytes": 1238
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+        "sha256": "cf5b8e7dac758466aefa1333e5b47ab15838e2490aba2049a6fb0c57789754b9",
+        "bytes": 20780
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-surface-exterior-adapter-draft-Outer-01/proposed/crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "purposes": [
+        "Original20 literal Source history"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/surface-exterior-gap-batch-draft-Outer-03/draft.json",
+        "sha256": "7e6f193908cc7e18df0abec00db242bcedb071113ebc12a9bc23adc3fdeca194",
+        "bytes": 27731
+      },
+      "archive_path": ".runtime/porting/SRC-06/surface-exterior-gap-batch-draft-Outer-03/draft.json",
+      "purposes": [
+        "Original Native P1/Surface bounded readset"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+        "sha256": "37d124e788cffe930444a03f1e03278cf94379f6e58397f3712830bc8df3e6bf",
+        "bytes": 2128
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+        "sha256": "e79e216accdeae949a54ffcdf6a9575dd618084bfccce9b351985cf55af52ba9",
+        "bytes": 9565
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5b3cebf916b6d4a909698a2fa8699477fcc22134aec9cb39fbc38c15b2fb34bf",
+        "bytes": 4137
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+        "sha256": "3c87e0c1fdc616c19850526841e51fe80fbad0df9884356bfa72fe49fdda2247",
+        "bytes": 26212
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+        "sha256": "fe2f3a264d5504882672f538aa0a7c32cf9645fb9c4fe4652a5c6443496473db",
+        "bytes": 24923
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "bc920cfbe1ec1791543b6de522f380b3589bff0156de7dfd86a97875d85b68b8",
+        "bytes": 96640
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+        "sha256": "99257a14dd9e35e5a0d3280e31c8c451f606ac3e0aeb83240ebaadae0356c05a",
+        "bytes": 139513
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "5d9fa875ff5d3ef3aaba2c7d74b54f65d56b06aa40580574f810330de85e3d2a",
+        "bytes": 32510
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+        "sha256": "5116f1b0b95e05d084629a36b5306e6dec5f40015e13372e6e1a91493fc895a3",
+        "bytes": 12306
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "sha256": "fcc9662cfbc372e3528bc5202120aa863fa15e2e2f32cff743c2e271e232aa05",
+        "bytes": 18301
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+        "sha256": "ae34e52fbcb88853f71c441e35260f990349f8b12de7e94c74c27063906041b4",
+        "bytes": 16849
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+        "sha256": "a0e96832ab2da9448bcc9fdb2beb8d5d44289c61be7a75d204077e5b45ab4b5c",
+        "bytes": 12573
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "sha256": "1aae5dbfcdf70e66e31ad4ae8dd62f0a59252322d596c02d7c6e0fe7c568ba85",
+        "bytes": 21773
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+        "sha256": "f58afbe9de10e5c9dbebb47a7689af59d7d007ee8c9e885811f233f8db9b9184",
+        "bytes": 1238
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "sha256": "e68a859f7eb50516f7ddbaf75d3698f9c4ff7112498375f3064f579388913042",
+        "bytes": 23370
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+        "sha256": "cf5b8e7dac758466aefa1333e5b47ab15838e2490aba2049a6fb0c57789754b9",
+        "bytes": 20780
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+        "sha256": "1591407808f8d113df013d5c88111add66233d1e4241fb5ae3b88293ffa4fae1",
+        "bytes": 15342
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+        "sha256": "9264c5818494d2ea185fd4cced28fd9888a151df033138491ad7c4a4fc213dab",
+        "bytes": 14282
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+        "sha256": "a9192022667334e6220eeedbf7d5473e82f7ccfd1eb5a8d32125a94286c64ac2",
+        "bytes": 8895
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "5a8bc101e2e305be38ac1e75c5b26d0178ce95e75e50d3494bff1297ac1d5cdd",
+        "bytes": 4315
+      },
+      "archive_path": "crates/ep_runtime/src/lib.rs",
+      "purposes": [
+        "Current selected20 compiler Source wholes"
+      ]
+    },
+    {
+      "source": {
+        "path": "tools/porting/record_command.py",
+        "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "bytes": 8557
+      },
+      "archive_path": "tools/porting/record_command.py",
+      "purposes": [
+        "Current actual applications/plans/peer/environment policy"
+      ]
+    }
+  ],
+  "uncompressed_bytes": 39993621,
+  "exclusions": [
+    "All old Source snapshot ledgers/trees and parent evidence ZIP recursion",
+    "Original core/static archives/objects/binaries/DLLs/maps",
+    "Full frozen environment values and live compile registry",
+    "Duplicate original28MB Native P1 output; whole runtime fixture already retains it losslessly",
+    "Unexecuted later OP/history/Exterior numerical claims"
+  ]
+}

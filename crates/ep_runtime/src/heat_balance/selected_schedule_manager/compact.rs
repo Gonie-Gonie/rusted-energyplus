@@ -75,33 +75,6 @@ fn for_days(value: &str, already: &mut [bool; 13]) -> Result<[bool; 13], Selecte
     if !one_valid { return Err(unavailable("actual ProcessForDayTypes no valid day diagnostic")); }
     Ok(these)
 }
-fn until_end(value: &str, minutes: usize) -> Result<usize, SelectedScheduleError> {
-    let value = value.strip_prefix("UNTIL").unwrap_or(value);
-    let value = value.strip_prefix(':').unwrap_or(value).trim();
-    let (hour, minute) = value.split_once(':')
-        .ok_or_else(|| unavailable("actual DecodeHHMMField missing separator diagnostic"))?;
-    let hour = if hour.trim().is_empty() { 0.0 } else { parsed_number(hour)? };
-    let minute = parsed_number(minute)?;
-    if hour.fract() != 0.0 || minute.fract() != 0.0 || hour < 0.0 || minute < 0.0 {
-        return Err(unavailable("actual DecodeHHMMField invalid/noninteger diagnostic"));
-    }
-    if hour > 24.0 || minute > 60.0 {
-        return Err(unavailable("actual ProcessIntervalFields invalid Until diagnostic"));
-    }
-    let (hour, minute) = (hour as usize, minute as usize);
-    if hour == 24 && minute > 0 {
-        return Err(unavailable("actual Until24:mm clamp/warning branch"));
-    }
-    if minute == 60 {
-        return Err(unavailable("actual Until minute60 endHr/endMin branch"));
-    }
-    if minute != 0 && minute % minutes != 0 {
-        return Err(unavailable("actual DecodeHHMMField timestep alignment warning"));
-    }
-    let end = hour * 60 + minute;
-    if end == 0 { return Err(unavailable("actual Until zero-time interval diagnostic")); }
-    Ok(end)
-}
 
 impl SelectedScheduleManager {
     /// Selected value-producing part of Native getObjectItem, including its
@@ -272,40 +245,19 @@ impl SelectedScheduleManager {
         Ok(())
     }
     fn populate_source_compact_day(&mut self, day: usize, untils: &[String], values: &[f64], steps: usize) -> Result<(), SelectedScheduleError> {
+        use super::minute::{SourceScheduleInterpolation, populate_source_day_from_minutes, process_interval_fields_with};
+        let row = self.day_schedules.get(day).ok_or_else(|| unavailable("actual populated Compact day owner"))?;
+        if row.interpolation != 0 { return Err(unavailable("actual production Compact non-No interpolation admission")); }
+        let name = row.name.clone();
         let mut minute_values = [0.0; 1440];
         let mut set_minutes = [false; 1440];
-        let mut begin = 0usize;
-        if untils.len() != values.len() { return Err(unavailable("actual ProcessIntervalFields arity diagnostic")); }
-        for (until, value) in untils.iter().zip(values) {
-            let end = until_end(until, 60 / steps)?;
-            if end <= begin { return Err(unavailable("actual ProcessIntervalFields zero/overlap diagnostic")); }
-            let (begin_hour, begin_minute) = (begin / 60, begin % 60);
-            let (end_hour, end_minute) = ((end - 1) / 60, (end - 1) % 60);
-            if begin_hour == end_hour {
-                if set_minutes[begin..end].iter().any(|value| *value) { return Err(unavailable("actual ProcessIntervalFields overlap diagnostic")); }
-                for minute in begin_minute..=end_minute { minute_values[begin_hour * 60 + minute] = *value; set_minutes[begin_hour * 60 + minute] = true; }
-            } else {
-                // Native2930 includes minute60, then overwrites it through the
-                // subsequent middle/final-hour writes. Keep that actual order.
-                for minute in begin_minute..=60 { minute_values[begin_hour * 60 + minute] = *value; set_minutes[begin_hour * 60 + minute] = true; }
-                for hour in begin_hour + 1..end_hour {
-                    for minute in 0..60 { minute_values[hour * 60 + minute] = *value; set_minutes[hour * 60 + minute] = true; }
-                }
-                for minute in 0..=end_minute { minute_values[end_hour * 60 + minute] = *value; set_minutes[end_hour * 60 + minute] = true; }
-            }
-            begin = end;
-        }
-        if set_minutes.iter().any(|set| !set) { return Err(unavailable("actual ProcessIntervalFields incomplete-day diagnostic")); }
+        let mut errors_found = false;
+        process_interval_fields_with(untils, values, untils.len(), values.len(), &mut minute_values, &mut set_minutes,
+            &mut errors_found, &name, "Schedule:Compact", SourceScheduleInterpolation::No,
+            i32::try_from(60 / steps).map_err(|_| unavailable("actual Compact minute clock conversion"))?,
+            &mut |_, _| Err(unavailable("actual Compact minute diagnostic backend boundary")))?;
+        if errors_found { return Err(unavailable("actual ProcessIntervalFields Compact input errors")); }
         let row = self.day_schedules.get_mut(day).ok_or_else(|| unavailable("actual populated Compact day owner"))?;
-        for hour in 0..24 {
-            let mut end_minute = 60 / steps - 1;
-            for timestep in 0..steps {
-                let index = hour * steps + timestep;
-                row.timestep_values[index] = minute_values[hour * 60 + end_minute];
-                row.sum_timestep_values += row.timestep_values[index];
-                end_minute += 60 / steps;
-            }
-        }
-        Ok(())
+        populate_source_day_from_minutes(row, &minute_values, steps)
     }
 }

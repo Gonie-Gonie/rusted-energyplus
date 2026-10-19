@@ -1,0 +1,231 @@
+{
+  "accepted": true,
+  "findings": [],
+  "full_call_records": 115,
+  "P1_calls": 60,
+  "Surface_records": 55,
+  "P1_Source_strict_raw_bit_state_observations": 75524,
+  "P1_Native_entire_output_finite_f64": 75672,
+  "P1_named_input_bit_objects": 148,
+  "P1_state_snapshots": 204,
+  "SourceP1_successful_receipt": {
+    "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-53/receipt.json",
+    "sha256": "eaaecb147b5146b165c6347443c52341ae92058650ac1bef6d2e3d966d4dd6a6",
+    "bytes": 6224
+  },
+  "Surface50_successful_receipt": {
+    "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-surface-Root-50/receipt.json",
+    "sha256": "d64617036434151abc51f911eac58c1f68b0a8cf6450edb3c7bb2feb10b9a8ce",
+    "bytes": 6201
+  },
+  "Surface_to_current_exact_P1_cfg_only_bridge": {
+    "old_compiler_plan": {
+      "path": ".runtime/porting/SRC-06/source-P1-Surface-coherent-draft-Peer-50/complete-proposed-compiler-Source-plan.json",
+      "sha256": "6fa41d549ca3df3ab074b663c2b0c9bae34529db74e9cc910bb90b7c3a8d417e",
+      "bytes": 2580486
+    },
+    "current_compiler_plan": {
+      "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+      "sha256": "2695383e35a3600ed2e862c8616bcb9816df8e5d776598e8b0d3b55535ac4128",
+      "bytes": 2580714
+    },
+    "changed_paths": [
+      "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs"
+    ],
+    "only_changed_path_is_P1_private_cfg_child": true,
+    "shared_runner_and_all13_Surface_sources_whole_unchanged": true,
+    "all_other4533_compiler_inputs_whole_unchanged": true,
+    "selected_Source_union": [
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "unchanged": false
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+        "unchanged": true
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/lib.rs",
+        "unchanged": true
+      }
+    ],
+    "Surface_fixture_whole_unchanged": true,
+    "Surface_reexecuted": false
+  },
+  "compiler_inputs": 4534,
+  "Rust_sources": 4521,
+  "accepted_selected_Cargo_invocations": 2,
+  "P1_total_attempts": 5,
+  "prior_compile_setup_failures": [
+    {
+      "scope": "initial two cfg API compile bindings",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-P1/receipt.json",
+        "sha256": "867ac589a7f20c836696a90bec5507d82e5741dfbe817e116933d721188ad982",
+        "bytes": 4207
+      },
+      "exit_code": 101,
+      "qualification": "Preserved compile/setup/schema failure, not an observed scientific mismatch; no pass relabelling."
+    },
+    {
+      "scope": "cfg raw lexical pre-scan setup",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-purchased_air-Root-50/receipt.json",
+        "sha256": "eb6c94a9a34c1be3e15841a0cf477cefb6d7ca33c8a607b8058c9016341125a6",
+        "bytes": 6221
+      },
+      "exit_code": 1,
+      "qualification": "Preserved compile/setup/schema failure, not an observed scientific mismatch; no pass relabelling."
+    },
+    {
+      "scope": "cfg Node observation shape",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-51/receipt.json",
+        "sha256": "39383e843642d8594acbcf1c763b813133551a0baa23db7a61075e22be07f697",
+        "bytes": 6226
+      },
+      "exit_code": 101,
+      "qualification": "Preserved compile/setup/schema failure, not an observed scientific mismatch; no pass relabelling."
+    },
+    {
+      "scope": "cfg initial EIO stream phase",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-gap-cohort-Root-52/receipt.json",
+        "sha256": "5d0b2cf442f38a0a59b9f1eca03da583b1ae9f19c3264794ad7d8788dcffd46c",
+        "bytes": 6226
+      },
+      "exit_code": 101,
+      "qualification": "Preserved compile/setup/schema failure, not an observed scientific mismatch; no pass relabelling."
+    }
+  ],
+  "same_successful_compiler_snapshot_claim": false,
+  "private_cache_state_observed": false,
+  "new_normal_CLI_or_engine_runs": 0,
+  "old2336_471_59_P2_rerun": false,
+  "gates_changed": false,
+  "schema": "src06-canonical-purchased-air-surface53.v1",
+  "base_HEAD": "0a0bc934de906433505eeb9cd571614532c4db3f",
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": 0,
+  "final_checkpoint": false,
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-gap-batch-actual-review-53/review.json",
+    "sha256": "bbac4d29c940910b1f30d9f75811a1ca916521b37b6bce0903e67d26f006a940",
+    "bytes": 19739
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+    "sha256": "2695383e35a3600ed2e862c8616bcb9816df8e5d776598e8b0d3b55535ac4128",
+    "bytes": 2580714
+  },
+  "selected_Source_files": [
+    "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/gap_batch_cohort/surface.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/input.rs",
+    "crates/ep_runtime/src/heat_balance/radiation.rs",
+    "crates/ep_runtime/src/heat_balance/radiation/fix_view_factors.rs",
+    "crates/ep_runtime/src/heat_balance/radiation/ordinary.rs",
+    "crates/ep_runtime/src/heat_balance/radiation/ordinary/native_gap_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/radiation/ordinary/radiant_exchange.rs",
+    "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs",
+    "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/native_gap_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+    "crates/ep_runtime/src/heat_balance/selected_schedule_manager.rs",
+    "crates/ep_runtime/src/heat_balance/selected_schedule_manager/compact.rs",
+    "crates/ep_runtime/src/heat_balance/selected_schedule_manager/minute.rs",
+    "crates/ep_runtime/src/heat_balance/selected_schedule_manager/native_gap_cohort.rs",
+    "crates/ep_runtime/src/lib.rs"
+  ],
+  "scope": "Four retained direct no-OA PurchasedAir factories plus scoped radiation/LU/master-history/minute records. Separate successful Source snapshots and all pre-success failures retained.",
+  "remaining": "Air history retry/multiplier, genuine solar/internal-gain producers and their full surface parents, full OutputProcessor, warmup-to-RunPeriod handoff, final same-Source15 plus complete own-export reread remain open.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/evidence.zip",
+    "sha256": "6a7002b1a7092ed3d50f9d1a79a5860936d52c9daea2509e36ab32beac036051",
+    "bytes": 4145585
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/manifest.json",
+    "sha256": "8a3e81c4bde68b5bec13ef3656f7f8e4b61f651be9ed6590107151d53f28e811",
+    "bytes": 153200
+  },
+  "archive_entries": 310,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-purchased-air-surface-Root-53.py",
+    "sha256": "3baed4c8c559858b3802617eb266751f33564340db1825eaa40bc4a01a9cde58",
+    "bytes": 11699
+  }
+}

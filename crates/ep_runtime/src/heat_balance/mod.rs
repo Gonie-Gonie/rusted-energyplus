@@ -131,3 +131,6 @@ pub use zone_air_initialization::*;
 pub use zone_predictor_corrector::*;
 
 pub mod source_reported_catalog;
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+pub(crate) mod gap_batch_cohort;
