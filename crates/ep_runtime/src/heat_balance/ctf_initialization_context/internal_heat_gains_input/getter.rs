@@ -1,12 +1,12 @@
 //! Ordered allocations/local arguments and admitted OtherEquipment getter.
 use super::{
-    E, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject, SourceOtherEquipment,
-    SourceOtherFuel, index, unavailable,
+    index, unavailable, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject,
+    SourceOtherEquipment, SourceOtherFuel, E,
 };
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
-    SelectedHeatBalanceInput, zone::SelectedZoneInputOwners,
+    zone::SelectedZoneInputOwners, SelectedHeatBalanceInput,
 };
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputFamily, SourceInputProcessorShortCut,
@@ -126,27 +126,44 @@ impl SelectedInternalHeatGains {
             if let Some((sum_area, sum_power)) = lighting_totals {
                 // Native1254-1261 is OUTSIDE the TotLights>0 block and
                 // precedes ElectricEquipment1263, even for no Lights.
-                let density_column = *owners.registry.named_indices.get("pdchInLtDens")
+                let density_column = *owners
+                    .registry
+                    .named_indices
+                    .get("pdchInLtDens")
                     .ok_or_else(|| unavailable("actual IHG1254 lighting-density column"))?;
                 if sum_area > 0.0 {
                     owners.table.fixed_real_entry_4(
-                        density_column, "Interior Lighting Total", sum_power / sum_area,
+                        density_column,
+                        "Interior Lighting Total",
+                        sum_power / sum_area,
                     )?;
                 } else {
                     // Native DataPrecisionGlobals::constant_zero is +0.0.
                     owners.table.fixed_real_entry_4(
-                        density_column, "Interior Lighting Total", 0.0,
+                        density_column,
+                        "Interior Lighting Total",
+                        0.0,
                     )?;
                 }
-                let area_column = *owners.registry.named_indices.get("pdchInLtArea")
+                let area_column = *owners
+                    .registry
+                    .named_indices
+                    .get("pdchInLtArea")
                     .ok_or_else(|| unavailable("actual IHG1260 lighting-area column"))?;
                 owners.table.fixed_real_entry_2(
-                    area_column, "Interior Lighting Total", sum_area,
+                    area_column,
+                    "Interior Lighting Total",
+                    sum_area,
                 )?;
-                let power_column = *owners.registry.named_indices.get("pdchInLtPower")
+                let power_column = *owners
+                    .registry
+                    .named_indices
+                    .get("pdchInLtPower")
                     .ok_or_else(|| unavailable("actual IHG1261 lighting-power column"))?;
                 owners.table.fixed_real_entry_2(
-                    power_column, "Interior Lighting Total", sum_power,
+                    power_column,
+                    "Interior Lighting Total",
+                    sum_power,
                 )?;
             }
         }
@@ -354,12 +371,38 @@ impl SelectedInternalHeatGains {
                 row.space_index = space_number;
                 row.zone_ptr = zone_number;
                 row.schedule = schedule;
-                if values.alphas[1] != "NONE" {
-                    return Err(unavailable(
-                        "positive OtherEquipment fuel validation/meters",
-                    ));
+                row.fuel = match values.alphas[1].as_str() {
+                    "NONE" => SourceOtherFuel::None,
+                    "PROPANE" => SourceOtherFuel::Propane,
+                    // Other enum/invalid/Water diagnostics remain an actual
+                    // unresolved fuel-validation operation, never a None alias.
+                    _ => {
+                        return Err(unavailable(
+                            "actual OtherEquipment unrepresented fuel lookup/diagnostics1868",
+                        ))
+                    }
+                };
+                if row.fuel != SourceOtherFuel::None {
+                    let fuel = row.fuel as i32;
+                    let zone = owners
+                        .zones
+                        .zones
+                        .as_mut()
+                        .and_then(|rows| index(zone_number).ok().and_then(|i| rows.get_mut(i)))
+                        .ok_or_else(|| unavailable("same OtherEquipment fuel-list Zone"))?;
+                    if !zone.other_equipment_fuels.contains(&fuel) {
+                        zone.other_equipment_fuels.push(fuel);
+                    }
+                    let space = owners
+                        .zones
+                        .spaces
+                        .as_mut()
+                        .and_then(|rows| index(space_number).ok().and_then(|i| rows.get_mut(i)))
+                        .ok_or_else(|| unavailable("same OtherEquipment fuel-list Space"))?;
+                    if !space.other_equipment_fuels.contains(&fuel) {
+                        space.other_equipment_fuels.push(fuel);
+                    }
                 }
-                row.fuel = SourceOtherFuel::None;
                 if local.numeric_field_blanks[0] {
                     owners.backend.show_warning_error(&format!(
                         "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but that field is blank.  0 OtherEquipment will result.",
@@ -369,6 +412,16 @@ impl SelectedInternalHeatGains {
                     row.design_level = 0.0;
                 } else {
                     row.design_level = values.numbers[0] * 1.0;
+                }
+                if row.design_level < 0.0 && row.fuel == SourceOtherFuel::Propane {
+                    owners.backend.show_severe_error(&format!(
+                        "GetInternalHeatGains: OtherEquipment=\"{}\", {} is not allowed to be negative",
+                        object.name, local.numeric_field_names[0],
+                    ))?;
+                    owners
+                        .backend
+                        .show_continue_error("... when a fuel type of Propane is specified.")?;
+                    self.errors_found = true;
                 }
                 let schedule = schedule.ok_or_else(|| {
                     unavailable("invalid schedule before actual pointer dereference")

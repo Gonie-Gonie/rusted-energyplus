@@ -3,6 +3,8 @@ use super::bound_real::SourceOutputVariableType;
 use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceIntegerOutputTarget {
+    #[cfg(all(test, feature = "native-controlled-air-cohort"))]
+    CohortInteger { slot: u8 },
     PurchasedAirAvailabilityStatus { index: i32 },
     Weather {
         field: super::SourceWeatherIntegerOutputField,

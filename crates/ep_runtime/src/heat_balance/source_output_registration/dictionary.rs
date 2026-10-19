@@ -78,7 +78,7 @@ impl SourceOutputRegistration {
     pub(super) fn write_real_report_dictionary(
         &mut self,
         number: usize,
-        host: &mut impl SourceOutputDictionaryHost,
+        host: &mut (impl SourceOutputDictionaryHost + ?Sized),
     ) -> Result<(), OrdinaryRadiationError> {
         let var = self
             .out_vars

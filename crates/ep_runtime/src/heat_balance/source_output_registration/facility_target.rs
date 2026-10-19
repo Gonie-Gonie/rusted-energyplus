@@ -36,7 +36,11 @@ impl super::SourceRealOutputOwners for SourceNonFacilityOutputOwners<'_> {
     ) -> Result<&f64, super::OrdinaryRadiationError> {
         use super::SourceRealOutputTarget as T;
         match target {
-            T::Node { .. } | T::PurchasedAir { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
+            #[cfg(all(test, feature = "native-controlled-air-cohort"))]
+            T::CohortReal { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
+            T::InternalGain { .. } | T::Node { .. } | T::PurchasedAir { .. } => {
+                Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
+            }
             T::Weather { .. } => self.weather.real_output(target),
             T::Schedule { .. } => self.schedules.real_output(target),
             T::SystemReports { .. } => self.system_reports.real_output(target),

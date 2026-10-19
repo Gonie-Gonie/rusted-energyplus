@@ -25,6 +25,12 @@ pub(crate) enum SourceSurfaceOutputField {
 /// Stable actual field identity; Source ordinals remain independent of typed IDs.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceRealOutputTarget {
+    #[cfg(all(test, feature = "native-controlled-air-cohort"))]
+    CohortReal { slot: u8 },
+    InternalGain {
+        field: super::SourceInternalGainOutputField,
+        index: i32,
+    },
     PurchasedAir {
         field: super::SourcePurchasedAirOutputField,
         index: i32,

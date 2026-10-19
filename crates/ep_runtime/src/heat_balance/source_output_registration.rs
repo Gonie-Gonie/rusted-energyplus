@@ -100,21 +100,27 @@ use crate::error::WarmupOutputError;
 use std::collections::BTreeMap;
 mod air_target;
 mod purchased_air_target;
-pub(crate) use purchased_air_target::{SourcePurchasedAirOutputField, SourcePurchasedAirReportingOutputContext};
+pub(crate) use purchased_air_target::{
+    SourcePurchasedAirOutputField, SourcePurchasedAirReportingOutputContext,
+};
 mod node_target;
 pub(crate) use node_target::{SourceNodeOutputField, SourceNodeReportingOutputContext};
 mod system_target;
 pub(crate) use system_target::{SourceAllIntegerOutputOwners, SourceHvacRealOutputField};
+mod internal_gain_target;
+pub(crate) use internal_gain_target::SourceInternalGainOutputField;
 mod bound_real;
 mod exterior_light_target;
 mod facility_target;
 mod system_reports_target;
 pub(crate) use exterior_light_target::SourceExteriorLightOutputField;
-pub(crate) use system_reports_target::{SourceSystemReportsOutputField, SourceZoneVentReportOutputField};
+pub(crate) use system_reports_target::{
+    SourceSystemReportsOutputField, SourceZoneVentReportOutputField,
+};
 mod general_real;
-mod meters;
 mod metered_variables;
-pub(crate) use metered_variables::{SourceMeterData, SourceMeteredVariable, SourceMeterHeatOrCool};
+mod meters;
+pub(crate) use metered_variables::{SourceMeterData, SourceMeterHeatOrCool, SourceMeteredVariable};
 mod weather_target;
 pub(crate) use facility_target::{SourceFacilityOutputField, SourceNonFacilityOutputOwners};
 pub(crate) use weather_target::{SourceWeatherIntegerOutputField, SourceWeatherRealOutputField};
@@ -122,7 +128,9 @@ mod instant_meter;
 mod meter_reporting;
 mod milo_dtoa;
 /// Same Native Milo dtoa used by InputProcessor numeric-to-alpha getters.
-pub(crate) fn source_json_alpha_number(value: f64) -> Result<String, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+pub(crate) fn source_json_alpha_number(
+    value: f64,
+) -> Result<String, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
     milo_dtoa::source_dtoa(value)
 }
 mod report_for_tabular;
@@ -132,7 +140,7 @@ mod results_meter;
 mod update_data;
 mod update_meters;
 pub(crate) use report_streams::SourceOutputReportStreams;
-pub(crate) use results_meter::{SourceMeterDataFrame, add_source_report_meter};
+pub(crate) use results_meter::{add_source_report_meter, SourceMeterDataFrame};
 pub(crate) use update_data::{SourceOutputUpdateEnvironment, SourceOutputUpdateOwners};
 mod pollution_target;
 pub(crate) use air_target::{
@@ -635,3 +643,8 @@ impl SourceOutputRegistration {
         Ok(())
     }
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_p4;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+pub(crate) use native_p4::{SourceP4Values,native_p4_results};

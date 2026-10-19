@@ -67,12 +67,15 @@ pub(crate) struct SourceCombinedOutputOwners<'a> {
 impl SourceRealOutputOwners for SourceCombinedOutputOwners<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         match target {
+            #[cfg(all(test, feature = "native-controlled-air-cohort"))]
+            SourceRealOutputTarget::CohortReal { .. } => Err(super::OrdinaryRadiationUnavailable::StorageDomain.into()),
             SourceRealOutputTarget::SurfaceHeatBalance { .. } => self.surface.real_output(target),
             SourceRealOutputTarget::Solar { .. } => self.solar.real_output(target),
             SourceRealOutputTarget::Air { .. } => {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
-            SourceRealOutputTarget::PurchasedAir { .. }
+            SourceRealOutputTarget::InternalGain { .. }
+            | SourceRealOutputTarget::PurchasedAir { .. }
             | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::Weather { .. }
             | SourceRealOutputTarget::Schedule { .. }

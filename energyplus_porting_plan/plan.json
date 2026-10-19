@@ -12976,6 +12976,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/summary.json",
         "sha256": "0d0aae827dc167ba12b02bc86229103812d5a33667709df3a421af90f0ade840",
         "size_bytes": 10176
+      },
+      "canonical_output_processor_air_history_54": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-output-processor-air-history-54/summary.json",
+        "sha256": "36616c52bf717d4c20be44ee9a1e705a0589a701f7d018bb75b71b21e4bb41bc",
+        "size_bytes": 11200
       }
     },
     {

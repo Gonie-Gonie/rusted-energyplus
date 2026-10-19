@@ -1,0 +1,3907 @@
+{
+  "schema": "src06-P4-history54-finite-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-output-processor-air-history-54/evidence.zip",
+    "sha256": "d39a7bc15056626a0e93dea214738aff11134434e599e950ade69be00032bf8a",
+    "bytes": 3950849
+  },
+  "entries": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+        "bytes": 16816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+        "bytes": 35280
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "bytes": 13547
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+        "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+        "bytes": 24717
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "bytes": 133816
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.cc",
+        "sha256": "db83c2fbae521494c1435c93ca56a1d1b4fb232a153bc3375ae0e1765fbcac7b",
+        "bytes": 11758
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.cc",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.hh",
+        "sha256": "ffb67fb6de0404a49535f9752ca37d8030b8c9a1024ce1ab7347233055278a58",
+        "bytes": 6146
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataOutputs.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+        "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+        "bytes": 45326
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceAirManager.cc",
+        "sha256": "28c2799083e7fbc7654edcd151273849e7a4eef9b4a03e40e7eb0f89b939b98a",
+        "bytes": 293277
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceAirManager.cc",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceAirManager.hh",
+        "sha256": "bddde01f9bf2887b4566e37d3cc4de77cdff2db82c6e34263dbc12fff4019964",
+        "bytes": 5605
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceAirManager.hh",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+        "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+        "bytes": 225982
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+        "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+        "bytes": 55700
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+        "bytes": 108928
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ResultsFramework.cc",
+        "sha256": "13bcfc2830a579619dd8cad10a906e84577bf7c068db154a606ab8681d57268b",
+        "bytes": 47148
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ResultsFramework.cc",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ResultsFramework.hh",
+        "sha256": "38bcefa7300bd22df261ee01e931128b7f284791c1b0e35ad22a83a67e079798",
+        "bytes": 23068
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ResultsFramework.hh",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "bytes": 404705
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+        "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+        "bytes": 25280
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "purposes": [
+        "History3 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/OutputProcessor.unit.cc",
+        "sha256": "2ae164b66c79554ef79e17365b9183d4f67246f666dc06f93fc5111ee922919a",
+        "bytes": 292120
+      },
+      "archive_path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/OutputProcessor.unit.cc",
+      "purposes": [
+        "P4 original-core pinned Native authority",
+        "P4 scaffold12 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/correction-proof.json",
+        "sha256": "ecd63e240e6019228efb9166aaf2f2077be22c38458aa622549ea139035cba73",
+        "bytes": 2084
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/correction-proof.json",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/draft.json",
+        "sha256": "4d3d4e9e9971cd117b64b15f3a80323ab0f9a45bb6c5885cbd81d5ea249a17ea",
+        "bytes": 5601
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/draft.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/forward.diff",
+        "sha256": "6b4652ba3c9bb09b81d40d022c2a98320a98c584e5e4ac4e615c6326dcb9b9f5",
+        "bytes": 2180
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/forward.diff",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/inverse.diff",
+        "sha256": "7da62be6d3c7e9939b0f5d5949164db21f7fb6c79f77c9ca3ecf41250c4577b0",
+        "bytes": 2180
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/inverse.diff",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/purchased_air_P4_history_batch.cpp",
+        "sha256": "e5ae9528e802bca19638df080d98035741f0f988524d2ef52ec2e3957c3ae537",
+        "bytes": 84410
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-P4-genuine-factory-guard-draft-Audit-02/purchased_air_P4_history_batch.cpp",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/air_history_fragment.cpp",
+        "sha256": "58f02fb8b5dcd02e3177d6baa24da8b4f22349b63ded2b81b315bd08a92bd27f",
+        "bytes": 9874
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/air_history_fragment.cpp",
+      "purposes": [
+        "Exact history ADL correction original/proposed source"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/combined.forward.diff",
+        "sha256": "9617b250b7d7468133b5bef0b41ad1f72bcc43ca833953e2d01207a36dc7a132",
+        "bytes": 669
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/combined.forward.diff",
+      "purposes": [
+        "Exact history ADL correction forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/combined.inverse.diff",
+        "sha256": "5fe843e72894b8aa141bc05059dbee8905584a7634dd6f518dc240c1b77d5b68",
+        "bytes": 669
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/combined.inverse.diff",
+      "purposes": [
+        "Exact history ADL correction forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/correction.json",
+        "sha256": "ebe824ce660e98a9c0679725866fb0053c7feb8337d2bcacb1fb52bc0eceac13",
+        "bytes": 5403
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/correction.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/fragment.forward.diff",
+        "sha256": "e0e3ea97f610d1da8fb27f15da272144e3e91b858e9ab79575e6c59e759ad839",
+        "bytes": 667
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/fragment.forward.diff",
+      "purposes": [
+        "Exact history ADL correction forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/fragment.inverse.diff",
+        "sha256": "babb14b513864b30b6e6f8a0fd1417f2d2bd6d53c47effe60f47d41220d5c368",
+        "bytes": 667
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/fragment.inverse.diff",
+      "purposes": [
+        "Exact history ADL correction forward/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/purchased_air_P4_history_batch.cpp",
+        "sha256": "9cdbcaee0e972cb1a75c4e8b637beb8ef8e78a6af1c488749557c9dac0def70f",
+        "bytes": 83198
+      },
+      "archive_path": ".runtime/porting/SRC-06/Native-history-ADL-fix-Peer-04/purchased_air_P4_history_batch.cpp",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-Exterior-Native-recipes-ready-Peer-08-02/manifest.json",
+        "sha256": "6847e0072154708be08b191783782c807784dd869ce814ab4d3298704af54bce",
+        "bytes": 131506
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-Exterior-Native-recipes-ready-Peer-08-02/manifest.json",
+      "purposes": [
+        "Exact selected Native recipe metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Exterior-Native-driver-draft-Peer-03/named-inputs.json",
+        "sha256": "d139ff41321fef5ac05da17c8bcb7ea8599f5be4f44b9c04a37c85e5a6590669",
+        "bytes": 238102
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Exterior-Native-driver-draft-Peer-03/named-inputs.json",
+      "purposes": [
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Exterior-Native-driver-draft-Peer-03/purchased_air_P4_history_batch.cpp",
+        "sha256": "f613cc243c84a357f3b014881c60e79a540723db47f2870877b849f86e681804",
+        "bytes": 83180
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Exterior-Native-driver-draft-Peer-03/purchased_air_P4_history_batch.cpp",
+      "purposes": [
+        "Exact history ADL correction original/proposed source"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Native-recipes-ready-Peer-07/manifest.json",
+        "sha256": "258251dc88c4cb87f2f48c3ef21f4e4420daacc3f743c35da234298945c90a1d",
+        "bytes": 123267
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Native-recipes-ready-Peer-07/manifest.json",
+      "purposes": [
+        "Exact selected Native recipe metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/apply-P4-history-gap-batch-Root-54.py.forward.diff",
+        "sha256": "e9d576e2df6e01f9d1e54650878c9edee31a70de2ada14a112b0e68974998a61",
+        "bytes": 9773
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/apply-P4-history-gap-batch-Root-54.py.forward.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/apply-P4-history-gap-batch-Root-54.py.inverse.diff",
+        "sha256": "4f8d661fdde52e16d919b6c9021fe30ee7762ca9bbace3dd65e47b1835324835",
+        "bytes": 9773
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/apply-P4-history-gap-batch-Root-54.py.inverse.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/gap-P4-history-guards-Peer-54.py.forward.diff",
+        "sha256": "50f4734c11e5ce61295244b2b82fa7bda54df09ca52a39bd5943b18305565caf",
+        "bytes": 5907
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/gap-P4-history-guards-Peer-54.py.forward.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/gap-P4-history-guards-Peer-54.py.inverse.diff",
+        "sha256": "55ce9cc78207eac0a766a9c04486ca26aecb477e020cc6472022b813339d732d",
+        "bytes": 5907
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/gap-P4-history-guards-Peer-54.py.inverse.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/helper-full-parent-forward-inverse.json",
+        "sha256": "a7ea9215f9fc47520ba096095479973078cf52b4be9475a10b77557941a8c14a",
+        "bytes": 3106
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/helper-full-parent-forward-inverse.json",
+      "purposes": [
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/launch-P4-history-gap-batch-Root-54.py.forward.diff",
+        "sha256": "1abfe4b1106447ffed178218048c15b43f4c8b034dffc66c90d2e459cb7e41b0",
+        "bytes": 6380
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/launch-P4-history-gap-batch-Root-54.py.forward.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/launch-P4-history-gap-batch-Root-54.py.inverse.diff",
+        "sha256": "894665942d0792e839fa07c61bc3f697652cd73730cc396396b99811e1b03507",
+        "bytes": 6380
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/launch-P4-history-gap-batch-Root-54.py.inverse.diff",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/prepared.json",
+        "sha256": "d94ba173460000079614c66e4869981a7f3abdec7ae9b5a7d74f70d8e87238c3",
+        "bytes": 5595
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/prepared.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/read-only-preflight.json",
+        "sha256": "247af38a4750a711d3f2a46f0065bb57cd3bf143dd457826383925e741dd46c3",
+        "bytes": 1609
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-Root-helpers-ready-Peer-54/read-only-preflight.json",
+      "purposes": [
+        "Read-only complete-parent/overlay/helper/fixture preflight"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/P4-history-publication-draft-Peer-54/prior-shared-body-impact-bridge.json",
+        "sha256": "46a020109ca430752e43020cac1b7671be1809bff750bede85711d156a3164e5",
+        "bytes": 4538
+      },
+      "archive_path": ".runtime/porting/SRC-06/P4-history-publication-draft-Peer-54/prior-shared-body-impact-bridge.json",
+      "purposes": [
+        "Explicit prior shared-body impact bridge only"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-OtherEquipment-Propane-OP-review-Audit-05/review.json",
+        "sha256": "08ea102ba37e14208179b0da39e3ee0b7a6ca2d2bdf1668ab3309344d5143e6f",
+        "bytes": 22863
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-OtherEquipment-Propane-OP-review-Audit-05/review.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers",
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-Source-air-history-review-Audit-01/review.json",
+        "sha256": "90c713e3ecd90fc9ca8ff41e69169d888cfd2da3d9b14e81542ead3f1a3ec206",
+        "bytes": 10998
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-Source-air-history-review-Audit-01/review.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-air-history-Native-review-Audit-02/review.json",
+        "sha256": "c71833615022257438d22782e075775b976a0b0eccfc061582ce3b9e063e100b",
+        "bytes": 20477
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-air-history-Native-review-Audit-02/review.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-output-processor-Native-P4-review-01/review.json",
+        "sha256": "df8ba5a6efe30f008878423a80bb77ba3fb4f7b9bac79f1403599eae3d73e2f9",
+        "bytes": 11928
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-output-processor-Native-P4-review-01/review.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Peer-purchased-air-Native-caller-review-P1-02/review.json",
+        "sha256": "c411827470ee1f93fe9f2fc95456996832645197dd099573a7aeb2d2ab8c8bf3",
+        "bytes": 14732
+      },
+      "archive_path": ".runtime/porting/SRC-06/Peer-purchased-air-Native-caller-review-P1-02/review.json",
+      "purposes": [
+        "Actual history/P1 factory and inherited helper declaration lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Native-P4-real-factory-guard-independent-review-02/review.json",
+        "sha256": "a4e78def26dce066ec91199517806cd2e7cdf2bb9262fa6dc3a7fe156f795b19",
+        "bytes": 4327
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Native-P4-real-factory-guard-independent-review-02/review.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Native-history-ADL-independent-review-05/review.json",
+        "sha256": "e87d83be0a64a1c31213b11af5616d3b04cf1673595c5896eeefab0ef72af8ff",
+        "bytes": 1925
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Native-history-ADL-independent-review-05/review.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-P4-history-union-independent-review-01/review.json",
+        "sha256": "75f36ab2976217ddb12e9d5c38e9d192b133bbb2c33e5d14ff0f24da89db55a0",
+        "bytes": 2231
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-P4-history-union-independent-review-01/review.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Propane-P4-history-application-54/receipt.json",
+        "sha256": "4d5a264807d75a3d9ec26f9f35e75158a6b32b29ee92e8b0fce33ffdaae9c2ea",
+        "bytes": 8968
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Propane-P4-history-application-54/receipt.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Propane-P4-union-independent-review-02/review.json",
+        "sha256": "c027b81b5b9da517ca1989d1905a28a0bac68ba0401dd77711c3ac0c0f13fbf1",
+        "bytes": 1767
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Propane-P4-union-independent-review-02/review.json",
+      "purposes": [
+        "Exact21 composition and original20/history3 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Source-P4-history-actual-review-54/review.json",
+        "sha256": "027391ad8d8b5f4bb2940390dfe774006f37c11623f38df161db9876ece34719",
+        "bytes": 10629
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Source-P4-history-actual-review-54/review.json",
+      "purposes": [
+        "Accepted actual review/checker plus preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-Source-P4-scaffold-independent-review-01/review.json",
+        "sha256": "01fcf61d4d27ccfbd0d7b98f4d9e23f13b16a87712d783cc87a1796d797caa24",
+        "bytes": 2954
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-Source-P4-scaffold-independent-review-01/review.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/after.json",
+        "sha256": "f8720a49b8e1b71383fb5d9e3b336668b78cd1ded5adcf0d6f218c45ab6912c1",
+        "bytes": 14235
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/after.json",
+      "purposes": [
+        "All-four external fixture custody before/after"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/before.json",
+        "sha256": "2f411a2dd6898f30c8dc4eb317b3f8ab7f120ea6c4ec939d5f7792624d4e8e4a",
+        "bytes": 7630
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/before.json",
+      "purposes": [
+        "All-four external fixture custody before/after"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/after.json",
+        "sha256": "03238437cbd05929b42a3ecefe471ace4cfe014bce29759cec2475be4375cee0",
+        "bytes": 14256
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/after.json",
+      "purposes": [
+        "All-four external fixture custody before/after"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/before.json",
+        "sha256": "c7b0d5cddd491ae07eadec6461cbd2c948e0804941c6a672460810fcd98400d8",
+        "bytes": 7646
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/before.json",
+      "purposes": [
+        "All-four external fixture custody before/after"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/Root-source-gap-batch-actual-review-53/review.json",
+        "sha256": "bbac4d29c940910b1f30d9f75811a1ca916521b37b6bce0903e67d26f006a940",
+        "bytes": 19739
+      },
+      "archive_path": ".runtime/porting/SRC-06/Root-source-gap-batch-actual-review-53/review.json",
+      "purposes": [
+        "Historical P1/Surface actual scope, no54 replay"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/air_history_fragment.cpp",
+        "sha256": "73261501d2fc1e3bbeeed0ca0bcd09d33cf8cee2661b1dc0e5936277e838efb3",
+        "bytes": 9856
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/air_history_fragment.cpp",
+      "purposes": [
+        "Actual history/P1 factory and inherited helper declaration lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.168-180.txt",
+        "sha256": "e37f4dd70ef539a251f918103bc3044858d086e9a7ef1bbb334db376d27456a3",
+        "bytes": 470
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.168-180.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.495-515.txt",
+        "sha256": "b8ff8ed0a53ca3f64203cc2f2370822d0d8082ac5fc19cdb7ce216df9ee6f4a1",
+        "bytes": 647
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.495-515.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.55-90.txt",
+        "sha256": "01c5d62d261e43e089266e75733f57d0884aeb4538b8d2d396b7a0b17b584307",
+        "bytes": 1597
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__DataRoomAirModel.hh.55-90.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__HeatBalanceAirManager.cc.4246-4492.txt",
+        "sha256": "17ffa7d09544ceb82f74ed27e6153d1659a22207f06f548ce048dea759aa01cd",
+        "bytes": 14994
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__HeatBalanceAirManager.cc.4246-4492.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__HeatBalanceAirManager.hh.69-99.txt",
+        "sha256": "b8f1950a24b6937d4c348c2238ae67c02a2d9afa9f8a76a6ae3c3ba05256f8ec",
+        "bytes": 1181
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__HeatBalanceAirManager.hh.69-99.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4167-4431.txt",
+        "sha256": "811b43ed38dacc01c0cad2ba125cd4104a14b2d88f6c0e5f74d71b7f237dd76c",
+        "bytes": 14010
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__ZoneTempPredictorCorrector.cc.4167-4431.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__ZoneTempPredictorCorrector.hh.102-253.txt",
+        "sha256": "7c54f811d1bb6b70ccfe40fdf7977a04751d05566baf57d440e3880046ce3830",
+        "bytes": 10740
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-01/src__EnergyPlus__ZoneTempPredictorCorrector.hh.102-253.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/draft.json",
+        "sha256": "f91e9752c8198399df73b6bf8bc1435ede9832993756d0b5052fd60ccf91c302",
+        "bytes": 11478
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/draft.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/src__EnergyPlus__DataHeatBalance.hh.99-108.txt",
+        "sha256": "aa35838f6a6a02c8119ebd3265919f9e53dae50cf800a6b5a135b640435570ee",
+        "bytes": 187
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/src__EnergyPlus__DataHeatBalance.hh.99-108.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/src__EnergyPlus__Psychrometrics.hh.1223-1270.txt",
+        "sha256": "ec044ae9de915792aa20d89e451a196d9624ccaf8d16f31b4bba1d153d74b9ca",
+        "bytes": 2108
+      },
+      "archive_path": ".runtime/porting/SRC-06/air-history-Native-gap-draft-Peer-02/src__EnergyPlus__Psychrometrics.hh.1223-1270.txt",
+      "purposes": [
+        "History3 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/apply-P4-history-gap-batch-Root-54.py",
+        "sha256": "41c27ee28c8c94483193f93ed97d87bcc77ade96d2d314f1c3934d7e4fde31a4",
+        "bytes": 3597
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-P4-history-gap-batch-Root-54.py",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas",
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/apply-Source-gap-batch-Root-50.py",
+        "sha256": "03f08ddbc7f1ccfcaafeec69f9105cf0de23d3da453f01fa0149f9d8c385fb2e",
+        "bytes": 6143
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-Source-gap-batch-Root-50.py",
+      "purposes": [
+        "Exact inherited guard function Sources",
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/apply-purchased-air-gap-cohort-Root-P1.py",
+        "sha256": "ce2bbee3e812a3036048fd8ac686190b1e1574c5d3c34124591a7069090a4bf5",
+        "bytes": 8237
+      },
+      "archive_path": ".runtime/porting/SRC-06/apply-purchased-air-gap-cohort-Root-P1.py",
+      "purposes": [
+        "Exact inherited guard function Sources"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/author-Source-air-history-scaffold-Peer-01.py",
+        "sha256": "17cb71719159466a98ce8709ca7cb410031d63c07b8bbd0549b30ed11e5d9413",
+        "bytes": 20240
+      },
+      "archive_path": ".runtime/porting/SRC-06/author-Source-air-history-scaffold-Peer-01.py",
+      "purposes": [
+        "History3 bounded owner/input/readset/author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/receipt.json",
+        "sha256": "b8d4c77be0b0e1cd4dde83805cfe160e392b96bef2bc7a2b3f6f9b78373f880c",
+        "bytes": 6959
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/receipt.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stderr.log",
+        "sha256": "fc2f38e514f8d2b8df9e0e600a2f5e9f97605dc954eb3a842798bbca111ec7a2",
+        "bytes": 1507816
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stderr.log",
+      "purposes": [
+        "Actual complete Source stdout/stderr"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stdout.log",
+        "sha256": "211dabe2fa72e8bad167f5ff66d6caff883c8f7e656fc035b81b51538075406a",
+        "bytes": 378
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stdout.log",
+      "purposes": [
+        "Actual complete Source stdout/stderr"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/receipt.json",
+        "sha256": "8f5d7502fcaff89906b58e5a788bfd28483ded518c3a1cead8e243c82ef2d477",
+        "bytes": 6979
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/receipt.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stderr.log",
+        "sha256": "0ec60d0564ee49fac5bb0a7410adc18af428dd693129e3f9ca9efd080fd97e57",
+        "bytes": 1507923
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stderr.log",
+      "purposes": [
+        "Actual complete Source stdout/stderr"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stdout.log",
+        "sha256": "f123b64e6a9e19a92ffab0ff3e5017926a37ba3d9d09ce2558c4684889b7d3ef",
+        "bytes": 339
+      },
+      "archive_path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stdout.log",
+      "purposes": [
+        "Actual complete Source stdout/stderr"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54-02.py",
+        "sha256": "9f5caf65531c98f4efa3986eb48cb3f749b1924344886033f5ed1a018fb8cf30",
+        "bytes": 7253
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54-02.py",
+      "purposes": [
+        "Accepted actual review/checker plus preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54.py",
+        "sha256": "15de7a1e93212a3deadfbe6777fec097fea58a4f762df8cf0a059c35af8b74c8",
+        "bytes": 7181
+      },
+      "archive_path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54.py",
+      "purposes": [
+        "Accepted actual review/checker plus preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/correct-P4-factory-guard-Audit-02.py",
+        "sha256": "1f7610bc0d161405c3618f6bb52db5a49d4d0e4fd3043f3892d64535d8a95e09",
+        "bytes": 5862
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-P4-factory-guard-Audit-02.py",
+      "purposes": [
+        "Actual P4 guard-only correction whole/inverse"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/correct-history-ADL-Native-Peer-04.py",
+        "sha256": "f96393c790956d51e172f4e0ae41072d3e00a2ed699e1dd5390349c2e3c2027f",
+        "bytes": 4522
+      },
+      "archive_path": ".runtime/porting/SRC-06/correct-history-ADL-Native-Peer-04.py",
+      "purposes": [
+        "Exact history ADL correction original/proposed source"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/extend-P4-history-publication-Peer-54-03.py",
+        "sha256": "b75fea628ea30dcc6f31a450d268381c2a66aac560288c22f7e68c262dbd5781",
+        "bytes": 4881
+      },
+      "archive_path": ".runtime/porting/SRC-06/extend-P4-history-publication-Peer-54-03.py",
+      "purposes": [
+        "Finite-publication only Native closure extension author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/freeze-Source-P4-scaffold-Audit-01.py",
+        "sha256": "4ebb9829a587c2ebb3247eed91e93b029943fd28667a76b3e56e2b1a6ad743c3",
+        "bytes": 11679
+      },
+      "archive_path": ".runtime/porting/SRC-06/freeze-Source-P4-scaffold-Audit-01.py",
+      "purposes": [
+        "P4 scaffold12 bounded owner/input/readset/author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/freeze-gain-Propane-OP-Outer-05.py",
+        "sha256": "9a89ceb562d2b8f14cd87d273c0b9aa8219689f78ad1bdd09493df09e5ee8772",
+        "bytes": 10901
+      },
+      "archive_path": ".runtime/porting/SRC-06/freeze-gain-Propane-OP-Outer-05.py",
+      "purposes": [
+        "Production Propane14 bounded owner/input/readset/author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/gap-P4-history-guards-Peer-54.py",
+        "sha256": "89f2f230b0faebf72e44117b19d0598f460fde4c441c3a3907510ac7c0438400",
+        "bytes": 5764
+      },
+      "archive_path": ".runtime/porting/SRC-06/gap-P4-history-guards-Peer-54.py",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas",
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+        "sha256": "fc76790e89122784da36a9687c22079a2aefe67cdf498b0d55e32ac9d52b598e",
+        "bytes": 3087
+      },
+      "archive_path": ".runtime/porting/SRC-06/hard-size-command-guards-Peer-43.py",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/launch-P4-history-gap-batch-Root-54.py",
+        "sha256": "3ca71a4f754f7429cfe0898575c35070c87ba6f70df765ced95e52327e07e3be",
+        "bytes": 3640
+      },
+      "archive_path": ".runtime/porting/SRC-06/launch-P4-history-gap-batch-Root-54.py",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers",
+        "Full accepted helper parent/forward/inverse deltas",
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/launch-Source-gap-batch-Root-50.py",
+        "sha256": "25dec74fe4bd5bfaf2fb3c55f3753d1c9ddb0ab4b964f32ac49c3642f3804f26",
+        "bytes": 3170
+      },
+      "archive_path": ".runtime/porting/SRC-06/launch-Source-gap-batch-Root-50.py",
+      "purposes": [
+        "Full accepted helper parent/forward/inverse deltas"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1-receipt.json",
+        "sha256": "83c076150950505a776dc215767f9c0a9da4ff3e03c38dde4e1d29acbfb42039",
+        "bytes": 7218
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1-receipt.json",
+      "purposes": [
+        "Actual retained Native failed build command receipt"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1.stderr",
+      "purposes": [
+        "Actual retained Native failed build complete log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-1.stdout",
+      "purposes": [
+        "Actual retained Native failed build complete log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2-receipt.json",
+        "sha256": "6a32db21d9675e0116676726ad3a7a91f8efc224bd2fef9e201332ab6cd817b3",
+        "bytes": 7238
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2-receipt.json",
+      "purposes": [
+        "Actual retained Native failed build command receipt"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2.stderr",
+        "sha256": "d9c35ee01cf6605568885ce20c7c6086fcc745edfa9063e3d235958033584d9d",
+        "bytes": 1875
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2.stderr",
+      "purposes": [
+        "Actual retained Native failed build complete log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/compile-2.stdout",
+      "purposes": [
+        "Actual retained Native failed build complete log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/native-build.json",
+        "sha256": "82e98c8a79854e4bc062c14e494a4c4c74619662e06b2707d09c401ec6e51767",
+        "bytes": 10253
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/native-build.json",
+      "purposes": [
+        "Preserved actual Native guard/ADL compiler failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-06/native-build.json",
+        "sha256": "fe6892524ce91ed91417764f7ea77be344a6d1266367c8ab7dacd0aa4fa19dd2",
+        "bytes": 35461
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-06/native-build.json",
+      "purposes": [
+        "Accepted original-core actual build metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-07/native-build.json",
+        "sha256": "1317bff372a30dd2a820be8b251a592c25a712159923ddb47808b6c5ae3fdd23",
+        "bytes": 38081
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-07/native-build.json",
+      "purposes": [
+        "Accepted original-core actual build metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/Native-after.json",
+        "sha256": "3a963dcb2d62d2663b77497ca01a7c117e9d03945d18f701924145ba21790b4b",
+        "bytes": 62837
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/Native-after.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/Native-before.json",
+        "sha256": "9ec46e3d2837b9d79f37e656e0500e5211d17dc35aa825c8033d72a057ec9128",
+        "bytes": 63077
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/Native-before.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/actual-child-modules.json",
+        "sha256": "72922b04104f5ad2990a6981a6f56ca8c09a6fc669f545d9b8ce1b3d612f0b6a",
+        "bytes": 4305
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/actual-child-modules.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/receipt.json",
+        "sha256": "717ef1911a028cd5c0963825bb34e5003a49a641ad89aa6690fd52c5819f103d",
+        "bytes": 11350
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/receipt.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/stderr.log",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/stdout.log",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/receipt.json",
+        "sha256": "3b1738df22a8a285880920de9f7e2dfa6a0df716c3f829790c7b724e2c2406af",
+        "bytes": 9467
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/receipt.json",
+      "purposes": [
+        "Preserved actual Native guard/ADL compiler failure"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/stderr.log",
+        "sha256": "59d0d37669808d467985ee252202311c7f1c5d238cdcd999cb6803ebb3231709",
+        "bytes": 57
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/stderr.log",
+      "purposes": [
+        "Preserved actual Native failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/stdout.log",
+      "purposes": [
+        "Preserved actual Native failure log"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/Native-after.json",
+        "sha256": "ec73ac61beb7b98bd02b5d7a3c714db3632568bb54e96f754a68ddd30762090b",
+        "bytes": 72618
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/Native-after.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/Native-before.json",
+        "sha256": "8e296239e6c143c274eb7e561655a27467ce3758f87ec153eea7ae88b8e8b582",
+        "bytes": 72858
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/Native-before.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/actual-child-modules.json",
+        "sha256": "fb40b40619b7e68246d516dfcc7aee81b427c8a21893567500ddc23c823a386f",
+        "bytes": 4421
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/actual-child-modules.json",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/receipt.json",
+        "sha256": "b3d0e29c6940823f39996aa099d1293e94bf8aa242ef9e6425906dfbe0aec5dd",
+        "bytes": 13253
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/receipt.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/stderr.log",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/stdout.log",
+        "sha256": "b7236ca62264bc3519a9a873ee1bf647db196380259a5850cbf46b88c2211bf2",
+        "bytes": 24
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/stdout.log",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/purchased_air_batch.cpp",
+        "sha256": "3f1e0e286f4fe451672e5fc2673c0dc5004a74714b00281fea9506f1b4d01e4b",
+        "bytes": 50921
+      },
+      "archive_path": ".runtime/porting/SRC-06/original-core-gap-batch-type-binding-draft-Audit-03/purchased_air_batch.cpp",
+      "purposes": [
+        "Actual history/P1 factory and inherited helper declaration lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataEnvironment.hh.90-130.txt",
+        "sha256": "411e0c8a075bfd454acce3ca57c0ad5bf83cfd54ac846cef3bcb743ba1a6a921",
+        "bytes": 3283
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataEnvironment.hh.90-130.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobalConstants.hh.371-450.txt",
+        "sha256": "1f4b5be4494039ec56b5f4b568ceff697f703eca7c2d406b388760079b8e28e5",
+        "bytes": 1641
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobalConstants.hh.371-450.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobals.hh.65-145.txt",
+        "sha256": "bbdce9cc8ef33136e31b9f11544eb777304266e18be57fe890e2d85ecbe8615e",
+        "bytes": 6344
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataGlobals.hh.65-145.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataHVACGlobals.hh.490-532.txt",
+        "sha256": "5f02f9b9393dbeb302cd13b2d577b9aaace2445d9d1378372a302251e70c4c69",
+        "bytes": 4015
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataHVACGlobals.hh.490-532.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataOutputs.hh.74-123.txt",
+        "sha256": "7ac0cad33410d9983304022c3f6fbe5b942352abc7283353862bd866565025e9",
+        "bytes": 2094
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__DataOutputs.hh.74-123.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.588-654.txt",
+        "sha256": "ae39668d497e5ce735c69d7ae0b7311ce4d9ad3e238b772964f8ed4f24a2ed67",
+        "bytes": 2597
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.588-654.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.785-843.txt",
+        "sha256": "528a510b9ff39e2e2ae527a63e57268868ae3a938a3756fafb5c496891d81487",
+        "bytes": 5181
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.785-843.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.1179-1194.txt",
+        "sha256": "361615370c7e24a24cca5228e3a405c9bf24a2123987fe063910567f8ad9b9bd",
+        "bytes": 784
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.1179-1194.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.263-281.txt",
+        "sha256": "e5e869b70df72bab66784886166f15293cbe590cfa1a8ea16d9134284426682e",
+        "bytes": 836
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.263-281.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.390-504.txt",
+        "sha256": "1dba9079c05e86ae56296c79078b8dd83ba58ceeddcd93781cc5446c9d1babf2",
+        "bytes": 3377
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.390-504.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/draft.json",
+        "sha256": "a71b59fe4e22e82d4ad2f5b689ba2fee2161abed71c7a4c857fdbcf2d742eaa5",
+        "bytes": 30067
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/draft.json",
+      "purposes": [
+        "Independently reviewed original Native full methods/corrections"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/named-inputs.json",
+        "sha256": "7c92c423ee3742184c85ac21e94fb724fc5e5b4769264f092b096db51f9353f6",
+        "bytes": 37869
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/named-inputs.json",
+      "purposes": [
+        "Original P4 methods/input/constructor declarations"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/output_processor_fragment.cpp",
+        "sha256": "82f7d5524cbae01b75dee2840e5a11533be31d1398d3009d7ab2799f8878777e",
+        "bytes": 22403
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/output_processor_fragment.cpp",
+      "purposes": [
+        "Original full P4 appended method caller"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/purchased_air_and_output_processor_batch.cpp",
+        "sha256": "d51fb2f4c9ca8a11906e0ef95c02a55e3a06e3d8e796cc2523ca9bfba7154ac8",
+        "bytes": 73324
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-Native-P4-draft-Audit-01/purchased_air_and_output_processor_batch.cpp",
+      "purposes": [
+        "Original P4 methods/input/constructor declarations"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__DataOutputs.cc.164-208.txt",
+        "sha256": "5994b914cb9c4fc8ba59f65b10f62d9be282e3199a1b1dd8c472459fdb9ab55c",
+        "bytes": 1660
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__DataOutputs.cc.164-208.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.123-189.txt",
+        "sha256": "777462847037aec8936cab0d3b5ae739106da3143c0733ae1b79c15a7a7a65fe",
+        "bytes": 4091
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.123-189.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1360-1612.txt",
+        "sha256": "fa64816b8ec7f297c5cf7f794e2b2c0842bffebf603042f8eda34bf3fb858ef0",
+        "bytes": 11880
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1360-1612.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1614-1766.txt",
+        "sha256": "c2663c899b6e188db9a2030e81f7afbed3505b043c7e4f4b55cbc53ed6dbc73d",
+        "bytes": 5977
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1614-1766.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1768-2000.txt",
+        "sha256": "57cc7ad8402a927b5dcb7e1f3c2007e7f6ed014eb4c05324b89bed0ef73b29c4",
+        "bytes": 11037
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.1768-2000.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.2224-2854.txt",
+        "sha256": "785657d5c7feffdde7182c7cb6a946f267a2e1a5e60eea6cadb50c17998ebe75",
+        "bytes": 28346
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.2224-2854.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.253-346.txt",
+        "sha256": "a5463cadbb594560783559efcdee35605807855b863472e982000b1103da9bb7",
+        "bytes": 4427
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.253-346.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3003-3243.txt",
+        "sha256": "45a96195553b34623a328b03e21c923f21a89bb701ebfd0eca8d5aa916b676b1",
+        "bytes": 9698
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3003-3243.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3245-3744.txt",
+        "sha256": "0abf5b78a545064ef966f042be472077a3b89fbd9fa3b1738a438a7c53b0ba4e",
+        "bytes": 22620
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3245-3744.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3804-4096.txt",
+        "sha256": "ceb460d13a679a8f0323446022efc1d823e3e3e0d45d40c038ae3177f33c6ed8",
+        "bytes": 14902
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.3804-4096.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.421-587.txt",
+        "sha256": "4013d409f5f697766bd5246453c2a44ee8609ea01a052f505196465ff3356699",
+        "bytes": 7295
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.cc.421-587.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.132-198.txt",
+        "sha256": "9d6bf47abbd679ae324f4265865cfd8003ab5fbfed55ba916edbdf5e8727afe2",
+        "bytes": 2161
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.132-198.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.392-588.txt",
+        "sha256": "1baedf9dd23fc099d52999040479f9e44d7f364b8fa8e353f19dba8a4d70341e",
+        "bytes": 9013
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.392-588.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.918-978.txt",
+        "sha256": "139b50ecd39c03da40bdd107fadc5ba2440840b35664cd4f1a25233eb05931ba",
+        "bytes": 2654
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__OutputProcessor.hh.918-978.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.1004-1051.txt",
+        "sha256": "56efe49f96667b9f7518bbb5c44cf1a5a542301822eddc56fe66c88942c5a1f2",
+        "bytes": 2253
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.1004-1051.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.924-927.txt",
+        "sha256": "2b0dfa8def0fa3640f1a3179951cdc3bd42c295169d23a6ca3beae9081ce453d",
+        "bytes": 91
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.cc.924-927.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.hh.182-245.txt",
+        "sha256": "cf6ebd28b9234ed962845497819beba79cbb835c4467e2780a04505ab8f5ecb2",
+        "bytes": 1975
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.hh.182-245.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.hh.354-390.txt",
+        "sha256": "340d726bf25db3d5de0c67a3f3b8d0e395c0f4bc4ce8ed6672c69d69e0ec001c",
+        "bytes": 1742
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/src__EnergyPlus__ResultsFramework.hh.354-390.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/tst__EnergyPlus__unit__OutputProcessor.unit.cc.4574-4660.txt",
+        "sha256": "a91a54e4c9c59e2479dda6635e3c569b7e9ff29e68d47d7ee37fe813b2090f3d",
+        "bytes": 3243
+      },
+      "archive_path": ".runtime/porting/SRC-06/output-processor-full-method-P4-readonly-plan-Audit-01/Native-extents/tst__EnergyPlus__unit__OutputProcessor.unit.cc.4574-4660.txt",
+      "purposes": [
+        "P4 original-core exact function extent",
+        "P4 scaffold12 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-P4-history-Root-helpers-Peer-54.py",
+        "sha256": "d604007944fced0fcee05411671b6374861234065753196513f19b0b740d3495",
+        "bytes": 6856
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-P4-history-Root-helpers-Peer-54.py",
+      "purposes": [
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-P4-history-publication-Peer-54.py",
+        "sha256": "f875809221aee0149febbb2ecf5e6b700749814990103a8105b7d30ba4b0ce30",
+        "bytes": 16708
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-P4-history-publication-Peer-54.py",
+      "purposes": [
+        "Accepted actual review/checker plus preserved metadata-only checker precheck"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-P4-runtime-fixture-Audit-01.py",
+        "sha256": "00c0d54240928885940f400dcbf6a48317d18af6bf39da867d577ba8ff872663",
+        "bytes": 7341
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-P4-runtime-fixture-Audit-01.py",
+      "purposes": [
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-Propane-P4-history-union-Peer-01.py",
+        "sha256": "ec8025209785e24c8ca7eb8d9352eb35a2a6b5d143e8712b5fa1e896895cf633",
+        "bytes": 8196
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-Propane-P4-history-union-Peer-01.py",
+      "purposes": [
+        "Exact21 composition and original20/history3 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-Propane-P4-union-Audit-01.py",
+        "sha256": "7afb6a63cf629fd6be2cac1ef1f0d6ce7b49e1544bfb9430f28893a196a6a8e4",
+        "bytes": 6480
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-Propane-P4-union-Audit-01.py",
+      "purposes": [
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-air-history-Native-gap-Peer-01.py",
+        "sha256": "56b8222345b0b920502eeeded48493c06f0a4604a9f2a33d1da78f6053591288",
+        "bytes": 13815
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-air-history-Native-gap-Peer-01.py",
+      "purposes": [
+        "Actual history/P1 factory and inherited helper declaration lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-air-history-runtime-fixture-Peer-01.py",
+        "sha256": "151b2db343aebc393f89d9203088673993979dcd4e56d8aed8d55e6b957ff9d4",
+        "bytes": 5409
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-air-history-runtime-fixture-Peer-01.py",
+      "purposes": [
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/prepare-output-processor-Native-P4-Audit-01.py",
+        "sha256": "50145ced7696195954d363baa218be64a02ca2af7a0d8d092f98ec96dce3d0c1",
+        "bytes": 14588
+      },
+      "archive_path": ".runtime/porting/SRC-06/prepare-output-processor-Native-P4-Audit-01.py",
+      "purposes": [
+        "Original P4 methods/input/constructor declarations"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-02/draft.json",
+        "sha256": "e2c4d1bb286593665b2b5e4ba5ba57f188fb543384bf10bdae94f6e948edb19f",
+        "bytes": 58013
+      },
+      "archive_path": ".runtime/porting/SRC-06/purchased-air-native-TU-draft-Audit-02/draft.json",
+      "purposes": [
+        "Actual history/P1 factory and inherited helper declaration lineage"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-07.py",
+        "sha256": "7b31ea654508f25e6e9eeedb3c22c2f3776d795651363eb0c923c99b66f38e78",
+        "bytes": 30644
+      },
+      "archive_path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-07.py",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-08-02.py",
+        "sha256": "46d7f8b35a2ff8da7adcf44d42adbbef3c08c591817459e92e8cbf27b3580b99",
+        "bytes": 34850
+      },
+      "archive_path": ".runtime/porting/SRC-06/run-original-core-gap-batch-Root-08-02.py",
+      "purposes": [
+        "Actual Native logs/PID-DLL gate/custody metadata"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/seal-compact-annual-daygroup-helper-Peer-01.py",
+        "sha256": "674454f45a643fc3e8d6587921052354ecee7ef0067b89ad60dfcaae71c1d50f",
+        "bytes": 11702
+      },
+      "archive_path": ".runtime/porting/SRC-06/seal-compact-annual-daygroup-helper-Peer-01.py",
+      "purposes": [
+        "Exact inherited guard function Sources"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.145-240.txt",
+        "sha256": "20459fe9f70129b04a490f229c9a6b39414078154e27cb600eec5406f5a8f94f",
+        "bytes": 7036
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.145-240.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.337-370.txt",
+        "sha256": "4bcf26fd15e886d8b14f956a98229fe90cfe294c1955b4e5af30baa73afe27c8",
+        "bytes": 2300
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.337-370.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.64-98.txt",
+        "sha256": "d42c16be5bf9d1714a2cd6a7b3e2826d3b5cf7ddefc7eafd38c25e04645d93cb",
+        "bytes": 1775
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataGlobalConstants.hh.64-98.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.1619-1695.txt",
+        "sha256": "b05c6a7ae0727e965236cc8e6b72446c772cb605ad28d9d7bf2a3ec60e315aa8",
+        "bytes": 2639
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.1619-1695.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.445-480.txt",
+        "sha256": "1d65f006a82a1f2646d3a9718e9843d6b4a9ce1cef9af0fc7cfe8652e026007d",
+        "bytes": 3144
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.445-480.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.650-678.txt",
+        "sha256": "514bdb0d66c997dfb31974cca3ace59e839eb8f4026b2161b660d42d637cc4b8",
+        "bytes": 2962
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.650-678.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.861-958.txt",
+        "sha256": "c7c09426f957e20527a90339ed4d1fd465ffe73577ac4e521c8f73f655ff85f1",
+        "bytes": 7181
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/DataHeatBalance.hh.861-958.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.1795-1935.txt",
+        "sha256": "901c9f9552f17784b1007acb98672747bd4f8921b1f744f5d5013550ec0c8956",
+        "bytes": 8866
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.1795-1935.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5427-5465.txt",
+        "sha256": "67cba0dbf6e3c8a81c50bbb4a08096a86ea5d6c9b157f3dfd3410355be77a144",
+        "bytes": 2584
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5427-5465.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5529-5541.txt",
+        "sha256": "ba3f032cd44b73d5f41dbe6f47f9f89aeba4d3b98ba64672f763cfbe94bfddfa",
+        "bytes": 738
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5529-5541.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5542-5650.txt",
+        "sha256": "bea0797dd0116b8a2a5f601615dd2c46dfcd8a271dd8c515e0e1a81a0b8ad5cb",
+        "bytes": 7261
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5542-5650.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5651-5770.txt",
+        "sha256": "8b2e53a9527361ed3dc62c3b944a2f305254f73818f30995db8d96019b43cb74",
+        "bytes": 7951
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/InternalHeatGains.cc.5651-5770.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.111-251.txt",
+        "sha256": "85a4fa9ff8ad04f147e9f0b51cbbdf93231e7fa3c845203fd15459cc366221a6",
+        "bytes": 7198
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.111-251.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.1360-1610.txt",
+        "sha256": "903b6b4bb2c2f0f58475eb230519be640d3bc0fc79582fea093d9c3e39e3e6c0",
+        "bytes": 11850
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.1360-1610.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.3003-3144.txt",
+        "sha256": "be3461e66fcba280183a0717979d3d295c4e02ad21ba9f88cf510141678b7e42",
+        "bytes": 6065
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.cc.3003-3144.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.hh.169-241.txt",
+        "sha256": "b5e12d9a29578dc842983719b48c2996a4c942dce7be3ba0bfb2b26994b8ba35",
+        "bytes": 1896
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.hh.169-241.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.hh.354-419.txt",
+        "sha256": "ec2caa119c368af9bcaf5d344206a8b1f9b3f1b3840b5bc7ffadc44cd3fceffd",
+        "bytes": 3682
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-extents/OutputProcessor.hh.354-419.txt",
+      "purposes": [
+        "Production Propane14 strict Native readset extent"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+        "bytes": 35280
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/DataGlobalConstants.hh",
+      "purposes": [
+        "Production Propane14 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "bytes": 133816
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/DataHeatBalance.hh",
+      "purposes": [
+        "Production Propane14 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/InternalHeatGains.cc",
+        "sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+        "bytes": 536516
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/InternalHeatGains.cc",
+      "purposes": [
+        "Production Propane14 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/OutputProcessor.cc",
+        "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+        "bytes": 225982
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/OutputProcessor.cc",
+      "purposes": [
+        "Production Propane14 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/OutputProcessor.hh",
+        "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+        "bytes": 55700
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/Native-wholes/src/EnergyPlus/OutputProcessor.hh",
+      "purposes": [
+        "Production Propane14 pinned Native whole authority"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/draft.json",
+        "sha256": "5c0c9fe0c0e708467a7cd9d95f55f5bb009fd776dddb6db2f3a9f56ea10e2d56",
+        "bytes": 65091
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-OtherEquipment-Propane-OP-draft-Outer-05/draft.json",
+      "purposes": [
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+        "sha256": "2695383e35a3600ed2e862c8616bcb9816df8e5d776598e8b0d3b55535ac4128",
+        "bytes": 2580714
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-P1-open-output-fix-Peer-53/complete-proposed-compiler-Source-plan.json",
+      "purposes": [
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/complete-proposed-compiler-Source-plan.json",
+        "sha256": "177b6dd0d083d60241996c3b8e6a121e3015230750c35467e2be56346c6a0f4d",
+        "bytes": 2582576
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/complete-proposed-compiler-Source-plan.json",
+      "purposes": [
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/draft.json",
+        "sha256": "45dc0d7c3565a9788ba042f6b38ce8b3d00ee5600b7d2f37c8356e37276b8d7a",
+        "bytes": 35001
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/draft.json",
+      "purposes": [
+        "Exact21 composition and original20/history3 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/literal-six-file-union-proof.json",
+        "sha256": "b8efcf0406317af054b75fe6fb4990ae0e47d72d8352a3dda1a76dac27ce803b",
+        "bytes": 7999
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-coherent-draft-Audit-01/literal-six-file-union-proof.json",
+      "purposes": [
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+        "sha256": "b7a698ba83fcd214a2067513510d37a9bf8b27ef685654668f6404f2cb09b111",
+        "bytes": 13502
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+        "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+        "bytes": 19471
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+        "sha256": "3d06dd02816c6fcf793931454ab894dc2f72bac31cafbcddae09a09e49526b6e",
+        "bytes": 7190
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+        "sha256": "37d124e788cffe930444a03f1e03278cf94379f6e58397f3712830bc8df3e6bf",
+        "bytes": 2128
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "bc920cfbe1ec1791543b6de522f380b3589bff0156de7dfd86a97875d85b68b8",
+        "bytes": 96640
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+        "sha256": "565a13eecac2b6b0256d3c82cd359f872877a28552b08d1225b1db74be5b7b5f",
+        "bytes": 17315
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+        "sha256": "d1090607c00da66a972df6a57070fb1f2143469937692e81ce8f1e09620554d1",
+        "bytes": 5558
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+        "sha256": "7844da2cd8412a0beb83d62924f53a0e9526df9d7c2365988aad85f8fe22f726",
+        "bytes": 22800
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+        "sha256": "86215174a8a7cef256c21b30e08658ada35176e576a0e7336301cfc334712523",
+        "bytes": 4312
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+        "sha256": "32ebc992172d21daf570d282ed43df51ef79dfb6cdbd23ce840d80598fbc9af2",
+        "bytes": 8265
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+        "sha256": "420271fd61f33cc21c7172ff0278393a7083c1f6d6fc648f20a1a3e06aec6b3a",
+        "bytes": 11031
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+        "sha256": "7759d37373ac220353445aa846c8cdafba9cc7a2681c87d6fdcd7a97f51554aa",
+        "bytes": 4561
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+        "sha256": "76f1e2c40a30d165dc326d65f78ddcda7067179123a00d2632d82b4c32d8e54f",
+        "bytes": 2706
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+        "sha256": "7275e47b282388e5d73b424ddae79e5bb540eba8d9152ad7c236032300b8cfc5",
+        "bytes": 12943
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+        "sha256": "9b992142e1a0824b3813f8d435f5eceb2d66bb24a677c75884cc1d635a904c04",
+        "bytes": 24665
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+        "sha256": "0c2fc45a232ed32eec041a42c9ab01ba0c0023e31b51252ef6bc62b998696cfe",
+        "bytes": 3396
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+        "sha256": "98f40a46eb5756e3eea45c015dd5cff556ac60f1c63423cf20cdb18233972058",
+        "bytes": 1882
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/before/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/complete-proposed-compiler-Source-plan.json",
+        "sha256": "2afc056257d345a5a0c93f380312faef089c46e48d4bd65cc66ec72926da154f",
+        "bytes": 2583643
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/complete-proposed-compiler-Source-plan.json",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/1.forward.diff",
+        "sha256": "3abb172fc332494ed64d39f55b5cec988cb742b00cc1ee72a538ca00b77a1db1",
+        "bytes": 850
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/1.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/1.inverse.diff",
+        "sha256": "5067b305314ee278a6e15e955daf72664cbf3e199f56290faf3a5269b4940eea",
+        "bytes": 850
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/1.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/10.forward.diff",
+        "sha256": "cd5cecf132752b6ea59bc8578a4779f7cf427cd65f6d0befe87c6e2aa57a6e15",
+        "bytes": 2825
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/10.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/10.inverse.diff",
+        "sha256": "0a25cd6274ab64ae380e4e70953bc2dfb5b683375e944513a56a441847628e77",
+        "bytes": 2814
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/10.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/11.forward.diff",
+        "sha256": "41bb40cac27bb8ccc939aaad805672a397b1fdf6e41e64f8341e8e2a16610712",
+        "bytes": 1272
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/11.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/11.inverse.diff",
+        "sha256": "b466acef47bb38db8324f6ba1d764bdae88dfd9f8ab13dea8d390e2c8cf35a4e",
+        "bytes": 1272
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/11.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/12.forward.diff",
+        "sha256": "af658a94757c18ca04c819c4ddbb89169c0c82febab24ebeed524788484a66fb",
+        "bytes": 509
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/12.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/12.inverse.diff",
+        "sha256": "b60cd02dcb83acf5dd26da2e3a10a6ffc87503a68dde9dd28ee8cbced6643947",
+        "bytes": 509
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/12.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/13.forward.diff",
+        "sha256": "4112b8d8758a2e8de653ed64d6fb7d5d237e17e9363f6164e64bd1c00161beb9",
+        "bytes": 644
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/13.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/13.inverse.diff",
+        "sha256": "0a683f132c5066744e4cbdf28ab72523a1cca7edd8f154c7d4b3b56655ba5458",
+        "bytes": 644
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/13.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/14.forward.diff",
+        "sha256": "21395ce4a88b180764031c69328ad9f3a80eb8a36622b72dfaf1e65836e015ed",
+        "bytes": 482
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/14.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/14.inverse.diff",
+        "sha256": "05d09f6e2712ec66e98187e0c614a8bbddc0c36a1238d4e266f20026ebe1104c",
+        "bytes": 482
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/14.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/15.forward.diff",
+        "sha256": "f0c3f81606d0ce098e25d20fa0c4e4553791f62258646de27043f797bfe9f881",
+        "bytes": 1010
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/15.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/15.inverse.diff",
+        "sha256": "66006c177f0abb253f9bee6c3edfde5f65e8e6c703c480b5ea26936d5527080d",
+        "bytes": 1010
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/15.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/16.forward.diff",
+        "sha256": "9e6dcb9e837a9d5ac0a6240deffc0a17ed5f54811206e2592c11fb08622d8509",
+        "bytes": 3617
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/16.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/16.inverse.diff",
+        "sha256": "8be242ca3f5506a1b3fc412e60e5948140b5cbf5bbc1afd50d757e3efe1d68aa",
+        "bytes": 3617
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/16.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/17.forward.diff",
+        "sha256": "f9323fca3389f9e1314010c42f22299f36d4fc562dc596387a68aaedae6cea27",
+        "bytes": 1566
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/17.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/17.inverse.diff",
+        "sha256": "61b90c3b282cd0eefc0b6130cf06593b53931b5b9ca2e1b63a1307f9ade4d1b7",
+        "bytes": 1566
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/17.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/18.forward.diff",
+        "sha256": "ccf0d22d2b70fcd92f0bef0c0d568e9547bb19773a09a67ebafeb9d01fe4e661",
+        "bytes": 11976
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/18.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/18.inverse.diff",
+        "sha256": "cce45b0aaf6504e7b976d507dd494fa0a6393262e571317280d47776e309c5d4",
+        "bytes": 11976
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/18.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/19.forward.diff",
+        "sha256": "bd7fe480eaa62eaf9984796850459ae95c6caaf51f94fa966795a2af4087ed1f",
+        "bytes": 14313
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/19.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/19.inverse.diff",
+        "sha256": "fe5bb005aa839515c91f4104b50bcac564d0ae7dbb5be9b03c16375e239ecec2",
+        "bytes": 14313
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/19.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/2.forward.diff",
+        "sha256": "8db5575c27c3d7444592be25b1b497832d3cecbe27df2a7a0db6bbded4a7e8a7",
+        "bytes": 6829
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/2.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/2.inverse.diff",
+        "sha256": "b3564c7dfbf1f731271480d2b4951be9b3275cd43029bbd293ecb5fea7b58f36",
+        "bytes": 6829
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/2.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/20.forward.diff",
+        "sha256": "cbad7bdaa74d2a33c616b89f47ec63ad127fdabc59a0e93f4931d76f17498a94",
+        "bytes": 1236
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/20.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/20.inverse.diff",
+        "sha256": "e5b00297f686ea69afb7ceb31c1a942255f11462084f59b0d3c309d7d8d9f2e0",
+        "bytes": 1236
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/20.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/21.forward.diff",
+        "sha256": "cf75dcae714eb9c963897664f97cfd382b5b042c21aad73d16f08e0b97fb8129",
+        "bytes": 795
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/21.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/21.inverse.diff",
+        "sha256": "e7a1f130c72059bd8d3f3d26b3aa456522a7b5ab717be2d0e5c614544cf329bf",
+        "bytes": 795
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/21.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/3.forward.diff",
+        "sha256": "25060a72cb07121c82dcf79cbb3474259427831c0c3542353d27281486ea45c9",
+        "bytes": 8370
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/3.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/3.inverse.diff",
+        "sha256": "d76e46370b34add2721933b4e907c6d10bc47790b5ffc332b9e2a2ca23d847a8",
+        "bytes": 8370
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/3.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/4.forward.diff",
+        "sha256": "877882b0aad19a337a6762410737af1e2126713be7c5c6e64d4914ad671b67d7",
+        "bytes": 1293
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/4.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/4.inverse.diff",
+        "sha256": "8b96fafbd76f78f81809551bcd702720fd4bf70ffbe24b3f68982c4e27f0f60f",
+        "bytes": 1293
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/4.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/5.forward.diff",
+        "sha256": "bdab87d87a487567ab16c1bcb1c98ce6d068f0db58dba3d81418f4f0674fcef0",
+        "bytes": 299
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/5.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/5.inverse.diff",
+        "sha256": "077573b2b313389c1b0aef896a3163c7a0482b7a9826abe88575fd84dcc48c8a",
+        "bytes": 299
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/5.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/6.forward.diff",
+        "sha256": "2119b7c653fcc81685985d3d819a147d4205652190ced0cfb8e4c3c20e93ffc4",
+        "bytes": 21087
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/6.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/6.inverse.diff",
+        "sha256": "a0ce8bda9f934d2c7712b682ef549dd33dd0f9ab20289e38245a5f9b53cee794",
+        "bytes": 21087
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/6.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/7.forward.diff",
+        "sha256": "4fb0b9319661a374257f0aae8f07145515b7b43319c018dad2e114a8d959fc7e",
+        "bytes": 29079
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/7.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/7.inverse.diff",
+        "sha256": "971ff643217af815667a798f2df35e053bfd9e22a1e7690961aec2049ea9fd87",
+        "bytes": 29079
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/7.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/8.forward.diff",
+        "sha256": "375454b4f1ba7e8f81309c4eb1d167df673d8660c87592ea9b2e97b14ccd114f",
+        "bytes": 7369
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/8.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/8.inverse.diff",
+        "sha256": "a6d1d0d6c64bd2e4cda813ac22823bf2bef342010fc234a35ad0cd062b6a9082",
+        "bytes": 7385
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/8.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/9.forward.diff",
+        "sha256": "129c0b68de45c12056061eedc1151bbb71098d33e8b79d72c61ccbb2e8f937c4",
+        "bytes": 433
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/9.forward.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/9.inverse.diff",
+        "sha256": "e57456b3d0c3ea660a8497d5b4da13a71296028bbb875e88d5f25e61851f90f8",
+        "bytes": 433
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/diffs/9.inverse.diff",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/draft.json",
+        "sha256": "5cfc61ec791789f16cde283713cf218cc15005ec533651f585df565c6c181779",
+        "bytes": 44073
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/draft.json",
+      "purposes": [
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/literal-two-hook-union-proof.json",
+        "sha256": "53d5c0896fed273bdfbe078c43f87ecd746d632115b9ed2ed8442428a30aa9ca",
+        "bytes": 2650
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/literal-two-hook-union-proof.json",
+      "purposes": [
+        "Exact21 composition and original20/history3 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+        "sha256": "9ef0c8109748c424b9d142425e6fd14478dc139193ec37a65f52498525557a99",
+        "bytes": 13589
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+        "sha256": "14905a93e5fa461df3ebfef098f6007cc0c0f3957b498a74b9401ca2e61cb848",
+        "bytes": 21790
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+        "sha256": "bad698908082149a722bdfcd4ded87c5b5c8b53a9cfa9c7cbe04dd54d01a3d9d",
+        "bytes": 13136
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+        "sha256": "b4d173466041e17fb185a2856cdffb093b4a9bb94bf546e2f30d8d77e916c915",
+        "bytes": 2399
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "f0869a21e09476d7513fb0d0db6db531ba548a1d887c6d8ac01c1437d12831c8",
+        "bytes": 96681
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs",
+        "sha256": "ef252f1c406d8253c15b04a47c340fcf37a1bd5a55e25889deb60112e05708f9",
+        "bytes": 20374
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/output_processor.rs",
+        "sha256": "d90666a38d78b330f6b2a8ec25007a340da013157e6f971f3b50a83372c128bb",
+        "bytes": 28090
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/output_processor.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+        "sha256": "29220faa7c986b801c91f1d08a1b58f36b0283b995a10d456b443f726fbd1f1a",
+        "bytes": 18336
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+        "sha256": "d65910f31126ad45cc343c9d520a3dbc1455f6cd754880d17a5f3a78c5e6a8b7",
+        "bytes": 5588
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+        "sha256": "d5c64e6186c0e8502df3c66d485b36b88917810f5dc943be280fae4b15ae1c45",
+        "bytes": 23113
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+        "sha256": "a2b6b4bf890945421dfd295c0a55d5510adbd19eeb2068daf6182d2ac85204a6",
+        "bytes": 4606
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+        "sha256": "f0541c3d7ee47cdacddaf821034d2b64d6d215f1143adedb498867108166e043",
+        "bytes": 8361
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+        "sha256": "f2d9187984e65f051cfb0ef6460ee55a60b90f550aa76ce80b02600cff88cb09",
+        "bytes": 11223
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+        "sha256": "f838a3629cfda7c01cb72c6a72bf3ae66223f0753f93320754d93c523ce413f8",
+        "bytes": 4572
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+        "sha256": "3b384ed1f76e4f3d9e15ff19e94f4849f1e45ee069809db0d40653a79967509f",
+        "bytes": 2934
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+        "sha256": "0dfb5dfefa86037bc30b81115c0e5d365d6903c2483cd251c38247b3bec32035",
+        "bytes": 14842
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/internal_gain_target.rs",
+        "sha256": "44a793ace7a91c7a5757adff1568c00df548990a1d0a02e94826842ddb24d6dd",
+        "bytes": 1337
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/internal_gain_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+        "sha256": "07905d0a2633b9e0c2966bb36de70d44d4dbcf8020e9f4c4de2241afbd7831d5",
+        "bytes": 28874
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/native_p4.rs",
+        "sha256": "0a1ed96698d10873ec2cf6d1f2eb1d082a4a53afe1fe0705bc50c8dc4cccbad3",
+        "bytes": 13907
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/native_p4.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+        "sha256": "dadbad35bf506a88166fe3c78cd7b9f9423bb51b47090b65543c38910a4eadc9",
+        "bytes": 3647
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+        "sha256": "09002592fea205b7ac29346330b2bfcd95aae74f4d218779add16b0e1ba581f1",
+        "bytes": 2081
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/1.stdout.rs",
+        "sha256": "52b626b6570309a1b78e32ae180c6fcbbbc3cb4294f1a4cc324e621cc2be1b59",
+        "bytes": 13589
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/1.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/1.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/1.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/10.stdout.rs",
+        "sha256": "47163b11db0b1921373c3b49cd5a9814c5107cceaffe602ec252fb6b907db450",
+        "bytes": 23114
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/10.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/10.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/10.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/11.stdout.rs",
+        "sha256": "a16d91017dfda3a991f2aad1ad81d6bfbc2488921653b1b3f632dfa8e21a0832",
+        "bytes": 4637
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/11.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/11.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/11.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/12.stdout.rs",
+        "sha256": "bc46dce130f1d1c40a896c2731a6d96a2b25d7f19860d6accfc7f0dfb27dca69",
+        "bytes": 8387
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/12.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/12.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/12.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/13.stdout.rs",
+        "sha256": "f2d9187984e65f051cfb0ef6460ee55a60b90f550aa76ce80b02600cff88cb09",
+        "bytes": 11223
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/13.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/13.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/13.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/14.stdout.rs",
+        "sha256": "f838a3629cfda7c01cb72c6a72bf3ae66223f0753f93320754d93c523ce413f8",
+        "bytes": 4572
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/14.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/14.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/14.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/15.stdout.rs",
+        "sha256": "3b384ed1f76e4f3d9e15ff19e94f4849f1e45ee069809db0d40653a79967509f",
+        "bytes": 2934
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/15.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/15.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/15.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/16.stdout.rs",
+        "sha256": "0dfb5dfefa86037bc30b81115c0e5d365d6903c2483cd251c38247b3bec32035",
+        "bytes": 14842
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/16.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/16.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/16.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/17.stdout.rs",
+        "sha256": "44a793ace7a91c7a5757adff1568c00df548990a1d0a02e94826842ddb24d6dd",
+        "bytes": 1337
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/17.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/17.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/17.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/18.stdout.rs",
+        "sha256": "07905d0a2633b9e0c2966bb36de70d44d4dbcf8020e9f4c4de2241afbd7831d5",
+        "bytes": 28874
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/18.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/18.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/18.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/19.stdout.rs",
+        "sha256": "0a1ed96698d10873ec2cf6d1f2eb1d082a4a53afe1fe0705bc50c8dc4cccbad3",
+        "bytes": 13907
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/19.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/19.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/19.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/2.stdout.rs",
+        "sha256": "ad386db9d40560052c1a824b514629520c376feed3aa77911de9da48d825fda9",
+        "bytes": 21791
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/2.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/2.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/2.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/20.stdout.rs",
+        "sha256": "0d2eeb5df07af0ff0eeb8c5274e9b428f5080b058cecc02541c78bc6de07da46",
+        "bytes": 3678
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/20.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/20.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/20.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/21.stdout.rs",
+        "sha256": "b560feef66353b79c5f9d39dbe25210bc0b3c76954457a820ccf49ae4449740a",
+        "bytes": 2143
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/21.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/21.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/21.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/3.stdout.rs",
+        "sha256": "4643270182fcebc4ef69e568284e1fefd967dd3e7c9f923ab5b6b5b85b90180a",
+        "bytes": 13136
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/3.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/3.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/3.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/4.stdout.rs",
+        "sha256": "3dd97fb7581bb6c6852bd40829eaec8afa111c3b427704d4a3ee40a8869f33b9",
+        "bytes": 2738
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/4.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/4.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/4.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/5.stdout.rs",
+        "sha256": "d856d5245c76b0ac7d08827edec95e7ae1d61753aba67ed27fda908178d98c28",
+        "bytes": 96747
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/5.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/5.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/5.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/6.stdout.rs",
+        "sha256": "ef252f1c406d8253c15b04a47c340fcf37a1bd5a55e25889deb60112e05708f9",
+        "bytes": 20374
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/6.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/6.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/6.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/7.stdout.rs",
+        "sha256": "d90666a38d78b330f6b2a8ec25007a340da013157e6f971f3b50a83372c128bb",
+        "bytes": 28090
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/7.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/7.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/7.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/8.stdout.rs",
+        "sha256": "6e4fa36dd1ecbc2a58ffb10eef3319081a44f7942120e7b14b6b2f1562d4e07d",
+        "bytes": 18320
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/8.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/8.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/8.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/9.stdout.rs",
+        "sha256": "d65910f31126ad45cc343c9d520a3dbc1455f6cd754880d17a5f3a78c5e6a8b7",
+        "bytes": 5588
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/9.stdout.rs",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/9.stdout.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/syntax/9.stdout.stderr",
+      "purposes": [
+        "Selected21 exact before/proposed/forward/inverse and syntax provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-air-history-gap-scaffold-Peer-01/draft.json",
+        "sha256": "8749fb3225ff11f8ede313f65857c7062457eac124f7c9d5478f4a27a8fe379f",
+        "bytes": 15872
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-air-history-gap-scaffold-Peer-01/draft.json",
+      "purposes": [
+        "Exact21 composition and original20/history3 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/fixture.json",
+        "sha256": "0edffefc13dad650220b2cf282afc184b41f020548f7929baf74cd69dad9da21",
+        "bytes": 5414263
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/fixture.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/projection.json",
+        "sha256": "66c9825be097a2f936068bcf4ad222166e29bbc63a0af0a67cc9368e28eddc42",
+        "bytes": 5435
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/projection.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture",
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-gap-author-Audit-P4-01/input-only-proof.json",
+        "sha256": "0dcab40b89a80189f574d2f197ce5ddd8c6374e230b4a7161051abcd66421693",
+        "bytes": 16633
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-gap-author-Audit-P4-01/input-only-proof.json",
+      "purposes": [
+        "P4 scaffold12 bounded owner/input/readset/author",
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-gap-author-Audit-P4-01/input-only.json",
+        "sha256": "a748185c3ad4cd265b09d3b574ed2f6180525f2491d370f448af8c7f0020d115",
+        "bytes": 110897
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-gap-author-Audit-P4-01/input-only.json",
+      "purposes": [
+        "P4 scaffold12 bounded owner/input/readset/author",
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/concrete-target-API-census.jsonl",
+        "sha256": "0152a855e14596ee8e02d23a767efdcbdc4864d58602d3f9e399a4e27fe28683",
+        "bytes": 68272
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/concrete-target-API-census.jsonl",
+      "purposes": [
+        "P4 scaffold12 bounded owner/input/readset/author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/draft.json",
+        "sha256": "6d903bf4955c36599ca074cd37b16693fe0fd567ec9d315efdcc939108fef12e",
+        "bytes": 48628
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/draft.json",
+      "purposes": [
+        "Original20 composition/production/P4 scopes"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/observation-coverage.json",
+        "sha256": "9eae199750bbd3629be4de121cb932b64b058112d61c7ca5c6fc087082f761e2",
+        "bytes": 3047
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-gap-scaffold-Audit-01/observation-coverage.json",
+      "purposes": [
+        "P4 scaffold12 bounded owner/input/readset/author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/fixture.json",
+        "sha256": "5adbb0f0e15ed70a218b6d929961c41c24fbb5ae717a984e3b9ddfae7d25ef13",
+        "bytes": 25659941
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/fixture.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/projection.json",
+        "sha256": "a8bade850d086578f6cc40de898490ca7739f5a0d9767f009825c82778e9d385",
+        "bytes": 5080
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/projection.json",
+      "purposes": [
+        "Actual selected scientific group/whole runtime fixture",
+        "Root54 preparation/helpers/exact fixture provenance"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-only.json",
+        "sha256": "a74ed789526de8ff91e6e43c8a87c0959438a4e5e19ccede97fe22d73e9a9161",
+        "bytes": 228315
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-only.json",
+      "purposes": [
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-transport-proof.json",
+        "sha256": "11b1850b8cce5c99db27522aff9921340670defb696d5eb160cc678b3a343010",
+        "bytes": 157009
+      },
+      "archive_path": ".runtime/porting/SRC-06/source-purchased-air-gap-scaffold-Peer-01/input-transport-proof.json",
+      "purposes": [
+        "Whole declared primary inputs/true raw input bridge/projection author"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+        "sha256": "9ef0c8109748c424b9d142425e6fd14478dc139193ec37a65f52498525557a99",
+        "bytes": 13589
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+        "sha256": "14905a93e5fa461df3ebfef098f6007cc0c0f3957b498a74b9401ca2e61cb848",
+        "bytes": 21790
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+        "sha256": "bad698908082149a722bdfcd4ded87c5b5c8b53a9cfa9c7cbe04dd54d01a3d9d",
+        "bytes": 13136
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+        "sha256": "b4d173466041e17fb185a2856cdffb093b4a9bb94bf546e2f30d8d77e916c915",
+        "bytes": 2399
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+        "sha256": "f0869a21e09476d7513fb0d0db6db531ba548a1d887c6d8ac01c1437d12831c8",
+        "bytes": 96681
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs",
+        "sha256": "ef252f1c406d8253c15b04a47c340fcf37a1bd5a55e25889deb60112e05708f9",
+        "bytes": 20374
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/output_processor.rs",
+        "sha256": "d90666a38d78b330f6b2a8ec25007a340da013157e6f971f3b50a83372c128bb",
+        "bytes": 28090
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/output_processor.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+        "sha256": "29220faa7c986b801c91f1d08a1b58f36b0283b995a10d456b443f726fbd1f1a",
+        "bytes": 18336
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+        "sha256": "d65910f31126ad45cc343c9d520a3dbc1455f6cd754880d17a5f3a78c5e6a8b7",
+        "bytes": 5588
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+        "sha256": "d5c64e6186c0e8502df3c66d485b36b88917810f5dc943be280fae4b15ae1c45",
+        "bytes": 23113
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+        "sha256": "a2b6b4bf890945421dfd295c0a55d5510adbd19eeb2068daf6182d2ac85204a6",
+        "bytes": 4606
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+        "sha256": "f0541c3d7ee47cdacddaf821034d2b64d6d215f1143adedb498867108166e043",
+        "bytes": 8361
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+        "sha256": "f2d9187984e65f051cfb0ef6460ee55a60b90f550aa76ce80b02600cff88cb09",
+        "bytes": 11223
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+        "sha256": "f838a3629cfda7c01cb72c6a72bf3ae66223f0753f93320754d93c523ce413f8",
+        "bytes": 4572
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+        "sha256": "3b384ed1f76e4f3d9e15ff19e94f4849f1e45ee069809db0d40653a79967509f",
+        "bytes": 2934
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+        "sha256": "0dfb5dfefa86037bc30b81115c0e5d365d6903c2483cd251c38247b3bec32035",
+        "bytes": 14842
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/internal_gain_target.rs",
+        "sha256": "44a793ace7a91c7a5757adff1568c00df548990a1d0a02e94826842ddb24d6dd",
+        "bytes": 1337
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/internal_gain_target.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+        "sha256": "07905d0a2633b9e0c2966bb36de70d44d4dbcf8020e9f4c4de2241afbd7831d5",
+        "bytes": 28874
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/native_p4.rs",
+        "sha256": "0a1ed96698d10873ec2cf6d1f2eb1d082a4a53afe1fe0705bc50c8dc4cccbad3",
+        "bytes": 13907
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/native_p4.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+        "sha256": "dadbad35bf506a88166fe3c78cd7b9f9423bb51b47090b65543c38910a4eadc9",
+        "bytes": 3647
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+        "sha256": "09002592fea205b7ac29346330b2bfcd95aae74f4d218779add16b0e1ba581f1",
+        "bytes": 2081
+      },
+      "archive_path": "crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "purposes": [
+        "Current selected21 Source whole"
+      ]
+    },
+    {
+      "source": {
+        "path": "tools/porting/record_command.py",
+        "sha256": "18168e36c2c759d55811d1c19695a4c0f7c0e5bba67b1e13f5e499d54d8780c8",
+        "bytes": 8557
+      },
+      "archive_path": "tools/porting/record_command.py",
+      "purposes": [
+        "Actual current application/full plan/independent scopes/helpers"
+      ]
+    }
+  ],
+  "uncompressed_bytes": 49226989,
+  "exclusions": [
+    "Old compiler snapshot ledgers/Source trees/source-objects and recursive prior evidence ZIPs",
+    "Core/static archives/objects/binaries/DLLs/maps and full frozen environment values",
+    "Duplicate Native P4/history raw JSON: entire outputs are already losslessly retained in the two runtime fixtures",
+    "Duplicate old P1/Surface fixtures retained by public53; all four are independently guarded in actual54",
+    "Future multiplier2/warmup/Exterior Source expected results or unexecuted claims"
+  ]
+}

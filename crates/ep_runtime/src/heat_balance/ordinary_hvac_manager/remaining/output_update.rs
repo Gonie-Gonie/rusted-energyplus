@@ -49,6 +49,7 @@ impl SourceOrdinaryHvacRemaining {
         };
         let fields = LiveReadFields {
             nodes: &*o.equipment,
+            gains: &*o.gains,
             weather_outputs: Some(&weather),
             schedules: o.schedules,
             arrays: o.surface_arrays,

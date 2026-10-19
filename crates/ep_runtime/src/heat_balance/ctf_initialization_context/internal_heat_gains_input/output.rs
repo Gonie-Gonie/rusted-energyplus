@@ -1,6 +1,6 @@
-//! Reached None-fuel IHG declarations on the existing OutputProcessor owner.
+//! Ordered None/Propane IHG declarations on the existing OutputProcessor owner.
 use super::getter::SourceGainInputOwners;
-use super::{E, SelectedInternalHeatGains, index, unavailable};
+use super::{index, unavailable, SelectedInternalHeatGains, E};
 use crate::heat_balance::source_output_registration::{
     SourceOutputFileHost, SourceOutputStoreType as Store, SourceOutputUnits as Units,
     SourceRealOutputDeclaration, SourceReportVariableInput,
@@ -135,11 +135,18 @@ impl SelectedInternalHeatGains {
         let mut add_space_outputs = vec![false; space_names.len()];
         // All preceding equipment loops are genuinely empty in this admission.
         if let Some(equipment) = &self.allocations.other_equipment {
-            for row in equipment {
+            for (row_index, row) in equipment.iter().enumerate() {
                 add_zone_outputs[index(row.zone_ptr)?] = true;
                 add_space_outputs[index(row.space_index)?] = true;
-                if row.fuel != super::SourceOtherFuel::None {
-                    return Err(unavailable("positive IHG fuel meter output"));
+                if row.fuel == super::SourceOtherFuel::Propane {
+                    self.declare_propane(owners, row_index, false)?;
+                    self.declare_propane(owners, row_index, true)?;
+                }
+                if row.fuel != super::SourceOtherFuel::None
+                    && row.fuel != super::SourceOtherFuel::Invalid
+                    && row.fuel != super::SourceOtherFuel::Propane
+                {
+                    return Err(unavailable("positive IHG other fuel meter output"));
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     let value = if i.is_multiple_of(2) {
@@ -165,6 +172,35 @@ impl SelectedInternalHeatGains {
                     .as_ref()
                     .and_then(|v| v.get(number))
                     .ok_or_else(|| unavailable("same Other ZoneRpt"))?;
+                let fuels = owners
+                    .zones
+                    .zones
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual zone fuel list"))?[number]
+                    .other_equipment_fuels
+                    .clone();
+                for fuel in fuels {
+                    if fuel == -1 || fuel == 14 {
+                        continue;
+                    }
+                    if fuel != 5 {
+                        return Err(unavailable("actual other fuel total output name"));
+                    }
+                    declare(
+                        owners,
+                        name,
+                        "Zone Other Equipment Propane Rate",
+                        1,
+                        &report.other_power[5],
+                    )?;
+                    declare(
+                        owners,
+                        name,
+                        "Zone Other Equipment Propane Energy",
+                        0,
+                        &report.other_consumption[5],
+                    )?;
+                }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     declare(
                         owners,
@@ -185,6 +221,35 @@ impl SelectedInternalHeatGains {
                     .as_ref()
                     .and_then(|v| v.get(number))
                     .ok_or_else(|| unavailable("same Other spaceRpt"))?;
+                let fuels = owners
+                    .zones
+                    .spaces
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual space fuel list"))?[number]
+                    .other_equipment_fuels
+                    .clone();
+                for fuel in fuels {
+                    if fuel == -1 || fuel == 14 {
+                        continue;
+                    }
+                    if fuel != 5 {
+                        return Err(unavailable("actual other fuel total output name"));
+                    }
+                    declare(
+                        owners,
+                        name,
+                        "Space Other Equipment Propane Rate",
+                        1,
+                        &report.other_power[5],
+                    )?;
+                    declare(
+                        owners,
+                        name,
+                        "Space Other Equipment Propane Energy",
+                        0,
+                        &report.other_consumption[5],
+                    )?;
+                }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     declare(
                         owners,
@@ -199,5 +264,89 @@ impl SelectedInternalHeatGains {
         }
         // Later ITE/Baseboard loops are also empty; local flags then destruct.
         Ok(())
+    }
+}
+
+impl SelectedInternalHeatGains {
+    fn declare_propane(
+        &self,
+        owners: &mut SourceGainInputOwners<'_, '_>,
+        row_index: usize,
+        energy: bool,
+    ) -> Result<(), E> {
+        use crate::heat_balance::source_output_registration::{
+            SourceGeneralMeterArguments, SourceGeneralRealRegistrationOptions,
+            SourceInternalGainOutputField, SourceMeterEndUse, SourceMeterGroup,
+            SourceMeterResource, SourceRealOutputBinding, SourceRealOutputTarget,
+        };
+        let row = self
+            .allocations
+            .other_equipment
+            .as_ref()
+            .and_then(|rows| rows.get(row_index))
+            .ok_or_else(|| unavailable("same OtherEquipment output row"))?;
+        let target = SourceRealOutputTarget::InternalGain {
+            index: i32::try_from(row_index + 1)
+                .map_err(|_| unavailable("actual OtherEquipment output index"))?,
+            field: if energy {
+                SourceInternalGainOutputField::OtherConsumption
+            } else {
+                SourceInternalGainOutputField::OtherPower
+            },
+        };
+        let binding = SourceRealOutputBinding::new(target, self).map_err(E::Output)?;
+        let zone = owners
+            .zones
+            .zones
+            .as_ref()
+            .and_then(|r| index(row.zone_ptr).ok().and_then(|i| r.get(i)))
+            .ok_or_else(|| unavailable("same output Zone"))?;
+        let space = owners
+            .zones
+            .spaces
+            .as_ref()
+            .and_then(|r| index(row.space_index).ok().and_then(|i| r.get(i)))
+            .ok_or_else(|| unavailable("same output Space"))?;
+        let meter = energy.then_some(SourceGeneralMeterArguments {
+            resource: SourceMeterResource::Propane,
+            end_use: SourceMeterEndUse::InteriorEquipment,
+            end_use_subcategory: &row.end_use_subcategory,
+            group: SourceMeterGroup::Building,
+            zone_name: &zone.name,
+            space_type: &space.space_type,
+            zone_multiplier: zone.multiplier,
+            zone_list_multiplier: zone.list_multiplier,
+        });
+        let mut request = SourceReportVariableInput::new(
+            owners.report_inputs,
+            owners.input,
+            owners.minimum_report_frequency,
+        );
+        owners
+            .registration
+            .setup_bound_general_real_source_input(
+                &mut request,
+                owners.prescan,
+                SourceRealOutputDeclaration {
+                    name: if energy {
+                        "Other Equipment Propane Energy"
+                    } else {
+                        "Other Equipment Propane Rate"
+                    },
+                    key: &row.name,
+                    units: if energy { Units::J } else { Units::W },
+                    store_type: if energy { Store::Sum } else { Store::Average },
+                },
+                owners.minutes,
+                &mut GainOutputHost(&mut *owners.host),
+                owners.eio,
+                binding,
+                SourceGeneralRealRegistrationOptions {
+                    time_step: crate::heat_balance::source_output_registration::TimeStepKind::Zone,
+                    meter,
+                },
+                owners.backend,
+            )
+            .map_err(E::Output)
     }
 }

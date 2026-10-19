@@ -1,4 +1,4 @@
-//! Real SetupOutputVariable3003–3144 with actual Zone/System and energy meters.
+//! Real SetupOutputVariable with actual Zone/System and energy meters.
 use super::bound_real::SourceOutputVariableType;
 use super::*;
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -187,6 +187,57 @@ impl SourceOutputRegistration {
         options: SourceGeneralRealRegistrationOptions<'_>,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), OrdinaryRadiationError> {
+        self.setup_bound_general_real_optional_dictionary(
+            input,
+            prescan,
+            declaration,
+            minutes_in_time_step,
+            host,
+            eio,
+            binding,
+            Some(dictionary_host),
+            options,
+            backend,
+        )
+    }
+    pub(crate) fn setup_bound_general_real_source_input(
+        &mut self,
+        input: &mut SourceReportVariableInput<'_>,
+        prescan: &SourceOutputPreScan,
+        declaration: SourceRealOutputDeclaration<'_>,
+        minutes_in_time_step: i32,
+        host: &mut impl SourceOutputFileHost,
+        eio: &mut dyn std::io::Write,
+        binding: SourceRealOutputBinding<'_>,
+        options: SourceGeneralRealRegistrationOptions<'_>,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<(), OrdinaryRadiationError> {
+        self.setup_bound_general_real_optional_dictionary(
+            input,
+            prescan,
+            declaration,
+            minutes_in_time_step,
+            host,
+            eio,
+            binding,
+            None,
+            options,
+            backend,
+        )
+    }
+    fn setup_bound_general_real_optional_dictionary(
+        &mut self,
+        input: &mut SourceReportVariableInput<'_>,
+        prescan: &SourceOutputPreScan,
+        declaration: SourceRealOutputDeclaration<'_>,
+        minutes_in_time_step: i32,
+        host: &mut impl SourceOutputFileHost,
+        eio: &mut dyn std::io::Write,
+        binding: SourceRealOutputBinding<'_>,
+        dictionary_host: Option<&mut dyn SourceOutputDictionaryHost>,
+        options: SourceGeneralRealRegistrationOptions<'_>,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<(), OrdinaryRadiationError> {
         // CheckReportVariable then FindItem precede actual meter validation/DD.
         let (request_indexes, on_the_list) = self.prepare_real_registration_front(
             input,
@@ -229,7 +280,7 @@ impl SourceOutputRegistration {
         selected: SourceRealRegistrationSelection,
         declaration: SourceRealOutputDeclaration<'_>,
         options: SourceGeneralRealRegistrationOptions<'_>,
-        dictionary_host: &mut impl SourceOutputDictionaryHost,
+        mut dictionary_host: Option<&mut dyn SourceOutputDictionaryHost>,
         binding: SourceRealOutputBinding<'_>,
         mut on_meter: bool,
     ) -> Result<(), OrdinaryRadiationError> {
@@ -310,7 +361,10 @@ impl SourceOutputRegistration {
             var.report = true;
             var.frequency = self.requested_variables[request].frequency;
             var.schedule = self.requested_variables[request].reporting_schedule;
-            self.write_real_report_dictionary(number, dictionary_host)?;
+            let actual_dictionary_host = dictionary_host
+                .as_deref_mut()
+                .ok_or(OrdinaryRadiationUnavailable::InputBranch)?;
+            self.write_real_report_dictionary(number, actual_dictionary_host)?;
         }
         Ok(())
     }

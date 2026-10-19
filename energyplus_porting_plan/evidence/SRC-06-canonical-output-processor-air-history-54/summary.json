@@ -1,0 +1,232 @@
+{
+  "accepted": true,
+  "findings": [],
+  "compiler_inputs": 4538,
+  "Rust_sources": 4525,
+  "selected_Source_files": [
+    "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output.rs",
+    "crates/ep_runtime/src/heat_balance/gap_batch_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/output_processor.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+    "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/dictionary.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/general_real.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/internal_gain_target.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/native_p4.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+    "crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs"
+  ],
+  "existing": 17,
+  "new": 4,
+  "full_operations": 78,
+  "original_P4_setup_calls": 9,
+  "P4_full_operations": 38,
+  "history_full_operations": 40,
+  "Source_exact_state_raw_bits": 57553,
+  "P4_Source_exact_state_raw_bits": 34321,
+  "history_Source_exact_state_raw_bits": 23232,
+  "Native_entire_output_finite_f64": 57822,
+  "P4_Native_entire_output_finite_f64": 34470,
+  "history_Native_entire_output_finite_f64": 23352,
+  "denominators_distinct": true,
+  "observed_state_snapshots": 183,
+  "accepted_selected_Cargo_invocations": 2,
+  "both_groups_same_recorded_Source_snapshot": true,
+  "all_four_external_fixtures_stable": true,
+  "actual_groups": [
+    {
+      "group": "output_processor",
+      "full_calls": 38,
+      "Source_exact_raw_bit_state_observations": 34321,
+      "Native_whole_output_finite_fields": 34470,
+      "denominators_distinct": true,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/receipt.json",
+        "sha256": "8f5d7502fcaff89906b58e5a788bfd28483ded518c3a1cead8e243c82ef2d477",
+        "bytes": 6979
+      },
+      "actual_Native_receipt": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-07-output_processor/receipt.json",
+        "sha256": "b3d0e29c6940823f39996aa099d1293e94bf8aa242ef9e6425906dfbe0aec5dd",
+        "bytes": 13253
+      },
+      "external_fixture": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/fixture.json",
+        "sha256": "5adbb0f0e15ed70a218b6d929961c41c24fbb5ae717a984e3b9ddfae7d25ef13",
+        "bytes": 25659941
+      },
+      "fixture_projection": {
+        "path": ".runtime/porting/SRC-06/source-output-processor-runtime-fixture-Audit-01/projection.json",
+        "sha256": "a8bade850d086578f6cc40de898490ca7739f5a0d9767f009825c82778e9d385",
+        "bytes": 5080
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/before.json",
+          "sha256": "c7b0d5cddd491ae07eadec6461cbd2c948e0804941c6a672460810fcd98400d8",
+          "bytes": 7646
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-output_processor-guard-54/after.json",
+          "sha256": "03238437cbd05929b42a3ecefe471ace4cfe014bce29759cec2475be4375cee0",
+          "bytes": 14256
+        }
+      ],
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6e348d91a32e8a96da4aeed6842c2a2c3efba739e635de8263bc1301beed51b6",
+        "sha256": "6e348d91a32e8a96da4aeed6842c2a2c3efba739e635de8263bc1301beed51b6",
+        "bytes": 1860468
+      },
+      "all4538_archived_compiler_inputs_exact": true,
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stdout.log",
+          "sha256": "f123b64e6a9e19a92ffab0ff3e5017926a37ba3d9d09ce2558c4684889b7d3ef",
+          "bytes": 339
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-output_processor-Root-54/stderr.log",
+          "sha256": "0ec60d0564ee49fac5bb0a7410adc18af428dd693129e3f9ca9efd080fd97e57",
+          "bytes": 1507923
+        }
+      },
+      "ep_runtime_compile_messages": 1
+    },
+    {
+      "group": "air_history",
+      "full_calls": 40,
+      "Source_exact_raw_bit_state_observations": 23232,
+      "Native_whole_output_finite_fields": 23352,
+      "denominators_distinct": true,
+      "actual_Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/receipt.json",
+        "sha256": "b8d4c77be0b0e1cd4dde83805cfe160e392b96bef2bc7a2b3f6f9b78373f880c",
+        "bytes": 6959
+      },
+      "actual_Native_receipt": {
+        "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-air_history/receipt.json",
+        "sha256": "717ef1911a028cd5c0963825bb34e5003a49a641ad89aa6690fd52c5819f103d",
+        "bytes": 11350
+      },
+      "external_fixture": {
+        "path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/fixture.json",
+        "sha256": "0edffefc13dad650220b2cf282afc184b41f020548f7929baf74cd69dad9da21",
+        "bytes": 5414263
+      },
+      "fixture_projection": {
+        "path": ".runtime/porting/SRC-06/source-air-history-runtime-fixture-Peer-01/projection.json",
+        "sha256": "66c9825be097a2f936068bcf4ad222166e29bbc63a0af0a67cc9368e28eddc42",
+        "bytes": 5435
+      },
+      "fixture_before_after_guards": [
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/before.json",
+          "sha256": "2f411a2dd6898f30c8dc4eb317b3f8ab7f120ea6c4ec939d5f7792624d4e8e4a",
+          "bytes": 7630
+        },
+        {
+          "path": ".runtime/porting/SRC-06/Root-runtime-fixture-air_history-guard-54/after.json",
+          "sha256": "f8720a49b8e1b71383fb5d9e3b336668b78cd1ded5adcf0d6f218c45ab6912c1",
+          "bytes": 14235
+        }
+      ],
+      "recorded_source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6e348d91a32e8a96da4aeed6842c2a2c3efba739e635de8263bc1301beed51b6",
+        "sha256": "6e348d91a32e8a96da4aeed6842c2a2c3efba739e635de8263bc1301beed51b6",
+        "bytes": 1860468
+      },
+      "all4538_archived_compiler_inputs_exact": true,
+      "logs": {
+        "stdout": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stdout.log",
+          "sha256": "211dabe2fa72e8bad167f5ff66d6caff883c8f7e656fc035b81b51538075406a",
+          "bytes": 378
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-06/canonical-source-gap-batch-air_history-Root-54/stderr.log",
+          "sha256": "fc2f38e514f8d2b8df9e0e600a2f5e9f97605dc954eb3a842798bbca111ec7a2",
+          "bytes": 1507816
+        }
+      },
+      "ep_runtime_compile_messages": 0
+    }
+  ],
+  "relevant_preserved_Native_failures": [
+    {
+      "path": ".runtime/porting/SRC-06/original-core-gap-batch-run-Root-06-output_processor/receipt.json",
+      "sha256": "3b1738df22a8a285880920de9f7e2dfa6a0df716c3f829790c7b724e2c2406af",
+      "bytes": 9467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/original-core-gap-batch-build-Root-05/native-build.json",
+      "sha256": "82e98c8a79854e4bc062c14e494a4c4c74619662e06b2707d09c401ec6e51767",
+      "bytes": 10253
+    }
+  ],
+  "original_metadata_only_checker": {
+    "path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54.py",
+    "sha256": "15de7a1e93212a3deadfbe6777fec097fea58a4f762df8cf0a059c35af8b74c8",
+    "bytes": 7181
+  },
+  "accepted_checker": {
+    "path": ".runtime/porting/SRC-06/check-Source-P4-history-actual-Root-54-02.py",
+    "sha256": "9f5caf65531c98f4efa3986eb48cb3f749b1924344886033f5ed1a018fb8cf30",
+    "bytes": 7253
+  },
+  "prior_shared_body_impact_bridge": {
+    "path": ".runtime/porting/SRC-06/P4-history-publication-draft-Peer-54/prior-shared-body-impact-bridge.json",
+    "sha256": "46a020109ca430752e43020cac1b7671be1809bff750bede85711d156a3164e5",
+    "bytes": 4538
+  },
+  "positive_Propane_IHG_numerical_PASS": false,
+  "new_P1_Surface_numerical_PASS": false,
+  "private_cache_state_observed": false,
+  "new_normal_CLI_or_engine_runs": 0,
+  "prior_scientific_bodies_rerun": false,
+  "gates_changed": false,
+  "schema": "src06-canonical-output-processor-air-history54.v1",
+  "base_HEAD": "58c77de0c95ebd20470c5857ef861d9a76f1251b",
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": 0,
+  "final_checkpoint": false,
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-Source-P4-history-actual-review-54/review.json",
+    "sha256": "027391ad8d8b5f4bb2940390dfe774006f37c11623f38df161db9876ece34719",
+    "bytes": 10629
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-Propane-P4-history-coherent-draft-Peer-01/complete-proposed-compiler-Source-plan.json",
+    "sha256": "2afc056257d345a5a0c93f380312faef089c46e48d4bd65cc66ec72926da154f",
+    "bytes": 2583643
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-output-processor-air-history-54/evidence.zip",
+    "sha256": "d39a7bc15056626a0e93dea214738aff11134434e599e950ade69be00032bf8a",
+    "bytes": 3950849
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-output-processor-air-history-54/manifest.json",
+    "sha256": "79554c8c5ec9d7e035396312cbd8834c72859623759b51dd1dfa428c9ca33715",
+    "bytes": 174121
+  },
+  "archive_entries": 349,
+  "scope": "Two full same-owner original-core unit groups, with exact primary input and state/stream comparisons. All four external fixtures guarded; prior P1/Surface are historical passes only.",
+  "remaining": "Positive Propane IHG and Exterior producer linking; full multiplier2 Predict/Correct/history; full surface-parent and warmup-to-RunPeriod handoff; final same-Source15 and complete own-export reread remain open.",
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-P4-history-Root-54.py",
+    "sha256": "48d03a252b471ff27e29e5d126adab6e666dd5b1874b5f90d12536046a7a3fe5",
+    "bytes": 8967
+  }
+}

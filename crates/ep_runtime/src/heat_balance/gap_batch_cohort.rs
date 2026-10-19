@@ -6,7 +6,7 @@ use std::{io,path::Path};
 type Result<T=()> = std::result::Result<T,Box<dyn std::error::Error>>;
 fn invalid(message:&str)->io::Error {io::Error::new(io::ErrorKind::InvalidData,message)}
 pub(crate) fn run(group:&str,fixture_path:&Path)->Result<usize> {
-    if !matches!(group,"purchased_air"|"surface"|"exterior") {
+    if !matches!(group,"purchased_air"|"surface"|"exterior"|"output_processor"|"air_history") {
         return Err(invalid("selected implemented whole scientific group").into());
     }
     // Runtime loading is test-feature-only. No production input or expected
@@ -27,6 +27,8 @@ pub(crate) fn run(group:&str,fixture_path:&Path)->Result<usize> {
     match group {
         "purchased_air"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_purchased_air_cohort(&fixture),
         "surface"=>surface::run(&fixture),
+        "air_history"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_air_history_cohort(&fixture),
+        "output_processor"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_output_processor_cohort(&fixture),
         "exterior"=>Err(invalid("Source Exterior adapter literal join pending").into()),
         _=>Err(invalid("unreachable selected group").into()),
     }

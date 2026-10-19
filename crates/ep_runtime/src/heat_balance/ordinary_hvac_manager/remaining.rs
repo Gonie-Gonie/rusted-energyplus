@@ -9,31 +9,31 @@ use crate::heat_balance::{
         FacilityElectricService, SourceFacilityElectricOwners, SourceFacilityOutputContext,
     },
     ordinary_air_heat_balance::{
-        SourceAirHeatBalance,
         environment::SourceZoneFanHeatBalanceArrays,
         output_registration::SourceAirOutputOwners,
         predictor_corrector::{
-            SourceZoneAirPredictorCorrector,
             oscillation::{SourceOscillationOutputContext, SourceOscillationOwners},
             simple_air::SourceAirReportOutputOwners,
+            SourceZoneAirPredictorCorrector,
         },
+        SourceAirHeatBalance,
     },
-    ordinary_exterior_energy_use::SourceExteriorEnergyUse,
     ordinary_equipment::OrdinaryEquipment,
+    ordinary_exterior_energy_use::SourceExteriorEnergyUse,
     ordinary_pollution::SourcePollutionModule,
     ordinary_surface_initialization::{
-        SourceSurfaceHeatBalanceArrays, output::SourceSurfaceOutputOwners,
+        output::SourceSurfaceOutputOwners, SourceSurfaceHeatBalanceArrays,
     },
     ordinary_surface_management::SourceResilienceOutputOwners,
     ordinary_system_reports::SourceSystemReports,
     ordinary_thermal_comfort::SourceThermalComfort,
     radiation::ordinary::{
-        OrdinaryRadiationError, OrdinaryRadiationUnavailable, OrdinarySolarRadiation,
-        solar_output_registration::SourceSolarOutputOwners,
+        solar_output_registration::SourceSolarOutputOwners, OrdinaryRadiationError,
+        OrdinaryRadiationUnavailable, OrdinarySolarRadiation,
     },
     selected_heat_balance_input::{
-        SelectedHeatBalanceInputState, surface::SurfaceGeometryInputState,
-        zone::SelectedZoneInputOwners,
+        surface::SurfaceGeometryInputState, zone::SelectedZoneInputOwners,
+        SelectedHeatBalanceInputState,
     },
     selected_schedule_manager::SelectedScheduleManager,
     source_output_registration::{
@@ -68,6 +68,7 @@ impl SourceRealOutputOwners for HvacLossFields<'_> {
 /// partial-view read is an explicit error, never a fabricated numeric zero.
 struct LiveReadView<'a> {
     nodes: &'a OrdinaryEquipment,
+    gains: &'a crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
     schedules: &'a SelectedScheduleManager,
     surface: &'a dyn SourceRealOutputOwners,
@@ -85,6 +86,9 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         use SourceRealOutputTarget as T;
         match target {
+            #[cfg(all(test, feature = "native-controlled-air-cohort"))]
+            T::CohortReal { .. } => Err(OrdinaryRadiationUnavailable::StorageDomain.into()),
+            T::InternalGain { .. } => self.gains.real_output(target),
             T::Node { .. } | T::PurchasedAir { .. } => self.nodes.real_output(target),
             T::Weather { .. } => self
                 .weather_outputs
@@ -113,6 +117,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
 
 struct LiveReadFields<'a> {
     nodes: &'a OrdinaryEquipment,
+    gains: &'a crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
     schedules: &'a SelectedScheduleManager,
     arrays: &'a SourceSurfaceHeatBalanceArrays,
@@ -162,6 +167,7 @@ impl LiveReadFields<'_> {
         let hvac = HvacLossFields(self.control);
         read(&LiveReadView {
             nodes: self.nodes,
+            gains: self.gains,
             weather_outputs: self.weather_outputs,
             schedules: self.schedules,
             surface: &surface,
@@ -190,6 +196,7 @@ impl SourceOrdinaryHvacRemaining {
     ) -> Result<(), Error> {
         let fields = LiveReadFields {
             nodes: &*o.equipment,
+            gains: &*o.gains,
             weather_outputs: None,
             schedules: o.schedules,
             arrays: o.surface_arrays,
@@ -249,10 +256,10 @@ impl SourceOrdinaryHvacRemaining {
     }
 }
 impl<
-    H: SourceOutputFileHost,
-    D: SourceOutputDictionaryHost
-        + crate::heat_balance::source_output_registration::SourceOutputReportStreams,
-> SourceHvacRemainingChildren<H, D> for SourceOrdinaryHvacRemaining
+        H: SourceOutputFileHost,
+        D: SourceOutputDictionaryHost
+            + crate::heat_balance::source_output_registration::SourceOutputReportStreams,
+    > SourceHvacRemainingChildren<H, D> for SourceOrdinaryHvacRemaining
 {
     fn manage_electric_facility(
         &mut self,
@@ -295,7 +302,10 @@ impl<
                 manager.check_source_concurrent_eir_heat_pumps()
             }
             C::CalculateMoreNodeInfo => o.equipment.calculate_source_more_node_info(
-                o.environment, &*output.registration, &*o.schedules, o.runtime_language,
+                o.environment,
+                &*output.registration,
+                &*o.schedules,
+                o.runtime_language,
             ),
             C::DetectOscillatingZoneTemperature => {
                 let mut owners = SourceOscillationOwners {
@@ -324,7 +334,8 @@ impl<
             }
             C::CalculatePollution => {
                 let fields = LiveReadFields {
-            nodes: &*o.equipment,
+                    nodes: &*o.equipment,
+                    gains: &*o.gains,
                     weather_outputs: None,
                     schedules: o.schedules,
                     arrays: o.surface_arrays,
@@ -358,19 +369,38 @@ impl<
                 .ancillary
                 .system_reports
                 .initialize_source_energy_reports(
-                    o.globals, o.hvac, o.equipment, &manager.simulation.air_loop,
-                    o.zones, o.predefined_registry, o.predefined_table, &*output.registration,
+                    o.globals,
+                    o.hvac,
+                    o.equipment,
+                    &manager.simulation.air_loop,
+                    o.zones,
+                    o.predefined_registry,
+                    o.predefined_table,
+                    &*output.registration,
                 ),
             C::ReportSystemEnergyUse => manager
                 .ancillary
                 .system_reports
-                .report_source_system_energy_use(o.globals, o.hvac, o.equipment, &o.controller.demand),
+                .report_source_system_energy_use(
+                    o.globals,
+                    o.hvac,
+                    o.equipment,
+                    &o.controller.demand,
+                ),
             C::ReportVentilationLoads => manager
                 .ancillary
                 .system_reports
                 .report_source_ventilation_loads(
-                    o.globals, o.hvac, o.equipment, o.zones, &o.controller.demand,
-                    &o.controller.reports, o.air, o.environment, o.sizing, o.comfort_summary,
+                    o.globals,
+                    o.hvac,
+                    o.equipment,
+                    o.zones,
+                    &o.controller.demand,
+                    &o.controller.reports,
+                    o.air,
+                    o.environment,
+                    o.sizing,
+                    o.comfort_summary,
                 ),
             C::ReportAirHeatBalance => manager.report_source_air_heat_balance(o),
             C::UpdateDataAndReportSystem => Self::update_source_ordinary_output(

@@ -1,6 +1,6 @@
 //! Actual selected ManageInternalHeatGains input and timestep owners.
 //! Genuine timestep producers retain explicit unported provider boundaries.
-use super::{CtfInitializationContext, hb_input_error};
+use super::{hb_input_error, CtfInitializationContext};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 use ep_model::TypedModel;
@@ -24,6 +24,8 @@ pub(crate) use timestep::{
 pub(crate) enum SourceOtherFuel {
     #[default]
     Invalid = -1,
+    /// Native Constant::eFuel::Propane, distinct from eFuel::None14.
+    Propane = 5,
     None = 14,
 }
 

@@ -19,9 +19,11 @@ rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 | 전체 predictor 부모 | [포착한 실제 호출 1,168건](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json) 비교 통과 |
 | IdealLoads 지속 상태 | [네 실제 입력 팩토리·60회 전체 호출](evidence/SRC-06-canonical-purchased-air-surface-53/summary.json), 호출 전후 상태의 75,524개 원시 비트 비교 통과 |
 | 복사·LU·CTF master history·분 스케줄 | [55개 기록](evidence/SRC-06-canonical-purchased-air-surface-53/summary.json) 비교 통과. 이후 변경은 IdealLoads 전용 시험 파일 한 개로 한정되어 이 결과를 재사용 |
+| 출력 집계·reset | [전체 38회 호출·35 live 변수·7 보고 주기](evidence/SRC-06-canonical-output-processor-air-history-54/summary.json), 상태값 34,321개 원시 비트 일치 |
+| 공기 이력 | [네 실제 입력 팩토리·40회 PushZone/PushSystem/Revert](evidence/SRC-06-canonical-output-processor-air-history-54/summary.json), 상태값 23,232개 원시 비트 일치 |
 | 성공 실행 출력 정리 | [A/B 24시간 두 건](evidence/SRC-06-canonical-successful-log-layout-49/summary.json), 기존 계산·CSV·JSON 유지, 중복 오류 파일 제거, 콘솔 원문을 `logs/source-console.log`로 이동 |
 
-다음 작업은 공기 상태 이력의 복사·되돌리기·재시도와 multiplier, 복사열·태양열·내부발열 생산자와 실제 표면 부모 연결, 전체 OutputProcessor 누적·reset의 원본 비교입니다. 이어 warmup→RunPeriod 상태 인계와 같은 최종 Source의 15개 실행 및 전체 JSON/CSV 재읽기를 마무리합니다. 현재 15건의 과거 증거를 하나의 최종 Source 검증으로 합쳐 표기하지 않습니다.
+다음 작업은 multiplier를 포함한 전체 공기 예측·보정과 이력 재시도, 복사열·태양열·내부발열 생산자와 실제 표면 부모 연결의 원본 비교입니다. 이어 warmup→RunPeriod 상태 인계와 같은 최종 Source의 15개 실행 및 전체 JSON/CSV 재읽기를 마무리합니다. 현재 15건의 과거 증거를 하나의 최종 Source 검증으로 합쳐 표기하지 않습니다.
 
 검증은 변경한 계산 경로에 필요한 기존 통합 cohort 또는 실행만 수행합니다. 같은 몸체를 다시 검증할 근거가 없다면 이전 대규모 cohort·연간 실행·전체 테스트를 반복하지 않습니다. 문서와 로그 경로만 바꾼 경우에는 해당 출력 확인과 문서 검사를 사용합니다.
 

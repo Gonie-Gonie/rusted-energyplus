@@ -7,6 +7,7 @@ pub(crate) enum SourceMeterEndUse {
     Heating = 0,
     Cooling = 1,
     ExteriorLights = 3,
+    InteriorEquipment = 4,
     Cogeneration = 13,
     CarbonEquivalentEmissions = 16,
 }
@@ -16,6 +17,7 @@ impl SourceMeterEndUse {
             Self::Heating => Ok("Heating"),
             Self::Cooling => Ok("Cooling"),
             Self::ExteriorLights => Ok("ExteriorLights"),
+            Self::InteriorEquipment => Ok("InteriorEquipment"),
             Self::Cogeneration => Ok("Cogeneration"),
             Self::CarbonEquivalentEmissions => Ok("CarbonEquivalentEmissions"),
             Self::Invalid => Err(OrdinaryRadiationUnavailable::InputBranch.into()),
@@ -30,12 +32,14 @@ pub(crate) enum SourceMeterGroup {
     Hvac = 1,
     Plant = 2,
     Zone = 3,
+    SpaceType = 4,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub(crate) enum SourceMeterResource {
     Invalid = -1,
     Electricity = 0,
+    Propane = 5,
     DistrictCooling = 10,
     DistrictHeatingWater = 11,
     EnergyTransfer = 15,
@@ -159,6 +163,7 @@ impl SourceOutputRegistration {
             SourceMeterEndUse::Cooling => 1,
             SourceMeterEndUse::Invalid
             | SourceMeterEndUse::ExteriorLights
+            | SourceMeterEndUse::InteriorEquipment
             | SourceMeterEndUse::Cogeneration
             | SourceMeterEndUse::CarbonEquivalentEmissions => {
                 return Err(OrdinaryRadiationUnavailable::InputBranch.into());
@@ -363,6 +368,7 @@ impl SourceOutputRegistration {
             SourceMeterEndUse::Heating => 0,
             SourceMeterEndUse::Cooling => 1,
             SourceMeterEndUse::ExteriorLights => 3,
+            SourceMeterEndUse::InteriorEquipment => 4,
             SourceMeterEndUse::Cogeneration => 13,
             SourceMeterEndUse::Invalid | SourceMeterEndUse::CarbonEquivalentEmissions => {
                 return Err(OrdinaryRadiationUnavailable::InputBranch.into());
@@ -398,6 +404,54 @@ impl SourceOutputRegistration {
             .ok_or(OrdinaryRadiationUnavailable::StorageDomain)? = name.into();
         if category.num_subcategories > self.max_num_subcategories {
             self.max_num_subcategories = category.num_subcategories;
+        }
+        Ok(())
+    }
+    fn add_source_general_end_use_space_type(
+        &mut self,
+        end_use: SourceMeterEndUse,
+        name: &str,
+    ) -> Result<(), OrdinaryRadiationError> {
+        let category_index = match end_use {
+            SourceMeterEndUse::Heating => 0,
+            SourceMeterEndUse::Cooling => 1,
+            SourceMeterEndUse::ExteriorLights => 3,
+            SourceMeterEndUse::InteriorEquipment => 4,
+            SourceMeterEndUse::Cogeneration => 13,
+            SourceMeterEndUse::Invalid | SourceMeterEndUse::CarbonEquivalentEmissions => {
+                return Err(OrdinaryRadiationUnavailable::InputBranch.into());
+            }
+        };
+        let category = self
+            .end_use_categories
+            .as_mut()
+            .and_then(|r| r.get_mut(category_index))
+            .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+        for number in 1..=category.num_space_types {
+            let i = usize::try_from(number - 1)
+                .map_err(|_| OrdinaryRadiationUnavailable::StorageDomain)?;
+            let prior = category
+                .space_type_names
+                .as_ref()
+                .and_then(|r| r.get(i))
+                .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+            if prior.eq_ignore_ascii_case(name) {
+                return Ok(());
+            }
+        }
+        category.num_space_types = category
+            .num_space_types
+            .checked_add(1)
+            .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+        let count = usize::try_from(category.num_space_types)
+            .map_err(|_| OrdinaryRadiationUnavailable::StorageDomain)?;
+        let names = category.space_type_names.get_or_insert_with(Vec::new);
+        names.resize(count, String::new());
+        *names
+            .get_mut(count - 1)
+            .ok_or(OrdinaryRadiationUnavailable::StorageDomain)? = name.into();
+        if category.num_space_types > self.max_num_end_use_space_types {
+            self.max_num_end_use_space_types = category.num_space_types;
         }
         Ok(())
     }
@@ -463,7 +517,9 @@ impl SourceOutputRegistration {
                 | SourceMeterResource::ElectricityNet => SourceMeterIpUnits::Electricity,
                 SourceMeterResource::DistrictCooling => SourceMeterIpUnits::Cooling,
                 SourceMeterResource::DistrictHeatingWater
-                | SourceMeterResource::EnergyTransfer | SourceMeterResource::CarbonEquivalent => {
+                | SourceMeterResource::Propane
+                | SourceMeterResource::EnergyTransfer
+                | SourceMeterResource::CarbonEquivalent => {
                     if units == SourceOutputUnits::Kg {
                         SourceMeterIpUnits::OtherKG
                     } else {
@@ -507,6 +563,7 @@ impl SourceMeterResource {
     pub(super) fn source_name(self) -> Result<&'static str, OrdinaryRadiationError> {
         match self {
             Self::Electricity => Ok("Electricity"),
+            Self::Propane => Ok("Propane"),
             Self::DistrictCooling => Ok("DistrictCooling"),
             Self::DistrictHeatingWater => Ok("DistrictHeatingWater"),
             Self::EnergyTransfer => Ok("EnergyTransfer"),
@@ -525,6 +582,7 @@ impl SourceMeterGroup {
             Self::Hvac => Ok("HVAC"),
             Self::Plant => Ok("Plant"),
             Self::Zone => Ok("Zone"),
+            Self::SpaceType => Ok("SpaceType"),
             Self::Invalid => Err(OrdinaryRadiationUnavailable::InputBranch.into()),
         }
     }
@@ -537,7 +595,6 @@ impl SourceOutputRegistration {
         out_var_number: usize,
     ) -> Result<(), OrdinaryRadiationError> {
         let resource = args.resource.source_name()?;
-        // Actual CarbonEquivalentEmissions maps to Constant::EndUse::Invalid.
         let subcategory = if !args.end_use_subcategory.is_empty() {
             args.end_use_subcategory
         } else if matches!(
@@ -545,6 +602,7 @@ impl SourceOutputRegistration {
             SourceMeterEndUse::Heating
                 | SourceMeterEndUse::Cooling
                 | SourceMeterEndUse::ExteriorLights
+                | SourceMeterEndUse::InteriorEquipment
                 | SourceMeterEndUse::Cogeneration
         ) {
             "General"
@@ -555,7 +613,7 @@ impl SourceOutputRegistration {
             self.add_source_general_end_use_subcategory(args.end_use, subcategory)?;
         }
         if !args.space_type.is_empty() {
-            return Err(OrdinaryRadiationUnavailable::InputBranch.into());
+            self.add_source_general_end_use_space_type(args.end_use, args.space_type)?;
         }
         self.add_source_general_meter(
             &format!("{resource}:Facility"),
@@ -576,16 +634,29 @@ impl SourceOutputRegistration {
                 args.group,
                 out_var_number,
             )?;
-            if args.group == SourceMeterGroup::Building && !args.zone_name.is_empty() {
-                self.add_source_general_meter(
-                    &format!("{resource}:Zone:{}", args.zone_name),
-                    units,
-                    args.resource,
-                    SourceMeterEndUse::Invalid,
-                    "",
-                    SourceMeterGroup::Zone,
-                    out_var_number,
-                )?;
+            if args.group == SourceMeterGroup::Building {
+                if !args.zone_name.is_empty() {
+                    self.add_source_general_meter(
+                        &format!("{resource}:Zone:{}", args.zone_name),
+                        units,
+                        args.resource,
+                        SourceMeterEndUse::Invalid,
+                        "",
+                        SourceMeterGroup::Zone,
+                        out_var_number,
+                    )?;
+                }
+                if !args.space_type.is_empty() {
+                    self.add_source_general_meter(
+                        &format!("{resource}:SpaceType:{}", args.space_type),
+                        units,
+                        args.resource,
+                        SourceMeterEndUse::Invalid,
+                        "",
+                        SourceMeterGroup::SpaceType,
+                        out_var_number,
+                    )?;
+                }
             }
         }
         if args.end_use != SourceMeterEndUse::Invalid {
@@ -599,16 +670,29 @@ impl SourceOutputRegistration {
                 SourceMeterGroup::Invalid,
                 out_var_number,
             )?;
-            if args.group == SourceMeterGroup::Building && !args.zone_name.is_empty() {
-                self.add_source_general_meter(
-                    &format!("{end_use}:{resource}:Zone:{}", args.zone_name),
-                    units,
-                    args.resource,
-                    args.end_use,
-                    "",
-                    SourceMeterGroup::Zone,
-                    out_var_number,
-                )?;
+            if args.group == SourceMeterGroup::Building {
+                if !args.zone_name.is_empty() {
+                    self.add_source_general_meter(
+                        &format!("{end_use}:{resource}:Zone:{}", args.zone_name),
+                        units,
+                        args.resource,
+                        args.end_use,
+                        "",
+                        SourceMeterGroup::Zone,
+                        out_var_number,
+                    )?;
+                }
+                if !args.space_type.is_empty() {
+                    self.add_source_general_meter(
+                        &format!("{end_use}:{resource}:SpaceType:{}", args.space_type),
+                        units,
+                        args.resource,
+                        args.end_use,
+                        "",
+                        SourceMeterGroup::SpaceType,
+                        out_var_number,
+                    )?;
+                }
             }
             if !subcategory.is_empty() {
                 self.add_source_general_meter(
@@ -620,16 +704,32 @@ impl SourceOutputRegistration {
                     SourceMeterGroup::Invalid,
                     out_var_number,
                 )?;
-                if args.group == SourceMeterGroup::Building && !args.zone_name.is_empty() {
-                    self.add_source_general_meter(
-                        &format!("{subcategory}:{end_use}:{resource}:Zone:{}", args.zone_name),
-                        units,
-                        args.resource,
-                        args.end_use,
-                        subcategory,
-                        SourceMeterGroup::Zone,
-                        out_var_number,
-                    )?;
+                if args.group == SourceMeterGroup::Building {
+                    if !args.zone_name.is_empty() {
+                        self.add_source_general_meter(
+                            &format!("{subcategory}:{end_use}:{resource}:Zone:{}", args.zone_name),
+                            units,
+                            args.resource,
+                            args.end_use,
+                            subcategory,
+                            SourceMeterGroup::Zone,
+                            out_var_number,
+                        )?;
+                    }
+                    if !args.space_type.is_empty() {
+                        self.add_source_general_meter(
+                            &format!(
+                                "{subcategory}:{end_use}:{resource}:SpaceType:{}",
+                                args.space_type
+                            ),
+                            units,
+                            args.resource,
+                            args.end_use,
+                            subcategory,
+                            SourceMeterGroup::SpaceType,
+                            out_var_number,
+                        )?;
+                    }
                 }
             }
         }
