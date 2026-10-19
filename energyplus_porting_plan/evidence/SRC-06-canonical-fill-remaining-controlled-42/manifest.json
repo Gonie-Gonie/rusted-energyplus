@@ -1,0 +1,596 @@
+{
+  "schema": "src06-canonical42-finite-engine-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-fill-remaining-controlled-42/evidence.zip",
+    "sha256": "62319fd547dbf1a5dacf7fc4207c5e4dd90126131c41ccd8bf9089d46464f2d8",
+    "bytes": 2426373
+  },
+  "entries": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+      "bytes": 35280
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "bytes": 133816
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InternalHeatGains.cc",
+      "sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+      "bytes": 536516
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+      "sha256": "a833c153bbd89783a6075056c0ff791a2dec041df4badfdfa499fd0bd1b53674",
+      "bytes": 169800
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.hh",
+      "sha256": "0f6469e250751848f4256d4e1dc380776391c6f93f93f5879941ca19b65b108a",
+      "bytes": 61093
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportTabular.cc",
+      "sha256": "8253e49dfaa51b94f1e045665cd76cbe24f6ae04bd364c4538c349f5ada553c2",
+      "bytes": 1103718
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-fill-remaining-controlled-Source-review-42/review.json",
+      "sha256": "556aa46d0de69d17fb0855535705612381b6bad93d6bc97656c9cb5e7f5049b4",
+      "bytes": 9878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-fill-remaining-controlled-application-42/receipt.json",
+      "sha256": "03f29de96aa215c9863170061174df24f15c046ae0965107699a1d450d891543",
+      "bytes": 11678
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-fill-remaining-controlled-actual-review-42/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-fill-remaining-controlled-actual-review-42/review.json",
+      "sha256": "55bbcea3db9ce3fc60cfe41f06f00ee4ab479f3ea0a1ed75ac888decb7a236a2",
+      "bytes": 19512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-fill-remaining-controlled-actual-review-42/table-clock-differences.json",
+      "sha256": "0cc5a610ceef6a76f47ac680216f4860b1c9013d5a0a970a435ba40612e7e9c2",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-node-setpoint-endrun-actual-review-41-02/review.json",
+      "sha256": "574277c9e4ca17c9007371f482ef7c02b3b38656a96ea394f3a8e21022e4e001",
+      "bytes": 20808
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-system-report-cohort-actual-review-40-02/review.json",
+      "sha256": "fb60c1444896085f7f0a65aefc38221919931235343844010700d86934da95e7",
+      "bytes": 12568
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-fill-remaining-controlled-Outer-42-02.py",
+      "sha256": "15d4294770c0fff0496db5cc5c6efa0e71bbb67073f3e8ecd5eb8e2866df8a6f",
+      "bytes": 6177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/diagnostics.json",
+      "sha256": "ec92299a9a333ec50fbb165122c690621fdfae08f482e4d5eb81f3821ca80efe",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplustbl.htm",
+      "sha256": "ac3f8934528b4828c9ba36780b60c77b22dca9a1293822faac9422e5d466edb4",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/eplustbl.xml",
+      "sha256": "de724c0f4b480b5a6370372e1704cded980d8fa832452c96f1b3a56c447bf894",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/results/source-reported-results.json",
+      "sha256": "a1fd785ab5ea473c6bf0e342675e300526e5457d09b14a2abde4a39b26622cfe",
+      "bytes": 1679928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-Root-42/output/run-summary.json",
+      "sha256": "98bd2009f3e30736c08ee8ca437f296bf151e113f6af9798699c23dc07fa118b",
+      "bytes": 32818
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-command-Root-42/receipt.json",
+      "sha256": "e2af7a159104daef93b50afd6518df96e056ec6ba167e7aaa466aaff0730d189",
+      "bytes": 4137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-command-Root-42/stderr.log",
+      "sha256": "f68dc44f33e4c942ff6d4b41cc9573ddb5d48dce03be6104737743611576b6b6",
+      "bytes": 1081
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-A-24H-command-Root-42/stdout.log",
+      "sha256": "957d6e539da7682ac551b3753833a011613540ddb3e27455362bc6c3cb5def65",
+      "bytes": 408278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-Root-42/output/diagnostics.json",
+      "sha256": "6e3c862ac856e517de332aa2e3387351a7a1ba6cf992df545b3a305a788eb526",
+      "bytes": 2983
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-Root-42/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-Root-42/output/run-summary.json",
+      "sha256": "589c737f53d7d46af6a4202e514b6aa174f7193e3bc8147fd1650b884d1ac805",
+      "bytes": 25397
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-command-Root-42/receipt.json",
+      "sha256": "3b08e968db8866720e78d724765b19da02ca31013abb3bf8e8ea7c2962cf47b3",
+      "bytes": 4188
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-command-Root-42/stderr.log",
+      "sha256": "0e08e9014e707bfe8ee8cce869c2298cff33b152925c918cd57b50a5af8d5048",
+      "bytes": 11064
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-fill-remaining-controlled-B-NOLIMIT-24H-command-Root-42/stdout.log",
+      "sha256": "b50edb12591de546005283afd528941031f821c0c9e93d8160dbca9971eecba9",
+      "bytes": 408313
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-fill-remaining-controlled-actual-Outer-42-02.py",
+      "sha256": "40bf56dba9c0ce59215eb3c8aaec0929e43ab12946827e776b909ad6602fb8d3",
+      "bytes": 9471
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/correct-fill-remaining-controlled-plan-metadata-Outer-42-02.py",
+      "sha256": "61beeee9818aeff7e52283303eef22d1a12c21bc119a1f2df13596ad30da0e1a",
+      "bytes": 4020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fill-remaining-controlled-adapters-prepared-Outer-42-02/manifest.json",
+      "sha256": "168b30248ba732c2f7d54b13c27cc49ad3a1a78d46f8cc8da6a7362002ba9e69",
+      "bytes": 4885
+    },
+    {
+      "path": ".runtime/porting/SRC-06/fill-remaining-controlled-publication-READY-Outer-42-02/publication-template.json",
+      "sha256": "3d34f9e24f20c6e794b9502c4f508ac50e055361fdbd610474d6e070e837ffbe",
+      "bytes": 23560
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-fill-remaining-controlled-Outer-42-02.py",
+      "sha256": "47030c48f9c4b5ae7c1da78ba904f0c7d8c4a4b4b8b7c22572dd2d7c341235b6",
+      "bytes": 3271
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-fill-remaining-controlled-Outer-42.py",
+      "sha256": "53c4f4a696946635c1949ec46a517b94d4efc87aa86bf1117e2c6d1d0872c6a5",
+      "bytes": 10011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-fill-remaining-controlled-metadata-Outer-42-02.py",
+      "sha256": "96fea1da6defe4b126a3a3a49527edbf2f14fa95d869492bb0090ebc4b3cae71",
+      "bytes": 4524
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-fill-remaining-controlled-publication-Outer-42-02.py",
+      "sha256": "e17cd07904e188cd1de6eb2fd6c3ca2ef812524b3f9468824ab6dbffdd2bfc7f",
+      "bytes": 7875
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-fill-remaining-controlled-checkpoint-Outer-42-02.py",
+      "sha256": "b837e244bdfb1e4b9cbbb075ac6683f26523af42858576ffa1988e5d43cba540",
+      "bytes": 10929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-fill-remaining-controlled-Outer-42-02.py",
+      "sha256": "8bafb68578559cad7ffb8ae59b15edb43e98564cc5160c059541b8dac1b1b544",
+      "bytes": 9500
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-author-Outer-42/controlled.rs.fragment",
+      "sha256": "bd60283169f886f9b85cf57adb9a6168adb94062300d7c0afc03662788864609",
+      "bytes": 8846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Native/DataGlobalConstants.hh600-602.txt",
+      "sha256": "6fce8c96240f65081a1f8e56961337e12740bcf89563b900b67ecae7e2d01b95",
+      "bytes": 306
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Native/OutputReportPredefined.hh163-174.txt",
+      "sha256": "a54c857ee944f7fedfe4e452c02c011cab4269fdc5a69025a547489b3aacdf90",
+      "bytes": 794
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Native/whole-production-isNominalOccupied-census.jsonl",
+      "sha256": "9ef986e80393244fc8361825935e0f1e37399222e3a92f4ed9d535b9354b9d92",
+      "bytes": 2851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Source/175-212.txt",
+      "sha256": "290af147df22433b95d72abb4d99ee2eddf206a396726147fd350a440b0ea242",
+      "bytes": 1562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Source/23-34.txt",
+      "sha256": "3fef0347a62f4928a5e74790b502086afc9c492e040b86d30cc3c22a990379d1",
+      "bytes": 326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/Source/97-111.txt",
+      "sha256": "46765c5018da016351b93db10c4356046c1c4df9fe9bbdf01b56b69fe35cb844",
+      "bytes": 743
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42-02/draft.json",
+      "sha256": "d69d8aabbb0405a4ed71a639f57cfaa54639dd66cbb4b00ba736167013d71481",
+      "bytes": 21613
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/DataHeatBalance.hh/630-650.txt",
+      "sha256": "8edfd296ccf4c56c10262ccd0076827881bcf261645a4ec79fc4ff67ac651429",
+      "bytes": 2130
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/InternalHeatGains.cc/895-919.txt",
+      "sha256": "32795fac9303b8b75ac03a7aaf2d6d0606293613b1ac6b6f9296bbac22090c53",
+      "bytes": 1664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/OutputReportPredefined.cc/1766-1835.txt",
+      "sha256": "c725c5543234ad49bfac50b73a0a1e9b472c6e1add668ef876ca7d02e269ab9e",
+      "bytes": 3172
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/OutputReportPredefined.cc/1837-1915.txt",
+      "sha256": "e368e6dfc5df973257a5c75c4c41ffea24ebb90ddc88f6c8479eae8246995ec1",
+      "bytes": 2636
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/OutputReportTabular.cc/6333-6537.txt",
+      "sha256": "045d03276f1f4889c97e31e65d0a62a2e04061461377295ec1d8146a9d409b23",
+      "bytes": 13049
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/Native/src/EnergyPlus/OutputReportTabular.cc/6539-6542.txt",
+      "sha256": "f1d1093aa60b035a013f2942b063492a21ecd97b334ddff9f51d6be457e0ab5c",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/before/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "d1ab5f336ec2c84790fa3af349ae905e40530f74aea7867b29c3836e6577288e",
+      "bytes": 34590
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/before/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "bytes": 47825
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/before/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/01.forward.diff",
+      "sha256": "bfdb4f9c3f0d78dbe245b0d614ad47a95a22fa67e05e9aa06a58515a1235eb81",
+      "bytes": 11535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/01.inverse.diff",
+      "sha256": "a5ae0396161cd808b4dbb08d45e5aad1d3a1938b5dae775de774b492f19484c2",
+      "bytes": 11535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/02.forward.diff",
+      "sha256": "a4ee556a6887b56574c6c22549fd81ba3123720a75692d548ae0f9411abdca1e",
+      "bytes": 715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/02.inverse.diff",
+      "sha256": "e1c924d05ab79de70c00f2aef165a7c0b6b5e12fd33a769992145a70058404d8",
+      "bytes": 715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/03.forward.diff",
+      "sha256": "c181ee1973b144a780f6d15208022968f6557dd74902bc3c3e1b98aedbd9d216",
+      "bytes": 947
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/diffs/03.inverse.diff",
+      "sha256": "47b6e496c18d72cc72b0a9ce8c7914f404628250b85046adc997cfeffe74d902",
+      "bytes": 947
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/draft.json",
+      "sha256": "c04acf03e4a81ebdd834e8c35c6c5a75b3b26b781e9135b1b11561e10207d665",
+      "bytes": 15729
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "d1ab5f336ec2c84790fa3af349ae905e40530f74aea7867b29c3836e6577288e",
+      "bytes": 34590
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "bytes": 47825
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/literal-inverse/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/01.stdout",
+      "sha256": "6dffcb357ee015c115ec7c859514030753826c8fef9cda9c0ba8992c70d05cea",
+      "bytes": 62512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/02.stdout",
+      "sha256": "8bcce92a3742e0b424b3c28c2a3e1298965af495a83e6d0a05b3975c060d77e4",
+      "bytes": 35923
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/parse/03.stdout",
+      "sha256": "319c545b97f0cb885ad804c52581108bbfe9180fd1d036d34f322b07fce9e05f",
+      "bytes": 23204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "d15b52fe6be48e0d84b37496ab42e3cf343af57b892ec0be86d4f49c4f606da6",
+      "bytes": 34752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/proposed/crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "e5db1b1d78eae5bc3a6833c6af86d34f07032cdfa3fd2f304c50d3305994cb78",
+      "bytes": 56526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-draft-Outer-42/proposed/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "319c545b97f0cb885ad804c52581108bbfe9180fd1d036d34f322b07fce9e05f",
+      "bytes": 23204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42-02/complete-final-compiler-Source-plan.json",
+      "sha256": "0ea95a09405d0d019270d38a1ea8c6c384bfadd68d8fd1a006f9d837a43cb2c6",
+      "bytes": 2638515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42-02/manifest.json",
+      "sha256": "05e2d6a72007994116e1855dc077ef8f1c461943380000f45dbdf177cb14ff38",
+      "bytes": 26092
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/complete-final-compiler-Source-plan.json",
+      "sha256": "eba4ac66f1a7e08ef05427aa6f9568a07b2c49c538bee3b834eb2016bd97da99",
+      "bytes": 2637874
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/contexts/1.rs.txt",
+      "sha256": "7d1576ee0b8626834fc9133b9cfb98b9e671d69ad71b398357d5b0e4c2dccecb",
+      "bytes": 84
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/contexts/2.rs.txt",
+      "sha256": "9096abea145195ddc9da39055886142d2ba5580759b344182bd64c7a3ec22791",
+      "bytes": 3041
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/contexts/3.rs.txt",
+      "sha256": "3b73d892192ec81fdf19a4607368448a659e1df6753f9eeb696b03d39124bb04",
+      "bytes": 901
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/contexts/ordinary-equipment-actual41-to40-bridge.json",
+      "sha256": "d6c64394f385863fb2b467639591d1d4b11addedec9fe76accb7e34c4ce406c8",
+      "bytes": 1883
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/manifest.json",
+      "sha256": "917b8efb8fe1184274f87dfee0fa64c1460f23e9ce18a720b8009b092d61eac9",
+      "bytes": 25014
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/01.stdout",
+      "sha256": "6dffcb357ee015c115ec7c859514030753826c8fef9cda9c0ba8992c70d05cea",
+      "bytes": 62512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/02.stdout",
+      "sha256": "8bcce92a3742e0b424b3c28c2a3e1298965af495a83e6d0a05b3975c060d77e4",
+      "bytes": 35923
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/parse/03.stdout",
+      "sha256": "319c545b97f0cb885ad804c52581108bbfe9180fd1d036d34f322b07fce9e05f",
+      "bytes": 23204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-fill-remaining-controlled-held-Outer-42/whole4497-Rust-API-census.json",
+      "sha256": "45351d283815c578971b6d715a7b98601fc0e2d256126bf2a734979c1d982d21",
+      "bytes": 13456
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-system-report-cohort-held-Audit-40-02/complete-final-compiler-Source-plan.json",
+      "sha256": "ddb9ed4a1357ea234499b13ba7924ed6bf6e0a71ad12b24d3f8517ebcaece426",
+      "bytes": 2636925
+    },
+    {
+      "path": ".runtime/porting/source-objects/08/0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/source-objects/2f/2fd5ba611b674aa6ca7280e9ec20bb9c9904482f49677df9073111578ac93c24",
+      "sha256": "2fd5ba611b674aa6ca7280e9ec20bb9c9904482f49677df9073111578ac93c24",
+      "bytes": 1849775
+    },
+    {
+      "path": ".runtime/porting/source-objects/35/35decb25b1d12b44495cc4c147a02a79eab6f9ddfd367d6d8bbf1075c3a18480",
+      "sha256": "35decb25b1d12b44495cc4c147a02a79eab6f9ddfd367d6d8bbf1075c3a18480",
+      "bytes": 13462
+    },
+    {
+      "path": ".runtime/porting/source-objects/58/58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "bytes": 19471
+    },
+    {
+      "path": ".runtime/porting/source-objects/d1/d1ab5f336ec2c84790fa3af349ae905e40530f74aea7867b29c3836e6577288e",
+      "sha256": "d1ab5f336ec2c84790fa3af349ae905e40530f74aea7867b29c3836e6577288e",
+      "bytes": 34590
+    },
+    {
+      "path": ".runtime/porting/source-objects/e6/e6e7054c03dc24dba68e1cf9e560a995e627b6bca32328fc34f4168ac37800f1",
+      "sha256": "e6e7054c03dc24dba68e1cf9e560a995e627b6bca32328fc34f4168ac37800f1",
+      "bytes": 1849775
+    },
+    {
+      "path": ".runtime/porting/source-objects/fa/fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "sha256": "fa486bd0bdeaf8e42580d8b11e91e9982cefb4241c48b93e47b73794f6bf0482",
+      "bytes": 47825
+    },
+    {
+      "path": ".runtime/porting/source-objects/fc/fc73eab3de7b11b2bf1b8ea034db530f2a208c6d278b679aa9add158290c1ed0",
+      "sha256": "fc73eab3de7b11b2bf1b8ea034db530f2a208c6d278b679aa9add158290c1ed0",
+      "bytes": 55394
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+      "sha256": "58ada5494a11fe436641f0d7a21f84b7da0d46904888d81bc8b2a0b4488aaf18",
+      "bytes": 19471
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_simulation/endrun_prefix.rs",
+      "sha256": "d15b52fe6be48e0d84b37496ab42e3cf343af57b892ec0be86d4f49c4f606da6",
+      "bytes": 34752
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/remaining.rs",
+      "sha256": "e5db1b1d78eae5bc3a6833c6af86d34f07032cdfa3fd2f304c50d3305994cb78",
+      "bytes": 56526
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "319c545b97f0cb885ad804c52581108bbfe9180fd1d036d34f322b07fce9e05f",
+      "bytes": 23204
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-node-setpoint-endrun-41/summary.json",
+      "sha256": "b53b61f21d550acceabde113cbd02a770f39b63133deef5c02ce1d7ef8064278",
+      "bytes": 6841
+    }
+  ],
+  "scope": "Three existing production Sources and no new Source files. Exactly two actual canonical B/A24 CLI invocations; canonical Cargo target and incremental0 are enforced by the launcher. No unrelated test profile or historical-target retry is executed by42. The accepted41 A24 proof and parent40 scientific cohort/compiler custody are separately attributed. No Native engine or scientific cohort executed by this production checkpoint; the separately accepted report cohort40 is unchanged and not rerun by42. No historical ZIP recursion, raw Native capture, exe/core, annual output payload or blanket mathematical equivalence claim."
+}

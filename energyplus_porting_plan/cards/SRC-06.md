@@ -500,3 +500,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source40 Native report cohort](../evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 기존 프로세스 메인 코호트의 보고 전용 선택으로 실제 엔진 306회와 전체 Native 함수의 별도 입력 변형 165회, 총 471회 보고 호출을 비트 단위로 대조했습니다. 비영 부하 8분류와 인접 이진64 경계를 포함하며, 기존 예측·보정 1,168쌍은 수정 없이 이번 실행에서 제외했습니다. 양의 1차 공조·DSOA 및 전체 B 완료는 주장하지 않습니다. 관측 입력 배열 복원 누락으로 실패한 첫 실행과 수정 후 성공 실행을 함께 보존합니다.
+
+
+[Source42 controlled predefined entries](../evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). 제어 존의 FillRemaining 표 항목과 누계를 같은 Config·Zone·ZonePreDefRep에 연결했다. 입력된 노드 순서와 나눗셈 묶음, 출력 자릿수를 보존한다. B 실행 결과: `GetHeatBalanceInput: actual thermostat DualHeatCool heatSched->Num6642`. A24의 기존 5,352개 보고값 증거는 전체 결과 비교 후 이어받는다.

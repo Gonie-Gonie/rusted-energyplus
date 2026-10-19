@@ -58,6 +58,8 @@ pub(crate) struct SelectedZoneData {
     pub(crate) nominal_mixing: f64,
     pub(crate) is_part_of_total_area: bool,
     pub(crate) is_nominal_controlled: bool,
+    /// Native ZoneData.hh645 ctorfalse; sole true writer IHG907 follows positive People input.
+    pub(crate) is_nominal_occupied: bool,
     pub(crate) has_adjusted_return_temperature_by_ite: bool,
     pub(crate) has_lights_return_air_gain: bool,
     pub(crate) has_airflow_window_return: bool,
@@ -141,6 +143,7 @@ impl Default for SelectedZoneData {
             nominal_mixing: 0.0,
             is_part_of_total_area: true,
             is_nominal_controlled: false,
+            is_nominal_occupied: false,
             has_adjusted_return_temperature_by_ite: false,
             has_lights_return_air_gain: false,
             has_airflow_window_return: false,

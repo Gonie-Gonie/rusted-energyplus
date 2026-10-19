@@ -188,3 +188,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source40 Native report cohort](evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 실제 입력 getter가 만든 Config·List·물리 Node와 기존 수요·공기·보고·누적 사전정의 소유자에 관측된 함수 진입 피연산자만 복원합니다. 보고 20항목·시설 7항목·요약 7항목·사전정의 24항목 및 소비된 읽기값을 대조하며, 엔진 수명과 매번 새로 생성되는 Native 단위 입력의 주소 수명을 구분합니다.
+
+
+[Source42 controlled predefined entries](evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). Zone.isNominalOccupied는 Native 생성자의 false를 같은 존 소유자에 보관한다. 유일한 true 작성 경로인 양수 People 입력은 기존 실제 경계를 유지하며 실행 횟수나 예상 결과로 점유 플래그를 대체하지 않는다.

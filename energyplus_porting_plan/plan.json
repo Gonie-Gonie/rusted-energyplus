@@ -12931,6 +12931,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json",
         "sha256": "5287024f9193d97f09aa2a6d51238bc554ede0aba3444809ed30a35101bb8644",
         "size_bytes": 6909
+      },
+      "canonical_fill_remaining_controlled_42": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json",
+        "sha256": "f21008edc08710f7801df688b6dd45df1a097b00f9dd1eff436a0b7112b61499",
+        "size_bytes": 6256
       }
     },
     {

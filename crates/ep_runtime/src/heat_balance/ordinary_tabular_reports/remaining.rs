@@ -16,6 +16,7 @@ use crate::weather::day::WeatherEnvironmentState;
 pub(crate) struct SourceRemainingPredefinedOwners<'a> {
     pub(crate) hvac: &'a mut SelectedHvacGlobals,
     pub(crate) hvac_manager: &'a crate::heat_balance::ordinary_hvac_manager::SourceHvacManager,
+    pub(crate) equipment: &'a crate::heat_balance::ordinary_equipment::OrdinaryEquipment,
     pub(crate) gain_modules: &'a crate::heat_balance::selected_gain_modules::SourceGainModules,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) environment: &'a WeatherEnvironmentState,
@@ -236,18 +237,18 @@ impl SourceTabularReports {
             consumption_total,
         )?;
 
-        let total_occupants = 0.0;
-        let total_average_occupants = 0.0;
-        let total_area = 0.0;
-        let total_voz_min = 0.0;
-        let total_mech_vent_vol = 0.0;
-        let total_nat_vent_vol = 0.0;
-        let total_infil_vol = 0.0;
-        let total_voz_dyn = 0.0;
-        let total_mech_vent_rate_occ = 0.0;
-        let total_nat_vent_rate_occ = 0.0;
-        let total_infil_rate_occ = 0.0;
-        let total_voz_dyn_occ = 0.0;
+        let mut total_occupants = 0.0;
+        let mut total_average_occupants = 0.0;
+        let mut total_area = 0.0;
+        let mut total_voz_min = 0.0;
+        let mut total_mech_vent_vol = 0.0;
+        let mut total_nat_vent_vol = 0.0;
+        let mut total_infil_vol = 0.0;
+        let mut total_voz_dyn = 0.0;
+        let mut total_mech_vent_rate_occ = 0.0;
+        let mut total_nat_vent_rate_occ = 0.0;
+        let mut total_infil_rate_occ = 0.0;
+        let mut total_voz_dyn_occ = 0.0;
         for number in 1..=o.globals.num_of_zones {
             let zone = o
                 .zones
@@ -255,7 +256,7 @@ impl SourceTabularReports {
                 .as_ref()
                 .and_then(|rows| rows.get(at(number).ok()?))
                 .ok_or(Error::Unavailable("actual FillRemaining Zone(iZone)6350"))?;
-            let _zone_multiplier =
+            let zone_multiplier =
                 zone.multiplier
                     .checked_mul(zone.list_multiplier)
                     .ok_or(Error::Unavailable(
@@ -282,10 +283,115 @@ impl SourceTabularReports {
                     predefined.afn_infil_vol_total_occ = 0.0;
                 }
                 if zone.is_controlled {
-                    let _air_loop_name = String::new();
-                    return Err(Error::Unavailable(
-                        "actual FillRemaining controlled ZoneEquipConfig.NumInletNodes6370",
-                    ));
+                    let air_loop_name = String::new();
+                    let config = o.equipment.source_zone_equipment_config(number)?;
+                    for inlet in 1..=*config.number_inlet_nodes() {
+                        let air_loop_number = *config.inlet_node_air_loop_number(inlet)
+                            .ok_or(Error::Unavailable("actual FillRemaining Config.InletNodeAirLoopNum6371"))?;
+                        if air_loop_number > 0 {
+                            // The first genuine PrimaryAirSystems.Name request occurs
+                            // here, after all earlier AFN writes; no count/name proxy.
+                            return Err(Error::Unavailable("actual FillRemaining PrimaryAirSystems.Name6374"));
+                        }
+                    }
+                    text(o.table, o.registry, "pdchOaMvAirLpNm", &zone.name, &air_loop_name)?;
+
+                    let multiplier = f64::from(zone_multiplier);
+                    if zone.is_nominal_occupied && predefined.num_occ_accum_time > 0.0 {
+                        let average_occupants = predefined.num_occ_accum / predefined.num_occ_accum_time;
+                        for name in ["pdchOaoAvgNumOcc1", "pdchOaoAvgNumOcc2", "pdchOaMvAvgNumOcc"] {
+                            real2(o.table, o.registry, name, &zone.name, average_occupants)?;
+                        }
+                        total_average_occupants += average_occupants * multiplier;
+                    } else {
+                        for name in ["pdchOaoAvgNumOcc1", "pdchOaoAvgNumOcc2", "pdchOaMvAvgNumOcc"] {
+                            real2(o.table, o.registry, name, &zone.name, 0.0)?;
+                        }
+                    }
+                    real2(o.table, o.registry, "pdchOaMvNomNumOcc", &zone.name, zone.total_occupants)?;
+                    total_occupants += zone.total_occupants * multiplier;
+
+                    for name in ["pdchOaoZoneVol1", "pdchOaoZoneVol2", "pdchOaMvZoneVol"] {
+                        real2(o.table, o.registry, name, &zone.name, zone.volume)?;
+                    }
+                    self.input_state.total_volume += zone.volume * multiplier;
+                    real2(o.table, o.registry, "pdchOaMvZoneArea", &zone.name, zone.floor_area)?;
+                    total_area += zone.floor_area * multiplier;
+                    real3(o.table, o.registry, "pdchOaMvMinDynTrgVent", &zone.name, predefined.voz_min / multiplier)?;
+                    integer(o.table, o.registry, "pdchOaMvZoneMult", &zone.name, zone_multiplier)?;
+                    total_voz_min += predefined.voz_min;
+
+                    if zone.volume > 0.0 && predefined.tot_time_occ > 0.0 {
+                        real3(o.table, o.registry, "pdchOaoAvgMechVent", &zone.name,
+                            predefined.mech_vent_vol_total_occ / (predefined.tot_time_occ * zone.volume * multiplier))?;
+                        real3(o.table, o.registry, "pdchOaoMinMechVent", &zone.name,
+                            predefined.mech_vent_vol_min / (zone.volume * multiplier))?;
+                    }
+                    real2(o.table, o.registry, "pdchOaTaBzMechVent", &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier)?;
+                    total_mech_vent_vol += predefined.mech_vent_vol_total_std_den;
+
+                    real2(o.table, o.registry, "pdchOaTaBzNatVent", &zone.name,
+                        predefined.simp_vent_vol_total_std_den + predefined.afn_vent_vol_total_std_den)?;
+                    total_nat_vent_vol += (predefined.simp_vent_vol_total_std_den + predefined.afn_vent_vol_total_std_den) * multiplier;
+                    real2(o.table, o.registry, "pdchOaTaBzTotVent", &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier + predefined.simp_vent_vol_total_std_den
+                            + predefined.afn_vent_vol_total_std_den)?;
+
+                    if zone.volume > 0.0 && predefined.tot_time_occ > 0.0 {
+                        real3(o.table, o.registry, "pdchOaoAvgInfil", &zone.name,
+                            predefined.infil_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
+                        real3(o.table, o.registry, "pdchOaoMinInfil", &zone.name,
+                            predefined.infil_vol_min / zone.volume)?;
+                        real3(o.table, o.registry, "pdchOaoAvgAFNInfil", &zone.name,
+                            predefined.afn_infil_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
+                        real3(o.table, o.registry, "pdchOaoMinAFNInfil", &zone.name,
+                            predefined.afn_infil_vol_min / zone.volume)?;
+                        real3(o.table, o.registry, "pdchOaoAvgSimpVent", &zone.name,
+                            predefined.simp_vent_vol_total_occ / (predefined.tot_time_occ * zone.volume))?;
+                        real3(o.table, o.registry, "pdchOaoMinSimpVent", &zone.name,
+                            predefined.simp_vent_vol_min / zone.volume)?;
+                    }
+                    real2(o.table, o.registry, "pdchOaTaBzInfil", &zone.name,
+                        predefined.infil_vol_total_std_den + predefined.afn_infil_vol_total_std_den)?;
+                    total_infil_vol += (predefined.infil_vol_total_std_den + predefined.afn_infil_vol_total_std_den) * multiplier;
+                    real2(o.table, o.registry, "pdchOaTaBzTotVentInfil", &zone.name,
+                        predefined.mech_vent_vol_total_std_den / multiplier + predefined.simp_vent_vol_total_std_den
+                            + predefined.afn_vent_vol_total_std_den + predefined.afn_infil_vol_total_std_den
+                            + predefined.infil_vol_total_std_den)?;
+                    real2(o.table, o.registry, "pdchOaTaBzDynTrgVent", &zone.name,
+                        predefined.voz_target_total / multiplier)?;
+                    total_voz_dyn += predefined.voz_target_total;
+                    real2(o.table, o.registry, "pdchOaTaBzTmBelow", &zone.name, predefined.voz_target_time_below)?;
+                    real2(o.table, o.registry, "pdchOaTaBzTmAt", &zone.name, predefined.voz_target_time_at)?;
+                    real2(o.table, o.registry, "pdchOaTaBzTmAbove", &zone.name, predefined.voz_target_time_above)?;
+                    real2(o.table, o.registry, "pdchOaTaBzTmAboveUnocc", &zone.name, predefined.tot_vent_time_non_zero_unocc)?;
+                    integer(o.table, o.registry, "pdchOaTaBzZoneMult", &zone.name, zone_multiplier)?;
+
+                    if zone.is_nominal_occupied && predefined.tot_time_occ > 0.0 {
+                        let total_time_occ_seconds = predefined.tot_time_occ * 3600.0;
+                        let mech_vent = predefined.mech_vent_vol_total_occ_std_den / total_time_occ_seconds;
+                        real4(o.table, o.registry, "pdchOaOccBzMechVent", &zone.name, mech_vent / multiplier)?;
+                        total_mech_vent_rate_occ += mech_vent;
+                        let natural_vent = (predefined.simp_vent_vol_total_occ_std_den
+                            + predefined.afn_vent_vol_total_occ_std_den) / total_time_occ_seconds;
+                        real4(o.table, o.registry, "pdchOaOccBzNatVent", &zone.name, natural_vent)?;
+                        total_nat_vent_rate_occ += natural_vent * multiplier;
+                        real4(o.table, o.registry, "pdchOaOccBzTotVent", &zone.name, mech_vent / multiplier + natural_vent)?;
+                        let infiltration = (predefined.infil_vol_total_occ_std_den
+                            + predefined.afn_infil_vol_total_occ_std_den) / total_time_occ_seconds;
+                        real4(o.table, o.registry, "pdchOaOccBzInfil", &zone.name, infiltration)?;
+                        total_infil_rate_occ += infiltration * multiplier;
+                        real4(o.table, o.registry, "pdchOaOccBzTotVentInfil", &zone.name,
+                            mech_vent / multiplier + natural_vent + infiltration)?;
+                        let average_voz = predefined.voz_target_total_occ / total_time_occ_seconds;
+                        real4(o.table, o.registry, "pdchOaOccBzDynTrgVent", &zone.name, average_voz / multiplier)?;
+                        total_voz_dyn_occ += average_voz;
+                        real2(o.table, o.registry, "pdchOaOccBzTmBelow", &zone.name, predefined.voz_target_time_below_occ)?;
+                        real2(o.table, o.registry, "pdchOaOccBzTmAt", &zone.name, predefined.voz_target_time_at_occ)?;
+                        real2(o.table, o.registry, "pdchOaOccBzTmAbove", &zone.name, predefined.voz_target_time_above_occ)?;
+                        integer(o.table, o.registry, "pdchOaOccBzZoneMult", &zone.name, zone_multiplier)?;
+                    }
                 }
             }
         }

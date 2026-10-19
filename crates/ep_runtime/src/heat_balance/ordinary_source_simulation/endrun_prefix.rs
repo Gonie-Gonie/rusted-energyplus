@@ -315,6 +315,8 @@ impl SourceInitializationFiles {
                         reports.selected_zone_input.as_mut(),
                         "actual same ZonePreDefRep owner before FillRemaining5213",
                     )?,
+                    equipment: required(reports.source_zone_equipment.as_ref(),
+                        "actual same ZoneEquipConfig before FillRemaining5213")?,
                     controller: &session.controller,
                     predefined_summary: &session.comfort_summary,
                     zone_plenum: &session.hvac.ancillary.zone_plenum,

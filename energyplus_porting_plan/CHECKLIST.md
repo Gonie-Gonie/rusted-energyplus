@@ -331,3 +331,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source40 Native report cohort](evidence/SRC-06-canonical-system-report-native-cohort-40/summary.json). 보고 전용 단일 코호트에 471회 Native 대조를 통합했습니다. 실행 범위 선택은 CONTRIBUTING.md에 정리했으며 카드·게이트 수는 유지합니다.
+
+
+[Source42 controlled predefined entries](evidence/SRC-06-canonical-fill-remaining-controlled-42/summary.json). 기존 Rust 파일 3개로 제어 존 최종 표 기입을 연결했다. 실제 B/A24 CLI 2회만 사용하고 실행 도구가 canonical 빌드 경로와 incremental0을 직접 지정한다. 새 테스트와 게이트 변경은 없다.
