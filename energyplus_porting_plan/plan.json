@@ -12786,6 +12786,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-endrun-core-10/summary.json",
         "sha256": "49c9d1f0fae44d86afab5a13f484a03c8fe348aceb53b8ca1ce04513b8bae52b",
         "size_bytes": 323492
+      },
+      "canonical_completed_source_activation_11": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/summary.json",
+        "sha256": "49bc529e949c23e3ccf92880db6dccdef42decd183c3ed8a6fa30d32a7adba60",
+        "size_bytes": 8901
       }
     },
     {

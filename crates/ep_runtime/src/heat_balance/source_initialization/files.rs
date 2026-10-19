@@ -210,6 +210,12 @@ impl SourceInitializationFiles {
         }
         Ok(&mut self.outputs[1])
     }
+    /// Exact retained ESO/MTR paths of this Source run, also after native close.
+    /// Borrowing does not open, flush, substitute or reconstruct either stream.
+    pub fn source_reported_paths(&self) -> (&Path, &Path) {
+        (&self.outputs[0].path, &self.outputs[2].path)
+    }
+
     /// Borrow the retained EIO stream without opening it or substituting a sink.
     /// Writes to an unreached stream return the real not-connected error.
     pub fn eio_stream(&mut self) -> &mut dyn Write {

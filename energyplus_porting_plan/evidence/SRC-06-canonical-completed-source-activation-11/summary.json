@@ -1,0 +1,145 @@
+{
+  "status": "Canonical explicit Source activation and own complete reported-result export; bounded actual A24 validated",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "prepared_promotion": {
+    "path": ".runtime/porting/SRC-06/canonical-source82-completed-activation-prepared-Outer-11/manifest.json",
+    "sha256": "40a16bb8e3fe5b5bbf62c6d00f4b3cbf3cad56ab3bf165996b89b5b7328ac274",
+    "bytes": 34350
+  },
+  "independent_promotion_review": {
+    "path": ".runtime/porting/SRC-06/Audit-canonical-source82-completed-activation-Source-review-01/review.json",
+    "sha256": "605b6956dd9bad742d65393c1f1b982f262a7cf9d40a4ad5fdb2e2f96beb3a4a",
+    "bytes": 20845
+  },
+  "changed_Rust_files": 10,
+  "new_Rust_files": 5,
+  "existing_Rust_files": 5,
+  "compiler_inputs": 4472,
+  "Rust_sources": 4459,
+  "literal_applications": 40,
+  "dispatch": "Existing explicit Some(A/B) selects Source after unchanged support admission. SomeA requires existing OneZone class; SomeB requires existing direct IdealLoads class. None retains canonical10 default. Source errors propagate without a Legacy retry.",
+  "real_sequence": "Same retained raw InputProcessor, report/files/weather owners; actual primary, full endrun620, checked selected native Environment/TotalDays scope, same-owned completed ESO/MTR strict reader, immediate separate Source outcome before legacy schedule cache.",
+  "result_contract": "Separate Source schema retains stream/report ID, key/name/units, frequency/StoreType, every actual native tuple, raw decimal operands, parsed f64 and bits, complete dictionary/end/footer/counters. No civil year, reset-accumulator history, profile result series, frequency collapse or reconstructed samples.",
+  "serialization": "Borrowed streamed JSON and exact raw-token CSV; typed artifact-map failures. The existing optional Source oracle comparison flags return Unsupported after completed export, without a Native/Legacy fallback.",
+  "diagnostic_observer_paths_quarantined": 9,
+  "diagnostic_new_child_absent": "crates/ep_runtime/src/heat_balance/source_output_registration/report_diagnostics.rs",
+  "None_path_verification": "Whole preparation and execution-startup inverse against canonical10; five existing legacy payloads/fixture and public helpers remain whole equal. This is Source preservation evidence, not a new None runtime execution.",
+  "canonical10_existing_CTF_test_section_whole_preserved": true,
+  "new_test_bodies": 0,
+  "full_suite_rerun": false,
+  "accepted_isolated_Source82_A24": {
+    "path": ".runtime/porting/SRC-06/Root-ordinary-provider-union82-actual-review-01/review.json",
+    "sha256": "3b9966785160ec62cd1de1d63d8d0008b812c884ec8c7b439af5139acedb0ca7",
+    "bytes": 2693
+  },
+  "canonical_A24_completed_Source_run": true,
+  "canonical_A24_reported_serialization_roundtrip": true,
+  "canonical_A24_original_named_tolerance_and_RMSE_PASS": true,
+  "production_explicit_scope_activation": true,
+  "original_A24_reported_tolerance_audit": {
+    "path": ".runtime/porting/SRC-06/completed-A24-tolerance-identity-audit-Audit-02/audit.json",
+    "sha256": "3cd42ca127c9eef3edff9d38a127dfa0d63cf8edcb4bc9ccab31079240e379a4",
+    "bytes": 26085
+  },
+  "independent_original_tolerance_review": {
+    "path": ".runtime/porting/SRC-06/Peer-completed-A24-tolerance-identity-review-01/review.json",
+    "sha256": "7bb564ccdb175c90b56ef71ed2bf0bad948abe4e2aea9ecb5b30851cd850731b",
+    "bytes": 5285
+  },
+  "original_A24_reported_metrics": {
+    "series": 58,
+    "samples": 5352,
+    "raw_operand_unequal": 3536,
+    "parsed_binary64_unequal": 3536,
+    "tolerance_failures": 0,
+    "rmse_failures": 0,
+    "all_declared_A24_reported_values_within_original_tolerances": true
+  },
+  "original_tolerance_policy": {
+    "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+    "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+    "bytes": 45145
+  },
+  "policy_metadata_notes": [
+    {
+      "variable": "Schedule Value",
+      "profile_units": "scalar (declared schedule type retained)",
+      "actual_Source_and_Native_ESO_units": "",
+      "actual_Source_and_Native_RDD": "Zone Average []",
+      "actual_input": "Schedule:Constant AlwaysOn uses On/Off type limits0..1 DISCRETE",
+      "meaning": "The profile explicitly uses a descriptive scalar label; physical blank units and actual schedule-type binding are retained separately. No scale or units conversion."
+    },
+    {
+      "variable": "Zone Air Humidity Ratio",
+      "profile_units": "kgWater/kgDryAir",
+      "profile_sampling_stage": "zone",
+      "actual_Source_and_Native_ESO_units": "",
+      "actual_Source_and_Native_RDD": "HVAC Average []",
+      "pinned_Native_registration": "ZoneTempPredictorCorrector.cc2848 Constant::Units::None; direct airHumRat target, TimeStepType::System, StoreType::Average",
+      "meaning": "Preexisting policy metadata differs from Native dictionary metadata. This audit does not rewrite either side or claim literal unit/timestep-type equivalence. Unique exact key/name/frequency and Source-vs-Native physical-unit/type equality identify the actual reported numeric pair; original named row atol1e-9 and rmse_max1e-9 are applied with no scale conversion. Trace sampling_stage is retained separately; actual Timestep Average report is used, never instantaneous callback airHumRat."
+    }
+  ],
+  "numeric_scope": "Original named reported-value atol/rtol and per-series RMSE only. Existing3536 unequal reported operands are retained. This does not assert internal binary64 identity or complete literal descriptive policy-unit/timestep-type equivalence.",
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "full15matrix_complete": false,
+  "B_completion_claim": false,
+  "internal_unit_card_completion_claim": false,
+  "retained_prior_whole_comparison": {
+    "mismatches": 235456,
+    "required_unavailable_or_unpaired": 2754
+  },
+  "retained_prior_whole_comparison_scope": "Historical whole comparison remains retained; bounded new A24 reported-value success does not replace it or alter plan/card gates.",
+  "previous_checkpoint": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-endrun-core-10/summary.json",
+    "sha256": "49c9d1f0fae44d86afab5a13f484a03c8fe348aceb53b8ca1ce04513b8bae52b",
+    "bytes": 323492
+  },
+  "remaining": [
+    "Actual remaining A/B case and duration gates, beginning with current SourceB raw-admission/positive equipment and NodeList branches.",
+    "Strict optional Source oracle comparator integration, with exact identities/native tuples and unchanged original policies.",
+    "Internal branch/unit/integration evidence and original full plan completion requirements."
+  ],
+  "reconstruction": "Finite ten Source before/accepted82 parent/proposed bodies and four literal diffs, complete4472 input plan, direct reviews/receipts and actual A24 raw output/export operands. Base Git plus command snapshot custody binds unchanged compiler inputs; no recursive historical checkpoint ZIP duplication or full transitive archive claim.",
+  "schema": "src06-canonical-completed-source-activation.v1",
+  "base_HEAD": "05d8abddb0da6ffdfe237031dd128277d37edeb2",
+  "canonical_check": {
+    "path": ".runtime/porting/SRC-06/canonical-source82-activation-all-targets-Root-11/receipt.json",
+    "sha256": "32104ce221288ba702eabe76c8adb82480cf68a12ec995b33c102bb458167788",
+    "bytes": 3820
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source82-A-24H-command-Root-11/receipt.json",
+    "sha256": "755e05bc7f7124965bb366f4d039e5ef3b7f0cc7a66dcec52fac2c0087cb8027",
+    "bytes": 4514
+  },
+  "canonical_A24_independent_review": {
+    "path": ".runtime/porting/SRC-06/Peer-canonical11-A24-export-roundtrip-01/review.json",
+    "sha256": "0d971eca58811c5b81b5abad452d8983eff0cfd871a828e543b4ff389385a2db",
+    "bytes": 23372
+  },
+  "additional_accepted_case_reviews": [],
+  "validation_refs": {
+    "path": ".runtime/porting/SRC-06/canonical11-publication-validation-refs-Audit-11.json",
+    "sha256": "1b103aee563cbdfcb9babb1d4f41e7d7021acff6d9d7c861b6b3dad5f8390623",
+    "bytes": 748
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/evidence.zip",
+    "sha256": "97efd3e1a0956e274f9bc28a1ba5317b3436965a3df1a889ce393212a8110fe7",
+    "bytes": 2145849
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/manifest.json",
+    "sha256": "c79952215aed57865f36945457e8d69402fbbb6d3db692d651946600c2fae089",
+    "bytes": 37073
+  },
+  "archive_entries": 151,
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/publish-canonical-source-activation-Audit-11-template.py",
+    "sha256": "0692e3946d44cf40958431aea0028b26e7c0ba01ea02edde56cecf700bfaf068",
+    "bytes": 12604
+  }
+}

@@ -1,5 +1,8 @@
 //! Arbitrary-run pipeline implementation.
 
+mod source_outcome;
+use source_outcome::{RuntimeExecutionOutcome, SourceRuntimeResult};
+
 use crate::ctf_initialization_outputs::{CtfRunOutputs, write_error_summary};
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
@@ -1411,6 +1414,7 @@ fn run_with_optional_porting_scope_impl(
                     simulation_model.as_ref(),
                     assessment.runtime_class,
                     &raw_model,
+                    scope,
                 )
             },
         ) {
@@ -1458,6 +1462,8 @@ fn run_with_optional_porting_scope_impl(
                             matches!(config.trace_level, TraceLevel::Full | TraceLevel::Surface),
                             &mut ctf_outputs,
                             &config.output_dir,
+                            config.hours,
+                            scope,
                         )
                     })
                 });
@@ -1465,11 +1471,13 @@ fn run_with_optional_porting_scope_impl(
             .persist(&config.output_dir)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
         match runtime_result.and_then(|result| {
-            validate_runtime_demand_provenance(
-                assessment.run_result_state,
-                &result,
-                simulation_model.as_ref(),
-            )?;
+            if let RuntimeExecutionOutcome::Legacy(legacy) = &result {
+                validate_runtime_demand_provenance(
+                    assessment.run_result_state,
+                    legacy,
+                    simulation_model.as_ref(),
+                )?;
+            }
             Ok(result)
         }) {
             Ok(result) => {
@@ -1477,23 +1485,28 @@ fn run_with_optional_porting_scope_impl(
                     "rust_runtime",
                     "rusted-energyplus",
                     runtime_start.elapsed().as_secs_f64(),
-                    format!(
-                        "execute {} for {} hourly samples",
-                        result.runtime_class.id(),
-                        result.sample_count
-                    ),
+                    result.execution_description(),
                 );
                 let export_start = Instant::now();
-                write_runtime_artifacts(&config.output_dir, &result.results)
-                    .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-                if let Some(snapshot) = result.geometry_snapshot.as_ref() {
-                    crate::geometry_trace::write_runtime_geometry(config, snapshot)?;
+                match &result {
+                    RuntimeExecutionOutcome::Legacy(legacy) => {
+                        write_runtime_artifacts(&config.output_dir, &legacy.results)
+                            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+                        if let Some(snapshot) = legacy.geometry_snapshot.as_ref() {
+                            crate::geometry_trace::write_runtime_geometry(config, snapshot)?;
+                        }
+                    }
+                    RuntimeExecutionOutcome::Source(source) => {
+                        crate::source_reported_results::write_source_reported_artifacts(
+                            &config.output_dir.join("results"), &source.reports,
+                        ).map_err(|error| RunError::new(RunExitCode::OutputExport, error.to_string()))?;
+                    }
                 }
                 timing.push(
                     "rust_output_export",
                     "ep_run",
                     export_start.elapsed().as_secs_f64(),
-                    "write result-store.json, selected-outputs.csv, and meters.csv",
+                    result.export_description(),
                 );
                 rust_runtime_result = Some(result);
             }
@@ -1517,13 +1530,32 @@ fn run_with_optional_porting_scope_impl(
         }
     }
 
+    // Source reported identities/tuples cannot enter the legacy key/name-only
+    // comparator or its default-output-request fallback. Keep its legacy API.
+    if (config.oracle_baseline || config.compare_oracle)
+        && matches!(rust_runtime_result.as_ref(), Some(RuntimeExecutionOutcome::Source(_)))
+    {
+        diagnostics.error(
+            "SourceReportedOracleComparisonUnsupported", "oracle",
+            "completed Source artifacts were exported; Source-specific oracle request/comparison identity and timestamp handling is not connected",
+        );
+        return finish_successful_summary(
+            config, &prepared_input, &assessment, diagnostics, timing,
+            rust_runtime_result.as_ref(), None,
+            "unsupported-source-reported-results".to_owned(),
+            if config.compare_oracle { "unsupported-source-reported-results" } else { "not-requested" }.to_owned(),
+            None, RunExitCode::Unsupported,
+            "Source oracle comparison is unsupported; completed Source results are retained",
+        );
+    }
+
     let should_run_oracle = config.oracle_baseline || config.compare_oracle;
     if should_run_oracle {
         let oracle_start = Instant::now();
         match run_requested_oracle_baseline(
             config,
             &prepared_input,
-            rust_runtime_result.as_ref().map(|result| &result.results),
+            rust_runtime_result.as_ref().and_then(RuntimeExecutionOutcome::legacy_results),
         ) {
             Ok(summary) => {
                 timing.push(
@@ -1561,7 +1593,7 @@ fn run_with_optional_porting_scope_impl(
     if config.compare_oracle {
         let compare_start = Instant::now();
         match (
-            rust_runtime_result.as_ref().map(|result| &result.results),
+            rust_runtime_result.as_ref().and_then(RuntimeExecutionOutcome::legacy_results),
             oracle_summary.as_ref(),
         ) {
             (Some(results), Some(summary)) => match compare_with_oracle(results, summary) {
@@ -2046,7 +2078,7 @@ fn finish_successful_summary(
     assessment: &SupportAssessment,
     diagnostics: RunDiagnostics,
     mut timing: PipelineTiming,
-    rust_runtime_result: Option<&RustRuntimeResult>,
+    rust_runtime_result: Option<&RuntimeExecutionOutcome>,
     oracle_summary: Option<&OracleBaselineSummary>,
     oracle_status: String,
     compare_status: String,
@@ -2135,7 +2167,8 @@ fn finish_successful_summary(
             "inactive_ideal_loads_branches": assessment.inactive_ideal_loads_branches.clone(),
             "conformance_claim": false,
         },
-        "rust_runtime": rust_runtime_result.as_ref().map(|result| json!({
+        "rust_runtime": rust_runtime_result.map(|outcome| match outcome {
+            RuntimeExecutionOutcome::Legacy(result) => json!({
             "runtime_class": result.runtime_class.id(),
             "samples": result.sample_count,
             "series": result.results.series.len(),
@@ -2685,14 +2718,21 @@ fn finish_successful_summary(
                 .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle
                 .as_ref()
                 .map(purchased_air_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry::lifecycle_json),
-        })),
-        "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
+        }),
+            RuntimeExecutionOutcome::Source(result) => source_outcome::source_summary(result),
+        }),
+        "source_order_gate": rust_runtime_result.map(RuntimeExecutionOutcome::source_order_gate),
+        "source_order_gate_scope": rust_runtime_result.and_then(|result| match result {
+            RuntimeExecutionOutcome::Source(_) => Some("execution-plan preflight; not an actual Source caller trace"),
+            RuntimeExecutionOutcome::Legacy(_) => None,
+        }),
         "oracle": oracle_summary,
         "comparison": comparison_summary,
         "oracle_status": oracle_status,
         "compare_status": compare_status,
         "diagnostics": diagnostic_counts(&diagnostics),
-        "artifacts": artifact_map(&config.output_dir),
+        "artifacts": source_outcome::artifact_map(&config.output_dir, rust_runtime_result)
+            .map_err(|error| RunError::new(RunExitCode::OutputExport, error.to_string()))?,
         "timing": timing,
     });
     let run_summary_path = config.output_dir.join("run-summary.json");
@@ -3464,7 +3504,21 @@ fn prepare_runtime_inputs(
     simulation_model: Option<&SimulationModel>,
     runtime_class: RuntimeClass,
     raw_model: &RawModel,
+    scope: Option<crate::PortingScope>,
 ) -> Result<PreparedRuntimeInputs, String> {
+    // The already-admitted CLI scope selects Source explicitly. Ordinary
+    // calls retain the existing compatibility path and never enter a retry.
+    match (scope, runtime_class) {
+        (None, _)
+        | (Some(crate::PortingScope::A), RuntimeClass::OneZoneHeatBalanceCompatibility)
+        | (Some(crate::PortingScope::B), RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility) => {}
+        (Some(selected), actual) => return Err(format!(
+            "porting scope {} cannot execute selected runtime class {} through Source",
+            selected.id(), actual.id(),
+        )),
+    }
+    let source_initialization_required =
+        runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility || scope.is_some();
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let mut pending_ordinary_weather = None;
     let (time_axis, weather_series, zone_timestep_schedule_cache) =
@@ -3534,12 +3588,12 @@ fn prepare_runtime_inputs(
             let environment_inputs = crate::weather_solar_controls::capture_environment_inputs()?;
             configuration.solar_controls =
                 crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
-            if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+            if source_initialization_required {
                 let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
                 crate::ordinary_design_day_input::project(raw_model, &mut configuration, reverse)?;
             }
             let bytes = std::fs::read(weather_path).map_err(|error| error.to_string())?;
-            let weather_series = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+            let weather_series = if source_initialization_required {
                 pending_ordinary_weather = Some(PendingOrdinaryWeather {
                     bytes,
                     configuration,
@@ -3551,8 +3605,8 @@ fn prepare_runtime_inputs(
                         .map_err(|error| format!("failed to open live EPW owner: {error}"))?,
                 )
             };
-            let zone_timestep_schedule_cache = if runtime_class
-                == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+            let zone_timestep_schedule_cache = if scope.is_none()
+                && runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
             {
                 let environment_axis = build_environment_time_axes_with_weather_metadata(
                     &model.typed,
@@ -3592,7 +3646,7 @@ fn prepare_runtime_inputs(
         &time_axis,
         runtime_class_requires_weather(runtime_class),
     )?;
-    let schedule_cache = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+    let schedule_cache = if source_initialization_required {
         // No disposable cache or trace is produced from the pre-Project timestep.
         None
     } else {
@@ -3605,14 +3659,14 @@ fn prepare_runtime_inputs(
         Some(cache)
     };
 
-    let selected_input_processor = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+    let selected_input_processor = if source_initialization_required
     {
         Some(crate::ordinary_input_processor::resolve(raw_model)?)
     } else {
         None
     };
     let source_initialization_input =
-        if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+        if source_initialization_required {
             // Pure raw projection only; actual counts/getters still use the moved IP.
             Some(
                 ep_runtime::heat_balance::source_initialization::SourceInitializationInput {
@@ -3669,14 +3723,14 @@ fn prepare_runtime_inputs(
         zone_timestep_schedule_cache,
         weather_series,
         selected_input_processor,
-        reporting_prescan_input: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+        reporting_prescan_input: if source_initialization_required {
             Some(crate::ordinary_input_processor::resolve_reporting_prescan(
                 raw_model,
             )?)
         } else {
             None
         },
-        ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+        ordinary_warmup_reporting: if source_initialization_required
         {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
             let (equipment, radiation) = crate::ordinary_equipment_input::resolve_with_radiation(
@@ -3700,10 +3754,12 @@ fn execute_rust_runtime(
     capture_geometry: bool,
     ctf_outputs: &mut CtfRunOutputs,
     output_dir: &Path,
-) -> Result<RustRuntimeResult, String> {
+    requested_hours: Option<usize>,
+    scope: Option<crate::PortingScope>,
+) -> Result<RuntimeExecutionOutcome, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_inputs.sample_count;
-    if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+    if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility || scope.is_some() {
         let input = runtime_inputs
             .source_initialization_input
             .take()
@@ -3738,6 +3794,39 @@ fn execute_rust_runtime(
             runtime_inputs.time_axis.system_timestep = profile.system_timestep;
             if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting.as_mut() {
                 ctf_outputs.apply_source_reporting_controls(reporting)?;
+            }
+            if scope.is_some() {
+                // Explicit porting runs use the same real Source owners through
+                // primary, complete endrun and the completed own-file reader.
+                let weather = ctf_outputs
+                    .initialize_unopened_source_weather(pending.bytes, pending.configuration)?;
+                runtime_inputs.weather_series = Some(weather);
+                let weather = runtime_inputs
+                    .weather_series
+                    .as_ref()
+                    .ok_or("same unopened Source weather before continuation268")?;
+                let reporting = runtime_inputs
+                    .ordinary_warmup_reporting
+                    .as_ref()
+                    .ok_or("same actual Source reporting controls before continuation268")?;
+                let shading_path = output_dir.join("eplusrs.shd");
+                ctf_outputs
+                    .source_simulation_through_primary(weather, &model.typed, reporting, &shading_path)
+                    .map_err(|error| error.to_string())?;
+                ctf_outputs
+                    .source_simulation_endrun_prefix(weather)
+                    .map_err(|error| error.to_string())?;
+                // This branch is reachable only after the same actual Native620
+                // success. Do not fall through to the legacy schedule-cache route.
+                let scope = ctf_outputs.reports().source_reported_run_scope(weather)
+                    .map_err(|error| error.to_string())?;
+                let native_hour_scope = source_outcome::validate_requested_hours(&scope, requested_hours)
+                    .map_err(|error| error.to_string())?;
+                let reports = ctf_outputs.read_completed_source_reports()?;
+                return Ok(RuntimeExecutionOutcome::Source(Box::new(SourceRuntimeResult {
+                    reports, scope, native_hour_scope, requested_hours,
+                    runtime_class, source_order_gate,
+                })));
             }
             let weather =
                 ctf_outputs.initialize_source_weather(pending.bytes, pending.configuration)?;
@@ -3781,7 +3870,7 @@ fn execute_rust_runtime(
                     model, weather_series, options, &mut initialization,
                 )
             }.map_err(|error| error.to_string())?;
-            Ok(RustRuntimeResult {
+            Ok(RuntimeExecutionOutcome::Legacy(Box::new(RustRuntimeResult {
                 geometry_snapshot: capture_geometry.then(|| {
                     crate::geometry_trace::runtime_projection_with_source(
                         &model.typed, &simulation.state, ctf_outputs.reports(),
@@ -3975,7 +4064,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle: None,
-            })
+            })))
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
             let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
@@ -4704,7 +4793,7 @@ fn execute_rust_runtime(
                         .summary
                         .calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
                 );
-            Ok(RustRuntimeResult {
+            Ok(RuntimeExecutionOutcome::Legacy(Box::new(RustRuntimeResult {
                 geometry_snapshot: capture_geometry
                     .then(|| {
                         crate::geometry_trace::runtime_projection_with_source(
@@ -4861,7 +4950,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
-            })
+            })))
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
             let simulation = simulate_ideal_loads_purchased_air_compat(
@@ -4869,7 +4958,7 @@ fn execute_rust_runtime(
                 IdealLoadsCompatibilityOptions::hourly_samples(sample_count),
             )
             .map_err(|error| error.to_string())?;
-            Ok(RustRuntimeResult {
+            Ok(RuntimeExecutionOutcome::Legacy(Box::new(RustRuntimeResult {
                 geometry_snapshot: None,
                 results: simulation.results,
                 runtime_class,
@@ -5061,7 +5150,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle: None,
-            })
+            })))
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
             let projection = simulate_ideal_loads_node_state_projection(
@@ -5069,7 +5158,7 @@ fn execute_rust_runtime(
                 NodeStateProjectionOptions::hourly_samples(sample_count),
             )
             .map_err(|error| error.to_string())?;
-            Ok(RustRuntimeResult {
+            Ok(RuntimeExecutionOutcome::Legacy(Box::new(RustRuntimeResult {
                 geometry_snapshot: None,
                 results: projection.results,
                 runtime_class,
@@ -5259,7 +5348,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle: None,
-            })
+            })))
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
     }

@@ -360,6 +360,20 @@ impl CtfRunOutputs {
         )
     }
 
+    /// Only the caller's successful genuine endrun620 branch may invoke this.
+    /// Paths and registration/counters belong to the same completed Source run.
+    pub(crate) fn read_completed_source_reports(
+        &self,
+    ) -> Result<crate::source_reported_results::SourceReportedStreams, String> {
+        let catalog = self.reports.source_reported_catalog()
+            .map_err(|error| error.to_string())?;
+        let files = self.initialization_files.as_ref()
+            .ok_or("actual retained Source file owner after620 is missing")?;
+        let (eso, mtr) = files.source_reported_paths();
+        crate::source_reported_results::read_completed_source_reports(eso, mtr, &catalog)
+            .map_err(|error| error.to_string())
+    }
+
     pub(crate) fn reports(&self) -> &CtfInitializationReports {
         &self.reports
     }
