@@ -53,17 +53,21 @@ SUR-04에서 사용한 외표면온도와 원본의 고정/갱신 시점 비교
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-## 현재 구현과 검증
+24 full CalcOutsideSurfTemp calls, selected no-source/no-movable branch and .01 boundary/steady/mass/solar/repeated inputs. Not a full outside-manager or arbitrary boundary matrix.
 
-`ordinary_surface_initialization/outside_driver.rs`의 실제 외표면 계산을 같은 소유자에서 호출합니다. 선택한 무내부열원·무이동단열 분기에 대해 원본 전체 함수와 Source를 7개 수명, 24회 호출로 비교했습니다. quick-conduction 경계 0.01의 아래·동일·위, 정상/축열, 일사 유무와 반복 호출을 포함하며, 관측한 상태와 반환값은 binary64 원시 비트로 비교합니다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-CTF 캐시의 실제 생성 뒤 선언된 세 계수와 이력은 이 좁은 소비자 단위의 입력입니다. 이 결과만으로 전체 CTF 생성 과정이나 외표면 부모 전체를 검증했다고 보지 않습니다. SUR-04에 전달되는 값의 시점과 표면 반복 연결은 실제 A24 관측으로 별도 확인합니다.
+직접 단위 근거: [최종증거팩: Root-SUR03-SUR05-actual-review-56 a3210cec2e4a](../evidence/SRC-06-final-current-source-validation-60/summary.json).
 
-실행 영수증, 입력·출력 원문, 범위와 보존된 최초 컴파일 실패는 [선택 표면 단위 검증](../evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)에 모읍니다. 기존 카드 체크와 게이트는 전체 64개 카드의 최종 판정에서 정리합니다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

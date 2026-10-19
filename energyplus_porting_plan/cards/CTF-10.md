@@ -7,8 +7,6 @@
 - 조건부 선행 카드: {}
 - EP 기준: v26.1.0 / `6f2e40d10250a105b49966baa24d843711e61048`
 
-Scope review passed. Unit, integration and production gates remain unconfirmed.
-
 ## Pinned Original scope and contracts
 
 Original symbols: `HeatBalanceManager.cc::InitConductionTransferFunctions` and `Construction.cc::calculateTransferFunction`.
@@ -45,179 +43,25 @@ The eight source arrays reset to positive-zero bits. Existing CTF01-09 profiles 
 The direct history-unit policy fixes17 owner profiles at atol=rtol=0. Retained-copy bits, IDs, order, allocations, counters and clock/call boundaries are exact.
 Unavailable, unreached, nonfinite arithmetic and unobserved master branches receive no numerical PASS. Native equations and branch outcomes are not recomputed.
 
-## Existing selected evidence
+기존 카드의 추가 고정 원본 구간(완료 범위를 확대하지 않음):
 
-| Evidence | Confirmed scope |
-| --- | --- |
-| [Original baseline](../evidence/CTF-10-original-baseline/summary.json) | genuine Native custody and unchanged Rust baseline |
-| [Public storage](../evidence/CTF-10-unit/summary.json) | unit39/42 direct calls; fixed15 genuine13 loaders then true whole Init;45 guards |
-| [Earlier fixed6 CLI](../evidence/CTF-10-production-cli/summary.json) | pre-activation ordinary6 exit0/source-order match/nohours/nooracle; no numerical equivalence claim |
-| [Exact Original pair retirement](../evidence/CTF-10-retention/summary.json) | two new10 Original paths removed with protected/core/absence guards; no registry/history rewrite |
-| [Standalone surface binding](../evidence/CTF-10-surface-binding/summary.json) | actual12x19 owners, IDs, generation key and uninitialized history contract |
-| [Protected Original maintenance](../evidence/CTF-10-storage-maintenance/summary.json) | four existing executables losslessly NTFS-LZX compressed; paths/logical bytes/SHA unchanged |
-| [Consumer04 Original capture](../evidence/CTF-10-surface-consumer-original-baseline/summary.json) | ordinary A-24H complete lifecycle404878 events, zero omissions; factual custody only |
-| [Consumer05 history boundaries](../evidence/CTF-10-surface-consumer05-original-baseline/summary.json) |404886 events,4 Init+2025 simple Update, complete allocated owners/catalog; master unreached |
-| [Initial direct history comparison](../evidence/CTF-10-thermal-history-unit/summary.json) |2029 input-only cases, numeric973854/exact5671425, mismatch0; standalone API milestone |
+`Data/EnergyPlusData.cc840–857`, `EMSManager.cc208–247`, `SimulationManager.cc622–705,801–944,1359–1507`, `Material.cc198–226,275–309`, `HeatBalanceManager.cc1390–1397,1497–1513,1777–1797`, `DataHeatBalance.cc893–982`, `SurfaceGeometry.cc641–669,1423–1530`, `OutputReportPredefined.cc1766–1835,1928–1973`, `HeatBalanceSurfaceManager.cc163-189`.
 
-Selected public comparisons: unit numeric948290/discrete3874496; fixed15 numeric8988/discrete57532; mismatch0.
-Actual returned owners, original IDs/order/use, reverse providers, reset arrays and matching Init prefix are paired. This does not certify unpaired report/fatal backend behavior.
-Native capture uses unchanged A-24H input/weather and ordinary duration. The4GiB full-file QA admission bound never caps, samples or truncates producer events.
-Complete Native/projected-input/Rust bytes remain losslessly archived with full decompressed SHA/size. Native operands are restricted to same-input direct tests.
+## 최종 네 gate 근거
 
-## Current ordinary producer and surface lifecycle
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-The actual cache/public generation result is moved and connected once, with full19 history owners associated by each surface's ConstructionId.
-Generation key and compiler Source witnesses preserve material/caller/order/route/global dependencies. Unused unsupported definitions are not activated.
-Zone/Space/surface membership, actual class traversal, environment/ProductionWeather clock and timestep ownership are explicit.
-Selected final/history update occurs once after the existing CorrectStep air tail and before timestep_index increments. There is no legacy double history shift or numerical fallback.
-Prepared caller clock validation/commit, duplicate-commit rejection, generation freshness/invalidation and typed stop propagation remain distinct.
-Truly empty global0 layout permits empty-array operations only; nonempty global0 and unsupported branches retain typed stops.
+Declared constructions/use/order/reverse/public19 ownership plus actual Init postlude. EC finite reverse/unused/two-owner/generation/cache rejection accepted, not full transitive cache certification. Public-store numeric module raw-identical; actual flag/reset/postlude extensions are semantic owner carry.
 
-Activation milestone final03: `.runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json`, SHA `2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb`.
-Activation SourceSnapshot: `8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216`.
-Root-confirmed quality02: fmt0, Clippy0, focused245 PASS and workspace4851 PASS/21 groups, all on that same SourceSnapshot.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Activation retained same-input replay02 matches all2029 input/API/endpoint/normal-exit/parent-return joins and available cases.
-Comparison SHA `bd01b399e5a7588d94fef91726173d5ea8f6ae52dbe9b475cfa84ad5ac887de5`; numeric973854/exact5671425, mismatch0.
-All13 observed owner profiles have maxAbs/l2 zero. Four master profiles remain unobserved and receive no PASS. Native was not replayed.
-This confirms the direct API replay and current source quality; it does not establish persistent ordinary Rust/Native numerical equivalence.
+직접 단위 근거: [CTF-10-unit](../evidence/CTF-10-unit/summary.json), [최종증거팩: final64-existing-evidence-adjudication-Audit-03 b9f4ff21aee9](../evidence/SRC-06-final-current-source-validation-60/summary.json), [CTF-10-thermal-history-unit](../evidence/CTF-10-thermal-history-unit/summary.json), [CTF-10-report-scan-comparison](../evidence/CTF-10-report-scan-comparison/summary.json), [CTF-10-init-postlude-preparation-comparison](../evidence/CTF-10-init-postlude-preparation-comparison/summary.json), [CTF-10-ordinary-history-comparison](../evidence/CTF-10-ordinary-history-comparison/summary.json), [CTF-10-main-thread-history-comparison](../evidence/CTF-10-main-thread-history-comparison/summary.json).
 
-## Post-activation fixed6 CLI and publication
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-Ordinary A-24H/A-72H/B-NOLIMIT-24H/B-FLOW-24H/B-CAPACITY-24H/B-BOTH-24H all exited0 on the same current SourceSnapshot.
-All45 input/weather/metadata guards, compatibility/partial-deny/trace-full and original ordinary arguments were retained; no hours override, oracle or Native answers were supplied.
-The [current activation evidence](../evidence/CTF-10-production-activation/summary.json) retains all six actual receipts, current quality and complete direct replay with the failure-to-fix lineage.
-These ordinary runs establish regression success; persistent ordinary Rust/Native numerical equivalence remains pending.
-
-## Report input and Scan implementation
-
-The ordinary compiler now preserves all five report input families, unnamed IDF declaration order, physical alpha counts and exact default/blank/case facts.
-General's first-scan flags/options/EMS effects, retained cache and optional queries are implemented in source order. Unknown surface-list tokens retain the EMPTY warning path.
-The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summary.json) records fmt/Clippy0, focused250 and workspace4859 PASS, including all eight new regression tests, on SourceSnapshot `95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723`.
-At that milestone, Native getter/cache/query comparison and ordinary postlude connection were pending. The later comparison and ordinary initialization sections record their current results.
-This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
-
-## Ordinary initialization reporting and formatter comparison
-
-Both ordinary A/B runtime paths now retain the real predefined registry, string table, Scan cache and error/output owners across initialization success or failure. Loading and retry diagnostics execute at their producer sites; the complete report/Scan/EIO/final-fatal suffix runs before surface lifecycle allocation. Genuine I/O causes remain discoverable through RuntimeError. Reached CTF error, EIO and console streams are exported independently, and the error prefix is retained in the ordinary summary.
-
-The [ordinary initialization evidence](../evidence/CTF-10-ordinary-initialization/summary.json) records fmt/Clippy0, focused300 and workspace4920 PASS on the same actual SourceSnapshot. All608 same-input Native/Rust F/G formatted texts matched exactly. The unchanged six ordinary A/B CLI cases returned0 with all45 input guards and the current three output files. Failed checks and test-only corrections are retained.
-
-These results establish the ordinary connection, regression behavior and selected formatter equivalence. Native registry/backend/whole-Init comparison and persistent ordinary numerical/history integration remain pending; no card gate is promoted.
-
-## Actual Init postlude reference comparison
-
-The [current selected Init comparison evidence](../evidence/CTF-10-init-postlude-preparation-comparison/summary.json) records 2106 numerical and 696389 discrete comparisons across the same frozen15 model and6 direct-state cases, with0 mismatches and no dropped records. All132 optional unpaired observations remain explicit and receive no PASS. Selected paired owner fields pass; whole-Init equivalence and persistent ordinary integration remain unconfirmed.
-
-Corrections retain the genuine project Timestep/report preparation, early EMS Scan before registry allocation, ordered NominalR/NominalU film arithmetic, and real geometry predefined-table entries in Source order. Direct state preparation uses actual compiled inputs. The observer's historical card reference joins the authentic archived document. The [prior failed comparison](../evidence/CTF-10-init-postlude-comparison/summary.json) retains all829 original mismatches; the later production preflight and empty-diff validation failures remain in the new evidence lineage.
-
-Pinned EP26.1 Source ranges: Data/EnergyPlusData.cc840–857; EMSManager.cc208–247; SimulationManager.cc622–705,801–944,1359–1507; Material.cc198–226,275–309; HeatBalanceManager.cc1390–1397,1497–1513,1777–1797; DataHeatBalance.cc893–982; SurfaceGeometry.cc641–669,1423–1530; OutputReportPredefined.cc1766–1835,1928–1973. The archived correction preparations retain the complete direct helpers, owner/default witnesses and exact deltas.
-
-Changed Rust files:
-
-- `crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs`
-- `crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs`
-- `crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs`
-- `crates/ep_runtime/src/heat_balance/ctf_reports.rs`
-- `crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs`
-- `crates/ep_runtime/src/heat_balance/initialization.rs`
-- `crates/ep_runtime/src/heat_balance/mod.rs`
-- `crates/ep_runtime/src/heat_balance/ctf_geometry_reports.rs`
-- `crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs`
-- `crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs`
-- `crates/ep_run/examples/ctf10_init_postlude_support/fields.rs`
-
-Original literal corrections and separate actual formatter deltas remain archived.
-
-Actual fmt/Clippy0, focused312, workspace4932 PASS/21 groups, and direct-observer4 PASS share SourceSnapshot `d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb`. Both candidate executions returned0. Actual quality commands:
-
-```text
-cargo fmt --all -- --check
-cargo clippy --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked --workspace --all-targets -- -D warnings
-cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked -p ep_runtime --lib heat_balance::
-cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked --workspace
-cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked -p ep_run --example ctf10_init_postlude_candidate_direct_observer
-```
-
-The unchanged frozen arithmetic profiles and required-absence rules govern the comparison. Native04 and Clippy08 failures remain recorded. Selected scope exclusions, unavailable owners, different caller header inputs and optional backends receive no PASS. Complete CTF-10 gates, ordinary persistent history/warmup handoff and the predecessor integration chain remain unconfirmed; no card gate is promoted.
-
-## Complete registry, producer diagnostics and Init postlude
-
-The full predefined registry retains1301 named indices, all1206 ordered calls, the actual sizing branch and opaque-layer IDs. Genuine first SimulationControl sizing inputs are retained. Selected loading/retry Severe/Continue/Fatal effects execute at their producer callpoints before later flags/stores, through borrowed real backend owners. Final shared flags and the complete ordered report/Scan/EIO/fatal postlude are implemented.
-The [Init postlude implementation evidence](../evidence/CTF-10-init-postlude/summary.json) records fmt/Clippy0, focused299 and workspace4914 PASS, adding34 tests. Independent Source and actual formatter/composed-module reviews passed. At that milestone, ordinary caller connection and Native registry/backend/whole-Init comparison were pending. The ordinary connection is now recorded above; Native whole-Init comparison remains pending and no card gate is promoted.
-
-## Actual selected Scan comparison
-
-The genuine EnergyPlus helper and current Rust observer executed the same frozen inputs. All12 cases,264 queries,64 getter records and4 ordered diagnostics passed21,405 exact comparisons with0 mismatches and no missing or unavailable records. All31 cache members, optional arguments, getter contents and query association were required.
-The [selected Scan comparison evidence](../evidence/CTF-10-report-scan-comparison/summary.json) retains actual build, input, QA, projection and execution records. Backend streams/counters, Rust-only default metadata and Native-only getter metadata remain explicitly unpaired. Whole Init and production integration are pending; no card gate is promoted.
-
-## Report output and error backend implementation
-
-Actual compiler names, construction layers, retained predefined string entries and borrowed EIO output are implemented. Source warning/continue/fatal output, counters, optional callbacks and SQLite adapter boundaries retain their real order and output prefix on failure.
-The [report output/backend evidence](../evidence/CTF-10-report-output/summary.json) records fmt/Clippy0, focused270 and workspace4880 PASS with21 added tests. The observer compilation failure and exact correction are retained. Concurrent recorder publication passed eight-process regression.
-At that report-output milestone, Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition were pending. Their later selected Scan/F/G, registry and ordinary-connection results are recorded above. The corrected selected Init owner comparison now passes; whole-Init equivalence remains unconfirmed. No card gate is promoted.
-
-## Retained failure-to-fix lineage
-
-The earlier public Clippy clone warning and borrowed-slice correction remain in the public-storage evidence.
-Consumer03 unused Windows argc/argv compile failure: `.runtime/porting/CTF-10/surface-consumer-native-build-01/native-compile-command-01/receipt.json`; stopped before engine execution.
-Consumer05 optional size-ref preflight failure: `.runtime/porting/CTF-10/surface-consumer05-original-stages-command-01/receipt.json`; stopped before PE/engine execution.
-Initial activation workspace failure: `.runtime/porting/CTF-10/production-activation-workspace-command-01/receipt.json`; retained separately from empty-layout/caller-clock/fixture/unused-owner/boundary corrections.
-Reviewed Source, exact before/diff, application/formatter and genuine failure receipt/log/snapshot objects are retained as explicit lineage in the current activation archive. Success receipts never overwrite failures.
-
-## Remaining scope and completion checks
-
-- [x] Original scope and input/output/mutated-owner contracts fixed
-- [ ] Whole unit gate: remaining whole Init/helper/report/fatal evidence; selected cache-invalidation regressions already passed in current quality
-- [ ] Integration gate: ordinary Rust/Native time/state/call-order and persistent-history numerical pairing
-- [ ] Production gate: ordinary path, prerequisite gates and absence of EP/fixture answer injection
-
-Whole Init reportLayers/ScanForReports and final-fatal backend custody cannot be replaced by the selected Init prefix.
-Unobserved general/master history arithmetic, CON-01-excluded surface/material families and unavailable/excluded paths have no PASS.
-Existing evidence stays immutable. Source activation, quality, direct replay and ordinary CLI success alone do not promote the three gates or complete CTF-10.
-
-## Prospective persistent ordinary history capture contract
-
-This passive capture observes one genuine CON-01 A-admitted ordinary run through the existing run_bounded_porting(&config, PortingScope::A) entry used by fixed A CLI --porting-scope a; PartialRunPolicy::Deny remains unchanged; it does not replay Native pre-state or change solver inputs, calls, Result, commit order or existing gate status.
-Input is the unchanged selected Native05 A-24H IDF/weather with all45 fixed-input guards; the actual Rust caller supplies phase/day/hour/substep, independent begin-step seconds and owned weather clock. Missing Native environment/calendar/KickOff fields remain explicitly unpaired.
-The Original manager calls outside then inside balance, ManageAirHeatBalance, UpdateFinalSurfaceHeatBalance and conditional UpdateThermalHistories in that order (HeatBalanceSurfaceManager.cc163-189).
-The Rust lifecycle observes Begin entry/return/failure, immediately before/after selected initialization, immediately before/after selected history update, before successful clock release, and Commit return/failure. Initialization return precedes lagged-copy/current-clock installation; update return precedes lagged-copy; accepted history commit precedes timestep-index advancement.
-Borrowed owners include the exact producer generation key/context, full19-slot normal histories for every allocated column, actual optional masters/counters and scratch5, report4, flags, current/last clocks, independent HT/opaque/AllHT traversal, public12x19 coefficients and ordered model/Surface->Construction/Zone/Space associations.
-The observer also records actual current/lagged surface consumer views and selected input/context/route/error. No Native owner or ordinal is used to construct a Rust owner or identity.
-The optional runtime sink serializes only in the example lane, streams every event without a sample cap, and retains partial output plus genuine caller/IO failure. Disabled capture performs no serialization or growing-ledger allocation.
-Full owner allocation/shape/IDs/order and copied bits remain exact; any arithmetic pairing uses only the separately frozen Source policy. A stream footer proves transport completion only, not branch reachability or numerical equivalence.
-Required missing, stopped, ambiguous, unsupported or unavailable events cannot PASS; Native-only context and unobserved branches retain explicit availability status.
-Source proposal: `.runtime/porting/CTF-10/ordinary-history-capture-prep-01/manifest.json` (`0754e521a9bbc6eac7a26aa96bc5865626343a9df011cce21a6e984c09ae879e`).
-Future actual application/formatter review, same-Source fmt/Clippy/focused/workspace checks, Cargo-emitted artifact custody, uncapped ordinary execution and independent persistent pairing remain separate required evidence.
-
-## Applied Source and regression verification
-
-Actual Source `c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7` has3,915 files. fmt/Clippy passed; focused316 and workspace4,940 tests passed with zero failed/ignored. Four authored SUR04 IEEE regressions and four real-owner capture tests do not substitute for Native endpoints. Ordinary execution, complete persistent boundary comparison and pending dependency/gate certification remain open.
-Evidence: [summary](../evidence/CTF-10-ordinary-history-capture-source/summary.json) (`b88c5cebab7f153b402ae2320a043bcabd78426d5b0b3ed8669c6208f991a70c`).
-
-Initial unscoped observer execution returned4 before runtime on unsupported Raw ZoneAirHeatBalanceAlgorithm, with no lifecycle events. Its actual receipt/diagnostics remain preserved at `.runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-execution-command/receipt.json`; this is an admission failure, not CTF numerical evidence.
-
-## Applied A caller correction
-
-Actual Source `a0d63dbd95735e9fd1f6288be64576dfc61f0f9f5131a8ec4a2598ef7051ca8c` keeps3,915 files;3,914 unrelated files are byte-exact. The example now uses the existing strict A ordinary entry with Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. The initial unscoped exit4/zero-event attempt remains preserved. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
-Evidence: [scoped caller and quality](../evidence/CTF-10-ordinary-history-capture-source/scoped-caller-and-quality.json) (`5f4065edfeae47e64eb7f169b0d744076d7ee7ff355f9d73efac070a7a749526`).
-
-Scoped observer attempt02 terminated with Windows stack overflow (0xC00000FD) before any stream record; its retained0B stream has no completion footer. The passive example requires the same explicit8 MiB worker stack as the existing successfulCLI, with the sink and ordinary runtime on that worker. Inputs, Deny and numerical policy remain unchanged. Ordinary reachability and comparison remain unverified; no gates change. The failed receipt remains `.runtime/porting/CTF-10/ordinary-history-invocation-02/ordinary-execution-command/receipt.json`.
-
-## Applied observer stack correction
-
-Actual Source `e2dd7f51e2eda2899f028f281cbbb9d9d58690486754cc44c44c383101adf255` keeps3,915 files;3,913 unrelated files are byte-exact. The example now uses the existing CLI 8 MiB worker stack with strict A/Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. Both the initial unscoped exit4/zero-event attempt and scoped Windows stack-overflow attempt remain preserved; the latter has an empty stream and no completion footer. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
-Evidence: [observer entry and quality](../evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json) (`ab5badeb6adf939b0ddbd303956ba6fa8d4ef18157ec045837dd62aa88fb647b`).
-
-## First genuine ordinary history comparison: retained FAIL
-
-Strict A/Deny ordinary execution exited0 and captured all578 observed lifecycle events. The frozen full-stream comparer exited1:192 paired stages,3,898 required unavailable/unmatched stages,1,978,267 exact observations and35,031 mismatches. Stream custody completed without truncation; every mismatch/unmatched stage and the full Rust stream are archived. Warmup/kickoff/start-flag and outdoor weather owner differences remain. No integration, equation-per-iteration, whole-manager or full-card PASS is claimed.
-Evidence: [retained ordinary comparison](../evidence/CTF-10-ordinary-history-comparison/summary.json) (`77c800f7f6314a8fa640defd419103781748b56d997135a016a5a3c3d41f5cc2`).
-
-## Windows main ordinary history comparison: retained FAIL
-
-The unchanged strict A/Deny A-24H input completed on the actual Windows main entry. The full frozen-policy comparison retained FAIL: 1,340 paired stages, 2,754 required unavailable/unmatched stages, 13,807,360 exact observations and 235,456 mismatches. Native captured 404,886 events and Rust captured 4,034 events. Both full factual reviews checked the five complete ledgers, including every mismatch and required boundary; 4,094 required-ledger rows include the 1,340 paired stages.
-
-The first paired difference is already present in incoming SurfTempIn at Warmup day1/hour1/timestep2, before that history update. Incoming histories, constants and reports also differ. This identifies a differing boundary, without establishing its cause. Native has 20 warmup days and Rust has6; the original ambiguous initialization key remains unavailable under the unchanged pairing policy. Required missing or ambiguous stages cannot PASS.
-
-[Actual main-entry comparison evidence](../evidence/CTF-10-main-thread-history-comparison/summary.json) preserves all five full compressed ledgers and the finite selected Source/custody archive (57 rows, 51 stored objects). Large original streams and whole Source payloads remain provenance references to the earlier released evidence; the selected archive does not claim transitive replayability. The previous worker-entry FAIL remains immutable. Ordinary lifecycle/state/cadence, inside iteration, predecessor integration and all three full-card gates remain pending; A14/54 and B14/64 are unchanged.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

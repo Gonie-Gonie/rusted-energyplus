@@ -33,15 +33,12 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 
 ## 실제 구현의 소유권과 호출 순서
 
-- 날씨의 Today/Tomorrow, 달력, 스케줄, CTF master history는 서로 다른 지속 상태입니다. 환경 초기화·warmup·RunPeriod의 인계와 accepted step의 갱신 시점을 각각 검증합니다.
-- 실내 대류는 공간별 MAT/ZT/ZTAV와 두 표면온도 배열을 구분합니다. Natural의 strict 부호·exact-zero 분기, Detailed의 하한 대입 및 원본 반복 갱신 순서를 유지합니다. [TARP 비교](evidence/SRC-06-tarp-inside-selected/summary.json), [dispatcher 상태 비교](evidence/SRC-06-tarp-dispatcher/summary.json).
-- Predictor/corrector는 실제 AirHeatBalance·Node·Demand 소유자를 공유합니다. [전체 predictor 부모 1,168건](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json)은 독립적으로 포착한 호출의 검증이며, 연속 push/revert/retry 이력과 multiplier 변형의 검증은 별도로 남아 있습니다. 코드에서 도출한 네 사후조건은 Native 관측 비트로 세지 않습니다.
-- IdealLoads의 입력·가용성·초기화·계산·노드 갱신·보고는 같은 장비와 노드 상태를 사용합니다. [hard-sized 네 Sizer 및 전체 Size](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json)의 검증 범위와 전체 SimPurchasedAir의 지속 호출 검증을 구분합니다.
-- OutputProcessor의 system step 누적과 zone step 확정은 별개입니다. accepted 시간만 누적하고, 원본 zone 호출이 수행하는 meter 갱신을 중복 호출하지 않습니다. warmup·시간·일·월·환경 reset과 report latch는 원본 시점에 유지합니다.
-- 종료 처리는 같은 Source 오류 카운터·진단 상태·타이머를 소비합니다. [일반 종료 검증](evidence/SRC-06-canonical-normal-completion-47/summary.json)과 [성공 실행 로그 정리](evidence/SRC-06-canonical-successful-log-layout-49/summary.json)를 참조합니다. ERR·END·콘솔의 실제 실행 시간은 보존하며, 실패/Legacy 경로는 기존 출력 경로를 유지합니다.
+- Today/Tomorrow·달력·스케줄·CTF history는 서로 다른 지속 owner입니다. 환경 초기화·warmup·RunPeriod의 인계와 accepted step 갱신을 구분합니다.
+- 실제 Surface 부모에서 외표면→실내 반복→공기 계산→최종 표면→history 순서를 관측합니다.30회 대류 갱신의 실제 heap owner와 반환 H→계산 전 H→첫 소비 H를 연결하며 이동 가능한 Rust stack 주소의 전역 불변성을 요구하지 않습니다.
+- 두 warmup 인계 경계의 MAT/W·CTF 상수·normal4배열×19항은 실제 할당 owner에서 직접 관측합니다. 보고 평균이나 생성하지 않은 배열 상태로 대체하지 않습니다. 34437 scope rows; 635375 exact binary64 observations; 2 direct handoffs; 4 same-owner convection connections
+- Predictor/corrector·Demand·Node·IdealLoads는 실제 동일 owner를 사용합니다. 독립 포착 부모1,168과 연속 history40·배수2의21호출은 다른 관측 수명입니다. 단위 결과를 생산 입력으로 주입하지 않습니다.
+- OutputProcessor의 system 누적과 zone 확정, warmup/주기 reset, 보고·meter 갱신은 원본 시점을 유지합니다. 일반 종료는 같은 오류 카운터·진단·실제 타이머를 소비합니다.
 
 ## 증거 해석
 
-같은 입력·초기 상태·관측 필드와 실제 Source 버전을 확인한 뒤 비교 결과를 재사용합니다. 단위 호출, 일반 실행, 보고 값, JSON/CSV 재읽기 검증은 각각 기록합니다. 과거 원본 실행의 부동소수점 환경이나 private cache 상태를 관측하지 않았다면 추정값으로 대체하지 않습니다.
-
-[과거 CTF 이력 비교](evidence/CTF-10-main-thread-history-comparison/summary.json)의 235,456개 불일치와 2,754개 필수 미확인 경계는 해당 과거 Source의 실패 기록입니다. 현재 실행의 결과로 바꾸어 표기하거나 삭제하지 않습니다. 최신 검증 범위와 아직 닫히지 않은 gate는 [작업계획 안내](README.md#현재-진행-상태)와 `plan.json`을 참조합니다.
+최종 [카드별 근거](evidence/SRC-06-final-current-source-validation-60/summary.json)는 같은 입력·정책·관측 필드·Source의 유효한 연결을 명시합니다. 실제 ERR/END/콘솔 경과 시간은 보존하며, 미관측 private cache·통계·부동소수점 환경을 추정값으로 채우지 않습니다. 과거 CTF 이력의235,456 불일치와2,754 미확인, SCH01 원본 비정상 종료2건 및 모든 수정 전 실패는 해당 실행의 기록으로 유지합니다. 새 결과가 이를 과거 PASS로 바꾸지 않습니다.

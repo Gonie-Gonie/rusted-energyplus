@@ -78,77 +78,21 @@ SRC-04의 입사·흡수식은 선행 카드가 완료된 후 별도로 검증�
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-## 실제 구현과 비교 결과
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-EnergyPlus 26.1 고정 커밋의 저장된 SolarInterpolation과 TimeStepFraction을 사용한다.
-1 timestep/hour의 보간 생략, 첫 시간 이력, 같은 읽기 날짜의 24시→1시 NextHour,
-일사 누락 sentinel·카운터 및 실제 Ignore 제어의 적용 순서를 유지했다.
-실제 Today 슬롯의 DNI/DHI는 소유 기상 sample을 거쳐 열 계산 입력으로 전달된다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-과학 실행 커밋은 `728e253205efe3466345759fd3c4b7bf9520e2b5`이다.
-원본 helper는 589회 실제 호출 후 종료 코드 0이며, 단위 비교는 888,227건/불일치 0건이다.
-생산 입력은 기존 A-24H, A-72H, B-BOTH-24H의 Full/Summary 여섯 실행이며 모두 종료 코드 0이다.
-생산 비교는 3,459,134건/불일치 0건이다. 저장 보간 배열, DNI, DHI 및 선택된
-NextHour.LiquidPrecip 항목의 최대절대오차와 RMSE는 단위·생산 비교 모두 0이다.
-기존 변수별 허용오차와 signed-zero/상태/배열의 정확 비교 정책은 유지했다.
-
-## 실패 보존과 수정 근거
-
-첫 후보 단위 비교의 198개 불일치는 첫 읽기 이전 날씨 코드 카운터 인계 누락이었다.
-기존 cursor setter로 실제 소유 상태를 전달했으며, 비교 JSON이나 기대값을 덮어쓰지 않았다.
-첫 전체 workspace 시험은 새 producer 시험 두 개에서 실패했다. 원본 초기화 순서에 따라
-시험 fixture의 TimeStepFraction을 1/steps로 설정했고, 기대값과 생산 계산식은 바꾸지 않았다.
-
-첫 생산 비교의 954개 불일치는 모두 environment.DayOfYear_Schedule이었다.
-CLK-05 원본 helper의 Initialize-only 이력과 일반 CLI의 SetCurrent 이력 차이를 확인했다.
-이 필드의 전후 관측 966개만 동일 입력·직접 호출 ID를 가진 기존 CLK-04 실제 원본 이력에
-명시적으로 대응시켰다. 나머지 모든 비교 항목은 CLK-05 원본 값을 유지했다.
-새 대응을 여섯 생산 실행 전에 고정했으며, 날짜를 재계산하거나 필드를 제외하지 않았다.
-CLK-04의 실제 native 0, 과거 wrapper 1, metadata recovery 0은 각각 보존한다.
-
-첫 생산 결과 독립 검토도 이전 CLK-04 증거 형식에 없는 필드 접근으로 종료 코드 1이었다.
-이 실패를 보존하고 해당 원본 증거 형식의 실제 필드와 실행 기록을 검증하도록 보완해 재검토를 통과했다.
-잘못 선택한 Cargo library 빌드와 freezer 거부, 누락된 build receipt를 사용한 계획 실패도
-그대로 보존한다. 실행 receipt가 없는 CLI freezer 02의 종료 상태는 미확인이다.
-
-최종 Clippy 첫 실행은 시험 코드의 clone-on-copy 두 곳에서 종료 코드 101이었다.
-Clone과 Copy를 함께 derive하는 RawEpwOutputs의 시험용 snapshot 두 곳을 Copy로 바꾸고
-해당 두 표현의 서식만 정리했다. cfg(test) 모듈에 있는 이 변경의 실제 전체 diff를 검토했으며,
-시험 기대값·fixture·생산 계산 코드는 그대로 유지했다. 실제 실패와 수정 전후 파일을 보존한다.
-
-## 검증 범위의 한계
-
-선택된 Setup/GetNext/Initialize의 저장 일사와 실제 소유 입력 전달을 검증한다.
-일반 CLI의 480회 Current 호출 자체와 태양 위치·야간 보정·SRC-04의 표면 물리식은
-이번 카드의 원본 수치 동등성 인증 범위에 포함하지 않는다. 관측 불가능한 항목은 통과로 세지 않는다.
-생산 실행에 EnergyPlus 결과나 기대값을 계산 입력으로 공급하지 않았다.
-하늘 온도·IR은 CLK-06, 표면 입사·흡수식은 SRC-04, 호출 순서·warmup·상태 인계는
-해당 SYS 카드에서 이어서 검증한다.
-
-## 최종 소스와 품질 검사
-
-두 번째 최종 Clippy 실행은 관찰용 selected getter 두 곳의 중첩 if 경고로 종료 코드 101이었다.
-동일한 실패 가능 조회와 단락 평가 순서, DNI/DHI 또는 Null 반환을 유지하는 let-chain으로
-두 관찰 getter를 정리했다. 실제 두 함수의 전체 diff와 수정 전후 바이트를 검토했고 실패를 보존했다.
-
-최종 품질 커밋은 `87108b269cbb393f2426c2fefc4dfaeab81a4575`이다.
-workspace 시험 4,605개가 통과했으며 실패·무시 항목은 0개다. 최종 Clippy, 선택된 소스의
-서식 검사, 소스 품질 및 구조 검사까지 다섯 실제 실행 모두 종료 코드 0이다.
-과학 실행 이후 변경은 관찰 파일 10개의 서식과 위 두 getter 정리, cfg(test) 시험 파일 1개의
-두 Copy 표현 정리뿐이다. 나머지 소스·설정 3,733개는 과학 실행 당시 바이트와 동일하다.
-생산 수학·제어·trace 소스 14개와 Cargo 설정은 그대로이며, 이 메타데이터 검증으로
-새 수치 동등성 범위를 추가하거나 생산 실험 결과를 재계산하지 않았다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

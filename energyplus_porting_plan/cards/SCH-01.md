@@ -56,24 +56,7 @@ SCH-02가 소비하는 구간을 EP와 대조
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋: `7047f3e486ee964d983db50d1107a590db69fbe3`, `47c0dedbfe296e86075671dc112d9c81bf3956cf`, `df865d96a56c36b6dfc3011994c0525c351ecce0`
-
-시험 명령: 실제 argv·실행 소스 snapshot·종료 코드·stdout/stderr는 아래 보관 manifest의 각 `receipt.json`에 기록했다.
-
-증거 경로: [기존 구현 비교](../evidence/SCH-01-baseline/README.md), [수정 후 비교와 생산 인계](../evidence/SCH-01-corrected/README.md)
-
-최대오차/RMSE/상태 불일치: 비교된 수치의 최대 절대오차 0, 이산 불일치 0. RMSE는 별도 수집하지 않았다. 미가용 사례는 비교 통과에 포함하지 않았다.
-
-추가 검토할 helper: SCH-02 평가·SCH-03 조회와 시간 전진은 별도 카드 범위다.
-
-## SCH-01 착수 시 원본 범위 보완
+## 보존한 상세 범위·정밀도 계약
 
 EP 기준은 26.1.0 / `6f2e40d10250a105b49966baa24d843711e61048`이다. 생산 입력은 기존 CON-01 계약의 A/B IDF와 동일한 바이트를 사용한다. 진단용 잘못된 Constant/Compact/TypeLimits 입력은 선정 parser 분기를 확인하기 위한 것이며 생산 지원 범위를 늘리지 않는다.
 
@@ -87,14 +70,25 @@ Compact의 TypeLimits 검사는 원본이 채운 실제 timestep 배열에 의�
 
 Rust 입력 변환에는 기존 생산 경로의 실제 IDF→epJSON 변환기를 사용한다. 원본 IDF, 변환 도구, 실제 명령·종료·로그, 변환된 입력 해시와 선언 순서를 함께 기록한다. 변환 실패 시 시험용 정답 JSON을 만들지 않는다. EP 계산 결과는 비교 기준으로만 사용하며 Rust 생산 계산에 주입하지 않는다.
 
-## 고정 계약과 실제 수정 후 검증
-
 실행 전에 입력 82개와 요청 작업 164개, 실제 ID 대응·owner·부분 상태·가용성 정책, 변수별 atol/rtol=0과 class/shape 정확 일치를 고정했다. CON-01 생산 입력·기상·메타데이터 45개 해시는 유지했다. 원본 소스와 직접 helper, 관찰·변환·비교 소스를 검토했으므로 범위 확정 항목만 통과로 갱신한다.
 
-기존 구현의 실제 비교에서 확인한 선언 순서·ID, 단위 owner와 Compact 허용·경고·검증 차이를 수정했다. 수정 후 단위 관찰 비교는 수치 21,508,632개와 이산 716,890개에서 불일치 0개다. 실제 Native가 비정상 종료하여 결과가 없는 두 사례의 필수 가용성 실패 2개와, 실제 변환기가 epJSON을 남기지 않은 세 사례는 그대로 남았다. 원본 결과나 예상 배열을 Rust 입력으로 주입하지 않았다.
+## 최종 네 gate 근거
 
-실제 CLI를 다시 빌드하고 A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H, B-BOTH-24H를 실행했다. 선정한 실제 초기화 owner와 cache 인계 비교는 수치 10,119,332개, 이산 316,842개에서 불일치와 필수 누락이 모두 0개다. 비교 소스 검토 뒤 새로 실행한 두 번째 생산 묶음과 비교 보고서를 최종 근거로 사용한다. 첫 번째 실제 비교의 빈 Compact family 처리 오류와 종료 1 기록, 첫 번째 생산 묶음도 보존했다.
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-Dense cache 1,824개 값은 class/shape만 확인했으며 수치 비교에 포함하지 않았다. 개별 조회의 호출 시각, SCH-02/03 계산, 실행하지 않은 나머지 생산 입력 9개는 인증하지 않았다. 단위·연결·생산 gate와 카드 전체 완료는 계속 미확인이다.
+77 paired semantic outcomes(55 accepted22 rejected)+3 conversion-stage invalids+2 Original OS abnormal processes. Old availability=false/numerical afterstates stay unavailable. Current5 ingress outcomes are separate, not82/82 numeric.
 
-실제 품질 검사에서 compiler/raw/runtime 단위시험 3,500개, 수정 후 compiler 재검사 487개, 생산 연결 후 ep_run 단위시험 779개가 통과했다. 해당 패키지의 Clippy와 전체 fmt 검사도 종료 0이다. 앞선 컴파일·시험·format 실패 기록과 수정 전후 소스 snapshot을 함께 보존했으며, 실행 당시 서로 다른 commit/dirty 상태를 단일 clean 실행으로 합쳐 주장하지 않는다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
+
+직접 단위 근거: [SCH-01-corrected](../evidence/SCH-01-corrected/summary.json), [최종증거팩: Root60-final-actual-review 0db456e8d3ca](../evidence/SRC-06-final-current-source-validation-60/summary.json).
+
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.
+
+명명한 결과 구분: 대응 의미 결과 77개(승인 55, 거부 22), 변환 단계 무효 입력 3개, 원본 비정상 프로세스 2개입니다. 후자의 수치 후상태는 계속 미가용이며, 예외·문구·부분 상태 동등성이나82/82 수치 통과를 주장하지 않습니다.

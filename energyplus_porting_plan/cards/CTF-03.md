@@ -56,31 +56,21 @@ CTF-04 행렬의 차원·경계 인덱스 일치
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:
-시험 명령:
-증거 경로:
-최대오차/RMSE/상태 불일치:
-추가 검토할 helper:
+490–619 initial Nodes/dx/rcmax/dt/history only; exact whole arithmetic module. Initial callback state is not final retry state.
 
-## Source amendment before CTF-03 outputs (2026-10-10)
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Root FULL and other-author source peers accepted the passive initial callback, two whole Native helpers, fresh input writer, strict PE reader and OriginalDataQA sources. The actual initial capture after original619 is separate from the unchanged three preprocessing checkpoints and from later retries908-936. It copies live Nodes/dx and initial scalar/count/selector owners without evaluating them. Unit39/42 and fixed15/195 reuse only literal/input rows; production construction obligations remain dynamic. Three separate dx/initial_CTFTimeStep/caller_TimeStepZone profiles atol=rtol=0, exact class/active-prefix-shape/signedzero. Nodes/counts/selectors/history/IDs/branch/caller inputs exact; inherited18 preprocessing profiles remain unchanged separate context. Required reached absence on either/both sides fails; unselected/unreached/stopped/unknown states never numerical PASS. No tolerance changes after outputs. Actual CTF03 Native build/helper, OriginalDataQA, existing Rust baseline and candidate comparisons have not run. Scope passed; the other three gates and dependent completion remain pending.
+직접 단위 근거: [CTF-03-unit](../evidence/CTF-03-unit/summary.json).
 
-## Actual selected initial-discretization milestone (2026-10-11)
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-Evidence: `evidence/CTF-03-unit/summary.json`. Genuine OriginalDataQA0 in both lanes preceded the unchanged Rust baseline and candidate application. Actual unit39/42 selected25 initial owners: 148 numeric and7644 discrete comparisons; fixed15/195 with21 construction calls selected15:45 numeric and2556 discrete comparisons. All mismatches0; all three frozen zero-tolerance metrics maximum absolute error/RMSE0 and nonfinite errors0. Unavailable context37/12 is retained without PASS. Actual initial Nodes/dx/rcmax/selectors/time/history owners are paired; later Native retry/final owners are not substituted.
-
-Actual `cargo test --locked --workspace --all-targets`:4667 passed/0 failed/0 ignored across37 test binaries. This was before two function-local lint attributes, which preserve the pinned source predicate/branch order without body, test or policy changes. Initial Clippy exit101 and exact amendment are preserved; subsequent workspace all-target Clippy and fmt exit0. Fresh Cargo example build after these checks supplied both actual candidate executions and both actual comparisons (all exit0/source-preserving). Unused bindings01 remain archived; actual bindings02 match the final source bytes.
-
-Selected unit gate passed. CTF01 dependency completion, CTF04 matrix/coefficient handoff, genuine retry/final owners, integration and production gates remain pending. Fixed6 CLI at this source has not yet run; no whole-card or downstream PASS is claimed.
-
-## Actual fixed6 CLI after selected initial milestone (2026-10-11)
-
-Evidence: `evidence/CTF-03-production-cli/summary.json`. Fresh actual `ep_cli/eplus-rs` build02 supplied A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H. All6 actual exit0, source-preserving, source-order matches=true, compatibility/partial-deny/full-trace, no hours override or compare-oracle. All45 input guards remain exact. Actual fixture-demand-injection field is null for A and false for B, preserved as emitted. Build01 wrong package ep_run exit101 is preserved; it ran no CLI model and no source changes were needed. These CLI outcomes do not establish differential numerical equality, downstream coefficients, integration or production gate completion.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

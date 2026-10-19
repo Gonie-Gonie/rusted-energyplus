@@ -67,7 +67,7 @@ B에서는 그 의존성을 적용한다.
 
 ## 전체 체크리스트
 
-CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-preparation-comparison/summary.json)는 동일한 15개 모델·6개 직접 상태 사례에서 수치 2,106개·상태/보고서 696,389개를 비교해 불일치 0개를 기록했습니다. 전체 4,932개 테스트와 추가 관측기 4개도 통과했습니다. 선택 범위 밖 132개 항목은 미확인으로 유지하며, 전체 초기화와 지속 실행 이력 인계는 아직 완료되지 않았습니다. 이전 829개 불일치와 수정 기록을 보존했고 A14/54·B14/64 완료 수는 변하지 않습니다.
+과거 CTF 초기화·회귀·실패 기록은 원래 증거에 남으며, 현재 카드별 판정은 아래64행과 [최종 근거](evidence/SRC-06-final-current-source-validation-60/summary.json)를 따릅니다.
 
 
 ### 00 범위·계약
@@ -95,9 +95,9 @@ CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-preparation-
 ### 03 스케줄·물성
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [SCH-01](cards/SCH-01.md) | Constant/Compact 입력 정규화 | `ScheduleManager.cc` · `ProcessScheduleInput; ProcessForDayTypes; DecodeHHMMField` | CON-01 |
-| [ ] | [SCH-02](cards/SCH-02.md) | 분 단위 확장과 timestep 표 생성 | `ScheduleManager.cc` · `ProcessIntervalFields; DaySchedule::populateFromMinuteVals` | SCH-01, CLK-01 |
-| [ ] | [SCH-03](cards/SCH-03.md) | 현재 스케줄 조회·갱신 시점 | `ScheduleManager.cc` · `ScheduleConstant::getHrTsVal; ScheduleDetailed::getHrTsVal; UpdateScheduleVals` | SCH-02, CLK-01 |
+| [x] | [SCH-01](cards/SCH-01.md) | Constant/Compact 입력 정규화 | `ScheduleManager.cc` · `ProcessScheduleInput; ProcessForDayTypes; DecodeHHMMField` | CON-01 |
+| [x] | [SCH-02](cards/SCH-02.md) | 분 단위 확장과 timestep 표 생성 | `ScheduleManager.cc` · `ProcessIntervalFields; DaySchedule::populateFromMinuteVals` | SCH-01, CLK-01 |
+| [x] | [SCH-03](cards/SCH-03.md) | 현재 스케줄 조회·갱신 시점 | `ScheduleManager.cc` · `ScheduleConstant::getHrTsVal; ScheduleDetailed::getHrTsVal; UpdateScheduleVals` | SCH-02, CLK-01 |
 | [x] | [PSY-01](cards/PSY-01.md) | 기본 습공기 물성 | `Psychrometrics.hh` · `PsyCpAirFnW; PsyRhoAirFnPbTdbW; PsyHFnTdbW; PsyTdbFnHW` | CON-01 |
 | [x] | [PSY-02](cards/PSY-02.md) | 포화·습구·습공기비 역산 | `Psychrometrics.cc` · `PsyTsatFnHPb; PsyWFnTdbRhPb; PsyWFnTdbH; PsyTwbFnTdbWPb` | PSY-01 |
 
@@ -105,82 +105,79 @@ CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-preparation-
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
 | [x] | [CTF-01](cards/CTF-01.md) | 구성체 열물성 전처리 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CON-01 |
-| [ ] | [CTF-02](cards/CTF-02.md) | 전부 저항층인 경우의 CTF | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
-| [ ] | [CTF-03](cards/CTF-03.md) | 유질량 1D 구성체의 절점 분할 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
-| [ ] | [CTF-04](cards/CTF-04.md) | 상태공간 A/B/C/D 행렬 구성 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-03 |
-| [ ] | [CTF-05](cards/CTF-05.md) | CTF 행렬 역산 | `Construction.cc` · `ConstructionProps::calculateInverseMatrix` | CTF-04 |
-| [ ] | [CTF-06](cards/CTF-06.md) | 행렬 지수 계산 | `Construction.cc` · `ConstructionProps::calculateExponentialMatrix` | CTF-04 |
-| [ ] | [CTF-07](cards/CTF-07.md) | Gamma 행렬 계산 | `Construction.cc` · `ConstructionProps::calculateGammas` | CTF-05, CTF-06 |
-| [ ] | [CTF-08](cards/CTF-08.md) | 최종 CTF 계수와 차수 | `Construction.cc` · `ConstructionProps::calculateFinalCoefficients` | CTF-07 |
-| [ ] | [CTF-09](cards/CTF-09.md) | 계수 안정성 검사·timestep 재시도 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-08 |
-| [ ] | [CTF-10](cards/CTF-10.md) | 구성체별 생성 연결·역순 재사용 | `HeatBalanceManager.cc` · `InitConductionTransferFunctions; ConstructionProps::calculateTransferFunction` | CTF-02, CTF-09 |
+| [x] | [CTF-02](cards/CTF-02.md) | 전부 저항층인 경우의 CTF | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
+| [x] | [CTF-03](cards/CTF-03.md) | 유질량 1D 구성체의 절점 분할 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
+| [x] | [CTF-04](cards/CTF-04.md) | 상태공간 A/B/C/D 행렬 구성 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-03 |
+| [x] | [CTF-05](cards/CTF-05.md) | CTF 행렬 역산 | `Construction.cc` · `ConstructionProps::calculateInverseMatrix` | CTF-04 |
+| [x] | [CTF-06](cards/CTF-06.md) | 행렬 지수 계산 | `Construction.cc` · `ConstructionProps::calculateExponentialMatrix` | CTF-04 |
+| [x] | [CTF-07](cards/CTF-07.md) | Gamma 행렬 계산 | `Construction.cc` · `ConstructionProps::calculateGammas` | CTF-05, CTF-06 |
+| [x] | [CTF-08](cards/CTF-08.md) | 최종 CTF 계수와 차수 | `Construction.cc` · `ConstructionProps::calculateFinalCoefficients` | CTF-07 |
+| [x] | [CTF-09](cards/CTF-09.md) | 계수 안정성 검사·timestep 재시도 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-08 |
+| [x] | [CTF-10](cards/CTF-10.md) | 구성체별 생성 연결·역순 재사용 | `HeatBalanceManager.cc` · `InitConductionTransferFunctions; ConstructionProps::calculateTransferFunction` | CTF-02, CTF-09 |
 
 ### 05 열원·외부 경계
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [SRC-01](cards/SRC-01.md) | 내부 대류발열 | `InternalHeatGains.cc` · `InitInternalHeatGains; zoneSumAllInternalConvectionGains` | SCH-03 |
-| [ ] | [SRC-02](cards/SRC-02.md) | 내부 복사발열의 표면 배분 | `HeatBalanceSurfaceManager.cc` · `ComputeIntThermalAbsorpFactors; InitIntSolarDistribution` | SRC-01, GEO-02 |
-| [ ] | [SRC-03](cards/SRC-03.md) | 태양위치·태양방향 | `WeatherManager.cc` · `CalculateDailySolarCoeffs; CalculateSunDirectionCosines; DetermineSunUpDown` | CLK-01, CLK-03 |
-| [ ] | [SRC-04](cards/SRC-04.md) | 외표면 입사·흡수 일사 | `SolarShading.cc` · `FigureSolarBeamAtTimestep; AnisoSkyViewFactors; CalcAbsorbedOnExteriorOpaqueSurfaces` | SRC-03, CLK-05, GEO-02 |
-| [ ] | [SRC-05](cards/SRC-05.md) | 표면 높이의 외기조건 | `DataSurfaces.cc` · `SetSurfaceOutBulbTempAt; SetSurfaceWindSpeedAt; SetSurfaceWindDirAt` | CLK-04, GEO-02 |
-| [ ] | [SRC-06](cards/SRC-06.md) | TARP 실내 대류 | `ConvectionCoefficients.cc` · `CalcASHRAETARPNatural; CalcASHRAEDetailedIntConvCoeff; InitIntConvCoeff` | GEO-02, PSY-01 |
-| [ ] | [SRC-07](cards/SRC-07.md) | 실외 대류계수·습윤 경계 | `ConvectionCoefficients.cc` · `InitExtConvCoeff; CalcASHRAESimpExtConvCoeff` | SRC-05, PSY-01 |
-| [ ] | [SRC-08](cards/SRC-08.md) | 실외 장파복사 선형화 | `ConvectionCoefficients.cc` · `InitExtConvCoeff` | CLK-06, SRC-05, GEO-02 |
+| [x] | [SRC-01](cards/SRC-01.md) | 내부 대류발열 | `InternalHeatGains.cc` · `InitInternalHeatGains; zoneSumAllInternalConvectionGains` | SCH-03 |
+| [x] | [SRC-02](cards/SRC-02.md) | 내부 복사발열의 표면 배분 | `HeatBalanceSurfaceManager.cc` · `ComputeIntThermalAbsorpFactors; InitIntSolarDistribution` | SRC-01, GEO-02 |
+| [x] | [SRC-03](cards/SRC-03.md) | 태양위치·태양방향 | `WeatherManager.cc` · `CalculateDailySolarCoeffs; CalculateSunDirectionCosines; DetermineSunUpDown` | CLK-01, CLK-03 |
+| [x] | [SRC-04](cards/SRC-04.md) | 외표면 입사·흡수 일사 | `SolarShading.cc` · `FigureSolarBeamAtTimestep; AnisoSkyViewFactors; CalcAbsorbedOnExteriorOpaqueSurfaces` | SRC-03, CLK-05, GEO-02 |
+| [x] | [SRC-05](cards/SRC-05.md) | 표면 높이의 외기조건 | `DataSurfaces.cc` · `SetSurfaceOutBulbTempAt; SetSurfaceWindSpeedAt; SetSurfaceWindDirAt` | CLK-04, GEO-02 |
+| [x] | [SRC-06](cards/SRC-06.md) | TARP 실내 대류 | `ConvectionCoefficients.cc` · `CalcASHRAETARPNatural; CalcASHRAEDetailedIntConvCoeff; InitIntConvCoeff` | GEO-02, PSY-01 |
+| [x] | [SRC-07](cards/SRC-07.md) | 실외 대류계수·습윤 경계 | `ConvectionCoefficients.cc` · `InitExtConvCoeff; CalcASHRAESimpExtConvCoeff` | SRC-05, PSY-01 |
+| [x] | [SRC-08](cards/SRC-08.md) | 실외 장파복사 선형화 | `ConvectionCoefficients.cc` · `InitExtConvCoeff` | CLK-06, SRC-05, GEO-02 |
 
 ### 06 실내 장파복사
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [RAD-01](cards/RAD-01.md) | 근사 view-factor 행렬 | `HeatBalanceIntRadExchange.cc` · `CalcApproximateViewFactors` | GEO-02 |
-| [ ] | [RAD-02](cards/RAD-02.md) | view-factor 보정 | `HeatBalanceIntRadExchange.cc` · `FixViewFactors` | RAD-01 |
-| [ ] | [RAD-03](cards/RAD-03.md) | ScriptF 생성 | `HeatBalanceIntRadExchange.cc` · `CalcScriptF; CalcMatrixInverse` | RAD-02 |
-| [ ] | [RAD-04](cards/RAD-04.md) | 표면 간 장파 교환 | `HeatBalanceIntRadExchange.cc` · `CalcInteriorRadExchange` | RAD-03 |
+| [x] | [RAD-01](cards/RAD-01.md) | 근사 view-factor 행렬 | `HeatBalanceIntRadExchange.cc` · `CalcApproximateViewFactors` | GEO-02 |
+| [x] | [RAD-02](cards/RAD-02.md) | view-factor 보정 | `HeatBalanceIntRadExchange.cc` · `FixViewFactors` | RAD-01 |
+| [x] | [RAD-03](cards/RAD-03.md) | ScriptF 생성 | `HeatBalanceIntRadExchange.cc` · `CalcScriptF; CalcMatrixInverse` | RAD-02 |
+| [x] | [RAD-04](cards/RAD-04.md) | 표면 간 장파 교환 | `HeatBalanceIntRadExchange.cc` · `CalcInteriorRadExchange` | RAD-03 |
 
 ### 07 표면 열수지
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [SUR-01](cards/SUR-01.md) | 표면온도·열유속 이력 초기화 | `HeatBalanceSurfaceManager.cc` · `InitThermalAndFluxHistories` | CTF-10, GEO-02 |
-| [ ] | [SUR-02](cards/SUR-02.md) | 과거 CTF 항 합산 | `HeatBalanceSurfaceManager.cc` · `InitSurfaceHeatBalance` | SUR-01 |
-| [ ] | [SUR-03](cards/SUR-03.md) | 외기 접촉면의 외표면온도 | `HeatBalanceSurfaceManager.cc` · `CalcOutsideSurfTemp` | SUR-02, SRC-04, SRC-07, SRC-08 |
-| [ ] | [SUR-04](cards/SUR-04.md) | 내표면 방정식과 단열 경계 | `HeatBalanceSurfaceManager.cc` · `CalcHeatBalanceInsideSurf2CTFOnly; CalcHeatBalanceOutsideSurf` | SUR-02, SRC-02, SRC-06, RAD-04 |
-| [ ] | [SUR-05](cards/SUR-05.md) | 실내 표면 반복·수렴 | `HeatBalanceSurfaceManager.cc` · `CalcHeatBalanceInsideSurf2CTFOnly` | SUR-03, SUR-04 |
-| [ ] | [SUR-06](cards/SUR-06.md) | 확정 열유속·CTF 이력 commit | `HeatBalanceSurfaceManager.cc` · `UpdateThermalHistories` | SUR-05 |
-| [ ] | [SUR-07](cards/SUR-07.md) | 표면 열수지 출력 | `HeatBalanceSurfaceManager.cc` · `UpdateIntermediateSurfaceHeatBalanceResults; ReportSurfaceHeatBalance` | SUR-06 |
+| [x] | [SUR-01](cards/SUR-01.md) | 표면온도·열유속 이력 초기화 | `HeatBalanceSurfaceManager.cc` · `InitThermalAndFluxHistories` | CTF-10, GEO-02 |
+| [x] | [SUR-02](cards/SUR-02.md) | 과거 CTF 항 합산 | `HeatBalanceSurfaceManager.cc` · `InitSurfaceHeatBalance` | SUR-01 |
+| [x] | [SUR-03](cards/SUR-03.md) | 외기 접촉면의 외표면온도 | `HeatBalanceSurfaceManager.cc` · `CalcOutsideSurfTemp` | SUR-02, SRC-04, SRC-07, SRC-08 |
+| [x] | [SUR-04](cards/SUR-04.md) | 내표면 방정식과 단열 경계 | `HeatBalanceSurfaceManager.cc` · `CalcHeatBalanceInsideSurf2CTFOnly; CalcHeatBalanceOutsideSurf` | SUR-02, SRC-02, SRC-06, RAD-04 |
+| [x] | [SUR-05](cards/SUR-05.md) | 실내 표면 반복·수렴 | `HeatBalanceSurfaceManager.cc` · `CalcHeatBalanceInsideSurf2CTFOnly` | SUR-03, SUR-04 |
+| [x] | [SUR-06](cards/SUR-06.md) | 확정 열유속·CTF 이력 commit | `HeatBalanceSurfaceManager.cc` · `UpdateThermalHistories` | SUR-05 |
+| [x] | [SUR-07](cards/SUR-07.md) | 표면 열수지 출력 | `HeatBalanceSurfaceManager.cc` · `UpdateIntermediateSurfaceHeatBalanceResults; ReportSurfaceHeatBalance` | SUR-06 |
 
 ### 08 존 공기
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
 | [x] | [ZON-01](cards/ZON-01.md) | 존 공기 상태 초기화 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::beginEnvironmentInit` | CON-01, GEO-03 |
-| [ ] | [ZON-02](cards/ZON-02.md) | 존 열수지 계수와 공기 열용량 | `ZoneTempPredictorCorrector.cc` · `ZoneHeatBalanceData::calcSumHAT; ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums; predictSystemLoad` | ZON-01, SUR-05, SRC-01, PSY-01 |
-| [ ] | [ZON-03](cards/ZON-03.md) | ThirdOrder·이중 설정온도 부하예측 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::predictSystemLoad; calcPredictedSystemLoad; CalcZoneAirTempSetPoints` | ZON-02, SCH-03 |
-| [ ] | [ZON-04](cards/ZON-04.md) | 공기온도 corrector | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::correctAirTemp; correctZoneAirTemps` | ZON-02 |
-| [ ] | [ZON-05](cards/ZON-05.md) | 현재 범위의 수분수지 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::correctHumRat` | ZON-01, PSY-01 |
-| [ ] | [ZON-06](cards/ZON-06.md) | zone/system 온습도 이력 관리 | `ZoneTempPredictorCorrector.cc` · `pushZoneTimestepHistory; pushSystemTimestepHistory; revertZoneTimestepHistory` | ZON-04, ZON-05 |
+| [x] | [ZON-02](cards/ZON-02.md) | 존 열수지 계수와 공기 열용량 | `ZoneTempPredictorCorrector.cc` · `ZoneHeatBalanceData::calcSumHAT; ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums; predictSystemLoad` | ZON-01, SUR-05, SRC-01, PSY-01 |
+| [x] | [ZON-03](cards/ZON-03.md) | ThirdOrder·이중 설정온도 부하예측 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::predictSystemLoad; calcPredictedSystemLoad; CalcZoneAirTempSetPoints` | ZON-02, SCH-03 |
+| [x] | [ZON-04](cards/ZON-04.md) | 공기온도 corrector | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::correctAirTemp; correctZoneAirTemps` | ZON-02 |
+| [x] | [ZON-05](cards/ZON-05.md) | 현재 범위의 수분수지 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::correctHumRat` | ZON-01, PSY-01 |
+| [x] | [ZON-06](cards/ZON-06.md) | zone/system 온습도 이력 관리 | `ZoneTempPredictorCorrector.cc` · `pushZoneTimestepHistory; pushSystemTimestepHistory; revertZoneTimestepHistory` | ZON-04, ZON-05 |
 
 ### 09 IdealLoads
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [HVAC-01](cards/HVAC-01.md) | 설비·존·노드·스케줄 결합 | `PurchasedAirManager.cc` · `GetPurchasedAir; SimPurchasedAir` | CON-01, SCH-01 |
-| [ ] | [HVAC-02](cards/HVAC-02.md) | 초기화 lifecycle·hard-size 제한 | `PurchasedAirManager.cc` · `InitPurchasedAir; SizePurchasedAir` | HVAC-01, PSY-01, SCH-03 |
-| [ ] | [HVAC-03](cards/HVAC-03.md) | 매호출 reset·가용성·운전모드 | `PurchasedAirManager.cc` · `CalcPurchAirLoads` | HVAC-02, ZON-03 |
-| [ ] | [HVAC-04](cards/HVAC-04.md) | no-OA 난방·유량/용량 제한 | `PurchasedAirManager.cc` · `CalcPurchAirLoads; CalcPurchAirMixedAir` | HVAC-03, PSY-01 |
-| [ ] | [HVAC-05](cards/HVAC-05.md) | no-OA 냉방·유량/용량 제한 | `PurchasedAirManager.cc` · `CalcPurchAirLoads; CalcPurchAirMixedAir` | HVAC-03, PSY-01, PSY-02 |
-| [ ] | [HVAC-06](cards/HVAC-06.md) | Calc 말미의 출력·노드 commit | `PurchasedAirManager.cc` · `CalcPurchAirLoads; UpdatePurchasedAir` | HVAC-04, HVAC-05 |
-| [ ] | [HVAC-07](cards/HVAC-07.md) | 냉난방 rate·연료·energy 보고 | `PurchasedAirManager.cc` · `ReportPurchasedAir` | HVAC-06, SCH-03 |
-| [ ] | [HVAC-08](cards/HVAC-08.md) | 공급공기를 존 corrector에 피드백 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums` | HVAC-06, ZON-02 |
+| [x] | [HVAC-01](cards/HVAC-01.md) | 설비·존·노드·스케줄 결합 | `PurchasedAirManager.cc` · `GetPurchasedAir; SimPurchasedAir` | CON-01, SCH-01 |
+| [x] | [HVAC-02](cards/HVAC-02.md) | 초기화 lifecycle·hard-size 제한 | `PurchasedAirManager.cc` · `InitPurchasedAir; SizePurchasedAir` | HVAC-01, PSY-01, SCH-03 |
+| [x] | [HVAC-03](cards/HVAC-03.md) | 매호출 reset·가용성·운전모드 | `PurchasedAirManager.cc` · `CalcPurchAirLoads` | HVAC-02, ZON-03 |
+| [x] | [HVAC-04](cards/HVAC-04.md) | no-OA 난방·유량/용량 제한 | `PurchasedAirManager.cc` · `CalcPurchAirLoads; CalcPurchAirMixedAir` | HVAC-03, PSY-01 |
+| [x] | [HVAC-05](cards/HVAC-05.md) | no-OA 냉방·유량/용량 제한 | `PurchasedAirManager.cc` · `CalcPurchAirLoads; CalcPurchAirMixedAir` | HVAC-03, PSY-01, PSY-02 |
+| [x] | [HVAC-06](cards/HVAC-06.md) | Calc 말미의 출력·노드 commit | `PurchasedAirManager.cc` · `CalcPurchAirLoads; UpdatePurchasedAir` | HVAC-04, HVAC-05 |
+| [x] | [HVAC-07](cards/HVAC-07.md) | 냉난방 rate·연료·energy 보고 | `PurchasedAirManager.cc` · `ReportPurchasedAir` | HVAC-06, SCH-03 |
+| [x] | [HVAC-08](cards/HVAC-08.md) | 공급공기를 존 corrector에 피드백 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums` | HVAC-06, ZON-02 |
 
 ### 10 실행·검증
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [SYS-01](cards/SYS-01.md) | 표면·공기·HVAC·시간간격 연결 | `HVACManager.cc` · `ManageHVAC; SimHVAC; SimSelectedEquipment` | SUR-05, ZON-06; B: HVAC-08 |
-| [ ] | [SYS-02](cards/SYS-02.md) | warmup 최고/최저온도·냉난방부하 수렴 | `HeatBalanceManager.cc` · `RecKeepHeatBalance; CheckWarmupConvergence` | SYS-01 |
-| [ ] | [SYS-03](cards/SYS-03.md) | warmup→RunPeriod 상태 인계 | `HeatBalanceManager.cc` · `ManageHeatBalance; InitHeatBalance; CheckWarmupConvergence` | SYS-02, CLK-03, SCH-03, SUR-06 |
-| [ ] | [SYS-04](cards/SYS-04.md) | 요청 출력과 meter의 수치 집계 | `OutputProcessor.cc` · `UpdateDataandReport` | SUR-07, SYS-01; B: HVAC-07 |
-| [ ] | [SYS-05](cards/SYS-05.md) | 비공조 1존 수직 통합시험 | `HeatBalanceSurfaceManager.cc` · `ManageSurfaceHeatBalance` | SYS-03, SYS-04, CTF-10 |
-| [ ] | [SYS-06](cards/SYS-06.md) | 직결 IdealLoads 수직 통합시험 | `PurchasedAirManager.cc` · `SimPurchasedAir` | SYS-05, HVAC-07, HVAC-08 |
+| [x] | [SYS-01](cards/SYS-01.md) | 표면·공기·HVAC·시간간격 연결 | `HVACManager.cc` · `ManageHVAC; SimHVAC; SimSelectedEquipment` | SUR-05, ZON-06; B: HVAC-08 |
+| [x] | [SYS-02](cards/SYS-02.md) | warmup 최고/최저온도·냉난방부하 수렴 | `HeatBalanceManager.cc` · `RecKeepHeatBalance; CheckWarmupConvergence` | SYS-01 |
+| [x] | [SYS-03](cards/SYS-03.md) | warmup→RunPeriod 상태 인계 | `HeatBalanceManager.cc` · `ManageHeatBalance; InitHeatBalance; CheckWarmupConvergence` | SYS-02, CLK-03, SCH-03, SUR-06 |
+| [x] | [SYS-04](cards/SYS-04.md) | 요청 출력과 meter의 수치 집계 | `OutputProcessor.cc` · `UpdateDataandReport` | SUR-07, SYS-01; B: HVAC-07 |
+| [x] | [SYS-05](cards/SYS-05.md) | 비공조 1존 수직 통합시험 | `HeatBalanceSurfaceManager.cc` · `ManageSurfaceHeatBalance` | SYS-03, SYS-04, CTF-10 |
+| [x] | [SYS-06](cards/SYS-06.md) | 직결 IdealLoads 수직 통합시험 | `PurchasedAirManager.cc` · `SimPurchasedAir` | SYS-05, HVAC-07, HVAC-08 |
 
 ## 현재 진행 상태
 
-최신 구현·검증 결과와 남은 작업은 [작업계획 안내](README.md#현재-진행-상태)에 모았습니다.
-64개 카드의 완료 여부는 위 표와 `plan.json`의 네 gate를 기준으로 판단합니다.
-[선택 표면 단위 56번](evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)은 SUR03 전체 선택 함수 24회와 SUR05 원문 종료 분기 30회의 결과입니다. 실제 Source 반복·상태 인계와 최종 15개 실행 결과를 대신하지 않으며, 이 기록으로 위 카드 gate를 바꾸지 않습니다.
-과거 단계별 실행 기록은 `evidence/`와 Git 이력에 보존하며, 과거 테스트 개수를 현재 검증 결과로 사용하지 않습니다.
+카드별 네 gate와 해당 실제 근거는 [작업계획](README.md#현재-진행-상태) 및 [최종 판정](evidence/SRC-06-final-current-source-validation-60/summary.json)을 참조합니다. 위64행은 개별 plan 판정 후 기존 `sync_plan_views.py`로만 갱신합니다. 단위·보고 값·자체 출력·부수 출력의 검증 범위를 합치지 않습니다. 모든 과거 실패와 unavailable 상태는 기존 증거 및 Git에 유지합니다.

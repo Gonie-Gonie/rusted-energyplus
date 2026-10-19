@@ -56,20 +56,7 @@ SUR-06에서 실제 NumHistories 소비; 단위 W와 상대오차 혼용 금지
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## Selected 1D retry scope (historical pre-execution amendment)
+## 보존한 상세 범위·정밀도 계약
 
 Construction.cc638-981 preserves once-only allocations/Iden construction followed by each actual repeated1D assignment and exponential884 -> inverse887 -> Gamma890 -> finalCoefficients894 -> caller903-981. The initial619 timestep/history remain distinct from caller TimeStepZone; Nodes/dx are not recalculated during retry. One original assembly storage owner is consumed and retained; each Gamma invocation is fresh.
 
@@ -79,22 +66,21 @@ Sum owners exist only after the actual919-930 branch. The >18 term branch skips 
 
 LoopExit is distinct from whole calculateTransferFunction return. Severe break may continue into public SI stores1024-1077; public19 capacity, SI conversion/stores, reverse/2D/internal-source branches and SUR handoff remain outside this selected retry proposal. No fatal, severe, partial, uninvoked or unavailable branch receives PASS. Actual Native diagnostics remain global occupied message records; Rust selected call intents are not substituted for that backend.
 
-Same literal39 unit models/42 whole calls and fixed15 production models/195 loader phases/45 guards are inherited without new expected outcomes. Current09 amendment/check authority must be real and separate from immutable historical_prior_08_authority, including nested historical07 ancestry. This draft changes no canonical gate and claims no numerical, integration, production or complete-card PASS. Source/full peer, actual amendment/check, fresh freeze, protected build/derive/PE and structural Original review remain Root actions.
+## 최종 네 gate 근거
 
-## Actual selected retry-visit comparison
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-Same frozen inputs and strict zero profiles: unit numeric945014/discrete3840604, fixed15 loader numeric7350/discrete40251; all mismatch0. Eight primary retry profiles and inherited assembly/method/Gamma/private-final handoffs have max absolute error/RMSE0. All actual selected visit owners are paired by real call/attempt identity; partial, absent and unavailable observations receive no PASS.
+638–981 real repeated 1D driver/all reached visits. Pure child kernels retained; wrappers now propagate actual diagnostic failures before later calls/stores. This is semantic carry, not identical old wrapper bytes or full error-backend certification.
 
-Actual Clippy/fmt checks0; focused162 and workspace4782 tests passed with0 failed. All candidate/quality/comparison recorders bind Sourcef280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced. The genuine first Clippy missing-docs and second macro recursion-limit failures are preserved. Corrections add eight field descriptions and a single unit-observer crate macro expansion limit; no math or input changes. Full actual scientific bytes, sources and commands are retained in evidence/CTF-09-unit/{manifest,summary}.json.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Only the selected unit gate passes. Whole Native public SI19 stores, reports/final fatal backend, SUR/cache handoff and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.
+직접 단위 근거: [CTF-09-unit](../evidence/CTF-09-unit/summary.json).
 
-## Actual fixed six ordinary CLI executions
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final09 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-09-production-cli/{manifest,summary}.json.
-
-## Actual exact-pair Original retirement
-
-The two new09 linked debug Originals were removed through the reviewed exact LiteralPath mechanism after the committed comparison/quality/CLI proof. Actual removed bytes2607188286; both paths are absent. Prior44 protected artifacts, both09 runtime derivatives and631 core objects remain unchanged;12 absent registered paths and all prior04/06/07/08 Original absences remain unchanged. No registry/history rewrite or scientific rerun. Evidence: evidence/CTF-09-retention/{manifest,summary}.json. Integration/production/full-card gates remain pending.
-
-Completed07/08/09 ordinary CLI traces (18 files) were transparently compressed with NTFS LZX. Their paths, lengths and SHA256 bytes are unchanged before/after; no trace was deleted or moved. The actual operation and command receipt are included in this selected retention archive.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

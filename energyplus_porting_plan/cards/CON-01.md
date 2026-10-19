@@ -83,32 +83,21 @@ scope.json, 입력 해시, 활성/비활성 분기표, typed state 계약, 출�
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋: `33e7806de97bf84cdbf17284b397dac1ed8d75ad`
-시험 명령: `trace_con01.py`, `check_con01_admission.py`; 정확한 argv/커밋은 증거 기록 참조.
-증거 경로: `../evidence/CON-01/`
-최대오차/RMSE/상태 불일치: 스케줄 max absolute error 0; 설정/시간/바인딩 불일치 0; 열물리 RMSE는 미측정.
-추가 검토할 helper: 위임된 GEO/CLK/SCH/PSY/CTF/SRC/RAD/SUR/ZON/HVAC/SYS 수치 본문.
+Input/algorithm/state admission contract, not a physics arithmetic unit. FixedA3/B12 and45 input/weather/metadata hashes remain unchanged.
 
-## 2026-10-07 종료 검토
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-입력·설정 admission 경계의 A/B 네 gate를 종료한다.
-구현/실행 커밋: `33e7806de97bf84cdbf17284b397dac1ed8d75ad`; Rust 빌드 원본: `bbd92dad27cb81bbd593835639cfdf510af677fe`.
-증거: `../evidence/CON-01/comparison-report.json`, `source-review.md`,
-`checks/commands.json`, `evidence-manifest.json`.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-- Rust scope 9개, CLI 인자 9개, compiler 472개 통과; clippy/fmt 통과.
-- EP/Rust 설정 비교 7건×96 accepted zone steps, 설정/스케줄/시간 불일치 0.
-- 고정 생산 IDF 15개 실제 CLI admission 통과: 1,593 checks, 743,904 schedule samples, max absolute error 0.
-- latent/OA/Autosize 위반 3건은 정확히 exit 4로 사전 차단.
-- 추가 검토: 각 후속 카드의 수치/변경상태 helper.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-Rust 열물리 실행은 이 카드에서 검증하지 않았다.
-EP 72H/annual은 not_run이며, 준비된 입력을 실행 완료로 집계하지 않는다.
-CTF/표면/존/HVAC/adaptive timestep/warmup/연간 수치 gate는 각 후속 카드에 남아 있다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

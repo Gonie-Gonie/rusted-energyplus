@@ -56,20 +56,7 @@ CTF-05~08에 오차·차원·단위 그대로 전달
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## Source amendment before CTF-04 outputs (2026-10-11)
+## 보존한 상세 범위·정밀도 계약
 
 Pinned Construction.cc638-648 allocates actual AMat/IdenMatrix and produces identity;661-728 assembles selected no-source1D AMat/B3/C2/D2. A separate passive callback after728 copies every actual attempt. Original whole-method arithmetic/branches and old four checkpoints/counts remain unchanged. Root FULL and other-author FULL source reviews accepted the passive transport, whole Native helpers, input writer, PE reader, OriginalDataQA, pure matrix/identity body, two-owner cache ingress and candidate observers. Unchanged accepted predecessor bodies are authenticated by exact before/diff correspondence.
 
@@ -77,36 +64,21 @@ Numerical selection is first actual ordinal1 only, with genuine initial619 dt/hi
 
 Seven separate AMat/IdenMatrix/BMat/CMat/DMat/assembly_CTFTimeStep/caller_TimeStepZone profiles are frozen at atol=rtol=0 with exact class, actual shape and signedzero. Initial3 and preprocessing18 remain unchanged separate handoffs. Unit39/42 and fixed15/195 reuse only original literal/member/IDF input rows; production construction obligations remain dynamic. Actual source-return/fatal/exception/OS outcomes remain context and never imply missing values or PASS.
 
-New CTF04 linked originals carry prospective-debug-original intent from the start: actual identity/strict PE and both files verified before current helper execution, retained through PE/current execution, any future removal only via separately Root-authorized actual existing retention lifecycle record. Earlier live refs remain literal; no deletion occurs here. Scope passed; unit/integration/production and dependency completion remain pending. Actual CTF04 configure/compile/helper, candidate application and comparisons have not run.
+## 최종 네 gate 근거
 
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-## Actual Original data and unchanged Rust baseline
+638–648 allocate/identity and661–728 selected first assembly; current same-storage extraction/reassignment whole matches executed09. First04 and all09 visit policies remain separate.
 
-Both genuine CTF04 Native helpers and independent Original DataQA completed with actual exit0 before fresh unchanged CTF03 Cargo/production execution. Unit39/42 retained41 assembly visits: first25 selected, later16 unpaired/noPASS, no matrix omissions/failures. Fixed15 production/195 loader phases/21 CTF calls retained15 selected first visits, no omissions/failures. Actual preservation kept36 protected artifacts,631 present core objects,12 registered absent objects and all679 old compile rows (actual685); both independent PE reviews passed. Originals remain retained under the prospective04 intent.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-The fresh unchanged Rust baseline returned on all15 same authentic converted input-only models and exposed21 existing CTF03 owners. Exact nine new04 source paths are absent from disk/captured source snapshot. The first-assembly gap is structural unavailability; numerical mismatch count is null. Two unpublished derived summary field mistakes were corrected against actual producer manifests/owner arrays, with both earlier summaries retained; actual inputs/build/execution/results were unchanged. Reviewed candidate remains unapplied.
+직접 단위 근거: [CTF-04-unit](../evidence/CTF-04-unit/summary.json).
 
-Evidence: `evidence/CTF-04-original-baseline/summary.json` and selected content-addressed manifest. Binary/map payloads and full transitive replay closure are not included. No numerical or remaining-gate PASS is claimed.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-
-## Actual selected first assembly comparisons
-
-Reviewed14 Rust source files applied after genuine OriginalQA and unchanged baseline; Rustfmt2024 only, no post-format arithmetic amendments. Fresh actual Cargo build followed all quality checks. Unit25 first owners:39,475 primary numeric and90,388 discrete comparisons, zero mismatches. Fixed15 initialized loader first owners:885 primary numeric and5,401 discrete comparisons, zero mismatches. All7 separate frozen profiles have max absolute error0/RMSE0/nonfinite errors0. Shape, class, signed-zero, integer/ID/order/caller and first-attempt stamps are exact.
-
-Inherited preprocessing/initial handoff copies remain separate metrics. Native unit later16 attempts remain retained unpaired/noPASS. Unavailable contexts54 unit/18 production were not counted as PASS. Focused13 and full workspace4,679 tests passed (0failed/0ignored;39 workspace binaries); Clippy and fmt passed. Both genuine candidate executions and strict comparisons ended0 with unchanged captured source bytes. Evidence: `evidence/CTF-04-unit/summary.json`.
-
-Only the selected first-assembly unit gate is passed. Fixed6 CLI after this application, retry/whole coefficient handoff, integration/production gates and predecessor completion remain pending.
-
-
-## Actual fixed-six production CLI after selected assembly port
-
-Fresh actual ep_cli/eplus-rs Cargo build followed selected04 comparisons and quality. A24/A72/B-NOLIMIT/B-FLOW/B-CAPACITY/B-BOTH all ended0 with the same captured source bytes and Cargo binary. Compatibility/partial-deny/full-trace flags, no hours override/oracle comparison, all45 input guards and source-order matches are verified. Fixture-demand-injection is actual null for both A runs and false for four B runs; null is not reinterpreted as a boolean observation.
-
-Evidence: `evidence/CTF-04-production-cli/summary.json`. This verifies actual CLI execution after this application; it does not certify whole CTF coefficient/retry handoff or complete integration/production gates. The earlier selected-unit summary retains its historical pre-CLI flag literally.
-
-
-## Actual two-original retention cleanup
-
-After selected comparisons, all four existing quality checks and actual fixed-six CLI validation, both prospectively declared04 debug originals were removed by separate exact LiteralPath actions: actual2,599,837,555 bytes. Both removal commands and the outer recorder ended0; all36 legacy protected artifacts, both04 derived helpers,631 present core objects and12 registered absent objects were preserved. Earlier Original refs and launchers remain literal historical records.
-
-Evidence: `evidence/CTF-04-retention/summary.json`, with actual pair tombstones and before/after preservation metadata. No registry rewrite, full debug copy, scientific rerun, remaining-gate PASS or debug recovery claim is made. This later actual record supersedes the earlier live-retention state only for these exact two04 originals.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

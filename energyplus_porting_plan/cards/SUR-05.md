@@ -53,17 +53,21 @@ EP와 iteration count·첫 2회 표면 상태 및 종료상태 비교
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-## 현재 구현과 검증
+30 mechanically literal Original9236–9272 suffix evaluations/3 lifetimes cover500/501,converged,warmup/sizing and real diagnostics; zero full inside calls in that unit. Normal full actual2025 solver lifetimes/first2/exit are separate P3. No natural501 reach claim.
 
-`ordinary_surface_initialization/inside_driver.rs`는 실제 반복의 수렴 종료부를 공유 메서드로 호출합니다. 동일한 오류 소유자가 시각 진단, 13필드 recurring 행과 실제 카운터를 갱신합니다. 수렴 허용치·최소 반복·500회 한계와 진단 순서는 원본을 유지합니다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-비수렴 단위는 원본 종료부를 바이트 단위로 추출한 지정 분기 단위입니다. 3개 지속 수명에서 30회 평가하며 500/501 경계, warmup·sizing 상태, 반복 진단과 실제 저장 상태를 Source와 비교했습니다. 전체 실내 반복 함수를 호출한 단위로 계산하지 않습니다. Source의 계속/중단 반환 분류 중 원본 wrapper에 반환값이 없는 부분은 원문 제어 흐름에서 도출한 조건으로 구분합니다.
+직접 단위 근거: [최종증거팩: Root-SUR03-SUR05-actual-review-56 a3210cec2e4a](../evidence/SRC-06-final-current-source-validation-60/summary.json).
 
-정상 반복의 iteration count·첫 두 상태·종료 상태와 30회마다의 대류 갱신·즉시 소비 순서는 같은 실제 A24 실행의 수동 관측으로 연결합니다. 수집기는 기본 비활성이고 계산·입력·기대값을 변경하지 않습니다. 이 연결 결과와 분기 단위 결과의 범위는 [선택 표면 단위 검증](../evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)에서 구분합니다. 기존 카드 체크와 게이트는 전체 64개 카드의 최종 판정에서 정리합니다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

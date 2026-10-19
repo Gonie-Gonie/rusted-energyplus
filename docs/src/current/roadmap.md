@@ -7,53 +7,55 @@ last_reviewed: 2026-06-23
 
 # Roadmap
 
-The roadmap is phase-led. Historical milestones remain in
-`specs/milestones.toml` and generated docs, but new work should be planned
-around source-order porting stages rather than version-number accumulation.
+Work is organized by explicit source/owner/branch contracts. Historical version
+milestones remain in `specs/milestones.toml` and generated documentation; an
+existing file, source map or successful demo is not a completion claim.
 
-## P0: Current-State Judgment Correction
+## Completed Fixed CON-01 Port
 
-Treat existing surfaces as implementation to audit and harden, not as completed
-checklist items. `ep_run`, support assessment, launcher scripts, PDF/evidence
-scripts, and IdealLoads branch candidates already exist, so the next work is
-classification, source-order alignment, capability integration, and evidence
-hardening.
+The [64-card plan](../../../energyplus_porting_plan/README.md) covers the fixed opaque one-zone
+A and direct no-OA sensible hard-sized IdealLoads B inputs. The selected Source
+path now includes the real CTF, Surface/air, PurchasedAir, report and normal
+completion producers. Retained unit comparisons remain tied to their actual
+Source and inputs; unchanged units are not described as rerun on every later
+binary.
 
-## Phase 1: Source-Order Runtime Reset
+The final four-gate decisions bind the same-current-Source
+fifteen normal runs, Surface cadence/first-two/exit states, direct warmup
+handoffs, exact named input outcomes, output round trips and separately scoped
+ancillary differences in the [final validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json).
+The current finite results are **15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0** and
+**A 54/54, B 64/64**. These are explicit per-card
+finite decisions, not general EnergyPlus equivalence. Preserve every failed attempt, unavailable state and excluded
+branch; do not relax a numerical policy to close a card.
 
-Tighten the contract, docs, specs, and runtime boundaries. Split diagnostic
-probes away from compatibility paths, make `ExecutionPlan` an actual runtime
-barrier, and keep unsupported features typed and explicit.
+## Keep Promotion Boundaries Separate
 
-## Phase 2: 1ZoneUncontrolled Clean Conformance
+A completed finite card does not promote a conformance manifest, make a routine
+`family_gated`/`complete`, or establish full-domain readiness. Declared-variable
+release claims continue to require their own reports and blocking gates.
+`specs/algorithm_ledger.toml`, `specs/project_contract.toml`, the capability
+registry and generated coverage remain authoritative for those broader claims.
 
-Port the heat-balance path around EnergyPlus routines: `ManageHeatBalance`,
-`ManageSurfaceHeatBalance`, `ManageAirHeatBalance`,
-`ZoneTempPredictorCorrector`, and the CTF history handoff. Promote only
-declared official `1ZoneUncontrolled` variables with reports and blocking
-gates.
+Keep `ep_run` as the CLI-independent orchestration layer, explicit support/run
+states and unsupported-feature boundaries, and source-order barriers in
+`ExecutionPlan`. Diagnostic probes and fixture-demand adapters stay distinct
+from the normal compatible Source route.
 
-## Phase 3: IdealLoads Clean Conformance
+## Expand Only from a New Explicit Contract
 
-Port `ZoneEquipmentManager` dispatch and `PurchasedAirManager` source-order
-paths. Start with no-OA/no-limit sensible, finite limits, and
-ConstantSensibleHeatRatio before expanding humidity, outdoor-air, economizer,
-heat-recovery, and meter branches.
+Broader humidity/OA/economizer/heat-recovery, sizing, mixed HVAC, Plant, EMS,
+AFN, fenestration and general ExampleFiles require their own active object
+graphs, state ownership, source ranges, support rules and evidence gates.
+An ExampleFile must map to supported capabilities or produce a clean blocked
+or explicitly diagnostic partial report. Exploratory unit inputs do not widen
+the fixed production domain.
 
-## Phase 4: Arbitrary IDF Run Framework
+## Keep Validation Proportional to the Change
 
-Harden the existing `ep_run` crate as the only CLI-independent orchestration
-layer. Keep `ep_cli` as command dispatch, connect `SupportAssessment` to the
-capability registry, add branch-specific runtime classes, and verify output
-layout, run states, exit codes, oracle baseline, and oracle compare.
-
-## Phase 5: ExampleFiles Coverage Expansion
-
-Add ExampleFiles only when their active object graph maps to supported
-capabilities or produces a clean blocked/partial support report.
-
-## Phase 6: HVAC/Plant Expansion
-
-Expand beyond IdealLoads and heat balance only after source maps, algorithm
-ledger entries, support rules, runtime ownership, and evidence gates exist for
-the target subsystem.
+Use the existing focused cohort or ordinary run that reaches changed code.
+Preserve accepted unchanged-body/readset evidence instead of repeating old
+large suites, annual runs or Original captures. Run relevant quality checks
+once at a code milestone; documentation adoption uses the existing plan/view
+checks. A genuinely missing input/state observation warrants a bounded new
+capture, not a new generic parent hierarchy or an invented expected value.

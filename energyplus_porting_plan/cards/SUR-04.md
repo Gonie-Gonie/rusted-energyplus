@@ -74,20 +74,21 @@ SUR-05가 호출하는 반복 kernel로 연결
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+Selected inside numerator/denominator/adiabatic/IterDamp and outside adiabatic boundary expressions are directly paired in actual current P3 first2 pre21/flags3/postT/Tmp and final states. This is real same-input kernel/caller evidence, not a new standalone or all-transitive whole-parent unit.
 
-## Applied Source and regression verification
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Actual Source `c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7` has3,915 files. fmt/Clippy passed; focused316 and workspace4,940 tests passed with zero failed/ignored. Four authored SUR04 IEEE regressions and four real-owner capture tests do not substitute for Native endpoints. Ordinary execution, complete persistent boundary comparison and pending dependency/gate certification remain open.
-Evidence: [summary](../evidence/CTF-10-ordinary-history-capture-source/summary.json) (`b88c5cebab7f153b402ae2320a043bcabd78426d5b0b3ed8669c6208f991a70c`).
+직접 단위 근거: [최종증거팩: final-A24-Surface-readback-Root-P7-01 2682ccc47d60](../evidence/SRC-06-final-current-source-validation-60/summary.json).
+
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

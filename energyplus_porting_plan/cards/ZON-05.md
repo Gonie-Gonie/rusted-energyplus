@@ -55,19 +55,21 @@ ZON-02의 cp/rho 및 HVAC 공급노드 W와 일관성
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 검증 상태
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 고정 입력의 직접 수분수지 단위 비교 통과
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-원본 correctHumRat 4433–4619행 전체와 직접 helper를 확인했다. 확정 범위는 zone-only·완전혼합·ThirdOrder·NoAFN·no-OA·무잠열원이다. 유입 노드 순서, 정수 배수, 밀도·증발열·수분 용량의 계산 순서, 기존 4칸 working 이력, 하한 후 포화 비교, 독립적인 양수 시스템 노드 W/H 기록을 보존한다. 검증된 PSY-01/02 계산과 같은 지속 상태를 재사용한다. 저장 W에 별도 하한이나 대체 기본값을 넣지 않는다.
+Full correctHumRat4433–4619 selected zone/Mixing/ThirdOrder/noAFN/noOA; lower/saturation/positiveNodeW/H. Current W/RH/weighted means/history are actual parent/multiplier/P1 connections, not inferred copies.
 
-실제 출력 전에 입력 21개·호출 43개와 변수별 허용오차를 고정했다. 정상·온도/압력/용량/dt 변화·건조/습윤 공급·0유량·유입 순서·정수 배수·0 부근·반복 호출을 같은 입력으로 실행했다. 원본과 Rust 각각 43회 모두 반환했다. 수치 208개·이산 항목 21,573개에서 불일치 0, 네 수치 프로필의 최대 절대오차와 RMSE 모두 0이다. 원본 내부 지역 변수·guard 선택은 직접 관찰하지 않았으며, 미관찰·중단·결측을 통과로 계산하지 않는다. 다중 유입 순서 시험은 단위 기구 시험이며 생산 입력 범위를 확장하지 않는다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-포맷·전체 Clippy 통과, 열수지 테스트 211개 및 전체 workspace 테스트 4,816개 통과. 비교기 계약 테스트 7개도 통과했다. 품질·Rust 실행은 실제 SourceSnapshot `ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193`에 결합된다. 명령·결과·소스 차이는 `evidence/ZON-05-unit/manifest.json`과 `summary.json`에 보존했다.
+직접 단위 근거: [SRC-06-canonical-predictor-corrector-native-cohort-31-cohort](../evidence/SRC-06-canonical-predictor-corrector-native-cohort-31-cohort/summary.json), [SRC-06-canonical-warmup-multiplier-exterior-55](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), [ZON-05-unit](../evidence/ZON-05-unit/summary.json).
 
-남은 작업은 전체 4칸 상태의 실제 지속 소유권, PurchasedAir 공급/피드백 노드 W/H 전달, 온도 후 습도 보정 순서, working 이력 선택, 현재 W/RH·가중 평균 기록, 조건부 zone/system 이력 push와 rollback이다. 기존 고정 경로의 system 이력 선택 및 무조건 DS push는 원본의 non-shortened zone-step 순서와 다르다. 실제 일반 실행 호출자를 관측한 뒤 연결한다. 고정 15개 입력에는 수분 용량 override 객체가 없으므로 원본의 명시적인 기본값 1.0 생산자를 사용할 수 있다. 더 넓은 입력의 override와 음수 밀도 진단 백엔드 동등성은 미검증이다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-증거: `evidence/ZON-05-original-baseline/summary.json`, `evidence/ZON-05-unit/summary.json`. 연결·생산 gate와 카드 전체는 미완료다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

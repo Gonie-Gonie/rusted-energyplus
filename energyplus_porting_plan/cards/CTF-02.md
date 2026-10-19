@@ -56,31 +56,21 @@ Six distinct public coefficient/dt/U profiles atol=rtol=0, exact class/shape/sig
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:
-시험 명령:
-증거 경로:
-최대오차/RMSE/상태 불일치:
-추가 검토할 helper:
+985–1103 all-resistive/public storage; six exact profiles/all19. Whole arithmetic module raw-identical to executed02. Massive/reverse/retry effects are separate.
 
-## Source amendment before CTF-02 outputs (2026-10-10)
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Root reviewed the full held Rust proposal and Native unit/production helpers; other-author full source peers accepted them. Original public arrays are copied only after the unchanged whole method returns. Selection is the literal source predicate from captured operands, not an invented branch flag. Private s0/e/s are neither read nor reconstructed. Unit39/42 and production15/195 are inherited input-only rows; production construction calls remain dynamic. Fresh CTF-02 coefficient policies must be frozen before its first helper execution. Actual Native data QA, existing Rust baseline, candidate comparisons, SUR-04/SUR-07 and production gates remain pending. Historical CTF-01 outputs are not CTF-02 coefficient evidence.
+직접 단위 근거: [CTF-02-unit](../evidence/CTF-02-unit/summary.json).
 
-## Actual Original and unchanged Rust baseline (2026-10-10)
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-Genuine Native unit39/42 and production15/195 completed with actual process exit0. Exact PE/build review and actual OriginalDataQA passed before a fresh unchanged Rust build/run. Unit selected8/public42 and production selected6/public21 are factual observations; all other public records remain unpaired context. Existing Rust initialized all15 models and21 CTF-01 construction owners, with no CTF-02 public owner/API in current source. The actual legacy surface storage is retained as context; no CTF-02 numeric comparison is claimed. Evidence: `energyplus_porting_plan/evidence/CTF-02-original-baseline/summary.json`. Candidate implementation, comparisons, integration and production gates remain pending.
-
-## Actual selected candidate comparisons and production CLI (2026-10-10)
-
-The real Rust preprocessing/assigned English conductance now generates selected all-resistive construction owners and ordinary surface copies. Actual unit39/42 selected8:624 numeric and7086 discrete comparisons, zero mismatch. Actual fixed15 loader lane selected6/public21:468 numeric and3045 discrete comparisons, zero mismatch. All six frozen coefficient/dt/U metrics have maximum absolute error and RMSE0; all19 slots and signed zero/class/shape remain exact. Unselected/unreached context is not PASS. Full workspace all-targets4650/0 failures/0 ignored, Clippy and fmt passed. The fresh-build production CLI ran all six cases with exit0, no oracle comparison or hours override, source-order matches and unchanged45 guards. These CLI runs do not certify numerical whole-building equivalence. Evidence: `energyplus_porting_plan/evidence/CTF-02-unit/summary.json`. Unit gate passed; genuine SUR04/SUR07 Native phase/caller proof, dependent integration and production gates remain pending.
-
-## Actual Rust surface regressions (2026-10-10)
-
-Three targeted tests passed with zero failures/ignored tests; runtime Clippy and workspace fmt also passed. They exercise ordinary empty-override initialization with actual generated coefficients, timestep/fresh-history state, boundary/damping dependence, report signs, retained inside-phase outside operand and history commit. No Native coefficient answer is supplied. Evidence: `energyplus_porting_plan/evidence/CTF-02-surface-regressions/summary.json`. These are Rust regressions; genuine Native surface-HB initialization/caller and per-iteration/report/history equivalence remain pending, so integration and production gates remain pending.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

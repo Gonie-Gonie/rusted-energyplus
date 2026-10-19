@@ -56,64 +56,21 @@ SCH-03의 조회 날짜와 CLK-03의 EPW record index 분리 검증
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋: `fe57a35751652c7fe7734a5b88ae475c36fc7b3b` (고정 Rust producer); C++ wrapper의 namespace 보완은 `e8b7d578`.
-시험 명령: `evidence/CLK-01/source-review.md`의 원본-first 단위 명령과 `comparison-report.json`이 연결하는 일반 CLI Full/Summary 명령·receipt.
-증거 경로: `evidence/CLK-01/{source-reference,comparison-report,independent-review}.json`; raw는 `.runtime/porting/CLK-01/`.
-최대오차/RMSE/상태 불일치: 대응 helper 1,912개 모두 0/0; 단위 71,358 checks, 실제 zone 호출 36,960회의 불일치·누락 모두 0.
-추가 검토할 helper: 원본-only mutable helper 1,168개는 Rust helper 통과로 계산하지 않음. Today/Tomorrow와 reset/handoff는 CLK-03, 보고 mutation은 SYS-04에서 검증.
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-## 착수 시 확인한 범위
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-현재 작업은 CON-01의 고정된 15개 입력과 2013년 단일 ordinary weather
-RunPeriod에 한정한다. 입력의 weather holiday/DST 사용 정책은 Yes이지만,
-선정 EPW에 활성 holiday/DST 정의가 없어 실제 override는 없다. 윤년·세기년
-helper 경계시험은 단위시험이며 생산 입력의 연도 범위를 확장하지 않는다.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-검증 대상은 계산에 전달되는 civil 날짜·요일·day type, Gregorian/weather/
-always-leap schedule ordinal, hour와 canonical zone interval이다. Gregorian
-year와 EPW의 TMY record year를 구분한다. A의 원본 weather 환경 번호 3과
-B의 번호 1은 비활성 DesignDay 선언 수가 다른 결과이며, Rust가 준비한
-환경 index의 의미와 별도로 검증한다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-원본 `SimulationManager.cc:532`의 Weather 갱신 뒤, `HeatBalanceManager.cc:190`
-이후의 `begin_zone_timestep_before_init_heat_balance` 공개 callback에서 현재
-달력을 관찰한다. `currentTime`과 `minutes`는 이 시점에도 이전 system 상태를
-반영할 수 있으므로 canonical zone interval로 취급하지 않는다. 보고 후 API
-필드도 별도 보존한다. 원본 연간 실행의 마지막 12월 31일 보고에서는
-CalendarYear가 2014로 갱신된다. 이 mutation과 보고 serializer는 SYS-04의
-범위이며, 계산 전 현재 날짜의 2013년과 섞어서 비교하지 않는다.
-
-전체 source/helper/state 계약은 `contracts/CLK-01-source.json`, 고정 입력과
-helper recipe는 `contracts/CLK-01-cases.json`, 정확 일치 정책은
-`contracts/CLK-01-tolerances.json`에 기록했다. GetRunPeriodData 외에
-SetupEnvironmentTypes, Julian 변환과 weekday 계산, General::OrdinalDay,
-실제 weather/callback 호출 시점을 추가로 검토했다.
-
-Rust의 기존 calendar API와 실제 physical zone-loop hook을 재사용한다.
-관찰 코드는 날짜 계산이나 시뮬레이션 상태를 갱신하지 않는다. prepared
-calendar row와 실제 zone invocation을 구분하고, 기본 Summary 실행에서는
-clock artifact를 생성하지 않는다. 원본의 monthly weekday 배열은 C++의
-실제 before/after 상태와 Rust가 소비하는 월별 projection을 대조하며, 원본
-전역 mutable 배열 전체를 복제했다고 주장하지 않는다.
-
-원본 공개 API의 15개 실행은 모두 종료 코드 0이며, 각 입력에서 pre-report와
-post-report callback이 24H 96회, 72H 288회, annual 35,040회씩 순서대로
-기록되었다. raw 증거는 `.runtime/porting/CLK-01/native-api-first/`에 보존한다.
-공개 API 관찰에 이어 genuine-state C++ 단위시험과 Rust 대응 비교를 완료했다.
-15개 준비 달력의 1,845일·180개 monthly-array projection과 12개 연간 month
-start가 정확히 일치한다. 실제 실행은 A 24H/72H/annual 및 B의 4가지 limit
-각각 24H/72H인 11개 사례이며, Full/Summary 22회에서 총 36,960회 zone 호출을
-원본 calendar/native callback/ESO interval과 비교해 불일치와 누락이 없었다.
-전체 series·선정 출력 CSV·meter CSV가 Full/Summary 간 일치하고, 일반 Summary는
-clock/PSY observer artifact를 만들지 않았다. 독립 해시·상태 검토도 통과했다.
-
-연간 준비 row는 `physics_executed=false`이다. B의 연간 물리 실행, Tomorrow
-handoff/EPW cursor, DatesShouldBeReset, warmup 및 adaptive system 호출 순서는
-이 카드의 준비 row로 인증하지 않는다. CLK-03 및 SYS 카드에서 별도로 검증한다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

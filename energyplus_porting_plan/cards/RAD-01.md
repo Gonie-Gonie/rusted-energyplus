@@ -55,19 +55,21 @@ RAD-02의 행렬 인덱스와 행/열 의미 보존
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 검증 상태
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-원본 전체 함수 1406–1519행과 선언 109–116행을 기준으로, 명시한 유한 불투명 geometry 21개를 검증했다. 면적 누적 순서, 엄격한 방위·경사 경계, 바닥 간 제외, 양수 면적의 나눗셈, F(j,i) 축 의미와 경고 후 계속 진행을 보존한다. ZoneArea와 F는 각각 atol=0, rtol=0이며 값 분류·배열 모양·부호 있는 0을 비교한다. 입력 비트·식별자·순서도 정확히 비교한다.
+Selected full approximate view-factor21 geometries and actual geometry→F ownership. No whole radiation-parent or unobserved diagnostic text certification.
 
-원본과 Rust가 모두 21회 반환했다. 수치 378개와 이산 항목 2115개에서 불일치 0, 최대 절대오차와 RMSE 0이다. 경고 11개의 식별자·개수·순서도 일치했다. 미관찰 항목을 통과로 계산하지 않았다. Native 전역 진단 백엔드의 문구는 별도 미검증 항목이다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-fmt·Clippy 통과, 열수지 203개 및 workspace 4808개 테스트 통과. 고정한 일반 CLI 6종도 모두 exit0과 실제 source-order 검사를 통과했다. 입력·날씨·메타데이터 45개 해시는 유지됐다.
+직접 단위 근거: [SRC-06-canonical-purchased-air-surface-53](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json), [RAD-01-unit](../evidence/RAD-01-unit/summary.json), [RAD-01-unit-gate](../evidence/RAD-01-unit-gate/summary.json).
 
-남은 연결 범위는 GEO-02가 실제 생성한 enclosure 표면 순서와 raw ZoneArea/F/경고 소유권, RAD-02 보정 행렬과의 축·소유권 연결, 보정된 solar F 재사용 및 radiant ScriptF 호출 순서, 생산 초기화 상태의 지속·무효화 시점이다. 일반 CLI 성공만으로 이 항목들을 통과 처리하지 않는다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-증거: `evidence/RAD-01-unit/summary.json`, `evidence/RAD-01-production-cli/summary.json`, `evidence/RAD-01-unit-gate/summary.json`. 과거 빌드 실패와 재현 기록은 기존 증거에 보존되어 있다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

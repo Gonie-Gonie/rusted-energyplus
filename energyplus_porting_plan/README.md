@@ -8,38 +8,19 @@ rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 
 ## 현재 진행 상태
 
-완료 카드는 A **14/54**, B **14/64**입니다. 보고 값이 일치한 실행과 카드 전체의 완료 조건은 구분합니다. 아래 결과는 해당 기록의 Source 버전과 검증 범위에 한정합니다.
+최종 판정은 A **54/54**, B **64/64**입니다. 이는 고정 CON-01 입력과 각 카드에 적힌 원본 분기·정책의 판정이며 전체 EnergyPlus 동등성이 아닙니다. 각 판정은 실제 영수증과 개별 Root 판정에 연결합니다.
 
-| 검증 범위 | 실제 결과·증거 |
+| 근거 | 최종 실제 결과 |
 |---|---|
-| A 비공조 24시간·72시간·연간 보고 값 | [현재 일반 종료 실행 3건](evidence/SRC-06-canonical-normal-completion-47/summary.json), 허용오차 위반·RMSE 0 |
-| B NoLimit 24시간·72시간·연간 보고 값 | [3건·3,613,248값](evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json), 허용오차 위반·RMSE 0 |
-| B flow/capacity/both × 24시간·72시간·연간 | [9건·10,839,744값](evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json), 허용오차 위반·RMSE 0 |
-| hard-sized IdealLoads | [원본 59건과 네 Sizer·전체 Size](evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json) 비교 통과 |
-| 전체 predictor 부모 | [포착한 실제 호출 1,168건](evidence/SRC-06-canonical-full-predictor-parent-48/summary.json) 비교 통과 |
-| IdealLoads 지속 상태 | [네 실제 입력 팩토리·60회 전체 호출](evidence/SRC-06-canonical-purchased-air-surface-53/summary.json), 호출 전후 상태의 75,524개 원시 비트 비교 통과 |
-| 복사·LU·CTF master history·분 스케줄 | [55개 기록](evidence/SRC-06-canonical-purchased-air-surface-53/summary.json) 비교 통과. 이후 변경은 IdealLoads 전용 시험 파일 한 개로 한정되어 이 결과를 재사용 |
-| 출력 집계·reset | [전체 38회 호출·35 live 변수·7 보고 주기](evidence/SRC-06-canonical-output-processor-air-history-54/summary.json), 상태값 34,321개 원시 비트 일치 |
-| 공기 이력 | [네 실제 입력 팩토리·40회 PushZone/PushSystem/Revert](evidence/SRC-06-canonical-output-processor-air-history-54/summary.json), 상태값 23,232개 원시 비트 일치 |
-| warmup 지속 상태 | [실제 RecKeep 50회·Check 19회](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), 상태값 45,072개 원시 비트 비교 통과 |
-| multiplier 2 예측·보정·이력 | [실제 getter로 만든 소유자에서 21회 호출](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), 상태·반환값 17,893개 원시 비트 비교 통과 |
-| 기상·태양열·내부발열 | [허용 범위 170개 기록](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json): 순서·본문으로 검증한 이전 prefix 137개와 이후 성공한 범주 33개. Native 전체 179개 보존, 범위 밖 차양 9개 제외 |
-| 선택 표면 계산·비수렴 종료 분기 | [SUR03 전체 선택 함수 24회·SUR05 지정 종료 분기 30회](evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) 비교 통과. 후자는 전체 실내 반복 호출이 아님 |
-| Source 품질 정리 | [57번 품질 기록](evidence/SRC-06-source-quality-hygiene-57/summary.json): 같은 Source에서 fmt·기본 feature workspace strict Clippy·workspace 4,975개(기존 제외 2개)·선택 beam 18개 통과 |
-| HVAC 입력·호출 오류 | [58번 원본 비교](evidence/SRC-06-canonical-purchased-air-admission-58/summary.json): 실제 전체 Sim 7회·35개 상태·7,096개 원시 수치 관측값 일치. Fatal 6개와 반환 노드로 계속하는 1개를 구분; 기존 정상 60회도 통과 |
-| 성공 실행 출력 정리 | [A/B 24시간 두 건](evidence/SRC-06-canonical-successful-log-layout-49/summary.json), 기존 계산·CSV·JSON 유지, 중복 오류 파일 제거, 콘솔 원문을 `logs/source-console.log`로 이동 |
+| 현재 Source·품질 | Source59; fmt/strict Clippy/workspace 4975 passed (2 existing ignored); retained-unit carry separately bound |
+| 일반 고정15·수치 및 자체 출력 | 15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0 |
+| Surface 반복·warmup 인계 | 34437 scope rows; 635375 exact binary64 observations; 2 direct handoffs; 4 same-owner convection connections |
+| 물리·부수 출력 | 15 scoped ancillary readbacks; owned termination/layout checked; raw physical inequalities preserved; overall ancillary IO PASS=false |
+| 오류 입력5·SCH01 결과 구분 | Five executed invalid outcomes: converter-stage3 and Rust structured compilation2; two Original abnormal afterstates remain unavailable; no82/82 numerical PASS |
 
-55번 증거는 각 실제 실행 단계와 변경되지 않은 본문·읽기 범위의 연결 근거를 보존합니다. 170개를 한 번에 성공한 실행이나 전 범주의 동일 바이너리·Source 검증으로 합쳐 표기하지 않습니다.
+실제 단위·연결·생산 근거와 역사적 실패는 [최종 카드별 판정](evidence/SRC-06-final-current-source-validation-60/summary.json)에 모읍니다. 변경하지 않은 단위를 새 바이너리에서 다시 실행한 것으로 세지 않습니다. Exterior170은 도출한 앞137과 직접 성공33의 결합이고 차양기하9는 Native-only입니다. SUR05의30은 전체 내부 함수가 아닌 원문 종료 분기입니다. SCH01의 두 원본 수치 후상태는 계속 미확인으로 남깁니다.
 
-HVAC01의 필수 오류 경로 7개는 원본의 진단·상태 변경·종료 순서대로 연결하고 비교를 통과했습니다. 잘못된 배기 노드는 실제 Severe 후 반환 노드로 전환하여 계속 계산합니다. 현재 Source의 fmt·strict Clippy·workspace 4,975개(기존 제외 2개)도 통과했습니다. 비교 어댑터의 첫 컴파일 실패와 필드 경로 한 줄 수정은 58번 증거에 보존합니다. 다음 작업은 실제 Source Surface 부모의 반복·호출 시점과 warmup→RunPeriod의 MAT·W·CTF 상태 인계 비교입니다. Native 두 경계 관측은 960개 실수 필드와 실행 플래그를 확인했으며, Source 비교는 아직 수행하지 않았습니다. 이어 같은 최종 Source의 15개 일반 실행, 전체 JSON/CSV 재읽기와 부수 출력 검증을 마무리합니다. 기존 15건의 과거 보고 값 증거는 각 실행의 범위로 유지합니다.
-
-기존 audit 시험의 CRLF 기대값 수정과 관측기 최초 컴파일 실패 13건·`serde_json` 의존성 수정은 56번 증거에 남아 있습니다. 이후 57번에서는 포맷과 항목별 문서·lint를 정리하고, 14개 누락값 요청을 기존 오류로 전달하도록 바로잡았습니다. 실제 fmt·strict Clippy·workspace와 선택 beam 검증은 통과했으며, 앞선 두 Clippy 실패도 보존합니다. 별도 feature의 process-main cohort에는 미사용 helper 경고 3,419개가 남아 있으므로 모든 feature가 경고 없이 통과했다고 해석하지 않습니다. 이번 품질 정리로 카드 gate를 바꾸지 않습니다.
-
-[59번 관측기 수정](evidence/SRC-06-source-live-kickoff-observer-59/summary.json)은 실제 전역 kickoff 셀을 읽도록 37곳을 바로잡았습니다. 첫 A24 실행은 정상 종료했고 수치 635,375개와 두 상태 인계 값이 원본 비트와 일치했지만, kickoff 관측값 1,007개가 달라 전체 비교는 실패로 보존합니다. 수정은 관측용 읽기에 한정되며 계산·플래그 쓰기를 바꾸지 않았습니다. 현재 fmt·strict Clippy·workspace 4,975개(기존 제외 2개)는 통과했습니다. 새 P7 실행에서 관측기 수정 결과를 확인한 뒤 최종 15개 실행을 진행합니다.
-
-검증은 변경한 계산 경로에 필요한 기존 통합 cohort 또는 실행만 수행합니다. 같은 몸체를 다시 검증할 근거가 없다면 이전 대규모 cohort·연간 실행·전체 테스트를 반복하지 않습니다. 문서와 로그 경로만 바꾼 경우에는 해당 출력 확인과 문서 검사를 사용합니다.
-
-각 카드의 네 gate와 증거 색인은 [CHECKLIST.md](CHECKLIST.md), [plan.json](plan.json), 상태 소유권은 [STATE_CONTRACTS.md](STATE_CONTRACTS.md)에 있습니다. 과거 단계별 진행 문장은 이 세 문서에서 걷어냈고, 기존 `evidence/`와 Git 이력은 보존했습니다. 과거 CTF 비교의 235,456개 불일치·2,754개 미확인은 해당 실행의 역사적 기록이며 현재 결과로 재분류하지 않습니다.
+같은 코드·원인에 대한 불필요한 cohort/연간 재실행을 요구하지 않습니다. 변경 범위에 맞는 선택 검증 후 실제 fmt·Clippy·workspace를 한 번 기록하며, 현재 판정은 아래 정책·카드와 `plan.json`으로 확인합니다.
 
 ## 범위
 

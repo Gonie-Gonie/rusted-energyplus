@@ -56,13 +56,21 @@ SYS-01이 정해진 단계에 1회 호출
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-현재 검증: 네 실제 입력 팩토리에서 같은 공기·Node·Zone owner를 유지한 PushZone 20회·PushSystem 16회·Revert 4회를 지속 호출했습니다. 88개 snapshot의 실제 공기 멤버와 여섯 이력 배열 등을 비교해 상태값 23,232개 원시 비트가 일치했습니다. 입력 MAT·ZT·ZTAV·평균/현재 습도·기압만 공급하며 이력이나 종료 상태를 복원하지 않습니다. 전체 예측·보정과 multiplier·상위 manager 연결은 후속 검증입니다.
+40 actual PushZone/PushSystem/Revert same-owner calls plus21 multiplier sequence; rollback/accepted updates and real caller order. No resetting histories between each persistent call.
 
-[원본 범위·실제 명령·입력/소스 해시·독립 검토·실패 기록](../evidence/SRC-06-canonical-output-processor-air-history-54/summary.json)에 모았습니다. 두 그룹은 같은 Source snapshot에서 실행했습니다. 이 단위 비교로 카드의 네 gate를 일괄 완료 처리하지 않습니다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
+
+직접 단위 근거: [SRC-06-canonical-output-processor-air-history-54](../evidence/SRC-06-canonical-output-processor-air-history-54/summary.json), [SRC-06-canonical-warmup-multiplier-exterior-55](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json).
+
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

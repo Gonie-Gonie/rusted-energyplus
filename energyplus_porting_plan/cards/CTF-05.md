@@ -56,21 +56,7 @@ CTF-07 gamma 계산 연결
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-
-## Reviewed combined first-method scope before observation
+## 보존한 상세 범위·정밀도 계약
 
 Construction.cc1375-1494 whole inverse/no-pivot scalar order; actual caller887 after exponential884. Actual original AMat and IdenMatrix, first invocation1/assembly1 under selected no-source1D context. Final AInv and private AMat1 before deallocation retained.
 
@@ -80,19 +66,21 @@ Actual AInv/final_AMat1 with exact typed shape/class/signedzero/control/caller s
 
 Primary separate profiles: AInv, final_AMat1. Each prospectively fixed atol0.0/rtol0.0, exact class/shape/signedzero. Seven inherited assembly profiles, three initial profiles and eighteen preprocessing profiles remain separate handoff checks. Native actual entry/stage/control/final/caller-return ledgers are retained without caps or reconstruction. Missing first owner on either or both sides is a comparison failure; later visits and unavailable contexts are never PASS.
 
-Same literal unit39/42 and fixed production15/195/45 input guards only. Both CTF05 and CTF06 real card checks are required before input freeze. Root FULL and independent other-author FULL Source review preceded this amendment. Future actual build/PE/OriginalDataQA must precede fresh unchanged Rust baseline and candidate application. No actual build, engine output, numeric equivalence or remaining-gate PASS is claimed. New06 debug originals follow forward-only prospective retention until a separate actual approved cleanup; earlier histories remain literal.
+## 최종 네 gate 근거
 
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-## Actual selected first-method comparison
+1375–1494 whole no-pivot inverse, first invocation after exponential; raw module identical. Exponential output never replaces originalAMat operand.
 
-Actual Original DataQA and fresh unchanged Rust04 baseline preceded this application. The original first assembly feeds the real exponential then inverse APIs; inverse receives original AMat/Iden, not AExp. Unit25 and fixed-production15 first owner pairs passed all nine frozen zero-tolerance profiles.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Unit:157300 numeric +721458 discrete comparisons; production:3180 +19328. Every mismatch count, primary maximum absolute error and RMSE is zero. Seven assembly handoff profiles, three initial profiles and eighteen preprocessing profiles remain separate. Unit16 later Native visits and88 unavailable observations; production30 unavailable observations remain unpaired/noPASS.
+직접 단위 근거: [CTF-05-06-unit](../evidence/CTF-05-06-unit/summary.json).
 
-Workspace4709 tests passed before a single test-only panic-to-Result correction; all six changed tests and final Clippy/fmt passed afterwards. Actual final SourceSnapshot `0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483` binds the real Cargo artifacts, both actual runs and strict comparison receipts. Failed first Clippy is preserved. Full Native/Rust scientific JSON bytes are retained with verified gzip SHA256/size roundtrips.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-Evidence: `energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json`. This selects the first no-source1D method invocation only. Retry/convergence, Gamma/final coefficients, complete-card integration/production and the fresh fixed-six CLI remain pending; no whole-card completion is claimed.
-
-Actual fixed-six CLI follow-up: all six commands returned0 on source snapshot `0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483`; actual source-order checks passed, all45 fixed input guards remained unchanged, no hours override/oracle comparison was supplied, and the literal fixture injection fields were null for A and false for B. Evidence: `evidence/CTF-05-06-production-cli/summary.json`. This does not certify whole CTF retry/coefficient handoff or complete integration/production gates. The prior selected-unit summary retains its historical pre-CLI flag.
-
-Actual forward-only retention follow-up: the two new CTF06 linked Originals were separately removed after real PE/DataQA, selected unit/fixed15 comparisons, quality checks, six CLI runs and committed archive verification. Removed2,602,389,838 bytes;38 prior artifacts, both06 derivatives,631 present core objects and12 absent registered paths remained unchanged. Evidence: `evidence/CTF-05-06-retention/summary.json`. Historical original-first references remain literal; no registry rewrite, debug recovery, scientific rerun or full-card gate closure is claimed.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

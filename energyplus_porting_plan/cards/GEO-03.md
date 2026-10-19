@@ -127,28 +127,21 @@ B의 양수 명시 체적 1m³는 선언·원본·반환·저장·실제 인수 
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋: `966af17aa5fc6bd68cddb9cfa23079dffc09ddc7`
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-메타데이터 reader 수정 커밋: `6288c2b3153b7c4851efb387c585f0f68d56af7b`.
-실제 두 reader 실패는 보존했으며 수정은 계산·입력·허용치를 변경하지 않았다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-시험 명령: `python -X utf8 -B tools/porting/check_geo03_units.py`와
-`python -X utf8 -B tools/porting/check_geo03_production.py`의 실제 인수·종료 코드는
-[actual-commands.json](../evidence/GEO-03/actual-commands.json)에 있다.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-증거: [source-review.md](../evidence/GEO-03/source-review.md),
-[final-unit-comparison.json](../evidence/GEO-03/final-unit-comparison.json),
-[production-comparison.json](../evidence/GEO-03/production-comparison.json),
-[independent-review.json](../evidence/GEO-03/independent-review.json).
-최종 전체 회귀시험 4,548개와 Clippy도 통과했다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-최대오차/RMSE/상태 불일치: 비교한 체적·높이·면적은 0; 최종 단위 2,672개와
-생산 연결 758개 검사에서 불일치 0. Space·원본 전역 카운터·IO·임시 버퍼·보정과
-비허용 fallback은 대응하지 않으며 AirPowerCap/ZON-02/SYS·연간·전체 EP 인증으로 확장하지 않는다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

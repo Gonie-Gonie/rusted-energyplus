@@ -143,22 +143,21 @@ Clippy `-D warnings`, source-quality, heat-balance-structure와 scoped rustfmt�
 exit 0이다. rustfmt 범위는 `air_manager.rs` lint 수정뿐이며 전체 workspace
 format 검증으로 표현하지 않는다.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋: `af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e`
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-시험 명령: 위 실제 명령 증거의 final02 단위·production command03와 5개 필수 검사.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-증거 경로: `energyplus_porting_plan/evidence/ZON-01/`; 최종 crates tree는
-`e94b3224a4f6aeb5e7b2b993cfe4587b6585322c`이다.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-최대오차/RMSE/상태 불일치: 수치 RMSE를 재계산하지 않는 exact assignment 정책;
-최종 단위·생산의 비트/상태 불일치는 각각 0이다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-추가 검토할 helper: Space·형제 manager 상태, 이후 history/correction/retry,
-source weather/calendar/warmup 정렬, AirPowerCap 결과와 전체 SYS는 후속 범위이다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

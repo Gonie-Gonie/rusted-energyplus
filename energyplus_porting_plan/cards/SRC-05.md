@@ -56,25 +56,12 @@ SRC-07/08에 같은 snapshot 전달
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## Historical SRC-05 bounded Source proposal (before application)
+## 보존한 상세 범위·정밀도 계약
 
 The exact selected bodies are `DataSurfaces.cc:594–618,634–666`; their caller is
 `HeatBalanceSurfaceManager.cc:308–345`. The intervening temperature guard
 `DataSurfaces.cc:620–632` delegates the severe/continue/fatal backend to
-`DataEnvironment.cc:236–247`; that backend is a remaining integration obligation.
+`DataEnvironment.cc:236–247`; that backend is a separately owned diagnostic child.
 Declarations and allocation/initialization are `DataSurfaces.hh:1540–1543` and
 `SurfaceGeometry.cc:862–873`. Weather-station coefficients are produced at
 `WeatherManager.cc:7233–7301`; constants are `DataEnvironment.hh:79–80`.
@@ -88,64 +75,21 @@ while zero exponent writes every surface. Wind direction copies raw bits.
 Local environments, EMS overrides and explicit station/height variation remain
 outside ordinary admission; direct operand cases do not expand that admission.
 
-Held Rust setters and compatibility-helper corrections are Source proposals,
-with four unexecuted owner/branch regressions. No numerical Native claim or gate
-change is made. The ordinary runtime still lacks the retained four-array owner
-and true setter/check sequence at InitSurfaceHeatBalance. Full production
-handoff, guard/backend and SRC-07/08 consumers remain separate prerequisites.
-The actual failed persistent comparison remains evidence; no policy is changed.
+## 최종 네 gate 근거
 
-## Historical selected surface environment comparison (libtest observer)
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-Genuine unchanged-core Native calls and actual Rust selected setters did not pass the selected scope on 26 literal cases and 30 weather operations. Actual status: fail-selected-setters-or-input-join; input joins 2,112, full pre-owner checks 1,384, selected endpoint checks 1,334, point-helper checks 189; mismatches 3. Required-unavailable observations 103 and nonfinite arithmetic exclusions 0 are retained without PASS. Rust Source371ee432 has 3,919 members; its one-row predicate repair left 3,918 unrelated files unchanged. fmt/Clippy passed; focused329/workspace4,953 passed with two intentionally ignored observers, and the explicit SRC05 invocation passed one test. Both attempted comparison chains, complete observations and all ledgers are retained. Cold guard/backend, Native-unreached/skipped observations, ordinary manager handoff and whole-card gates remain pending. No gate changed.
-Evidence: [selected setters, complete observations and quality](../evidence/SRC-05-surface-environment/summary.json) (cc8a0746b6b5143a7b79376270ee66f3aaf860c4c1184e025953fcfef814193f).
+Qualified Exterior proof:137 ordered prefix records inferred from actual unique failed05 stop and exact dispatcher checks, plus33 directly successful later records.170 is not one successful run/one commonSource; Native9 overhang records remain excluded. True selected all-surface outdoor bulb/wind/direction writers and cold guard plus legitimate raw primary terrain/height operands. Historical libtestFP/required-unavailable values remain excluded.
 
-## Actual standalone main comparison and wind diagnostics
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-The independent standalone Rust main and genuine Native setters matched the available selected scope: 26 literal cases, 30 weather operations, 71 paired setter boundaries, 2,112 input joins, 1,384 full pre-owner and 1,384 selected endpoint checks, 189 point-helper checks, zero mismatches. All 102 required-unavailable rows remain excluded from PASS. This proof is bound to historical Source d34a84b7, its four closed fmt/Clippy/focused/workspace checks (341/4,968 passed, two ignored observers), the sole actual Cargo-emitted dev executable and its argc3 main execution. Later SRC-06 changes do not rewrite this capture.
+직접 단위 근거: [SRC-06-canonical-warmup-multiplier-exterior-55](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), [SRC-05-surface-environment](../evidence/SRC-05-surface-environment/summary.json), [SRC-05-weather-cold](../evidence/SRC-05-weather-cold/summary.json).
 
-Separate read-only floating point diagnostics retain all 25 cases in main and spawned lanes: 29 intermediate/result differences, 662 stage-control field differences and four lane-control differences. Native and Rust main lanes had no result differences; the spawned lane had 29. Actual x87 control words were 0x037f for Native main/spawn and Rust main, and 0x027f for Rust spawn. Both linked pow providers use the observed x87 helper family. These observations establish neither causation nor the historical libtest worker controls. No floating point controls, formula, tolerance or production execution path were changed for this result. The previous three-mismatch comparison and all diagnostics remain retained.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-At that historical capture, the production CLI and ordinary observer used a worker. Standalone selected parity did not prove that path, the cold guard/error backend, retained ordinary four-array setter/check sequence, SRC-07/08 handoff or whole SRC-05. All four gates remain pending; A 14/54 and B 14/64 are unchanged.
-
-Evidence: [complete selected observations, diagnostics, custody and historical failure](../evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json).
-
-## Actual Windows production main entry and closed ordinary capture
-
-Windows CLI and ordinary observer now call their unchanged run bodies on main.
-Non-Windows worker behavior is preserved. Target-specific build scripts reserve
-8 MiB for the Windows main stack without writing floating point controls.
-Actual Cargo-emitted CLI and observer binaries were independently checked as
-x64 PE32+ with an 8,388,608-byte stack reserve and a 4,096-byte commit.
-
-Actual Source 00bfa56d has 3,931 members: four reviewed changed Rust paths,
-two additions and 3,927 byte-identical unrelated members. Formatting introduced
-no extra delta. fmt and Clippy passed; focused tests passed 346 and workspace
-tests passed 4,973, with zero failures and the same two intentionally ignored
-Root-only observation tests. These checks preceded both actual Cargo builds.
-
-The unchanged A-24H IDF/weather CLI invocation and separate ordinary observer
-both exited 0, with unchanged Source, binaries and all 45 fixed input guards.
-All 62 output files (1,328,614,270 bytes) were fully hashed independently. The
-uncapped NDJSON closed with 4,034 written events, one Rust generation and 4,037
-physical lines. Complete ordinary outputs remain on D; published evidence
-retains their full hashes, sizes and IO completion metadata. Capture completion alone does not establish numerical equivalence or certify boundary reachability; the later [CTF-10 comparison](../evidence/CTF-10-main-thread-history-comparison/summary.json) is retained separately.
-
-The genuine Native no-user TARP first/repeated-call baseline closed before this
-Rust application. This prerequisite and all actual application, quality, Cargo,
-PE, process and independent factual reviews are retained in the
-[production-entry evidence](../evidence/SRC-05-production-main-thread/summary.json).
-The cold guard/error backend, retained ordinary four-array setter/check sequence,
-SRC-07/08 handoff and successful complete ordinary comparison remain pending. No card gate
-or A/B completion count changes.
-
-
-## Actual bounded weather handoff Source and selected cold-guard comparison
-
-Seventeen reviewed weather/observer Source paths are applied, including retained ordinary weather arrays, manager setter/check ordering and the absent-site/station EIO producers. The actual selected Native/Rust main comparison covers 29 literal cases, 31 declared operations and 38 paired public-call boundaries. Its status is `NO_MISMATCH_IN_AVAILABLE_SELECTED_PAIRS`: 28,879 input rows, 31,781 prestate rows and 41,767 endpoint rows, with zero mismatches and zero required unavailable. All 33 unavailable observations remain excluded from PASS: 14 nonfinite observations, 10 frozen-policy families and nine observer-only families. This selected comparison does not certify complete ordinary-run reachability or consumer handoff.
-
-The first genuine comparison remains preserved: input mismatches 29, prestate mismatches 38, paired endpoints zero and required unavailable 38. It ran directly through the tool; no recorder receipt was retained and its actual program exit code is unknown. The later strict comparison has its genuine closed recorder receipt. Both reports and all four complete gzip logs for each comparison are retained. No tolerance or pairing policy was relaxed.
-
-The final Source `d70e015d5808030720233b32aa8d3b7777a414a3ad6625423c6df8f9b899e914` passed fmt and Clippy; the consolidated workspace run passed 4,964 tests, with zero failures and the same two intentionally ignored observers. Actual application, formatter, Cargo/PE, capture and independent factual reviews are retained in [the bounded weather/cold evidence](../evidence/SRC-05-weather-cold/summary.json). Full Source payloads and large binary/map/object payloads remain outside the finite archive's replayability claim.
-
-Complete ordinary weather/inside-array reachability, persistent air/surface owner and correction cadence, SRC-07/08 handoff and successful complete ordinary comparison remain pending. All four SRC-05 gates stay unchecked; A14/54 and B14/64 remain unchanged.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

@@ -56,14 +56,21 @@ HVAC-04/05가 초기화된 제한을 실제 소비
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | B: 통과 |
+| unit_gate | B: 통과 |
+| integration_gate | B: 통과 |
+| production_gate | B: 통과 |
 
-현재 검증: 같은 owner에서 첫 호출·반복·재가동·새 환경 초기화까지 전체 Init을 포함한 60회 지속 호출을 비교했습니다. hard-size 전체 Size의 별도 59건 증거와 구분합니다.
+Real full Init through P1 first/repeat/environment/off/availability and actual node/config/sizing owners; Size59 is hard-size supporting proof, not a report/Calc proof.
 
-[실제 명령·고정 원본 범위·입력 해시·독립 검토·실패 기록](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)에 모았습니다. 표면 검증 55개 기록은 IdealLoads 전용 시험 파일 한 개만 바뀐 것을 확인해 재사용했습니다. 이 단위 비교로 카드의 네 gate를 일괄 완료 처리하지 않습니다.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
+직접 단위 근거: [SRC-06-canonical-purchased-air-surface-53](../evidence/SRC-06-canonical-purchased-air-surface-53/summary.json), [SRC-06-canonical-hard-sized-purchased-air-43](../evidence/SRC-06-canonical-hard-sized-purchased-air-43/summary.json).
+
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
+
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

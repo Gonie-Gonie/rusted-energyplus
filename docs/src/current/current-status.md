@@ -61,9 +61,10 @@ and do not change the variable coverage total.
 The official `1ZoneUncontrolled` target is currently declared-variable
 compatibility only. Broad CTF storage parity, broad solar/radiation parity,
 fenestration, infiltration, and general heat-balance compatibility remain
-outside the claim. The diagnostic probe lifecycle currently contains one
-unresolved first-run-period `SurfTempIn` state-mismatch hypothesis and one observation-only
-executable lane. The 40 historical Rust
+outside the claim. The separate historical broad diagnostic-probe ledger retains one
+first-run-period `SurfTempIn` hypothesis and one observation-only executable lane.
+Those ledger entries do not describe the frontier or outcome of the finite
+CON-01 Source cadence/handoff verification below. The 40 historical Rust
 probe selectors and 56 historical wrapper lanes are closed replay artifacts,
 excluded from the default suite; none of this diagnostic evidence is a
 promoted claim.
@@ -128,25 +129,44 @@ branches remain outside arbitrary-run release compatibility even where
 separate case-level conformance evidence exists. IdealLoads outdoor-air,
 economizer, heat-recovery branches remain outside arbitrary-run compatibility.
 
-Source-order lifecycle evidence is separate from the bounded numerical Calc
-result: mapped decisions and snapshots do not make the full PurchasedAir
-routine, broader thermostat families, adaptive iteration, sizing, or general
-HVAC behavior complete.
+The broad arbitrary-run and algorithm-ledger lanes retain their exact routine,
+branch and capability limits. In particular, the historical PurchasedAir
+source-map frontier at `PurchasedAirManager.cc:2375` describes that broader
+ledger lane. It is not the current frontier of the separately admitted finite
+CON-01 Source path.
 
-The current PurchasedAir source-order lifecycle boundary reaches the heating
-outdoor-air maximum-flow first-warning guard else entry at
-`PurchasedAirManager.cc` line 2375. The body beginning at line 2376 and the
-remaining heating/reporting lifecycle require further porting. The canonical
-algorithm and capability registries retain the exact lineage, branch,
-forbidden-feature, and evidence restrictions:
+The finite Source path has genuine selected no-OA/hard-sized evidence through
+GetInput, initialization, sizing, Calc, node update and reporting on the same
+real equipment/Node/Demand owners. [Persistent full calls](../../../energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)
+and [seven input/call error outcomes plus normal control](../../../energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/summary.json)
+retain their actual Source, inputs and scope. The observer-only59 correction
+does not change those scientific bodies. This finite result does not complete
+all PurchasedAir outdoor-air, humidity, sizing or general HVAC branches.
+
+## Finite CON-01 Verification
+
+The [64-card plan](../../../energyplus_porting_plan/README.md) fixes A's opaque unconditioned
+zone and B's direct no-OA sensible IdealLoads topology, four hard-limit modes
+and three durations. Its gates remain separate from broad domain readiness and
+promoted release manifests. The final [current-Source validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json)
+binds actual same-Source fifteen-case results, internal Surface cadence,
+two warmup handoffs, own-output rereads and the five named input outcomes.
+
+Current finite adjudication: **15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0**;
+**A 54/54, B 64/64 cards**;
+**15 scoped ancillary readbacks; owned termination/layout checked; raw physical inequalities preserved; overall ancillary IO PASS=false**. These actual references and individual
+four-gate decisions describe the fixed CON-01 scope. Unit proof, connection proof, reported values and physical serialization
+are different claims. The two abnormal Original schedule processes retain
+unavailable numerical afterstates; their named termination outcomes do not
+become82/82 numerical passes.
+
+The canonical broad algorithm and capability registries retain their existing
+lineage and forbidden-feature restrictions. This finite documentation update
+does not change their routine/domain status or promote a release manifest:
 
 - [Algorithm boundaries and routine completion](../../../specs/algorithm_ledger.toml)
 - [Capability and unsupported-feature boundaries](../../../specs/capabilities.toml)
 - [IdealLoads source map](../porting-map/ideal-loads-source-map.md)
-
-The [64-card porting plan](../../../energyplus_porting_plan/README.md) organizes
-the remaining source-faithful implementation work. A completed plan card or
-source map does not promote a conformance claim.
 
 ## Current Launcher State
 

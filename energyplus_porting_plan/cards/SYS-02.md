@@ -56,25 +56,21 @@ CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생�
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+69 genuine full RecKeep/Check calls in6 persistent lives,50+19/144states45072bits, actual forced-maximum diagnostics and current global stage. P3 supplies current real warmup cadence/handoff.
 
-## 현재 검증 근거
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-[55번 원본 비교](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json)는 실제 Project/Zone getter와 전체 열수지 allocator로 만든 같은 소유자에서 RecKeep 50회와 Check 19회를 이어 실행하고, 상태값 45,072개를 원시 비트로 비교했습니다. 일별 extrema·이전날 값, rolling 값, 보고 배열, 수렴 지표·flags, 실제 clock·EIO·오류 상태를 각 호출 전후에 확인했습니다. 이 결과는 해당 55-02 실행과 명시적 변경 영향 근거에 한정합니다.
+직접 단위 근거: [SRC-06-canonical-warmup-multiplier-exterior-55](../evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json).
 
-일별 온도와 부하의 실제 생산자, 최소·최대일수·네 수렴조건, transfer/reset 및 warning/backend 순서는 기존 계약을 유지합니다. ZTAV와 실제 SNLoad를 사용하며 MAT나 예측 부하를 대입하지 않습니다. 부하 수렴 허용값은 무차원입니다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-이전 선택 비교는 [일별 수렴](../evidence/SYS-02-selected-warmup/summary.json)과 [일별·rolling 상태](../evidence/SYS-02-rolling-warmup/summary.json)에 보존합니다. 당시 제외 항목과 실패·품질 기록도 각 증거의 원래 범위를 유지합니다.
-
-실제 Surface/공기 부모의 호출 연결, warmup 종료일과 첫 RunPeriod의 상태 인계 및 같은 최종 Source의 15개 일반 실행은 별도 확인합니다. 이 카드의 네 gate와 전체 A 14/54·B 14/64는 변경하지 않습니다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

@@ -80,18 +80,9 @@ Current counts are tracked outside the README. Generated coverage specs track
 the output-variable inventory, and release evidence separates passed
 release-evidence series from broader declared conformance/output requests.
 
-Recent [scoped original-source comparisons](energyplus_porting_plan/evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json)
-cover 69 persistent warmup calls, 21 multiplier-two predictor/corrector/history
-calls, and 170 admitted weather, solar and gain records. Warmup and multiplier
-checks compare 45,072 and 17,893 raw state/return fields. Exterior coverage joins
-a verified ordered prefix of 137 records with 33 successful later category
-records; all 179 Native records remain available, including nine exploratory
-shading records outside the fixed input scope. These results retain their
-recorded execution stages and unchanged-code bridges. The final fifteen-case
-run on one current Source, full Surface cadence and warmup handoff comparison
-remain separate work; card gates remain A 14/54 and B 14/64.
+The [finite card adjudication](energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json) records each of the64 contracts, its four gates, actual commands and remaining qualifications. Final fixed15 execution, internal Surface cadence/handoffs, output round trips and ancillary differences are recorded separately: A 54/54, B 64/64; 15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0; 34437 scope rows; 635375 exact binary64 observations; 2 direct handoffs; 4 same-owner convection connections.
 
-The [surface unit checkpoint](energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) verifies 24 selected outside-surface calls and 30 convergence-suffix evaluations. The subsequent [quality checkpoint](energyplus_porting_plan/evidence/SRC-06-source-quality-hygiene-57/summary.json) passes formatting, strict workspace Clippy under default features, 4,975 workspace tests (two existing exclusions), and 18 admitted beam records on one Source snapshot. Earlier failed checks and the featured cohort target's unused-helper warnings remain in the evidence. The [HVAC admission comparison](energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/summary.json) then passes seven error-path calls (35 states, 7,096 raw state observations), 60 positive calls and current quality checks. The [live kickoff observer correction](energyplus_porting_plan/evidence/SRC-06-source-live-kickoff-observer-59/summary.json) preserves the first A24 comparison failure and reads the actual scientific flag owner. Current quality checks pass. Next are fresh current-Source Surface cadence, handoff and final fifteen-case verification; card gates remain unchanged.
+The admitted Exterior170 records join a verified137-record prefix with33 directly successful records; nine Native overhang records remain outside CON-01. The30 convergence evaluations exercise a literal Original suffix, not a full inside-solver parent. Two abnormal Original schedule processes have unavailable numerical afterstates; their named invalid-input outcomes do not become82/82 numerical passes. Earlier failures and unobserved cache/field limits remain in immutable evidence.
 
 ## How To Run And Verify
 

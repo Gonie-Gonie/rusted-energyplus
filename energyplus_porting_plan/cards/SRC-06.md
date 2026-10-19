@@ -56,20 +56,21 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
+Selected complete TARP natural/Detailed math and actual dispatcher owner/state kernels are direct proofs; P3 verifies real30 cadence and Source H heap storage/return/precalc/first-consumer. Native callback candidates remain four code-derived candidates, not directly captured Native callback states.
 
-## 현재 구현과 증거
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-원본 TARP Natural/Detailed과 선택 InitIntConvCoeff dispatcher를 구현했습니다. [선택 수식 비교](../evidence/SRC-06-tarp-inside-selected/summary.json)는 28개 사례·60회 원본 호출 중 유한한 endpoint 54개가 일치합니다. 비유한 endpoint 6개는 class 진단만 기록했고, 필수 미확인 34개는 수치 PASS에 포함하지 않았습니다.
+직접 단위 근거: [SRC-06-tarp-inside-selected](../evidence/SRC-06-tarp-inside-selected/summary.json), [SRC-06-tarp-dispatcher](../evidence/SRC-06-tarp-dispatcher/summary.json).
 
-[선택 dispatcher 비교](../evidence/SRC-06-tarp-dispatcher/summary.json)는 실제 공간 MAT/ZT/ZTAV·표면온도 배열·지속 scratch·호출 순서를 구분합니다. [호출자 소유 공간 상태 인터페이스](../evidence/SRC-06-live-space-convection-interface.json)를 통해 같은 owner를 빌려 읽습니다.
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-남은 카드 조건은 실제 표면 열수지 부모에서 환경 reset·두 온도 배열·복사 후 완료 반복 30회마다의 계수 갱신·즉시 소비 순서를 확인하는 것입니다. 선택 단위 검증만으로 전체 카드의 네 gate를 닫지 않습니다. A 14/54·B 14/64는 유지합니다.
-
-다른 모듈의 포팅 현황은 [전체 진행 상태](../README.md#현재-진행-상태)에 모았습니다. 이전 단계별 기록과 실패 자료는 `../evidence/` 및 Git 이력에 보존합니다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

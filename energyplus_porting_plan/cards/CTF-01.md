@@ -56,20 +56,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## 착수 시 범위·owner 계약 보완
+## 보존한 상세 범위·정밀도 계약
 
 고정 EP 커밋의 `Construction.cc` 59–401을 선정 범위로 한다. 59–200의 실제 상태 초기화·미사용 early return과 로컬 할당, 201–309의 층 로딩·저항층 분류·오류, 311–315의 오류 후 return, 317–372의 연속 내부 저항층 병합, 374–401의 순서 있는 단위 변환·총 저항·conductance를 포함한다. 원본 함수 전체는 1103행까지 실제로 계속 호출한다. 401행 뒤 CTF 계산을 새 전처리 식으로 대체하거나 관찰을 위해 조기 종료하지 않는다.
 
@@ -81,30 +68,23 @@ CTF-02/03에 전달되는 배열·순서 검증
 
 18개 변수별 산술 profile의 atol/rtol=0, class/shape 정확 일치와 복사 입력 bits 정확 일치를 원본 출력 확인 전에 채택한다. air cp=1.007, 실제 상수 의존·연산 순서, cp/=(CFC*1000), 순서 있는 lr 합, guard 없는 cnd=1/rs를 보존한다. 비교 실패를 이유로 허용오차를 늘리지 않는다. 도달한 필수 값이 양쪽 또는 한쪽에서 누락되면 실패다. 미사용·원본 중단·OS 비정상 종료·관찰 오류와 미도달 상태를 명시하고 수치 통과에 포함하지 않는다.
 
-현재 Rust에는 Regular의 저장된 Resistance와 이 세 단계 정규화 배열 owner가 없다. 기존 derived R/C 합계나 최종 계수는 해당 owner의 대체 정답이 아니며 문맥으로만 보존한다. 실제 원본과 기존 구현의 차이를 확인한 뒤 기존 material/compiler/cache 초기화 경로를 보완한다. 나중의 원본 solver 오류 flag·계수와 Rust 전처리의 미소유 상태는 비교되지 않은 문맥으로 남긴다.
-
 생산 검증은 별도다. 기존 CON-01의 고정 입력 15개·입력/기상/메타데이터 해시 45개를 유지하며, 실제 InputProcessor·재료·구성체 loader와 실제 CTF 사용 owner를 관찰해야 한다. 위 멤버 단위 입력은 이를 인증하지 않는다. source/sink·2차원·다른 재료군·0 또는 11 초과 층은 제외한다. 새 실행·수치 비교·네 gate 통과를 이 문서 변경만으로 주장하지 않는다.
 
-## Actual Original and existing Rust baseline
+## 최종 네 gate 근거
 
-`evidence/CTF-01-baseline/summary.json` preserves genuine Native39/42 and prior Rust fixed15 owner inventories. OriginalDataQA passed before Rust execution: 42 whole source calls returned, 106 callbacks were recorded, and 20 unreached phases remain unavailable. Existing Rust loader/compiler/initialization returned in all15 fixed cases; stored Regular Resistance and the selected preprocessing owners are absent as recorded. The two different lanes are not a numeric comparison. Scope review is complete; unit/integration/production gates remain pending.
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-## Actual selected preprocessing unit implementation
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-`evidence/CTF-01-unit/summary.json` preserves the actual candidate source, Cargo build/run, failed precomparison Windows path attempt, corrected comparer and quality records. The corrected comparison uses the original frozen 18 zero-tolerance profiles: 1,874 numeric and 4,346 discrete comparisons, zero mismatches, maximum absolute error and profile RMSE both zero. Twenty genuinely unreached phases remain unavailable and are not counted PASS. Regular stored Resistance and selected PostLoad/PostMerge/PostConversion owners now follow the actual compiler/cache/initialization path. Workspace tests passed 4,642/4,642; Clippy with warnings denied and formatting passed. Only the selected unit gate passes; fixed15 genuine-loader integration, downstream CTF02/03 handoff and production gates remain pending.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-## Actual fixed15 loader-to-initializer gap
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-`evidence/CTF-01-loader-gap/summary.json` preserves actual Native build/PE/frozen inputs, Original DataQA, Rust production-observer build/run and the failed comparison. All15 Original loaders completed195 phases; all21 whole CTF calls returned and63 checkpoints were observed. All15 Rust initializers returned21 actual preprocessing owners. The eighteen profiles have378 numeric comparisons with zero error, but84 discrete surface registration/ID mismatches occur in the twelve B cases: Native registers Wall,Floor,Roof by zone/space; Rust retains Floor,Roof,Wall declaration order. This is a real compiler owner gap and is not hidden by sorting the comparer. Integration and production remain pending while the source-grounded registration repair is prepared.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-## Actual source registration repair and fixed15 replay
-
-`evidence/CTF-01-loader-fixed/summary.json` preserves the source repair and fresh actual Cargo/run/comparison plus full workspace quality records. The compiler now registers all admitted opaque surfaces by Zone, final Space and Wall/Floor/Roof, preserving input order within each class and rebuilding Surface IDs/name maps before downstream consumers. The exact unchanged comparer against the same Original loader data and frozen eighteen profiles passes378 numeric and1,614 discrete comparisons with zero mismatches; every profile maximum error and RMSE is zero. The earlier failed84 records remain preserved. All4,644 workspace tests pass, including both new registration/reference tests; workspace Clippy with warnings denied and formatting pass. This certifies the selected fixed15 loader-to-preprocessing lane only. Complete integration still requires genuine CTF02/03 handoff, and the six fresh production CLI executions remain pending.
-
-## Actual production CLI follow-up (2026-10-10)
-
-All fixed six A/B inputs ran through the actual Cargo-built CLI after the source-order repair, exited 0, and retained identical source and all45 input guards. Each used compatibility mode, partial deny, full trace, no hours override, no oracle comparison, and matching source order. B reports actual fixture_demand_injection_used=false; A reports null because that HVAC-demand field is absent, not a fabricated false. The actual A production weather call and earlier empty-override/no-fixture source audit are retained separately. See `evidence/CTF-01-production-cli/summary.json` for receipts, Cargo identity, source metadata and bounded run/support summaries. Huge traces remain in Runtime. Downstream CTF02/03 handoff and complete integration/production gates remain pending.
-
-## Selected gate closure (2026-10-11)
-
-The existing genuine CTF02/03 production comparisons each preserve all378 exact preprocessing scalar handoffs, actual15 model/21 owner associations and source order with zero mismatch. Later09 repeats those same378 copies without mismatch. Together with the recorded39/42 unit comparison, fixed15 repaired loader comparison and six production CLI runs, this completes the selected CTF01 scope and its four gates. No new physics replay is claimed. Current compiler/material/load sources remain byte-exact; the preprocessing change is only CFU visibility, and subsequent cache changes borrow existing owners without replay or reordering. Earlier pending statements above are historical. Twenty genuinely unreached phases remain numerically unverified. Diagnostic text/global fatal backend, later coefficient algorithms and SUR lifecycle remain separate obligations. Evidence: evidence/CTF-01-complete/summary.json.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

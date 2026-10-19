@@ -56,20 +56,7 @@ CTF-08 최종 계수에 독립 테스트와 동일 데이터 전달
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## Source-only first Gamma scope fixed before outputs
+## 보존한 상세 범위·정밀도 계약
 
 Pinned Original Construction.cc1496-1589 and caller875-894 are fully reviewed.
 Original executes exponential884, inverse887, then Gamma890. Selected first
@@ -87,32 +74,21 @@ assembly7, initial3 and preprocessing18 policies remain separate unchanged hando
 Inputs stay literal39 unit models/42 declared whole calls and15 production IDFs/
 195 declared loader phases with45 scope guards; no expected exits or arrays.
 
-Source authority: .runtime/porting/CTF-07/native-helper-prep-01/manifest.json
-SHA256 67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c;
-passive observer02 d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06;
-projection policy4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6.
-Both new linked Originals require actual PE/provider/runtime proof before execution;
-any later removal requires a separate actual retention record. Old retention refs
-remain literal. Scope review alone passes; unit/integration/production remain
-pending. Full retry, final coefficients, SI19 stores and surface handoff are pending.
+## 최종 네 gate 근거
 
-## Actual selected first Gamma validation
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-- Applied Source `293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e`; actual Cargo artifacts and execution custody verified.
-- Original unit 25 selected first pairs: 180219 numeric and 1130134 discrete comparisons, zero mismatches.
-- Fixed 15 loader pairs: 4005 numeric and 30477 discrete comparisons, zero mismatches.
-- Gamma1, Gamma2 and ATemp maximum absolute error/RMSE are zero; frozen zero tolerances and exact classes/shapes/signed zero are unchanged.
-- Focused Gamma tests 110 passed; workspace tests 4726 passed; clippy with denied warnings and format check exited zero.
-- Actual initial clippy failure and production comparer diagnostic label failure are preserved. The scoped lint expectation and diagnostic-only repair received independent Source review before execution.
-- [Complete selected evidence](../evidence/CTF-07-unit/summary.json) and [actual plan validation](../evidence/CTF-07-unit/validation.json).
-- Native 16 later unit invocations and unavailable 105 unit/36 production observations remain unpaired/noPASS.
-- Whole retry orchestration, final coefficients, public SI19 stores, cache handoff and complete integration/production gates remain pending.
-- Fixed six ordinary CLI executions and precise two-Original retirement are recorded separately.
+1496–1589 whole Gamma on source-produced AExp/AInv/identity/B/dt; first invocation policy; raw kernel identical.
 
-## Actual six ordinary CLI executions
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exited zero at Source293f3e45. All 45 fixed input hashes remained unchanged. Actual Cargo artifacts were used; compatibility/partial deny/full trace, no hours override, no oracle comparison. [Evidence](../evidence/CTF-07-production-cli/summary.json). Complete integration and production gates remain pending.
+직접 단위 근거: [CTF-07-unit](../evidence/CTF-07-unit/summary.json).
 
-## Actual precise two-Original retirement
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-Removed only the two newly verified CTF07 linked debug Originals (2602986812 bytes). Actual plan/action, independent metadata review, genuine final Source293f comparisons/quality/CLI6 and Git archive508-file coverage are preserved. Prior40 artifacts, verified07 derivatives2, core631 present/12 absent and prior04/06 retirements remain unchanged. [Evidence](../evidence/CTF-07-retention/summary.json). No gate completion or recovery claim follows from removal.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

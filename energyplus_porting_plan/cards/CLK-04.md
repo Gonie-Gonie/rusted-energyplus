@@ -56,25 +56,21 @@ SRC-05의 표면 외기 조건 및 PSY 입력으로 연결
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-## 실제 완료 증거
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-구현 `15127617dbc39ee82f0e631e3fe99a3a2fc1e87e`: 단위 5,517,963건·불일치 0, A/B 생산 3,736,442건·불일치 0. 기존 3개 CON 입력의 Full/Summary 6회 실행과 Current 480개를 확인했습니다.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-최종 품질 `a036b012100d2a4cd38240925a7f92f6784f1ce7`: workspace 4,591개 통과, Clippy·형식·소스·구조 검사 실제 0. 생산 수학과 Cargo는 동일하며 관찰자 5개 파일의 후속 정리 계보를 별도로 보존했습니다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-원본 native 0 / 당시 wrapper 1 / metadata recovery 0, 과거 단위·생산 실패와 비가용 경로를 그대로 보존했습니다. 일사·하늘 및 이후 카드 물리식은 이번 통과 범위에 포함하지 않습니다.
-
-증거: `energyplus_porting_plan/evidence/CLK-04.json`; 압축 원문 보존: `energyplus_porting_plan/evidence/CLK-04-archive/archive.json`.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

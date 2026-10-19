@@ -56,25 +56,21 @@ HVAC-05 포화 보정 및 CLK-04 기상상태 연결
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 최종 네 gate 근거
 
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [x] 상태·시간·호출순서를 포함한 연결시험 통과
-- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-구현 커밋: `e7eec6e030a1cf51236a74a427bf0fa3c90ea65a`
-시험 명령: `python -B tools/porting/psy02_reference.py --check`; `.runtime/porting/PSY-02/run_committed_units.py`; `tools/porting/check_psy02_production.py --case <각 사례> --original-driver-build .runtime/porting/PSY-02/native-driver-replay-target-frozen/native-driver-build.json`
-증거 경로: `contracts/PSY-02-{source,cases,tolerances}.json`, `evidence/PSY-02/{source-original-preparation,source-unit-preparation,build-receipt,native-reachability,comparison-report,independent-review}.json`, `evidence/PSY-02/production/*.json`
-최대오차/RMSE/상태 불일치: 단위 516개 수치 호출·33,510개 검사는 최대오차/RMSE 0, 불일치 0. 실제 실행의 Twb 최대오차 `1.0436096431476471e-14 °C` / RMSE `1.8451792967017515e-15 °C`, W/RH `4.440892098500626e-16 kg/kg` / `2.451905405833003e-17 kg/kg`, 최종 Psat 캐시 `1.4551915228366852e-11 Pa` / `1.7537739051563307e-12 Pa`. 모두 사전 고정 허용오차 내 통과. 순서·입력·태그·분기·정확 비교 필드는 불일치 0.
-추가 검토할 helper: 이 카드의 직접 Psat/Pb/W(T,Twb,P), F6/F7, 순서 의존 min/max와 원본 반복 보조함수의 본문·상태를 고정했다. `General::Iterate` 직접 호출 5개, 경고 재발행 수명과 통계 OFF의 내부 반복 횟수는 독립 Rust 비교 통과로 세지 않는다.
+Existing independently accepted card unit/source/connection evidence is retained exactly in plan.evidence and its pinned input/policy/source ranges. Current59 is a scientific-body/caller carry, not a new execution of that old unit.
 
-## 완료 근거와 적용 한계
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-원본 14개 파일·29개 구간과 입력·정밀도 계약을 수치 비교 전에 고정했다. 같은 입력의 원본 C++를 먼저 실행한 뒤 세 개의 새 Rust 상태 수명에서 단위 결과, 호출 전후 스칼라, 캐시 태그·첫 입력 보존·충돌·네 개 최종 테이블을 검증했다. Rust 생산 바이너리와 tuple 바이너리는 위 커밋에서 빌드·보관했으며, 실제 컴파일 소스의 보관 바이트와 Git의 개행 정규화를 구분했다.
+기존의 정확한 단위·명령·입력·정책 메타데이터는 `plan.json`의 원래 `evidence` 객체를 그대로 유지합니다.
 
-일반 CLI Full/Summary 14회는 A24H/A72H, B의 NoLimit/flow/capacity/both24H, both72H를 실행했다. 1,056개의 실제 zone timestep에서 22,895개 선택 물성 호출을 순서대로 원본에 재생했고 누락과 불일치가 없다. 호출자의 실제 입력·상태·캐시를 비교하며, 원본 예상값은 Rust 계산에 주입하지 않는다. 선택 출력·meter·전체 JSON 시계열은 Full/Summary에서 같고 Summary는 관측 파일을 생성하지 않는다. 호출 합계에는 초기화·검증·재계산이 포함되므로 원본의 물리 생산자 호출 횟수와 같다고 주장하지 않는다.
+기존 승인 근거의 본문 구간·helper·입력·단위 정책은 원래 evidence에 보존합니다.
 
-원본의 별도 CON15 실제 실행과 캐시 수명·태그 쓰기 검토는 해당 입력의 warmup까지 cached HPb 호출이 비활성임을 입증한다. 그 함수를 실제 Rust 생산 호출로 가장하지 않으며, 정상·경계·비제로·반복 상태의 단위 증거로 구현을 검증했다. 현재 물성 소비 지점의 연결만 완료했다. HVAC-05 포화 보정 전체 조립, CLK-04 기상 조립, B 연간 Rust 물리 실행, warmup과 SYS 인계·통합 및 건물 전체 원본 일치는 후속 카드의 별도 의무이다.
-
-기존 전체 workspace 4,533개 시험(16 suite), clippy, IdealLoads의 기존 소스·트랜잭션 검증을 통과했다. 개발 중 실패한 명령과 최초 native 정의 검증 실패도 변경 없이 보관했다. 수치 결과를 맞추기 위한 허용오차 완화, 근사식 또는 생산 fixture 주입은 없다.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.

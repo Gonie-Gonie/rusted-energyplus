@@ -56,20 +56,7 @@ EIO 제공 계수를 사용하지 않고 SUR-02~07 구동
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
-
-- [x] 원본 범위와 입출력·변경상태 계약 확정
-- [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
-
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
-
-## Source-only selected private coefficient scope
+## 보존한 상세 범위·정밀도 계약
 
 Construction.cc1591-1906 and caller894 are fixed before any CTF08 helper build/run or scientific output. Only actual invocation1/assembly1 on the massive nonreversed 1D no-source path is selected. Actual preceding exponential884/inverse887/Gamma890 returns and initial619 context are required.
 
@@ -77,20 +64,21 @@ Seven new primary owners are s0, full allocated s/e including initialized tails,
 
 All real later visits, omissions, independent copy masks and six failure kinds must be retained and validated; later observations receive no PASS. R workspaces/private controls are unavailable at return and are not reconstructed. Same literal39 unit models/42 whole calls and original15 production models/195 loader phases/45 input guards are retained. No identity from prior07 frozen docs is rebound to live current docs.
 
-Whole retry orchestration, final public SI19 stores and SUR/cache handoff remain pending; this selected scope establishes no unit, integration, production or complete-card PASS. The two new08 linked Originals are retained through PE and real helper review, then require separate precise actual retirement.
+## 최종 네 gate 근거
 
-## Actual selected first private coefficient comparison
+| Gate | 범위별 Root 판정 |
+|---|---|
+| scope_review | A: 통과 / B: 통과 |
+| unit_gate | A: 통과 / B: 통과 |
+| integration_gate | A: 통과 / B: 통과 |
+| production_gate | A: 통과 / B: 통과 |
 
-Same frozen inputs and strict zero profiles: unit numeric248178/discrete1574736, fixed15 loader numeric6510/discrete46896, all mismatch0. Seven primary full private owners have max absolute error/RMSE0, including initialized tails, exact class/shape/signed zero and integer/control state. Selected first owners25/15; Native later16 unit visits remain retained and unpaired. Unavailable122/42 records receive no PASS.
+1591–1906 whole private coefficient calculation, private pre-deallocation owners; raw kernel identical. Current terms/public SI19 not inferred from private first pair.
 
-Actual Cargo clippy/fmt checks0; focused132 and workspace4748 tests passed with0 failed/ignored. All actual candidate/quality/comparison recorders bind Source761312a84eda41f616c5002808815011dcb6b46fb48c1ee6c1697cbdcb43fe6c. Full scientific bytes, source/commands and real OriginalDataQA baseline are preserved in evidence/CTF-08-unit/{manifest,summary}.json.
+실제 구현 기준은 Source59 `a2c512a246f73dc806805c6c4e277c2960fdda44`입니다. [최종 판정](../evidence/SRC-06-final-current-source-validation-60/summary.json)의 해당 카드별 범위·gate 근거와 현재 연결 결과를 참조합니다. 이전 단위 명령은 원래 근거에 보존되며 현재 바이너리 재실행으로 집계하지 않습니다.
 
-Only the selected unit gate passes. Whole retry, final public SI19 stores, SUR/cache connection and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.
+직접 단위 근거: [CTF-08-unit](../evidence/CTF-08-unit/summary.json).
 
-## Actual fixed six ordinary CLI executions
+선택 본문의 정확한 행·원문 해시·역할과 직접 helper 근거는 해당 카드의 `evidence_by_scope.selected_source_extents` 및 최종증거팩의 본문 구간 원장에 기록합니다. 선언 행은 심볼 위치 식별에만 사용합니다.
 
-A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final08 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-08-production-cli/{manifest,summary}.json.
-
-## Actual exact-pair Original retirement
-
-The two new08 linked debug Originals were removed through the reviewed exact LiteralPath mechanism after the committed comparison/quality/CLI proof. Actual removed bytes2604258635; both paths are absent. Prior42 protected artifacts, both08 runtime derivatives and631 core objects remain unchanged;12 absent registered paths and all prior04/06/07 Original absences remain unchanged. No registry/history rewrite or scientific rerun. Evidence: evidence/CTF-08-retention/{manifest,summary}.json. Integration/production/full-card gates remain pending.
+과거 실패·미관측 값·제외 분기는 불변 근거에 남습니다. 수치 단위, 현재 연결, 보고값 정책, 물리 파일 직렬화의 판정을 합치지 않습니다.
