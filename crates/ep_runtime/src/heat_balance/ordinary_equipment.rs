@@ -14,6 +14,7 @@ mod source_endrun;
 mod source_marked_nodes;
 mod source_reset;
 mod source_setup_reporting;
+pub(crate) mod source_purchased_air;
 
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
 use source_nodes::{SourceNodeData, SourceNodeSetpointCheck};
@@ -448,6 +449,8 @@ pub(crate) struct OrdinaryEquipment {
     equipment_inputs_filled: bool,
     equipment_simulated_once: bool,
     management_modules: management::SourceEquipmentManagementModules,
+    /// Sole actual DataPurchasedAirMgr, retained from cold Native construction.
+    pub(crate) purchased_air: source_purchased_air::owners::SourcePurchasedAirManager,
     zone_equipment_mixers: Vec<std::convert::Infallible>,
     zone_return_mixers: Vec<std::convert::Infallible>,
     init_equipment_one_time_flag: bool,
@@ -676,6 +679,7 @@ impl OrdinaryEquipment {
             equipment_inputs_filled: false,
             equipment_simulated_once: false,
             management_modules: Default::default(),
+            purchased_air: Default::default(),
             zone_equipment_mixers: Vec::new(),
             zone_return_mixers: Vec::new(),
             init_equipment_one_time_flag: true,

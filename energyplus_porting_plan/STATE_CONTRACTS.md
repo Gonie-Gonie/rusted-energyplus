@@ -140,3 +140,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [예측 상태와 Node 소유권 검증](evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json). 같은 실제 Node에서 이력 복원 결과를 먼저 확인한 뒤 세 계수 입력을 전달해 설정값과 수요를 비트 단위로 대조합니다. 전체 예측기·수정기와 캐시 검증은 별도 범위입니다.
+
+
+[Source IdealLoads 입력·보고 연결 검증](evidence/SRC-06-canonical-purchased-air-input-25/summary.json). PurchasedAir는 13개 모듈 필드와 134개 장비 필드를 보존하며, 실수 66개·정수 1개 보고값은 같은 장비 상태를 참조한다. Node·스케줄 연결에도 기존 실제 소유자를 사용한다. 원본 IDF의 물리 필드 수도 변환 뒤에 보존한다.

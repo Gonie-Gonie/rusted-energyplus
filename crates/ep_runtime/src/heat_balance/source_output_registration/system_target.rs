@@ -6,6 +6,7 @@ pub(crate) enum SourceHvacRealOutputField {
     SystemRejectHeatLoss,
 }
 pub(crate) struct SourceAllIntegerOutputOwners<'a> {
+    pub(crate) equipment: &'a dyn SourceIntegerOutputOwners,
     pub(crate) weather: &'a dyn SourceIntegerOutputOwners,
     pub(crate) air: &'a dyn SourceIntegerOutputOwners,
     pub(crate) surface: &'a dyn SourceIntegerOutputOwners,
@@ -17,6 +18,7 @@ impl SourceIntegerOutputOwners for SourceAllIntegerOutputOwners<'_> {
         target: SourceIntegerOutputTarget,
     ) -> Result<&i32, OrdinaryRadiationError> {
         match target {
+            SourceIntegerOutputTarget::PurchasedAirAvailabilityStatus { .. } => self.equipment.integer_output(target),
             SourceIntegerOutputTarget::Weather { .. } => self.weather.integer_output(target),
             SourceIntegerOutputTarget::ZoneThermostatControlType { .. } => {
                 self.air.integer_output(target)

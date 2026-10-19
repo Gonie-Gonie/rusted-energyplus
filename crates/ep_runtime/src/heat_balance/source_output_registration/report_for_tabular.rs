@@ -63,7 +63,7 @@ fn date_to_string_with_month(coded_date: i32) -> String {
 
 impl SourceOutputRegistration {
     /// Push each actual final-year meter period to the same predefined table.
-    /// The admitted meter constructors produce Electricity, OtherJ and OtherKG.
+    /// The admitted meter constructors produce Electricity, Cooling, OtherJ and OtherKG.
     /// Existing real-entry helpers keep their explicit finite fixed-format
     /// domain; no scientific/nonfinite formatting or completion is invented.
     pub(crate) fn report_source_for_tabular_reports(
@@ -87,6 +87,13 @@ impl SourceOutputRegistration {
                     "pdchEMelecmaxvalue",
                     "pdchEMelecmaxvaluetime",
                 ],
+                SourceMeterIpUnits::Cooling => [
+                    "pdchEMcoolannual",
+                    "pdchEMcoolminvalue",
+                    "pdchEMcoolminvaluetime",
+                    "pdchEMcoolmaxvalue",
+                    "pdchEMcoolmaxvaluetime",
+                ],
                 SourceMeterIpUnits::OtherKG => [
                     "pdchEMotherKGannual",
                     "pdchEMotherKGminvalue",
@@ -104,7 +111,7 @@ impl SourceOutputRegistration {
             };
             let annual = match meter.ip_units {
                 Some(SourceMeterIpUnits::OtherKG) => period.value,
-                Some(SourceMeterIpUnits::Electricity | SourceMeterIpUnits::OtherJ) => {
+                Some(SourceMeterIpUnits::Electricity | SourceMeterIpUnits::Cooling | SourceMeterIpUnits::OtherJ) => {
                     period.value * 1.0E-9
                 }
                 None => return Err(Error::Unavailable("actual initialized meter RT_forIPUnits")),

@@ -452,3 +452,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [단일 Native 코호트 테스트](../evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json). 한 테스트에서 1,168개 호출과 시간 간격 축소 77회를 검증했습니다. 신규 CLI 실행을 주장하지 않으며 게이트는 A14/54·B14/64를 유지합니다.
+
+
+[Source IdealLoads 입력·보고 연결 검증](../evidence/SRC-06-canonical-purchased-air-input-25/summary.json). PurchasedAir 입력과 실제 장비의 보고 선언을 연결했다. B는 `GetHeatBalanceInput: actual PurchasedAirManager InitPurchasedAir201`에서 중단되며, B 전체 완료는 후속 작업이다.

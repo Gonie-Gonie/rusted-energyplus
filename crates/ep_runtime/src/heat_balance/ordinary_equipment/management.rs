@@ -5,6 +5,8 @@ mod output_required;
 use crate::heat_balance::ordinary_hvac_manager::{SourceHvacManager, SourceHvacOwners};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_sizing::SourceZoneEquipmentSizing;
+use crate::heat_balance::ordinary_hvac_manager::simulation::output_registration::SourceHvacOutputContext;
+use crate::heat_balance::source_output_registration::{SourceOutputFileHost, SourceOutputDictionaryHost, SourcePurchasedAirReportingOutputContext};
 pub(crate) use modules::SourceEquipmentManagementModules;
 fn at(number: i32) -> Result<usize, Error> {
     number
@@ -15,16 +17,18 @@ fn at(number: i32) -> Result<usize, Error> {
         ))
 }
 impl SourceHvacManager {
-    pub(crate) fn manage_source_zone_equipment(
+    pub(crate) fn manage_source_zone_equipment<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
         &mut self,
         first_hvac_iteration: bool,
         o: &mut SourceHvacOwners<'_, '_>,
+        output: &mut SourceHvacOutputContext<'_, H, D>,
+        eio: &mut dyn std::io::Write,
     ) -> Result<(), Error> {
         self.initialize_source_zone_equipment(first_hvac_iteration, o)?;
         if o.globals.zone_sizing_calculation {
             return Err(Error::Unavailable("actual SizeZoneEquipment156"));
         }
-        self.simulate_source_zone_equipment(first_hvac_iteration, o)?;
+        self.simulate_source_zone_equipment(first_hvac_iteration, o, output, eio)?;
         o.equipment.equipment_simulated_once = true;
         self.update_source_zone_equipment(o)?;
         o.hvac.sim_zone_equipment = false;
@@ -136,10 +140,12 @@ impl SourceHvacManager {
         }
         Ok(())
     }
-    fn simulate_source_zone_equipment(
+    fn simulate_source_zone_equipment<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
         &mut self,
         first_hvac_iteration: bool,
         o: &mut SourceHvacOwners<'_, '_>,
+        output: &mut SourceHvacOutputContext<'_, H, D>,
+        eio: &mut dyn std::io::Write,
     ) -> Result<(), Error> {
         let mut _supply_path_inlet_changed = false;
         let _system_output_provided = 0.0;
@@ -281,15 +287,29 @@ impl SourceHvacManager {
                 }
                 match equipment_type {
                     12 => {
-                        let _name = &o.equipment.priority_simulation_order.as_ref()
+                        let name = o.equipment.priority_simulation_order.as_ref()
                             .and_then(|rows| rows.get(equipment_number - 1))
-                            .ok_or(Error::Unavailable("actual PurchasedAir priority name3872"))?.equipment_name;
-                        let _same_component_index = o.equipment.equipment_lists.as_mut()
-                            .and_then(|rows| rows.get_mut(at(o.sizing.current_zone_equipment_number).ok()?))
-                            .and_then(|list| list.equipment_indices.as_mut())
-                            .and_then(|rows| rows.get_mut(at(equipment_pointer).ok()?))
-                            .ok_or(Error::Unavailable("actual PurchasedAir same EquipIndex3877"))?;
-                        return Err(Error::Unavailable("actual PurchasedAirManager SimPurchasedAir3871"));
+                            .ok_or(Error::Unavailable("actual PurchasedAir priority name3872"))?.equipment_name.clone();
+                        let mut purchased_output = SourcePurchasedAirReportingOutputContext {
+                            registration: output.registration,
+                            input: o.input,
+                            prescan: output.prescan,
+                            reports: output.reports,
+                            minimum_report_frequency: output.minimum_report_frequency,
+                            minutes_in_time_step: o.clock.minutes_in_time_step,
+                            host: output.host,
+                            dictionary_host: output.dictionary_host,
+                            eio: &mut *eio,
+                        };
+                        o.equipment.simulate_source_purchased_air(
+                            &name, o.sizing.current_zone_equipment_number, equipment_pointer, number,
+                            o.shortcut, *o.source_is_epjson, o.schedules, o.globals.num_of_zones,
+                            &mut self.ancillary.branch_node_connections, o.globals.any_energy_management_system_in_model,
+                            o.backend, &mut purchased_output,
+                        )?;
+                        // Actual Init/Calc/Update/Report has not returned in
+                        // this bounded producer; never forge its zero response.
+                        return Err(Error::Unavailable("actual PurchasedAir post-callee output response4084"));
                     }
                     // Current real input admits only PurchasedAir. Any later
                     // represented positive type must enter its actual callee,

@@ -27,6 +27,7 @@ impl SourceMeterEndUse {
 pub(crate) enum SourceMeterGroup {
     Invalid = -1,
     Building = 0,
+    Hvac = 1,
     Plant = 2,
     Zone = 3,
 }
@@ -35,6 +36,8 @@ pub(crate) enum SourceMeterGroup {
 pub(crate) enum SourceMeterResource {
     Invalid = -1,
     Electricity = 0,
+    DistrictCooling = 10,
+    DistrictHeatingWater = 11,
     EnergyTransfer = 15,
     ElectricityPurchased = 17,
     ElectricitySurplusSold = 18,
@@ -52,6 +55,7 @@ pub(crate) enum SourceMeterType {
 pub(crate) enum SourceMeterIpUnits {
     OtherJ = 0,
     Electricity = 1,
+    Cooling = 3,
     OtherKG = 5,
 }
 
@@ -457,7 +461,9 @@ impl SourceOutputRegistration {
                 | SourceMeterResource::ElectricityPurchased
                 | SourceMeterResource::ElectricitySurplusSold
                 | SourceMeterResource::ElectricityNet => SourceMeterIpUnits::Electricity,
-                SourceMeterResource::EnergyTransfer | SourceMeterResource::CarbonEquivalent => {
+                SourceMeterResource::DistrictCooling => SourceMeterIpUnits::Cooling,
+                SourceMeterResource::DistrictHeatingWater
+                | SourceMeterResource::EnergyTransfer | SourceMeterResource::CarbonEquivalent => {
                     if units == SourceOutputUnits::Kg {
                         SourceMeterIpUnits::OtherKG
                     } else {
@@ -501,6 +507,8 @@ impl SourceMeterResource {
     pub(super) fn source_name(self) -> Result<&'static str, OrdinaryRadiationError> {
         match self {
             Self::Electricity => Ok("Electricity"),
+            Self::DistrictCooling => Ok("DistrictCooling"),
+            Self::DistrictHeatingWater => Ok("DistrictHeatingWater"),
             Self::EnergyTransfer => Ok("EnergyTransfer"),
             Self::ElectricityPurchased => Ok("ElectricityPurchased"),
             Self::ElectricitySurplusSold => Ok("ElectricitySurplusSold"),
@@ -514,6 +522,7 @@ impl SourceMeterGroup {
     pub(super) fn source_name(self) -> Result<&'static str, OrdinaryRadiationError> {
         match self {
             Self::Building => Ok("Building"),
+            Self::Hvac => Ok("HVAC"),
             Self::Plant => Ok("Plant"),
             Self::Zone => Ok("Zone"),
             Self::Invalid => Err(OrdinaryRadiationUnavailable::InputBranch.into()),

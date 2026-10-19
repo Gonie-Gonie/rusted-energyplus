@@ -25,6 +25,10 @@ pub(crate) enum SourceSurfaceOutputField {
 /// Stable actual field identity; Source ordinals remain independent of typed IDs.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceRealOutputTarget {
+    PurchasedAir {
+        field: super::SourcePurchasedAirOutputField,
+        index: i32,
+    },
     Node {
         field: super::SourceNodeOutputField,
         index: i32,

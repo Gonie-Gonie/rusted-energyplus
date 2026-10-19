@@ -3,6 +3,7 @@ use super::bound_real::SourceOutputVariableType;
 use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceIntegerOutputTarget {
+    PurchasedAirAvailabilityStatus { index: i32 },
     Weather {
         field: super::SourceWeatherIntegerOutputField,
     },

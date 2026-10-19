@@ -72,7 +72,8 @@ impl SourceRealOutputOwners for SourceCombinedOutputOwners<'_> {
             SourceRealOutputTarget::Air { .. } => {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
-            SourceRealOutputTarget::Node { .. }
+            SourceRealOutputTarget::PurchasedAir { .. }
+            | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::Weather { .. }
             | SourceRealOutputTarget::Schedule { .. }
             | SourceRealOutputTarget::SystemReports { .. }

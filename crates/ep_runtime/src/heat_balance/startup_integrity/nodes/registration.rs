@@ -7,6 +7,7 @@ use super::{Error, SourceBranchNodeConnections, extent};
 pub(crate) enum SourceNodeObjectType {
     Invalid = -1,
     ZoneHvacEquipmentConnections = 261,
+    ZoneHvacIdealLoadsAirSystem = 268,
     SpaceHvacEquipmentConnections = 282,
     Num = 286,
 }
@@ -14,6 +15,7 @@ impl SourceNodeObjectType {
     pub(crate) fn source_name(self) -> Result<&'static str, Error> {
         match self {
             Self::ZoneHvacEquipmentConnections => Ok("ZoneHVAC:EquipmentConnections"),
+            Self::ZoneHvacIdealLoadsAirSystem => Ok("ZoneHVAC:IdealLoadsAirSystem"),
             Self::SpaceHvacEquipmentConnections => Ok("SpaceHVAC:EquipmentConnections"),
             _ => Err(Error::Unavailable("actual finite Node ConnectionObjectType name domain")),
         }
@@ -126,7 +128,7 @@ impl SourceBranchNodeConnections {
             row.fluid_stream = fluid_stream;
             row.object_is_parent = is_parent;
         }
-        // Both represented object-type names are genuine non-AirTerminal
+        // All represented object-type names are genuine non-AirTerminal
         // families, so Native's prefix guard is false and caller error latches
         // are unchanged. AirTerminal-specific records are not projected here.
         Ok(())

@@ -89,6 +89,7 @@ impl SourceOrdinaryHvacRemaining {
         };
         let surface = SourceInsideIteration(o.inside_surface_iterations);
         let integers = SourceAllIntegerOutputOwners {
+            equipment: &*o.equipment,
             weather: &weather,
             air: &air,
             surface: &surface,

@@ -217,6 +217,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneControl:Thermostat",
         name_field_index: 0,
     },
+    // PurchasedAir's real getter consumes IDF order and physical max-fields metadata.
+    IdfOrderTarget {
+        object_type: "ZoneHVAC:IdealLoadsAirSystem",
+        name_field_index: 0,
+    },
     // ScheduleManager uses getObjectItem's preserved IDF order within these
     // families. Cross-family registration order remains the compiler's owner.
     IdfOrderTarget {
@@ -392,6 +397,7 @@ pub fn apply_idf_declaration_order(
                         | "RunPeriod"
                         | "SizingPeriod:DesignDay"
                         | "ZoneControl:Thermostat"
+                        | "ZoneHVAC:IdealLoadsAirSystem"
                 )
             {
                 report_field_counts.push((
@@ -403,6 +409,8 @@ pub fn apply_idf_declaration_order(
                         "OtherEquipment" => idf_object.max_fields.max(11),
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
+                        // Pinned IdealLoads IDD/schema min_fields is 27; only semicolon records reach this padding.
+                        "ZoneHVAC:IdealLoadsAirSystem" => idf_object.max_fields.max(27),
                         "Site:GroundTemperature:BuildingSurface"
                         | "Site:GroundTemperature:FCfactorMethod"
                         | "Site:GroundTemperature:Shallow"
@@ -573,7 +581,8 @@ fn scan_target_objects(
         if let Some(object_type) = fields.first()
             && (object_type.eq_ignore_ascii_case("RunPeriod")
                 || object_type.eq_ignore_ascii_case("SizingPeriod:DesignDay")
-                || object_type.eq_ignore_ascii_case("ZoneControl:Thermostat"))
+                || object_type.eq_ignore_ascii_case("ZoneControl:Thermostat")
+                || object_type.eq_ignore_ascii_case("ZoneHVAC:IdealLoadsAirSystem"))
             && targets
                 .iter()
                 .any(|target| target.object_type.eq_ignore_ascii_case(object_type))
@@ -1200,6 +1209,11 @@ mod unnamed_report_order_tests {
                 "SizingPeriod:DesignDay,Z,12;SizingPeriod:DesignDay,A,7,,SummerDesignDay;",
                 Some([2, 4]),
             ),
+            (
+                "ZoneHVAC:IdealLoadsAirSystem",
+                "ZoneHVAC:IdealLoadsAirSystem,Z;ZoneHVAC:IdealLoadsAirSystem,A,Availability,Supply,,,50,13,0.0156,0.0077,NoLimit,,,NoLimit,,,,,None,0.7,None,,,None,NoEconomizer,None,0.7,0.65,,,DistrictHeatingWater,,DistrictCooling;",
+                Some([27, 32]),
+            ),
         ] {
             let epjson = format!("{{\"{family}\":{{\"A\":{{}},\"Z\":{{}}}}}}");
             let raw = parse_epjson_str_with_idf_order(&epjson, idf)?;
@@ -1281,6 +1295,18 @@ mod unnamed_report_order_tests {
                 .ok_or("unterminated DesignDay must remain unavailable")?;
             assert!(error.to_string().contains("terminating semicolon"));
             assert_eq!(eof_design_day, before_eof);
+        }
+        let mut eof_ideal_loads = parse_epjson_str(r#"{"ZoneHVAC:IdealLoadsAirSystem":{"A":{}}}"#)?;
+        for idf in [
+            "zonehvac:idealloadsairsystem,a",
+            "ZoneHVAC:IdealLoadsAirSystem,A,",
+        ] {
+            let before_eof = eof_ideal_loads.clone();
+            let error = apply_idf_declaration_order(&mut eof_ideal_loads, idf, IDF_ORDER_TARGETS)
+                .err()
+                .ok_or("unterminated IdealLoads must remain unavailable")?;
+            assert!(error.to_string().contains("terminating semicolon"));
+            assert_eq!(eof_ideal_loads, before_eof);
         }
         Ok(())
     }

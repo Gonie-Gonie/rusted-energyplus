@@ -12851,6 +12851,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-prediction-native-cohort-21/summary.json",
         "sha256": "a9c19a86603e99790752566408c7d205b0e428cb5e0f0d5f32192693ea2e5805",
         "size_bytes": 8085
+      },
+      "canonical_purchased_air_input_25": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-input-25/summary.json",
+        "sha256": "28fa5554cbaeba1a4ce420df36ee3e6a78847979086d22d20d2f4e90dce0a726",
+        "size_bytes": 5189
       }
     },
     {

@@ -99,6 +99,8 @@ use super::source_output_prescan::SourceOutputPreScan;
 use crate::error::WarmupOutputError;
 use std::collections::BTreeMap;
 mod air_target;
+mod purchased_air_target;
+pub(crate) use purchased_air_target::{SourcePurchasedAirOutputField, SourcePurchasedAirReportingOutputContext};
 mod node_target;
 pub(crate) use node_target::{SourceNodeOutputField, SourceNodeReportingOutputContext};
 mod system_target;

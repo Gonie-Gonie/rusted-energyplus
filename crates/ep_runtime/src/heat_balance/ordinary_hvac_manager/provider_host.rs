@@ -156,7 +156,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
             Child::ManageSystemAvailability => manager.manage_source_system_availability(owners),
             Child::ManageZoneEquipment {
                 first_hvac_iteration,
-            } => manager.manage_source_zone_equipment(first_hvac_iteration, owners),
+            } => manager.manage_source_zone_equipment(first_hvac_iteration, owners, &mut self.output, eio),
             Child::ManageNonZoneEquipment {
                 first_hvac_iteration,
             } => manager.manage_source_non_zone_equipment(first_hvac_iteration, owners),

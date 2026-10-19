@@ -85,7 +85,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
         use SourceRealOutputTarget as T;
         match target {
-            T::Node { .. } => self.nodes.real_output(target),
+            T::Node { .. } | T::PurchasedAir { .. } => self.nodes.real_output(target),
             T::Weather { .. } => self
                 .weather_outputs
                 .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?

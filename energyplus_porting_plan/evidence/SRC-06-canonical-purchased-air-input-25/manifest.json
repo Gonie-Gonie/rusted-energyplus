@@ -1,0 +1,1571 @@
+{
+  "schema": "src06-canonical25-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-input-25/evidence.zip",
+    "sha256": "8bf89b1102c68f906d29a46ade576eab3ceed3ea192401377cff8404e9a2ed67",
+    "bytes": 3115711
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-purchased-air-IDF-metadata-Source-review-25/review.json",
+      "sha256": "75846e908d7aff1d3bb81ee971ebc058519930e2a63a17f93614afbc5ee2c7ea",
+      "bytes": 4967
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-purchased-air-final-join-review-25/review.json",
+      "sha256": "6f27dc4d40917b3459c26dd35ef5af633f097a831292cbd7215f6556194ed666",
+      "bytes": 29003
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-purchased-air-output-routing-Source-review-25/review.json",
+      "sha256": "1c88cf03a10cd904fd9cb627c4c3b96ae7b74707afb252e40afb64ab3ee7fd8d",
+      "bytes": 46744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-purchased-air-IDF-metadata-application-25/receipt.json",
+      "sha256": "3e1d7a6a74e2e4b94a57fe617fb3cfc00f58e1b1b08a454ab85824328b2b829e",
+      "bytes": 4119
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-purchased-air-input-application-25/receipt.json",
+      "sha256": "d700ccaa38d7c8d2aeed863e29f798005c8517743b8289b0a921d5d83bb6cc94",
+      "bytes": 65326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-purchased-air-input-final-application-25-02/receipt.json",
+      "sha256": "aabaa7e594a137eee0ccff7e289750cc90444bb5587439764ad797a2b65be952",
+      "bytes": 69108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-purchased-air-input-output-draft-review-25/review.json",
+      "sha256": "2e923a13f95c30b0af3d2558b50594927ff2a850c90d1279b3bc146ebb67f79b",
+      "bytes": 7944
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-prediction-cohort-actual-review-21/review.json",
+      "sha256": "29148090bfc5f96840193c24f168ac4b7733b0f07acd76141c6ab8c8db655925",
+      "bytes": 6160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-purchased-air-input-actual-review-25-02/review.json",
+      "sha256": "1bc1b45027a2a3a675e6dc16c12ce1e6fc1fe16076e66357a20044b6555402ca",
+      "bytes": 18290
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-purchased-air-input-actual-review-25-02/table-clock-differences.json",
+      "sha256": "0de7c0148a04ea4e933ffbac60e614069f2862e1d028cbfb4e268ce59e9702a9",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-purchased-air-IDF-metadata-Root-25.py",
+      "sha256": "7d837d9daf21365829f865b0b2d88a896a6ffe6f7217ef8b4d72b5e19d0cfe3c",
+      "bytes": 4380
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-purchased-air-input-Root-25.py",
+      "sha256": "447d349e74d1ae6ef8333d8e37d6864d3f972db4259abdbaf884a8c8a98a436e",
+      "bytes": 5612
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-purchased-air-IDF-metadata-test-Root-25/receipt.json",
+      "sha256": "5dff6e6fc343fe1dcc5e56c4dce4063fc4c3c9a408bb2f8779796f13e2313829",
+      "bytes": 6451
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-purchased-air-IDF-metadata-test-Root-25/stderr.log",
+      "sha256": "60fa40776443febb37c7ac3d81041f3a04f673017799dbcee24d8365ebdb9de7",
+      "bytes": 347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-purchased-air-IDF-metadata-test-Root-25/stdout.log",
+      "sha256": "d6e5632f25c325f39cb1f282c52b19493a2740d0a691469914b2d11b00a3c60b",
+      "bytes": 232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/diagnostics.json",
+      "sha256": "816b80e515efca246f079aef24aa8241643cc86d870d6f93570438aa5c7c059a",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplustbl.htm",
+      "sha256": "07e9b991e8a792b84a519fb62a06101216a4c6b1037ad756e4bf07ea200115ed",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/eplustbl.xml",
+      "sha256": "71a608ec71fff07b5abcc64664e9c90afcdb88608d41d1699bd20dc6cca10631",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/results/source-reported-results.json",
+      "sha256": "0ea5a739177da5b3b3e399ec4f995c1d07069f0ff7e74a0be3f87d93fcb46b76",
+      "bytes": 1679922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-Root-25-02/output/run-summary.json",
+      "sha256": "54c7b44dead0ff23d9c6278795cfe79f6f1122c47212c5c76b46160fd682fd65",
+      "bytes": 32735
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25-02/receipt.json",
+      "sha256": "8376fdf0f9bd2240f76d136c44985f8b0997a339ddc50673c64041d1778a5484",
+      "bytes": 7044
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25-02/stderr.log",
+      "sha256": "8fce3f9291b9e38fe9b5a3ed0d441a1c26076bade68ed58dd8b246b7c0017d54",
+      "bytes": 755
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25-02/stdout.log",
+      "sha256": "a4e94952b1f882e0e465b0f598af83f5edae968615967240a10ef8c0419d3cb3",
+      "bytes": 386988
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25/receipt.json",
+      "sha256": "aebd455705ff19a5252fab48f00a695972ad24d84a35d1fb10814fa4799e1f91",
+      "bytes": 6945
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25/stderr.log",
+      "sha256": "017be66d1df47c06f6eb276ece040c2b2b392c1b06229c5f4319209fb4f29a05",
+      "bytes": 752
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-A-24H-command-Root-25/stdout.log",
+      "sha256": "d642c23db4011f17b90bb655958ca62c0b4476be022261647ae86d7f581c047e",
+      "bytes": 386976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25-02/output/diagnostics.json",
+      "sha256": "41db0352b6cf493bf3697545c99f2d96edf75d1190f4cc4c5ebfa58acc9233f9",
+      "bytes": 2980
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25-02/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25-02/output/run-summary.json",
+      "sha256": "4fdc4609d7491af7abf150701ef49a5d37cd0849356850a3ca12eeca465f39cf",
+      "bytes": 25316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25/output/diagnostics.json",
+      "sha256": "efe302d6527310bd368fd4d6f1e602706999c33dd894d1050ac22cd9d7209899",
+      "bytes": 2986
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25/output/input/converted.epJSON",
+      "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+      "bytes": 37726
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25/output/input/input-hashes.json",
+      "sha256": "01ab0ccba1e8522cb0981e5244c77596129dfb4c0a82466151b1107b08721bf7",
+      "bytes": 773
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-Root-25/output/input/original.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25-02/receipt.json",
+      "sha256": "f976f08c37a3491e14cd4777132af5204cb8e2f1ca1044244ce78b60d3126125",
+      "bytes": 7095
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25-02/stderr.log",
+      "sha256": "0638f648e2ee563d71b3e0f1332ee9a7535f612d294740bf5d2071fc7bcbb5ab",
+      "bytes": 11999
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25-02/stdout.log",
+      "sha256": "8e968ac8a9903226111ca0d6fd1abbf1e2a5f44c85596bb73f436a4839dcbdea",
+      "bytes": 387024
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25/receipt.json",
+      "sha256": "e96ae640371df4c12d9f537cfdad2a79696031826e12d82dc76be9a1baf5e668",
+      "bytes": 6996
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25/stderr.log",
+      "sha256": "82dde7d6991dd372fce55eea35086f3537aefbd33aa3edc2ccd9e3afc7e7ac7f",
+      "bytes": 10687
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-purchased-air-input-B-NOLIMIT-24H-command-Root-25/stdout.log",
+      "sha256": "6fa822be9bba8b4bee96285e73e8cf0dfc659a30fdcfc9fb838642ad3d1d9806",
+      "bytes": 387011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-purchased-air-composite-application-Root-25-02.py",
+      "sha256": "0607d5ada9c54ff47eaae5161d6eeb871340b95db89cd1336d25b52584a2998e",
+      "bytes": 4680
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-purchased-air-input-actual-Root-25-02.py",
+      "sha256": "174c50b347edbb59f208e72012fb9c62462583a72430b339ef53686d963b959c",
+      "bytes": 8003
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compose-purchased-air-IDF-correction-Outer-25-02.py",
+      "sha256": "199f19e450e2e1ba8cc0a8cc04e9a016712c189a241b32b6e6f96ef6ee0f8e61",
+      "bytes": 7869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-purchased-air-input-Root-25-02.py",
+      "sha256": "7de9b69f6c8a05b831b4f08e554530c10d0721428f00f7ca2c878a1e8a5a69ee",
+      "bytes": 1320
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-source-B-raw-ingress-held-Audit-01/schema-authority.json",
+      "sha256": "a2c165fd813f7db29ecf2c9abe3da6ea1afbc9196bd723ea7be0dc966a9ceffe",
+      "bytes": 5862
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-coherent-purchased-air-Audit-25.py",
+      "sha256": "7c7986434780a994c533ac2d08f21ab504896ed898323da50f818a9a7e2690f5",
+      "bytes": 14147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-purchased-air-IDF-metadata-Peer-25.py",
+      "sha256": "d5fe40d0371e6343971ad006783b5817c0899aa75ece40a2f21378ef1ba146db",
+      "bytes": 10006
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-purchased-air-publication-Audit-25.py",
+      "sha256": "3abb6a1959ccf19ffe6f69e0b86ad7d3f1ab9bdcc22fc65996434c82329a693b",
+      "bytes": 9467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-purchased-air-publication-successor-Audit-25-02.py",
+      "sha256": "af2c4922fb01505100214bdb6c0ddaed53d41452e75b6be35c06cac3a2d1d22d",
+      "bytes": 12268
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-purchased-air-checkpoint-Audit-25-02.py",
+      "sha256": "b72bc268b93f9d4ca42b3f7c226ebf611ca171a0a5788826ed39aaf4e0aa67dd",
+      "bytes": 13381
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-purchased-air-checkpoint-Audit-25.py",
+      "sha256": "d6cb53bd35216942dcf3f843b14484989839065c77633c234e204f6a04ed7e38",
+      "bytes": 12015
+    },
+    {
+      "path": ".runtime/porting/SRC-06/purchased-air-publication-prepared-Audit-25-02/publication-template.json",
+      "sha256": "c9576d65f8c3bf68d83bb0fa5bfb90beb27ebd0aa29fd417f19c3accd29d41a9",
+      "bytes": 66857
+    },
+    {
+      "path": ".runtime/porting/SRC-06/purchased-air-publication-prepared-Audit-25/publication-template.json",
+      "sha256": "5014acf9360d21b530ea1fb2605d3e9ae5cef259e7c3c41efb980e076c4275ea",
+      "bytes": 54989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-coherent-purchased-air-Audit-25.py",
+      "sha256": "17e5689d8d6119fafa5b5996a00933b4db6b57edc95ab9bbc6156357fc305739",
+      "bytes": 7020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/Native-extents/Energy+.idd.in.35807-36042.txt",
+      "sha256": "be3cd4c0a75cddfdf8d87bb216e7b7ff5082c34d440b2476c96bb794a8efb3b9",
+      "bytes": 10317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/Native-extents/IdfParser.cc.309-405.txt",
+      "sha256": "b895c9188b1d3b114ffdf234575986ae9f0ee2292b7eb40b7ca34fd2d943fdec",
+      "bytes": 4376
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/Native-schema/IdealLoads-object.json",
+      "sha256": "8bde9de8ba2101b77c610bedffc36cd3ba8a34ccfaf421787fd1f89a70d37d3c",
+      "bytes": 19917
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/Native/idd/Energy+.idd.in",
+      "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+      "bytes": 4504288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/Native/src/EnergyPlus/InputProcessing/IdfParser.cc",
+      "sha256": "fdbab72d01cbce4d33ef06fecc4a57eddd17a9c8c30fb82e64a91ff92df38a78",
+      "bytes": 30215
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/before/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "c48d509776aa32f55a6471b0ff2da0cf1254e0058888e3721e4f7800f87ab06c",
+      "bytes": 48733
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/diffs/01-forward.diff",
+      "sha256": "a12d1a0c8b41137a9578be3d9be9809869d7f77ae12c1b907aadc04ec2abc3cd",
+      "bytes": 3598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/diffs/01-inverse.diff",
+      "sha256": "ecff1cfcfefb2e5ce8e04ef9eb739c22bc2ea8be1a5e4b7851d328b4d916245b",
+      "bytes": 3598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/literal-inverse/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "c48d509776aa32f55a6471b0ff2da0cf1254e0058888e3721e4f7800f87ab06c",
+      "bytes": 48733
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/manifest.json",
+      "sha256": "0e83d9891451eca0f96e1871bd8ac541b3f3a7eb559ab4c277466f69cbecf547",
+      "bytes": 8591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/parse/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/parse/stdout",
+      "sha256": "716e2d480dec1e592e88078fd7e5c9a0c3c88864565f75288568926743465ab3",
+      "bytes": 50235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-IDF-metadata-held-Peer-25/proposed/crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "716e2d480dec1e592e88078fd7e5c9a0c3c88864565f75288568926743465ab3",
+      "bytes": 50235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-constructor-draft-Audit-25-02/draft.json",
+      "sha256": "130b19e840ab780eac67814c2bd69676cfedd5651c7a57028632369f2d8b0e7e",
+      "bytes": 40512
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/Array1D.hh.1421-1427.txt",
+      "sha256": "73a9b0a1c0f52a0802c9b0ae70f2f9e0c505d7b7e29700f38d58df0353567f08",
+      "bytes": 114
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/Array1D.hh.473-483.txt",
+      "sha256": "6eee9b0c83d813a74cddd0dd63d20d6c664d80474e2403abdab8073a394c257b",
+      "bytes": 212
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/BranchNodeConnections.cc.346-354.txt",
+      "sha256": "9b9c776d02b2c1f8215f3ff6eee9d976c2e21d1c3d4afb5ce6b30699e65eadfb",
+      "bytes": 377
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/BranchNodeConnections.cc.633-633.txt",
+      "sha256": "13d52e3313ab4ea6ad076c894ecbf35a19b6b10b96a67a12a64322b489e6ba28",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/DataGlobalConstants.hh.223-237.txt",
+      "sha256": "0095526c759d3476e0379f332b4feec6a323a1867acda9107dc4e45eb58bcd7c",
+      "bytes": 1426
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/DataGlobalConstants.hh.288-337.txt",
+      "sha256": "8af0cd6689d2553aabd057f662f8fe8f6b404d83e3615398e9465530c8d74b41",
+      "bytes": 5018
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/DataGlobalConstants.hh.99-172.txt",
+      "sha256": "3214bf6dd148f45d844008148ac7a30f99c1b734a5e1401dd31cfa894124f2b2",
+      "bytes": 1484
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/DataLoopNode.hh.145-425.txt",
+      "sha256": "6ee6bc00186a3a51e1fa89c5d964953a4ec48188263501296ceafb909bf73db8",
+      "bytes": 10943
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/InputProcessor.cc.1216-1260.txt",
+      "sha256": "a20d58092c88cf336e020a20ae6a592b181fedf3ad2d827ef9bdea2ec46d9175",
+      "bytes": 1490
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/InputProcessor.cc.621-687.txt",
+      "sha256": "39ec8a8266aa25653385c60dac1fcebe93b7f23e52ea00ed8c17fc07f473f841",
+      "bytes": 3009
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/InputProcessor.cc.747-887.txt",
+      "sha256": "2f3ad792efd430702ceb3600a6111d33a8cb2b9f7871ca4da4500779ac8acf68",
+      "bytes": 6319
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/InputProcessor.cc.932-1070.txt",
+      "sha256": "262e56c661eb3dbe5f275facd1e1f2a21f8f0ac16bf7112170849c12a7730ec6",
+      "bytes": 5787
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/NodeInputManager.cc.740-949.txt",
+      "sha256": "304383618289bf940ef2f269d4093954c8d114424860000690864ad40e58b8f0",
+      "bytes": 9408
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.cc.1037-1277.txt",
+      "sha256": "bee746e560f8680209ef7927d171a9280e431ea7e9355a968551ebde394cbd79",
+      "bytes": 12940
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.cc.1309-1477.txt",
+      "sha256": "8ab4e4814bc545348eee524ab073339030bd24d76da824ac347af91c07e0cd7a",
+      "bytes": 8358
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.cc.1501-1611.txt",
+      "sha256": "2fb702da21648980719dc108fb766ff6257f83c903b53bfff4ff032587b5d085",
+      "bytes": 4976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.cc.2002-2125.txt",
+      "sha256": "d8ae3c2b752b060f9535e9a41edbf2e03bddcbb9a5440b2c700645ab6987f8ec",
+      "bytes": 9011
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.cc.3003-3240.txt",
+      "sha256": "56a672d58c17ddea6f23b43367983a0cb5d6abaffa9426033830a9a38cf54624",
+      "bytes": 9620
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.hh.118-132.txt",
+      "sha256": "fac34db9eb1ce574c67eeaaa3cf732a12bdf3c93ed476c5d9348e684084de28b",
+      "bytes": 232
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.hh.407-424.txt",
+      "sha256": "d29ea177a9543e20482889fc3fa53afd4e9218f70c22c8e3506d53cb449e9c48",
+      "bytes": 628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/OutputProcessor.hh.818-834.txt",
+      "sha256": "be3d4e91934d5e58c9b1d1cf483e5221338f06c1873412a7478f5aec71544244",
+      "bytes": 1501
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/PurchasedAirManager.cc.144-1058.txt",
+      "sha256": "a2e4f005265ce6c028c097018003654c71a355ace27a850348a86d8cb676c8c8",
+      "bytes": 54077
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/PurchasedAirManager.hh.390-405.txt",
+      "sha256": "b30e50c8a5590d0c5e8d664bddcdc70bbfd2f6f0e92bb5b0da23f1525ecbf91c",
+      "bytes": 1120
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native-extents/PurchasedAirManager.hh.69-325.txt",
+      "sha256": "50ed4b38d579398a4a64ea571beb1a1f2325ad84867d60124d5e08a78c3102d4",
+      "bytes": 20690
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/BranchNodeConnections.cc",
+      "sha256": "bc34ef8d562e56a9b586f8f390fc51019258aa004707bc1479f3fd04371c5616",
+      "bytes": 126666
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+      "bytes": 35280
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/DataLoopNode.hh",
+      "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+      "bytes": 26592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "bytes": 122929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/NodeInputManager.cc",
+      "sha256": "90914bc81beea62bbcfe2c164a3492b2b3db566654e82cba3cbfdae286669970",
+      "bytes": 70173
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/OutputProcessor.cc",
+      "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+      "bytes": 225982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/OutputProcessor.hh",
+      "sha256": "a31fb3555214de7340999e22a53fd6be539dc9d0e3aa44f96590fece661fc46a",
+      "bytes": 55700
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+      "bytes": 209881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/src/EnergyPlus/PurchasedAirManager.hh",
+      "sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+      "bytes": 29562
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/Native/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+      "bytes": 55083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "52dac9ef8732fe1991c5b81ca3641abd9706e89262de4b81562334e36dd5b32b",
+      "bytes": 40865
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "ce8592b53caea730afa744769a6afb91ffb3410ee02c84c6b706932ae5d9636c",
+      "bytes": 23282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "f293fe949ac93f92fce8c0ca882893ca9ebe7991fa0b66ab632a5e7e8fb86df1",
+      "bytes": 13769
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/getter.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/registration.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/schema.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "260974d810127ad909b3db4ef8f4258653bdd7dfb68ca6ae52e9e9b1608cb455",
+      "bytes": 17789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/provider_host.rs",
+      "sha256": "05d236077de97464497b4a4fc62c27cdce9f6c918b857b0537306e96a870ba56",
+      "bytes": 11285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "a0dcaad5f467bcc2d3973801aea291c10abc01636f486c5bd64d691adb1e52fb",
+      "bytes": 17663
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "08245b5512e59131db5b67164a15517f8adbe202436c5de6d24ec391e1953f72",
+      "bytes": 5520
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "e720a3dd891fe4b64b5c94c69595e4bf7f0d645d0995aa10b53843f5a9560671",
+      "bytes": 22164
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "3e9eaddda4c8fccce080e055b63bae23e64ab55fc391ce28208da6403f858afc",
+      "bytes": 4266
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "sha256": "5d2773c3595b1ea6018e9c6589b70542577ec88579066e6f78cc8c99767bc7b7",
+      "bytes": 8214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "7a649839a8722601415e0f916fda16def785cf1cbd4bce32e7770cc4599b9407",
+      "bytes": 10932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "0cd6294c5ffda9bcacfb1a695af0c1a5db3c59362474fee3d1448ebc325d943f",
+      "bytes": 2681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "sha256": "91093fcdd595ab6649473b26fb664eba560e2d1675e4cf4b08657d0017b01156",
+      "bytes": 24264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/purchased_air_target.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/report_for_tabular.rs",
+      "sha256": "62e56b2563c39ac7f9feb73cbbee6440dc66f2b22d596f2b0e6425330fe13a84",
+      "bytes": 5662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "be0ed5f4dae39c0055f66be4b9823d1e470b62cb2938e75806c4446e9ffc2450",
+      "bytes": 3338
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "sha256": "bbfb6af131528ceca05464c0ee00d3a11117c0956323e761bc1720a7381a2a34",
+      "bytes": 1702
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "d2296680e246c20830d8bb4aba11be28feddb9530d01d3f31cb6584ceb3d87ca",
+      "bytes": 6866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/complete-final-compiler-Source-plan.json",
+      "sha256": "0d30a64a99838fcde2832bd583b7aab2de1be02faafbd43a2540bf9d7e4bd95d",
+      "bytes": 2627065
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/01-forward.diff",
+      "sha256": "994ced637b182b7369f5047d229ce866411e9fec49a82b25e2749aaa1d2dd143",
+      "bytes": 1231
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/01-inverse.diff",
+      "sha256": "e6f9ca25fac3fe7cdbb58d402b0ae1d14bc353b6134dfdd3c2716e8e14355843",
+      "bytes": 1231
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/02-forward.diff",
+      "sha256": "cbd3ccc9c18c2abacb90766b9941bed3dd0b13a4588e91845177d5b4b0bb921d",
+      "bytes": 5025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/02-inverse.diff",
+      "sha256": "4d32ffc386aecaafeef724db1a4dde834079ece3eff846b0af1fa2733dbc05be",
+      "bytes": 5025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/03-forward.diff",
+      "sha256": "1238527bcf0629c9be8241fd91a0da0e551d9591f77fc8afcd4a0e3c7509d870",
+      "bytes": 359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/03-inverse.diff",
+      "sha256": "8f0dfa1b75cdcc7b634d1595d5c6562c4cf453a98f6419a25c620606d0988b5f",
+      "bytes": 359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/04-forward.diff",
+      "sha256": "cac0749fd6e8b944d87a81fff2866ff733d665a605bed423acacf4042cb9216f",
+      "bytes": 1308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/04-inverse.diff",
+      "sha256": "d88f638627ecf52a93b0aa53f32b0ef625502a2fe179aaa39444bb17ae477270",
+      "bytes": 1308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/05-forward.diff",
+      "sha256": "d3bb8a04cf6935edd63db2507e31b39a5f4f9399fc20c53278f8d683f10d7f0a",
+      "bytes": 21222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/05-inverse.diff",
+      "sha256": "00ee0cac507577cdc29bf2224025850962331cfae4887214a6322c593ad5a49b",
+      "bytes": 21222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/06-forward.diff",
+      "sha256": "3dcafbf295849d0eddfd69bb8269bac231b9ac63fb0a160595d3e47c767ee0cd",
+      "bytes": 20033
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/06-inverse.diff",
+      "sha256": "d95347e2fe9ff712335a070c714a328c346bea16480f827884aafb2a7d50843c",
+      "bytes": 20033
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/07-forward.diff",
+      "sha256": "4d6cfedf1c7cb1299e346ff544c02ed28cb050228d081fdb170657c794907d12",
+      "bytes": 7135
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/07-inverse.diff",
+      "sha256": "1126b0721fb595a5926afe937fd608e9a51bdff2a0c3fe6f790c642e7aa557f2",
+      "bytes": 7135
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/08-forward.diff",
+      "sha256": "460156dbae453d46d59820b6ae8dc7de0933e822b25baed2e967238d15f4c108",
+      "bytes": 4859
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/08-inverse.diff",
+      "sha256": "89c35647f6f03dd4c0df5e6befa26ac351a154b102b364049c99b6fc2241b2ef",
+      "bytes": 4859
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/09-forward.diff",
+      "sha256": "bdedd98a4bc456b4f919eafe2183647b1ed68f465f85ec8118215f017c96faae",
+      "bytes": 2531
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/09-inverse.diff",
+      "sha256": "9e3889921f101aab8208af94c377a8cfb9118a21bf625c96568fd45a27c2a6a7",
+      "bytes": 2531
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/10-forward.diff",
+      "sha256": "32fab0489745746e7bb7f8a0757458473141c869d6bab63158ed7e297eae02a6",
+      "bytes": 514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/10-inverse.diff",
+      "sha256": "349d4a8bf351fb5e28d4eab57c76eafffb37f8b79b1fd1a6f380090aac33a222",
+      "bytes": 514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/11-forward.diff",
+      "sha256": "35dfb6aacbffaa57b2ec84aa977fc7c667cb052c813fd4962f32da64ef3004bd",
+      "bytes": 537
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/11-inverse.diff",
+      "sha256": "f93a446f023a71d53979e79b6976b060a0c4b13114198cfcfec93bc77d8fe11b",
+      "bytes": 537
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/12-forward.diff",
+      "sha256": "84198bf25fba828d80370f93c887b2efa25690dcd972dd80af2f038d251222ff",
+      "bytes": 423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/12-inverse.diff",
+      "sha256": "7e51779712e36ef11fa802f3d39bd4c98d42468849e4be005b2f7b2ea0d5a1ec",
+      "bytes": 423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/13-forward.diff",
+      "sha256": "091ac8571b95b5730b2da50783165f96191af40022e480a1ae132dd5a28ea28c",
+      "bytes": 985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/13-inverse.diff",
+      "sha256": "82ee50a7b2255bdf7101a75189da97f32ddd4e397112a9bab1f551b2e67bca8b",
+      "bytes": 985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/14-forward.diff",
+      "sha256": "28b56ab7db60dee86b9cca7c1fb009dee43bd01b0b4dc1e5fe33505e4258e492",
+      "bytes": 929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/14-inverse.diff",
+      "sha256": "58af911a17be59f9320373cf8d2eb55b025e6bc320ec264b318debc34c55c0d6",
+      "bytes": 929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/15-forward.diff",
+      "sha256": "3a2231b3ca8b7d9a3840b84a439c30dcdc992674c8b782b1b35e93491f23d499",
+      "bytes": 756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/15-inverse.diff",
+      "sha256": "93b48949cd35e660e494d55ec453c52fb6a74cd58ca5d40c0693c4d045ddc80e",
+      "bytes": 756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/16-forward.diff",
+      "sha256": "9df8836b5c7d9f4421a3ed85904b4e1235d556d4bfb0a09b01f529692fcb3f98",
+      "bytes": 660
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/16-inverse.diff",
+      "sha256": "027930ec720dd3ec4b186af5ee955681e7d9294ef8185d5415d352872f47e498",
+      "bytes": 660
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/17-forward.diff",
+      "sha256": "a6b084d42b08a1c7204207e9efd24ca6244114a047b6f855651da459e8e219b7",
+      "bytes": 11034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/17-inverse.diff",
+      "sha256": "4ef1e429a1e29591e6d5ad693084785457f663463957ac816bdd23a2bde7ce42",
+      "bytes": 11034
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/18-forward.diff",
+      "sha256": "1bf3b7d40816aa36aa7be7bcd2d8522f03d9198f88027843bd14c94231050be5",
+      "bytes": 729
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/18-inverse.diff",
+      "sha256": "a133456cdc8421bb3e3669f1ef7bebac046fa5a0a0b477d30a45a1361f3e4e4b",
+      "bytes": 729
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/19-forward.diff",
+      "sha256": "bdee887159f1c09a778d700724fb4858f8573e80ad8292cab6fa4af4fad9190f",
+      "bytes": 631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/19-inverse.diff",
+      "sha256": "acb86ee7c5c5b240296221887c4540442b3c38f51916e980148fea5061c3c072",
+      "bytes": 631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/20-forward.diff",
+      "sha256": "47b97a85362d9b2c2235595667379f30ca44b0775001fdc6439df534ed7e0ee5",
+      "bytes": 467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/20-inverse.diff",
+      "sha256": "d69340da20ec4844f60fa7d167d7ae084a35a5294701763d8375dac908e3bf8b",
+      "bytes": 467
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/21-forward.diff",
+      "sha256": "f3f9ef55462217811865d2a9bee8cc4fa21a0d4cb949d7bb52511ef29500ac2b",
+      "bytes": 2299
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/21-inverse.diff",
+      "sha256": "75fc455a03c522cc5e909565ed29191312ecb902309c61ee97c60317d8c291eb",
+      "bytes": 2299
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/22-forward.diff",
+      "sha256": "0ca84c6f454067201f1a0be6e7d680bb78a190c9ce84542edf63f322b572ebf8",
+      "bytes": 1778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/22-inverse.diff",
+      "sha256": "da6808ebbd44d0674fc9149468d9e74f938e334fb1fdaeb98d2597a11e9b6130",
+      "bytes": 1778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/23-forward.diff",
+      "sha256": "052131c5fab83cf55028c09c7356257242d1d2e7a1093ff062550abd9dccaefb",
+      "bytes": 19997
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/diffs/23-inverse.diff",
+      "sha256": "bc46884aee08af693f423fde940b9ca9f550f765d1bccabf3ead020238374622",
+      "bytes": 19997
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/integration-contract.json",
+      "sha256": "81f67a0d521ae973d2001356376efcddfb88822bd0a33bfd5e295fc59b8e9967",
+      "bytes": 2530
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "52dac9ef8732fe1991c5b81ca3641abd9706e89262de4b81562334e36dd5b32b",
+      "bytes": 40865
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "ce8592b53caea730afa744769a6afb91ffb3410ee02c84c6b706932ae5d9636c",
+      "bytes": 23282
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "f293fe949ac93f92fce8c0ca882893ca9ebe7991fa0b66ab632a5e7e8fb86df1",
+      "bytes": 13769
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/getter.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/registration.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/schema.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "260974d810127ad909b3db4ef8f4258653bdd7dfb68ca6ae52e9e9b1608cb455",
+      "bytes": 17789
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/provider_host.rs",
+      "sha256": "05d236077de97464497b4a4fc62c27cdce9f6c918b857b0537306e96a870ba56",
+      "bytes": 11285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "a0dcaad5f467bcc2d3973801aea291c10abc01636f486c5bd64d691adb1e52fb",
+      "bytes": 17663
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "08245b5512e59131db5b67164a15517f8adbe202436c5de6d24ec391e1953f72",
+      "bytes": 5520
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "e720a3dd891fe4b64b5c94c69595e4bf7f0d645d0995aa10b53843f5a9560671",
+      "bytes": 22164
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "3e9eaddda4c8fccce080e055b63bae23e64ab55fc391ce28208da6403f858afc",
+      "bytes": 4266
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "sha256": "5d2773c3595b1ea6018e9c6589b70542577ec88579066e6f78cc8c99767bc7b7",
+      "bytes": 8214
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "7a649839a8722601415e0f916fda16def785cf1cbd4bce32e7770cc4599b9407",
+      "bytes": 10932
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "0cd6294c5ffda9bcacfb1a695af0c1a5db3c59362474fee3d1448ebc325d943f",
+      "bytes": 2681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "sha256": "91093fcdd595ab6649473b26fb664eba560e2d1675e4cf4b08657d0017b01156",
+      "bytes": 24264
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/purchased_air_target.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/report_for_tabular.rs",
+      "sha256": "62e56b2563c39ac7f9feb73cbbee6440dc66f2b22d596f2b0e6425330fe13a84",
+      "bytes": 5662
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "be0ed5f4dae39c0055f66be4b9823d1e470b62cb2938e75806c4446e9ffc2450",
+      "bytes": 3338
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "sha256": "bbfb6af131528ceca05464c0ee00d3a11117c0956323e761bc1720a7381a2a34",
+      "bytes": 1702
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/literal-inverse/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "d2296680e246c20830d8bb4aba11be28feddb9530d01d3f31cb6584ceb3d87ca",
+      "bytes": 6866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/manifest.json",
+      "sha256": "f6a1ed0cca7edde252943e0c6cec601ae10078ba7ce5922d97fe568312308b04",
+      "bytes": 81292
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/01.stdout",
+      "sha256": "e0f1a395f6b8328139e0b03903221143dcf163be3f0c915f37d7ceacc0d77fc7",
+      "bytes": 41422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/02.stdout",
+      "sha256": "a20eef3011b8f8733c97834d6f5c75a6a6463f38339a705a3e88a1594bce1b71",
+      "bytes": 27745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/03.stdout",
+      "sha256": "0dd50755cdf4605c392438d5e7c96857b6ad011bc9e1c98643ae2ffb2d8dccdf",
+      "bytes": 15398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/04.stdout",
+      "sha256": "b958b37564d5e2b29918dc8ff94c575e03b6cb83e699a23a923255807dabc816",
+      "bytes": 8183
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/05.stdout",
+      "sha256": "d55ed8bafc2790f8784455fd55143a3d5efffeaa26dd5e55b183e45e2f8b0513",
+      "bytes": 27495
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/06.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/06.stdout",
+      "sha256": "0412333cf244664480c4bda2a1db2876bdb6c1503fe4a64912a1c505ade8ab5b",
+      "bytes": 19517
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/07.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/07.stdout",
+      "sha256": "346f08573957d0474f96b218de3658d4d136701991fe7682e3ad9472c2dc0395",
+      "bytes": 8053
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/08.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/08.stdout",
+      "sha256": "a3eb9792c39d977420e83ccb81df95afd8f42c17113fbbde3f1d0b40c2f955a0",
+      "bytes": 5575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/09.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/09.stdout",
+      "sha256": "74f16cc7dc3bbe5fd7c6d3286e455e68b1260ade70ddfdf6a85ed4db36030f22",
+      "bytes": 2247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/10.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/10.stdout",
+      "sha256": "b71340f22fb3c54ebecb7b23765a03ec0aa27db28ad56a56d5f5c0dd5053aa6d",
+      "bytes": 22316
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/11.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/11.stdout",
+      "sha256": "420271fd61f33cc21c7172ff0278393a7083c1f6d6fc648f20a1a3e06aec6b3a",
+      "bytes": 11031
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/12.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/12.stdout",
+      "sha256": "adb5d235f0fe1319ef8840cb0b7938fa160b480d8e0392a205f2fb5ba6cd6e79",
+      "bytes": 8278
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/13.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/13.stdout",
+      "sha256": "d88c3c58151fcdcaeb8eba28ea81aaf5800e6d99b4fd63604626f98d5ec42748",
+      "bytes": 1913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/14.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/14.stdout",
+      "sha256": "d05cebf46e35cbee60ba2f15a5a848f8cc9ef9d0573e4f417de54f9dd3926454",
+      "bytes": 4343
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/15.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/15.stdout",
+      "sha256": "4856fd0510a94099ed4555f6b675adc20ed09703410914858b710516cc8a9dfe",
+      "bytes": 2737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/16.stdout",
+      "sha256": "0c2fc45a232ed32eec041a42c9ab01ba0c0023e31b51252ef6bc62b998696cfe",
+      "bytes": 3396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/17.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/17.stdout",
+      "sha256": "ac94433d52d660db51896535bd7302cd6accc2902c76760c4e91c040672b80f9",
+      "bytes": 34354
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/18.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/18.stdout",
+      "sha256": "584eef837c950191c26f0197c02df773868dbbe97ed87f7d455e1db90898d7b0",
+      "bytes": 11387
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/19.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/19.stdout",
+      "sha256": "60b7a430efe3d8cfb713ac410ac25a84949653f15600159de04f8435bbf18a47",
+      "bytes": 17696
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/20.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/20.stdout",
+      "sha256": "d1090607c00da66a972df6a57070fb1f2143469937692e81ce8f1e09620554d1",
+      "bytes": 5558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/21.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/21.stdout",
+      "sha256": "4f0595f43366f011c79970c10135dea4c37b4ddb136b65750168803ea2f20403",
+      "bytes": 24681
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/22.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/22.stdout",
+      "sha256": "5b92b494dbb3cb7d0acdbd28ce2f04c09b7af14e11616d0b2a8c4dd0693df073",
+      "bytes": 6025
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/23.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/parse/23.stdout",
+      "sha256": "45b1ccdb439dd91614f29740b2a7ae6d4c7c37d3e963221b5779257b6790d903",
+      "bytes": 25781
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "31824e66a1a734fd3c441b4920992a98ed52c55f1020e1fa0144eecd60df8343",
+      "bytes": 24694
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "105d6e650e6cb45ab17efec41655571f96660d63b24e211c1a9c98b72cbe1e6c",
+      "bytes": 13780
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "caae2ff40cd58aff276de0ebb98fef97069dc0a14343aa2713a42c8a4419356d",
+      "bytes": 20784
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/getter.rs",
+      "sha256": "4300c8ee3472fe1502aed8845ca1d691ae8a68aa1c44e42b949b3b7d49cb4c10",
+      "bytes": 6816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "bytes": 19423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/registration.rs",
+      "sha256": "ee59de0084c86feee6555894d257d9b2606409295f4b291818c4b94311323345",
+      "bytes": 19584
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/schema.rs",
+      "sha256": "db21c4e61c33960c2767e2a72b9cea454747fe9b792d8ef4a183bdb29fa28826",
+      "bytes": 4625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "f65cab3792f4d161d167acdaf8adff029c0716e9a790338ac6526e05a2b0b886",
+      "bytes": 28205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/provider_host.rs",
+      "sha256": "b3c23c9bfbc85abe1a1b6dc36d486f7b10ae6400a6b54350de4355667f5e0a2b",
+      "bytes": 11308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "b0558e3869daba00bb73bfc0723f467b9cc348dc9b4e4bcd69f8c1929f8e0014",
+      "bytes": 17688
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "d1090607c00da66a972df6a57070fb1f2143469937692e81ce8f1e09620554d1",
+      "bytes": 5558
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "0f287dee36ed3cb222019e47d1e2ee4dae6f1ea20be07e84c5c8a91a0ea1bb12",
+      "bytes": 22302
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "86215174a8a7cef256c21b30e08658ada35176e576a0e7336301cfc334712523",
+      "bytes": 4312
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "sha256": "32ebc992172d21daf570d282ed43df51ef79dfb6cdbd23ce840d80598fbc9af2",
+      "bytes": 8265
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "420271fd61f33cc21c7172ff0278393a7083c1f6d6fc648f20a1a3e06aec6b3a",
+      "bytes": 11031
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "76f1e2c40a30d165dc326d65f78ddcda7067179123a00d2632d82b4c32d8e54f",
+      "bytes": 2706
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "sha256": "9b992142e1a0824b3813f8d435f5eceb2d66bb24a677c75884cc1d635a904c04",
+      "bytes": 24665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/purchased_air_target.rs",
+      "sha256": "74f16cc7dc3bbe5fd7c6d3286e455e68b1260ade70ddfdf6a85ed4db36030f22",
+      "bytes": 2247
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/report_for_tabular.rs",
+      "sha256": "67aa24c67c5011e1bbe4749601bd8f57eec7166feae7974f7ef592c983c24192",
+      "bytes": 5985
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "0c2fc45a232ed32eec041a42c9ab01ba0c0023e31b51252ef6bc62b998696cfe",
+      "bytes": 3396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "sha256": "98f40a46eb5756e3eea45c015dd5cff556ac60f1c63423cf20cdb18233972058",
+      "bytes": 1882
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "cf90dc0cd42b9c83b0cb4b7294d2f29537c2699a2a685cdd58e488d9c8d2746a",
+      "bytes": 6989
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Audit-25/whole-crates-API-census.json",
+      "sha256": "5c0a8b82f78fb8498782cdafcb1373c046da6b1af074a1355458573156aba5b3",
+      "bytes": 2088795
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Outer-25-02/complete-final-compiler-Source-plan.json",
+      "sha256": "fc96be590fb15bfb05b73fd2dfe1e7b8a7c74a679600eb8d8f58945ac07a4a21",
+      "bytes": 2627155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-held-Outer-25-02/manifest.json",
+      "sha256": "f2bc3fd2f9fafb9046cae94af13af58e4e0eaba03202900f1f5b516dac92f813",
+      "bytes": 70955
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-input-draft-Peer-25-02/draft.json",
+      "sha256": "18f1f37e6c8ed1db5ae0c80f212524d2abf26247879e411095ac1b744cade49d",
+      "bytes": 17019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-input-draft-Peer-25-02/schema-custody.draft.json",
+      "sha256": "800f70a0a57d50f9a389864aa2f5d2e41b6ae9bc2f25284e83e524beaebf15f0",
+      "bytes": 27436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-input-draft-Peer-25-02/schema-integer-correction.json",
+      "sha256": "36829ad14282a77bfa528908dbc53a84af418c002f9b0071c982a9b73b347c5f",
+      "bytes": 2519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-purchased-air-output-routing-draft-Audit-25-02/draft.json",
+      "sha256": "bee67804b0b30483fe45153e83eb0b9e2868d673e1f7c2543413d58a186b5562",
+      "bytes": 57815
+    },
+    {
+      "path": ".runtime/porting/source-objects/12/121146edd2084bc4411a72d7ef342d5042246c3edd63820179fe5ac66f993942",
+      "sha256": "121146edd2084bc4411a72d7ef342d5042246c3edd63820179fe5ac66f993942",
+      "bytes": 1845844
+    },
+    {
+      "path": ".runtime/porting/source-objects/52/52aeb1d042daf05cc189c9ce37d5e00c835370382bb1259fadf399ac3a8c8a79",
+      "sha256": "52aeb1d042daf05cc189c9ce37d5e00c835370382bb1259fadf399ac3a8c8a79",
+      "bytes": 1845844
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "716e2d480dec1e592e88078fd7e5c9a0c3c88864565f75288568926743465ab3",
+      "bytes": 50235
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/management.rs",
+      "sha256": "31824e66a1a734fd3c441b4920992a98ed52c55f1020e1fa0144eecd60df8343",
+      "bytes": 24694
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "105d6e650e6cb45ab17efec41655571f96660d63b24e211c1a9c98b72cbe1e6c",
+      "bytes": 13780
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "caae2ff40cd58aff276de0ebb98fef97069dc0a14343aa2713a42c8a4419356d",
+      "bytes": 20784
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/getter.rs",
+      "sha256": "4300c8ee3472fe1502aed8845ca1d691ae8a68aa1c44e42b949b3b7d49cb4c10",
+      "bytes": 6816
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "bytes": 19423
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/registration.rs",
+      "sha256": "ee59de0084c86feee6555894d257d9b2606409295f4b291818c4b94311323345",
+      "bytes": 19584
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/schema.rs",
+      "sha256": "db21c4e61c33960c2767e2a72b9cea454747fe9b792d8ef4a183bdb29fa28826",
+      "bytes": 4625
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_setup_reporting.rs",
+      "sha256": "f65cab3792f4d161d167acdaf8adff029c0716e9a790338ac6526e05a2b0b886",
+      "bytes": 28205
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/provider_host.rs",
+      "sha256": "b3c23c9bfbc85abe1a1b6dc36d486f7b10ae6400a6b54350de4355667f5e0a2b",
+      "bytes": 11308
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "b0558e3869daba00bb73bfc0723f467b9cc348dc9b4e4bcd69f8c1929f8e0014",
+      "bytes": 17688
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining/output_update.rs",
+      "sha256": "d1090607c00da66a972df6a57070fb1f2143469937692e81ce8f1e09620554d1",
+      "bytes": 5558
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+      "sha256": "0f287dee36ed3cb222019e47d1e2ee4dae6f1ea20be07e84c5c8a91a0ea1bb12",
+      "bytes": 22302
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/air_target.rs",
+      "sha256": "86215174a8a7cef256c21b30e08658ada35176e576a0e7336301cfc334712523",
+      "bytes": 4312
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_integer.rs",
+      "sha256": "32ebc992172d21daf570d282ed43df51ef79dfb6cdbd23ce840d80598fbc9af2",
+      "bytes": 8265
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs",
+      "sha256": "420271fd61f33cc21c7172ff0278393a7083c1f6d6fc648f20a1a3e06aec6b3a",
+      "bytes": 11031
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/facility_target.rs",
+      "sha256": "76f1e2c40a30d165dc326d65f78ddcda7067179123a00d2632d82b4c32d8e54f",
+      "bytes": 2706
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/meters.rs",
+      "sha256": "9b992142e1a0824b3813f8d435f5eceb2d66bb24a677c75884cc1d635a904c04",
+      "bytes": 24665
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/purchased_air_target.rs",
+      "sha256": "74f16cc7dc3bbe5fd7c6d3286e455e68b1260ade70ddfdf6a85ed4db36030f22",
+      "bytes": 2247
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/report_for_tabular.rs",
+      "sha256": "67aa24c67c5011e1bbe4749601bd8f57eec7166feae7974f7ef592c983c24192",
+      "bytes": 5985
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/solar_target.rs",
+      "sha256": "0c2fc45a232ed32eec041a42c9ab01ba0c0023e31b51252ef6bc62b998696cfe",
+      "bytes": 3396
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/source_output_registration/system_target.rs",
+      "sha256": "98f40a46eb5756e3eea45c015dd5cff556ac60f1c63423cf20cdb18233972058",
+      "bytes": 1882
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "cf90dc0cd42b9c83b0cb4b7294d2f29537c2699a2a685cdd58e488d9c8d2746a",
+      "bytes": 6989
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-zone-equipment-orchestration-24/summary.json",
+      "sha256": "6977d3a673f7fb48903e3fef7683b1183c70007b1a9af3fbea25f494bbe128b4",
+      "bytes": 4512
+    }
+  ],
+  "scope": "24 coherent PurchasedAir input/live-output and raw-IDF metadata Sources, Native authority, accepted peer and actual B/A24. One existing RawModel test executed; no new test body, historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}

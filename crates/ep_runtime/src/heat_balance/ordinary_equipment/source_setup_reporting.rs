@@ -44,6 +44,78 @@ fn index(number: i32) -> Result<usize, OrdinaryRadiationError> {
 }
 impl SourceRealOutputOwners for OrdinaryEquipment {
     fn real_output(&self, target: Target) -> Result<&f64, OrdinaryRadiationError> {
+        if let Target::PurchasedAir { field, index: number } = target {
+            let row = self.purchased_air.units.as_ref().and_then(|rows| rows.get(index(number).ok()?))
+                .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+            return Ok(match field {
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SenHeatEnergy => &row.sen_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::LatHeatEnergy => &row.lat_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotHeatEnergy => &row.tot_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SenCoolEnergy => &row.sen_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::LatCoolEnergy => &row.lat_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotCoolEnergy => &row.tot_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotHeatFuelEnergy => &row.tot_heat_fuel_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotCoolFuelEnergy => &row.tot_cool_fuel_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneSenHeatEnergy => &row.zone_sen_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneLatHeatEnergy => &row.zone_lat_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotHeatEnergy => &row.zone_tot_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneSenCoolEnergy => &row.zone_sen_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneLatCoolEnergy => &row.zone_lat_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotCoolEnergy => &row.zone_tot_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OASenHeatEnergy => &row.oa_sen_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OALatHeatEnergy => &row.oa_lat_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OATotHeatEnergy => &row.oa_tot_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OASenCoolEnergy => &row.oa_sen_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OALatCoolEnergy => &row.oa_lat_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OATotCoolEnergy => &row.oa_tot_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecSenHeatEnergy => &row.ht_rec_sen_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecLatHeatEnergy => &row.ht_rec_lat_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecTotHeatEnergy => &row.ht_rec_tot_heat_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecSenCoolEnergy => &row.ht_rec_sen_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecLatCoolEnergy => &row.ht_rec_lat_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecTotCoolEnergy => &row.ht_rec_tot_cool_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotHeatFuelEnergy => &row.zone_tot_heat_fuel_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotCoolFuelEnergy => &row.zone_tot_cool_fuel_energy,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SenHeatRate => &row.sen_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::LatHeatRate => &row.lat_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotHeatRate => &row.tot_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SenCoolRate => &row.sen_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::LatCoolRate => &row.lat_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotCoolRate => &row.tot_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotHeatFuelRate => &row.tot_heat_fuel_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TotCoolFuelRate => &row.tot_cool_fuel_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneSenHeatRate => &row.zone_sen_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneLatHeatRate => &row.zone_lat_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotHeatRate => &row.zone_tot_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneSenCoolRate => &row.zone_sen_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneLatCoolRate => &row.zone_lat_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotCoolRate => &row.zone_tot_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OASenHeatRate => &row.oa_sen_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OALatHeatRate => &row.oa_lat_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OATotHeatRate => &row.oa_tot_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OASenCoolRate => &row.oa_sen_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OALatCoolRate => &row.oa_lat_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OATotCoolRate => &row.oa_tot_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecSenHeatRate => &row.ht_rec_sen_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecLatHeatRate => &row.ht_rec_lat_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecTotHeatRate => &row.ht_rec_tot_heat_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecSenCoolRate => &row.ht_rec_sen_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecLatCoolRate => &row.ht_rec_lat_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::HtRecTotCoolRate => &row.ht_rec_tot_cool_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotHeatFuelRate => &row.zone_tot_heat_fuel_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::ZoneTotCoolFuelRate => &row.zone_tot_cool_fuel_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TimeEconoActive => &row.time_econo_active,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::TimeHtRecActive => &row.time_ht_rec_active,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OutdoorAirMassFlowRate => &row.outdoor_air_mass_flow_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::OutdoorAirVolFlowRateStdRho => &row.outdoor_air_vol_flow_rate_std_rho,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SupplyAirMassFlowRate => &row.supply_air_mass_flow_rate,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SupplyAirVolFlowRateStdRho => &row.supply_air_vol_flow_rate_std_rho,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SupplyTemp => &row.supply_temp,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::SupplyHumRat => &row.supply_hum_rat,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::MixedAirTemp => &row.mixed_air_temp,
+                crate::heat_balance::source_output_registration::SourcePurchasedAirOutputField::MixedAirHumRat => &row.mixed_air_hum_rat,
+            });
+        }
         let Target::Node {field, index: number} = target else {
             return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
         };
@@ -274,5 +346,18 @@ impl OrdinaryEquipment {
             }
         }
         Ok(())
+    }
+}
+
+/// Actual enum overload binds the live underlying i32, not a real conversion.
+impl crate::heat_balance::source_output_registration::SourceIntegerOutputOwners for OrdinaryEquipment {
+    fn integer_output(&self, target: crate::heat_balance::source_output_registration::SourceIntegerOutputTarget)
+        -> Result<&i32, OrdinaryRadiationError> {
+        let crate::heat_balance::source_output_registration::SourceIntegerOutputTarget::PurchasedAirAvailabilityStatus { index: number } = target else {
+            return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
+        };
+        let row = self.purchased_air.units.as_ref().and_then(|rows| rows.get(index(number).ok()?))
+            .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+        Ok(&row.avail_status)
     }
 }

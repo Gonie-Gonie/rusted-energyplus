@@ -262,7 +262,7 @@ impl OrdinaryEquipment {
 }
 
 impl NodeOwner {
-    fn init_unique_check_source(
+    pub(super) fn init_unique_check_source(
         &mut self,
         context: &str,
         input: &mut SelectedInputProcessor,
