@@ -506,3 +506,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source44 thermostat predefined reports](../evidence/SRC-06-canonical-thermostat-predefined-44/summary.json). 온도조절기의 설정값과 스케줄 요약을 실제 Schedule 소유자에 연결했다. 날짜별 값·일수·월을 Native 순서대로 구한다. B 실행 결과: `Source B-NOLIMIT-24H completed through actual620`. A24의 기존 5,352개 보고값 증거는 전체 결과 비교 후 이어받는다.
+
+
+[Source45 NoLimit B24/72/annual validation](../evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json). 무제한 B의 24시간·72시간·연간 Source 실행과 같은 케이스의 Native 보고값 전체 비교를 확인했다. 기존 허용오차와 RMSE 조건을 모두 통과했으며 원시값·비트 차이는 비교 보고서에 남겼다.

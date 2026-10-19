@@ -123,14 +123,23 @@ def paired(a, b, exact=True):
 
 def available_variables(path):
     rows = {}
-    for line in path.read_text(encoding="utf8").splitlines():
-        if line.startswith("!"):
+    lines = path.read_text(encoding="utf8").splitlines()
+    regular = (len(lines) >= 2 and lines[0].startswith("Program Version,")
+               and lines[1] == "Var Type (reported time step),Var Report Type,Variable Name [Units]")
+    for line in lines[2:] if regular else lines:
+        if not regular and line.startswith("!"):
             continue
-        m = re.fullmatch(r"Output:Variable,\*,(.+),hourly; !- (Zone|HVAC) (Average|Sum) \[(.*)\]", line)
-        require(m is not None, f"unsupported RDD row: {line}")
-        identity = m[1], m[4]
+        if regular:
+            m = re.fullmatch(r"(Zone|HVAC),(Average|Sum),(.+) \[(.*)\]", line)
+            require(m is not None, f"unsupported Regular RDD row: {line}")
+            timestep_type, store_type, name, units = m[1], m[2], m[3], m[4]
+        else:
+            m = re.fullmatch(r"Output:Variable,\*,(.+),hourly; !- (Zone|HVAC) (Average|Sum) \[(.*)\]", line)
+            require(m is not None, f"unsupported RDD row: {line}")
+            name, timestep_type, store_type, units = m[1], m[2], m[3], m[4]
+        identity = name, units
         require(identity not in rows, "duplicate RDD identity")
-        rows[identity] = {"raw_line": line, "timestep_type": m[2], "store_type": m[3]}
+        rows[identity] = {"raw_line": line, "timestep_type": timestep_type, "store_type": store_type}
     return rows
 
 

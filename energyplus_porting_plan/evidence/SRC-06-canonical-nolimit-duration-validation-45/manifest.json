@@ -1,0 +1,456 @@
+{
+  "schema": "src06-B-nolimit-three-case-finite-validation-evidence45.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-nolimit-duration-validation-45/evidence.zip",
+    "sha256": "ad8765581cfd0a416818053d541c1aeda970778a0d3fa75ea81a02dad1a54f86",
+    "bytes": 1962302
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Root-nolimit-B24-durations-actual-review-45/large-duration-result-artifact-hash-inventory.json",
+      "sha256": "99fe08eaa15c8685ad436d77a4bfbdeca4625b6d161b07c3e8a41ff6c159cbfe",
+      "bytes": 3536
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-nolimit-B24-durations-actual-review-45/review.json",
+      "sha256": "ea21b8494191229fce99742599df474054fde4f2c8eb950097384606117b962f",
+      "bytes": 43666
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-thermostat-predefined-actual-review-44/review.json",
+      "sha256": "a0200bcebc991909674966221d2e0d9c46f71c273ebc2a4f53067611420a8c0d",
+      "bytes": 19106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/diagnostics.json",
+      "sha256": "22a0a8d037a0c7b63a172dedd2c507758471bdb41a390f117bed479289e22e04",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/eplusrs.eso",
+      "sha256": "d7d38eae178cc9fed9b2398aa01e2d36da2135c638c21e2ecd2588d59de51aff",
+      "bytes": 202668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/results/source-eso.csv",
+      "sha256": "dfb415b948acfe2de8ca010653ac5317d90a1c104a7f0c0fb8e95e52313b671a",
+      "bytes": 2991866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/results/source-mtr.csv",
+      "sha256": "2d3169e717f52badbed5c7c683d7bacc79a22554d73d764c657755ef2e208332",
+      "bytes": 251
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/results/source-reported-results.json",
+      "sha256": "a6bd3f86c9e7acb8878488614d944b012c90754737fa61c259ffb0103509ce79",
+      "bytes": 3026097
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/run-summary.json",
+      "sha256": "8ebacc330a0eb2c9417a5e086831b5bc478e376afb3983d2f3472a49e2981950",
+      "bytes": 61305
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-command-Root-44/receipt.json",
+      "sha256": "c87dc0133188773ba95f8b78efd25ee22e772b60a2d57e63551c41497820f49d",
+      "bytes": 4560
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-command-Root-44/stderr.log",
+      "sha256": "ce3c3bf569979142fc57b880199b69fe8a1a278b74a3b610cf4af1033641cb0d",
+      "bytes": 10285
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-command-Root-44/stdout.log",
+      "sha256": "a614e345ae7e313f4e23bd24a84e8b07328dd5e4ceb0018576d26300f81513a4",
+      "bytes": 408297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-nolimit-B24-durations-actual-Outer-45.py",
+      "sha256": "dcd8645f3e09d3c2ade3595b0be8d3c860f820df932f86da303fba654c6db096",
+      "bytes": 16309
+    },
+    {
+      "path": ".runtime/porting/SRC-06/compare-nolimit-duration-Outer-after44.py",
+      "sha256": "7ee0df87c725e4bce9bf6a48c0d2122094c22bc0c1073e88fbff6859ccdf3751",
+      "bytes": 1910
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-24H-reported-Root-44/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-24H-reported-Root-44/comparison.json",
+      "sha256": "d2263d8c26582e382f0f33127ec49c0851a7c9e7e47cb75b296eccdb9a9acfad",
+      "bytes": 146326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-72H-reported-Root-45/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-72H-reported-Root-45/comparison.json",
+      "sha256": "7ead35bd78cae71034ce89be6eb673696552585a17bb9dd85cda58e5d52fda95",
+      "bytes": 146499
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-ANNUAL-reported-Root-45/all-tolerance-failures.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-ANNUAL-reported-Root-45/comparison.json",
+      "sha256": "5f0e243e2964796d0d0b9fa0bf8df136b8488444209cf4ca2852ab97aad8980d",
+      "bytes": 153626
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-artifact-readback-ready-Audit-03/check-completed-B-own-artifacts-Root.py",
+      "sha256": "b57881c80ce217b20548cafba6ba4db7e591ed72dbdcb19d292f14f832ef8a2a",
+      "bytes": 18944
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/plan.json",
+      "sha256": "5870b5df147f1279c9799652688883a1890676e3e074e89498dca12171b0dbc4",
+      "bytes": 16654
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/proposed/tools/porting/check_completed_reported_streams.py",
+      "sha256": "1f0fd5053748210d812201957ec9e1ae56e8712e0082a2c9b7cdac3cba79e7b8",
+      "bytes": 24700
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/tool-forward.diff",
+      "sha256": "9f611a43c7710c67ed6be034c68488d0f835a2b79e3daddb4b7053bd66b5ef36",
+      "bytes": 2007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/tool-inverse.diff",
+      "sha256": "262383d24d9216f48d3b9de6483051334a1aee7fb000433d39ae789717ac1b52",
+      "bytes": 2007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/all-ancillary-physical-differences.jsonl",
+      "sha256": "467fd3e0429f9fdd3e7314377169115e20195b8e674110e4983dd1809a676eb7",
+      "bytes": 61418
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/all9792-own-export-roundtrip-samples.jsonl",
+      "sha256": "6a7818b1d41448da2bd1316504aa4437f964ab713635838d125d642cc4be34a6",
+      "bytes": 4758519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/review.json",
+      "sha256": "6fca3f8908f513fd971b8d15340affbb3cbe670f167f0cb5858167acb4cc0871",
+      "bytes": 23595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-source-native-nolimit-duration-Outer-after44.py",
+      "sha256": "1ba407f4e204d56443db26fe77deb43c539e2fe44b993dbc931ae20371ab1622",
+      "bytes": 6658
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.mdd",
+      "sha256": "cf91059e279bb2394f0e0892c7f4b3120e34e20e3f981c77fa45569b1967c079",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-Root-12/output/energyplusout.rdd",
+      "sha256": "94e6282fe122881f31fefc9339f6e827676f6493cab416dcd6ad1e540afc3a46",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/receipt.json",
+      "sha256": "5e4c9f0ad0ca63bd3ba1a03e41373cbebf350a9d606071e6745dedbd4f794f2b",
+      "bytes": 4807
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/stdout.log",
+      "sha256": "23e64c8a198370022137578a93a4ac76cbc98b4af1afce65d7eefbdb4b157286",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-Root-45/output/energyplusout.mdd",
+      "sha256": "1907d73678c1d4ccffd54447a6073ed998f534e9da7d42e0198d1b733efc0f06",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-Root-45/output/energyplusout.rdd",
+      "sha256": "7272d085a93e15b7e5da6608328b9d55c48b8c26a98859f98f7ebc17df1c6f75",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-command-Root-45/receipt.json",
+      "sha256": "937dbb69fafba685035ac25bbd20c8854b2f7c85f759e4b1d26a33b2b5e41cf3",
+      "bytes": 3354
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-command-Root-45/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-command-Root-45/stdout.log",
+      "sha256": "1e68825d6ece9cdf0d33678944c06289374c9e37d2aa2d93a80ddd9a0a81adef",
+      "bytes": 460
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-custody-Root-45/custody.json",
+      "sha256": "fb2b7e6a7acacc06901727802b04355c0fb0063dbb7c71ed0fd654efab3f3fb6",
+      "bytes": 25145
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/energyplusout.mdd",
+      "sha256": "1907d73678c1d4ccffd54447a6073ed998f534e9da7d42e0198d1b733efc0f06",
+      "bytes": 1129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/energyplusout.rdd",
+      "sha256": "7272d085a93e15b7e5da6608328b9d55c48b8c26a98859f98f7ebc17df1c6f75",
+      "bytes": 24783
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/receipt.json",
+      "sha256": "63d8b965596c1a10dd2ec355689ed67f41506cf63e07ac1da4ad0f3021044367",
+      "bytes": 3366
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/stderr.log",
+      "sha256": "ced59a5298a8d59e7b4f4f8603bde448c948253819bfbc3e645c2dcb038b1c6f",
+      "bytes": 36
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/stdout.log",
+      "sha256": "4328e6655f3b2113bab680984e759fc83d4a8ba50922998672a13d58fdfb8885",
+      "bytes": 2440
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-custody-Root-45/custody.json",
+      "sha256": "b1452c88572edebe9f2156c1ddfaaff55598bf47cd33dfd25f212098ceb73697",
+      "bytes": 25159
+    },
+    {
+      "path": ".runtime/porting/SRC-06/nolimit-B24-durations-publication-READY-Outer-45/publication-template.json",
+      "sha256": "c23ed12f013570c7521934241cbf80d3c43be6eb8b3b8e102f35833b38a64064",
+      "bytes": 10982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/nolimit-duration-launch-prepared-Outer-after44/plan.json",
+      "sha256": "7b1611f1b71510fb516e3b759edb283238c77d2200aa075ef8c09e54cbb1086d",
+      "bytes": 21767
+    },
+    {
+      "path": ".runtime/porting/SRC-06/nolimit-validation-publication-WAIT-Outer-after44/publication-WAIT.json",
+      "sha256": "017d17c3173381a0cdcbca1e088bcaa3093ed83428604b6dc244cb05f4a848cb",
+      "bytes": 11120
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-completed-B-comparison-Audit-01.py",
+      "sha256": "1994a662cb7865c6cd9324864248c5c6e78051fec4ab0e1c831c94bd51317adf",
+      "bytes": 14472
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-nolimit-B24-durations-publication-Outer-45.py",
+      "sha256": "23dff49362260c440e4574399d1c82eb01c9b4ab2b56a15b5feab4113f7f9f02",
+      "bytes": 5711
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-nolimit-duration-launch-Outer-after44.py",
+      "sha256": "6807eaeba439977c7d7aa3df855e145ee69486f1e8b602c349899033b5debb2c",
+      "bytes": 7203
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-public-Regular-reader-Outer-45.py",
+      "sha256": "ff165ab69dbcb325b35f91648634cf0fbb6cb7ebef712e89f315ae5fb9cd3c32",
+      "bytes": 3528
+    },
+    {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/before/tools/porting/check_completed_reported_streams.py",
+      "sha256": "46a1b6f9081d9a0ff5a2d430b17ec647b88a41f5052c3bb1c95df98174ab754c",
+      "bytes": 24063
+    },
+    {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/forward.diff",
+      "sha256": "b3a418d6267ef0c0abc26ea731f2afdbc34517c2335da37a0de1521a90bd8f0c",
+      "bytes": 1669
+    },
+    {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/inverse.diff",
+      "sha256": "8d6cb3199531ea2dbff4225b7c692ed15efb14ddf2fa8ad95f039d81ef7ec144",
+      "bytes": 1669
+    },
+    {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/manifest.json",
+      "sha256": "c076e7c4f522e087aaed4458dbf436483817ce1ab891f2a0f3d5970e041e562e",
+      "bytes": 2180
+    },
+    {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/proposed/tools/porting/check_completed_reported_streams.py",
+      "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+      "bytes": 24664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-nolimit-B24-durations-Outer-45.py",
+      "sha256": "e81f368e45e1aff740cfe600ffd86b003deb98596144bb93805e627549b10fb5",
+      "bytes": 8745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/diagnostics.json",
+      "sha256": "320c2a13596ebbe0dde6d06b3753955e3e8205a3f11aa01680d6f40a269b4bef",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/run-summary.json",
+      "sha256": "926affa84c6a337c0cd62cba27361be1509c9c978985b9c0c5b1f65ea52e1ced",
+      "bytes": 61003
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-command-Root-45/receipt.json",
+      "sha256": "6934ec93067ae205ead1ce45cd6f38aa849cfaadce2f3f6ea722df81111ba4b2",
+      "bytes": 3619
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-command-Root-45/stderr.log",
+      "sha256": "60f9083b9f4ffbaa8f9ee0db2e198f61a41ee153d1e35564c5c3a2e86a0c9beb",
+      "bytes": 2756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-command-Root-45/stdout.log",
+      "sha256": "c26ef819d58a6ff62bc675abcb70f5888eee119a2765ff42c6af09efaddaf552",
+      "bytes": 408234
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-custody-Root-45/custody.json",
+      "sha256": "d1a8d1fffe78ab1afe0b5eef81bb0f9ad5bdf417118c6ed6d00380537bfa29e2",
+      "bytes": 25135
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/diagnostics.json",
+      "sha256": "090659a4fa83da62d4933fa224823ff8f333b3578f63549bac3fb56c2b013994",
+      "bytes": 2589
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/eplusrs.mdd",
+      "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+      "bytes": 1124
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/eplusrs.rdd",
+      "sha256": "fbb670e675b757f5433fa3e8cd3992c7a0e36498c38c5d322cabb77cf0866f3f",
+      "bytes": 24778
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/run-summary.json",
+      "sha256": "061b49876a018aea2e9759bc3e8662b5a5fc8b387909fd5150464fdd107fbb4e",
+      "bytes": 61304
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/receipt.json",
+      "sha256": "5700ad3595294608035a766f0bf6f4e31c27312c0829da611983bc387963e17a",
+      "bytes": 3632
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/stderr.log",
+      "sha256": "689cdfe635507e37fbb14c8061b9d3a82e1d050754b808abfc686a3eda211c00",
+      "bytes": 2762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/stdout.log",
+      "sha256": "04c24fd350ba71dfe4e93c3ee1883eacf1ec29efc9be8528e2374fd695fce361",
+      "bytes": 408246
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-custody-Root-45/custody.json",
+      "sha256": "ac19b7fdbe96721db8c2c0e51c024c5349b1f21b318f59f2ba75d6bf5410c67d",
+      "bytes": 25149
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-thermostat-predefined-held-Outer-44/complete-final-compiler-Source-plan.json",
+      "sha256": "90ffa0c310f4600a3dc24045c9f9b1871617b7a9512a7023bdf604458da26654",
+      "bytes": 2637867
+    },
+    {
+      "path": ".runtime/porting/SRC-06/system-report-Native-reported-comparison-Peer-39/comparison.json",
+      "sha256": "684df2ea2aff18aa187bf704c34f10cf38e2c4b6952084ca8208764b1e298aaf",
+      "bytes": 126704
+    },
+    {
+      "path": ".runtime/porting/source-objects/7b/7b46d6f55ae7f001d95d5f0f3762ff8d46e7be7172f373703f5f7cae15021a99",
+      "sha256": "7b46d6f55ae7f001d95d5f0f3762ff8d46e7be7172f373703f5f7cae15021a99",
+      "bytes": 1835423
+    },
+    {
+      "path": ".runtime/porting/source-objects/83/831d13ec1ad9521905804031e85efd131e56ec8e8f819f5f583969739928d5e9",
+      "sha256": "831d13ec1ad9521905804031e85efd131e56ec8e8f819f5f583969739928d5e9",
+      "bytes": 1850148
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+      "bytes": 13025
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68",
+      "bytes": 23645
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+      "bytes": 13025
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e",
+      "bytes": 24541
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+      "bytes": 13030
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8",
+      "bytes": 24009
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "tools/porting/check_completed_reported_streams.py",
+      "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+      "bytes": 24664
+    }
+  ],
+  "scope": "All three strict comparison reports, full B24 own9792 raw-sample/ancillary ledgers and small B24 own exports; actual command/custody/stdout/stderr/Source-snapshot metadata, unchanged policy and one-function Regular-reader proof. Annual outputs are hashed/inventoried only and remain ignored; no large annual JSON/CSV/ESO, runtime DLL/exe/core or recursive ZIP included. Native runtime pin metadata is not a bundled runtime or loaded-module trace."
+}

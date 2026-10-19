@@ -12941,6 +12941,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-thermostat-predefined-44/summary.json",
         "sha256": "60d011e9fb3a8726d9ab808dfe7e1a695f2ca7538ad7b4f4bb704d57377649f3",
         "size_bytes": 6485
+      },
+      "canonical_nolimit_duration_validation_45": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-nolimit-duration-validation-45/summary.json",
+        "sha256": "0ef6bebe81f22fc398d3b84744b630ad6f61a4ca14511682c9821bd0bb126aff",
+        "size_bytes": 28911
       }
     },
     {

@@ -1,0 +1,758 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "new_production_Sources": 0,
+  "validation_tool_existing_files_changed": 1,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "production_Source_changed": false,
+  "Source4511_Rust4498_parent_preserved": true,
+  "new_duration_Source_CLI_invocations": 2,
+  "new_duration_Native_CLI_invocations": 2,
+  "inherited_B24_Source_and_Native_not_rerun": true,
+  "qualification": "These three NoLimit B cases only, not the remaining flow/capacity/both variants or full15/64-card closure. Native comparisons use original named tolerances/RMSE; raw/binary64 differences remain in complete reports. Own JSON/CSV verified only B24, durations unverified; no overall ancillary IO PASS. Public tool promotion adds Regular RDD input support only and preserves all numerical/parser/API logic outside that one reader and canonical ROOT location.",
+  "schema": "src06-canonical-nolimit-duration-validation45.v1",
+  "status": "Three genuine Source620 and matching Native NoLimit case results; all original-policy reported comparisons passed",
+  "Root_actual_aggregate": {
+    "path": ".runtime/porting/SRC-06/Root-nolimit-B24-durations-actual-review-45/review.json",
+    "sha256": "ea21b8494191229fce99742599df474054fde4f2c8eb950097384606117b962f",
+    "bytes": 43666
+  },
+  "cases": [
+    {
+      "case": "B-NOLIMIT-24H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-command-Root-44/receipt.json",
+        "sha256": "c87dc0133188773ba95f8b78efd25ee22e772b60a2d57e63551c41497820f49d",
+        "bytes": 4560
+      },
+      "Native_receipt": {
+        "path": ".runtime/porting/SRC-06/native-installed-B-NOLIMIT-24H-command-Root-12/receipt.json",
+        "sha256": "5e4c9f0ad0ca63bd3ba1a03e41373cbebf350a9d606071e6745dedbd4f794f2b",
+        "bytes": 4807
+      },
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-24H-reported-Root-44/comparison.json",
+        "sha256": "d2263d8c26582e382f0f33127ec49c0851a7c9e7e47cb75b296eccdb9a9acfad",
+        "bytes": 146326
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/run-summary.json",
+        "sha256": "8ebacc330a0eb2c9417a5e086831b5bc478e376afb3983d2f3472a49e2981950",
+        "bytes": 61305
+      },
+      "Source_diagnostics": {
+        "path": ".runtime/porting/SRC-06/canonical-source-thermostat-predefined-B-NOLIMIT-24H-Root-44/output/diagnostics.json",
+        "sha256": "22a0a8d037a0c7b63a172dedd2c507758471bdb41a390f117bed479289e22e04",
+        "bytes": 2589
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68",
+        "bytes": 23645
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "bytes": 13025
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "full_case_hours": 24,
+      "zone_steps": 96,
+      "metrics": {
+        "series": 102,
+        "samples": 9792,
+        "raw_operand_unequal": 0,
+        "parsed_binary64_unequal": 0,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Drybulb Temperature",
+          "units": "C",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Drybulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "custodies": [],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_ordered_reported_stream_comparison_pass": true,
+      "raw_and_binary64_exact": true,
+      "own_JSON_CSV_verified": true,
+      "ancillary_IO_admitted": false
+    },
+    {
+      "case": "B-NOLIMIT-72H",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-command-Root-45/receipt.json",
+        "sha256": "6934ec93067ae205ead1ce45cd6f38aa849cfaadce2f3f6ea722df81111ba4b2",
+        "bytes": 3619
+      },
+      "Native_receipt": {
+        "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-command-Root-45/receipt.json",
+        "sha256": "937dbb69fafba685035ac25bbd20c8854b2f7c85f759e4b1d26a33b2b5e41cf3",
+        "bytes": 3354
+      },
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-72H-reported-Root-45/comparison.json",
+        "sha256": "7ead35bd78cae71034ce89be6eb673696552585a17bb9dd85cda58e5d52fda95",
+        "bytes": 146499
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/run-summary.json",
+        "sha256": "926affa84c6a337c0cd62cba27361be1509c9c978985b9c0c5b1f65ea52e1ced",
+        "bytes": 61003
+      },
+      "Source_diagnostics": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-Root-45/output/diagnostics.json",
+        "sha256": "320c2a13596ebbe0dde6d06b3753955e3e8205a3f11aa01680d6f40a269b4bef",
+        "bytes": 2589
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e",
+        "bytes": 24541
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+        "bytes": 13025
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "full_case_hours": 72,
+      "zone_steps": 288,
+      "metrics": {
+        "series": 102,
+        "samples": 29376,
+        "raw_operand_unequal": 4,
+        "parsed_binary64_unequal": 4,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Wetbulb Temperature",
+          "units": "C",
+          "max_abs_delta": 3.552713678800501e-15,
+          "rmse_delta": 2.7693827873701494e-16,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Wetbulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "Environment",
+          "name": "Site Horizontal Infrared Radiation Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Horizontal Infrared Radiation Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "WALL X0",
+          "name": "Surface Inside Face Conduction Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "WALL X0",
+            "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 0.0,
+          "rmse_delta": 0.0,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-72H-custody-Root-45/custody.json",
+          "sha256": "d1a8d1fffe78ab1afe0b5eef81bb0f9ad5bdf417118c6ed6d00380537bfa29e2",
+          "bytes": 25135
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-72H-custody-Root-45/custody.json",
+          "sha256": "fb2b7e6a7acacc06901727802b04355c0fb0063dbb7c71ed0fd654efab3f3fb6",
+          "bytes": 25145
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_ordered_reported_stream_comparison_pass": true,
+      "raw_and_binary64_exact": false,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_admitted": false
+    },
+    {
+      "case": "B-NOLIMIT-ANNUAL",
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/receipt.json",
+        "sha256": "5700ad3595294608035a766f0bf6f4e31c27312c0829da611983bc387963e17a",
+        "bytes": 3632
+      },
+      "Native_receipt": {
+        "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-command-Root-45/receipt.json",
+        "sha256": "63d8b965596c1a10dd2ec355689ed67f41506cf63e07ac1da4ad0f3021044367",
+        "bytes": 3366
+      },
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-B-NOLIMIT-ANNUAL-reported-Root-45/comparison.json",
+        "sha256": "5f0e243e2964796d0d0b9fa0bf8df136b8488444209cf4ca2852ab97aad8980d",
+        "bytes": 153626
+      },
+      "Source_summary": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/run-summary.json",
+        "sha256": "061b49876a018aea2e9759bc3e8662b5a5fc8b387909fd5150464fdd107fbb4e",
+        "bytes": 61304
+      },
+      "Source_diagnostics": {
+        "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-Root-45/output/diagnostics.json",
+        "sha256": "090659a4fa83da62d4933fa224823ff8f333b3578f63549bac3fb56c2b013994",
+        "bytes": 2589
+      },
+      "case_metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8",
+        "bytes": 24009
+      },
+      "case_input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+        "bytes": 13030
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "bytes": 1623506
+      },
+      "full_case_hours": 8760,
+      "zone_steps": 35040,
+      "metrics": {
+        "series": 102,
+        "samples": 3574080,
+        "raw_operand_unequal": 17520,
+        "parsed_binary64_unequal": 17520,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "maximum_absolute_deltas_by_actual_unit": {
+        "C": {
+          "key": "Environment",
+          "name": "Site Outdoor Air Wetbulb Temperature",
+          "units": "C",
+          "max_abs_delta": 7.993605777301127e-14,
+          "rmse_delta": 1.2466236578386979e-15,
+          "policy": {
+            "key": "Environment",
+            "variable": "Site Outdoor Air Wetbulb Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W/m2": {
+          "key": "FLOOR",
+          "name": "Surface Heat Storage Rate per Area",
+          "units": "W/m2",
+          "max_abs_delta": 7.958078640513122e-13,
+          "rmse_delta": 1.525607507923794e-14,
+          "policy": {
+            "key": "FLOOR",
+            "variable": "Surface Heat Storage Rate per Area",
+            "units": "W/m2",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-05,
+            "rtol": 0.0,
+            "rmse_max": 1e-05
+          }
+        },
+        "W": {
+          "key": "ZONE ONE",
+          "name": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+          "units": "W",
+          "max_abs_delta": 2.0321522242738865e-12,
+          "rmse_delta": 1.9398053781956285e-14,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 0.001,
+            "rtol": 0.0,
+            "rmse_max": 0.001
+          }
+        },
+        "": {
+          "key": "ZONE ONE",
+          "name": "Zone Air Humidity Ratio",
+          "units": "",
+          "max_abs_delta": 1.6479873021779667e-17,
+          "rmse_delta": 1.0973262434038764e-18,
+          "policy": {
+            "key": "ZONE ONE",
+            "variable": "Zone Air Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "J": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "units": "J",
+          "max_abs_delta": 6.039044819772243e-10,
+          "rmse_delta": 5.118732073245286e-12,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1.0,
+            "rtol": 0.0,
+            "rmse_max": 1.0
+          }
+        },
+        "kg/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "units": "kg/s",
+          "max_abs_delta": 1.1102230246251565e-16,
+          "rmse_delta": 2.113536123894332e-18,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "m3/s": {
+          "key": "ZONE ONE IDEAL LOADS",
+          "name": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "units": "m3/s",
+          "max_abs_delta": 1.1102230246251565e-16,
+          "rmse_delta": 2.200402941895258e-18,
+          "policy": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+            "units": "m3/s",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        },
+        "kgWater/kgDryAir": {
+          "key": "ZONE ONE INLET",
+          "name": "System Node Humidity Ratio",
+          "units": "kgWater/kgDryAir",
+          "max_abs_delta": 1.6479873021779667e-17,
+          "rmse_delta": 1.0979448418083392e-18,
+          "policy": {
+            "key": "ZONE ONE INLET",
+            "variable": "System Node Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "sampling_stage": "system",
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          }
+        }
+      },
+      "custodies": [
+        {
+          "path": ".runtime/porting/SRC-06/source-nolimit-duration-B-NOLIMIT-ANNUAL-custody-Root-45/custody.json",
+          "sha256": "ac19b7fdbe96721db8c2c0e51c024c5349b1f21b318f59f2ba75d6bf5410c67d",
+          "bytes": 25149
+        },
+        {
+          "path": ".runtime/porting/SRC-06/native-installed-nolimit-duration-B-NOLIMIT-ANNUAL-custody-Root-45/custody.json",
+          "sha256": "b1452c88572edebe9f2156c1ddfaaff55598bf47cd33dfd25f212098ceb73697",
+          "bytes": 25159
+        }
+      ],
+      "Source620_completed": true,
+      "Native_completed": true,
+      "strict_ordered_reported_stream_comparison_pass": true,
+      "raw_and_binary64_exact": false,
+      "own_JSON_CSV_verified": false,
+      "ancillary_IO_admitted": false
+    }
+  ],
+  "totals": {
+    "case_series": 306,
+    "reported_scalar_samples": 3613248,
+    "raw_operand_unequal": 17524,
+    "parsed_binary64_unequal": 17524,
+    "tolerance_failures": 0,
+    "rmse_failures": 0,
+    "all_three_strict_comparisons_pass": true
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-thermostat-predefined-held-Outer-44/complete-final-compiler-Source-plan.json",
+    "sha256": "90ffa0c310f4600a3dc24045c9f9b1871617b7a9512a7023bdf604458da26654",
+    "bytes": 2637867
+  },
+  "own_export_scope": {
+    "verified_cases": [
+      "B-NOLIMIT-24H"
+    ],
+    "JSON_CSV_scalar_roundtrips": 9792,
+    "readback": {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/review.json",
+      "sha256": "6fca3f8908f513fd971b8d15340affbb3cbe670f167f0cb5858167acb4cc0871",
+      "bytes": 23595
+    },
+    "all_samples": {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/all9792-own-export-roundtrip-samples.jsonl",
+      "sha256": "6a7818b1d41448da2bd1316504aa4437f964ab713635838d125d642cc4be34a6",
+      "bytes": 4758519
+    },
+    "unverified_cases": [
+      "B-NOLIMIT-72H",
+      "B-NOLIMIT-ANNUAL"
+    ],
+    "existing_public_bounded_own_export_reader": false,
+    "qualification": "Existing public comparator verifies physical reported streams only; existing private own-export readers load complete JSON/physical histories/CSV lists. No new reader or huge annual JSON-tree load was introduced."
+  },
+  "ancillary_IO_scope": {
+    "overall_IO_PASS": false,
+    "admitted_cases": [],
+    "known_B24_unclassified_rows": 180,
+    "uncapped_B24_raw_differences": {
+      "path": ".runtime/porting/SRC-06/completed-B-own-export-and-ancillary-Root-44/all-ancillary-physical-differences.jsonl",
+      "sha256": "467fd3e0429f9fdd3e7314377169115e20195b8e674110e4983dd1809a676eb7",
+      "bytes": 61418
+    },
+    "duration_ancillary_unreviewed": true
+  },
+  "Native_B24_historical_IDD_qualification": "Retain accepted Native39-vs-installed12 bridge684df2. Installed12 receipt does not independently pin historical IDD bytes/INI absence; current explicit39 capture and whole physical Native reported agreement are separate evidence.",
+  "public_Regular_comparer": {
+    "path": "tools/porting/check_completed_reported_streams.py",
+    "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+    "bytes": 24664
+  },
+  "public_promotion": {
+    "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/manifest.json",
+    "sha256": "c076e7c4f522e087aaed4458dbf436483817ce1ab891f2a0f3d5970e041e562e",
+    "bytes": 2180
+  },
+  "Regular_reader_proof": {
+    "held_readiness_plan": {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/plan.json",
+      "sha256": "5870b5df147f1279c9799652688883a1890676e3e074e89498dca12171b0dbc4",
+      "bytes": 16654
+    },
+    "public_before": {
+      "path": "tools/porting/check_completed_reported_streams.py",
+      "sha256": "46a1b6f9081d9a0ff5a2d430b17ec647b88a41f5052c3bb1c95df98174ab754c",
+      "bytes": 24063
+    },
+    "held_reader": {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/proposed/tools/porting/check_completed_reported_streams.py",
+      "sha256": "1f0fd5053748210d812201957ec9e1ae56e8712e0082a2c9b7cdac3cba79e7b8",
+      "bytes": 24700
+    },
+    "held_forward_diff": {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/tool-forward.diff",
+      "sha256": "9f611a43c7710c67ed6be034c68488d0f835a2b79e3daddb4b7053bd66b5ef36",
+      "bytes": 2007
+    },
+    "held_inverse_diff": {
+      "path": ".runtime/porting/SRC-06/completed-B-comparison-ready-Audit-01/tool-inverse.diff",
+      "sha256": "262383d24d9216f48d3b9de6483051334a1aee7fb000433d39ae789717ac1b52",
+      "bytes": 2007
+    },
+    "only_available_variables_function_and_private_ROOT_relocation_change": true,
+    "all_other_numeric_parser_API_functions_AST_exact": true,
+    "public_promotion": {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/manifest.json",
+      "sha256": "c076e7c4f522e087aaed4458dbf436483817ce1ab891f2a0f3d5970e041e562e",
+      "bytes": 2180
+    },
+    "public_proposed": {
+      "path": ".runtime/porting/SRC-06/public-Regular-reader-held-Outer-45/proposed/tools/porting/check_completed_reported_streams.py",
+      "sha256": "dfd48ccfbbe1d88b4d70bbf4634eb3963679659442e2d8cacf929abb02f7186e",
+      "bytes": 24664
+    },
+    "public_ROOT_parents2_preserved": true
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-nolimit-duration-validation-45/evidence.zip",
+    "sha256": "ad8765581cfd0a416818053d541c1aeda970778a0d3fa75ea81a02dad1a54f86",
+    "bytes": 1962302
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-nolimit-duration-validation-45/manifest.json",
+    "sha256": "5d80c3b6ae6a3074420e7df03388722af05f3d81413bd86bc0c291bbc900c8fe",
+    "bytes": 20834
+  },
+  "archive_entries": 89,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-nolimit-B24-durations-Outer-45.py",
+    "sha256": "e81f368e45e1aff740cfe600ffd86b003deb98596144bb93805e627549b10fb5",
+    "bytes": 8745
+  }
+}
