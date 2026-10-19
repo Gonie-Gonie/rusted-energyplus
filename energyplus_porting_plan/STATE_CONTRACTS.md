@@ -167,3 +167,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source33 component/Node report](evidence/SRC-06-canonical-component-node-report-33/summary.json). 기존 Config·물리 Node와 요청·스케줄·EMS 상태를 재사용하고, Native 호출과 기록 순서를 보존합니다.
+
+
+[Source34 controlled-zone ventilation](evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json). ZoneVentRepVars의 기존 20개 기본값과 할당을 유지한다. Config.ZoneName을 빌리고 같은 SystemReports 소유자의 구역 인덱스·필드로 매번 출력값을 해석한다. 보고값 복사본이나 새 계산 상태는 만들지 않는다.

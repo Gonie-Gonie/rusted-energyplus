@@ -48,9 +48,16 @@ impl SourceSystemReports {
             {
                 continue;
             }
-            return Err(Error::Unavailable(
-                "actual controlled ZoneVentRepVars/ZoneEquipConfig.ZoneName1993–1994 before zone declarations",
-            ));
+            // Native1993 takes the real report-row reference before the name and flag.
+            self.zone_vent_rep_vars
+                .as_ref()
+                .and_then(|rows| rows.get(at(zone).ok()?))
+                .ok_or(Error::Unavailable("actual ZoneVentRepVars1993 live row"))?;
+            let config = o.equipment.source_zone_equipment_config(zone)?;
+            let name = config.zone_name();
+            self.register_source_zone_ventilation_outputs(
+                zone, name, registration, input, backend, output,
+            )?;
         }
         self.register_source_facility_ventilation_outputs(registration, input, backend, output)
     }

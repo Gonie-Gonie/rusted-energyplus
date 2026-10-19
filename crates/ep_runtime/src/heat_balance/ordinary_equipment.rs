@@ -483,6 +483,10 @@ pub(crate) struct SourceZoneEquipmentConfigRef<'a> {
     row: &'a EquipmentConfig,
 }
 impl SourceZoneEquipmentConfigRef<'_> {
+    /// Same retained Config.ZoneName read by SystemReports1994.
+    pub(crate) fn zone_name(&self) -> &str {
+        &self.row.zone_name
+    }
     pub(crate) fn is_controlled(&self) -> &bool {
         &self.row.is_controlled
     }

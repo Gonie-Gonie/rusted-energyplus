@@ -1,0 +1,91 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": false,
+  "selected_existing_production_Sources": 5,
+  "new_Source_files": 0,
+  "controlled_zone_output_declarations": 20,
+  "first8_conditional_on_real_VentLoadsReportEnabled": true,
+  "remaining12_unconditional_per_controlled_zone": true,
+  "following_facility_declarations_unchanged": 4,
+  "source_report_ctor20_unchanged": true,
+  "real_Config_key_borrow_and_indexed_live_Which": true,
+  "new_test_bodies": 0,
+  "actual_test_bodies_executed": 0,
+  "scope": "Controlled-zone ventilation registration uses the same retained ZoneVentRepVars owner and actual Config.ZoneName, native20 declarations in order, true m3/ach units; no scientific formulas or scalar output cache. Actual B frontier remains recorded, not inferred.",
+  "qualification": "A24 original5352 proof is transferred through accepted33 current-run whole-file checks; safe-main predictor/corrector cohort remains inherited and unchanged, not rerun. No finite15/all12/card/fullB/internal-unit completion claim.",
+  "schema": "src06-canonical-controlled-zone-ventilation.v1",
+  "status": "Genuine Source controlled-zone ventilation live output registration; actual B result recorded",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-ventilation-held-Audit-34/manifest.json",
+    "sha256": "95c7fad71826d0e3f6bef1cf86efd2a29a10aa5d973de99ebe3ac5db105e4085",
+    "bytes": 30723
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-controlled-zone-ventilation-Source-review-34/review.json",
+    "sha256": "200affc971b4d7eb862f20bac9339d6978071197ae573804e2a6687ad6daf3be",
+    "bytes": 27448
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-zone-ventilation-held-Audit-34/complete-final-compiler-Source-plan.json",
+    "sha256": "7f7e7674808a970b1e9ad0beda6546a81831614708ead3d80fe9abc6500251b2",
+    "bytes": 2631668
+  },
+  "accepted_parent_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-component-node-report-actual-review-33/review.json",
+    "sha256": "c9b9aabda8147ebe2c9b8498600863e17855e1e40d01813c9b7ceb684b6ef39d",
+    "bytes": 19066
+  },
+  "accepted_parent_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-component-node-report-held-Outer-33/complete-final-compiler-Source-plan.json",
+    "sha256": "7f41b4ee1c9f6af67263d8e44c80d59bcfd4c9fa5e59e4662af240138e272747",
+    "bytes": 2631185
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-ventilation-B-NOLIMIT-24H-command-Root-34/receipt.json",
+    "sha256": "e9cfe5dbb297529bfbf817bc9ba6cb8bb45316f8594b9e868ef18ee68206af2d",
+    "bytes": 4474
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-zone-ventilation-A-24H-command-Root-34/receipt.json",
+    "sha256": "2d0b31c380349f84c70ce78946a42d0ebc02b18caddf317e27d860df75cd647e",
+    "bytes": 4423
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-zone-ventilation-actual-review-34/review.json",
+    "sha256": "ec2e7f307040ecfc083c4822146ec9a4b3f69ad44db23ff137051c4514f1c844",
+    "bytes": 17760
+  },
+  "actual_B_completed": false,
+  "actual_B_result": "GetHeatBalanceInput: actual CheckNodeConnections919 NodeConnections.ConnectionType first record access",
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted33_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-component-node-report-actual-review-33/review.json",
+      "sha256": "c9b9aabda8147ebe2c9b8498600863e17855e1e40d01813c9b7ceb684b6ef39d",
+      "bytes": 19066
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal33": 7,
+    "CSV_files_whole_equal33": 2,
+    "scope": "Accepted33 A24 proof transfer. No new Native/72H/annual or internal-state comparison."
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-ventilation-34/evidence.zip",
+    "sha256": "ba4377263eb100b357fc858046fb06de1358826ed9bb5a6c50bdb5da47e99289",
+    "bytes": 1636139
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-zone-ventilation-34/manifest.json",
+    "sha256": "c526e6940c1d694af7197ba398ccfc61a879c69c431d38415d6f10856c41a17d",
+    "bytes": 28028
+  },
+  "archive_entries": 114,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-controlled-zone-ventilation-checkpoint-Audit-34.py",
+    "sha256": "ecdcf2ecc4a3342fdd3ec151b84e183410715a166f8672136b2bbfe66cb27434",
+    "bytes": 10427
+  }
+}

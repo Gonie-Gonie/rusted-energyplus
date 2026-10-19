@@ -479,3 +479,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source33 component/Node report](../evidence/SRC-06-canonical-component-node-report-33/summary.json). B의 실제 결과: `GetHeatBalanceInput: actual controlled ZoneVentRepVars/ZoneEquipConfig.ZoneName1993–1994 before zone declarations`. 이번 단계는 CLI 두 건으로 검증했으며, 테스트 코호트 결과는 부모 증거로 구분합니다.
+
+
+[Source34 controlled-zone ventilation](../evidence/SRC-06-canonical-controlled-zone-ventilation-34/summary.json). 제어 구역의 실제 환기 보고 상태에 출력 20개를 Native 순서로 연결했다. 구역명과 보고값은 기존 소유자에서 직접 참조하며 앞 8개는 실제 VentLoadsReportEnabled를 따른다. B 실행 결과: `GetHeatBalanceInput: actual CheckNodeConnections919 NodeConnections.ConnectionType first record access`. A24 회귀는 기존 5,352개 보고값 증거를 이어받고, 계산식 변경이나 테스트 추가는 없다.

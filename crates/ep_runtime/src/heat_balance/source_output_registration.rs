@@ -110,7 +110,7 @@ mod exterior_light_target;
 mod facility_target;
 mod system_reports_target;
 pub(crate) use exterior_light_target::SourceExteriorLightOutputField;
-pub(crate) use system_reports_target::SourceSystemReportsOutputField;
+pub(crate) use system_reports_target::{SourceSystemReportsOutputField, SourceZoneVentReportOutputField};
 mod general_real;
 mod meters;
 mod weather_target;
@@ -198,6 +198,8 @@ pub(crate) enum SourceOutputUnits {
     WPerM2K,
     KgPerSecond,
     M3PerSecond,
+    M3,
+    Ach,
     JPerKgK,
     Ppm,
 }
@@ -227,6 +229,8 @@ impl SourceOutputUnits {
             Self::WPerM2K => "W/m2-K",
             Self::KgPerSecond => "kg/s",
             Self::M3PerSecond => "m3/s",
+            Self::M3 => "m3",
+            Self::Ach => "ach",
             Self::JPerKgK => "J/kg-K",
             Self::Ppm => "ppm",
         }
