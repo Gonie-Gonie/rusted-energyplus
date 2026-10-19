@@ -57,9 +57,13 @@ impl SourceAirLoopData {
                         .map_err(|_| Error::Unavailable("actual signed NumInletNodes1934"))?;
                     target.inlet_nodes =
                         Some(vec![SourceNodeConvergenceLog::default(); inlet_count]);
-                    return Err(Error::Unavailable(
-                        "positive actual ZoneEquipConfig InletNode(1) read1939",
-                    ));
+                    for ordinal in 1..=inlet_count {
+                        let actual = *config.inlet_node_number(ordinal)
+                            .ok_or(Error::Unavailable("actual ZoneEquipConfig InletNode1939"))?;
+                        target.inlet_nodes.as_mut().and_then(|rows| rows.get_mut(ordinal - 1))
+                            .ok_or(Error::Unavailable("actual ZoneInletConvergence InletNode1939"))?.node_number =
+                            i32::try_from(actual).map_err(|_| Error::Unavailable("actual convergence NodeNum integer domain1939"))?;
+                    }
                 }
             }
             self.connect_source_return_nodes(o)?;
@@ -79,10 +83,12 @@ impl SourceAirLoopData {
                 if !*config.is_controlled() {
                     continue;
                 }
-                if *config.number_return_nodes() > 0 {
-                    return Err(Error::Unavailable(
-                        "positive actual ReturnNodeAirLoopNum2133",
-                    ));
+                for ordinal in 1..=*config.number_return_nodes() {
+                    let air_loop = *config.return_node_air_loop_number(ordinal)
+                        .ok_or(Error::Unavailable("actual ReturnNodeAirLoopNum2133"))?;
+                    if air_loop > 0 {
+                        return Err(Error::Unavailable("actual AirLoopFlow DesSupply2135"));
+                    }
                 }
             }
         }
@@ -112,10 +118,16 @@ impl SourceAirLoopData {
             if !*config.is_controlled() {
                 continue;
             }
-            if *config.number_return_nodes() > 0 {
-                return Err(Error::Unavailable(
-                    "positive actual ConnectReturnNodes ReturnNode2333",
-                ));
+            for ordinal in 1..=*config.number_return_nodes() {
+                let _this_return_node = *config.return_node_number(ordinal)
+                    .ok_or(Error::Unavailable("actual ConnectReturnNodes ReturnNode2333"))?;
+                // Native starts this local at0 and only the following actual
+                // return-path child may produce a positive airloop association.
+                for _return_path in 1..=*o.equipment.source_number_return_paths() {
+                    return Err(Error::Unavailable("actual ConnectReturnNodes ReturnAirPath2336"));
+                }
+                // No return-path child executed: actual local airLoopNum remains0.
+                // Its positive matching-inlet branch therefore performs no writes.
             }
         }
         if o.hvac.number_of_primary_air_systems > 0 {

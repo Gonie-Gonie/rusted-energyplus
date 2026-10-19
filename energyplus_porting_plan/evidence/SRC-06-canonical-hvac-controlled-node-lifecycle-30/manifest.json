@@ -1,0 +1,596 @@
+{
+  "schema": "src06-canonical30-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/evidence.zip",
+    "sha256": "c24ea48192296245b444c5ca2294353d76fac0960a6ca42cb29891e4995622fb",
+    "bytes": 1739359
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/compiler/cmake_pch.hxx",
+      "sha256": "94f365a6b671a7b78f4ddf8459bbbe4b6996180691875bbe55f8444f5d88f4f9",
+      "bytes": 936
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/compiler/compile_commands.json",
+      "sha256": "c5b5d41281d232afdd4922fe533278418c702e2a92b9b57731a0796fa57ecc11",
+      "bytes": 4316067
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/compiler/macro.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/compiler/macro.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/review.json",
+      "sha256": "cf51135e42742a864745b0057a9e9c79ce6ed08a2fb8124b8fa6f60377a7b9ab",
+      "bytes": 34804
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-hvac-return-air-extension-Source-review-30-02/review.json",
+      "sha256": "9546e538bcdf8b2b855c52947a2586b9524db36f3b7dccca898a9fee709680c1",
+      "bytes": 10083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-hvac-controlled-node-lifecycle-application-30/receipt.json",
+      "sha256": "5506a5a345bacd581d75b0b0215b92a5349c05fb9be85eea65d348afec310977",
+      "bytes": 14407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-air-balance-actual-review-29/review.json",
+      "sha256": "85538c54d4a67e5a314706e83f6796b00835fe602d59805cd35310a01c289767",
+      "bytes": 17389
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hvac-controlled-node-lifecycle-actual-review-30/review.json",
+      "sha256": "e2ebb413a2ae7e70f9f0e469dd74821991665d7af242192e1ffa97767773f808",
+      "bytes": 18048
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-hvac-controlled-node-lifecycle-actual-review-30/table-clock-differences.json",
+      "sha256": "6988459787dc74172d6e36606df90876bbe826fa14757327fe6f84b99569d5c0",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-hvac-controlled-node-lifecycle-Root-30.py",
+      "sha256": "a347409d3c4d9b09cd18215f3f4b0913b8a1575a7cc179e6b1ecea09b362953c",
+      "bytes": 7303
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/diagnostics.json",
+      "sha256": "0e11922ce93d2bf1dc638f53708f087d7c94504c8dfbab0487eea3f6ded5e126",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplustbl.htm",
+      "sha256": "58489c80ad22554432fb391e577ed6512f68e1486ffab08750818da5c3b74def",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/eplustbl.xml",
+      "sha256": "a076c3f951382bfd8b353eda53196553b20f76913f1d3f2b7695a7637498fe3a",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/results/source-reported-results.json",
+      "sha256": "f5b2eb06cc608885e3935021706e85c8540ca8d5a475df33fc678cbde1c24f51",
+      "bytes": 1679938
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-Root-30/output/run-summary.json",
+      "sha256": "17ee66a88bff55e784026689905a9a735aba3e43e25a2a0f55149481b9739343",
+      "bytes": 32951
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-command-Root-30/receipt.json",
+      "sha256": "ca61ceca4318e271c7cbada2267a71da4943fd6b70946f4fe87bae1f1eae5d38",
+      "bytes": 4297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-command-Root-30/stderr.log",
+      "sha256": "38cd2013287c8c43818d77c9b713f24928d1df2ac459e6e8b6b8c058bac3159f",
+      "bytes": 763
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-command-Root-30/stdout.log",
+      "sha256": "88cfc2ebdb14e7b558d09921b1f6d0ac1060010e4addf4f45eb58dd178796ce9",
+      "bytes": 403356
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-Root-30/output/diagnostics.json",
+      "sha256": "3b2427ad204b9b8f421123a26fc8e79b0bca064969aa4ceac1b61173228ee4f7",
+      "bytes": 2974
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-Root-30/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-Root-30/output/run-summary.json",
+      "sha256": "d12ec0e790ea6f22d7602873a7740ed62c3581d0e1452b98828fa4211eb9a19e",
+      "bytes": 25521
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-command-Root-30/receipt.json",
+      "sha256": "ccd32feea593758b4bbef84559c53dfde9b7bece22f4e95344e0a6b62779057d",
+      "bytes": 4349
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-command-Root-30/stderr.log",
+      "sha256": "a77dfa04d20938c481ac659ecfafe047b4b92cbab58f02d567f3b8581c855924",
+      "bytes": 10731
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-command-Root-30/stdout.log",
+      "sha256": "0471c71544387eceda44e5a9379346712c8c81d4e42ebfc203f099c99155f23c",
+      "bytes": 403391
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-hvac-controlled-node-lifecycle-actual-Root-30.py",
+      "sha256": "ece588246c7be8b905711dd68cfd4bc75ea9c7eebd60f1d9a73c658853dfbce2",
+      "bytes": 6809
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/Native-before.json",
+      "sha256": "c2b5bc48ab3f7eb2f3b97c6d24b536c8339c6c7c3e674d0a6d9ae5473d389dc8",
+      "bytes": 46850
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-build-Root-21/native-build.json",
+      "sha256": "9ff0df8f49b91b5318a8bdc410c951be21378ae81ad2252f6efc05af50f858e3",
+      "bytes": 99070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/hvac-controlled-node-lifecycle-publication-prepared-Peer-30/publication-template.json",
+      "sha256": "8db080751a7af62b3456be6e847bb16f566f7b86b4225b9ce6a3b4ba7a58a7a5",
+      "bytes": 25978
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-hvac-controlled-node-lifecycle-Root-30.py",
+      "sha256": "4d8a78dd34ed6126577e257a6240472f768bc6592456530ab3f4479f65c73bb0",
+      "bytes": 1336
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-hvac-controlled-node-lifecycle-publication-Peer-30.py",
+      "sha256": "c4487e851d10aa9a57d68b998e8c77edc929c4caa0eb891f862add33dd87e8a1",
+      "bytes": 12339
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-hvac-controlled-node-lifecycle-checkpoint-Peer-30.py",
+      "sha256": "26b6e7498563a78412d3c0fb2a9c577598376082ab3e2dab45ab7904928f44de",
+      "bytes": 12749
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-zone-equipment-output-checkpoint-Peer-28.py",
+      "sha256": "e35daa1a3beb4a70feb5a369b75877f1a4d4d32d170e77bbdcf7d32ea2ce01c4",
+      "bytes": 12203
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-hvac-controlled-node-lifecycle-Outer-30.py",
+      "sha256": "cf62de2c50ec8e919edaa21bf69c92c2a929e173fcf5adb14b5152c2752dd811",
+      "bytes": 10000
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-hvac-return-air-extension-Peer-30.py",
+      "sha256": "fe9736be89c6f8d9f12fd51e29a367e7a0887d0271952cf91bc317542be4ede8",
+      "bytes": 7297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-hvac-controlled-node-lifecycle-Peer-30.py",
+      "sha256": "937dd28e4a3401d587a6545b347c86f45c77452d7992ebbf69638ca41918f3fb",
+      "bytes": 11996
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-draft-Root-30-02/draft.json",
+      "sha256": "ce6e5b2c48cd9d8479e25d6e0df0421c8b7dbe3d94ed2676f5416fba7d3a3a12",
+      "bytes": 9366
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/API-census.json",
+      "sha256": "884ef058ebbe231e295e18c60aec2ea3031919e15300cbed64edce38ea5fd416",
+      "bytes": 901
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/AlignedAllocator.hh.45-85.txt",
+      "sha256": "053990b61a69401bc8344fb3fe93cf9b77e0e6ea426cf42cae548e329d73858c",
+      "bytes": 1216
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/Array.hh.1540-1568.txt",
+      "sha256": "77e02043a2987d582ebf5bf0d10031f1d48926be1a0c281ec21f4997ea964063",
+      "bytes": 759
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/Array.hh.2050-2079.txt",
+      "sha256": "cd2ada01b63bc5c816332ef9fb04eaa69284638a450b43bb7a065437d188ba5f",
+      "bytes": 670
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/Array1D.hh.1380-1408.txt",
+      "sha256": "41089231349fcde1f4ed1c656c4d96a15126cd43fe004a8166a5aa37eeba279c",
+      "bytes": 610
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/Array1D.hh.1419-1439.txt",
+      "sha256": "e6d309022cab8ec896c5b283ffe06abab580e2058ee34a9cbd2f25785ede3b5e",
+      "bytes": 366
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/Array1D.hh.925-945.txt",
+      "sha256": "11e6a124fa03d1805976c2fcf957fab7967a43da519bbecd9ce91015131f3a8b",
+      "bytes": 300
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/DataConvergParams.hh.95-125.txt",
+      "sha256": "6da67a3b35c8fe7a34f31dbbbec487c29e089acb08d8519bc9859c9f937bd61d",
+      "bytes": 945
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/DataLoopNode.hh.439-500.txt",
+      "sha256": "b05dd2bded72c0cb0bea10db531d8a4e6fc054a0af60bfdba34d1f90a38e3a9b",
+      "bytes": 3931
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/DataLoopNode.hh.95-104.txt",
+      "sha256": "9d11a096b58008442f5fda955211a617691d9a406c98d29de4335477e00e5af6",
+      "bytes": 276
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/HVACManager.cc.1760-1790.txt",
+      "sha256": "7c1f739fc8e4f9dacf4af2c33bbcfa7b0882a1e50e49f383e4a3394fc0c613b7",
+      "bytes": 1704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/HVACManager.cc.2884-3015.txt",
+      "sha256": "791903f271937d7d6f0b93d8697afdc3798a5be2464b7fb322f430c31c47c37b",
+      "bytes": 7378
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/HVACManager.cc.3017-3047.txt",
+      "sha256": "fd8e33ed07928895145c381dcd587bc9fc0542f762d9fadf723615735e48a7bb",
+      "bytes": 2078
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/SimAirServingZones.cc.1928-1950.txt",
+      "sha256": "e271ead782ad7840fce432b9ad2aab0c90f0e736cccf19d5e697270d473d0425",
+      "bytes": 1344
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/SimAirServingZones.cc.2127-2140.txt",
+      "sha256": "ac460672300243f75ba945239b2283c0f3e672765c649e61792b788b15aab490",
+      "bytes": 771
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/SimAirServingZones.cc.2309-2426.txt",
+      "sha256": "1a5ba03055b3d863709ab94b7143b83fcf6601a09a08a2c92e7900ca9d9d66b8",
+      "bytes": 6625
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native-extents/TypeTraits.hh.50-110.txt",
+      "sha256": "0de593b6f8acb3d66cef5a82c6667e0c9c84bfb4cf31e34213c43d4b1d33afd8",
+      "bytes": 1102
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/src/EnergyPlus/DataConvergParams.hh",
+      "sha256": "107dbe1042346470f6b68973bb003e74270a9c9d0030721ac7a1720faaf37070",
+      "bytes": 13606
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/src/EnergyPlus/DataLoopNode.hh",
+      "sha256": "b48a1fb47abd955b2c0db1203349f3fadc327e41d7638a0cf1128197afaf2f94",
+      "bytes": 26592
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/src/EnergyPlus/HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+      "bytes": 198904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/src/EnergyPlus/SimAirServingZones.cc",
+      "sha256": "e8e277efa3f8642d9333afa7e58e181c178833f3320eadd3097bc74f19f18b6c",
+      "bytes": 496376
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/third_party/ObjexxFCL/src/ObjexxFCL/AlignedAllocator.hh",
+      "sha256": "159c8d4e7685adfff8a871f8b55bb600cbc7f4bfcbe56309564e98d9493739f6",
+      "bytes": 2187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "sha256": "1c8e5f14bbdd577f8a6cc56d378308dcb72bf6cbdf0fa051ee9a4eaf7f1b823e",
+      "bytes": 57551
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+      "bytes": 55083
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Native/third_party/ObjexxFCL/src/ObjexxFCL/TypeTraits.hh",
+      "sha256": "db98b6509a5bf2fc2eb10f26199f73f114611bec379d541e862eaaf3ab65def6",
+      "bytes": 16326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_nodes.rs",
+      "sha256": "9e0f375985298b3c4941ac5bf217f5a5758ef24f7a66410623a9d0695e3d0320",
+      "bytes": 9829
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/owners.rs",
+      "sha256": "c5f214fd0f64268acc28140bd37f040a8c67b7955e30d4979415874558adfbf3",
+      "bytes": 10977
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/selected_heat_balance_input/zone/storage.rs",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/Source-context/crates/ep_runtime/src/heat_balance/selected_project_data.rs",
+      "sha256": "be69b98b18795e492c7275c10568b7deb24f6ea8de8554801bcb283d29a8bc28",
+      "bytes": 7665
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/actual29-parent-full-readback.json",
+      "sha256": "d07a5cec7eefd358d989bac5b7fc06dbdda73689a588bf3315355fb859eb4f71",
+      "bytes": 2373655
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/heat_to_return_air.rs",
+      "sha256": "e965f69ce378191d164f962e49b478a6c8373c9b9a44f8dde428337713daf2b9",
+      "bytes": 4548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation.rs",
+      "sha256": "3eb94201219336392a49493c82dfea0851f03f3193c849ea7b1c596fb04f503d",
+      "bytes": 17433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/air_loops/initialize.rs",
+      "sha256": "c2c00073e7ee0224219075f1ad0b5b2228e7789778997752f0f2e12ccdba2195",
+      "bytes": 5487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/complete-final-compiler-Source-plan.json",
+      "sha256": "bcd964f76402743fc706545ea6bce7ae35cd40372541a64ca2bcbeedb7844427",
+      "bytes": 2629746
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/01-forward.diff",
+      "sha256": "da9fef26c99d04be1aa6399d79aa957bc721d2e629194bc6320d8329c117737e",
+      "bytes": 2878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/01-inverse.diff",
+      "sha256": "ba930c137ff19b5f0440a7a34bb614ecedc0ac856b6e218c1cb063f130b98dc9",
+      "bytes": 2878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/02-forward.diff",
+      "sha256": "f068db8cea0853bb8959a7141d0bdde2a5f0fb6a76b68d2ffcc89630f29c929e",
+      "bytes": 3187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/02-inverse.diff",
+      "sha256": "d39719120aeb38aec59216f42fee073443d1a370ed02b2c8a9c0e9692be60423",
+      "bytes": 3187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/03-forward.diff",
+      "sha256": "25daf98cdc46c55f4a88dbe489e9bf55e081facbdcd244f791b345e5566b82f3",
+      "bytes": 3447
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/03-inverse.diff",
+      "sha256": "5b1901685a76a0bee477677d35a6830d97d9336bd648c3cc92816864fad653c8",
+      "bytes": 3447
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/04-forward.diff",
+      "sha256": "69528f362abbc29ac294667bcf2309782cc1386cb8b9f879f312564a7c8cd42d",
+      "bytes": 3165
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/diffs/04-inverse.diff",
+      "sha256": "50a903f6038440469857edf131c874b5bdfa47ce2b8033cd906e1e709c807f20",
+      "bytes": 3165
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "9168acba900d36c69988fb5be9b6e293bb03e8da9113d259fe3fc494b3bcbeb4",
+      "bytes": 41117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/heat_to_return_air.rs",
+      "sha256": "e965f69ce378191d164f962e49b478a6c8373c9b9a44f8dde428337713daf2b9",
+      "bytes": 4548
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation.rs",
+      "sha256": "3eb94201219336392a49493c82dfea0851f03f3193c849ea7b1c596fb04f503d",
+      "bytes": 17433
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/air_loops/initialize.rs",
+      "sha256": "c2c00073e7ee0224219075f1ad0b5b2228e7789778997752f0f2e12ccdba2195",
+      "bytes": 5487
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/manifest.json",
+      "sha256": "670e7cb7d4e886d61e4eed7a28df63fa36eb6406dde5747c056dba61d6bf59ab",
+      "bytes": 49595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/01.stdout",
+      "sha256": "f39c6b37bd71d5915bf412067bc2f47ae2d2e31c1d3f9d830fb8fd5d74306868",
+      "bytes": 44041
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/02.stdout",
+      "sha256": "534a1f7af448c28520f90c9a57e0ab6d0baf8ed75d034da79a985432f75ba137",
+      "bytes": 7088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/03.stdout",
+      "sha256": "1ed423d6315fa99d0cb52132eedff5ea9a4dd29365153f2d1543d4b76e9ee643",
+      "bytes": 18737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/parse/04.stdout",
+      "sha256": "43db6bd9ae0456c387be2c30a73b3617c71df6d8ade78861b63b58a064d08a04",
+      "bytes": 5591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "dfc5d36e55e71e2bb7f931fd000b83435ca7a9f6eef356c1dbbc5e2766198178",
+      "bytes": 43474
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/heat_to_return_air.rs",
+      "sha256": "900d9bf7d1634cfaf0f9984c60b7b81a44fd9a41c2c253f73c8a99c03b2cfdf6",
+      "bytes": 5287
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation.rs",
+      "sha256": "20fe1f379ceec1852a89718b772faf72f963851e2de98283303851789a5b8cd8",
+      "bytes": 18413
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/air_loops/initialize.rs",
+      "sha256": "7a181af098f7ad2352c3591ac922087b72b4fe984540936a73729793db0ae708",
+      "bytes": 6676
+    },
+    {
+      "path": ".runtime/porting/source-objects/ad/ad0f11eaae6529274f192c01c12c0dc69972b2724a2ebd9da9e5fbef1cb064e6",
+      "sha256": "ad0f11eaae6529274f192c01c12c0dc69972b2724a2ebd9da9e5fbef1cb064e6",
+      "bytes": 1847004
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "dfc5d36e55e71e2bb7f931fd000b83435ca7a9f6eef356c1dbbc5e2766198178",
+      "bytes": 43474
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/heat_to_return_air.rs",
+      "sha256": "900d9bf7d1634cfaf0f9984c60b7b81a44fd9a41c2c253f73c8a99c03b2cfdf6",
+      "bytes": 5287
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation.rs",
+      "sha256": "20fe1f379ceec1852a89718b772faf72f963851e2de98283303851789a5b8cd8",
+      "bytes": 18413
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/simulation/air_loops/initialize.rs",
+      "sha256": "7a181af098f7ad2352c3591ac922087b72b4fe984540936a73729793db0ae708",
+      "bytes": 6676
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-air-balance-29/summary.json",
+      "sha256": "aa556986ff0f12f22518725cabc31375997dc03f4d9671e0f1f329db42b87d7f",
+      "bytes": 4961
+    }
+  ],
+  "scope": "4 coherent HVAC physical-Node lifecycle/return-air flag Sources, Native authority, two explicitly scoped semantic peers and actual B/A24. No checkpoint30 test execution. No historical ZIP recursion, annual JSON/CSV or transitive rebuild claim."
+}

@@ -155,3 +155,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source 구역 질량 보존·리턴 공기 검증](evidence/SRC-06-canonical-controlled-air-balance-29/summary.json). Config·물리 Node·MassConservation과 기존 캐시 이득을 함께 사용합니다. 리턴 노드 필터·냉동 잠열 크레디트·수요 초기화 순서를 보존하며, 습공기 물성의 미구현 진단은 명시적 경계로 남깁니다.
+
+
+[Source HVAC Node 생명주기 검증](evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json). Node 번호와 반환공기 연결은 실제 보유 배열에서 읽으며, Node 설정값과 수렴 이력은 같은 소유자에 Native 순서로 씁니다. 초기화되지 않은 이력은 미정 상태로 유지하며 임의의 수치로 채우지 않습니다.

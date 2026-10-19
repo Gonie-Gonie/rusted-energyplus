@@ -12876,6 +12876,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-air-balance-29/summary.json",
         "sha256": "aa556986ff0f12f22518725cabc31375997dc03f4d9671e0f1f329db42b87d7f",
         "size_bytes": 4961
+      },
+      "canonical_hvac_controlled_node_lifecycle_30": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/summary.json",
+        "sha256": "ab2d5ff31081622cd9fba7564cc3fc2a8ba9cc80415f51dcd75e7a2eb27d1986",
+        "size_bytes": 5274
       }
     },
     {

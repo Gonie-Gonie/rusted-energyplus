@@ -1,0 +1,97 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 4,
+  "existing_Rust_sources": 4,
+  "new_Rust_sources": 0,
+  "new_test_functions": 0,
+  "actual_test_bodies_executed": 0,
+  "focused_validation_policy": "Actual production B then appropriate A24 only. No unrelated test/profile, repeated cohort, new test or alltargets.",
+  "scope": "Same controlled heat-to-return-air inlet/airloop flag loops2934/2951/3009 (positive fan/warning operations remain boundaries); real InitAirLoops inlet NodeNum allocation writes, ConnectReturnNodes no-path traversal, return-design same IDs; real convergence Node field/history shift and Node/default setpoint resets. Positive airloop/return-path child operations remain boundaries.",
+  "unknown_history_qualification": "Existing Option history cells are kept. Native Array1D placement-new T default construction plus std::array scalars lacks an initializer in declarations. No Native uninitialized raw bits or numerical equality claim for unknown diagnostic slots; no zero/default history invented. Exact actual compiler macro authority must be authenticated before final acceptance.",
+  "full_B_or_finite15_completion_claim": false,
+  "Native_harness_runtime_or_unit_equivalence_claim": false,
+  "gate_changes": false,
+  "policy_changes": false,
+  "schema": "src06-canonical-hvac-controlled-node-lifecycle.v1",
+  "status": "Genuine Source controlled HVAC Node lifecycle; B incomplete at actual frontier",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/manifest.json",
+    "sha256": "670e7cb7d4e886d61e4eed7a28df63fa36eb6406dde5747c056dba61d6bf59ab",
+    "bytes": 49595
+  },
+  "independent_semantic_peers": {
+    "original_three": {
+      "path": ".runtime/porting/SRC-06/Outer-hvac-controlled-node-lifecycle-Source-review-30/review.json",
+      "sha256": "cf51135e42742a864745b0057a9e9c79ce6ed08a2fb8124b8fa6f60377a7b9ab",
+      "bytes": 34804
+    },
+    "fourth_and_identity": {
+      "path": ".runtime/porting/SRC-06/Peer-hvac-return-air-extension-Source-review-30-02/review.json",
+      "sha256": "9546e538bcdf8b2b855c52947a2586b9524db36f3b7dccca898a9fee709680c1",
+      "bytes": 10083
+    }
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-hvac-controlled-node-lifecycle-held-Peer-30/complete-final-compiler-Source-plan.json",
+    "sha256": "bcd964f76402743fc706545ea6bce7ae35cd40372541a64ca2bcbeedb7844427",
+    "bytes": 2629746
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-command-Root-30/receipt.json",
+    "sha256": "ccd32feea593758b4bbef84559c53dfde9b7bece22f4e95344e0a6b62779057d",
+    "bytes": 4349
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-A-24H-command-Root-30/receipt.json",
+    "sha256": "ca61ceca4318e271c7cbada2267a71da4943fd6b70946f4fe87bae1f1eae5d38",
+    "bytes": 4297
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-hvac-controlled-node-lifecycle-actual-review-30/review.json",
+    "sha256": "e2ebb413a2ae7e70f9f0e469dd74821991665d7af242192e1ffa97767773f808",
+    "bytes": 18048
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: positive controlled Zone supply sums5203",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "accepted29_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-air-balance-actual-review-29/review.json",
+      "sha256": "85538c54d4a67e5a314706e83f6796b00835fe602d59805cd35310a01c289767",
+      "bytes": 17389
+    },
+    "series": 58,
+    "samples": 5352,
+    "physical_files_whole_equal29": 7,
+    "CSV_files_whole_equal29": 2,
+    "scope": "Proof transfer from accepted29; no new Native/72H/annual run or internal-state equivalence claim."
+  },
+  "B_Node_lifecycle_observation": {
+    "BND": {
+      "path": ".runtime/porting/SRC-06/canonical-source-hvac-controlled-node-lifecycle-B-NOLIMIT-24H-Root-30/output/eplusrs.bnd",
+      "sha256": "d3a901766bf47db1b15ba70fe008ec1bb82bc06539eda24c1841a66fe41f9f4e",
+      "bytes": 41
+    },
+    "BND_bytes": 41,
+    "BND_node_block_present": false,
+    "Native_paired_Node_state_or_IO_claim": false
+  },
+  "actual_scope_qualification": "Only the accepted Root actual aggregate establishes executed paths and proof transfer; Source peer alone establishes neither internal numerical Native state equivalence nor positive Node execution.",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/evidence.zip",
+    "sha256": "c24ea48192296245b444c5ca2294353d76fac0960a6ca42cb29891e4995622fb",
+    "bytes": 1739359
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-hvac-controlled-node-lifecycle-30/manifest.json",
+    "sha256": "626758721332cfd7616edc2e11c271f826dacd1b6937e01859452e3e6c298559",
+    "bytes": 29326
+  },
+  "archive_entries": 117,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-hvac-controlled-node-lifecycle-checkpoint-Peer-30.py",
+    "sha256": "26b6e7498563a78412d3c0fb2a9c577598376082ab3e2dab45ab7904928f44de",
+    "bytes": 12749
+  }
+}

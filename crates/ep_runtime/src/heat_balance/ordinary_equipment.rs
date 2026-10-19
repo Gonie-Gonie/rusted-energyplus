@@ -489,6 +489,16 @@ impl SourceZoneEquipmentConfigRef<'_> {
     pub(crate) fn number_inlet_nodes(&self) -> &usize {
         &self.row.inlet_nodes
     }
+    /// Actual stored physical ordinals, read in Native InitAirLoops/ConnectReturnNodes.
+    pub(crate) fn inlet_node_number(&self, ordinal: usize) -> Option<&usize> {
+        self.row.inlet_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
+    pub(crate) fn return_node_number(&self, ordinal: usize) -> Option<&usize> {
+        self.row.return_node_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
+    pub(crate) fn return_node_air_loop_number(&self, ordinal: usize) -> Option<&i32> {
+        self.row.return_node_air_loop_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
     pub(crate) fn number_exhaust_nodes(&self) -> &usize {
         &self.row.exhaust_nodes
     }
@@ -536,6 +546,36 @@ impl ZoneEquipmentActiveElements for ZoneEquipmentView<'_> {
 }
 
 impl OrdinaryEquipment {
+    /// Native HVACManager1769-1784 on the same complete Node array and default row.
+    pub(crate) fn source_node_mass_flow(&self, ordinal: i32)
+        -> Result<f64, super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        let index = ordinal.checked_sub(1).and_then(|n| usize::try_from(n).ok())
+            .ok_or(E::Unavailable("actual convergence physical Node ordinal3035"))?;
+        self.nodes.physical.as_ref().and_then(|rows| rows.get(index)).map(|row| row.mass_flow_rate)
+            .ok_or(E::Unavailable("actual convergence same physical Node3035"))
+    }
+    pub(crate) fn reset_source_hvac_node_setpoints(&mut self)
+        -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as E;
+        if self.nodes.number_of_nodes > 0 {
+            let rows = self.nodes.physical.as_mut()
+                .ok_or(E::Unavailable("actual SimHVAC Node array setpoint reset1770"))?;
+            for row in rows {
+                row.temperature_setpoint = -999.0;
+                row.humidity_ratio_setpoint = -999.0;
+                row.humidity_ratio_min = -999.0;
+                row.humidity_ratio_max = -999.0;
+                row.mass_flow_rate_setpoint = -999.0;
+            }
+            self.nodes.default_node_values.temperature_setpoint = -999.0;
+            self.nodes.default_node_values.humidity_ratio_setpoint = -999.0;
+            self.nodes.default_node_values.humidity_ratio_min = -999.0;
+            self.nodes.default_node_values.humidity_ratio_max = -999.0;
+            self.nodes.default_node_values.mass_flow_rate_setpoint = -999.0;
+        }
+        Ok(())
+    }
     pub(crate) fn source_zone_air_node_mut(
         &mut self,
         ordinal: i32,

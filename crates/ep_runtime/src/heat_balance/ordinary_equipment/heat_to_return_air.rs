@@ -38,11 +38,12 @@ impl OrdinaryEquipment {
                     .as_mut()
                     .and_then(|v| v.get_mut(index(number).ok()?))
                     .ok_or(Error::Unavailable("actual same ZoneEquipConfig2930"))?;
-                let air_loop_found = false;
-                if config.inlet_nodes > 0 {
-                    return Err(Error::Unavailable(
-                        "actual first InletNodeAirLoopNum read2934",
-                    ));
+                let mut air_loop_found = false;
+                for ordinal in 0..config.inlet_nodes {
+                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                        .and_then(|rows| rows.get(ordinal))
+                        .ok_or(Error::Unavailable("actual same InletNodeAirLoopNum2934"))?;
+                    if air_loop > 0 { air_loop_found = true; }
                 }
                 if !air_loop_found && config.inlet_nodes == config.exhaust_nodes {
                     config.zonal_system_only = true;
@@ -59,13 +60,16 @@ impl OrdinaryEquipment {
                 if !config.is_controlled {
                     continue;
                 }
-                let _cycling_fan = false;
-                if config.inlet_nodes > 0 {
-                    return Err(Error::Unavailable(
-                        "actual first cycling fan InletNodeAirLoopNum2951",
-                    ));
+                let cycling_fan = false;
+                for ordinal in 0..config.inlet_nodes {
+                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                        .and_then(|rows| rows.get(ordinal))
+                        .ok_or(Error::Unavailable("actual cycling InletNodeAirLoopNum2951"))?;
+                    if air_loop > 0 {
+                        return Err(Error::Unavailable("actual cycling AirLoopControlInfo cycFanSched2953"));
+                    }
                 }
-                if config.zonal_system_only {
+                if config.zonal_system_only || cycling_fan {
                     let _zone = zones
                         .zones
                         .as_ref()
@@ -100,10 +104,15 @@ impl OrdinaryEquipment {
                 continue;
             }
             zone.no_heat_to_return_air = true;
-            if !config.zonal_system_only && config.inlet_nodes > 0 {
-                return Err(Error::Unavailable(
-                    "actual positive final continuous-fan InletNodeAirLoopNum3009",
-                ));
+            if !config.zonal_system_only {
+                for ordinal in 0..config.inlet_nodes {
+                    let air_loop = *config.inlet_node_air_loop_numbers.as_ref()
+                        .and_then(|rows| rows.get(ordinal))
+                        .ok_or(Error::Unavailable("actual final InletNodeAirLoopNum3009"))?;
+                    if air_loop > 0 {
+                        return Err(Error::Unavailable("actual continuous AirLoopControlInfo fanOp3011"));
+                    }
+                }
             }
         }
         Ok(())

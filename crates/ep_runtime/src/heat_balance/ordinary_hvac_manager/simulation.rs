@@ -165,9 +165,7 @@ impl SourceHvacManager {
         self.check_source_air_loop_flow_balance(o)?;
         if !o.globals.zone_sizing_calculation && !o.globals.system_sizing_calculation {
             if self.my_setpoint_init {
-                if *o.equipment.source_number_of_nodes() > 0 {
-                    return Err(Error::Unavailable("actual SimHVAC Node setpoint reset1769"));
-                }
+                o.equipment.reset_source_hvac_node_setpoints()?;
                 self.my_setpoint_init = false;
                 o.hvac.do_setpoint_test = true;
             } else {
@@ -434,24 +432,32 @@ impl SourceHvacManager {
     }
     fn update_source_zone_inlet_convergence(
         &self,
-        o: &SourceHvacOwners<'_, '_>,
+        o: &mut SourceHvacOwners<'_, '_>,
     ) -> Result<(), Error> {
-        // The real InitAirLoops1931 must allocate and initialize each ZoneInletConvergence record.
+        // Native3024-3045: same allocated records and physical Node, ordered
+        // humidity, mass flow, then temperature. Unwritten slots stay unknown;
+        // copying them does not invent initial numeric history values.
         for number in 1..=o.globals.num_of_zones {
-            let at = super::index(number)?;
-            let row = o
-                .project
-                .convergence
-                .zone_inlet_convergence
-                .as_ref()
-                .and_then(|r| r.get(at))
-                .ok_or(Error::Unavailable(
-                    "actual ZoneInletConvergence allocation3024",
-                ))?;
-            if row.number_inlet_nodes > 0 {
-                return Err(Error::Unavailable(
-                    "actual ZoneInletConvergence Node history3026",
-                ));
+            let row = o.project.convergence.zone_inlet_convergence.as_mut()
+                .and_then(|rows| rows.get_mut(super::index(number).ok()?))
+                .ok_or(Error::Unavailable("actual ZoneInletConvergence allocation3024"))?;
+            for ordinal in 1..=row.number_inlet_nodes {
+                let entry = row.inlet_nodes.as_mut()
+                    .and_then(|rows| rows.get_mut(super::index(ordinal).ok()?))
+                    .ok_or(Error::Unavailable("actual ZoneInletConvergence InletNode3025"))?;
+                let node = o.equipment.source_zone_air_node_mut(entry.node_number)?;
+                let previous = entry.humidity_ratio;
+                entry.humidity_ratio[0] = Some(*node.humidity_ratio);
+                for log in 1..10 { entry.humidity_ratio[log] = previous[log - 1]; }
+                let previous = entry.mass_flow_rate;
+                // The existing temperature/humidity Node borrow intentionally
+                // has no mass-flow projection; read the same physical field.
+                entry.mass_flow_rate[0] = Some(o.equipment.source_node_mass_flow(entry.node_number)?);
+                for log in 1..10 { entry.mass_flow_rate[log] = previous[log - 1]; }
+                let previous = entry.temperature;
+                let node = o.equipment.source_zone_air_node_mut(entry.node_number)?;
+                entry.temperature[0] = Some(*node.temperature);
+                for log in 1..10 { entry.temperature[log] = previous[log - 1]; }
             }
         }
         Ok(())
