@@ -485,6 +485,13 @@ pub(crate) struct SourceZoneEquipmentConfigRef<'a> {
     row: &'a EquipmentConfig,
 }
 impl SourceZoneEquipmentConfigRef<'_> {
+    /// Actual retained indices read by normal SystemReports controlled-zone bodies.
+    pub(crate) fn equipment_list_index(&self) -> &usize { &self.row.equipment_list_index }
+    pub(crate) fn zone_design_specification_outdoor_air_index(&self) -> &i32 { &self.row.zone_design_specification_outdoor_air_index }
+    pub(crate) fn zone_air_distribution_index(&self) -> &i32 { &self.row.zone_air_distribution_index }
+    pub(crate) fn inlet_node_air_loop_number(&self, ordinal: usize) -> Option<&i32> {
+        self.row.inlet_node_air_loop_numbers.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
     /// Actual names and physical node ordinals consumed by startup reports.
     pub(crate) fn equipment_list_name(&self) -> &str { &self.row.equipment_list_name }
     pub(crate) fn control_list_name(&self) -> &str { &self.row.control_list_name }
@@ -536,6 +543,12 @@ impl SourceZoneEquipmentConfigRef<'_> {
 /// A short borrow of the same actual EquipmentList row, not a report projection.
 pub(crate) struct SourceZoneEquipmentListRef<'a> { row: &'a EquipmentList }
 impl SourceZoneEquipmentListRef<'_> {
+    pub(crate) fn equipment_type(&self, ordinal: usize) -> Option<&i32> {
+        self.row.equipment_types.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
+    pub(crate) fn equipment_index(&self, ordinal: usize) -> Option<&i32> {
+        self.row.equipment_indices.as_ref()?.get(ordinal.checked_sub(1)?)
+    }
     pub(crate) fn name(&self) -> &str { &self.row.name }
     pub(crate) fn number_equipment_types(&self) -> &usize { &self.row.number_of_equipment_types }
     pub(crate) fn equipment_type_name(&self, ordinal: usize) -> Option<&str> {

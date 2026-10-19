@@ -25,7 +25,7 @@ use crate::heat_balance::{
         SourceSurfaceHeatBalanceArrays, output::SourceSurfaceOutputOwners,
     },
     ordinary_surface_management::SourceResilienceOutputOwners,
-    ordinary_system_reports::{SourceSystemReportOwners, SourceSystemReports},
+    ordinary_system_reports::SourceSystemReports,
     ordinary_thermal_comfort::SourceThermalComfort,
     radiation::ordinary::{
         OrdinaryRadiationError, OrdinaryRadiationUnavailable, OrdinarySolarRadiation,
@@ -179,21 +179,6 @@ impl LiveReadFields<'_> {
 }
 
 impl SourceOrdinaryHvacRemaining {
-    fn system_owners<'a>(
-        o: &'a mut SourceHvacOwners<'_, '_>,
-        air_loop: &'a super::simulation::state::SourceAirLoopData,
-    ) -> SourceSystemReportOwners<'a> {
-        SourceSystemReportOwners {
-            globals: o.globals,
-            hvac: o.hvac,
-            equipment: o.equipment,
-            zones: o.zones,
-            air_loop,
-            predefined_registry: o.predefined_registry,
-            predefined_table: o.predefined_table,
-            predefined_summary: o.comfort_summary,
-        }
-    }
     fn facility<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
         first: bool,
         update_only: bool,
@@ -379,17 +364,14 @@ impl<
             C::ReportSystemEnergyUse => manager
                 .ancillary
                 .system_reports
-                .report_source_system_energy_use(&Self::system_owners(
-                    o,
-                    &manager.simulation.air_loop,
-                )),
+                .report_source_system_energy_use(o.globals, o.hvac, o.equipment, &o.controller.demand),
             C::ReportVentilationLoads => manager
                 .ancillary
                 .system_reports
-                .report_source_ventilation_loads(&mut Self::system_owners(
-                    o,
-                    &manager.simulation.air_loop,
-                )),
+                .report_source_ventilation_loads(
+                    o.globals, o.hvac, o.equipment, o.zones, &o.controller.demand,
+                    &o.controller.reports, o.air, o.environment, o.sizing, o.comfort_summary,
+                ),
             C::ReportAirHeatBalance => manager.report_source_air_heat_balance(o),
             C::UpdateDataAndReportSystem => Self::update_source_ordinary_output(
                 crate::heat_balance::source_output_registration::TimeStepKind::System,

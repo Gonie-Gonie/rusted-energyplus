@@ -322,3 +322,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source38 energy report initialization](evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 에너지 보고 초기화와 현재 계량값 읽기를 기존 파일 4개와 새 파일 1개로 연결했다. 실제 B/A24 한 쌍으로 확인하고, 추가 테스트나 Native 재실행 없이 게이트 수를 유지한다.
+
+
+[Source39 controlled system reports](evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 정상 제어 구역 보고 경로를 기존 Rust 파일 6개로 연결하고 실제 B/A24 경로를 확인했다. 이번 단위의 추가 테스트는 없으며 게이트 수는 유지한다. 보고 계산의 Native 수치 검증은 아직 완료로 표시하지 않는다.

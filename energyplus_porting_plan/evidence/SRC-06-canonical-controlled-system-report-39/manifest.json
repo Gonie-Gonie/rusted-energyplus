@@ -1,0 +1,886 @@
+{
+  "schema": "src06-canonical39-finite-engine-evidence.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-system-report-39/evidence.zip",
+    "sha256": "0c72a64e1369fe61e172d50ebaac6f2d58b8ded27616a31cdd6a2055536433d8",
+    "bytes": 2012513
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-controlled-system-report-Source-review-39-03/review.json",
+      "sha256": "59a7a2c8507ca17028e0e81c6dc248177fd944f92bfc55b0e5d4dcfc7f86c348",
+      "bytes": 5541
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-controlled-system-report-application-39/receipt.json",
+      "sha256": "4682abc38044169f5046fd255aad6cc43d4937651619973a7ce9048be9927366",
+      "bytes": 20477
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-system-report-actual-review-39/retained-Native-B-NOLIMIT-24H.bnd",
+      "sha256": "5305e8fd01fdd4997b72b207fa02b014af54c38b45f9cb87e02c3335498f10b1",
+      "bytes": 8595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-system-report-actual-review-39/review.json",
+      "sha256": "123bca67176a27e8e40b8823fafb985ea61389d78374490e874b625e8eb8ced2",
+      "bytes": 19711
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-system-report-actual-review-39/table-clock-differences.json",
+      "sha256": "a650d8e3a23b4e5db35d6e966ef2edb0271b72306849cd281ca301c86a859aaa",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-energy-report-initialization-actual-review-38-02/review.json",
+      "sha256": "89c5d59260a6c137aee3768e2a6ae772b8805ebd98528c0549ace5ca105918b2",
+      "bytes": 21867
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-controlled-system-report-Root-39.py",
+      "sha256": "b177762b40f7e32a18d428fcc77e3c23c85a892e2dee9d4147684e4cd11e8de5",
+      "bytes": 7407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-controlled-system-report-Audit-39.py",
+      "sha256": "c788ddc52f2cca2a29b49e840f87443f01fe3bf142d6110cddfba9dded4d5a58",
+      "bytes": 29744
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/diagnostics.json",
+      "sha256": "07a37321df80ce743d707eaddb2a2d557f5669c4aa2d6c385f044b574d397c7c",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplustbl.htm",
+      "sha256": "d88d9eb918995134ae647397f84ecc9e7db55ac0e79a4d9f717333f1af56a818",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/eplustbl.xml",
+      "sha256": "fec5fccf1465e0ef8195cc3fd10a907d092ca2fba9e497dcb04fd711378d1a67",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/results/source-reported-results.json",
+      "sha256": "a9b634d8884fa4c79defe87eb749ad9672d40b8b48dd5dc18ad5e90fc031275d",
+      "bytes": 1679926
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-Root-39/output/run-summary.json",
+      "sha256": "eb0712deb3811aa2fd7e919415312759b70f68840c7469dc33e8a20d6a1280d3",
+      "bytes": 32800
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-command-Root-39/receipt.json",
+      "sha256": "dd9486493a325fc87a7051eb4efda0bf7e024168744642d63a145d806124d459",
+      "bytes": 4551
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-command-Root-39/stderr.log",
+      "sha256": "bcb1b372dbad4f536a6df9618f417d73f5a4b78eb078da885c6d805f7b6cc7b7",
+      "bytes": 1080
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-A-24H-command-Root-39/stdout.log",
+      "sha256": "860470f24db9df9418978ded5aad1f6301bdb4390549797de13afa816f6bf738",
+      "bytes": 408274
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-Root-39/output/diagnostics.json",
+      "sha256": "e46598f6e0cd36edfc8a2a1e125c42b3ae1f172cb529eee747205f7e20a5672c",
+      "bytes": 2992
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-Root-39/output/eplusrs.bnd",
+      "sha256": "d81e5e8453028d8e1b1b268b96537cd94b83a1090b71236fa547f591bc4750d2",
+      "bytes": 8559
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-Root-39/output/run-summary.json",
+      "sha256": "76a9a8fdb02a3e3f00be1b47adbecbedbc122d2cf2f7b5e0fba2bb0500064caf",
+      "bytes": 25361
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-command-Root-39/receipt.json",
+      "sha256": "6aa3ea06e7239d5db70ebf721cd22817252a095cf1312ced1789a4c31466e12e",
+      "bytes": 4603
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-command-Root-39/stderr.log",
+      "sha256": "6dedfa214c9a99688a84a72797cdb0423f5cc604008833e14fa771410a4b3d67",
+      "bytes": 11037
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-system-report-B-NOLIMIT-24H-command-Root-39/stdout.log",
+      "sha256": "89ab033ddd0fae771cd2fee0b30622f4e5375d5fcb5d5ea78c6e57bbb3bbfebb",
+      "bytes": 408309
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-canonical-B-ingress-IO-A24-transfer-Peer-03.py",
+      "sha256": "0742d4694653c9f80e93e1ebe89ed80bf14696b148e39f8477f0c67c1cb50c74",
+      "bytes": 24774
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-controlled-system-report-actual-Root-39.py",
+      "sha256": "b1b9ded2af6a76f719aea336a62033919f2c0dee862d99805264a625601814a5",
+      "bytes": 9386
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-air-native-capture-Root-21/capture.json",
+      "sha256": "6845958c28d6eef55ce89100a13f2001d43ae7ca2fb3e86b2c189d2820b4c47f",
+      "bytes": 50963
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-system-report-publication-READY-Audit-39-02/publication-template.json",
+      "sha256": "cc9a7105ddf30efec302d90e39175e11d49b03c23770fc2a858fe75627e4b578",
+      "bytes": 39523
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-system-report-publication-prepared-Audit-39/publication-template.json",
+      "sha256": "73614f6c75edcb85874a8e62459c07a177a444b3ca841cc128c63a038df8aad7",
+      "bytes": 35519
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-system-report-publication-prepared-Audit-39/publisher-forward.diff",
+      "sha256": "70db305fa0bb541d89d1a7b6995f7c0d197e97592112356c264b3627d83c5021",
+      "bytes": 11079
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-system-report-publication-prepared-Audit-39/publisher-inverse.diff",
+      "sha256": "8d758c90d39cf20c1f00ac7d42d49077644cf8834750eda37078182569f12325",
+      "bytes": 11079
+    },
+    {
+      "path": ".runtime/porting/SRC-06/correct-controlled-system-report-switch-Audit-39-03.py",
+      "sha256": "7eae0b5d64bd37675e50e6999d5790d78216b674c22bb06ede2ce5bd79441732",
+      "bytes": 7036
+    },
+    {
+      "path": ".runtime/porting/SRC-06/finalize-controlled-system-report-publication-Audit-39-02.py",
+      "sha256": "6bad090ed2ad0a667bb870e6b5a8a3d555e7393c31f21535104aa1a7dafab3ad",
+      "bytes": 4342
+    },
+    {
+      "path": ".runtime/porting/SRC-06/finish-controlled-system-report-draft-Audit-39-02.py",
+      "sha256": "75cf818db9425fee4c14d7bfaabbd31aff3b801c2ae98f435f9819b109642c90",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/launch-controlled-system-report-Root-39.py",
+      "sha256": "f5482d9ff1aa379cfa0b53904d41ad374fd1eed6fb611db3c785cc216b3c2e29",
+      "bytes": 1329
+    },
+    {
+      "path": ".runtime/porting/SRC-06/plan-controlled-system-report-Audit-39.py",
+      "sha256": "6465d71591051a9ab214d6cfd494a2557f89521794ad831c62bf2833fb08d64b",
+      "bytes": 18112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-controlled-system-report-publication-Audit-39.py",
+      "sha256": "148174f7660bf4ea9351410acfec9e66068f7c3f89dba2d244eaefca6904c84d",
+      "bytes": 8951
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-ESO-dictionary-1.txt",
+      "sha256": "460024a5db723c394601aada77c8a6aa423ec0dfd4b882dbd9ae3ea6f2fd6ce1",
+      "bytes": 8451
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-ESO-dictionary-2.txt",
+      "sha256": "74445cb8cb494e96b4cf60699eb0505e311f308c63eac157377b38fc5d58f75e",
+      "bytes": 8451
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataHVACGlobals.hh.87-95.txt",
+      "sha256": "2651b69e21c05ce6ca7254d11bf7381977b517acca8020bdb3c5bc4bef7b6cc6",
+      "bytes": 554
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataHeatBalance.hh.1494-1609.txt",
+      "sha256": "6f76c38a03b7a8b7b54faccfb4ad44312ac744994bab5ef425ca6232d56ad70a",
+      "bytes": 9188
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataHeatBalance.hh.425-445.txt",
+      "sha256": "33c8635c779b765b66fbf17351375cc3039fb79b625ed26d947fad859b23012b",
+      "bytes": 1530
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataHeatBalance.hh.571-580.txt",
+      "sha256": "b09de858c6db0fc7d6e7a990c9a7f063b98a45156a8dddebe877c7ce54d5ee8d",
+      "bytes": 569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataSizing.cc.634-671.txt",
+      "sha256": "1b6544dcee8a2abcd3f90d004a0d7dd677a55df1cb8d963587874bafad10103e",
+      "bytes": 2357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataSizing.hh.1223-1232.txt",
+      "sha256": "c896d23398a547d5274a8af150033ad27371d22a79311d024284ceedeb71d0b0",
+      "bytes": 896
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataZoneEnergyDemands.hh.164-171.txt",
+      "sha256": "6a4ba0c85cf5beb6d900ec7fe063c981221a973c1aeaae02c1ae507cfa254524",
+      "bytes": 586
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataZoneEnergyDemands.hh.65-80.txt",
+      "sha256": "c2c049002643f1de41e67c0fe5c04bed72d69bcfe188c9bd3075d3bf4275c423",
+      "bytes": 1082
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataZoneEquipment.hh.112-166.txt",
+      "sha256": "c1d2b645fd2c95cead5aacb9bcb5f265b5f24fc2812681f4fa520babb44b2d10",
+      "bytes": 1973
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataZoneEquipment.hh.305-382.txt",
+      "sha256": "63ed1be3be21cb3cee570ef4922632f17594711b56b2f21b75ff15e9ec1cdfe3",
+      "bytes": 5849
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/DataZoneEquipment.hh.415-457.txt",
+      "sha256": "f3b48554f2f80cd6712766cc9216ee55f02a2e4424011eaac017c3efbd6657db",
+      "bytes": 2697
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/Fmath.hh.338-355.txt",
+      "sha256": "48db0836330b74e6c8124d64f8faaf2caddb14da250fd4c35ab1a49ce99750ff",
+      "bytes": 326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/HVACManager.cc.433-472.txt",
+      "sha256": "d9525392dd06616aaefe953a6db0640d0a3c75b105c33a8fd38a9ce37606e770",
+      "bytes": 2357
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/Psychrometrics.hh.513-547.txt",
+      "sha256": "a9f3f2e2ab84e56a96d72ce91f21e13510be7f099d63b8fcd862de821f014600",
+      "bytes": 1540
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/Psychrometrics.hh.648-666.txt",
+      "sha256": "9098e1862ca09275a9d8a83d29c12b21964e5676dcaf137123a9b169338bdf64",
+      "bytes": 705
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/PurchasedAirManager.cc.3099-3170.txt",
+      "sha256": "28b75b1bc35257c1b1cf82a086b64fc1efeb0b4cc223ec6c36c30431fc49eabb",
+      "bytes": 2538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/PurchasedAirManager.cc.3188-3234.txt",
+      "sha256": "0baeb016b588b87ee403dcf6a9d8d4103b8670046ee28e72e39f77faa2f2c9f2",
+      "bytes": 1685
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/SystemReports.cc.2978-3296.txt",
+      "sha256": "3f873f467fa25601b2a4f84158315244bd760be6411908748bbdac4f0960b18d",
+      "bytes": 17830
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/SystemReports.cc.3829-4500.txt",
+      "sha256": "a114768c6098be0918e57b0ca15cb287705563fe05bdba83da354c0d66765d9b",
+      "bytes": 41454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native-extents/ZoneTempPredictorCorrector.hh.102-132.txt",
+      "sha256": "84395b28b159236e2019197138d94c4b552a7add11625078b4ddecf9d8347144",
+      "bytes": 2653
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "bytes": 24717
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "bytes": 133816
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataSizing.cc",
+      "sha256": "a4823d53aece501364b7c86f610419f5ceabf53c0ee88ddcdf871c06f7a33d89",
+      "bytes": 83296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataSizing.hh",
+      "sha256": "cf16d26b03010c9b5ca77a89b92004961111dce6451393bf0b23e604220768c5",
+      "bytes": 116969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "bytes": 12483
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/DataZoneEquipment.hh",
+      "sha256": "ebfb8ad7844e2beb89a09c0b055cc0ab017a16dc79b219b8be7c94501cecdbd7",
+      "bytes": 31704
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+      "bytes": 198904
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "bytes": 108928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+      "bytes": 209881
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/SystemReports.cc",
+      "sha256": "373928bdae2a85ccc62677c7297269ee34804a93251eba69fe9dec9ce491b795",
+      "bytes": 308416
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "bytes": 25280
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/Native/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "bytes": 27600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prospective-controlled-system-report-readonly-Audit-39/plan.json",
+      "sha256": "4c30f7338513240f0ad2f17aa69ede0b156259257680bc2e471e9c0b6a63c9e2",
+      "bytes": 50887
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-controlled-system-report-checkpoint-Audit-39.py",
+      "sha256": "969710d9e05cb140a56e99e4cda4e786cfb3ee64a1accdb285300acb919e2e43",
+      "bytes": 10583
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-energy-report-structure-checkpoint-Audit-37.py",
+      "sha256": "042079808d871c4da2b9a36c783bf0283906f13b89bd06b2d5170d36bd41ace6",
+      "bytes": 10447
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-meter-final-predefined-Root-01.py",
+      "sha256": "e5aa0bb38df690b77f53b2ef63ec4083dca5a500b745881a2dd8d4b831515256",
+      "bytes": 6086
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-controlled-system-report-Audit-39.py",
+      "sha256": "e96275d9955c658fca7970bcedee48f78e6b5bb1d6ec62220fd5e50b79235de0",
+      "bytes": 10311
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/correction-proof.json",
+      "sha256": "ecfe94d204d67c30679bfa20619e351f50612dc0940f0e19f4a524a8b166e8d4",
+      "bytes": 1893
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/correction/forward.diff",
+      "sha256": "10fac9a0541ecb5b94b666cc4c9f35db9b918768ce21a2ed5ff294b0c850e371",
+      "bytes": 1359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/correction/inverse.diff",
+      "sha256": "b6812c3b529666576783d56b4cf68e19abdfe192b6148603fd3f2c4631c20422",
+      "bytes": 1359
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/correction/remaining.rs",
+      "sha256": "565a13eecac2b6b0256d3c82cd359f872877a28552b08d1225b1db74be5b7b5f",
+      "bytes": 17315
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/draft.json",
+      "sha256": "80865bf0349de0fd5953dd66aef0e202a70a0e2ea3a240fe0f73460bbb02ffb7",
+      "bytes": 48281
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_system_reports/reporting.rs",
+      "sha256": "433da2dec3f9c324cdd8d49ad6e557925b5b62c78bff906d1585a3c10538c154",
+      "bytes": 19020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-03/branch-correction-proof.json",
+      "sha256": "eda4289ef5cbd70319b490559760a8f58eb229a7589573120bdec97aa1d6dcbf",
+      "bytes": 2070
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-03/correction/forward.diff",
+      "sha256": "3e42eabb0f7d2a542f63eed19ce2c57afc6bb6042a8cf5398b4b7ffbbdd3e0d2",
+      "bytes": 3867
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-03/correction/inverse.diff",
+      "sha256": "63c6f2ed2d4b501aaac259ec52c79b558d084ad1f0bf4b98a1a9f38cfc20b18b",
+      "bytes": 3867
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39-03/draft.json",
+      "sha256": "840afffd96eaa1ab71533779fe77b63ace04e918b5ed5e839bb0c4446b4b34c2",
+      "bytes": 48869
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39/draft.json",
+      "sha256": "5fb05520dc99acb0ef6c90e686acbf091478708117dd9aacefc6f8ff11044d65",
+      "bytes": 14591
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-draft-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "4f35c885705055cbc045685a9b939fbfa1704d8e7a00dc849e11273b90fb489c",
+      "bytes": 17873
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/API-census.json",
+      "sha256": "43bdccdd290b4698fcedba535e7009a30b12410509cb0324d366e4c30cd46014",
+      "bytes": 11138
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/actual38-parent-full-readback.json",
+      "sha256": "adbd06f0f3dbc3828012909a8595346ebe7b6a96a016c57b6084e38ec189f478",
+      "bytes": 2272455
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "c70bba26b30976b6d770add773e1661dd560c487ad33fd2c107532b85f374564",
+      "bytes": 50347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "bytes": 21286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "bytes": 19423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "74590a51ee24cd55ca285f54e4fa8c447ca349b2dd9a32d72789b176bb20fc08",
+      "bytes": 17855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/ordinary_system_reports/reporting.rs",
+      "sha256": "3ead61a8fae8983ec1223a58b496a0de172efb7409752506ee321d565066d784",
+      "bytes": 4814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/before/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "e44f3711827c94122892fe05f72c6b64880ab5823ad9d2de58c223645820371b",
+      "bytes": 24553
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/complete-final-compiler-Source-plan.json",
+      "sha256": "bce973594c3271e8b95d8d081d69ae4caf419a61d0b3a1ac45a1d3b25874de80",
+      "bytes": 2635279
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/01.forward.diff",
+      "sha256": "8cb8a8e4211b856a983bc57b50ff84ed068c18cc1a9bda442ae66b4734ec99fd",
+      "bytes": 22295
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/01.inverse.diff",
+      "sha256": "74dd438eedef4ca028f42480cae6ff2b219f3580c30d0658817f806bd5060b7b",
+      "bytes": 22221
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/02.forward.diff",
+      "sha256": "5eff4f72667ab2adb10d7a5a906803146db2af446c35c09fddb2bf9a11129a10",
+      "bytes": 2550
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/02.inverse.diff",
+      "sha256": "13a8b86bed959a4727da6833c880166159e30c746d2621b3cc0457873ba506e0",
+      "bytes": 2550
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/03.forward.diff",
+      "sha256": "8c100a1ca6411b627b5a47a2fed6d9a16bf758a40e4cb68e66ae070f134248b9",
+      "bytes": 1851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/03.inverse.diff",
+      "sha256": "51eb3fd5c78eb42501a0af429e6376082d59c4d9ef1191e9cb258816a1db9007",
+      "bytes": 1851
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/04.forward.diff",
+      "sha256": "87facbe779de75afe6597f4f646c546e3ed70b46d367c5a28a53a4a611475499",
+      "bytes": 2434
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/04.inverse.diff",
+      "sha256": "32cf05e609148c4a9d457c982232e0c6de6ee66194cc3f6c773fb0814980ab7e",
+      "bytes": 2434
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/05.forward.diff",
+      "sha256": "58c0f1a03f7304c2f29c6113b95ab62c141fd126bcfa2b338dae753e2ba9272c",
+      "bytes": 1491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/05.inverse.diff",
+      "sha256": "5ae94b4f2ed2139174604b8153a7d4c5512769ba1f191e3856102da122d7e0f8",
+      "bytes": 1491
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/06.forward.diff",
+      "sha256": "84ac94857b7f91a34cc4ddbf61142e28916fc623c8f90e975cd0239002a73ac1",
+      "bytes": 653
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/diffs/06.inverse.diff",
+      "sha256": "9110486f561c82f873c2c6da30dce6a744c1ff1c7256a6eb3e9b217f96150d6c",
+      "bytes": 653
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "c70bba26b30976b6d770add773e1661dd560c487ad33fd2c107532b85f374564",
+      "bytes": 50347
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "bytes": 21286
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "bytes": 19423
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "74590a51ee24cd55ca285f54e4fa8c447ca349b2dd9a32d72789b176bb20fc08",
+      "bytes": 17855
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/ordinary_system_reports/reporting.rs",
+      "sha256": "3ead61a8fae8983ec1223a58b496a0de172efb7409752506ee321d565066d784",
+      "bytes": 4814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/literal-inverse/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "e44f3711827c94122892fe05f72c6b64880ab5823ad9d2de58c223645820371b",
+      "bytes": 24553
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/manifest.json",
+      "sha256": "26d7fca84dec43a118807013cb08b43f8fb0526925cefed18ca66c1e1e713b56",
+      "bytes": 48822
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/01.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/01.stdout",
+      "sha256": "77211678c8f6eef995c74efeecade889d92bbb814118896de7dcbead18ad4051",
+      "bytes": 23032
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/02.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/02.stdout",
+      "sha256": "89547b0a0e14ae7a695c2d007a95fe0979533387dce836b49274a76c8e7bd9aa",
+      "bytes": 17750
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/03.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/03.stdout",
+      "sha256": "e5327117d8e938346851558c9b858e78dc0d5cae2ab613ec32b61081613fec8d",
+      "bytes": 53317
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/04.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/04.stdout",
+      "sha256": "80dcc617e2b9a90f6c6cc324d8a69e9c0f7e715978cbde0c2578cd5e0c5d0d87",
+      "bytes": 30178
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/05.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/05.stdout",
+      "sha256": "15efbe55cc801265df12ff8e3d02832a44a08e076dd6b04bbe7185dc317894d6",
+      "bytes": 26069
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/06.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/parse/06.stdout",
+      "sha256": "a624985edff7979afd54bc9f8438a5d1b2cf2be230cef8c85ebbf383aaafd2bb",
+      "bytes": 19509
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fffbb401cc6e67d4d2b01e513e55f369dffe5b66bec872e69ce1b4809249b803",
+      "bytes": 51244
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "0cd321116800014e749a0cc29a499ebf39aeedc15cab62863f8fab263d912c89",
+      "bytes": 23227
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "b232c84ec9187dc491a2fa8ad9234b82aa101eea7b851b5e148a24beb9770536",
+      "bytes": 19415
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "565a13eecac2b6b0256d3c82cd359f872877a28552b08d1225b1db74be5b7b5f",
+      "bytes": 17315
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/ordinary_system_reports/reporting.rs",
+      "sha256": "0a5451936b337ef0d23ff8092f0551d985ee5f5e181a0641325ce0b073db88b3",
+      "bytes": 19421
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-system-report-held-Audit-39/proposed/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "cc976707f95b622540168c345e902f620aee2f442e39208f995324ed6a6154d4",
+      "bytes": 25844
+    },
+    {
+      "path": ".runtime/porting/source-objects/04/043e7dada0c39b64e98b399ee3e13f8c885af1e640c0cc0204e3679bd945990d",
+      "sha256": "043e7dada0c39b64e98b399ee3e13f8c885af1e640c0cc0204e3679bd945990d",
+      "bytes": 8167
+    },
+    {
+      "path": ".runtime/porting/source-objects/08/0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "sha256": "0867cf4e7cc4f6a71a41be35765c60f612c539114e5cf8c4791fca7246fda2f1",
+      "bytes": 23026
+    },
+    {
+      "path": ".runtime/porting/source-objects/12/12b7516a96394761525211f84e27dea9a1c4e77888a9b1681c37fc50a70ea1c1",
+      "sha256": "12b7516a96394761525211f84e27dea9a1c4e77888a9b1681c37fc50a70ea1c1",
+      "bytes": 13799
+    },
+    {
+      "path": ".runtime/porting/source-objects/38/38ca852ed7c51bdada2ee743540be285631c9e9706d98588d7031083910db483",
+      "sha256": "38ca852ed7c51bdada2ee743540be285631c9e9706d98588d7031083910db483",
+      "bytes": 42548
+    },
+    {
+      "path": ".runtime/porting/source-objects/3c/3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/source-objects/3e/3ead61a8fae8983ec1223a58b496a0de172efb7409752506ee321d565066d784",
+      "sha256": "3ead61a8fae8983ec1223a58b496a0de172efb7409752506ee321d565066d784",
+      "bytes": 4814
+    },
+    {
+      "path": ".runtime/porting/source-objects/54/54c309f661685ed86afe495fef4833316434529d49e3544843770ea6a46817c3",
+      "sha256": "54c309f661685ed86afe495fef4833316434529d49e3544843770ea6a46817c3",
+      "bytes": 3511
+    },
+    {
+      "path": ".runtime/porting/source-objects/6d/6d360deafafe70bdbcd5dd01392789681fd2f291a79c7583e64d306e4b626b7a",
+      "sha256": "6d360deafafe70bdbcd5dd01392789681fd2f291a79c7583e64d306e4b626b7a",
+      "bytes": 11089
+    },
+    {
+      "path": ".runtime/porting/source-objects/70/70c7d12dde1daddd8445a186c705f873913eabf5096ecb8362b3761ecf8433ed",
+      "sha256": "70c7d12dde1daddd8445a186c705f873913eabf5096ecb8362b3761ecf8433ed",
+      "bytes": 1547
+    },
+    {
+      "path": ".runtime/porting/source-objects/74/74590a51ee24cd55ca285f54e4fa8c447ca349b2dd9a32d72789b176bb20fc08",
+      "sha256": "74590a51ee24cd55ca285f54e4fa8c447ca349b2dd9a32d72789b176bb20fc08",
+      "bytes": 17855
+    },
+    {
+      "path": ".runtime/porting/source-objects/7c/7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "sha256": "7ce958a54a1d96c37746d68fcfc5f714069055b766f6497856242dab79cea817",
+      "bytes": 19423
+    },
+    {
+      "path": ".runtime/porting/source-objects/7d/7d001ab994ef9b61c560cb40d996f66f8f8194bd2e9bcc02c1ea16ccf4ca14c3",
+      "sha256": "7d001ab994ef9b61c560cb40d996f66f8f8194bd2e9bcc02c1ea16ccf4ca14c3",
+      "bytes": 28294
+    },
+    {
+      "path": ".runtime/porting/source-objects/83/8320fb86e257a3574c87f6cc6e2ea6e038d7e7f16357a6ba7e17e643888726f6",
+      "sha256": "8320fb86e257a3574c87f6cc6e2ea6e038d7e7f16357a6ba7e17e643888726f6",
+      "bytes": 10642
+    },
+    {
+      "path": ".runtime/porting/source-objects/ac/ac200f5994acf36869c9b1131108d7c130c8c3a5cb8b92734595378d75ad84c1",
+      "sha256": "ac200f5994acf36869c9b1131108d7c130c8c3a5cb8b92734595378d75ad84c1",
+      "bytes": 5998
+    },
+    {
+      "path": ".runtime/porting/source-objects/ae/aebbcb07071f27f20dfe95b3a1bca6c1e3afa7e715595fb273689c2fe69e67ad",
+      "sha256": "aebbcb07071f27f20dfe95b3a1bca6c1e3afa7e715595fb273689c2fe69e67ad",
+      "bytes": 15672
+    },
+    {
+      "path": ".runtime/porting/source-objects/af/afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "sha256": "afdebb1fa9e8eb31dc4314d3714f13da8d441db87379b29bbd9cd7f48ce17d78",
+      "bytes": 21286
+    },
+    {
+      "path": ".runtime/porting/source-objects/b1/b112bb3a6681b68a055328f2d04773d799ff6528e7ef412acaa7df9f5352a63c",
+      "sha256": "b112bb3a6681b68a055328f2d04773d799ff6528e7ef412acaa7df9f5352a63c",
+      "bytes": 34766
+    },
+    {
+      "path": ".runtime/porting/source-objects/b9/b92aaceb1505d0f9da60a1f39fb28801500d7d61dfffe343d4017ecb4e16ce1e",
+      "sha256": "b92aaceb1505d0f9da60a1f39fb28801500d7d61dfffe343d4017ecb4e16ce1e",
+      "bytes": 8316
+    },
+    {
+      "path": ".runtime/porting/source-objects/c7/c70bba26b30976b6d770add773e1661dd560c487ad33fd2c107532b85f374564",
+      "sha256": "c70bba26b30976b6d770add773e1661dd560c487ad33fd2c107532b85f374564",
+      "bytes": 50347
+    },
+    {
+      "path": ".runtime/porting/source-objects/e4/e44f3711827c94122892fe05f72c6b64880ab5823ad9d2de58c223645820371b",
+      "sha256": "e44f3711827c94122892fe05f72c6b64880ab5823ad9d2de58c223645820371b",
+      "bytes": 24553
+    },
+    {
+      "path": ".runtime/porting/source-objects/e7/e7d3d1e91bf6b576271d380991a7ef6438e345d50e311255653f74388d24ff47",
+      "sha256": "e7d3d1e91bf6b576271d380991a7ef6438e345d50e311255653f74388d24ff47",
+      "bytes": 18359
+    },
+    {
+      "path": ".runtime/porting/source-objects/f0/f08d5ab9ad966c4e572b182c278b4b115519a764d656e4a766eab51ce653a578",
+      "sha256": "f08d5ab9ad966c4e572b182c278b4b115519a764d656e4a766eab51ce653a578",
+      "bytes": 1848904
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "fffbb401cc6e67d4d2b01e513e55f369dffe5b66bec872e69ce1b4809249b803",
+      "bytes": 51244
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air.rs",
+      "sha256": "0cd321116800014e749a0cc29a499ebf39aeedc15cab62863f8fab263d912c89",
+      "bytes": 23227
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/owners.rs",
+      "sha256": "b232c84ec9187dc491a2fa8ad9234b82aa101eea7b851b5e148a24beb9770536",
+      "bytes": 19415
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_hvac_manager/remaining.rs",
+      "sha256": "565a13eecac2b6b0256d3c82cd359f872877a28552b08d1225b1db74be5b7b5f",
+      "bytes": 17315
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_system_reports/reporting.rs",
+      "sha256": "0a5451936b337ef0d23ff8092f0551d985ee5f5e181a0641325ce0b073db88b3",
+      "bytes": 19421
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "cc976707f95b622540168c345e902f620aee2f442e39208f995324ed6a6154d4",
+      "bytes": 25844
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-energy-report-initialization-38/summary.json",
+      "sha256": "37821510cc834fbc1f20992f3ca51a73a73907cfabd679152d4aa8a7d8ab8852",
+      "bytes": 9102
+    }
+  ],
+  "scope": "Six existing production Sources and no new Source files and exactly two actual B/A CLI receipts. The parent38 A24 proof is separately attributed; no current report cohort or Native run by this production checkpoint. New report scientific equivalence remains pending independent passive observation/replay. No historical ZIP recursion, raw Native capture, exe/core, annual output payload or blanket mathematical equivalence claim."
+}

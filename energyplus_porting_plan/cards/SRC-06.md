@@ -491,3 +491,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source38 energy report initialization](../evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 실제 장비 목록과 연결 정보를 사용해 에너지 보고 초기화의 두 순회와 표 기록 순서를 연결했다. 반복 보고에서는 같은 Which 참조의 현재 값을 읽어 기존 MeterData에 기록한다. B 실행 결과: `GetHeatBalanceInput: actual ReportSystemEnergyUse3155 ZoneSysEnergyDemand.TotalOutputRequired`. A24의 기존 5,352개 보고값 증거를 이어받으며 새 테스트나 계산식 변경은 없다.
+
+
+[Source39 controlled system reports](../evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 실제 수요·장비·물리 노드·구역 평균 상태를 빌려 정상 제어 구역의 에너지·환기 보고 계산과 누적 순서를 연결했다. 외기 유량이 0이어도 혼합 공기와 현재 환류 상태를 읽고 밀도를 계산한다. B 실행 결과: `GetHeatBalanceInput: actual checkSetpointNodesAtEnd first NodeSetpointCheck1588`. A24는 기존 보고값 5,352개의 증거를 이어받으며, 새 보고 계산의 Native 수치 대조는 별도 관측·재생 검증 대기 상태다. 보존된 Native BND 본문 8,518바이트·106줄과 일치하며, 이 비교는 보고 I/O 범위다.

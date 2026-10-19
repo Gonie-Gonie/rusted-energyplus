@@ -1,5 +1,5 @@
-//! UNSEALED genuine PurchasedAir retained constructor records only.
-//! No GetPurchasedAir, registration, lifecycle readiness or integration is implemented.
+//! Complete retained PurchasedAir constructor records used by genuine input,
+//! calculation/update/report, live output bindings and report lookups.
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

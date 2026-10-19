@@ -179,3 +179,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source38 energy report initialization](evidence/SRC-06-canonical-energy-report-initialization-38/summary.json). 두 번의 정확한 목록 검색은 실제 Config 인덱스를 각각 갱신한다. 같은 Equipment·OutputRegistration·표 소유자를 빌리며, 일회성 플래그와 표 기록 순서 및 매 반복의 직접 Which 읽기를 보존한다. 보고값 사본이나 대체 상태는 추가하지 않는다.
+
+
+[Source39 controlled system reports](evidence/SRC-06-canonical-controlled-system-report-39/summary.json). 보고 함수는 같은 수요·PurchasedAir·Node·평균 공기·ZonePreDefRep 소유자를 빌린다. 외기 유량 0의 습공기 물성 호출, 정수 배수 곱, 0.1 기준과 누적 순서를 보존하며, 실제 입력 플래그가 참인 장비 조회는 GetPurchasedAir 자식 경계에서 중단한다.

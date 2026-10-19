@@ -1,4 +1,4 @@
-//! Genuine PurchasedAir entry/GetPurchasedAir through the actual Init callee.
+//! Genuine PurchasedAir input, calculation/update/report and live report lookups.
 pub(crate) mod owners;
 mod getter;
 mod schema;
@@ -261,5 +261,45 @@ impl OrdinaryEquipment {
         }
         if errors_found{return Err(Error::Unavailable("actual GetPurchasedAir ErrorsFound fatal1049"));}
         Ok(())
+    }
+}
+
+impl OrdinaryEquipment {
+    /// Every Native report getter first tests the same real lazy-input latch.
+    /// The true GetPurchasedAir child needs its actual input/output host context;
+    /// normal reporting reads the existing same unit after real simulation input.
+    fn source_purchased_air_report_input(&self) -> Result<(), Error> {
+        if self.purchased_air.get_purchased_air_input {
+            return Err(Error::Unavailable("actual PurchasedAir report getter GetPurchasedAir lazy-input child"));
+        }
+        Ok(())
+    }
+    pub(crate) fn source_purchased_air_out_air_mass_flow(&self, number: i32) -> Result<f64, Error> {
+        self.source_purchased_air_report_input()?;
+        Ok(self.purchased_unit(number)?.outdoor_air_mass_flow_rate)
+    }
+    pub(crate) fn source_purchased_air_zone_inlet_air_node(&self, number: i32) -> Result<i32, Error> {
+        self.source_purchased_air_report_input()?;
+        let mut node = 0;
+        if number > 0 && number <= self.purchased_air.number_purchased_air {
+            node = self.purchased_unit(number)?.zone_supply_air_node_num;
+        }
+        Ok(node)
+    }
+    pub(crate) fn source_purchased_air_return_air_node(&self, number: i32) -> Result<i32, Error> {
+        self.source_purchased_air_report_input()?;
+        let mut node = 0;
+        if number > 0 && number <= self.purchased_air.number_purchased_air {
+            node = self.purchased_unit(number)?.zone_recirc_air_node_num;
+        }
+        Ok(node)
+    }
+    pub(crate) fn source_purchased_air_mixed_air_temperature(&self, number: i32) -> Result<f64, Error> {
+        self.source_purchased_air_report_input()?;
+        Ok(self.purchased_unit(number)?.mixed_air_temp)
+    }
+    pub(crate) fn source_purchased_air_mixed_air_humidity_ratio(&self, number: i32) -> Result<f64, Error> {
+        self.source_purchased_air_report_input()?;
+        Ok(self.purchased_unit(number)?.mixed_air_hum_rat)
     }
 }
