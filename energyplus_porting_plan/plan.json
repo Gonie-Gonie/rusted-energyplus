@@ -12791,6 +12791,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/summary.json",
         "sha256": "49bc529e949c23e3ccf92880db6dccdef42decd183c3ed8a6fa30d32a7adba60",
         "size_bytes": 8901
+      },
+      "canonical_B_ingress_IO_reported_cases_12": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/summary.json",
+        "sha256": "83cc962b11e0bd66e32c6cb7b0420910aae837dab2621684d6a17b0373f87efe",
+        "size_bytes": 12323
       }
     },
     {

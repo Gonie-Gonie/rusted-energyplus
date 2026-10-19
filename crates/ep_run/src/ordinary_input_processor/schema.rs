@@ -334,6 +334,9 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
             0,
             Some("chillers"),
         ),
+        ("ThermostatSetpoint:DualSetpoint", 3, 0, 0, 0, None),
+        ("ZoneControl:Thermostat", 11, 1, 0, 0, None),
+        ("ZoneHVAC:IdealLoadsAirSystem", 21, 11, 0, 0, None),
     ]
     .into_iter()
     .map(|(name, a, n, ae, ne, extension)| SourceObjectDefinition {

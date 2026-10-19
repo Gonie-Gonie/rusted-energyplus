@@ -3661,7 +3661,11 @@ fn prepare_runtime_inputs(
 
     let selected_input_processor = if source_initialization_required
     {
-        Some(crate::ordinary_input_processor::resolve(raw_model)?)
+        Some(if scope == Some(crate::PortingScope::B) {
+            crate::ordinary_input_processor::resolve_source_b(raw_model)?
+        } else {
+            crate::ordinary_input_processor::resolve(raw_model)?
+        })
     } else {
         None
     };
@@ -3733,10 +3737,11 @@ fn prepare_runtime_inputs(
         ordinary_warmup_reporting: if source_initialization_required
         {
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
-            let (equipment, radiation) = crate::ordinary_equipment_input::resolve_with_radiation(
-                raw_model,
-                input.advanced_report_variables,
-            )?;
+            let (equipment, radiation) = if scope == Some(crate::PortingScope::B) {
+                crate::ordinary_equipment_input::resolve_with_radiation_source_b(raw_model, input.advanced_report_variables)?
+            } else {
+                crate::ordinary_equipment_input::resolve_with_radiation(raw_model, input.advanced_report_variables)?
+            };
             input.equipment_input = Some(equipment);
             input.radiation_input = Some(radiation);
             Some(input)

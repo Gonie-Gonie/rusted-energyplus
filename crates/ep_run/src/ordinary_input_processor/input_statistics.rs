@@ -21,6 +21,7 @@ fn value(raw: &RawValue) -> SourceInputStatisticsValue {
 }
 pub(super) fn resolve(raw: &RawModel) -> SourceInputStatisticsInput {
     SourceInputStatisticsInput {
+        object_order: Default::default(),
         objects: raw
             .objects
             .iter()
@@ -44,4 +45,50 @@ pub(super) fn resolve(raw: &RawModel) -> SourceInputStatisticsInput {
             })
             .collect(),
     }
+}
+
+// Exact SourceB raw values for subsequent genuine getters. The existing
+// statistics-only A/None projection above stays unchanged.
+fn full_value(raw: &RawValue) -> SourceInputStatisticsValue {
+    match raw {
+        RawValue::Null => SourceInputStatisticsValue::Null,
+        RawValue::Bool(value) => SourceInputStatisticsValue::Bool(*value),
+        RawValue::Number(text) => SourceInputStatisticsValue::Number(text.clone()),
+        RawValue::String(text) => SourceInputStatisticsValue::String(text.clone()),
+        RawValue::Array(items) => SourceInputStatisticsValue::Array(items.iter().map(full_value).collect()),
+        RawValue::Object(fields) => SourceInputStatisticsValue::Object(fields.iter().map(|(name, value)| (name.0.clone(), full_value(value))).collect()),
+    }
+}
+pub(super) fn resolve_source_b(raw: &RawModel) -> Result<SourceInputStatisticsInput, String> {
+    let mut object_order = std::collections::BTreeMap::new();
+    for family in raw.objects.keys() {
+        let names = raw.ordered_instances(&family.0).map_err(|error| error.to_string())?
+            .into_iter().map(|(name, _)| name.0.clone()).collect();
+        object_order.insert(family.0.clone(), names);
+    }
+    Ok(SourceInputStatisticsInput {
+        object_order,
+        objects: raw
+            .objects
+            .iter()
+            .map(|(family, objects)| {
+                (
+                    family.0.clone(),
+                    objects
+                        .iter()
+                        .map(|(name, object)| {
+                            (
+                                name.0.clone(),
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, raw)| (field.0.clone(), full_value(raw)))
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect(),
+    })
 }

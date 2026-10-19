@@ -1,0 +1,364 @@
+//! Finite raw field grammar from the pinned Native seven-family schema.
+//! Retains operands only; positive Native getters and owners remain unavailable.
+use super::{blank, number, text_is};
+use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
+pub(super) fn is_family(family: &str) -> bool {
+    matches!(
+        family,
+        "NodeList"
+            | "Schedule:Compact"
+            | "ThermostatSetpoint:DualSetpoint"
+            | "ZoneControl:Thermostat"
+            | "ZoneHVAC:EquipmentConnections"
+            | "ZoneHVAC:EquipmentList"
+            | "ZoneHVAC:IdealLoadsAirSystem"
+    )
+}
+pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+    if matches!(
+        name,
+        "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
+    ) {
+        return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
+    }
+    match (family, name) {
+        ("NodeList", "nodes") => {
+            blank(value)
+                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "node_name" => blank(value) || matches!(value, RawValue::String(_)), _ => false, }) && fields.get(&FieldName("node_name".into())).is_some_and(|value| !blank(value)))))
+        }
+        ("Schedule:Compact", "schedule_type_limits_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("Schedule:Compact", "data") => {
+            blank(value)
+                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "field" => blank(value) || (number(value).is_some() || matches!(value, RawValue::String(_))), _ => false, }))))
+        }
+        ("ThermostatSetpoint:DualSetpoint", "heating_setpoint_temperature_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ThermostatSetpoint:DualSetpoint", "cooling_setpoint_temperature_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "zone_or_zonelist_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "control_type_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "control_1_object_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "ThermostatSetpoint:DualSetpoint",
+                        "ThermostatSetpoint:SingleCooling",
+                        "ThermostatSetpoint:SingleHeating",
+                        "ThermostatSetpoint:SingleHeatingOrCooling",
+                    ],
+                )
+        }
+        ("ZoneControl:Thermostat", "control_1_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "control_2_object_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "ThermostatSetpoint:DualSetpoint",
+                        "ThermostatSetpoint:SingleCooling",
+                        "ThermostatSetpoint:SingleHeating",
+                        "ThermostatSetpoint:SingleHeatingOrCooling",
+                    ],
+                )
+        }
+        ("ZoneControl:Thermostat", "control_2_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "control_3_object_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "ThermostatSetpoint:DualSetpoint",
+                        "ThermostatSetpoint:SingleCooling",
+                        "ThermostatSetpoint:SingleHeating",
+                        "ThermostatSetpoint:SingleHeatingOrCooling",
+                    ],
+                )
+        }
+        ("ZoneControl:Thermostat", "control_3_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "control_4_object_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "ThermostatSetpoint:DualSetpoint",
+                        "ThermostatSetpoint:SingleCooling",
+                        "ThermostatSetpoint:SingleHeating",
+                        "ThermostatSetpoint:SingleHeatingOrCooling",
+                    ],
+                )
+        }
+        ("ZoneControl:Thermostat", "control_4_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneControl:Thermostat", "temperature_difference_between_cutout_and_setpoint") => {
+            blank(value) || number(value).is_some_and(|n| n >= 0.0)
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_conditioning_equipment_list_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_air_inlet_node_or_nodelist_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_air_exhaust_node_or_nodelist_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_air_node_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:EquipmentConnections", "zone_return_air_node_or_nodelist_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        (
+            "ZoneHVAC:EquipmentConnections",
+            "zone_return_air_node_1_flow_rate_fraction_schedule_name",
+        ) => blank(value) || matches!(value, RawValue::String(_)),
+        (
+            "ZoneHVAC:EquipmentConnections",
+            "zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name",
+        ) => blank(value) || matches!(value, RawValue::String(_)),
+        ("ZoneHVAC:EquipmentList", "load_distribution_scheme") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "SequentialLoad",
+                        "SequentialUniformPLR",
+                        "UniformLoad",
+                        "UniformPLR",
+                    ],
+                )
+        }
+        ("ZoneHVAC:EquipmentList", "equipment") => {
+            blank(value)
+                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "zone_equipment_object_type" => blank(value) || text_is(value, &["AirLoopHVAC:UnitarySystem", "Fan:ZoneExhaust", "HeatExchanger:AirToAir:FlatPlate", "WaterHeater:HeatPump:PumpedCondenser", "WaterHeater:HeatPump:WrappedCondenser", "ZoneHVAC:AirDistributionUnit", "ZoneHVAC:Baseboard:Convective:Electric", "ZoneHVAC:Baseboard:Convective:Water", "ZoneHVAC:Baseboard:RadiantConvective:Electric", "ZoneHVAC:Baseboard:RadiantConvective:Steam", "ZoneHVAC:Baseboard:RadiantConvective:Water", "ZoneHVAC:CoolingPanel:RadiantConvective:Water", "ZoneHVAC:Dehumidifier:DX", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:EvaporativeCoolerUnit", "ZoneHVAC:ForcedAir:UserDefined", "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:HighTemperatureRadiant", "ZoneHVAC:HybridUnitaryHVAC", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", "ZoneHVAC:LowTemperatureRadiant:Electric", "ZoneHVAC:LowTemperatureRadiant:VariableFlow", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:RefrigerationChillerSet", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner"]), "zone_equipment_name" => blank(value) || matches!(value, RawValue::String(_)), "zone_equipment_cooling_sequence" => blank(value) || number(value).is_some_and(|n| n.fract() == 0.0 && n >= 0.0), "zone_equipment_heating_or_no_load_sequence" => blank(value) || number(value).is_some_and(|n| n.fract() == 0.0 && n >= 0.0), "zone_equipment_sequential_cooling_fraction_schedule_name" => blank(value) || matches!(value, RawValue::String(_)), "zone_equipment_sequential_heating_fraction_schedule_name" => blank(value) || matches!(value, RawValue::String(_)), _ => false, }) && fields.get(&FieldName("zone_equipment_cooling_sequence".into())).is_some_and(|value| !blank(value)) && fields.get(&FieldName("zone_equipment_heating_or_no_load_sequence".into())).is_some_and(|value| !blank(value)) && fields.get(&FieldName("zone_equipment_name".into())).is_some_and(|value| !blank(value)) && fields.get(&FieldName("zone_equipment_object_type".into())).is_some_and(|value| !blank(value)))))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "availability_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "zone_supply_air_node_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "zone_exhaust_air_node_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "system_inlet_air_node_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_heating_supply_air_temperature") => {
+            blank(value) || number(value).is_some_and(|n| n > 0.0 && n < 100.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "minimum_cooling_supply_air_temperature") => {
+            blank(value) || number(value).is_some_and(|n| n > -100.0 && n < 50.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_heating_supply_air_humidity_ratio") => {
+            blank(value) || number(value).is_some_and(|n| n > 0.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "minimum_cooling_supply_air_humidity_ratio") => {
+            blank(value) || number(value).is_some_and(|n| n > 0.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "heating_limit") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "LimitCapacity",
+                        "LimitFlowRate",
+                        "LimitFlowRateAndCapacity",
+                        "NoLimit",
+                    ],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_heating_air_flow_rate") => {
+            blank(value)
+                || (number(value).is_some_and(|n| n >= 0.0) || text_is(value, &["Autosize"]))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_sensible_heating_capacity") => {
+            blank(value)
+                || (number(value).is_some_and(|n| n >= 0.0) || text_is(value, &["Autosize"]))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "cooling_limit") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "LimitCapacity",
+                        "LimitFlowRate",
+                        "LimitFlowRateAndCapacity",
+                        "NoLimit",
+                    ],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_cooling_air_flow_rate") => {
+            blank(value)
+                || (number(value).is_some_and(|n| n >= 0.0) || text_is(value, &["Autosize"]))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "maximum_total_cooling_capacity") => {
+            blank(value)
+                || (number(value).is_some_and(|n| n >= 0.0) || text_is(value, &["Autosize"]))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "heating_availability_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "cooling_availability_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "dehumidification_control_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "ConstantSensibleHeatRatio",
+                        "ConstantSupplyHumidityRatio",
+                        "Humidistat",
+                        "None",
+                    ],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "cooling_sensible_heat_ratio") => {
+            blank(value) || number(value).is_some_and(|n| n <= 1.0 && n > 0.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "humidification_control_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &["", "ConstantSupplyHumidityRatio", "Humidistat", "None"],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "design_specification_outdoor_air_object_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "outdoor_air_inlet_node_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "demand_controlled_ventilation_type") => {
+            blank(value) || text_is(value, &["", "CO2Setpoint", "None", "OccupancySchedule"])
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "outdoor_air_economizer_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "DifferentialDryBulb",
+                        "DifferentialEnthalpy",
+                        "NoEconomizer",
+                    ],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "heat_recovery_type") => {
+            blank(value) || text_is(value, &["", "Enthalpy", "None", "Sensible"])
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "sensible_heat_recovery_effectiveness") => {
+            blank(value) || number(value).is_some_and(|n| n >= 0.0 && n <= 1.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "latent_heat_recovery_effectiveness") => {
+            blank(value) || number(value).is_some_and(|n| n >= 0.0 && n <= 1.0)
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "design_specification_zonehvac_sizing_object_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "heating_fuel_efficiency_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "heating_fuel_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "Coal",
+                        "Diesel",
+                        "DistrictCooling",
+                        "DistrictHeatingSteam",
+                        "DistrictHeatingWater",
+                        "Electricity",
+                        "FuelOilNo1",
+                        "FuelOilNo2",
+                        "Gasoline",
+                        "NaturalGas",
+                        "OtherFuel1",
+                        "OtherFuel2",
+                        "Propane",
+                    ],
+                )
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "cooling_fuel_efficiency_schedule_name") => {
+            blank(value) || matches!(value, RawValue::String(_))
+        }
+        ("ZoneHVAC:IdealLoadsAirSystem", "cooling_fuel_type") => {
+            blank(value)
+                || text_is(
+                    value,
+                    &[
+                        "",
+                        "Coal",
+                        "Diesel",
+                        "DistrictCooling",
+                        "DistrictHeatingSteam",
+                        "DistrictHeatingWater",
+                        "Electricity",
+                        "FuelOilNo1",
+                        "FuelOilNo2",
+                        "Gasoline",
+                        "NaturalGas",
+                        "OtherFuel1",
+                        "OtherFuel2",
+                        "Propane",
+                    ],
+                )
+        }
+        _ => false,
+    }
+}
+pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
+    match family {
+        "NodeList" => &[],
+        "Schedule:Compact" => &[],
+        "ThermostatSetpoint:DualSetpoint" => &[],
+        "ZoneControl:Thermostat" => &[
+            "zone_or_zonelist_name",
+            "control_type_schedule_name",
+            "control_1_object_type",
+            "control_1_name",
+        ],
+        "ZoneHVAC:EquipmentConnections" => &[
+            "zone_name",
+            "zone_conditioning_equipment_list_name",
+            "zone_air_node_name",
+        ],
+        "ZoneHVAC:EquipmentList" => &[],
+        "ZoneHVAC:IdealLoadsAirSystem" => &["zone_supply_air_node_name"],
+        _ => &[],
+    }
+}
+pub(super) fn has_compact_reference(raw: &RawModel, reference: &str) -> bool {
+    raw.objects
+        .get(&ObjectType("Schedule:Compact".into()))
+        .is_some_and(|objects| {
+            objects
+                .keys()
+                .any(|name| name.0.eq_ignore_ascii_case(reference))
+        })
+}

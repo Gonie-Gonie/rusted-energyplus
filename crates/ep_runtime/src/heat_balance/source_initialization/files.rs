@@ -34,6 +34,23 @@ pub struct SourceInitializationFilePaths {
     pub tabular_xml: PathBuf,
 }
 
+/// Windows text-mode transformation shared by the actual physical streams.
+/// Native IOFiles290 omits binary; every LF expands while prior CR is retained.
+fn native_text_bytes(bytes: &[u8]) -> std::borrow::Cow<'_, [u8]> {
+    #[cfg(windows)]
+    if bytes.contains(&b'\n') {
+        let mut text = Vec::with_capacity(bytes.len());
+        for &byte in bytes {
+            if byte == b'\n' {
+                text.push(b'\r');
+            }
+            text.push(byte);
+        }
+        return std::borrow::Cow::Owned(text);
+    }
+    std::borrow::Cow::Borrowed(bytes)
+}
+
 #[derive(Debug)]
 struct SourceOutputStream {
     path: PathBuf,
@@ -80,33 +97,14 @@ impl Write for SourceOutputStream {
         self.write_all(bytes).map(|()| bytes.len())
     }
     fn write_all(&mut self, bytes: &[u8]) -> io::Result<()> {
-        // IOFiles.open uses in|out|trunc, without binary. Rust File uses the
-        // binary OS handle, so perform the actual text-mode translation here,
-        // at each reached write. Already supplied CR is retained: CRLF input
-        // becomes CRCRLF, exactly as a Windows CRT text stream would write it.
-        #[cfg(windows)]
-        let translated;
-        #[cfg(windows)]
-        let bytes = if bytes.contains(&b'\n') {
-            let mut text = Vec::with_capacity(bytes.len());
-            for &byte in bytes {
-                if byte == b'\n' {
-                    text.push(b'\r');
-                }
-                text.push(byte);
-            }
-            translated = text;
-            translated.as_slice()
-        } else {
-            bytes
-        };
+        let bytes = native_text_bytes(bytes);
         let result = self
             .file
             .as_mut()
             .ok_or_else(|| {
                 io::Error::new(io::ErrorKind::NotConnected, "actual output is not open")
             })?
-            .write_all(bytes);
+            .write_all(bytes.as_ref());
         if result.is_err() {
             self.failed = true;
         }

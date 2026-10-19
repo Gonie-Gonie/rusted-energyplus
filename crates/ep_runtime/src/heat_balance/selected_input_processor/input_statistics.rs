@@ -12,6 +12,10 @@ pub enum SourceInputStatisticsValue {
     Null,
     /// Actual JSON number or boolean; its numerical value is never read here.
     OtherScalar,
+    /// Exact SourceB JSON number token, without a parse/roundtrip or default.
+    Number(String),
+    /// Exact SourceB JSON boolean scalar.
+    Bool(bool),
     /// Actual raw string, preserving its case and blank contents.
     String(String),
     /// Actual raw array, retaining each extensible item and its order.
@@ -23,7 +27,7 @@ impl SourceInputStatisticsValue {
     fn json_size(&self) -> usize {
         match self {
             Self::Null => 0,
-            Self::OtherScalar | Self::String(_) => 1,
+            Self::OtherScalar | Self::Number(_) | Self::Bool(_) | Self::String(_) => 1,
             Self::Array(rows) => rows.len(),
             Self::Object(fields) => fields.len(),
         }
@@ -36,6 +40,9 @@ pub type SourceInputStatisticsFields = BTreeMap<String, SourceInputStatisticsVal
 pub struct SourceInputStatisticsInput {
     /// Exact family, object-name and field spelling in lexical JSON map order.
     pub objects: BTreeMap<String, BTreeMap<String, SourceInputStatisticsFields>>,
+    /// SourceB effective input order from the same RawModel, including original
+    /// validated IDF declaration order for Compact. Empty for older A callers.
+    pub object_order: BTreeMap<String, Vec<String>>,
 }
 
 #[derive(Clone, Copy)]
@@ -149,8 +156,43 @@ impl SelectedInputProcessor {
                 }
             }
         }
+        if !raw.object_order.is_empty() {
+            if raw.object_order.len() != raw.objects.len() { return Err(SelectedInputUnavailable::Association); }
+            for (family, objects) in &raw.objects {
+                let order = raw.object_order.get(family).ok_or(SelectedInputUnavailable::Association)?;
+                let names: std::collections::BTreeSet<_> = order.iter().collect();
+                if order.len() != objects.len() || names.len() != objects.len()
+                    || order.iter().any(|name| !objects.contains_key(name)) {
+                    return Err(SelectedInputUnavailable::Association);
+                }
+            }
+        }
         self.statistics_input = Some(raw);
         Ok(())
+    }
+
+    /// Borrow retained original object fields for a later genuine Source getter.
+    /// Exact-case identity and raw array order are preserved; no values/defaults,
+    /// usage marking, indices or schedule/node state are produced by this read.
+    ///
+    /// # Errors
+    /// Rejects a missing raw owner, family or object association.
+    pub fn source_raw_object_fields(
+        &self, family: &str, object: &str,
+    ) -> Result<&SourceInputStatisticsFields, SelectedInputUnavailable> {
+        self.statistics_input.as_ref()
+            .and_then(|raw| raw.objects.get(family))
+            .and_then(|objects| objects.get(object))
+            .ok_or(SelectedInputUnavailable::Association)
+    }
+
+    /// Borrow effective original object order retained by explicit SourceB.
+    ///
+    /// # Errors
+    /// Rejects a missing raw order/family instead of inventing lexical order.
+    pub fn source_raw_object_names(&self, family: &str) -> Result<&[String], SelectedInputUnavailable> {
+        self.statistics_input.as_ref().and_then(|raw| raw.object_order.get(family))
+            .map(Vec::as_slice).ok_or(SelectedInputUnavailable::Association)
     }
 
     /// Actual Native322 child, after the six real shared shortcut allocations.

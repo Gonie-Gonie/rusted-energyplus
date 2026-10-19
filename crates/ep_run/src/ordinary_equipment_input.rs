@@ -30,13 +30,22 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
 }
 
 mod fields;
+mod source_b;
 use fields::{admitted_field, required_fields};
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
+    resolve_raw(raw, false)
+}
+/// SourceB preserves positive family operands for the same actual IP/getters.
+pub(crate) fn resolve_source_b(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
+    resolve_raw(raw, true)
+}
+fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipmentInput, String> {
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
         }
+        let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         if !matches!(
             family.0.as_str(),
             "Version"
@@ -72,7 +81,7 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
                 | "Schedule:Constant"
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
-        ) {
+        ) && !source_b_family {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
                 family.0
@@ -105,7 +114,9 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
                 return Err(format!("blank ordinary {} name", family.0));
             }
             for (field, value) in &object.fields {
-                if !admitted_field(&family.0, &field.0, value) {
+                if !admitted_field(&family.0, &field.0, value)
+                    && !(source_b_family && source_b::admitted_field(&family.0, &field.0, value))
+                {
                     return Err(format!(
                         "ordinary equipment field unavailable: {}.{}",
                         family.0, field.0
@@ -115,6 +126,13 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
             for &required in required_fields(&family.0) {
                 if field(object, required).is_none_or(blank) {
                     return Err(format!("missing {}.{}", family.0, required));
+                }
+            }
+            if source_b_family {
+                for &required in source_b::required_fields(&family.0) {
+                    if field(object, required).is_none_or(blank) {
+                        return Err(format!("missing {}.{}", family.0, required));
+                    }
                 }
             }
             let allowed = match family.0.as_str() {
@@ -262,7 +280,7 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
                         "ordinary {family} requires an actual Constant schedule"
                     ));
                 };
-                let schedule = raw
+                let constant = raw
                     .objects
                     .get(&ObjectType("Schedule:Constant".into()))
                     .and_then(|objects| {
@@ -270,8 +288,14 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
                             .iter()
                             .find(|(name, _)| name.0.eq_ignore_ascii_case(schedule))
                     })
-                    .map(|(_, object)| object)
-                    .ok_or("ordinary schedule reference is not a real Constant input")?;
+                    .map(|(_, object)| object);
+                if constant.is_none() && source_b_ingress && source_b::has_compact_reference(raw, schedule) {
+                    // Reference only: all ordered Compact fields remain raw on
+                    // the same IP. Native ProcessScheduleInput stops at its real
+                    // positive count before any cache/value can be consumed.
+                    continue;
+                }
+                let schedule = constant.ok_or("ordinary schedule reference is not a real Constant input")?;
                 // Original Schedule:Constant's absent hourly value is 0.0.
                 if !field(schedule, "hourly_value")
                     .filter(|value| !blank(value))
@@ -285,13 +309,12 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> 
             }
         }
     }
-    OrdinaryEquipmentInput::from_family_inventory(
-        raw.objects
-            .iter()
-            .map(|(family, objects)| (family.0.as_str(), objects.len())),
-        timestep,
-    )
-    .map_err(|error| error.to_string())
+    let inventory = raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len()));
+    if source_b_ingress {
+        OrdinaryEquipmentInput::from_source_family_inventory(inventory, timestep)
+    } else {
+        OrdinaryEquipmentInput::from_family_inventory(inventory, timestep)
+    }.map_err(|error| error.to_string())
 }
 
 /// Reuse the one existing complete positive-family/field admission once, then
@@ -307,6 +330,25 @@ pub(crate) fn resolve_with_radiation(
     String,
 > {
     let equipment = resolve(raw)?;
+    let radiation = ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
+        raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len())),
+        advanced_report_variables,
+    ).map_err(|error| error.to_string())?;
+    Ok((equipment, radiation))
+}
+
+/// Same genuine radiation counts after explicit SourceB raw ingress.
+pub(crate) fn resolve_with_radiation_source_b(
+    raw: &RawModel,
+    advanced_report_variables: bool,
+) -> Result<
+    (
+        OrdinaryEquipmentInput,
+        ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput,
+    ),
+    String,
+> {
+    let equipment = resolve_source_b(raw)?;
     let radiation = ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
         raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len())),
         advanced_report_variables,

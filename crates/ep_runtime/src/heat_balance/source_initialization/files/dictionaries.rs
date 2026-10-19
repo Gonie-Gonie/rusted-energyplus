@@ -102,7 +102,9 @@ impl SourceDictionaryStream {
         let result = match self.os.as_mut() {
             Some(SourceDictionaryBuffer::NativeNullBuffer { bad: true }) => Ok(()),
             Some(SourceDictionaryBuffer::PhysicalFile(_)) if self.failed => Ok(()),
-            Some(SourceDictionaryBuffer::PhysicalFile(file)) => file.write_all(bytes),
+            Some(SourceDictionaryBuffer::PhysicalFile(file)) => {
+                file.write_all(super::native_text_bytes(bytes).as_ref())
+            }
             Some(SourceDictionaryBuffer::FailedPhysicalOpen) => Ok(()),
             Some(SourceDictionaryBuffer::NativeNullBuffer { bad: false }) => {
                 return Err(io::Error::new(

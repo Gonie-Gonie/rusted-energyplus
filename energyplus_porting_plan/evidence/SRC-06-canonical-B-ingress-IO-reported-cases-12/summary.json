@@ -1,0 +1,250 @@
+{
+  "status": "Actual SourceB advances through raw ingress to real Compact getter boundary; combined A24 result transfer and dictionary writes verified",
+  "base_HEAD": "1435b44537a920ded21ae732bdc7c81051df0282",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "combined_plan": {
+    "path": ".runtime/porting/SRC-06/Root-combined-source-B-IO-tool-preflight-12/complete-compiler-plan.json",
+    "sha256": "4c6cbcd44d2180f3ea86379c16ed4fe994f79a0ab22af01dced9e3363b8737b0",
+    "bytes": 1700553
+  },
+  "combined_preflight_review": {
+    "path": ".runtime/porting/SRC-06/Root-combined-source-B-IO-tool-preflight-12/review.json",
+    "sha256": "c602b6089021db0f2acbc2340cd7c27aba7bcdd3f9978845a2c3f706040c96d1",
+    "bytes": 1522
+  },
+  "applied_custody": {
+    "path": ".runtime/porting/SRC-06/Root-combined-source-B-IO-tool-application-12/receipt.json",
+    "sha256": "b86b8476347c9eacd209421d22940cf0374b866b167020785768f38d6c05ad4e",
+    "bytes": 1923
+  },
+  "accepted_Source_peers": [
+    {
+      "path": ".runtime/porting/SRC-06/Outer-source-B-raw-ingress-Source-review-01/review.json",
+      "sha256": "48d4d41964a1e00c7f004ae937a5f20b2759c13ce9859babd6c89436a7ec5bfa",
+      "bytes": 10945
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Outer-dictionary-native-text-mode-Source-review-01/review.json",
+      "sha256": "ff9478c85b685667272675ffe60e4a4caec03b3c9b2b214d3d81d248a5e88c09",
+      "bytes": 7584
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Peer-completed-reported-stream-comparator-Source-review-01/review.json",
+      "sha256": "3ae17583b0f1312fdb5762d9bdf3d50a3e660a71ea80b4ce98e413618cd4ff9d",
+      "bytes": 7388
+    }
+  ],
+  "changed_Rust_files": 11,
+  "new_Rust_files": 1,
+  "existing_Rust_files": 10,
+  "new_public_tools": 1,
+  "compiler_inputs": 4473,
+  "Rust_sources": 4460,
+  "literal_applications": 24,
+  "raw_B": "SomeB Native field grammar retains raw values, extension fields, original effective object order and positive counts on the same InputProcessor raw owner. Three missing query/default-statistics definitions use pinned IDD/parser metadata. No typed NodeID/cache/ready-state substitution.",
+  "dictionary_IO": "RDD/MDD and general outputs share Native text expansion at each reached write. Windows LF becomes CRLF, existing CR remains; logical lengths and failure behavior preserved. No whole-file rewrite or numeric change.",
+  "public_comparer": "tools/porting/check_completed_reported_streams.py streams physical ESO/MTR with exact identity/dictionary/StoreType/frequency/native tuple order/footer/counters and unchanged original named atol/rtol/per-series RMSE. Public promotion changes six metadata/path references only.",
+  "public_algorithm_propagation": {
+    "path": ".runtime/porting/SRC-06/source-B-IO-publication-prepared-Audit-12/public-algorithm-propagation.json",
+    "sha256": "687ee613dee858ca8c225e652dc2a9f1a8cf1f05c105da376c6a93f68acb77ad",
+    "bytes": 1926
+  },
+  "public_A72_control": {
+    "path": ".runtime/porting/SRC-06/public-comparer-A-72H-control-Root-12/comparison.json",
+    "sha256": "b7db0caa956fb0d88cf28722cf96a06842d2122e0086d7c6531b5761f86f2304",
+    "bytes": 93059
+  },
+  "prior_A_case_comparison_refs": [
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source82-A-72H-tolerance-Root-12/comparison.json",
+      "sha256": "df345237096da07face1f70bf7657bd4602619fb131107ce499d17eab185fe27",
+      "bytes": 93076
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source82-A-ANNUAL-tolerance-Root-12/comparison.json",
+      "sha256": "b6f7457fbd13057bd9a65d701d793ebc0b7d778ed283ddc26d28796ae3201ce0",
+      "bytes": 93540
+    }
+  ],
+  "prior_A_case_compiled_scope": "A72/annual ran canonical11 Source before combined12 rawB/IO changes. Current A24 transfer is separate; no new combined12 A72/annual duration execution is inferred.",
+  "prior_case_metrics": [
+    {
+      "case": "A-72H",
+      "series": 58,
+      "samples": 16056,
+      "raw_operand_unequal": 10651,
+      "parsed_binary64_unequal": 10651,
+      "tolerance_failures": 0,
+      "rmse_failures": 0,
+      "passed": true
+    },
+    {
+      "case": "A-ANNUAL",
+      "series": 58,
+      "samples": 1953480,
+      "raw_operand_unequal": 1229028,
+      "parsed_binary64_unequal": 1229028,
+      "tolerance_failures": 0,
+      "rmse_failures": 0,
+      "passed": true
+    }
+  ],
+  "canonical_A24_completed_Source_run": true,
+  "canonical_A24_dictionary_write_and5352_proof_transfer": true,
+  "actual_B_incomplete_boundary": "Schedule: selected ScheduleManager unavailable: nonconstant schedule input",
+  "actual_B_completed": false,
+  "original_policy": {
+    "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+    "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+    "bytes": 45145
+  },
+  "policy_metadata_notes": [
+    {
+      "variable": "Schedule Value",
+      "profile_units": "scalar (declared schedule type retained)",
+      "actual_Source_and_Native_ESO_units": "",
+      "actual_Source_and_Native_RDD": "Zone Average []",
+      "actual_input": "Schedule:Constant AlwaysOn uses On/Off type limits0..1 DISCRETE",
+      "meaning": "The profile explicitly uses a descriptive scalar label; physical blank units and actual schedule-type binding are retained separately. No scale or units conversion."
+    },
+    {
+      "variable": "Zone Air Humidity Ratio",
+      "profile_units": "kgWater/kgDryAir",
+      "profile_sampling_stage": "zone",
+      "actual_Source_and_Native_ESO_units": "",
+      "actual_Source_and_Native_RDD": "HVAC Average []",
+      "pinned_Native_registration": "ZoneTempPredictorCorrector.cc2848 Constant::Units::None; direct airHumRat target, TimeStepType::System, StoreType::Average",
+      "meaning": "Preexisting policy metadata differs from Native dictionary metadata. This audit does not rewrite either side or claim literal unit/timestep-type equivalence. Unique exact key/name/frequency and Source-vs-Native physical-unit/type equality identify the actual reported numeric pair; original named row atol1e-9 and rmse_max1e-9 are applied with no scale conversion. Trace sampling_stage is retained separately; actual Timestep Average report is used, never instantaneous callback airHumRat."
+    }
+  ],
+  "numeric_scope": "Physical reported decimal operands, original per-row tolerances and sequential per-series RMSE. Existing numerical differences remain. No unit conversion, relaxed policy, reconstructed history, internal binary64 identity or whole conformance claim.",
+  "previous_checkpoint": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/summary.json",
+    "sha256": "49bc529e949c23e3ccf92880db6dccdef42decd183c3ed8a6fa30d32a7adba60",
+    "bytes": 8901
+  },
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "full15matrix_complete": false,
+  "new_test_bodies": 0,
+  "full_suite_rerun": false,
+  "annual_numeric_comparison_rerun": false,
+  "annual_JSON_CSV_copied": false,
+  "remaining": [
+    "Genuine Source Compact detailed/day/week/year constructors/getters before constant insertion; then positive zone equipment/NodeList/PurchasedAir owners.",
+    "Remaining B cases/durations and all required card/unit/integration/production gates.",
+    "Strict optional Source oracle dispatch; no compatibility fallback or false comparison PASS."
+  ],
+  "evidence_scope": "Finite changed Source/custody, direct reviews/receipts, actual A24 transfer, prior A72/annual physical ESO/MTR on both sides with dictionaries/all metrics/zero-failure ledgers. No historical ZIP recursion or annual JSON/CSV.",
+  "schema": "src06-canonical-B-ingress-IO-reported-cases.v1",
+  "canonical_check": {
+    "path": ".runtime/porting/SRC-06/canonical-source-B-raw-IO-all-targets-Root-12/receipt.json",
+    "sha256": "f634a01d26c1e9a76930ccc762032b21b648b9b88c520d74cb2d2d31227b0665",
+    "bytes": 4473
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-B-raw-IO-A-24H-command-Root-12/receipt.json",
+    "sha256": "b38533134f95e4504ffd6f5d0cf4a83e744d820b06bc822467844234a6a8119a",
+    "bytes": 5180
+  },
+  "canonical_first_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-B-raw-IO-B-NOLIMIT-24H-command-Root-12/receipt.json",
+    "sha256": "20ff6d1a48afac8dffafdc8c8fd717bd0768ecb11c62ae8553a036f2ebbc7c0d",
+    "bytes": 5230
+  },
+  "canonical_A24_IO_transfer_review": {
+    "path": ".runtime/porting/SRC-06/Peer-canonical-B-ingress-IO-A24-transfer-03/review.json",
+    "sha256": "6bfe7736ea81fc1123ebc4ee11c64e9de64d123f3e3a92e49636f13cd9dc4dca",
+    "bytes": 27122
+  },
+  "Root_actual_frontier_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-B-raw-ingress-actual-frontier-12/review.json",
+    "sha256": "f3cdd4c85f4a0557fb3e94690edb410e04b6800533d48df1b4118ea75b6817af",
+    "bytes": 1850
+  },
+  "prior_A72_annual_reported_comparisons": [
+    {
+      "case": "A-72H",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/canonical-source82-A-72H-tolerance-Root-12/comparison.json",
+        "sha256": "df345237096da07face1f70bf7657bd4602619fb131107ce499d17eab185fe27",
+        "bytes": 93076
+      },
+      "reported_series": 58,
+      "reported_samples": 16056,
+      "metrics": {
+        "series": 58,
+        "samples": 16056,
+        "raw_operand_unequal": 10651,
+        "parsed_binary64_unequal": 10651,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source82-A-72H-command-Root-11/receipt.json",
+        "sha256": "6e1c1869d309699b896066f5222ee80dcadd7c1c2ffbd37d29fd1a1061f665e5",
+        "bytes": 4501
+      },
+      "Native_receipt": {
+        "path": ".runtime/porting/SRC-06/native-installed-A-72H-command-Root-11/receipt.json",
+        "sha256": "ae9851ae7f7d49acd14416b69d4ba59994078f729337b07b6edec806d3472136",
+        "bytes": 3155
+      },
+      "scope": "Prior compiled canonical11 Source snapshot only; no new duration run or transfer through changed combined12 B/IO path is inferred"
+    },
+    {
+      "case": "A-ANNUAL",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/canonical-source82-A-ANNUAL-tolerance-Root-12/comparison.json",
+        "sha256": "b6f7457fbd13057bd9a65d701d793ebc0b7d778ed283ddc26d28796ae3201ce0",
+        "bytes": 93540
+      },
+      "reported_series": 58,
+      "reported_samples": 1953480,
+      "metrics": {
+        "series": 58,
+        "samples": 1953480,
+        "raw_operand_unequal": 1229028,
+        "parsed_binary64_unequal": 1229028,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "Source_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source82-A-ANNUAL-command-Root-11/receipt.json",
+        "sha256": "9ab4d0478339a53c4b5c8adf36155c74e5f94336fd0e2da651e1abee0781aabd",
+        "bytes": 4514
+      },
+      "Native_receipt": {
+        "path": ".runtime/porting/SRC-06/native-installed-A-ANNUAL-command-Root-11/receipt.json",
+        "sha256": "c52b0c32a087f2a6aa5ee2f4265bb94f12906abecec17778b5b0f9bd2aeeb7b1",
+        "bytes": 3169
+      },
+      "scope": "Prior compiled canonical11 Source snapshot only; no new duration run or transfer through changed combined12 B/IO path is inferred"
+    }
+  ],
+  "validation_refs": {
+    "path": ".runtime/porting/SRC-06/source-B-IO-publication-prepared-Audit-12/validation-refs.json",
+    "sha256": "c2fcd6c4a9151ad92d0d48c4024632deb6365859adbd05b823336693b7bfbd29",
+    "bytes": 472
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/evidence.zip",
+    "sha256": "a115946c00ee671f41301c08eaf99aa7abbdafc4644cb2d93407d64d46a0a3ca",
+    "bytes": 28256123
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-B-ingress-IO-reported-cases-12/manifest.json",
+    "sha256": "c25c1fe7466422f0bdba166a8713b0e59b04359d200f590fdc5f7977b5644e44",
+    "bytes": 39037
+  },
+  "archive_entries": 170,
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/publish-source-B-IO-reported-checkpoint-Audit-12-template.py",
+    "sha256": "93d5739174ef54c562e4201c0d1ea0741150cac7858c60a776c3ab38bb7ed54b",
+    "bytes": 13548
+  }
+}

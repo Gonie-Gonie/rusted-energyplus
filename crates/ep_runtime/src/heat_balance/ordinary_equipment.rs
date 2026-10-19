@@ -51,6 +51,28 @@ impl OrdinaryEquipmentInput {
         Ok(())
     }
 
+    /// Carry actual positive presence/counts to the retained Source IP/getter.
+    /// This does not initialize equipment or certify any positive branch.
+    ///
+    /// # Errors
+    /// Rejects an invalid clock or duplicate supplied family identity.
+    pub fn from_source_family_inventory<'a>(
+        inventory: impl IntoIterator<Item = (&'a str, usize)>,
+        timesteps_per_hour: usize,
+    ) -> Result<Self, OrdinaryEquipmentUnavailable> {
+        if timesteps_per_hour == 0 || timesteps_per_hour > 60 || 60 % timesteps_per_hour != 0 {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        let mut supplied = [None; 9];
+        for (family, count) in inventory {
+            if let Some(index) = Self::FAMILIES.iter().position(|&name| name == family) {
+                if supplied[index].is_some() { return Err(Unavailable::Input(family.into())); }
+                supplied[index] = Some(count);
+            }
+        }
+        Ok(Self { supplied, timesteps_per_hour })
+    }
+
     /// Five count-query families, NodeList, then three actual .find families.
     pub const FAMILIES: [&'static str; 9] = [
         "ZoneHVAC:EquipmentConnections",
