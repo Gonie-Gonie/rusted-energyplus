@@ -1,0 +1,65 @@
+{
+  "schema": "src06-code56-actual-workspace-quality.v1",
+  "source_plan": {
+    "path": ".runtime/porting/SRC-06/source-Surface-observer-runtime-json-edge-Audit-06/complete-final-compiler-Source-plan.json",
+    "sha256": "1727931c2e6649bc2e08931a5f1b94f34b980949b4756a9f7ad803ba10cbb09a",
+    "bytes": 2612493
+  },
+  "workspace_tests": {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--locked",
+      "--no-fail-fast"
+    ],
+    "exit_code": 0,
+    "passed": 4975,
+    "ignored": 2
+  },
+  "workspace_clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--locked",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 101,
+    "library_errors": 493,
+    "library_test_errors": 483
+  },
+  "format": {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 1,
+    "diff_sections": 1084,
+    "unique_files": 178
+  },
+  "qualification": "Whole workspace tests passed. Formatting and strict Clippy remain failed; no broad quality PASS or change to numerical gates is inferred.",
+  "logs": [
+    {
+      "path": ".runtime/porting/SRC-06/Root56-workspace-tests.log",
+      "sha256": "50ff8be5d1263ab6215f94b82b6dcc8eff2067e72f00588289671b04dd19a2b3",
+      "size_bytes": 1729208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root56-workspace-clippy.log",
+      "sha256": "08efd43d535c333faa07a683455647827fab68a1ab979bd3eae1cb1ca5a621ef",
+      "size_bytes": 505790
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root56-format-check.log",
+      "sha256": "f32bdf8d9eaea2d021208d0b175135b909117530b4b661c185180c3cbf731a07",
+      "size_bytes": 4449574
+    }
+  ]
+}

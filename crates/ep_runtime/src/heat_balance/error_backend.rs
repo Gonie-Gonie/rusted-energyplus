@@ -8,6 +8,7 @@ use std::fmt::{Display, Formatter};
 use std::io::{self, Write};
 
 mod live_flags;
+mod inside_diagnostics;
 mod scoped;
 pub(crate) use live_flags::SourceDiagnosticFlags;
 

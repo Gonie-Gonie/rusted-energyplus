@@ -101,7 +101,13 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     );
     assert_eq!(
         std::fs::read(output_dir.join("eplusrs.audit"))?,
-        b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+        if cfg!(windows) {
+            b"  Processing Schedule Input -- Start\r\n  Processing Schedule Input -- Complete\r\n"
+                .as_slice()
+        } else {
+            b"  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+                .as_slice()
+        }
     );
     if std::env::var("CI_FORCE_TIME_STEP").as_deref() == Ok("Y") {
         assert!(

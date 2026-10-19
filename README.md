@@ -91,7 +91,7 @@ recorded execution stages and unchanged-code bridges. The final fifteen-case
 run on one current Source, full Surface cadence and warmup handoff comparison
 remain separate work; card gates remain A 14/54 and B 14/64.
 
-The workspace test run did not pass: the observed failure is the stable-output-layout assertion, whose two audit lines have matching content but Windows CRLF rather than its hardcoded LF. That assertion correction is pending; this checkpoint does not claim a passing workspace suite.
+The latest [surface unit checkpoint](energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) verifies 24 selected outside-surface calls and 30 convergence-suffix evaluations. Workspace tests pass (4,975 passed, two existing exclusions); formatting and strict Clippy still require cleanup. Final current-Source Surface cadence, handoff and fifteen-case verification remain pending.
 
 ## How To Run And Verify
 

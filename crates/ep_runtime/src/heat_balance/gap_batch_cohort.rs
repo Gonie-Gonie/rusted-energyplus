@@ -11,7 +11,7 @@ pub(crate) fn run(group:&str,fixture_path:&Path)->Result<usize> {
 }
 pub(crate) fn run_with_category(group:&str,fixture_path:&Path,category:Option<&str>)->Result<usize> {
     if category.is_some() && group!="exterior" {return Err(invalid("category selection requires exterior group").into());}
-    if !matches!(group,"purchased_air"|"surface"|"exterior"|"output_processor"|"air_history"|"warmup"|"multiplier_predictor") {
+    if !matches!(group,"purchased_air"|"surface"|"exterior"|"output_processor"|"air_history"|"warmup"|"multiplier_predictor"|"inside_convergence_branch"|"outside_surface") {
         return Err(invalid("selected implemented whole scientific group").into());
     }
     // Runtime loading is test-feature-only. No production input or expected
@@ -32,6 +32,8 @@ pub(crate) fn run_with_category(group:&str,fixture_path:&Path,category:Option<&s
     match group {
         "purchased_air"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_purchased_air_cohort(&fixture),
         "surface"=>surface::run(&fixture),
+        "outside_surface"=>super::ordinary_surface_initialization::OrdinarySurfaceInitialization::run_native_gap_outside_surface_cohort(&fixture),
+        "inside_convergence_branch"=>super::ordinary_surface_initialization::OrdinarySurfaceInitialization::run_native_inside_convergence_branch_cohort(&fixture),
         "air_history"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_air_history_cohort(&fixture),
         "warmup"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_warmup_cohort(&fixture),
         "multiplier_predictor"=>super::ordinary_equipment::OrdinaryEquipment::run_native_gap_multiplier_predictor_cohort(&fixture),

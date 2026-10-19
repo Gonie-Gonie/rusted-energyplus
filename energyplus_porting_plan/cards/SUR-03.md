@@ -17,12 +17,9 @@
 
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.
 
-## 재사용 후보
+## 현재 Source 경로
 
-heat_balance/ctf.rs; surface_balance.rs
-
-현재 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
-이 카드의 새 검증이 통과했다는 의미가 아니다.
+`crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/outside_driver.rs`와 같은 모듈의 `native_gap_cohort.rs`가 실제 계산과 단위 호출을 소유합니다.
 
 ## 입력 계약
 
@@ -63,8 +60,10 @@ SUR-04에서 사용한 외표면온도와 원본의 고정/갱신 시점 비교
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+## 현재 구현과 검증
+
+`ordinary_surface_initialization/outside_driver.rs`의 실제 외표면 계산을 같은 소유자에서 호출합니다. 선택한 무내부열원·무이동단열 분기에 대해 원본 전체 함수와 Source를 7개 수명, 24회 호출로 비교했습니다. quick-conduction 경계 0.01의 아래·동일·위, 정상/축열, 일사 유무와 반복 호출을 포함하며, 관측한 상태와 반환값은 binary64 원시 비트로 비교합니다.
+
+CTF 캐시의 실제 생성 뒤 선언된 세 계수와 이력은 이 좁은 소비자 단위의 입력입니다. 이 결과만으로 전체 CTF 생성 과정이나 외표면 부모 전체를 검증했다고 보지 않습니다. SUR-04에 전달되는 값의 시점과 표면 반복 연결은 실제 A24 관측으로 별도 확인합니다.
+
+실행 영수증, 입력·출력 원문, 범위와 보존된 최초 컴파일 실패는 [선택 표면 단위 검증](../evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)에 모읍니다. 기존 카드 체크와 게이트는 전체 64개 카드의 최종 판정에서 정리합니다.

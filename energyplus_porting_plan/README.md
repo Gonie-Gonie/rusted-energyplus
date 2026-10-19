@@ -24,13 +24,14 @@ rusted-energyplus 기준: `d7b516627f421259012f3e61bc28cca831452468`
 | warmup 지속 상태 | [실제 RecKeep 50회·Check 19회](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), 상태값 45,072개 원시 비트 비교 통과 |
 | multiplier 2 예측·보정·이력 | [실제 getter로 만든 소유자에서 21회 호출](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json), 상태·반환값 17,893개 원시 비트 비교 통과 |
 | 기상·태양열·내부발열 | [허용 범위 170개 기록](evidence/SRC-06-canonical-warmup-multiplier-exterior-55/summary.json): 순서·본문으로 검증한 이전 prefix 137개와 이후 성공한 범주 33개. Native 전체 179개 보존, 범위 밖 차양 9개 제외 |
+| 선택 표면 계산·비수렴 종료 분기 | [SUR03 전체 선택 함수 24회·SUR05 지정 종료 분기 30회](evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json) 비교 통과. 후자는 전체 실내 반복 호출이 아님 |
 | 성공 실행 출력 정리 | [A/B 24시간 두 건](evidence/SRC-06-canonical-successful-log-layout-49/summary.json), 기존 계산·CSV·JSON 유지, 중복 오류 파일 제거, 콘솔 원문을 `logs/source-console.log`로 이동 |
 
 55번 증거는 각 실제 실행 단계와 변경되지 않은 본문·읽기 범위의 연결 근거를 보존합니다. 170개를 한 번에 성공한 실행이나 전 범주의 동일 바이너리·Source 검증으로 합쳐 표기하지 않습니다.
 
-다음 작업은 남은 표면 경계·비수렴 진단 단위 연결, 실제 Surface 부모의 호출 시점 비교, warmup→RunPeriod의 MAT·W·CTF 상태 인계 확인입니다. 이어 같은 최종 Source의 15개 일반 실행, 전체 JSON/CSV 재읽기와 부수 출력 검증을 마무리합니다. 기존 15건의 과거 보고 값 증거는 각 실행의 범위로 유지합니다.
+다음 작업은 실제 Source Surface 부모의 반복·호출 시점과 warmup→RunPeriod의 MAT·W·CTF 상태 인계 비교입니다. Native 두 경계 관측은 960개 실수 필드와 실행 플래그를 확인했으며, Source 비교는 아직 수행하지 않았습니다. 이어 같은 최종 Source의 15개 일반 실행, 전체 JSON/CSV 재읽기와 부수 출력 검증을 마무리합니다. 기존 15건의 과거 보고 값 증거는 각 실행의 범위로 유지합니다.
 
-55번 이후 workspace 시험은 아직 통과하지 않았습니다. 관측된 실패는 `arbitrary_run.rs:102`의 출력 배치 assertion으로, 같은 내용의 audit 두 줄에 실제 Windows CRLF와 고정 LF 기대값 차이가 있습니다. 해당 시험의 기대값 수정은 다음 통합 작업에 남기며, 이번 증거를 전체 workspace 통과로 표기하지 않습니다.
+기존 audit 시험은 실제 Windows CRLF에 맞는 정확한 기대값을 사용하도록 바로잡았습니다. 새 관측기의 최초 컴파일 실패 13건과 `serde_json`의 일반 의존성 연결 수정은 56번 증거에 보존합니다. 선택 단위 통과와 전체 workspace·Clippy 품질 결과는 구분합니다. 읽기 전용 fmt 검사에서는 기존 코드도 포함한 1,084개 차이가 있었고, 포맷을 일괄 변경하지 않았습니다.
 
 검증은 변경한 계산 경로에 필요한 기존 통합 cohort 또는 실행만 수행합니다. 같은 몸체를 다시 검증할 근거가 없다면 이전 대규모 cohort·연간 실행·전체 테스트를 반복하지 않습니다. 문서와 로그 경로만 바꾼 경우에는 해당 출력 확인과 문서 검사를 사용합니다.
 

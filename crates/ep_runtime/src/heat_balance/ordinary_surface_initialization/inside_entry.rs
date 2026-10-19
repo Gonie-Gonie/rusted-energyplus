@@ -177,8 +177,12 @@ impl OrdinarySurfaceInitialization {
                 scan: o.scan,
                 globals: o.globals,
                 clock: o.clock,
+                environment: o.environment,
+                hvac: &o.startup.hvac_globals,
+                recurring_errors: o.recurring_errors,
             };
-            self.calculate_source_inside_ctf_all_zones(
+            let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::InsideCtf, crate::heat_balance::source_surface_cadence::Frame::from_owners(self, o.clock, o.globals, o.environment, o.backend.state.kickoff_simulation, self.inside_surface_iterations));
+            let cadence_result = self.calculate_source_inside_ctf_all_zones(
                 o.radiation,
                 o.geometry,
                 o.zones,
@@ -191,7 +195,19 @@ impl OrdinarySurfaceInitialization {
                 o.project.carroll_method,
                 &mut providers,
                 o.backend,
-            )?;
+            );
+            if crate::heat_balance::source_surface_cadence::active() {
+                if let Ok(outcome) = &cadence_result {
+                    crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_loop_exited", o.clock, o.globals, o.backend.state.kickoff_simulation, self.inside_surface_iterations,
+                        crate::heat_balance::source_surface_cadence::Detail {converged:Some(outcome.converged), maximum_delta_bits:Some(outcome.maximum_temperature_difference.to_bits()), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                    for &number in &o.geometry.surface_lists.all_ht {
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_exit_surface", o.clock, o.globals, o.backend.state.kickoff_simulation, self.inside_surface_iterations,
+                            crate::heat_balance::source_surface_cadence::Detail {surface:Some(number),inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                    }
+                }
+            }
+            cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self, o.clock, o.globals, o.environment, o.backend.state.kickoff_simulation, self.inside_surface_iterations), cadence_result.is_ok());
+            cadence_result?;
         }
         self.calculate_source_zone_mrt(
             None,

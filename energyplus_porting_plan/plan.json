@@ -13007,6 +13007,11 @@
           "gate_changes": 0,
           "workspace_quality": "cargo test --workspace --locked는 통과하지 않았다. 관측된 arbitrary_run.rs:102 audit 두 줄의 CRLF/LF 기대값 차이를 다음 통합에서 수정해야 하며, 이번 단위 증거와 전체 workspace 통과를 구분한다."
         }
+      },
+      "canonical_surface_unit_checkpoint_56": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json",
+        "sha256": "bfa2b6ae9dbefb4a9b84dd697b775cc6fcf1e5cfc8d1da1d171cae235ca96e0f",
+        "size_bytes": 8216
       }
     },
     {
@@ -13487,7 +13492,7 @@
       "timing": "실내 표면 반복 전",
       "unit_tests": "quick-conduction 경계 양쪽; steady/mass; 일사 on/off",
       "integration_test": "SUR-04에서 사용한 외표면온도와 원본의 고정/갱신 시점 비교",
-      "rust_candidate": "heat_balance/ctf.rs; surface_balance.rs",
+      "rust_candidate": "crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/outside_driver.rs",
       "assessment": "기존 구현 재검증",
       "companion": "HeatBalanceSurfaceManager.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생략 분기가 실행되지 않는다는 근거를 남긴다.",
@@ -13499,7 +13504,12 @@
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "source_unit_checkpoint_56": {
+        "evidence": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json",
+        "scope": "Full selected no-source/no-movable CalcOutsideSurfTemp consumer; declared coefficients/history are unit inputs, not full CTF producer proof",
+        "full_selected_function_calls": 24
+      }
     },
     {
       "id": "SUR-04",
@@ -13554,7 +13564,7 @@
       "timing": "zone timestep의 표면 solve",
       "unit_tests": "빠른수렴·여러회수렴·비수렴; 첫 반복과 후속 반복의 입력",
       "integration_test": "EP와 iteration count·첫 2회 표면 상태 및 종료상태 비교",
-      "rust_candidate": "heat_balance/surface_loop.rs; algorithm.rs",
+      "rust_candidate": "crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs; crates/ep_runtime/src/heat_balance/error_backend/inside_diagnostics.rs",
       "assessment": "기존 구현 보완",
       "companion": "HeatBalanceSurfaceManager.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생략 분기가 실행되지 않는다는 근거를 남긴다.",
@@ -13566,7 +13576,12 @@
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "source_unit_checkpoint_56": {
+        "evidence": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json",
+        "scope": "Specified literal Original convergence/diagnostic suffix, not full inside-solver or501-iteration replay; Source normal cadence/handoff requires actual separate comparison",
+        "literal_suffix_evaluations": 30
+      }
     },
     {
       "id": "SUR-06",

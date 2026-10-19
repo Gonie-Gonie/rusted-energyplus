@@ -135,6 +135,7 @@ impl OrdinarySourceSession {
             predefined_registry: &mut reports.registry,
             predefined_table: &mut reports.table,
             backend,
+            recurring_errors: &mut reports.source_recurring_errors,
             fan: &mut self.fan,
             equipment: reports
                 .source_zone_equipment
@@ -163,7 +164,9 @@ impl OrdinarySourceSession {
             economic_tariff: &mut reports.economic_tariff,
             cost_estimate_monetary: &mut reports.cost_estimate_monetary,
         };
-        manage_source_heat_balance_after_input(&mut SourceHeatBalanceBodyHost {
+        let cadence_warmup_entry = crate::heat_balance::source_surface_cadence::active()
+            && owners.clock.warmup_flag;
+        let cadence_result = manage_source_heat_balance_after_input(&mut SourceHeatBalanceBodyHost {
             owners: &mut owners,
             surface: &mut self.surface,
             controller: &mut self.controller,
@@ -173,6 +176,31 @@ impl OrdinarySourceSession {
             model,
             shading_stream: &mut self.shading_stream,
             shading_path,
-        })
+        });
+        // Actual post-Check/day0/EMS return, before the same owners are released.
+        // No input or scientific reset is introduced by this passive observer.
+        if cadence_warmup_entry
+            && cadence_result.is_ok()
+            && !owners.clock.warmup_flag
+            && owners.clock.day_of_sim == 0
+            && owners.clock.kind_of_sim == 3
+            && !owners.globals.doing_sizing
+            && !owners.backend.state.kickoff_simulation
+        {
+            crate::heat_balance::source_surface_cadence::record_handoff(
+                "after_warmup_complete",
+                crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                    &self.surface, owners.clock, owners.globals, owners.environment,
+                    owners.backend.state.kickoff_simulation,
+                    self.surface.inside_surface_iterations,
+                ),
+                owners.clock.kind_of_sim,
+                owners.globals,
+                &self.surface.arrays,
+                owners.history,
+                owners.air,
+            );
+        }
+        cadence_result
     }
 }

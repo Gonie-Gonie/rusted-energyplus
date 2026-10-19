@@ -17,12 +17,9 @@
 
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.
 
-## 재사용 후보
+## 현재 Source 경로
 
-heat_balance/surface_loop.rs; algorithm.rs
-
-현재 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
-이 카드의 새 검증이 통과했다는 의미가 아니다.
+`crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_driver.rs`, `inside_providers.rs`와 실제 `error_backend/inside_diagnostics.rs`를 사용합니다. 관측기는 `source_surface_cadence.rs`, 지정 분기 호출은 `native_convergence_branch.rs`입니다.
 
 ## 입력 계약
 
@@ -63,8 +60,10 @@ EP와 iteration count·첫 2회 표면 상태 및 종료상태 비교
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+## 현재 구현과 검증
+
+`ordinary_surface_initialization/inside_driver.rs`는 실제 반복의 수렴 종료부를 공유 메서드로 호출합니다. 동일한 오류 소유자가 시각 진단, 13필드 recurring 행과 실제 카운터를 갱신합니다. 수렴 허용치·최소 반복·500회 한계와 진단 순서는 원본을 유지합니다.
+
+비수렴 단위는 원본 종료부를 바이트 단위로 추출한 지정 분기 단위입니다. 3개 지속 수명에서 30회 평가하며 500/501 경계, warmup·sizing 상태, 반복 진단과 실제 저장 상태를 Source와 비교했습니다. 전체 실내 반복 함수를 호출한 단위로 계산하지 않습니다. Source의 계속/중단 반환 분류 중 원본 wrapper에 반환값이 없는 부분은 원문 제어 흐름에서 도출한 조건으로 구분합니다.
+
+정상 반복의 iteration count·첫 두 상태·종료 상태와 30회마다의 대류 갱신·즉시 소비 순서는 같은 실제 A24 실행의 수동 관측으로 연결합니다. 수집기는 기본 비활성이고 계산·입력·기대값을 변경하지 않습니다. 이 연결 결과와 분기 단위 결과의 범위는 [선택 표면 단위 검증](../evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)에서 구분합니다. 기존 카드 체크와 게이트는 전체 64개 카드의 최종 판정에서 정리합니다.

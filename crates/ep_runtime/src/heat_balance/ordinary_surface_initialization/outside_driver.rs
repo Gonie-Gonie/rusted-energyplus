@@ -3,6 +3,8 @@
 mod boundary;
 mod local_environment;
 mod scalar;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_gap_cohort;
 use super::OrdinarySurfaceInitialization;
 use super::inside_ctf::{set, value};
 use super::prefix::index;

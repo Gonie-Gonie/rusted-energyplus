@@ -309,6 +309,17 @@ impl OrdinarySurfaceInitialization {
                 backend,
             )?;
             if self.inside_surface_iterations > 0 && self.inside_surface_iterations % 30 == 0 {
+                crate::heat_balance::source_surface_cadence::inside_event("inside_convection_entry", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
+                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                    crate::heat_balance::source_surface_cadence::Detail {
+                        surface,
+                        convection_bits: surface.and_then(|number| index(number).ok())
+                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
+                            .map(|value| value.to_bits()),
+                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
+                        ..crate::heat_balance::source_surface_cadence::Detail::default()
+                    }
+                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
                 providers.initialize_inside_convection(
                     geometry,
                     &mut self.arrays,
@@ -318,17 +329,53 @@ impl OrdinarySurfaceInitialization {
                     clock,
                     backend,
                 )?;
+                crate::heat_balance::source_surface_cadence::inside_event("inside_convection_return", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
+                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                    crate::heat_balance::source_surface_cadence::Detail {
+                        surface,
+                        convection_bits: surface.and_then(|number| index(number).ok())
+                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
+                            .map(|value| value.to_bits()),
+                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
+                        ..crate::heat_balance::source_surface_cadence::Detail::default()
+                    }
+                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
                 self.arrays.precalculate_source_inside_terms(
                     geometry,
                     zones,
                     clock.time_step_zone_sec,
                     globals,
                 )?;
+                crate::heat_balance::source_surface_cadence::inside_event("inside_precalculation_return", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, if crate::heat_balance::source_surface_cadence::active() {
+                    let surface = spaces.iter().find_map(|space| space.opaque.clone().next());
+                    crate::heat_balance::source_surface_cadence::Detail {
+                        surface,
+                        convection_bits: surface.and_then(|number| index(number).ok())
+                            .and_then(|i| self.arrays.surf_h_conv_int.as_deref().and_then(|v| v.get(i)))
+                            .map(|value| value.to_bits()),
+                        convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v| v.as_ptr() as usize),
+                        ..crate::heat_balance::source_surface_cadence::Detail::default()
+                    }
+                } else { crate::heat_balance::source_surface_cadence::Detail::default() });
             }
+            let mut cadence_first_solve = crate::heat_balance::source_surface_cadence::active();
             for space in &spaces {
                 for number in space.opaque.clone() {
+                    if cadence_first_solve {
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_first_immediate_solve", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface: Some(number),
+                            convection_bits: self.arrays.surf_h_conv_int.as_deref().and_then(|v| index(number).ok().and_then(|i|v.get(i))).map(|v|v.to_bits()),
+                            convection_storage: self.arrays.surf_h_conv_int.as_ref().map(|v|v.as_ptr() as usize),
+                            ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                        cadence_first_solve = false;
+                    }
+                    if crate::heat_balance::source_surface_cadence::active() && self.inside_surface_iterations < 2 {
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_before_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::full(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                    }
                     self.arrays
                         .solve_source_inside_opaque_ctf_at(index(number)?)?;
+                    if crate::heat_balance::source_surface_cadence::active() && self.inside_surface_iterations < 2 {
+                        crate::heat_balance::source_surface_cadence::inside_event("inside_ctf_after_temperature_assignment", clock, globals, backend.state.kickoff_simulation, self.inside_surface_iterations, crate::heat_balance::source_surface_cadence::Detail {surface:Some(number), inside_snapshot:Some(crate::heat_balance::source_surface_cadence::InsideSnapshot::temperature(&self.arrays,number)), ..crate::heat_balance::source_surface_cadence::Detail::default()});
+                    }
                 }
                 for number in space.opaque.clone() {
                     let i = index(number)?;
@@ -445,46 +492,78 @@ impl OrdinarySurfaceInitialization {
                     };
                 }
             }
-            if maximum_difference <= self.maximum_allowed_temperature_difference {
-                converged = true;
-            }
-            // EP_Count_Calls conditional timing instrumentation is unpaired.
-            if self.inside_surface_iterations < self.minimum_inside_surface_iterations {
-                converged = false;
-            }
-            if self.inside_surface_iterations > 500 {
-                if !clock.warmup_flag {
-                    self.ctf_inside_error_count = self
-                        .ctf_inside_error_count
-                        .checked_add(1)
-                        .ok_or(Error::Unavailable("inside Source diagnostic count domain"))?;
-                    if self.ctf_inside_error_count < 16 {
-                        providers.warn_nonconvergence(
-                            maximum_difference,
-                            self.maximum_allowed_temperature_difference_cond_fd,
-                            backend,
-                        )?;
-                    } else {
-                        providers.recurring_nonconvergence(
-                            maximum_difference,
-                            &mut self.ctf_inside_error_pointer,
-                            backend,
-                        )?;
-                    }
-                }
-                return Ok(SourceInsideCtfOutcome {
-                    converged,
-                    iterations: self.inside_surface_iterations,
-                    maximum_temperature_difference: maximum_difference,
-                });
-            }
-            if converged {
-                return Ok(SourceInsideCtfOutcome {
-                    converged,
-                    iterations: self.inside_surface_iterations,
-                    maximum_temperature_difference: maximum_difference,
-                });
-            }
+            if let Some(outcome) = self.check_source_inside_convergence(
+                maximum_difference, &mut converged, globals, clock, providers, backend,
+            )? { return Ok(outcome); }
         }
+    }
+}
+
+
+impl OrdinarySurfaceInitialization {
+    /// Same actual production suffix; no max/min/tolerance override. The loop
+    /// passes its actual reduced maximum and local convergence state once.
+    pub(super) fn check_source_inside_convergence(
+        &mut self,
+        maximum_difference: f64,
+        converged: &mut bool,
+        globals: &SelectedHeatBalanceGlobals,
+        clock: &WeatherGlobalState,
+        providers: &mut impl SourceInsideCtfProviders,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<Option<SourceInsideCtfOutcome>, Error> {
+        if maximum_difference <= self.maximum_allowed_temperature_difference {
+            *converged = true;
+        }
+        // EP_Count_Calls conditional timing instrumentation is unpaired.
+        if self.inside_surface_iterations < self.minimum_inside_surface_iterations {
+            *converged = false;
+        }
+        crate::heat_balance::source_surface_cadence::inside_event(
+            "inside_ctf_convergence_checks_reached",
+            clock,
+            globals,
+            backend.state.kickoff_simulation,
+            self.inside_surface_iterations,
+            crate::heat_balance::source_surface_cadence::Detail {
+                maximum_delta_bits: Some(maximum_difference.to_bits()),
+                converged: Some(*converged),
+                ..crate::heat_balance::source_surface_cadence::Detail::default()
+            },
+        );
+        if self.inside_surface_iterations > 500 {
+            if !clock.warmup_flag {
+                self.ctf_inside_error_count = self
+                    .ctf_inside_error_count
+                    .checked_add(1)
+                    .ok_or(Error::Unavailable("inside Source diagnostic count domain"))?;
+                if self.ctf_inside_error_count < 16 {
+                    providers.warn_nonconvergence(
+                        maximum_difference,
+                        self.maximum_allowed_temperature_difference_cond_fd,
+                        backend,
+                    )?;
+                } else {
+                    providers.recurring_nonconvergence(
+                        maximum_difference,
+                        &mut self.ctf_inside_error_pointer,
+                        backend,
+                    )?;
+                }
+            }
+            return Ok(Some(SourceInsideCtfOutcome {
+                converged: *converged,
+                iterations: self.inside_surface_iterations,
+                maximum_temperature_difference: maximum_difference,
+            }));
+        }
+        if *converged {
+            return Ok(Some(SourceInsideCtfOutcome {
+                converged: *converged,
+                iterations: self.inside_surface_iterations,
+                maximum_temperature_difference: maximum_difference,
+            }));
+        }
+        Ok(None)
     }
 }

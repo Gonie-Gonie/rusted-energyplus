@@ -91,6 +91,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
         surface: &mut OrdinarySurfaceInitialization,
         owners: &mut SourceInitSurfaceOwners<'_, '_, H, D>,
     ) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::InitializeHistories, crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations));
+        let cadence_result = (|| {
         initialize_source_air_surface_environment(
             surface,
             owners.air,
@@ -106,6 +108,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
             owners.clock,
             owners.environment,
         )
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations), cadence_result.is_ok());
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_InitThermalAndFluxHistories_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(surface, owners.clock, owners.globals, owners.environment, owners.backend.state.kickoff_simulation, surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn evaluate_outside_movable_insulation(
         &mut self,

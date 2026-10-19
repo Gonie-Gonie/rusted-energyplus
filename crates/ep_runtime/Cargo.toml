@@ -11,7 +11,6 @@ chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
 ep_model = { path = "../ep_model" }
 ep_platform_math = { path = "../ep_platform_math" }
 
-[dev-dependencies]
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 
 [lints]

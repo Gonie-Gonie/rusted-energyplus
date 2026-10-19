@@ -100,6 +100,7 @@ pub mod surface_manager;
 pub mod surface_weather;
 pub mod timestep;
 pub(crate) mod trace;
+pub mod source_surface_cadence;
 pub(crate) mod warmup;
 pub(crate) mod weather_driver;
 pub mod zone_air_correction;

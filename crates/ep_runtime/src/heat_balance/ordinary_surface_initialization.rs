@@ -11,6 +11,8 @@ use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 mod environment;
 mod inside_ctf;
 mod inside_driver;
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+mod native_convergence_branch;
 mod inside_entry;
 pub(crate) mod inside_providers;
 mod manager;

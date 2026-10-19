@@ -182,4 +182,5 @@ CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-preparation-
 
 최신 구현·검증 결과와 남은 작업은 [작업계획 안내](README.md#현재-진행-상태)에 모았습니다.
 64개 카드의 완료 여부는 위 표와 `plan.json`의 네 gate를 기준으로 판단합니다.
+[선택 표면 단위 56번](evidence/SRC-06-canonical-surface-unit-checkpoint-56/summary.json)은 SUR03 전체 선택 함수 24회와 SUR05 원문 종료 분기 30회의 결과입니다. 실제 Source 반복·상태 인계와 최종 15개 실행 결과를 대신하지 않으며, 이 기록으로 위 카드 gate를 바꾸지 않습니다.
 과거 단계별 실행 기록은 `evidence/`와 Git 이력에 보존하며, 과거 테스트 개수를 현재 검증 결과로 사용하지 않습니다.

@@ -1,0 +1,194 @@
+{
+  "schema": "src06-code-checkpoint56-publication-template.v1",
+  "status": "READY_FOR_ROOT_PUBLICATION_CODE_CHECKPOINT_ONLY",
+  "public_directory": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56",
+  "actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-SUR03-SUR05-actual-review-56/review.json",
+    "sha256": "a3210cec2e4aefa7323f0b69377c01ca2fad449330b5d683550121892e05c6f3",
+    "bytes": 25635
+  },
+  "complete_final_compiler_Source_plan": {
+    "path": ".runtime/porting/SRC-06/source-Surface-observer-runtime-json-edge-Audit-06/complete-final-compiler-Source-plan.json",
+    "sha256": "1727931c2e6649bc2e08931a5f1b94f34b980949b4756a9f7ad803ba10cbb09a",
+    "bytes": 2612493
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/evidence.zip",
+    "sha256": "f6788795511d600fcc6f4e60a22d7e55b8df488f511e0d2ab63f4640f84b7f45",
+    "bytes": 3277669
+  },
+  "finite_index": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-surface-unit-checkpoint-56/index.json",
+    "sha256": "984a67a6f46ddd21e4098011819e70ca62df443b2b76d5360f4fa09c7494814b",
+    "bytes": 278648
+  },
+  "compiler_inputs": 4561,
+  "Rust_sources": 4547,
+  "selected_files": 24,
+  "existing": 19,
+  "new": 5,
+  "actual_groups": [
+    {
+      "group": "outside_surface",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected-02/outside_surface/command/receipt.json",
+        "sha256": "46a91c9b66bd781704d63e41526d140c0d3589acdf2f68659eb48066d5cd2feb",
+        "bytes": 6782
+      },
+      "full_outside_calls": 24,
+      "literal_suffix_evaluations": 0
+    },
+    {
+      "group": "inside_convergence_branch",
+      "receipt": {
+        "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected-02/inside_convergence_branch/command/receipt.json",
+        "sha256": "75d8000253d0c5b0da4497a85ad40f5d6806441e505764adb5a54d72fc0fd072",
+        "bytes": 6822
+      },
+      "full_outside_calls": 0,
+      "literal_suffix_evaluations": 30
+    }
+  ],
+  "preserved_initial_compile": {
+    "receipt": {
+      "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected/outside_surface/command/receipt.json",
+      "sha256": "86778a5bf827bcc75b63781327e3e28ccf871522be4c29f0d97a3e7a7d664d05",
+      "bytes": 6702
+    },
+    "logs": {
+      "stdout": {
+        "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected/outside_surface/command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected/outside_surface/command/stderr.log",
+        "sha256": "12be2c61e9ea9b539dc9c285a9ce1cf596438429b517cd0978bebabd76bd57d1",
+        "bytes": 32135
+      }
+    },
+    "custody": {
+      "path": ".runtime/porting/SRC-06/Root-P3-SUR03-SUR05-selected/outside_surface/custody.json",
+      "sha256": "b011474b93b267437ede3462e0063a677aacc5aa0161f52f38839faff10811d8",
+      "bytes": 4758
+    },
+    "actual_Source_scientific_calls": 0,
+    "old_custody_count_qualification": "Unconditional24 scope field is Native-expected/planned, not executed Source calls.",
+    "initial_inside_process": false
+  },
+  "tiny_Native_handoff": {
+    "actual_readback": {
+      "path": ".runtime/porting/SRC-06/SYS03-handoff-Native-readback-Root-02/review.json",
+      "sha256": "b2dc0158aeb42fa13fbaab864d488c37c5aca723fe8b45834261e3e3f0389325",
+      "bytes": 128485
+    },
+    "readback_ready": {
+      "path": ".runtime/porting/SRC-06/SYS03-handoff-readback-ready-Outer-02/manifest.json",
+      "sha256": "7652b6848cf73ed15483d2c5588597405200818c1a8af3d83be6652355203e24",
+      "bytes": 4328
+    },
+    "original_false_admission": {
+      "path": ".runtime/porting/SRC-06/SYS03-handoff-Native-run-Root-01/receipt.json",
+      "sha256": "5539bb6844c19cde62421570f63c1e09a0e47d5ecdd2c807f87791a31cf05735",
+      "bytes": 30652
+    },
+    "actual_observation": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-06/SYS03-handoff-Root-01/handoffs.json",
+      "sha256": "32ca3e429f7f361de161cddbeca8ab863ab3e843c719194c0b6a96502044ed03",
+      "bytes": 53800
+    },
+    "actual_build": {
+      "path": ".runtime/porting/SRC-06/SYS03-handoff-Native-build-Root-01/native-build.json",
+      "sha256": "8e075c1bd17ed5921741cbab5e51c86622476701e8e611652f3029cc5a6a8ef1",
+      "bytes": 28515
+    },
+    "installed_difference_ledger": {
+      "path": ".runtime/porting/SRC-06/SYS03-physical-output-diagnosis-Outer-02/all-four-stream-physical-differences.jsonl",
+      "sha256": "9dd899904fb18bdc5acc48a30a4306131042aeb6dc081ece41fc56554a21d47a",
+      "bytes": 1772659
+    },
+    "installed_numeric_difference_rows": 3536,
+    "owned_first_header_rows": 8,
+    "Native_snapshots": 2,
+    "Native_entire_observation_finite_fields": 960,
+    "Source_cadence_and_handoff_comparison": "PENDING actual normal Source trace and separate strict comparer",
+    "qualification": "Readback only of the already completed gated run. All four complete physical bodies equal the genuine retained same-original-archive Surface A24 run after only owned first YMD. Installed A24 ESO3536 numeric differences remain a distinct unchanged historical comparator outcome. No new engine, tolerance, observer, expected data or original false receipt rewrite."
+  },
+  "Source_cadence_and_handoff_actual": "PENDING",
+  "final15": "PENDING actual final normal Source runs/comparisons",
+  "whole_workspace_fmt_green_claim": false,
+  "gate_promotions": 0,
+  "historical_scientific_groups_rerun": false,
+  "historical_all_units_same_binary_claim": false,
+  "summary": "24 full selected CalcOutsideSurfTemp calls and30 specified Original convergence-suffix evaluations passed in two selected Source processes on the exact current compiler snapshot. The latter is not a full inside-solver or501-iteration proof. Tiny genuine Native handoff has2 snapshots/960 finite fields; Source cadence/handoff comparison and final15 remain pending. Original installed-output admission failure and3536 numerical differences are preserved.",
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/prepare-SUR03-SUR05-publication-Peer-56.py",
+    "sha256": "dac638c40f54830e0e85ab8a18fc57a90cf29ffa5f453a7592b80c1a67baae44",
+    "bytes": 17947
+  },
+  "actual_quality": {
+    "schema": "src06-code56-actual-workspace-quality.v1",
+    "source_plan": {
+      "path": ".runtime/porting/SRC-06/source-Surface-observer-runtime-json-edge-Audit-06/complete-final-compiler-Source-plan.json",
+      "sha256": "1727931c2e6649bc2e08931a5f1b94f34b980949b4756a9f7ad803ba10cbb09a",
+      "bytes": 2612493
+    },
+    "workspace_tests": {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "passed": 4975,
+      "ignored": 2
+    },
+    "workspace_clippy": {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "library_errors": 493,
+      "library_test_errors": 483
+    },
+    "format": {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 1,
+      "diff_sections": 1084,
+      "unique_files": 178
+    },
+    "qualification": "Whole workspace tests passed. Formatting and strict Clippy remain failed; no broad quality PASS or change to numerical gates is inferred.",
+    "logs": [
+      {
+        "path": ".runtime/porting/SRC-06/Root56-workspace-tests.log",
+        "sha256": "50ff8be5d1263ab6215f94b82b6dcc8eff2067e72f00588289671b04dd19a2b3",
+        "size_bytes": 1729208
+      },
+      {
+        "path": ".runtime/porting/SRC-06/Root56-workspace-clippy.log",
+        "sha256": "08efd43d535c333faa07a683455647827fab68a1ab979bd3eae1cb1ca5a621ef",
+        "size_bytes": 505790
+      },
+      {
+        "path": ".runtime/porting/SRC-06/Root56-format-check.log",
+        "sha256": "f32bdf8d9eaea2d021208d0b175135b909117530b4b661c185180c3cbf731a07",
+        "size_bytes": 4449574
+      }
+    ]
+  }
+}

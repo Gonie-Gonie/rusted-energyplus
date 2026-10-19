@@ -918,6 +918,15 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
+    crate::source_surface_cadence::observe(config, scope, || {
+        run_with_optional_porting_scope_cadence_observed(config, scope)
+    })
+}
+
+fn run_with_optional_porting_scope_cadence_observed(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
     let schedule_scope = scope
         .filter(|_| config.trace_level == TraceLevel::Full)
         .map(crate::PortingScope::id);

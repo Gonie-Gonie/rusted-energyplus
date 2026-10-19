@@ -53,6 +53,30 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     }
 
     fn initialize_heat_balance(&mut self) -> Result<(), Error> {
+        if crate::heat_balance::source_surface_cadence::active()
+            && !self.owners.clock.warmup_flag
+            && self.owners.clock.kind_of_sim == 3
+            && self.owners.clock.day_of_sim == 1
+            && self.owners.clock.hour_of_day == 1
+            && self.owners.clock.time_step == 1
+            && self.owners.clock.begin_day_flag
+            && !self.owners.globals.doing_sizing
+            && !self.owners.backend.state.kickoff_simulation
+        {
+            crate::heat_balance::source_surface_cadence::record_handoff(
+                "before_first_run_init",
+                crate::heat_balance::source_surface_cadence::Frame::from_owners(
+                    self.surface, self.owners.clock, self.owners.globals,
+                    self.owners.environment, self.owners.backend.state.kickoff_simulation,
+                    self.surface.inside_surface_iterations,
+                ),
+                self.owners.clock.kind_of_sim,
+                self.owners.globals,
+                &self.surface.arrays,
+                self.owners.history,
+                self.owners.air,
+            );
+        }
         let o = &mut self.owners;
         let mut providers = SourceOrdinaryInitHeatBalanceHost {
             model: self.model,
@@ -100,6 +124,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     }
 
     fn manage_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::Manage, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let mut remaining = SourceOrdinaryHvacRemaining;
         let mut air_child = SourceOrdinaryAirProvider {
             hvac: self.hvac,
@@ -113,9 +139,14 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 air_child: &mut air_child,
             },
         )
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_result
     }
 
     fn record_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::SourceRecord, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let o = &mut self.owners;
         o.heat_balance
             .record_source_heat_balance(&mut SourceWarmupRecordOwners {
@@ -131,6 +162,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 project: o.project,
                 eio: o.eio,
             })
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_result
     }
 
     fn report_heat_balance(&mut self) -> Result<(), Error> {
@@ -154,6 +188,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     }
 
     fn check_warmup_convergence(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::SourceCheck, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let o = &mut self.owners;
         o.heat_balance
             .check_source_warmup_convergence(&mut SourceWarmupCheckOwners {
@@ -165,6 +201,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 environment: o.environment,
                 backend: o.backend,
             })
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        cadence_result
     }
 
     fn report_warmup_convergence(&mut self) -> Result<(), Error> {

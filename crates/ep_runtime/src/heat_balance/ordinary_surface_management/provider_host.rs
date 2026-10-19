@@ -101,6 +101,7 @@ pub(crate) struct SourceManageSurfaceOwners<'a, 'backend, H, D> {
     pub(crate) predefined_registry: &'a mut PredefinedRegistry,
     pub(crate) predefined_table: &'a mut PredefinedStringTable,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
+    pub(crate) recurring_errors: &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
     pub(crate) fan: &'a mut SourceZoneFanHeatBalanceArrays,
     pub(crate) equipment: &'a mut OrdinaryEquipment,
     pub(crate) sizing: &'a mut crate::heat_balance::selected_sizing::SelectedSizingManager,
@@ -158,6 +159,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
             .map_err(Error::from)
     }
     fn initialize_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::Initialize, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let o = &mut self.owners;
         let mut providers = SourceOrdinaryInitSurfaceHost {
             fan_zone: o.fan,
@@ -204,8 +207,13 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 &mut providers,
             )
             .map_err(Error::from)
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_InitSurfaceHeatBalance_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn calculate_outside_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_result = (|| {
         let o = &mut self.owners;
         self.surface
             .calculate_source_outside_surface_balance(&mut SourceOutsideCtfOwners {
@@ -227,21 +235,38 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 carroll_method: o.project.carroll_method,
                 backend: o.backend,
             })
+        })();
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_outside_surface_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn calculate_inside_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_result = (|| {
         self.surface
             .calculate_source_inside_surface_heat_balance(&mut self.owners)
+        })();
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_inside_surface_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn manage_air_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_result = (|| {
         self.air_child
             .manage_air_heat_balance(self.surface, self.controller, &mut self.owners)
+        })();
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_air_heat_balance_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn update_final_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_result = (|| {
         self.owners
             .final_surface
             .update_final_surface_heat_balance()
+        })();
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_final_surface_update_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn update_thermal_histories(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::UpdateHistories, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let o = &mut self.owners;
         self.surface
             .update_source_thermal_histories(&mut SourceThermalHistoryOwners {
@@ -255,6 +280,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 physical_surfaces: o.physical_surfaces,
             })
             .map(|_| ())
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_UpdateThermalHistories_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn update_condfd_moisture_balance(&mut self) -> Result<(), Error> {
         Err(Error::Unavailable(
@@ -293,6 +322,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
         )
     }
     fn report_surface_heat_balance(&mut self) -> Result<(), Error> {
+        let cadence_scope = crate::heat_balance::source_surface_cadence::enter(crate::heat_balance::source_surface_cadence::Procedure::Report, crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations));
+        let cadence_result = (|| {
         let o = &mut self.owners;
         self.surface
             .report_source_surface_heat_balance(&mut SourceSurfaceReportOwners {
@@ -307,6 +338,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 predefined: o.predefined_registry,
                 display_heat_emissions_summary: &o.tabular.display_heat_emissions_summary,
             })
+        })();
+        cadence_scope.finish(crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations), cadence_result.is_ok());
+        if cadence_result.is_ok() { crate::heat_balance::source_surface_cadence::record("actual_ReportSurfaceHeatBalance_return", crate::heat_balance::source_surface_cadence::Frame::from_owners(self.surface, self.owners.clock, self.owners.globals, self.owners.environment, self.owners.backend.state.kickoff_simulation, self.surface.inside_surface_iterations)); }
+        cadence_result
     }
     fn gather_component_loads_surface(&mut self) -> Result<(), Error> {
         Err(Error::Unavailable(

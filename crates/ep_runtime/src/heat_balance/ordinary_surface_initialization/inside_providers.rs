@@ -27,6 +27,9 @@ pub(crate) struct SourceOrdinaryInsideCtfHost<'a> {
     pub(crate) scan: &'a mut ReportScanState,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
+    pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
+    pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+    pub(crate) recurring_errors: &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
 }
 fn index(number: i32) -> Result<usize, Error> {
     number
@@ -127,32 +130,70 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
         maximum_allowed_cond_fd: f64,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
-        let difference = crate::heat_balance::source_round_format::round(maximum_difference, 3)
-            .map_err(|error| {
-                Error::Format(format!(
-                    "inside maximum difference .3R unavailable: {error:?}"
-                ))
-            })?;
-        let allowed = crate::heat_balance::source_round_format::round(maximum_allowed_cond_fd, 6)
-            .map_err(|error| {
-            Error::Format(format!(
-                "inside allowed difference .6R unavailable: {error:?}"
-            ))
-        })?;
-        backend.show_warning_error(&format!(
-            "Inside surface heat balance did not converge with Max Temp Difference [C] ={difference} vs Max Allowed Temp Diff [C] ={allowed}"
-        ))?;
-        Err(Error::Unavailable(
-            "actual inside nonconvergence ShowContinueErrorTimeStamp9261",
-        ))
+        source_inside_nonconvergence_warning(maximum_difference, maximum_allowed_cond_fd,
+            self.clock, self.globals, self.environment, self.hvac, backend)
     }
 
     fn recurring_nonconvergence(
         &mut self,
-        _maximum_difference: f64,
-        _error_pointer: &mut i32,
-        _backend: &mut SourceErrorBackend<'_>,
+        maximum_difference: f64,
+        error_pointer: &mut i32,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
-        Err(Error::Unavailable("actual inside recurring warning9263"))
+        source_inside_nonconvergence_recurring(maximum_difference, error_pointer,
+            self.recurring_errors, self.clock, self.globals, backend)
     }
+}
+
+/// Shared actual production warning/formatter/timestamp operations. No full
+/// convection host is constructed by the specified suffix unit.
+pub(crate) fn source_inside_nonconvergence_warning(
+    maximum_difference: f64,
+    maximum_allowed_cond_fd: f64,
+    clock: &WeatherGlobalState,
+    globals: &SelectedHeatBalanceGlobals,
+    environment: &crate::weather::day::WeatherEnvironmentState,
+    hvac: &crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), Error> {
+    let difference = crate::heat_balance::source_round_format::round(maximum_difference, 3)
+        .map_err(|error| {
+            Error::Format(format!(
+                "inside maximum difference .3R unavailable: {error:?}"
+            ))
+        })?;
+    let allowed = crate::heat_balance::source_round_format::round(maximum_allowed_cond_fd, 6)
+        .map_err(|error| {
+            Error::Format(format!(
+                "inside allowed difference .6R unavailable: {error:?}"
+            ))
+        })?;
+    backend.show_inside_warning_error(&format!(
+            "Inside surface heat balance did not converge with Max Temp Difference [C] ={difference} vs Max Allowed Temp Diff [C] ={allowed}"
+        ), clock, globals)?;
+    backend.show_source_continue_error_time_stamp("", clock, globals, environment, hvac)
+}
+/// Same original recurring message/optional operands; shared by the live host
+/// and the explicitly selected suffix unit, on their real persistent rows.
+pub(crate) fn source_inside_nonconvergence_recurring(
+    maximum_difference: f64,
+    error_pointer: &mut i32,
+    recurring_errors: &mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    clock: &WeatherGlobalState,
+    globals: &SelectedHeatBalanceGlobals,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), Error> {
+    backend.show_source_recurring_warning_at_end(
+        "Inside surface heat balance convergence problem continues",
+        error_pointer,
+        recurring_errors,
+        clock,
+        globals,
+        Some(maximum_difference),
+        Some(maximum_difference),
+        None,
+        "[C]",
+        "[C]",
+        "",
+    )
 }

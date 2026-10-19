@@ -75,3 +75,18 @@ impl SurfaceGeometryInputState {
         Ok(())
     }
 }
+
+impl SurfaceGeometryInputState {
+    /// Narrow complete scalar consumer uses the real physical Surface owner.
+    /// No vertices, space/geometry readiness or getter producer is asserted.
+    pub(crate) fn native_gap_outside_scalar_row(name: &str) -> Result<Self, Error> {
+        let mut geometry = Self::native_gap_opaque_radiation_rows(1)?;
+        let row = &mut geometry
+            .final_surfaces
+            .as_mut()
+            .ok_or(Error::Unavailable("actual outside unit Surface allocation"))?[0];
+        row.typed_id = Some(ep_model::SurfaceId(0));
+        row.row.name = name.to_owned();
+        Ok(geometry)
+    }
+}
