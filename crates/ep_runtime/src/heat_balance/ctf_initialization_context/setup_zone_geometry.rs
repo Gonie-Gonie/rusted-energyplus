@@ -3,7 +3,7 @@ use super::{CtfInitializationContext, hb_input_error};
 use crate::error::RuntimeError;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_equipment::{
-    OrdinaryEquipment, OrdinaryEquipmentInput, OrdinaryEquipmentUnavailable,
+    OrdinaryEquipment, OrdinaryEquipmentInput, OrdinaryEquipmentUnavailable, SourceEquipmentInputOwners,
 };
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 
@@ -30,6 +30,7 @@ impl CtfInitializationContext<'_> {
         environment: &crate::weather::day::WeatherEnvironmentState,
         minutes_in_time_step: i32,
         host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+        branch: Option<&mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections>,
     ) -> Result<Vec<crate::geometry::InitializedZoneGeometry>, RuntimeError> {
         let reports = &mut *self.reports;
         if reports
@@ -112,6 +113,17 @@ impl CtfInitializationContext<'_> {
                 reports.heat_balance_space_controls.simulation,
                 globals,
                 &mut reports.selected_internal_heat_gains,
+                SourceEquipmentInputOwners {
+                    zones: reports.selected_zone_input.as_mut()
+                        .and_then(|state| state.zones.as_deref_mut())
+                        .ok_or_else(|| hb_input_error(E::Unavailable("same actual mutable equipment Zone rows")))?,
+                    schedules: reports.selected_schedule_manager.as_mut()
+                        .ok_or_else(|| hb_input_error(E::Unavailable("same equipment ScheduleManager owner")))?,
+                    sizing: &mut reports.selected_sizing_manager,
+                    branch,
+                    source_is_epjson: reports.heat_balance_input.as_ref()
+                        .ok_or_else(|| hb_input_error(E::Unavailable("actual equipment input format custody")))?.source_is_epjson,
+                },
             )
             .map_err(|error| equipment_error(error, &mut self.backend))?;
         reports

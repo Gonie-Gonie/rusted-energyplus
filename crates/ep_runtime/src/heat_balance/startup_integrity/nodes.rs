@@ -1,5 +1,8 @@
 //! Actual shared BranchNodeConnections module slice and two finite checks.
 mod reporting;
+mod registration;
+pub(crate) use registration::{SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
+use registration::SourceNodeConnection;
 use super::{Error, extent};
 use std::convert::Infallible;
 #[derive(Clone, Debug, PartialEq)]
@@ -10,7 +13,7 @@ pub(crate) struct SourceBranchNodeConnections {
     /// Actual DataBranchNodeConnections.hh119 constructor0, same module.
     max_number_node_connections: i32,
     component_sets: Option<Vec<Infallible>>,
-    node_connections: Option<Vec<Infallible>>,
+    node_connections: Option<Vec<SourceNodeConnection>>,
     /// Actual DataBranchNodeConnections.hh120 constructor0; reporting never resets it.
     number_actual_parents: i32,
     parent_node_list: Option<Vec<Infallible>>,

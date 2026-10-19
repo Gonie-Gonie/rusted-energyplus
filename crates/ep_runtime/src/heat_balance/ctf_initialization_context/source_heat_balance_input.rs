@@ -25,6 +25,7 @@ impl CtfInitializationContext<'_> {
         output_host: &mut SourceMtdFileHost,
         equipment_input: OrdinaryEquipmentInput,
         radiation_input: OrdinaryRadiationInput,
+        branch: &mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
     ) -> Result<(), RuntimeError> {
         // The existing driver initializes the actual ErrorsFound local, then
         // Project/Site/Material/Frame/Construction/Building Zone input in order.
@@ -51,6 +52,7 @@ impl CtfInitializationContext<'_> {
             environment,
             minutes,
             output_host,
+            Some(branch),
         )?;
 
         // Actual278-313 includes variable absorptance, incident/scheduled gains,

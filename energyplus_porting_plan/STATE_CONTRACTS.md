@@ -113,3 +113,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source Zone·Node 입력 검증](evidence/SRC-06-canonical-Zone-Node-14/summary.json). Zone 제어 여부는 같은 InputProcessor의 실제 필드 조회로 설정하며, 알려진 부재 연결 유형에는 Native와 같은 Null을 삽입합니다. Node의 실제 개수·할당·NodeID0/Undefined·첫 확장 순서를 보존하고, 검증되지 않은 다중 IDF 순서는 명시적으로 중단합니다.
+
+
+[Source 제어장비 입력 검증](evidence/SRC-06-canonical-controlled-equipment-15/summary.json). 제어장비 입력은 기존 Zone·Schedule·Sizing·Node·Branch 소유자를 직접 갱신합니다. AirIn의 실제 terminal index 초기값 0과 미초기화 outlet index를 구별하고, 생성자·배열 할당·호출 순서를 보존합니다.

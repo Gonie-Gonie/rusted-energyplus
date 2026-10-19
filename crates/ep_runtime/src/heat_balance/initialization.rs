@@ -107,6 +107,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 source.environment,
                 source.minutes,
                 &mut *source.output_host,
+                None,
             )?;
             actual.continue_selected_heat_balance_input_before_solar()?;
             actual.initialize_selected_solar_view_factors(&model.typed)?;

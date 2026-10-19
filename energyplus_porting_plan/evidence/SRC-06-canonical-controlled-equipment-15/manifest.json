@@ -1,0 +1,932 @@
+{
+  "schema": "src06-canonical15-finite-evidence-archive.v1",
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/evidence.zip",
+    "sha256": "a5f5497512aa7658dbadc3b60f628e26d1b692db6e354e99332161432290165c",
+    "bytes": 2328820
+  },
+  "entries": [
+    {
+      "path": ".runtime/porting/SRC-06/Audit-Node-getters-registration-Source-review-01/review.json",
+      "sha256": "d2bbb8653447d0281e87d664b728b34ff1da2a57f2f0afed783643cfcb909df5",
+      "bytes": 23117
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-coherent-Source-review-01/Native-InputProcessor-setObjectItemValue-L790-893.txt",
+      "sha256": "5de14e6425306a061e546f85755b86ea2ffc4c6602ea7a6527a36d4a4c733d89",
+      "bytes": 4513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-coherent-Source-review-01/review.json",
+      "sha256": "c265619551ea04086d1fe948220dd6afc88bd1adbac7922b9746f26f4983c97e",
+      "bytes": 46340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-test-caller-fix-Source-review-15/review.json",
+      "sha256": "9fe7571e5c67562a72f3bb36ed9943f89ad97dea7db3e154127e804460404054",
+      "bytes": 3979
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-test-flag-fix-Source-review-15/review.json",
+      "sha256": "33c074aaf4bec7ea7dd084a4458f2a999b75d2727d306cf3d6c28d86dfbfd838",
+      "bytes": 4556
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-controlled-equipment-application-15/receipt.json",
+      "sha256": "1135682dd90244e0adecf7edffaf329259d2f09b6487ef019de1329b06731db6",
+      "bytes": 34526
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-Zone-Node-actual-review-14/review.json",
+      "sha256": "141d461e0070e3eb5c38fa0d5585f7dd4cb58c4141f91de637bc28dfefb131a8",
+      "bytes": 17465
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-equipment-actual-review-15/review.json",
+      "sha256": "e27d2e82d2332a4b1057ae98cdf84997c03ec4b5f9d4b95df33ff347fcdf807d",
+      "bytes": 18050
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-source-controlled-equipment-actual-review-15/table-clock-differences.json",
+      "sha256": "6b5cfe807c8587d7ebaca75b104567a693eb7fc8fc308163665ab9d28e63a28a",
+      "bytes": 6972
+    },
+    {
+      "path": ".runtime/porting/SRC-06/apply-controlled-equipment-Root-15.py",
+      "sha256": "41576d3c327d00fcad54326391a64e858ccb56dd886a197f3edbb4d0582d8524",
+      "bytes": 5462
+    },
+    {
+      "path": ".runtime/porting/SRC-06/author-controlled-equipment-Outer-02.py",
+      "sha256": "577f1d8cf8887bc255ac7cb1c0dd27509b4071b17ff5d4e0b43718b1d7199d1e",
+      "bytes": 16806
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/diagnostics.json",
+      "sha256": "5637a52e7383743f56c36099d012cccba1f2e43a188ed87c05b4516ef8351857",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.eio",
+      "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+      "bytes": 15340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.eso",
+      "sha256": "1681244ad3ccb4e9d1018e575a1bf2c2f31359dcca2be17727280dfa41940f4e",
+      "bytes": 112177
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.mdd",
+      "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+      "bytes": 3846
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.mtr",
+      "sha256": "627d9f87490ba25d667990aabd1918f308b51416a4d21de64a756f7cec81e833",
+      "bytes": 2454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.rdd",
+      "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+      "bytes": 30557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplusrs.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplustbl.csv",
+      "sha256": "9a3fb3102fa0ce510dc634906975271edf5b635e4728fcc7c57af20f02a6f9a1",
+      "bytes": 84631
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplustbl.htm",
+      "sha256": "5ce1bee94adba1f58c0770f0a9d1c609df2a420e1790c92e1474dddd3d9788fd",
+      "bytes": 354250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplustbl.tab",
+      "sha256": "03c5c9ba9722d6a7009a396cf3bd9b7607f46dae035613c8c6ae56d8f6519a48",
+      "bytes": 84628
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplustbl.txt",
+      "sha256": "8e10f31167a0e34f8c24420cdd92ad814155283384d35cf1ed9638ad82677a3d",
+      "bytes": 163308
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/eplustbl.xml",
+      "sha256": "33ca5c96358151bd17cc174ad597a5c7fdd8768c6cc5040ebe1fd23f353a9406",
+      "bytes": 226073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/results/source-eso.csv",
+      "sha256": "2a52d18d65f23eb7b471cff08799d39b5112f2738ad3e586e5d87bdb55d39a6e",
+      "bytes": 1621144
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/results/source-mtr.csv",
+      "sha256": "9496c8360b09ddc75a03b976e5035ae24d51a841966fc0ca8404f7f30a156683",
+      "bytes": 17976
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/results/source-reported-results.json",
+      "sha256": "4cd22282b6dfa8a24013c897b951ffbb6802fe34825fe2039ecae50d398049e6",
+      "bytes": 1679924
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-Root-15-02/output/run-summary.json",
+      "sha256": "89584397d4d6114f58a698c1a0b43515b46ea7d7a83e308c9c62c4af48c32487",
+      "bytes": 32762
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15-02/receipt.json",
+      "sha256": "92f5e22e63376f2de770fbee7a2204c265e2c44c938b493de2a8bd384c25f4d6",
+      "bytes": 6108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15-02/stderr.log",
+      "sha256": "2f0fdeed83fa56dd6d1146238aecdf8b5c67cb468addd2427e3579f41ba18d69",
+      "bytes": 756
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15-02/stdout.log",
+      "sha256": "8e515c1e45575196950b789e9e927734b19e95a060a881616571af11223f21da",
+      "bytes": 364429
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15/receipt.json",
+      "sha256": "63ea488cfc9d9b5242a18a29d78dd7e506571998bee7af95542c03d246710647",
+      "bytes": 6102
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15/stderr.log",
+      "sha256": "150ce0d3065f4fa23aac91238d677f30a4efbac7c42bad4dff44c2008c8a3039",
+      "bytes": 1493
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15/stdout.log",
+      "sha256": "7ff6fb6a377012aecfd67b308ded3e3caa4dd7614b95e5ab13f6c86fae268eb4",
+      "bytes": 364386
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-Root-15/output/diagnostics.json",
+      "sha256": "14db774cab79cf3772b1b1d63796ca19844c81c7b4d25c954840dcd96968a6b4",
+      "bytes": 2982
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-Root-15/output/run-summary.json",
+      "sha256": "d9a937b3cbe8f00c7527d8ac70d23e30ed4413f0a7c9192abaad9eeb0b61582a",
+      "bytes": 25270
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-command-Root-15/receipt.json",
+      "sha256": "e661ad760789195dcf30804a4832d09a54118c7561e8da290380b0c92a422ad1",
+      "bytes": 6151
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-command-Root-15/stderr.log",
+      "sha256": "bef3c3d8352f2cbcac273c8e431abc25bb97cc3885f9ac0a59dddd653256bee3",
+      "bytes": 10682
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-command-Root-15/stdout.log",
+      "sha256": "05b8a4477d727cef3e3244a0375bd3a4fecdadc71f66238c03e82e30ad2e863e",
+      "bytes": 364452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-02/receipt.json",
+      "sha256": "14b14a45fe3ace9bdaee1d2f080c755d3bc789ffb5d4153255c98f43ecb6a2b6",
+      "bytes": 5515
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-02/stderr.log",
+      "sha256": "ca1ee1595c4ce5e9d7ae29b155be8fb46d5b9d5cce01aefe4fb0d6e755af2dcf",
+      "bytes": 15636
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-03/receipt.json",
+      "sha256": "36508e96e6dfff8217f7cb09c21740930aefd4d7be6e7e9c53bf80bc239e34d9",
+      "bytes": 5513
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-03/stderr.log",
+      "sha256": "0b8b3d24e7c498a37425c535e7c8c2b880121bbfaa16b63fba9353b788cd26ea",
+      "bytes": 52737
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-03/stdout.log",
+      "sha256": "0a543ed2aae674f80563f99b27dc3413dc448028e4f04a19aa524d0b6c06a579",
+      "bytes": 229
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15/receipt.json",
+      "sha256": "b38cf2cdd9d30032ad9e0e71a096bc3d89df33b89054eef77757a853fb940121",
+      "bytes": 5373
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15/stderr.log",
+      "sha256": "2b18fbbb540454e0e7722b47e3d8a73ab175ef48f3788c56189ea05109c29fab",
+      "bytes": 16208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-compact-actual-Root-13.py",
+      "sha256": "e74ca3d9d2a85102f0dca30ed978ed25d7f8bee8e1fd72459b7b7ba131c2dea4",
+      "bytes": 10019
+    },
+    {
+      "path": ".runtime/porting/SRC-06/check-source-controlled-equipment-actual-Root-15.py",
+      "sha256": "66280e5b9c2bde87a2337a0590d1c8de599e25718f1fc247c4fb323424abf1f9",
+      "bytes": 7975
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-equipment-publication-prepared-Audit-15/publication-template.json",
+      "sha256": "c011240c6d7e928a08e478424ac13ceff17721038dba50900a30c41165e50894",
+      "bytes": 44422
+    },
+    {
+      "path": ".runtime/porting/SRC-06/controlled-equipment-publication-prepared-Audit-15/validation-refs.json",
+      "sha256": "d68454e3c873bfbb428a0dd2a4537b22de3462352229f42eff39fc37832ca88f",
+      "bytes": 1922
+    },
+    {
+      "path": ".runtime/porting/SRC-06/correct-controlled-equipment-test-flag-Root-15.py",
+      "sha256": "8fc9d6e3f73472fae8225269567916492da23bc10ef9d6d6f226ea7aace6f514",
+      "bytes": 4327
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-controlled-equipment-publication-Audit-15.py",
+      "sha256": "a9bfaff77f79b9bc14c9b68bf1893607f01965e5442011df759835d24302e2cd",
+      "bytes": 12245
+    },
+    {
+      "path": ".runtime/porting/SRC-06/publish-controlled-equipment-checkpoint-Audit-15-template.py",
+      "sha256": "3a7f935b38145dff6dfa692cec28dfc7c7c469320c5aab4530a7217c0e206a3c",
+      "bytes": 11878
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-controlled-equipment-Source-Audit-01.py",
+      "sha256": "1d4370de39de41b61b102ca2d0c629fbd8cd365c798f1752294aba0832ea3752",
+      "bytes": 17106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/review-controlled-equipment-test-flag-fix-Audit-15.py",
+      "sha256": "2206ab403b03915a96231849fe42b6a45d4ff10d858eaa9491d224812518067a",
+      "bytes": 6740
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-controlled-equipment-Outer-02.py",
+      "sha256": "56ad75b5ce3024c95af540d20a3824349f388c01bcd088b848b36be1019289e7",
+      "bytes": 16482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-Node-getters-registration-helper-held-Peer-01/manifest.json",
+      "sha256": "c3b3d39b5d4cd2e925a06597c32fec68fc580d495d6ceef58ea747c3c43adc7b",
+      "bytes": 28484
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-01/manifest.json",
+      "sha256": "f845e4f5a76fffcfdb58e66e639093c2b056e2c43d622ccffc0f140f7422a388",
+      "bytes": 56679
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "cb15059a233e388d5da92a73052e5d5762ae1faeee5545035893c847d64cc4a8",
+      "bytes": 23220
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "9b0c9f5569e8501e83ae4f6d61aa58bc5f8ce861a6c0ce00d8095106de462707",
+      "bytes": 3439
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-01/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "5a2afe4d22f34af1f1b14c68457300a6498b990ddf8100b62c2ed9172849dd18",
+      "bytes": 13587
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_BranchNodeConnections.cc.L651-798.txt",
+      "sha256": "8ba5dbc0473964ba8b2a0557a01507d9dd787d512fa8f283149ab9c7de42e5b9",
+      "bytes": 10020
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataSizing.hh.L1329-1329.txt",
+      "sha256": "ea50219c0abbdb83e99693b5665aa7a901bdd7fdc564a3be88c6272264c0825f",
+      "bytes": 133
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataSizing.hh.L1362-1368.txt",
+      "sha256": "999f8e515b33882ec5a235a89cffa6f90fff07e1ab0d2a7fc35ea4b5375390a4",
+      "bytes": 861
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataSizing.hh.L658-687.txt",
+      "sha256": "5446b5711d087db89e48dc083d33486445acc782ced1efb516c58a63e89c9951",
+      "bytes": 2545
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataZoneEquipment.cc.L101-163.txt",
+      "sha256": "7ba66e852415ba1c988f0b5d30fcdf028cb274467e584eba3f876615cdd6a6f9",
+      "bytes": 4930
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataZoneEquipment.cc.L167-812.txt",
+      "sha256": "670868ab9d177e8c03d910093bbe0b73da24060cc4798e01fdae8355640558d4",
+      "bytes": 39016
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataZoneEquipment.cc.L814-1260.txt",
+      "sha256": "5185e6f437f16ea91099884a6f369d50e91b3a04d80054f14c3b7ca2e7ebd6c1",
+      "bytes": 27843
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataZoneEquipment.hh.L108-190.txt",
+      "sha256": "02bd87e9b8024856afcecce46d92275496445339eba126613350e666a80f551a",
+      "bytes": 2761
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_DataZoneEquipment.hh.L282-452.txt",
+      "sha256": "6469f10add05a75ae91bd462ad148c49b1f9fc61c626fdfe45e44281dca568a0",
+      "bytes": 10913
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_GeneralRoutines.cc.L724-763.txt",
+      "sha256": "24351b88ba7a6cfc12632d78eae40305ac4404efc9327813d78f8ded7ea2bd59",
+      "bytes": 2058
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_GlobalNames.cc.L68-89.txt",
+      "sha256": "08f1d20e10f64fbd7681a37ee3da55152326ded7c087fc411a967cb4588ca062",
+      "bytes": 944
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_InputProcessing_InputProcessor.cc.L621-714.txt",
+      "sha256": "b7eb5982e65ef0482a155fe75fcac34fdf0064d61336f49479b7b9f544aafc96",
+      "bytes": 4215
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_InputProcessing_InputProcessor.cc.L895-929.txt",
+      "sha256": "f3d9447423d77ccfc5fffa0bd066ca8db80e4d8e55ee7d93a1dbdef8e0200df9",
+      "bytes": 1650
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_InputProcessing_InputProcessor.cc.L932-1118.txt",
+      "sha256": "9d1f7336dcb945952bd707f4ae4197b682d6c5351cd1a87a2acaa8a460727c1e",
+      "bytes": 8326
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_NodeInputManager.cc.L740-952.txt",
+      "sha256": "a270e6f4d38a64a46eb8d16e5b3965cea7e17b0ba67883d5e661302995346f12",
+      "bytes": 9538
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_NodeInputManager.cc.L80-186.txt",
+      "sha256": "a65baab98bd7af2281481ac0d4262ef99691ad54bfc87cebed6d49a36455c73f",
+      "bytes": 6140
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_ZoneEquipmentManager.cc.L169-197.txt",
+      "sha256": "8c0cd1d8963b2a1ce455542eca4010ccb9f073135f7ad3d3ab92811ecc9eb722",
+      "bytes": 1180
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/Native/src_EnergyPlus_ZoneEquipmentManager.hh.L72-80.txt",
+      "sha256": "81810c7a63d3e6350cc30451ddbd69cc36da888c49e666728dd61b0067c1df28",
+      "bytes": 294
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "c35aaacdea9424a390fcb834e4bb15ff820f372a47bcbbb1329014e3c7164334",
+      "bytes": 11119
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ctf_initialization_context/source_heat_balance_input.rs",
+      "sha256": "4dfce4a5dacf7d8fb95b137ed00c7e7d91c640c7b2860ecc5a0cadacf61898cd",
+      "bytes": 3652
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "0ac8707db148c2d2981b387f12c3371aad185db71d60f0e8880c326a6bede27c",
+      "bytes": 34143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "7b9a6eec443da60e26c74d103651f8ba90507f8f805b4a09d3fd9e8105717f0f",
+      "bytes": 34844
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_getter.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "c73f57d5122f5ef3a4f4defc1687e9dc6393d07bf8a6a47e99c2213002ab354e",
+      "bytes": 9300
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_node_connections.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/ordinary_source_session/first_input.rs",
+      "sha256": "35c66cf304137952db1360732d914e3e3adf6d5c8f9d0e6c987755d952ef7a01",
+      "bytes": 6790
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "473634599c221a334c30feb7a43070ec420e0b3be1ced21043d97c0da197a0da",
+      "bytes": 23813
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/selected_sizing/terminal_unit.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/startup_integrity.rs",
+      "sha256": "04d4e6d56ae7b676580a8e3ea0de8402049be880864510eff17c61e24939fab0",
+      "bytes": 2052
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "4e2e99d4bd5b19f058ace6636526da15568d57dded2fe286c1d1b5d1da42eb07",
+      "bytes": 2663
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/before/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/complete-final-compiler-Source-plan.json",
+      "sha256": "568ae3a356d9cfb735e7d8aa3d65a3a1801140f8d460eff63bab9f5b74be4360",
+      "bytes": 2497508
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/correction-proof.json",
+      "sha256": "20d43bd1dbf7a3a147077fb89b0c106513846b5e822a720d1be67112f888b57f",
+      "bytes": 5198
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_controlled_equipment.rs-forward.diff",
+      "sha256": "52eb6e4b114c9189798c9670d66e01641342a5c493f612413f63a5691ddda94c",
+      "bytes": 1350
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_controlled_equipment.rs-inverse.diff",
+      "sha256": "407fadf9be30c6fbe309f46b6935eb7bff81b5ade14bcc3aae47852ea50a0423",
+      "bytes": 1350
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_equipment_types.rs-forward.diff",
+      "sha256": "190c324926cedade299fded1753c6aa87064f8f2ad0b81395a01852492d6c225",
+      "bytes": 1533
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_equipment_types.rs-inverse.diff",
+      "sha256": "9f2f64bd264cecb21efeb1af3908baa8bc26bc962b8cf442914ebe6fed3764d8",
+      "bytes": 1533
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_input.rs-forward.diff",
+      "sha256": "c251417b0a0a27b972b35175c8ec3c44de85eeec96f6c3a87da8c4c67952ed26",
+      "bytes": 2854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/corrections/crates_ep_runtime_src_heat_balance_ordinary_equipment_source_input.rs-inverse.diff",
+      "sha256": "defb8dd11aad18dcb53be27321037ac7c9a45f11093fba8b9a1100e851b19d76",
+      "bytes": 2854
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/01-forward_diff.diff",
+      "sha256": "e5179c26b465312e4b034d3c142fb13e53f1900f14362bfdc744c578adcf2412",
+      "bytes": 2175
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/01-inverse_diff.diff",
+      "sha256": "fbe4e01d2c37cd99177ef0ac1ceb73e4ddba0efab43e25c5d5a3242188497188",
+      "bytes": 2175
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/02-forward_diff.diff",
+      "sha256": "cfa31f03bdf1ddcc2c93e0a59127ce5eb34cd5bf258334ca4fabb09f46116d0e",
+      "bytes": 877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/02-inverse_diff.diff",
+      "sha256": "42b63f31f5e13a6cf8d3cea9f2f8a81ad9c8d73c50f9eaf694324d1ee66e9df5",
+      "bytes": 877
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/03-forward_diff.diff",
+      "sha256": "bceea89498d21b477e43174199be71e529c6a5fe9d3e9cceadc242f142194111",
+      "bytes": 452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/03-inverse_diff.diff",
+      "sha256": "485156149847fb473475a20ad4bf5eee1c1a8e8ca98a47d118ac45d228286df5",
+      "bytes": 452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/04-forward_diff.diff",
+      "sha256": "23d0fda6b8fe14b06923737a5ffece7a3f12ebdb59835acb3c04da9e5c70e119",
+      "bytes": 23720
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/04-inverse_diff.diff",
+      "sha256": "8fb4173b727e356c6f82241d56430548ddc4eb25371b9a32172ecf03667559c7",
+      "bytes": 23720
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/05-forward_diff.diff",
+      "sha256": "5775c04f3da4275468ee709b6f98fbe3b35b8f16c4c119420ddc875235d6cb0b",
+      "bytes": 4598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/05-inverse_diff.diff",
+      "sha256": "2125909cf46bc33b52b9aae3ec249f10005f0d3ff68aa5d2f04ee40282f36b02",
+      "bytes": 4598
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/06-forward_diff.diff",
+      "sha256": "97a1bb3e607f7df508e247076cfdbb978e472fe16cabe09dbed9cf25de086d08",
+      "bytes": 3715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/06-inverse_diff.diff",
+      "sha256": "10309335ded5766c3c0a3bfe520ffea9ecaa0937b06b738ef33b33d0884eca4b",
+      "bytes": 3715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/07-forward_diff.diff",
+      "sha256": "b22748b9b80deabd26e2a5e47a6d602c5e63172d74a39ddabcc76ac3bf1bce20",
+      "bytes": 10362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/07-inverse_diff.diff",
+      "sha256": "3b4034f4332cfea36bff1440012dc8b1b77dddd8928b13bfff12e8a99cd861e2",
+      "bytes": 10362
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/08-forward_diff.diff",
+      "sha256": "cb77d666889bd3ac1edbd7e25cc41d019bb06decf20c10185d8a44beaacfa863",
+      "bytes": 9073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/08-inverse_diff.diff",
+      "sha256": "9b9fe90c1bd7c36af63c2d35108edd75b25addd1ef9c880bf91e4490e9a47c3d",
+      "bytes": 9073
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/09-forward_diff.diff",
+      "sha256": "a522579f97a0578a6fe4bea2917d1eddd72f7990a9ba0285de01f54dc00e4f47",
+      "bytes": 7299
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/09-inverse_diff.diff",
+      "sha256": "1f2815b9fc0023d15fb3dd94f84f48765ae4548f2707f0e03fa6aa2442e9bc29",
+      "bytes": 7299
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/10-forward_diff.diff",
+      "sha256": "5e8232e1018e42340048d2a449e953e6508c4242d02f17d419c30cb9b5d45714",
+      "bytes": 486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/10-inverse_diff.diff",
+      "sha256": "7e7c364431df727ebda7743fa528a84b354b55008a6ecf2fc4760a76a2526e58",
+      "bytes": 486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/11-forward_diff.diff",
+      "sha256": "c399736078bcb5ad06101b11a5ace5491fb9b93dbc7e0ae43e5a2da0edea4575",
+      "bytes": 2222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/11-inverse_diff.diff",
+      "sha256": "c61fcc5870c427a0f707c9d26af41707d2ada730d5f5276791d91ea65f7d6dea",
+      "bytes": 2222
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/12-forward_diff.diff",
+      "sha256": "296991f5aa068fb1f10653f76b8aca1c0b4c1d8cb352101a57ffc6a52f18ae10",
+      "bytes": 1495
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/12-inverse_diff.diff",
+      "sha256": "aaf8e5f14bb506e52c273c1400a943785ec613188885c9e757bdcd4faeecc878",
+      "bytes": 1495
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/13-forward_diff.diff",
+      "sha256": "b44f7cb89f283beaa590de8842246f4e52e982f6bd88e975cdc2ca1e65eb856a",
+      "bytes": 7192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/13-inverse_diff.diff",
+      "sha256": "1b7915838c15084ae36e4a53d33385d62f33e4ec11963d453a4bf132706f392b",
+      "bytes": 7192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/14-forward_diff.diff",
+      "sha256": "a53e75e4b0f8768613f402a3757ec711b7475bbbdc066b38e93c43d6e1c4f022",
+      "bytes": 970
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/14-inverse_diff.diff",
+      "sha256": "af4719139af146ff03b8d9aeea5142494c162b3a9dbd89a174f0861687f6b323",
+      "bytes": 970
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/15-forward_diff.diff",
+      "sha256": "f11c94b8476012c4fc3f990e39c5d475d05654c4528f63f12ea2b3ec47521801",
+      "bytes": 577
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/diffs/15-inverse_diff.diff",
+      "sha256": "b2cd5e4dcda83abeaf914247b6dd186348e60d61ba44bfe5ad97eadf208b773f",
+      "bytes": 577
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/integration-contract.json",
+      "sha256": "f3d847b98fa77edfc62fb3989fe50c6a23be92d0fe0d1b92e2137718dc82a059",
+      "bytes": 3624
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/manifest.json",
+      "sha256": "87bdcb7505fd0ed31329facc1f5c87359a496752089bd29083cb67086d9791c2",
+      "bytes": 57130
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "f4fcf52efc3c610fe7245ca2c7875cfd0d44283786d6d868318f75f5723a6862",
+      "bytes": 12045
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context/source_heat_balance_input.rs",
+      "sha256": "5f59ce11059ced77b8a9d57c15e5a62e2fef4e4c219e6167c44d05cbc4933ab2",
+      "bytes": 3768
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "f25d8f523708c02386ee4f2b984a0a1b935cd35146974d901f044cc741de5f63",
+      "bytes": 34165
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "22ccb24d33c899a9e528a1ac406e2a830d3f6986c03f5a1163a5161fe8645976",
+      "bytes": 39328
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_getter.rs",
+      "sha256": "0bc6614e09e30e172d2085896f29a676b35a30bc84f034ef24710bb43e41ffb1",
+      "bytes": 4324
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "f293fe949ac93f92fce8c0ca882893ca9ebe7991fa0b66ab632a5e7e8fb86df1",
+      "bytes": 13769
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_equipment/source_node_connections.rs",
+      "sha256": "b8b99282729ffc93e83e1b67f52d5456c90e99a0380cd07c4dcef8747c005fd4",
+      "bytes": 8710
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/ordinary_source_session/first_input.rs",
+      "sha256": "67f136f5b2a8688c359b75900cf8a5cb98b427408cb0f58fed39c6317f481827",
+      "bytes": 6864
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "f36f1df3da7a4b9c566d1415d5ce24e7f9c826858cd0d6bb6878c636d1a338b3",
+      "bytes": 24109
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/selected_sizing/terminal_unit.rs",
+      "sha256": "ba7f2263b4a3504aaf91d0daf3a16a3cf898ad65f3f303525dcc2411d76b73a6",
+      "bytes": 2007
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/startup_integrity.rs",
+      "sha256": "0a70155a0e3f9c96db31a479fc302cd2da0ed0f387137c04cf0d163be4a2b7db",
+      "bytes": 2125
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "bytes": 2833
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/proposed/crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "d2296680e246c20830d8bb4aba11be28feddb9530d01d3f31cb6584ceb3d87ca",
+      "bytes": 6866
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/reached-constructor-records.json",
+      "sha256": "263f1a808492e57245d7f42b69d0f016c3195f3a85d2f93e94dba56d19378849",
+      "bytes": 5478
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/before/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "7f64207dcc466426be9a23658a4bd5dd1d724f7e1fd61c683ca6fea181fd975a",
+      "bytes": 106257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/complete-final-compiler-Source-plan.json",
+      "sha256": "9131dd95363688f920065d0589f201e894a43a47d1784df66f11a5203f5cceab",
+      "bytes": 2497616
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/correction_forward.diff",
+      "sha256": "2b697fb4d949ddac2566afb02ebed0df3bcfb9f5c94cc978581bc0578366f2c5",
+      "bytes": 629
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/correction_inverse.diff",
+      "sha256": "d0ef4032326a2e47549bee747d80811a70a803eda11f297933deabff8799f50b",
+      "bytes": 629
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/forward_diff.diff",
+      "sha256": "79cd4a71a96f925d3d20bf63e488f36648a01e539bf42ab3ed07c63dc8548f76",
+      "bytes": 1376
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/inverse_diff.diff",
+      "sha256": "7cd4b6582950814e97c5ebf9cff9a7947e9b59e6eb3feff60d023ea0583b828c",
+      "bytes": 1376
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/manifest.json",
+      "sha256": "1232244c042f74cb09bafdfef09bcd0eee17be194bf3748098a765322e13fd2b",
+      "bytes": 5322
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "845679990f7bbd56dfb13dd6d046b69f8324ca1fe3f147e16128dcf9a80a85a4",
+      "bytes": 106874
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15/manifest.json",
+      "sha256": "e794a5da5d05acbbabb5b284260df5069d225f076cfa70818a5f762859a3c2ee",
+      "bytes": 3977
+    },
+    {
+      "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "909fa05d91ccd6165a975c6eec5c24495836c6d7cc3936b95292599e7ac9c708",
+      "bytes": 106803
+    },
+    {
+      "path": ".runtime/porting/source-objects/3f/3ff18555df9c7aa61d976388f0db76673426f1d9f7a3b44a51d77a6f7e528adc",
+      "sha256": "3ff18555df9c7aa61d976388f0db76673426f1d9f7a3b44a51d77a6f7e528adc",
+      "bytes": 1840311
+    },
+    {
+      "path": ".runtime/porting/source-objects/79/79e95aeb0dcd6ba4f6609f88ba1f31cba5115d3f35cb2f0775ac8021b7fedcb5",
+      "sha256": "79e95aeb0dcd6ba4f6609f88ba1f31cba5115d3f35cb2f0775ac8021b7fedcb5",
+      "bytes": 1840311
+    },
+    {
+      "path": ".runtime/porting/source-objects/a6/a66ca80b03aa3191d18a04d84b68d15f54b1b3c2a3e4e986963dda6aceae3164",
+      "sha256": "a66ca80b03aa3191d18a04d84b68d15f54b1b3c2a3e4e986963dda6aceae3164",
+      "bytes": 1840311
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/setup_zone_geometry.rs",
+      "sha256": "f4fcf52efc3c610fe7245ca2c7875cfd0d44283786d6d868318f75f5723a6862",
+      "bytes": 12045
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/source_heat_balance_input.rs",
+      "sha256": "5f59ce11059ced77b8a9d57c15e5a62e2fef4e4c219e6167c44d05cbc4933ab2",
+      "bytes": 3768
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+      "sha256": "8fc26d9728a3d186d858f03ce3a75468610f837fefdcfadd4ca294d6eb824a2c",
+      "bytes": 85227
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "f25d8f523708c02386ee4f2b984a0a1b935cd35146974d901f044cc741de5f63",
+      "bytes": 34165
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment.rs",
+      "sha256": "22ccb24d33c899a9e528a1ac406e2a830d3f6986c03f5a1163a5161fe8645976",
+      "bytes": 39328
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_controlled_equipment.rs",
+      "sha256": "3c4101fe22a65e98a6e4aa0c73bdc5df07fe8c6160a215a62a91d80aefca7742",
+      "bytes": 23208
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_getter.rs",
+      "sha256": "0bc6614e09e30e172d2085896f29a676b35a30bc84f034ef24710bb43e41ffb1",
+      "bytes": 4324
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_equipment_types.rs",
+      "sha256": "8146f2e04f85355d9d0f4d660e9f2dd23efff0d55f2a3628c50c78caff4911e4",
+      "bytes": 3436
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_input.rs",
+      "sha256": "f293fe949ac93f92fce8c0ca882893ca9ebe7991fa0b66ab632a5e7e8fb86df1",
+      "bytes": 13769
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_equipment/source_node_connections.rs",
+      "sha256": "b8b99282729ffc93e83e1b67f52d5456c90e99a0380cd07c4dcef8747c005fd4",
+      "bytes": 8710
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ordinary_source_session/first_input.rs",
+      "sha256": "67f136f5b2a8688c359b75900cf8a5cb98b427408cb0f58fed39c6317f481827",
+      "bytes": 6864
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing.rs",
+      "sha256": "f36f1df3da7a4b9c566d1415d5ce24e7f9c826858cd0d6bb6878c636d1a338b3",
+      "bytes": 24109
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/selected_sizing/terminal_unit.rs",
+      "sha256": "ba7f2263b4a3504aaf91d0daf3a16a3cf898ad65f3f303525dcc2411d76b73a6",
+      "bytes": 2007
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity.rs",
+      "sha256": "0a70155a0e3f9c96db31a479fc302cd2da0ed0f387137c04cf0d163be4a2b7db",
+      "bytes": 2125
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes.rs",
+      "sha256": "76afc488603577754cd48c706cf7654fe64d07a565fcdd90afd399128d23e095",
+      "bytes": 2833
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/startup_integrity/nodes/registration.rs",
+      "sha256": "d2296680e246c20830d8bb4aba11be28feddb9530d01d3f31cb6584ceb3d87ca",
+      "bytes": 6866
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "845679990f7bbd56dfb13dd6d046b69f8324ca1fe3f147e16128dcf9a80a85a4",
+      "bytes": 106874
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Zone-Node-14/summary.json",
+      "sha256": "10f2deddd9d99c5b1ee80e5ad0e99e91ee2df9b15a0b00232d074755bbd42722",
+      "bytes": 5926
+    }
+  ],
+  "scope": "Corrected controlled-equipment Source02 and existing test-caller compiler adapter, direct resolved-constructor/failed101 custody, accepted peers/final16Source plan and focused existing test/actual B+A24. Included JSON fixture is separately Git bound. No historical ZIP recursion, new Native dataset or annualJSON/CSV.",
+  "full_transitive_rebuild_archive_claim": false
+}

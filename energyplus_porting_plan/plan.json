@@ -12806,6 +12806,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-Zone-Node-14/summary.json",
         "sha256": "10f2deddd9d99c5b1ee80e5ad0e99e91ee2df9b15a0b00232d074755bbd42722",
         "size_bytes": 5926
+      },
+      "canonical_controlled_equipment_15": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/summary.json",
+        "sha256": "d2df9acebeb8acc73184d07b78dee5c925a8cbd9c2fe666855c42fd22c959508",
+        "size_bytes": 7268
       }
     },
     {

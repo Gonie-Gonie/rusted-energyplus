@@ -425,3 +425,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source Zone·Node 입력 검증](../evidence/SRC-06-canonical-Zone-Node-14/summary.json). 같은 입력 소유자의 제어 Zone 조회와 NodeList·Assign·InitUnique 경로를 연결했습니다. 기존 Native 비제어 입력 1쌍(pair7)·소유자 전이 테스트 및 A-24H 회귀를 통과했고 5,352개 보고값의 기존 검증도 유지했습니다. B는 GetZoneEquipmentData308의 EquipmentConnections getObjectItem에서 중단합니다. 입력된 Node의 Native 상태 대조와 후속 B 장비 포팅은 남아 있으며 A14/54·B14/64 게이트는 유지합니다.
+
+
+[Source 제어장비 입력 검증](../evidence/SRC-06-canonical-controlled-equipment-15/summary.json). 단일 Zone의 IdealLoads 장비 연결·목록·노드·terminal sizing 입력을 같은 실제 소유자에 연결했습니다. 기존 Native 비제어 입력 1쌍(pair7)·소유권 전이 테스트와 A-24H 회귀를 통과하고 보고값 5,352개의 기존 검증을 유지했습니다. B의 실제 미완료 경계는 `GetHeatBalanceInput: selected initially-closed six-quad volume domain`입니다. 제어장비 내부 상태의 Native 대조와 후속 B 경로는 남아 있으며 게이트는 A14/54·B14/64를 유지합니다.

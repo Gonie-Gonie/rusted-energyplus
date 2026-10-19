@@ -3,6 +3,10 @@ mod heat_to_return_air;
 pub(crate) mod management;
 mod node_reporting;
 mod source_input;
+mod source_equipment_types;
+mod source_equipment_getter;
+mod source_controlled_equipment;
+mod source_node_connections;
 mod source_nodes;
 mod source_node_lists;
 mod source_endrun;
@@ -13,6 +17,9 @@ mod source_setup_reporting;
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;
 use source_nodes::{SourceNodeData, SourceNodeSetpointCheck};
 use source_node_lists::SourceNodeList;
+use source_equipment_types::{SourceAirIn, SourceEquipmentData, SourceSimulationOrder};
+use super::selected_schedule_manager::SourceScheduleIndex;
+pub(crate) use source_input::SourceEquipmentInputOwners;
 use ep_model::{SpaceId, ZoneId};
 
 /// Unsupported input or an unavailable represented equipment owner.
@@ -165,6 +172,38 @@ impl EquipmentInputOwner {
 
 #[derive(Clone, Debug, PartialEq)]
 struct EquipmentConfig {
+    control_list_name: String,
+    return_flow_fraction_schedule: Option<SourceScheduleIndex>,
+    number_return_flow_basis_nodes: usize,
+    flow_error: bool,
+    inlet_node_numbers: Option<Vec<usize>>,
+    inlet_node_air_loop_numbers: Option<Vec<i32>>,
+    inlet_node_air_distribution_unit_numbers: Option<Vec<i32>>,
+    exhaust_node_numbers: Option<Vec<usize>>,
+    return_node_numbers: Option<Vec<usize>>,
+    return_node_air_loop_numbers: Option<Vec<i32>>,
+    return_node_return_path_numbers: Option<Vec<i32>>,
+    return_node_return_path_component_numbers: Option<Vec<i32>>,
+    return_node_inlet_numbers: Option<Vec<i32>>,
+    fixed_return_flow: Option<Vec<bool>>,
+    return_node_plenum_numbers: Option<Vec<i32>>,
+    return_flow_basis_node_numbers: Option<Vec<usize>>,
+    return_node_exhaust_node_numbers: Option<Vec<i32>>,
+    shared_exhaust_nodes: Option<Vec<i32>>,
+    return_node_space_mixer_indices: Option<Vec<i32>>,
+    air_distribution_units_heat: Option<Vec<SourceAirIn>>,
+    air_distribution_units_cool: Option<Vec<SourceAirIn>>,
+    zone_exhaust: f64,
+    zone_exhaust_balanced: f64,
+    plenum_mass_flow: f64,
+    excess_zone_exhaust: f64,
+    total_available_air_loop_outdoor_air: f64,
+    total_inlet_air_mass_flow_rate: f64,
+    total_exhaust_air_mass_flow_rate: f64,
+    air_loop_design_supply: f64,
+    zone_has_air_loop_with_outdoor_air_system: bool,
+    zone_air_distribution_index: i32,
+    zone_design_specification_outdoor_air_index: i32,
     zone_name: String,
     equipment_list_name: String,
     equipment_list_index: usize,
@@ -183,6 +222,38 @@ struct EquipmentConfig {
 impl Default for EquipmentConfig {
     fn default() -> Self {
         Self {
+            control_list_name: String::new(),
+            return_flow_fraction_schedule: None,
+            number_return_flow_basis_nodes: 0,
+            flow_error: false,
+            inlet_node_numbers: None,
+            inlet_node_air_loop_numbers: None,
+            inlet_node_air_distribution_unit_numbers: None,
+            exhaust_node_numbers: None,
+            return_node_numbers: None,
+            return_node_air_loop_numbers: None,
+            return_node_return_path_numbers: None,
+            return_node_return_path_component_numbers: None,
+            return_node_inlet_numbers: None,
+            fixed_return_flow: None,
+            return_node_plenum_numbers: None,
+            return_flow_basis_node_numbers: None,
+            return_node_exhaust_node_numbers: None,
+            shared_exhaust_nodes: None,
+            return_node_space_mixer_indices: None,
+            air_distribution_units_heat: None,
+            air_distribution_units_cool: None,
+            zone_exhaust: 0.0,
+            zone_exhaust_balanced: 0.0,
+            plenum_mass_flow: 0.0,
+            excess_zone_exhaust: 0.0,
+            total_available_air_loop_outdoor_air: 0.0,
+            total_inlet_air_mass_flow_rate: 0.0,
+            total_exhaust_air_mass_flow_rate: 0.0,
+            air_loop_design_supply: 0.0,
+            zone_has_air_loop_with_outdoor_air_system: false,
+            zone_air_distribution_index: 0,
+            zone_design_specification_outdoor_air_index: 0,
             zone_name: "Uncontrolled Zone".into(),
             equipment_list_name: String::new(),
             equipment_list_index: 0,
@@ -201,6 +272,22 @@ impl Default for EquipmentConfig {
 
 #[derive(Clone, Debug, Default, PartialEq)]
 struct EquipmentList {
+    load_distribution_scheme: i32,
+    number_available_heating_equipment: i32,
+    number_available_cooling_equipment: i32,
+    equipment_type_names: Option<Vec<String>>,
+    equipment_types: Option<Vec<i32>>,
+    equipment_names: Option<Vec<String>>,
+    equipment_indices: Option<Vec<i32>>,
+    equipment_splitter_indices: Option<Vec<i32>>,
+    component_pointers: Vec<Option<std::convert::Infallible>>,
+    equipment_data: Option<Vec<SourceEquipmentData>>,
+    cooling_priorities: Option<Vec<i32>>,
+    heating_priorities: Option<Vec<i32>>,
+    cooling_capacities: Option<Vec<i32>>,
+    heating_capacities: Option<Vec<i32>>,
+    sequential_cooling_fraction_schedules: Option<Vec<Option<SourceScheduleIndex>>>,
+    sequential_heating_fraction_schedules: Option<Vec<Option<SourceScheduleIndex>>>,
     name: String,
     number_of_equipment_types: usize,
 }
@@ -262,6 +349,8 @@ struct NodeOwner {
     more_node_info: Option<Vec<source_setup_reporting::SourceMoreNodeData>>,
     marked_nodes: Option<Vec<source_marked_nodes::SourceMarkedNode>>,
     node_references: Option<Vec<i32>>,
+    only_single_node_first_time: bool,
+    only_single_node_numbers: Option<Vec<usize>>,
 }
 
 impl Default for NodeOwner {
@@ -285,6 +374,8 @@ impl Default for NodeOwner {
             more_node_info: None,
             marked_nodes: None,
             node_references: None,
+            only_single_node_first_time: true,
+            only_single_node_numbers: None,
         }
     }
 }
@@ -380,7 +471,7 @@ pub(crate) struct OrdinaryEquipment {
     zone_config: Option<Vec<EquipmentConfig>>,
     equipment_lists: Option<Vec<EquipmentList>>,
     equipment_availability: Option<Vec<i32>>,
-    priority_simulation_order: Option<Vec<()>>,
+    priority_simulation_order: Option<Vec<SourceSimulationOrder>>,
 }
 
 /// Borrowed actual DataZoneEquip Config record, with no copied scalar flags.
@@ -614,10 +705,7 @@ impl OrdinaryEquipment {
                     maximum_equipment_types.max(list.number_of_equipment_types);
             }
         }
-        if maximum_equipment_types != 0 {
-            return Err(Unavailable::InconsistentOwner);
-        }
-        self.priority_simulation_order = Some(Vec::new());
+        self.priority_simulation_order = Some(vec![SourceSimulationOrder::default(); maximum_equipment_types]);
         Ok(())
     }
 
@@ -748,6 +836,11 @@ impl OrdinaryEquipment {
         spaces: &[SpaceId],
         source_gains:Option<&crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains>,
     ) -> Result<(), Unavailable> {
+        if let Some(gains) = source_gains {
+            if self.zone_config.as_ref().is_some_and(|rows| rows.iter().any(|row| row.is_controlled)) {
+                return self.validate_source_controlled_equipment_storage(zones, spaces, gains);
+            }
+        }
         if self.zone_ids != zones
             || self.space_ids != spaces
             || self.get_equipment_input

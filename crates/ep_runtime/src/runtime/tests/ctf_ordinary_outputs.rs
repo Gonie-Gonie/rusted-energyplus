@@ -877,6 +877,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 clock,
             )?;
         let space_controls = crate::heat_balance::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls::default();
+        let mut equipment_schedules =
+            crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
         let old_module = owners.shortcut.current_module_object.clone();
         equipment.get_zone_equipment_source(
             owners.input,
@@ -885,6 +887,14 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             space_controls.simulation,
             owners.globals,
             &mut context.reports.selected_internal_heat_gains,
+            crate::heat_balance::ordinary_equipment::SourceEquipmentInputOwners {
+                zones: owners.zones.zones.as_deref_mut().ok_or("actual equipment Zone rows")?,
+                schedules: &mut equipment_schedules,
+                sizing: &mut context.reports.selected_sizing_manager,
+                branch: None,
+                // Unused: this authored admitted-input fixture has zero controlled Connections.
+                source_is_epjson: false,
+            },
         )?;
         assert_eq!(owners.shortcut.current_module_object, old_module);
         for family in [

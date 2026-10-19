@@ -1,5 +1,7 @@
 //! Actual eight-getter ManageSizing path for the admitted empty-sizing domain.
 //! Input DoSizing switches and calculation globals are separate borrowed owners.
+mod terminal_unit;
+pub(crate) use terminal_unit::SourceTerminalUnitSizingData;
 use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
 use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_input_processor::{
@@ -111,6 +113,8 @@ pub(crate) struct SourceZoneEquipmentSizing {
 /// Unsupported positive array element types are not represented by this empty path.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedSizingManager {
+    pub(crate) number_of_air_terminal_units: usize,
+    pub(crate) terminal_unit_sizing: Option<Vec<SourceTerminalUnitSizingData>>,
     pub(crate) zone_equipment_sizing: Option<Vec<SourceZoneEquipmentSizing>>,
     /// Same DataSizing.hh1368 OASysEqSizing EPVector, constructor-unallocated.
     pub(crate) outside_air_system_equipment_sizing: Option<Vec<SourceZoneEquipmentSizing>>,
@@ -140,6 +144,8 @@ pub(crate) struct SelectedSizingManager {
 impl Default for SelectedSizingManager {
     fn default() -> Self {
         Self {
+            number_of_air_terminal_units: 0,
+            terminal_unit_sizing: None,
             zone_equipment_sizing: None,
             outside_air_system_equipment_sizing: None,
             unitary_system_equipment_sizing: None,

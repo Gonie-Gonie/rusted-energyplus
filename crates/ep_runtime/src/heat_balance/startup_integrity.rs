@@ -12,7 +12,7 @@ pub(crate) use connection_reports::{
     report_source_loop_connections,
 };
 pub(crate) use mixed_air::SourceMixedAir;
-pub(crate) use nodes::SourceBranchNodeConnections;
+pub(crate) use nodes::{SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType, SourceNodeObjectType};
 
 // These are independent real native module slices, not Branch connector counts.
 // Their positive input writers remain unavailable at the actual child call.

@@ -1,0 +1,138 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "changed_Rust_sources": 16,
+  "production_Rust_sources": 15,
+  "adapted_existing_test_files": 1,
+  "new_Rust_sources": 6,
+  "new_test_functions": 0,
+  "existing_test": "actual_native_get_equipment_pair_and_input_owner_transitions",
+  "test_scope": "One existing Native uncontrolled pair7 and real input/owner transitions; not positive controlled-equipment Native paired validation or all8 fixture cases.",
+  "existing_included_JSON_fixture": {
+    "path": "crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json",
+    "sha256": "8fc26d9728a3d186d858f03ce3a75468610f837fefdcfadd4ca294d6eb824a2c",
+    "bytes": 85227
+  },
+  "fixture_snapshot_scope": "Existing recorder captures rs/Cargo only. Tracked included JSON is separately Git/current bound and directly archived; no recorder change.",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-controlled-equipment-held-Outer-02/manifest.json",
+    "sha256": "87bdcb7505fd0ed31329facc1f5c87359a496752089bd29083cb67086d9791c2",
+    "bytes": 57130
+  },
+  "independent_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-coherent-Source-review-01/review.json",
+    "sha256": "c265619551ea04086d1fe948220dd6afc88bd1adbac7922b9746f26f4983c97e",
+    "bytes": 46340
+  },
+  "existing_test_caller_fix": {
+    "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/manifest.json",
+    "sha256": "1232244c042f74cb09bafdfef09bcd0eee17be194bf3748098a765322e13fd2b",
+    "bytes": 5322
+  },
+  "caller_fix_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-test-flag-fix-Source-review-15/review.json",
+    "sha256": "33c074aaf4bec7ea7dd084a4458f2a999b75d2727d306cf3d6c28d86dfbfd838",
+    "bytes": 4556
+  },
+  "retained_failed_tests": [
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15/receipt.json",
+      "sha256": "b38cf2cdd9d30032ad9e0e71a096bc3d89df33b89054eef77757a853fb940121",
+      "bytes": 5373
+    },
+    {
+      "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-02/receipt.json",
+      "sha256": "14b14a45fe3ace9bdaee1d2f080c755d3bc789ffb5d4153255c98f43ecb6a2b6",
+      "bytes": 5515
+    }
+  ],
+  "superseded_caller_peer": {
+    "path": ".runtime/porting/SRC-06/Audit-controlled-equipment-test-caller-fix-Source-review-15/review.json",
+    "sha256": "9fe7571e5c67562a72f3bb36ed9943f89ad97dea7db3e154127e804460404054",
+    "bytes": 3979
+  },
+  "corrected_caller_scope": "Only existing authored zero-equipment direct caller. Same fixture Zone rows and actual context sizing manager. Constructor-default local schedule/Branch None and authored format false are unconsumed because there are zero controlled Connections; this from_admitted_input fixture has no Raw format producer. No control-format ownership claim. Actual production passes its retained Raw format flag unchanged.",
+  "retained_failed_A_weather_path_command": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15/receipt.json",
+    "sha256": "63ea488cfc9d9b5242a18a29d78dd7e506571998bee7af95542c03d246710647",
+    "bytes": 6102
+  },
+  "failed_A_scope": "Manual weather-path typo, retained as unsuccessful CLI invocation rather than a Source runtime failure; successful corrected A suffix02 is authoritative.",
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-controlled-equipment-test-caller-fix-held-Root-15-02/complete-final-compiler-Source-plan.json",
+    "sha256": "9131dd95363688f920065d0589f201e894a43a47d1784df66f11a5203f5cceab",
+    "bytes": 2497616
+  },
+  "focused_validation_policy": "One meaningful existing runtime test build and realCLI B/A24; no new tests or habitual duplicate workspace-all-targets check.",
+  "scope": "Genuine retained single-Zone IdealLoads equipment input with same real mutable Zone/Schedule/Sizing/Node/Branch owners, exact field/value/constructor order and typed positive boundaries.",
+  "full_B_or_finite15_completion_claim": false,
+  "gate_changes": false,
+  "schema": "src06-canonical-controlled-equipment.v1",
+  "status": "Genuine controlled-equipment input; B remains incomplete at the exact actual frontier",
+  "canonical_existing_owner_test": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-owner-test-Root-15-03/receipt.json",
+    "sha256": "36508e96e6dfff8217f7cb09c21740930aefd4d7be6e7e9c53bf80bc239e34d9",
+    "bytes": 5513
+  },
+  "canonical_B_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-B-NOLIMIT-24H-command-Root-15/receipt.json",
+    "sha256": "e661ad760789195dcf30804a4832d09a54118c7561e8da290380b0c92a422ad1",
+    "bytes": 6151
+  },
+  "canonical_A24_CLI": {
+    "path": ".runtime/porting/SRC-06/canonical-source-controlled-equipment-A-24H-command-Root-15-02/receipt.json",
+    "sha256": "92f5e22e63376f2de770fbee7a2204c265e2c44c938b493de2a8bd384c25f4d6",
+    "bytes": 6108
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-controlled-equipment-actual-review-15/review.json",
+    "sha256": "e27d2e82d2332a4b1057ae98cdf84997c03ec4b5f9d4b95df33ff347fcdf807d",
+    "bytes": 18050
+  },
+  "actual_B_incomplete_boundary": "GetHeatBalanceInput: selected initially-closed six-quad volume domain",
+  "actual_B_completed": false,
+  "canonical_A24_completed_Source_run": true,
+  "accepted_A24_proof_transfer": {
+    "series": 58,
+    "samples": 5352,
+    "unchanged_policy": {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    "accepted14_proof": {
+      "path": ".runtime/porting/SRC-06/Root-source-Zone-Node-actual-review-14/review.json",
+      "sha256": "141d461e0070e3eb5c38fa0d5585f7dd4cb58c4141f91de637bc28dfefb131a8",
+      "bytes": 17465
+    },
+    "physical_files_whole_equal14": 7,
+    "CSV_files_whole_equal14": 2,
+    "table_lines": 19312,
+    "clock_only_line_changes_versus14": 30,
+    "scope": "Transfer from accepted14 reported output evidence; no new Native/72h/annual run or internal-state equivalence claim."
+  },
+  "preceding_B_returns": {
+    "controlled_equipment_and_wrapper": true
+  },
+  "validation_refs": {
+    "path": ".runtime/porting/SRC-06/controlled-equipment-publication-prepared-Audit-15/validation-refs.json",
+    "sha256": "d68454e3c873bfbb428a0dd2a4537b22de3462352229f42eff39fc37832ca88f",
+    "bytes": 1922
+  },
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/evidence.zip",
+    "sha256": "a5f5497512aa7658dbadc3b60f628e26d1b692db6e354e99332161432290165c",
+    "bytes": 2328820
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-controlled-equipment-15/manifest.json",
+    "sha256": "a9470208ac1cd0676644e1a63f0ca81065a246f1c971aa9ad92f34164bdf7375",
+    "bytes": 45161
+  },
+  "archive_entries": 184,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-controlled-equipment-checkpoint-Audit-15-template.py",
+    "sha256": "3a7f935b38145dff6dfa692cec28dfc7c7c469320c5aab4530a7217c0e206a3c",
+    "bytes": 11878
+  }
+}

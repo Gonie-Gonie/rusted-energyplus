@@ -131,6 +131,7 @@ impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
                 self.output_host,
                 self.equipment_input,
                 self.radiation_input,
+                &mut self.session.hvac.ancillary.branch_node_connections,
             )
             .map_err(|cause| Error::SourceInput(Box::new(cause)))?;
         self.session
