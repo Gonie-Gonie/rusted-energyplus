@@ -188,6 +188,7 @@ pub(super) fn assess_typed_runtime_boundaries(
     mode: RunMode,
     unsupported_objects: &mut Vec<SupportObjectEntry>,
     diagnostics: &mut RunDiagnostics,
+    source_admission: Option<&super::SourceSupportAdmission>,
 ) {
     let Some(typed_model) = typed_model else {
         return;
@@ -796,7 +797,7 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
-    warn_for_ignored_semantic_objects(raw_model, diagnostics);
+    warn_for_ignored_semantic_objects(raw_model, diagnostics, source_admission);
 }
 
 fn push_typed_unsupported_object(
@@ -845,8 +846,15 @@ fn push_typed_boundary(
     diagnostics.error(code, "support", note);
 }
 
-fn warn_for_ignored_semantic_objects(raw_model: &RawModel, diagnostics: &mut RunDiagnostics) {
+fn warn_for_ignored_semantic_objects(
+    raw_model: &RawModel,
+    diagnostics: &mut RunDiagnostics,
+    source_admission: Option<&super::SourceSupportAdmission>,
+) {
     for object_type in raw_model.objects.keys() {
+        if source_admission.is_some_and(|admission| admission.consumes(&object_type.0)) {
+            continue;
+        }
         if matches!(
             object_type.0.as_str(),
             "HeatBalanceAlgorithm"

@@ -34,11 +34,11 @@ pub(crate) struct SourceCloseOutputFilesOwners<'a> {
 }
 
 impl SourceOutputStream {
-    fn close_source_output(&mut self) {
+    pub(super) fn close_source_output(&mut self) {
         // Actual InputOutputFile.close234-237 resets os, not its path.
         self.file = None;
     }
-    fn delete_source_output(&mut self) -> io::Result<()> {
+    pub(super) fn delete_source_output(&mut self) -> io::Result<()> {
         // Actual del239-245 acts only when the os pointer exists, closes it
         // before removeFile, and leaves this same retained pathname in place.
         if self.file.take().is_some() {

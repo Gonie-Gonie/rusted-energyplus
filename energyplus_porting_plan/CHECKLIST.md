@@ -346,3 +346,6 @@ SRC-06의 실제 HB320 내부발열 입력은 원본 부모 반환과 새226개 
 
 
 [Source46 limit-mode reported validation](evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json). 기존 Native API 24시간 기준 3건을 출처 그대로 재사용하고, 누락된 72시간·연간 6건만 새로 실행했다. 동일한 Source43 빌드를 유지했으며 새 테스트와 게이트 변경은 없다.
+
+
+[Source47 정상 완료](evidence/SRC-06-canonical-normal-completion-47/summary.json). 정상 Source 완료 경로와 7개 CLI/3개 A 기간 보고값 검증을 추가했다. 기존 게이트와 남은 과학 단위 의무는 유지한다.

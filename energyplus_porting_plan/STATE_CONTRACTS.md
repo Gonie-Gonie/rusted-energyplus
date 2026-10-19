@@ -203,3 +203,6 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 
 
 [Source46 limit-mode reported validation](evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json). 이 검증은 제한 모드 9개의 보고값에 한정한다. 자체 JSON/CSV와 부가 IO는 미검증으로 남기며, Source59 수치 코호트·무제한 B·A 회귀 증거와 구분한다. 연간 대형 결과와 실행 바이너리를 ZIP에 넣지 않는다.
+
+
+[Source47 정상 완료](evidence/SRC-06-canonical-normal-completion-47/summary.json). 실제 진단 6계수·runtimeTimer·SimInfo·END/ERR 호스트를 같은 수명으로 마감한다. 양수 미지원 자식 경계와 실제 elapsed/부속 파일 차이는 보존한다.

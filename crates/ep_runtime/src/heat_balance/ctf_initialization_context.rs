@@ -38,6 +38,9 @@ pub use ordinary_surface_geometry::{
 /// Full real registry/table/cache owners, retained even if initialization stops.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct CtfInitializationReports {
+    /// Sole previously unmodeled NumRecurringErrors/RecurringErrors cells from DataErrTracking.
+    /// Positive recording producers are still explicit diagnostic boundaries.
+    pub(crate) source_recurring_errors: super::source_initialization::SourceRecurringErrorState,
     /// Genuine full registration state; repeated caller invocations append normally.
     pub registry: PredefinedRegistry,
     /// True only after the selected Setup caller reached SetPredefinedTables215.

@@ -104,6 +104,9 @@ impl CtfRunOutputs {
                     mdd: output_dir.join("eplusrs.mdd"),
                     audit: output_dir.join("eplusrs.audit"),
                     debug: output_dir.join("eplusrs.dbg"),
+                    end: output_dir.join("eplusrs.end"),
+                    error: output_dir.join("eplusrs.err"),
+                    dfs: output_dir.join("eplusrs.dfs"),
                     tabular_csv: output_dir.join("eplustbl.csv"),
                     tabular_tab: output_dir.join("eplustbl.tab"),
                     tabular_fixed: output_dir.join("eplustbl.txt"),
@@ -767,5 +770,16 @@ mod tests {
         }
         std::fs::remove_dir(dir)?;
         Ok(())
+    }
+}
+
+impl CtfRunOutputs {
+    pub(crate) fn complete_source_program(&mut self,weather:&ep_runtime::weather::day::ProductionWeatherTimestepSeries)->Result<(),String> {
+        let files=self.initialization_files.as_mut().ok_or("actual files before normal program completion")?;
+        {
+        let mut backend=SourceErrorBackend{state:&mut self.state,error_stream:Some(&mut self.error),console:&mut self.console,out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None};
+        files.complete_source_program(&mut self.reports,&mut self.source_session,weather,&mut backend).map_err(|e|e.to_string())?;
+        }
+        files.persist_source_error(&self.error).map_err(|e|e.to_string())
     }
 }

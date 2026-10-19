@@ -186,7 +186,7 @@ use crate::outputs::{
 use crate::{
     RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RunResultState,
     RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus, TraceLevel,
-    TraceSelection, assess_support,
+    TraceSelection,
 };
 
 mod purchased_air_cooling_capacity_zero_flow_reset;
@@ -1161,31 +1161,7 @@ fn run_with_optional_porting_scope_impl(
     }
 
     let support_start = Instant::now();
-    let mut scoped_report;
-    let support_report = if scope.is_some() {
-        scoped_report = compile_result.report.clone();
-        // These bounded controls are admitted only after the strict scope guard
-        // confirms the same ThirdOrder/Mixing branches as the Rust runtime.
-        scoped_report.coverage.retain(|entry| {
-            !matches!(
-                entry.object_type.as_str(),
-                "ZoneAirHeatBalanceAlgorithm" | "RoomAirModelType"
-            )
-        });
-        &scoped_report
-    } else {
-        &compile_result.report
-    };
-    let mut assessment = assess_support(
-        &raw_model,
-        support_report,
-        typed_model,
-        config.mode,
-        config.partial_policy,
-        config.output_format,
-        config.trace_level,
-    );
-    if let Some(scope) = scope {
+    let source_scope_trace = if let Some(scope) = scope {
         let mut trace =
             crate::inspect_porting_scope(&raw_model, &compile_result.report, typed_model, scope);
         ep_runtime::time_axis::clock_trace::register_design_day_declaration_count(
@@ -1230,6 +1206,39 @@ fn run_with_optional_porting_scope_impl(
         trace.production["bounded_coverage_exemptions"] = json!(exemptions);
         write_json(&config.output_dir.join("porting_scope.json"), &trace)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        Some(trace)
+    } else {
+        None
+    };
+    let source_admission = source_scope_trace.as_ref().and_then(|trace| {
+        crate::support::SourceSupportAdmission::from_validated_scope(&raw_model, trace)
+    });
+    let mut scoped_report;
+    let support_report = if scope.is_some() {
+        scoped_report = compile_result.report.clone();
+        // These bounded controls are admitted only after the strict scope guard
+        // confirms the same ThirdOrder/Mixing branches as the Rust runtime.
+        scoped_report.coverage.retain(|entry| {
+            !matches!(
+                entry.object_type.as_str(),
+                "ZoneAirHeatBalanceAlgorithm" | "RoomAirModelType"
+            )
+        });
+        &scoped_report
+    } else {
+        &compile_result.report
+    };
+    let mut assessment = crate::support::assess_support_with_source_admission(
+        &raw_model,
+        support_report,
+        typed_model,
+        config.mode,
+        config.partial_policy,
+        config.output_format,
+        config.trace_level,
+        source_admission.as_ref(),
+    );
+    if let Some(trace) = source_scope_trace {
         if !trace.admissible {
             for violation in trace.violations {
                 assessment
@@ -1242,7 +1251,7 @@ fn run_with_optional_porting_scope_impl(
             assessment.selected_algorithm_lane = crate::SelectedAlgorithmLane::none();
             assessment.runtime_selection_note = format!(
                 "scope {} rejected input before graph/runtime construction",
-                scope.id()
+                trace.scope.id()
             );
         }
     }
@@ -2088,11 +2097,13 @@ fn finish_successful_summary(
 ) -> Result<RunOutcome, RunError> {
     write_json(&config.output_dir.join("diagnostics.json"), &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-    write_error_summary(
-        &config.output_dir,
-        &render_eplusrs_err(&diagnostics, exit_code),
-    )
-    .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+    if !matches!(rust_runtime_result,Some(RuntimeExecutionOutcome::Source(_))) {
+        write_error_summary(
+            &config.output_dir,
+            &render_eplusrs_err(&diagnostics, exit_code),
+        )
+        .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+    }
     let report_start = Instant::now();
     let report = render_run_report(
         assessment,
@@ -3827,6 +3838,7 @@ fn execute_rust_runtime(
                     .map_err(|error| error.to_string())?;
                 let native_hour_scope = source_outcome::validate_requested_hours(&scope, requested_hours)
                     .map_err(|error| error.to_string())?;
+                ctf_outputs.complete_source_program(weather)?;
                 let reports = ctf_outputs.read_completed_source_reports()?;
                 return Ok(RuntimeExecutionOutcome::Source(Box::new(SourceRuntimeResult {
                     reports, scope, native_hour_scope, requested_hours,

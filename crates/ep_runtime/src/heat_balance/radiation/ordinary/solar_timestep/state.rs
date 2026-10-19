@@ -218,6 +218,10 @@ pub(crate) struct SourceShadowCombination {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceSolarTimestepState {
+    /// SolarShading.hh413-415 real constructors; no output-derived count.
+    pub(crate) num_too_many_figures: i32,
+    pub(crate) num_too_many_vertices: i32,
+    pub(crate) num_base_sub_surround: i32,
     pub(crate) shading: SourceSolarShadingArrays,
     pub(crate) heat_balance: SourceSolarHeatBalanceArrays,
     pub(crate) shadow_combinations: Option<Vec<SourceShadowCombination>>,
@@ -270,6 +274,7 @@ pub(crate) struct SourceSolarTimestepState {
 impl Default for SourceSolarTimestepState {
     fn default() -> Self {
         Self {
+            num_too_many_figures: 0, num_too_many_vertices: 0, num_base_sub_surround: 0,
             shading: SourceSolarShadingArrays::default(), heat_balance: SourceSolarHeatBalanceArrays::default(),
             shadow_combinations: None, casting_surface: None, penumbra_ids: Vec::new(), complex: SourceComplexSolarState::default(), max_hcv: 15,
             max_hc_array_bounds: 0, max_hc_array_increment: 0, max_number_of_figures: 0,

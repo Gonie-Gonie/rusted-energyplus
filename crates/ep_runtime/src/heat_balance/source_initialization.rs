@@ -18,10 +18,16 @@ use ep_model::ReportInputs;
 use std::io;
 
 mod files;
+pub(crate) use files::native_text_bytes;
 pub(crate) use files::SourceCloseOutputFilesOwners;
 mod kickoff_postlude;
 pub(crate) use kickoff_postlude::SourceFaultsManager;
 mod output_reporting;
+mod runtime_timer;
+pub(crate) use runtime_timer::SourceRuntimeTimer;
+mod program_completion;
+mod program_state;
+pub(crate) use program_state::{SourceRecurringErrorState, SourceSimulationInformation};
 mod produce_dictionaries;
 mod simulation_parent;
 pub(crate) use output_reporting::SourceSqliteState;
@@ -256,6 +262,10 @@ impl CtfInitializationReports {
             .source_initialization_weather
             .as_mut()
             .ok_or(SourceInitializationError::Association("pre-weather owner"))?;
+        // Actual commonInitialize277 precedes processEnvironmentVariables.
+        // This is the retained Source wrapper start, before actual Source IP;
+        // Rust conversion/compilation earlier in the CLI is outside this timer.
+        project.system.runtime_timer.tick();
         project.resolve_environment_operands(
             globals,
             &mut weather.environment,

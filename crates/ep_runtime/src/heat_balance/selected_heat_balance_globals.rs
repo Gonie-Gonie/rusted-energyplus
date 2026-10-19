@@ -14,6 +14,9 @@ impl PartialEq for SourceExternalHvacCallback {
 }
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedHeatBalanceGlobals {
+    /// DataGlobals.hh88/172 ctorfalse; this frontend has no ReadVars/API setter.
+    pub(crate) run_read_vars: bool,
+    pub(crate) running_via_api: bool,
     /// Actual DataGlobals.hh167/169 null progress callbacks on the sole global owner.
     pub(crate) progress_callbacks:
         crate::weather::day::source_next_environment::SourceProgressCallbacks,

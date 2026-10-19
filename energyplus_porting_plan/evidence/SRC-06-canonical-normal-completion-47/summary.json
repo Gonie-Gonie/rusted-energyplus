@@ -1,0 +1,273 @@
+{
+  "A": "14/54",
+  "B": "14/64",
+  "gate_changes": false,
+  "policy_changes": 0,
+  "selected_existing_sources": 19,
+  "selected_new_sources": 6,
+  "compiler_inputs": 4523,
+  "Rust_sources": 4510,
+  "scientific_unit_reruns": 0,
+  "Source_normal_scope": "Bounded existing A/B cases; real unsupported-positive completion branches remain explicit.",
+  "physics_scope": "Current47 A24/A72/annual reported policy/RMSE comparisons and exact five24 Source43 physical/own-export transfer; earlier43 scientific59 and46 B duration evidence is inherited, not rerun or source-version relabeled.",
+  "IO_scope": "MTD Native text transport fixed at true Source host. ERR/END carry actual same-owner counters/runtime. All remaining raw ancillary mismatches including actual elapsed and Source CTF sidecars are retained; no blanket ancillary PASS.",
+  "final_checkpoint": false,
+  "full15_latest_snapshot_or_gate_completion_claim": false,
+  "schema": "src06-canonical-normal-completion47.v1",
+  "status": "Normal Source completion owners and actual sevenCLI validation; ancillary differences retained",
+  "base_HEAD": "feda66208a8f3b3ae52aa38d7da56e8653c34b75",
+  "producer": {
+    "path": ".runtime/porting/SRC-06/source-normal-completion-held-Audit-47/manifest.json",
+    "sha256": "575f19cf5e918f9dc6cdf094dc26afdd864ee09ba4f4ac17e0c286305816cc7c",
+    "bytes": 91168
+  },
+  "independent_full_semantic_peer": {
+    "path": ".runtime/porting/SRC-06/Peer-normal-completion-Source-review-02/review.json",
+    "sha256": "608177483db98f76a0cc80621184bdbe2d2762a02014877b0e4373d981a60881",
+    "bytes": 43438
+  },
+  "application": {
+    "path": ".runtime/porting/SRC-06/Root-normal-completion-application-47/receipt.json",
+    "sha256": "d5f0823be751c22188edac5268e03e2554e7c7bdafe19ac6a85352b2fb58f6e5",
+    "bytes": 48298
+  },
+  "Root_actual_review": {
+    "path": ".runtime/porting/SRC-06/Root-source-normal-completion-actual-review-47/review.json",
+    "sha256": "43d8e0ed57d06aaa72fa7d2616cbdda9b32d5285ab07d050df992e62995eac58",
+    "bytes": 58160
+  },
+  "complete_compiler_plan": {
+    "path": ".runtime/porting/SRC-06/source-normal-completion-held-Audit-47/complete-final-compiler-Source-plan.json",
+    "sha256": "b7e8572d708ee1ad5562861f35524a27f1ffb2f4cbc23988e8203d3ed2f77aa9",
+    "bytes": 2572388
+  },
+  "parent_compiler_LF_bridge": {
+    "path": ".runtime/porting/SRC-06/Root-canonical-Git-LF-compiler-bridge-after46/receipt.json",
+    "sha256": "da16a6b898ee52ba4d41a0b3acf3c90dc00e8e85204c005d7c35bcd2173d3f0a",
+    "bytes": 8074
+  },
+  "actual_snapshot": {
+    "path": ".runtime/porting/source-objects/a7/a7819e22581999b83a87bb55b5eccd359e4e6b3d8165b9e8229d64fa71c3b6d5",
+    "sha256": "a7819e22581999b83a87bb55b5eccd359e4e6b3d8165b9e8229d64fa71c3b6d5"
+  },
+  "actual_production_CLI_invocations": 7,
+  "actual_test_bodies_executed": 0,
+  "new_test_bodies": 0,
+  "ordered_cases": [
+    {
+      "case": "B-NOLIMIT-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-NOLIMIT-24H-command-Root-47/receipt.json",
+        "sha256": "80972645d3da545fd3a3322f229d2a44ae6af5bc14a49f370c8cb1244859bf81",
+        "bytes": 7160
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-B-NOLIMIT-24H-readback-47/review.json",
+        "sha256": "07b48df9996818b392ab98918493107c079f565b25a69e7467958236674b3350",
+        "bytes": 27414
+      },
+      "actual_hours": 24,
+      "raw_ancillary_unequal_rows": 61,
+      "unclassified_ancillary_rows": 56,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "A-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-24H-command-Root-47/receipt.json",
+        "sha256": "3b9d7e9f5e1c78857e78bb1bb2966d3d47cae9495dbfb3b2b42d71d893e8a56d",
+        "bytes": 7108
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-A-24H-readback-47/review.json",
+        "sha256": "1a8cd6be364559cefae1820e1365ed8b27fafb066b6d6bda8844a03ad486907d",
+        "bytes": 37070
+      },
+      "actual_hours": 24,
+      "raw_ancillary_unequal_rows": 818,
+      "unclassified_ancillary_rows": 815,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "B-FLOW-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-FLOW-24H-command-Root-47/receipt.json",
+        "sha256": "af784b4a5b3c80034751f36bd326e2b35f642e5a95dc6c3edf40bf9a6892bc06",
+        "bytes": 7149
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-B-FLOW-24H-readback-47/review.json",
+        "sha256": "4373eaf5d74f37491278e2e6fe4efbc2daa6e4de92f66f2feb42b2781d976274",
+        "bytes": 27309
+      },
+      "actual_hours": 24,
+      "raw_ancillary_unequal_rows": 66,
+      "unclassified_ancillary_rows": 61,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "B-CAPACITY-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-CAPACITY-24H-command-Root-47/receipt.json",
+        "sha256": "7bf70c8a2cc5b7d209f96c5655dd7d43561e62eaafeeb02ffc2219b5d43d5505",
+        "bytes": 7165
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-B-CAPACITY-24H-readback-47/review.json",
+        "sha256": "ae487238807c042de5de47c44fd1aad984d8d40fcf0842fd39a37d1835703fa1",
+        "bytes": 27617
+      },
+      "actual_hours": 24,
+      "raw_ancillary_unequal_rows": 66,
+      "unclassified_ancillary_rows": 61,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "B-BOTH-24H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-B-BOTH-24H-command-Root-47/receipt.json",
+        "sha256": "2e4803029d46df895ccd91f8917eb586c9fae6cef4f5263eb57c1f77b86fa8d0",
+        "bytes": 7149
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-B-BOTH-24H-readback-47/review.json",
+        "sha256": "b732819739d26a2f26bd9d448533657ff5424b2d5157ea0240d0377bced100b6",
+        "bytes": 27309
+      },
+      "actual_hours": 24,
+      "raw_ancillary_unequal_rows": 66,
+      "unclassified_ancillary_rows": 61,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "A-72H",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-72H-command-Root-47/receipt.json",
+        "sha256": "5a4346c8defd17b01a6ad4ccdcff24bf3fc8176413108f9bd3c1d1912fb6c4a1",
+        "bytes": 7108
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-A-72H-readback-47/review.json",
+        "sha256": "85380fd50161ea3c592fbd45c4e58eb7f231ef61399188ccc97ca8e945b4d1a5",
+        "bytes": 31091
+      },
+      "actual_hours": 72,
+      "raw_ancillary_unequal_rows": 784,
+      "unclassified_ancillary_rows": 781,
+      "overall_physical_IO_PASS": false
+    },
+    {
+      "case": "A-ANNUAL",
+      "actual_receipt": {
+        "path": ".runtime/porting/SRC-06/canonical-source-normal-completion-A-ANNUAL-command-Root-47/receipt.json",
+        "sha256": "e7d2d2016e9bf5a340cc69e4e34817f1c66e3ac8af9453fa4304c2fac409add8",
+        "bytes": 7121
+      },
+      "case_readback": {
+        "path": ".runtime/porting/SRC-06/Root-normal-completion-A-ANNUAL-readback-47/review.json",
+        "sha256": "ecac623d7d6b134202a5e5f6a9da0ca9d5290f3608373a6f33de71283fc9eab0",
+        "bytes": 31369
+      },
+      "actual_hours": 8760,
+      "raw_ancillary_unequal_rows": 824,
+      "unclassified_ancillary_rows": 821,
+      "overall_physical_IO_PASS": false
+    }
+  ],
+  "current_A_strict_reported_comparisons": [
+    {
+      "case": "A-24H",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-normal-completion-A-24H-reported-Root-47/comparison.json",
+        "sha256": "895e14dbdf55cbea9c38af923f4516b7a8eedf26e8b472abffbaeaae387792c2",
+        "bytes": 92941
+      },
+      "totals": {
+        "series": 58,
+        "samples": 5352,
+        "raw_operand_unequal": 3536,
+        "parsed_binary64_unequal": 3536,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-A-24H-command-Root-67/receipt.json",
+        "sha256": "66dce9a44c5aa366719a44dec194656aeac174e88f17b05599c4248abd2b20b4",
+        "bytes": 3158
+      }
+    },
+    {
+      "case": "A-72H",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-normal-completion-A-72H-reported-Root-47/comparison.json",
+        "sha256": "44e9ff26772230e5a41b1dd0477c2787395a53266722a4e6ad0fae888366340d",
+        "bytes": 93168
+      },
+      "totals": {
+        "series": 58,
+        "samples": 16056,
+        "raw_operand_unequal": 10651,
+        "parsed_binary64_unequal": 10651,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-A-72H-command-Root-11/receipt.json",
+        "sha256": "ae9851ae7f7d49acd14416b69d4ba59994078f729337b07b6edec806d3472136",
+        "bytes": 3155
+      }
+    },
+    {
+      "case": "A-ANNUAL",
+      "comparison": {
+        "path": ".runtime/porting/SRC-06/completed-normal-completion-A-ANNUAL-reported-Root-47/comparison.json",
+        "sha256": "cd087c7b711a076008e480368d5bba9c8404556f4524a430b70daae518b76802",
+        "bytes": 93632
+      },
+      "totals": {
+        "series": 58,
+        "samples": 1953480,
+        "raw_operand_unequal": 1229028,
+        "parsed_binary64_unequal": 1229028,
+        "tolerance_failures": 0,
+        "rmse_failures": 0,
+        "passed": true
+      },
+      "Native_authority": {
+        "path": ".runtime/porting/SRC-06/native-installed-A-ANNUAL-command-Root-11/receipt.json",
+        "sha256": "c52b0c32a087f2a6aa5ee2f4265bb94f12906abecec17778b5b0f9bd2aeeb7b1",
+        "bytes": 3169
+      }
+    }
+  ],
+  "five24_whole43_physical_and_export_transfers": true,
+  "B24_policy_scope": "Prior genuine43/45/46 reported proofs transfer only through current whole physical/CSV/JSON/runtime equality; no new Native run or internal-state inference.",
+  "annual_own_JSON_CSV_roundtrip_claim": false,
+  "overall_ancillary_IO_PASS": false,
+  "preserved_reader01_failure": "Root reader01 KeyError CARGO_INCREMENTAL before evidence output directory creation; recorded Source CLI success remains unchanged.",
+  "limitations": [
+    "Seven normal Source47 CLI successes are not a new scientific unit, gate promotion, full card completion, or final checkpoint.",
+    "Current A24/A72/annual strict reported comparisons use unchanged original tolerances and sequential RMSE, not raw internal-state identity.",
+    "Only five24 own-export whole equality is carried here. Annual own JSON/CSV streaming scalar verification remains a separate obligation.",
+    "Root46 has genuine separate B duration comparisons. Historical Source43/46 scientific and duration evidence is inherited with explicit source-version qualification, not reexecuted under47.",
+    "Positive unsupported completion child boundaries remain explicit; no arbitrary input scope expansion."
+  ],
+  "archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-normal-completion-47/evidence.zip",
+    "sha256": "232b73868260338809433771154e6f04163c9b67ac0faf689cbe1c6f093eb7ba",
+    "bytes": 4699283
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-canonical-normal-completion-47/manifest.json",
+    "sha256": "67e7e11a198dc4e7fbbd5a76a974ce6d2074d7808a07f27a25f5a56921f81fb2",
+    "bytes": 112521
+  },
+  "archive_entries": 478,
+  "publisher_Source": {
+    "path": ".runtime/porting/SRC-06/publish-normal-completion-Root-47.py",
+    "sha256": "d62493864fbbaeeb43caa6c93c6bc9107cb6c4025c70a6b13af1f0b09df152bc",
+    "bytes": 8582
+  }
+}

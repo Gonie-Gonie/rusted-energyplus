@@ -21,10 +21,11 @@ impl SourceMtdFileHost {
     /// Write the already-reached actual MTD; never open or replace its file.
     pub(crate) fn write_reached(&mut self, bytes: &[u8]) -> io::Result<()> {
         use std::io::Write;
+        let bytes = crate::heat_balance::source_initialization::native_text_bytes(bytes);
         self.file
             .as_mut()
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotConnected, "actual MTD not open"))?
-            .write_all(bytes)
+            .write_all(bytes.as_ref())
     }
     /// Flush an actually opened MTD without opening an unreached file.
     ///

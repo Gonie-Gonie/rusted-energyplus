@@ -234,6 +234,19 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         report.push('\n');
     }
 
+    if !assessment.source_consumed_objects.is_empty() {
+        report.push_str("## Additional Handled Input Objects\n\n");
+        report.push_str("| object_type | count | note |\n");
+        report.push_str("| --- | ---: | --- |\n");
+        for entry in &assessment.source_consumed_objects {
+            report.push_str(&format!(
+                "| {} | {} | {} |\n",
+                markdown_cell(&entry.object_type), entry.count, markdown_cell(&entry.note)
+            ));
+        }
+        report.push('\n');
+    }
+
     if !assessment.ignored_raw_only_objects.is_empty() {
         report.push_str("## Ignored Raw-Only Objects\n\n");
         report.push_str("| object_type | count | note |\n");
@@ -487,6 +500,7 @@ mod tests {
             },
             typed_objects: Vec::new(),
             ignored_raw_only_objects: Vec::new(),
+            source_consumed_objects: Vec::new(),
             unsupported_objects: Vec::new(),
             diagnostics,
         });

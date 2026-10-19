@@ -327,6 +327,9 @@ pub(crate) struct SourceOutputRegistration {
     pub(crate) minimum_report_frequency: SourceReportFrequency,
     pub(crate) time_step_zone_sec: f64,
     pub(crate) end_use_categories: Option<Vec<SourceEndUseCategory>>,
+    /// Actual GenOutputVariablesAuditReport once-message latches, ctorfalse.
+    pub(crate) ungenerated_report_warning: bool,
+    pub(crate) opaque_surface_warning: bool,
     pub(crate) requested_variables: Vec<SourceRequestedVariable>,
     pub(crate) dictionary_variables: Vec<SourceDictionaryVariable>,
     pub(crate) out_vars: Vec<SourceOutVarReal>,
@@ -365,6 +368,8 @@ impl Default for SourceOutputRegistration {
             minimum_report_frequency: SourceReportFrequency::EachCall,
             time_step_zone_sec: 0.0,
             end_use_categories: None,
+            ungenerated_report_warning: false,
+            opaque_surface_warning: false,
             requested_variables: Vec::new(),
             dictionary_variables: Vec::new(),
             out_vars: Vec::new(),

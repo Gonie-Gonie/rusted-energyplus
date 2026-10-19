@@ -515,3 +515,6 @@ Rust QA 실행HEAD `b042d88c`와 이후 Native 실행HEAD `add087dc`는 실제7�
 
 
 [Source46 limit-mode reported validation](../evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json). 유량·용량·동시 제한 B의 24시간·72시간·연간 9개 케이스를 각각 같은 Native 기준과 전체 비교했다. 기존 허용오차와 RMSE 조건을 모두 통과했으며 원시값·비트 차이는 보고서에 남겼다.
+
+
+[Source47 정상 완료](../evidence/SRC-06-canonical-normal-completion-47/summary.json). 정상 완료 소유자 및 MTD CRLF 전송을 연결했다. 5개 24H의 선택된 7종 물리 파일과 자체 내보내기는 Source43과 동일하고 A24/A72/연간은 기존 허용오차·RMSE를 통과했다. 연간 자체 JSON/CSV 전수 왕복과 부속 IO 전체 일치·카드 완료는 아직 주장하지 않는다.

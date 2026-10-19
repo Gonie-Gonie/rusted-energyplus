@@ -26,6 +26,10 @@ pub struct SourceInitializationFilePaths {
     pub audit: PathBuf,
     /// Actual ManageSimulation185 debug path, opened before SQL/PostIP.
     pub debug: PathBuf,
+    /// Actual local END, native-style ERR, and retained DFS paths from this frontend.
+    pub end: PathBuf,
+    pub error: PathBuf,
+    pub dfs: PathBuf,
     /// Actual caller-selected paths for Native DataStringGlobals five table formats.
     pub tabular_csv: PathBuf,
     pub tabular_tab: PathBuf,
@@ -36,7 +40,7 @@ pub struct SourceInitializationFilePaths {
 
 /// Windows text-mode transformation shared by the actual physical streams.
 /// Native IOFiles290 omits binary; every LF expands while prior CR is retained.
-fn native_text_bytes(bytes: &[u8]) -> std::borrow::Cow<'_, [u8]> {
+pub(crate) fn native_text_bytes(bytes: &[u8]) -> std::borrow::Cow<'_, [u8]> {
     #[cfg(windows)]
     if bytes.contains(&b'\n') {
         let mut text = Vec::with_capacity(bytes.len());
@@ -139,6 +143,9 @@ pub struct SourceInitializationFiles {
     outputs: [SourceOutputStream; 4],
     audit: SourceOutputStream,
     debug: SourceOutputStream,
+    end: PathBuf,
+    error: PathBuf,
+    dfs: SourceOutputStream,
     // Native IOFilePath owns only the path, not a permanently opened stream.
     dxf: PathBuf,
     tabular_paths: [PathBuf; 5],
@@ -159,6 +166,9 @@ impl SourceInitializationFiles {
             ],
             audit: SourceOutputStream::new(paths.audit),
             debug: SourceOutputStream::new(paths.debug),
+            end: paths.end,
+            error: paths.error,
+            dfs: SourceOutputStream::new(paths.dfs),
             dxf: paths.dxf,
             tabular_paths: [paths.tabular_csv, paths.tabular_tab, paths.tabular_fixed, paths.tabular_html, paths.tabular_xml],
             dictionaries: [
@@ -325,3 +335,5 @@ impl SourceInitializationFiles {
         Ok(lines)
     }
 }
+
+mod program_end;

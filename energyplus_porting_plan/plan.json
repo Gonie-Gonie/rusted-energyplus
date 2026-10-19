@@ -12956,6 +12956,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-canonical-limit-mode-reported-validation-46/summary.json",
         "sha256": "3b81d690d030959d7a073ee50cdddb763e5b7a493e56346a793f841099794f0a",
         "size_bytes": 69112
+      },
+      "canonical_normal_completion_47": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-canonical-normal-completion-47/summary.json",
+        "sha256": "0a258a8a920c295ed39bccc69926953ff5e0dbbd10d7ea984e0100daca88c3fe",
+        "size_bytes": 12006
       }
     },
     {

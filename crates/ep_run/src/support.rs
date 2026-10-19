@@ -16,6 +16,8 @@ use crate::{
 pub use crate::support_registry::CAPABILITY_REGISTRY_PATH;
 
 mod runtime_boundaries;
+mod source_admission;
+pub(crate) use source_admission::SourceSupportAdmission;
 
 use runtime_boundaries::{
     assess_typed_runtime_boundaries, matched_capabilities, runtime_status_for_typed_model,
@@ -303,6 +305,9 @@ pub struct SupportAssessment {
     pub typed_objects: Vec<SupportObjectEntry>,
     /// Raw-only object entries that are ignored by this runtime.
     pub ignored_raw_only_objects: Vec<SupportObjectEntry>,
+    /// Raw input objects handled by the validated ordinary Source lane.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub source_consumed_objects: Vec<SupportObjectEntry>,
     /// Unsupported object entries.
     pub unsupported_objects: Vec<SupportObjectEntry>,
     /// Diagnostics emitted by support assessment.
@@ -352,9 +357,28 @@ pub fn assess_support(
     output_format: RunOutputFormat,
     trace_level: TraceLevel,
 ) -> SupportAssessment {
+    assess_support_with_source_admission(
+        raw_model, compile_report, typed_model, mode, partial_policy,
+        output_format, trace_level, None,
+    )
+}
+
+/// Classify only real input semantics covered by a validated Source admission.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn assess_support_with_source_admission(
+    raw_model: &RawModel,
+    compile_report: &CompileReport,
+    typed_model: Option<&TypedModel>,
+    mode: RunMode,
+    partial_policy: PartialRunPolicy,
+    output_format: RunOutputFormat,
+    trace_level: TraceLevel,
+    source_admission: Option<&SourceSupportAdmission>,
+) -> SupportAssessment {
     let mut diagnostics = RunDiagnostics::default();
     let mut typed_objects = Vec::new();
     let mut ignored_raw_only_objects = Vec::new();
+    let mut source_consumed_objects = Vec::new();
     let mut unsupported_objects = Vec::new();
     let capability_registry = load_embedded_capability_registry();
     if let Some(error) = capability_registry.error.as_ref() {
@@ -393,6 +417,16 @@ pub fn assess_support(
                 status: "typed".to_string(),
                 note: "compiled into the current TypedModel subset".to_string(),
             }),
+            ObjectCoverageStatus::RawOnly
+                if source_admission.is_some_and(|admission| admission.consumes(&coverage.object_type)) =>
+            {
+                source_consumed_objects.push(SupportObjectEntry {
+                    object_type: coverage.object_type.clone(),
+                    count: coverage.object_count,
+                    status: "source-input".to_string(),
+                    note: "Read by the admitted ordinary Source input path; bounded input handling is not a conformance or full-family claim".to_string(),
+                });
+            }
             ObjectCoverageStatus::RawOnly => {
                 if let Some(rule) =
                     partial_rule_for_object(&capability_registry.spec, &coverage.object_type)
@@ -448,6 +482,7 @@ pub fn assess_support(
         mode,
         &mut unsupported_objects,
         &mut diagnostics,
+        source_admission,
     );
     let (mut status, runtime_class, matched_capability_ids, missing_capability_ids) =
         if diagnostics.has_errors() || typed_model.is_none() {
@@ -517,6 +552,7 @@ pub fn assess_support(
         },
         typed_objects,
         ignored_raw_only_objects,
+        source_consumed_objects,
         unsupported_objects,
         diagnostics,
     }

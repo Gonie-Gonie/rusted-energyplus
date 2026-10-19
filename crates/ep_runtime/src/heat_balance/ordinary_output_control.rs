@@ -80,6 +80,7 @@ impl Default for SourceOutputControl {
 /// existing owner; these options contain no second vector or scalar registry.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceResultsFrameworkOptions {
+    pub(crate) simulation_information: super::source_initialization::SourceSimulationInformation,
     // Native ResultsFramework.hh433-434: distinct from outputVariables.
     pub(crate) meter_data_dictionary: Vec<String>,
     pub(crate) report_data_dictionary: Vec<String>,
@@ -95,6 +96,7 @@ pub(crate) struct SourceResultsFrameworkOptions {
 impl Default for SourceResultsFrameworkOptions {
     fn default() -> Self {
         Self {
+            simulation_information: Default::default(),
             meter_data_dictionary: Vec::new(),
             report_data_dictionary: Vec::new(),
             meter_frames: [
