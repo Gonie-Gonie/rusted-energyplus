@@ -241,13 +241,13 @@ pub struct RunPeriod {
     pub begin_month: u32,
     /// Begin day of month.
     pub begin_day_of_month: u32,
-    /// Optional begin year.
+    /// Effective begin year after Source truncation; zero/omitted input is unspecified.
     pub begin_year: Option<u32>,
     /// End month.
     pub end_month: u32,
     /// End day of month.
     pub end_day_of_month: u32,
-    /// Optional end year.
+    /// Effective end year after Source truncation; zero/omitted input is unspecified.
     pub end_year: Option<u32>,
     /// Optional declared start day of week.
     pub day_of_week_for_start_day: Option<DayOfWeek>,

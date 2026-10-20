@@ -79,6 +79,92 @@ fn timestep_admission_compilation_and_axis_agree_for_the_full_schema_domain() {
 }
 
 #[test]
+fn run_period_year_normalization_reaches_calendar_and_axis_before_source_weather() {
+    for (begin, end, weekday, year) in [
+        (json!(0), json!(0), Some("Tuesday"), 2013),
+        (json!(0.9), json!(-0.9), Some("Tuesday"), 2013),
+        (json!(2013.9), json!(2013.9), None, 2013),
+        (json!(2013), json!(0), None, 2013),
+    ] {
+        let mut value = input(PortingScope::A);
+        value["RunPeriod"]["Period"]["begin_year"] = begin;
+        value["RunPeriod"]["Period"]["end_year"] = end;
+        if let Some(weekday) = weekday {
+            value["RunPeriod"]["Period"]["day_of_week_for_start_day"] = json!(weekday);
+        }
+        let raw = parse_epjson_str(&value.to_string()).expect("raw RunPeriod year variants");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("normalized typed RunPeriod");
+        let trace = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(trace.admissible, "{value}: {:?}", trace.violations);
+        assert!(
+            crate::ordinary_input_processor::resolve(&raw).is_ok(),
+            "raw Source admission"
+        );
+        let axes = ep_runtime::time_axis::build_environment_time_axes(model)
+            .expect("normalized date calendar");
+        assert_eq!(axes[0].calendar.start_year, year);
+        assert_eq!(axes[0].calendar.end_year, year);
+        assert_eq!(axes[0].calendar.total_days, 1);
+        assert_eq!(
+            axes[0].sample_count(),
+            24 * model.timestep.number_of_timesteps_per_hour as usize
+        );
+    }
+    for (name, period, begin_year, end_year, days) in [
+        (
+            "December rollover with fractional start and zero end year",
+            json!({"begin_month":12,"begin_day_of_month":31,"begin_year":2013.9,"end_month":1,"end_day_of_month":1,"end_year":0}),
+            2013,
+            2014,
+            2,
+        ),
+        (
+            "February29 zero years select the Original leap default",
+            json!({"begin_month":2,"begin_day_of_month":29,"begin_year":0,"end_month":2,"end_day_of_month":29,"end_year":0}),
+            2012,
+            2012,
+            1,
+        ),
+    ] {
+        let mut value = input(PortingScope::A);
+        value["RunPeriod"]["Period"] = period;
+        let raw = parse_epjson_str(&value.to_string()).expect("raw year/date normalization");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("normalized year/date model");
+        let trace = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(trace.admissible, "{name}: {:?}", trace.violations);
+        assert!(
+            crate::ordinary_input_processor::resolve(&raw).is_ok(),
+            "{name}"
+        );
+        let axes =
+            ep_runtime::time_axis::build_environment_time_axes(model).expect("year/date calendar");
+        assert_eq!(axes[0].calendar.start_year, begin_year, "{name}");
+        assert_eq!(axes[0].calendar.end_year, end_year, "{name}");
+        assert_eq!(axes[0].calendar.total_days, days, "{name}");
+        assert_eq!(
+            axes[0].sample_count(),
+            days * 24 * model.timestep.number_of_timesteps_per_hour as usize,
+            "{name}"
+        );
+    }
+    for (begin, end) in [(1582, 1582), (0, 2013), (2013, 2012)] {
+        let mut value = input(PortingScope::A);
+        value["RunPeriod"]["Period"]["begin_year"] = json!(begin);
+        value["RunPeriod"]["Period"]["end_year"] = json!(end);
+        let raw =
+            parse_epjson_str(&value.to_string()).expect("raw Source-invalid year relationship");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("typed numeric fields");
+        assert!(
+            ep_runtime::time_axis::build_environment_time_axes(model).is_err(),
+            "Source-invalid calendar must stay blocked"
+        );
+    }
+}
+
+#[test]
 fn default_controls_and_source_adjustments_are_observable() {
     let mut value = input(PortingScope::A);
     value["Building"]["Building"]["north_axis"] = json!(-450);

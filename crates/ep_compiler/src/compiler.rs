@@ -978,6 +978,45 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn run_period_year(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<u32> {
+        let raw = field_value(object, field)?;
+        // RunPeriod's schema declares a number, not an integer. Original
+        // WeatherManager.cc5078/5081 truncates it to int before testing zero.
+        let year = self
+            .number_value("RunPeriod", object_name, field, raw)?
+            .trunc();
+        if year < f64::from(i32::MIN) || year > f64::from(i32::MAX) {
+            self.error(
+                "UnsupportedRunPeriodYear",
+                "RunPeriod",
+                Some(object_name),
+                Some(field),
+                "year is outside the defined EnergyPlus signed-int conversion domain".into(),
+            );
+            return None;
+        }
+        if year < 0.0 {
+            self.error(
+                "InvalidNumericRange",
+                "RunPeriod",
+                Some(object_name),
+                Some(field),
+                "year truncates to a negative calendar year".into(),
+            );
+            return None;
+        }
+        // Zero is the Source unspecified-year sentinel, including signed zero
+        // and numbers whose truncation is zero. Raw operands remain untouched.
+        // Calendar/Julian arithmetic limits remain separate; this conversion
+        // does not establish support for every representable large year.
+        if year == 0.0 { None } else { Some(year as u32) }
+    }
+
     fn parse_run_periods(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("RunPeriod") {
             let Some(id_value) = self.checked_id("RunPeriod", &name, model.run_periods.len())
@@ -1001,7 +1040,7 @@ impl<'a> Compiler<'a> {
                     "begin_day_of_month",
                     1,
                 ),
-                begin_year: self.optional_u32("RunPeriod", &name, &object, "begin_year"),
+                begin_year: self.run_period_year(&name, &object, "begin_year"),
                 end_month: self.u32_default("RunPeriod", &name, &object, "end_month", 12),
                 end_day_of_month: self.u32_default(
                     "RunPeriod",
@@ -1010,7 +1049,7 @@ impl<'a> Compiler<'a> {
                     "end_day_of_month",
                     31,
                 ),
-                end_year: self.optional_u32("RunPeriod", &name, &object, "end_year"),
+                end_year: self.run_period_year(&name, &object, "end_year"),
                 day_of_week_for_start_day: self.optional_enum(
                     "RunPeriod",
                     &name,
@@ -17466,6 +17505,7 @@ mod tests {
     mod material_roof_vegetation;
     mod material_variants;
     mod project_data;
+    mod run_period_years;
     mod schedule_compact_source;
     mod schedule_compact_type_limits;
     mod schedule_day_interval;
