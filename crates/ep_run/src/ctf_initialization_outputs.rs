@@ -521,6 +521,288 @@ mod tests {
     use super::*;
 
     #[test]
+    fn authored_clock_and_version_reach_source_getters_before_axis_construction()
+    -> Result<(), Box<dyn std::error::Error>> {
+        use serde_json::json;
+        let cases = [
+            ("absent timestep", Some("26.1"), None, 4, 1, "26.1"),
+            (
+                "empty timestep",
+                Some("26.1"),
+                Some(json!({})),
+                6,
+                0,
+                "26.1",
+            ),
+            (
+                "blank IDF timestep",
+                Some("26.1"),
+                Some(json!({})),
+                6,
+                0,
+                "26.1",
+            ),
+            (
+                "seven",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":7})),
+                6,
+                1,
+                "26.1",
+            ),
+            (
+                "eight",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":8})),
+                10,
+                1,
+                "26.1",
+            ),
+            (
+                "nine",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":9})),
+                10,
+                1,
+                "26.1",
+            ),
+            (
+                "fourteen",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":14})),
+                15,
+                1,
+                "26.1",
+            ),
+            (
+                "forty-five",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":45})),
+                60,
+                1,
+                "26.1",
+            ),
+            (
+                "matching patch",
+                Some("26.1.0"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                0,
+                "26.1.0",
+            ),
+            (
+                "advisory patch",
+                Some("26.1.99"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                0,
+                "26.1.99",
+            ),
+            (
+                "older version",
+                Some("25.2"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                2,
+                "25.2",
+            ),
+            (
+                "arbitrary version",
+                Some("not-a-version"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                2,
+                "NOT-A-VERSION",
+            ),
+            (
+                "absent version",
+                None,
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                1,
+                "",
+            ),
+            (
+                "blank version",
+                Some(""),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                1,
+                "26.1",
+            ),
+            (
+                "empty singleton keys",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                0,
+                "26.1",
+            ),
+            (
+                "whitespace singleton keys",
+                Some("26.1"),
+                Some(json!({"number_of_timesteps_per_hour":4})),
+                4,
+                0,
+                "26.1",
+            ),
+        ];
+        let forced = std::env::var("CI_FORCE_TIME_STEP")
+            .ok()
+            .is_some_and(|value| {
+                value
+                    .as_bytes()
+                    .first()
+                    .is_some_and(|byte| matches!(byte, b'Y' | b'y' | b'T' | b't'))
+            });
+        let dir = std::env::temp_dir().join(format!(
+            "ep-project-data-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)?
+                .as_nanos()
+        ));
+        std::fs::create_dir(&dir)?;
+        for (name, version, timestep, expected, warnings, eio_version) in cases {
+            let has_timestep = timestep.is_some();
+            let converted_idf = name == "blank IDF timestep";
+            let version_key = match name {
+                "blank IDF timestep" => "Version 1",
+                "empty singleton keys" => "",
+                "whitespace singleton keys" => " \t ",
+                _ => "v",
+            };
+            let timestep_key = if converted_idf {
+                "Timestep 1"
+            } else if name.contains("singleton keys") {
+                version_key
+            } else {
+                "t"
+            };
+            let mut value =
+                json!({"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Zone":{"z":{}}});
+            if let Some(version) = version {
+                value["Version"] = json!({(version_key):{"version_identifier":version}});
+            }
+            if let Some(timestep) = timestep {
+                value["Timestep"] = json!({(timestep_key):timestep});
+            }
+            let raw = if converted_idf {
+                ep_raw_model::parse_epjson_str_with_idf_order(
+                    &value.to_string(),
+                    "Version,26.1;Timestep,;Building,b,,,,,MinimalShadowing;Zone,z;",
+                )?
+            } else {
+                ep_raw_model::parse_epjson_str(&value.to_string())?
+            };
+            let compiled = ep_compiler::compile_raw_model(&raw);
+            crate::ordinary_equipment_input::resolve(&raw)?;
+            let mut model = compiled
+                .model
+                .ok_or_else(|| format!("{name}: {:?}", compiled.report.diagnostics))?;
+            assert_eq!(
+                model.timestep.number_of_timesteps_per_hour, expected,
+                "{name}"
+            );
+            assert_eq!(
+                model.authored_version_identifier.as_deref(),
+                version,
+                "{name}"
+            );
+            let input = crate::ordinary_input_processor::resolve(&raw)?;
+            let operands = SourceInitializationInput {
+                project: crate::ordinary_project_data::resolve(&raw, raw.is_epjson(), &input)?,
+                schedules: crate::ordinary_schedule_input::resolve(&raw)?,
+                sizing: crate::ordinary_sizing_input::resolve(&raw)?,
+                ..SourceInitializationInput::default()
+            };
+            let mut output = CtfRunOutputs::new(&model.version.to_string());
+            output.prepare_source_environment(&dir, operands)?;
+            {
+                let mut context = output.context();
+                let matches = input.check_source_version_match(&mut context.backend)?;
+                assert_eq!(
+                    matches,
+                    version.is_none_or(|v| v.is_empty() || v.starts_with("26.1")),
+                    "{name}"
+                );
+                assert!(
+                    version.is_none() || input.is_object_unused("Version", version_key),
+                    "precheck must not perform getObjectItem"
+                );
+                context.reports.initialize_source_input_processor(input)?;
+            }
+            output.initialize_source_state(&model.report_inputs)?;
+            let reached = output
+                .reports
+                .selected_input_processor
+                .as_ref()
+                .ok_or("same retained IP missing")?;
+            assert!(
+                version.is_none() || !reached.is_object_unused("Version", version_key),
+                "Version exact-key getter consumption: {name}"
+            );
+            assert!(
+                !has_timestep || !reached.is_object_unused("Timestep", timestep_key),
+                "Timestep exact-key getter consumption: {name}"
+            );
+            let actual = output.source_zone_timesteps_per_hour()?;
+            assert_eq!(
+                actual,
+                if forced && has_timestep { 2 } else { expected },
+                "{name}"
+            );
+            model.timestep.number_of_timesteps_per_hour = actual;
+            let axes = ep_runtime::time_axis::build_environment_time_axes(&model)?;
+            assert_eq!(axes[0].zone_timestep.timesteps_per_hour, actual, "{name}");
+            assert_eq!(axes[0].sample_count(), 24 * actual as usize, "{name}");
+            let version_warnings = if version.is_none() || version == Some("") {
+                1
+            } else if version.is_some_and(|v| !v.starts_with("26.1")) {
+                2
+            } else {
+                0
+            };
+            assert_eq!(
+                output.state.tracking.total_warning_errors,
+                if forced && has_timestep {
+                    version_warnings + 1
+                } else {
+                    warnings
+                },
+                "{name}"
+            );
+            assert_eq!(output.state.tracking.total_severe_errors, 0, "{name}");
+            if version == Some("not-a-version") {
+                let messages = String::from_utf8(output.error.clone())?;
+                let first = messages
+                    .find("IDF=\"not-a-version\"")
+                    .ok_or("raw Version warning missing")?;
+                let second = messages
+                    .find("IDF=\"NOT-A-VERSION\"")
+                    .ok_or("canonical Version warning missing")?;
+                assert!(
+                    first < second,
+                    "raw warning precedes canonical getter warning"
+                );
+            }
+            output.persist(&dir)?;
+            let eio = std::fs::read_to_string(dir.join("eplusrs.eio"))?;
+            assert!(
+                eio.lines()
+                    .any(|line| line == format!(" Version, {eio_version}")),
+                "{name}: Version EIO"
+            );
+            drop(output);
+            for entry in std::fs::read_dir(&dir)? {
+                std::fs::remove_file(entry?.path())?;
+            }
+        }
+        std::fs::remove_dir(&dir)?;
+        Ok(())
+    }
+
+    #[test]
     fn actual_fatal_prefix_survives_runtime_failure_and_summary()
     -> Result<(), Box<dyn std::error::Error>> {
         let dir = std::env::temp_dir().join(format!(

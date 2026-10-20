@@ -46,10 +46,9 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ) => {
             matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())
         }
-        ("Version", "version_identifier") => blank(value) || matches!(value, RawValue::String(_)),
+        ("Version", "version_identifier") => matches!(value, RawValue::String(_)),
         ("Timestep", "number_of_timesteps_per_hour") => {
-            blank(value)
-                || number(value).is_some_and(|n| n.fract() == 0.0 && (1.0..=60.0).contains(&n))
+            matches!(value, RawValue::Number(text) if text.parse::<u32>().is_ok_and(|n| (1..=60).contains(&n)))
         }
         ("Building", "north_axis") => blank(value) || number(value).is_some(),
         ("Building", "terrain") => {

@@ -113,7 +113,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
         for (name, object) in objects {
-            if name.0.trim().is_empty() {
+            if name.0.trim().is_empty() && !matches!(family.0.as_str(), "Version" | "Timestep") {
                 return Err(format!("blank ordinary {} name", family.0));
             }
             for (field, value) in &object.fields {
@@ -130,6 +130,11 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 if field(object, required).is_none_or(blank) {
                     return Err(format!("missing {}.{}", family.0, required));
                 }
+            }
+            if family.0 == "Version" && field(object, "version_identifier").is_none() {
+                return Err(
+                    "present Version requires its actual raw version_identifier string".into(),
+                );
             }
             if source_b_family {
                 for &required in source_b::required_fields(&family.0) {
@@ -240,24 +245,27 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             }
         }
     }
-    // A present Timestep object's omitted field uses the real schema default 6.
-    // A wholly absent object remains unavailable: Original then defaults to 4,
-    // while the compiler currently defaults to 6.
+    // GetProjectData distinguishes an absent object (4) from its schema field
+    // default (6), and normalizes positive non-divisors before building owners.
     let single = |family: &str| {
         raw.objects
             .get(&ObjectType(family.into()))
             .filter(|objects| objects.len() == 1)
             .and_then(|objects| objects.values().next())
     };
-    let timestep_object =
-        single("Timestep").ok_or("ordinary equipment requires one actual Timestep object")?;
-    let timestep = field(timestep_object, "number_of_timesteps_per_hour")
-        .map_or(Some(6.0), number)
-        .filter(|n| n.fract() == 0.0 && (1.0..=60.0).contains(n) && 60 % (*n as usize) == 0)
-        .ok_or("ordinary equipment requires a divisor-of-60 Timestep")? as usize;
-    if single("Version").and_then(|object| text(object, "version_identifier")) != Some("26.1") {
-        return Err("ordinary equipment requires the explicit supported Version 26.1".into());
-    }
+    let requested = single("Timestep")
+        .map(|object| {
+            field(object, "number_of_timesteps_per_hour")
+                .map_or(Some(6), |value| match value {
+                    RawValue::Number(text) => text.parse::<u32>().ok(),
+                    _ => None,
+                })
+                .filter(|n| (1..=60).contains(n))
+                .ok_or("ordinary equipment requires an integer Timestep between 1 and 60")
+        })
+        .transpose()?;
+    let timestep = ep_model::TimestepConfig::from_energyplus_input(requested, false)
+        .number_of_timesteps_per_hour as usize;
     let zone_name = raw
         .objects
         .get(&ObjectType("Zone".into()))
@@ -536,12 +544,12 @@ mod tests {
             ),
             ("explicit four remains four", base.to_owned(), Some(4)),
             (
-                "absent Timestep remains unavailable",
+                "absent Timestep uses Original non-CondFD default",
                 base.replace(
                     "\"Timestep\":{\"t\":{\"number_of_timesteps_per_hour\":4}},",
                     "",
                 ),
-                None,
+                Some(4),
             ),
             (
                 "missing solar field is not an equipment branch",
@@ -565,7 +573,7 @@ mod tests {
                 assert!(actual.is_err(), "{name}");
             }
         }
-        for timestep in ["0", "7", "61", "4.5", "\"4\"", "null"] {
+        for timestep in ["0", "61", "4.5", "\"4\"", "null"] {
             let raw = parse_epjson_str(&format!(
                 "{{{}}}",
                 base.replace(

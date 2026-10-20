@@ -248,7 +248,8 @@ fn rejects_missing_root_bad_rows_and_non_finite_values() -> Result<(), Box<dyn s
             .report
             .diagnostics
             .iter()
-            .any(|diagnostic| diagnostic.code == "InvalidScheduleFileShadingTimestep")
+            .any(|diagnostic| diagnostic.code == "InvalidNumericRange"
+                && diagnostic.object_type == "Timestep")
     );
 
     std::fs::write(root.join("shading.csv"), "Timestamp,Surface\nrow-1,0.5\n")?;

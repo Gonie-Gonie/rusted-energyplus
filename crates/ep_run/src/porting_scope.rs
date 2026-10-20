@@ -280,7 +280,7 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
 
 fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mut Vec<String>) {
     if model.version != ep_model::Version::oracle_26_1_0() {
-        violations.push("input Version must match the locked EnergyPlus 26.1.0".into());
+        violations.push("effective engine must match the locked EnergyPlus 26.1.0".into());
     }
     if model.zones.len() != 1 || model.surfaces.len() != 6 {
         violations.push("exactly one opaque zone with six detailed surfaces is required".into());

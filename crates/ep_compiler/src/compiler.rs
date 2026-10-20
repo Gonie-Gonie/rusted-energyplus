@@ -73,7 +73,7 @@ use ep_model::{
     SurfaceVaporCoefficient, SurfaceVaporCoefficients, SurfaceVaporCoefficientsId, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
-    VariableAbsorptanceSchedule, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
+    VariableAbsorptanceSchedule, VertexEntryDirection, WeekScheduleId, WindExposure,
     WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
     WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
     WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
@@ -659,7 +659,7 @@ impl<'a> Compiler<'a> {
 
     fn compile(mut self) -> CompileResult {
         let mut model = TypedModel {
-            version: self.parse_version(),
+            authored_version_identifier: self.parse_authored_version_identifier(),
             ..TypedModel::default()
         };
 
@@ -781,35 +781,16 @@ impl<'a> Compiler<'a> {
         }
     }
 
-    fn parse_version(&mut self) -> Version {
-        let Some(version) = self.raw_model.version.as_deref() else {
-            return Version::oracle_26_1_0();
-        };
-
-        let mut parts = version.split('.');
-        let Some(major) = parts.next().and_then(|part| part.parse::<u16>().ok()) else {
-            self.error(
-                "InvalidVersion",
-                "Version",
-                None,
-                Some("version_identifier"),
-                format!("could not parse EnergyPlus version '{version}'"),
-            );
-            return Version::oracle_26_1_0();
-        };
-        let minor = parts
-            .next()
-            .and_then(|part| part.parse::<u16>().ok())
-            .unwrap_or(0);
-        let patch = parts
-            .next()
-            .and_then(|part| part.parse::<u16>().ok())
-            .unwrap_or(0);
-
-        Version {
-            major,
-            minor,
-            patch,
+    fn parse_authored_version_identifier(&mut self) -> Option<String> {
+        let (name, object) = self.single_object("Version")?;
+        match field_value(&object, "version_identifier") {
+            Some(RawValue::String(value)) => Some(value.clone()),
+            _ => {
+                // InputProcessor::checkVersionMatch reads this raw string before
+                // getter defaults. A present object without it fails in Original.
+                self.invalid_field_type("Version", &name, "version_identifier", "string");
+                None
+            }
         }
     }
 
@@ -944,19 +925,33 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_timestep(&mut self, model: &mut TypedModel) {
-        let Some((name, object)) = self.single_object("Timestep") else {
-            return;
-        };
-
-        model.timestep = TimestepConfig {
-            number_of_timesteps_per_hour: self.u32_default(
-                "Timestep",
-                &name,
-                &object,
-                "number_of_timesteps_per_hour",
-                6,
-            ),
-        };
+        let conduction_finite_difference = self.objects("HeatBalanceAlgorithm").first().is_some_and(|(_, object)| {
+            matches!(field_value(object, "algorithm"), Some(RawValue::String(value)) if value.eq_ignore_ascii_case("ConductionFiniteDifference"))
+        });
+        let requested = self.single_object("Timestep").map(|(name, object)| {
+            let value = match field_value(&object, "number_of_timesteps_per_hour") {
+                None => {
+                    self.record_default("Timestep", &name, "number_of_timesteps_per_hour", "6");
+                    6
+                }
+                Some(RawValue::Number(text)) if text.parse::<u32>().is_ok() => {
+                    text.parse::<u32>().unwrap_or(6)
+                }
+                Some(_) => {
+                    // Native's schema validator requires an integer JSON type;
+                    // mathematically integral floats and strings are invalid.
+                    self.invalid_field_type("Timestep", &name, "number_of_timesteps_per_hour", "integer");
+                    6
+                }
+            };
+            if !(1..=60).contains(&value) {
+                self.error("InvalidNumericRange", "Timestep", Some(&name), Some("number_of_timesteps_per_hour"),
+                    format!("Timestep/{name} field number_of_timesteps_per_hour must be between 1 and 60, got {value}"));
+            }
+            value
+        });
+        model.timestep =
+            TimestepConfig::from_energyplus_input(requested, conduction_finite_difference);
     }
 
     fn parse_surface_convection_algorithms(&mut self, model: &mut TypedModel) {
@@ -17470,6 +17465,7 @@ mod tests {
     mod material_property_variable_thermal_conductivity;
     mod material_roof_vegetation;
     mod material_variants;
+    mod project_data;
     mod schedule_compact_source;
     mod schedule_compact_type_limits;
     mod schedule_day_interval;

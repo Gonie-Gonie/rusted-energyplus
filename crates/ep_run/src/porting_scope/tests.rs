@@ -59,6 +59,26 @@ fn trace(value: &Value, scope: PortingScope) -> PortingScopeTrace {
 }
 
 #[test]
+fn timestep_admission_compilation_and_axis_agree_for_the_full_schema_domain() {
+    for requested in 1..=60 {
+        let mut value = input(PortingScope::A);
+        value["Timestep"] = json!({"t":{"number_of_timesteps_per_hour":requested}});
+        let raw = parse_epjson_str(&value.to_string()).expect("raw clock input");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("compiled valid clock");
+        let trace = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(trace.admissible, "{requested}: {:?}", trace.violations);
+        let actual = crate::ordinary_equipment_input::resolve(&raw).expect("Source raw admission");
+        let steps = model.timestep.number_of_timesteps_per_hour;
+        assert_eq!(actual, ep_runtime::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_family_inventory([], steps as usize).expect("clock inventory"));
+        let axes = ep_runtime::time_axis::build_environment_time_axes(model)
+            .expect("effective clock axis");
+        assert_eq!(axes[0].zone_timestep.timesteps_per_hour, steps);
+        assert_eq!(axes[0].sample_count(), 24 * steps as usize);
+    }
+}
+
+#[test]
 fn default_controls_and_source_adjustments_are_observable() {
     let mut value = input(PortingScope::A);
     value["Building"]["Building"]["north_axis"] = json!(-450);
@@ -81,7 +101,7 @@ fn default_controls_and_source_adjustments_are_observable() {
         "ThirdOrderBackwardDifference"
     );
     assert_eq!(actual.settings["room_air_model_type"], "Mixing");
-    assert_eq!(actual.settings["timesteps_per_hour"], 6);
+    assert_eq!(actual.settings["timesteps_per_hour"], 4);
     assert_eq!(actual.production["conformance_claim"], false);
     value["Building"]["Building"]["maximum_number_of_warmup_days"] = json!(0);
     assert!(!trace(&value, PortingScope::A).admissible);
@@ -360,7 +380,7 @@ fn weather_trace_uses_real_calendar_selection_and_zone_schedule_values() {
     assert_eq!(actual["calendar_year"], 2013);
     assert_eq!(actual["weather_record_year"], 1999);
     assert_eq!(actual["hourly_samples"], 24);
-    assert_eq!(actual["zone_timestep_samples"], 144);
+    assert_eq!(actual["zone_timestep_samples"], 96);
     assert_eq!(actual["daylight_saving"]["active"], false);
     let schedules = actual["schedule_values"].as_array().expect("schedules");
     let thermostat = schedules

@@ -3,9 +3,11 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 mod input_statistics;
+mod version;
 pub use input_statistics::{
     SourceInputStatisticsFields, SourceInputStatisticsInput, SourceInputStatisticsValue,
 };
+pub use version::SourceVersionCheckError;
 
 /// Literal legacy_idd field counts; not an object-admission allowlist.
 #[derive(Clone, Debug, PartialEq, Eq)]

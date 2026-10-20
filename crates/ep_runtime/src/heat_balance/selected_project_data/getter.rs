@@ -93,18 +93,11 @@ impl SelectedProjectData {
                 ))?;
                 steps = 4;
             } else if 60 % steps != 0 {
-                let divisors: [i32; 12] = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60];
-                let (mut minimum, mut which) = (9999, 0);
-                for (index, divisor) in divisors.iter().enumerate() {
-                    if (steps - divisor).abs() > minimum {
-                        continue;
-                    }
-                    // Original assigns the signed difference, not abs(difference).
-                    minimum = steps - divisor;
-                    which = index;
-                }
-                backend.show_warning_error(&format!("Timestep: Requested number ({steps}) not evenly divisible into 60, defaulted to nearest ({}).", divisors[which]))?;
-                steps = divisors[which];
+                let selected =
+                    ep_model::TimestepConfig::from_energyplus_input(Some(steps as u32), false)
+                        .number_of_timesteps_per_hour as i32;
+                backend.show_warning_error(&format!("Timestep: Requested number ({steps}) not evenly divisible into 60, defaulted to nearest ({selected})."))?;
+                steps = selected;
             }
             owners.weather.global.time_steps_in_hour = steps;
             if cond_fd && owners.weather.global.time_steps_in_hour < 20 {

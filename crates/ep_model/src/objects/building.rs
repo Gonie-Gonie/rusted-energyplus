@@ -156,6 +156,43 @@ pub struct TimestepConfig {
     pub number_of_timesteps_per_hour: u32,
 }
 
+impl TimestepConfig {
+    /// Effective GetProjectData clock before any time axis or schedule is built.
+    ///
+    /// `None` means no Timestep object (four steps/hour), while a present object
+    /// with an omitted field supplies the schema default `Some(6)`. The signed
+    /// nearest-divisor loop and tie order follow SimulationManager.cc:817-875.
+    /// CondFD's minimum of twenty describes the input clock, not implemented physics.
+    #[must_use]
+    pub fn from_energyplus_input(
+        requested: Option<u32>,
+        conduction_finite_difference: bool,
+    ) -> Self {
+        let mut steps = match requested {
+            Some(value @ 1..=60) => value as i32,
+            _ => 4,
+        };
+        if 60 % steps != 0 {
+            let mut minimum = 9999;
+            let mut selected = 1;
+            for divisor in [1_i32, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60] {
+                if (steps - divisor).abs() > minimum {
+                    continue;
+                }
+                minimum = steps - divisor;
+                selected = divisor;
+            }
+            steps = selected;
+        }
+        if conduction_finite_difference && steps < 20 {
+            steps = 20;
+        }
+        Self {
+            number_of_timesteps_per_hour: steps as u32,
+        }
+    }
+}
+
 impl Default for TimestepConfig {
     fn default() -> Self {
         Self {

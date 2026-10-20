@@ -3064,6 +3064,7 @@ fn write_compile_artifacts(
             "raw_objects": report.raw_object_count,
             "typed_objects": report.typed_object_count,
             "version": model.version.to_string(),
+            "authored_version_identifier": model.authored_version_identifier,
             "counts": typed_counts(model),
             "diagnostics": report.diagnostics.iter().map(|diagnostic| json!({
                 "severity": diagnostic.severity.to_string(),
@@ -3830,8 +3831,13 @@ fn execute_rust_runtime(
             .ok_or("actual source initialization input missing")?;
         ctf_outputs.prepare_source_environment(output_dir, input)?;
         {
-            let initialization = ctf_outputs.context();
+            let mut initialization = ctf_outputs.context();
             if let Some(input) = runtime_inputs.selected_input_processor.take() {
+                // Original processInput warns on the raw Version before maps and
+                // GetProjectData. A mismatch does not make simulation input fatal.
+                let _version_match = input
+                    .check_source_version_match(&mut initialization.backend)
+                    .map_err(|error| error.to_string())?;
                 initialization
                     .reports
                     .initialize_source_input_processor(input)

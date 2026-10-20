@@ -36,8 +36,11 @@ use crate::{
 /// Minimal typed model for early compiler stages.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TypedModel {
-    /// Model version.
+    /// Effective pinned engine/schema version, independent of advisory input text.
     pub version: Version,
+    /// Exact authored Version identifier; absent only when the object is absent.
+    /// EnergyPlus accepts mismatching strings with warnings rather than changing engines.
+    pub authored_version_identifier: Option<String>,
     /// Building settings.
     pub building: Option<Building>,
     /// Global surface geometry input rules, when declared.
@@ -300,6 +303,7 @@ impl Default for TypedModel {
     fn default() -> Self {
         Self {
             version: Version::oracle_26_1_0(),
+            authored_version_identifier: None,
             building: None,
             global_geometry_rules: None,
             timestep: TimestepConfig::default(),
