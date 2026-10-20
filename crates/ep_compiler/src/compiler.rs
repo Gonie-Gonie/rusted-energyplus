@@ -13744,7 +13744,13 @@ impl<'a> Compiler<'a> {
                 0.0..=1.0,
             );
             let fraction_sum = fraction_latent + fraction_radiant + fraction_lost;
-            if fraction_sum > 1.0 + 1.0e-12 {
+            // Native IHG1960-1967 clamps the grouped subtraction, including
+            // small negative residuals, before deciding that the sum is invalid.
+            let mut fraction_convected = 1.0 - fraction_sum;
+            if fraction_convected.abs() <= 0.001 {
+                fraction_convected = 0.0;
+            }
+            if fraction_convected < 0.0 {
                 self.error(
                     "InvalidOtherEquipmentFractionSum",
                     "OtherEquipment",
@@ -13770,20 +13776,35 @@ impl<'a> Compiler<'a> {
                     "design_level",
                     0.0,
                 ),
-                power_per_floor_area_w_per_m2: self.number_range_default(
-                    "OtherEquipment",
-                    &name,
-                    &object,
-                    "power_per_floor_area",
-                    0.0,
-                    0.0..=f64::INFINITY,
-                ),
-                power_per_person_w: if design_level_calculation_method
-                    == OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+                power_per_floor_area_w_per_m2: if design_level_calculation_method
+                    == OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel
                 {
-                    // Native selects Numeric2 for either per-area alias; the
-                    // finite unselected Numeric3 is retained without a made-up
-                    // sign restriction. Other methods keep their old boundary.
+                    // Native selects Numeric1; finite unused Numeric2 is retained.
+                    self.number_default(
+                        "OtherEquipment",
+                        &name,
+                        &object,
+                        "power_per_floor_area",
+                        0.0,
+                    )
+                } else {
+                    self.number_range_default(
+                        "OtherEquipment",
+                        &name,
+                        &object,
+                        "power_per_floor_area",
+                        0.0,
+                        0.0..=f64::INFINITY,
+                    )
+                },
+                power_per_person_w: if matches!(
+                    design_level_calculation_method,
+                    OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel
+                        | OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+                ) {
+                    // Native selects Numeric1 or Numeric2 for these methods;
+                    // finite unused Numeric3 has no sign restriction. Other
+                    // methods keep their existing bounded projection.
                     self.number_default("OtherEquipment", &name, &object, "power_per_person", 0.0)
                 } else {
                     self.number_range_default(

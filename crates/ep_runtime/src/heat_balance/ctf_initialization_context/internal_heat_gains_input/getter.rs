@@ -445,7 +445,8 @@ impl SelectedInternalHeatGains {
                         "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but that field is blank.  0 OtherEquipment will result.",
                         object.name, level_name
                     );
-                    if level_field == 0 {
+                    if level_field == 0 && owners.clock.is_none() {
+                        // Preserve the old legacy entry point's backend phase.
                         owners.backend.show_warning_error(&message)?;
                     } else {
                         sizing_warning(owners, &message)?;

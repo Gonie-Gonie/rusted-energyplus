@@ -2706,6 +2706,271 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
             assert!(eio.is_empty(), "nominal EIO remains unreached");
         }
+        // Omitted direct Numeric1 reaches the real blank-warning child. The
+        // unused finite operands cannot replace it, even after prior errors.
+        for (idf, warmup, kickoff, sizing, prior_error) in [
+            (false, true, false, false, false),
+            (true, true, false, false, false),
+            (false, true, true, false, false),
+            (false, true, false, true, false),
+            (false, true, false, false, true),
+        ] {
+            let mut reports = failed_gains.clone();
+            reports.selected_internal_heat_gains.errors_found = prior_error;
+            let globals = reports
+                .selected_heat_balance_globals
+                .as_mut()
+                .ok_or("blank globals")?;
+            globals.kickoff_simulation = kickoff;
+            globals.doing_sizing = sizing;
+            let raw = reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("blank direct raw")?;
+            raw.source_is_epjson = !idf;
+            let objects = raw
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("blank direct objects")?;
+            let fields = &mut objects[0].fields;
+            fields.remove("design_level");
+            fields.insert(
+                "power_per_floor_area".into(),
+                ProjectInputValue::Number(-9.0),
+            );
+            fields.insert("power_per_person".into(), ProjectInputValue::Number(9.0));
+            if idf {
+                for object in objects {
+                    object.idf_max_fields = Some(13);
+                }
+            }
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: warmup,
+                ..Default::default()
+            };
+            let (mut state, mut errors, mut console, mut eio) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            let result = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            if prior_error {
+                assert!(matches!(
+                    result,
+                    Err(crate::RuntimeError::HeatBalanceInput(_))
+                ));
+            } else {
+                result?;
+            }
+            let gains = &reports.selected_internal_heat_gains;
+            assert_eq!(gains.get_input_flag, prior_error);
+            assert_eq!(gains.errors_found, prior_error);
+            let rows = gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("blank direct rows")?;
+            assert_eq!(rows[0].design_level.to_bits(), 0.0_f64.to_bits());
+            assert_eq!(
+                rows[0].nominal_min_design_level.to_bits(),
+                0.0_f64.to_bits()
+            );
+            assert_eq!(
+                rows[0].nominal_max_design_level.to_bits(),
+                0.0_f64.to_bits()
+            );
+            assert_eq!(
+                rows[0].fraction_radiant, 0.2,
+                "fractions follow successful warning"
+            );
+            assert_eq!(rows[1].design_level, if prior_error { 0.0 } else { -3.0 });
+            assert_eq!(state.tracking.total_warning_errors, 1);
+            assert_eq!(
+                state.tracking.total_warning_errors_during_warmup,
+                i32::from(warmup && !kickoff && !sizing)
+            );
+            assert_eq!(
+                state.tracking.total_warning_errors_during_sizing,
+                i32::from(sizing)
+            );
+            assert_eq!(state.tracking.total_severe_errors, 0);
+            assert!(!state.warmup_flag && !state.kickoff_simulation && !state.doing_sizing);
+            let text = String::from_utf8(errors)?;
+            let title = if idf { "Design Level" } else { "design_level" };
+            assert!(text.contains(&format!(
+                "specifies {title}, but that field is blank.  0 OtherEquipment will result."
+            )));
+            assert_eq!(
+                String::from_utf8(eio)?.contains("OtherEquipment Internal Gains Nominal"),
+                !prior_error
+            );
+        }
+        {
+            // Failure in the newly reached direct blank warning preserves the
+            // same earlier schedule/fuel writes but no sizing/fraction prefix.
+            let mut reports = failed_gains.clone();
+            reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("blank warning raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("blank warning objects")?[0]
+                .fields
+                .remove("design_level");
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: true,
+                ..Default::default()
+            };
+            let (mut state, mut console, mut eio, mut error_stream) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                OrdinaryFailingEio,
+            );
+            let result = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error_stream),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            assert!(matches!(result, Err(crate::RuntimeError::WarmupOutput(_))));
+            let gains = &reports.selected_internal_heat_gains;
+            assert!(gains.get_input_flag && !gains.errors_found);
+            let row = &gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("blank warning row")?[0];
+            assert!(row.schedule.is_some());
+            assert_eq!(row.design_level.to_bits(), 0.0_f64.to_bits());
+            assert_eq!(row.fraction_radiant, 0.0);
+            assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
+            assert!(eio.is_empty());
+        }
+        // The actual getter already owns the exact IHG fraction clamp. Exercise
+        // both adjacent binary64 sides and its retained severe/fatal prefix.
+        for (lost, valid) in [
+            (0.3995_f64, true),
+            (0.4005, true),
+            (f64::from_bits(0.401_f64.to_bits() - 1), true),
+            (0.401, true),
+            (f64::from_bits(0.401_f64.to_bits() + 1), false),
+            (0.4011, false),
+        ] {
+            let mut reports = failed_gains.clone();
+            let fields = &mut reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("clamp raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("clamp objects")?[0]
+                .fields;
+            for (name, value) in [
+                ("fraction_latent", 0.0),
+                ("fraction_radiant", 0.6),
+                ("fraction_lost", lost),
+            ] {
+                fields.insert(name.into(), ProjectInputValue::Number(value));
+            }
+            let clock = crate::weather::day::WeatherGlobalState::default();
+            let (mut state, mut errors, mut console, mut eio) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            let result = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            if valid {
+                result?;
+            } else {
+                assert!(matches!(
+                    result,
+                    Err(crate::RuntimeError::HeatBalanceInput(_))
+                ));
+            }
+            let gains = &reports.selected_internal_heat_gains;
+            let row = &gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("clamp row")?[0];
+            let residual = 1.0 - (0.0 + 0.6 + lost);
+            let expected = if residual.abs() <= 0.001 {
+                0.0
+            } else {
+                residual
+            };
+            assert_eq!(row.fraction_convected.to_bits(), expected.to_bits());
+            assert_eq!(row.fraction_lost.to_bits(), lost.to_bits());
+            assert_eq!(gains.errors_found, !valid);
+            assert_eq!(gains.get_input_flag, !valid);
+            assert_eq!(state.tracking.total_warning_errors, 0);
+            assert_eq!(state.tracking.total_severe_errors, i32::from(!valid));
+            let text = String::from_utf8(errors)?;
+            assert_eq!(text.contains("Sum of Fractions > 1.0"), !valid);
+            assert_eq!(
+                String::from_utf8(eio)?.contains("OtherEquipment Internal Gains Nominal"),
+                valid
+            );
+        }
         // Genuine enum/resource registration and the existing timestep prefix
         // all retain the same real gain rows. The gain-only IP fixture lacks
         // refrigeration schema definitions, an explicit first child boundary.

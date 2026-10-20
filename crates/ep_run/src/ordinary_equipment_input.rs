@@ -417,11 +417,22 @@ fn resolve_raw(
                             "design_level_calculation_method",
                             &["EquipmentLevel"],
                         ) {
-                            // Keep the existing legacy/direct-level boundary.
-                            field(object, "design_level").and_then(number).is_some()
-                                && ["power_per_floor_area", "power_per_person"]
+                            if source_calendar_ingress {
+                                // Missing Numeric1 is a genuine schema blank;
+                                // finite Numeric2/3 are retained but not selected.
+                                ["design_level", "power_per_floor_area", "power_per_person"]
                                     .iter()
-                                    .all(|name| field(object, name).is_none_or(blank))
+                                    .all(|name| {
+                                        field(object, name)
+                                            .is_none_or(|value| number(value).is_some())
+                                    })
+                            } else {
+                                // Keep the original unscoped legacy boundary.
+                                field(object, "design_level").and_then(number).is_some()
+                                    && ["power_per_floor_area", "power_per_person"]
+                                        .iter()
+                                        .all(|name| field(object, name).is_none_or(blank))
+                            }
                         } else {
                             source_calendar_ingress
                                 && text_is(field(object, "design_level_calculation_method").unwrap_or(&RawValue::Null), &["Watts/Area", "Power/Area"])
@@ -432,11 +443,25 @@ fn resolve_raw(
                                     .is_none_or(|value| number(value).is_some_and(|n| n >= 0.0))
                                 && field(object, "power_per_person").is_none_or(|value| number(value).is_some())
                         })
-                        && ["fraction_latent", "fraction_radiant", "fraction_lost"]
-                            .iter()
-                            .map(|name| field(object, name).and_then(number).unwrap_or(0.0))
-                            .sum::<f64>()
-                            <= 1.0
+                        && if source_calendar_ingress {
+                            let names = ["fraction_latent", "fraction_radiant", "fraction_lost"];
+                            let schema_numbers = names.iter().all(|name| {
+                                field(object, name).is_none_or(|value| number(value).is_some())
+                            });
+                            let [latent, radiant, lost] = names
+                                .map(|name| field(object, name).and_then(number).unwrap_or(0.0));
+                            let mut convected = 1.0 - (latent + radiant + lost);
+                            if convected.abs() <= 0.001 {
+                                convected = 0.0;
+                            }
+                            schema_numbers && convected >= 0.0
+                        } else {
+                            ["fraction_latent", "fraction_radiant", "fraction_lost"]
+                                .iter()
+                                .map(|name| field(object, name).and_then(number).unwrap_or(0.0))
+                                .sum::<f64>()
+                                <= 1.0
+                        }
                 }
                 "Output:Variable" => text(object, "variable_name").is_some(),
                 "Output:Meter" | "Output:Meter:MeterFileOnly" => {
@@ -1811,6 +1836,88 @@ mod source_a_compact_ingress {
                     )
                 )
             );
+        }
+        // Source keeps actual omitted Numeric1 and finite unselected Numeric2/3;
+        // the original legacy raw boundary still rejects both new cases.
+        for design in [None, Some(7.0_f64)] {
+            for unused in [9.0_f64, -9.0] {
+                let mut value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                    "OtherEquipment":{"direct":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                        "power_per_floor_area":unused,"power_per_person":unused}}});
+                if let Some(design) = design {
+                    value["OtherEquipment"]["direct"]["design_level"] = serde_json::json!(design);
+                }
+                let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+                assert!(resolve(&raw).is_err());
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                let compiled = ep_compiler::compile_raw_model(&raw);
+                let typed = compiled
+                    .model
+                    .ok_or_else(|| format!("{:?}", compiled.report.diagnostics))?;
+                assert_eq!(
+                    typed.other_equipment[0].design_level_w,
+                    design.unwrap_or(0.0)
+                );
+                assert_eq!(
+                    typed.other_equipment[0]
+                        .power_per_floor_area_w_per_m2
+                        .to_bits(),
+                    unused.to_bits()
+                );
+                assert_eq!(
+                    typed.other_equipment[0].power_per_person_w.to_bits(),
+                    unused.to_bits()
+                );
+                let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                let fields = &hb.objects["OtherEquipment"][0].fields;
+                assert_eq!(fields.contains_key("design_level"), design.is_some());
+                for name in ["power_per_floor_area", "power_per_person"] {
+                    assert_eq!(
+                        fields[name],
+                        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                            unused
+                        )
+                    );
+                }
+            }
+        }
+        for (lost, valid) in [
+            (0.3995_f64, true),
+            (0.4005, true),
+            (f64::from_bits(0.401_f64.to_bits() - 1), true),
+            (0.401, true),
+            (f64::from_bits(0.401_f64.to_bits() + 1), false),
+            (0.4011, false),
+        ] {
+            let value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                "OtherEquipment":{"clamp":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                    "design_level":7,"fraction_latent":0,"fraction_radiant":0.6,"fraction_lost":lost}}});
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert_eq!(resolve_source_a(&raw).is_ok(), valid, "{lost:?}");
+            assert_eq!(resolve_source_b(&raw).is_ok(), valid, "{lost:?}");
+            assert_eq!(resolve(&raw).is_ok(), 0.6 + lost <= 1.0, "legacy sum fence");
+        }
+        // An absent schema-number operand is distinct from explicit null/string.
+        for name in [
+            "design_level",
+            "power_per_floor_area",
+            "power_per_person",
+            "fraction_lost",
+        ] {
+            for invalid in [
+                serde_json::json!(null),
+                serde_json::json!(""),
+                serde_json::json!("1D0"),
+                serde_json::json!(true),
+            ] {
+                let mut value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                    "OtherEquipment":{"direct":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level":7}}});
+                value["OtherEquipment"]["direct"][name] = invalid;
+                let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+                assert!(resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err());
+            }
         }
         // The same selected raw gain getter consumes the real eFuel, while
         // legacy admission retains its original None-only boundary.

@@ -42,6 +42,70 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     );
     assert_eq!(model.other_equipment[0].zone, model.zones[0].id);
     assert_eq!(result.report.typed_object_count, model.object_count());
+    // Preserve Native's grouped subtraction at the representable clamp edge.
+    // The next lost-fraction float crosses the threshold even though decimal
+    // 0.401 itself is just inside after the actual rounded addition.
+    for (lost, valid) in [
+        (0.3995_f64, true),
+        (0.4005, true),
+        (f64::from_bits(0.401_f64.to_bits() - 1), true),
+        (0.401, true),
+        (f64::from_bits(0.401_f64.to_bits() + 1), false),
+        (0.4011, false),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"OtherEquipment":{{"Clamp":{{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","design_level":7,
+            "fraction_latent":0,"fraction_radiant":0.6,"fraction_lost":{lost}}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert_eq!(
+            !result.has_errors(),
+            valid,
+            "{lost:?}: {:?}",
+            result.report.diagnostics
+        );
+        if valid {
+            let typed = result.model.ok_or("typed clamp owner")?;
+            assert_eq!(
+                typed.other_equipment[0].fraction_lost.to_bits(),
+                lost.to_bits()
+            );
+        } else {
+            assert!(
+                result
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "InvalidOtherEquipmentFractionSum")
+            );
+        }
+    }
+    // Native selects Numeric1 only. Omission defaults the typed projection to
+    // zero; the genuine raw getter still owns its separate blank warning.
+    for unused in [9.0_f64, -9.0] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"OtherEquipment":{{"Unused":{{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone",
+            "power_per_floor_area":{unused},"power_per_person":{unused}}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let typed = result.model.ok_or("typed unused fields")?;
+        let row = &typed.other_equipment[0];
+        assert_eq!(row.design_level_w.to_bits(), 0.0_f64.to_bits());
+        assert_eq!(
+            row.power_per_floor_area_w_per_m2.to_bits(),
+            unused.to_bits()
+        );
+        assert_eq!(row.power_per_person_w.to_bits(), unused.to_bits());
+    }
+    let selected_negative = parse_epjson_str(
+        r#"{"Zone":{"Direct Zone":{}},"OtherEquipment":{"Bad":{
+        "zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone",
+        "design_level_calculation_method":"Power/Area","power_per_floor_area":-9}}}"#,
+    )?;
+    assert!(compile_raw_model(&selected_negative).has_errors());
     Ok(())
 }
 

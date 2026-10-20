@@ -237,8 +237,8 @@
       "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "OtherEquipment": [
-      "The ordinary one-Zone opaque Source A/B route retains direct EquipmentLevel and connects Power/Area and Watts/Area to the selected numeric operand, then multiplies by the actual post-geometry Space.FloorArea. Unselected direct-level fields never seed per-area heat. The real equipment owner feeds nominal reports, scheduled timestep rates and existing air/surface heat-balance consumers.",
-      "Source A/B retains None and connects thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Real object/Zone/Space rate and consumption bindings reach resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; same-input physical evidence exercises Electricity and its separate Hourly meter contract. Zero latent load remains required; per-person sizing, explicit or multiple Space/grouping and EMS stay unavailable. Finite unused Numeric3 may have either sign. Nonzero radiant combinations and arbitrary models remain field-scoped."
+      "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
+      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero radiant/lost fractions and its separate Hourly meter contract. Zero latent load remains required. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Unsigned JSON integer-kind parity and unknown instance metadata remain pending; arbitrary models and other fractional combinations retain their stated bounds."
     ]
   },
   "verification": {
@@ -255,18 +255,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-fuels-clippy-41.log",
-        "sha256": "3aef3d34899690175e1cc1d458549c2c2348eca7903d30904d9e1b665b21c5f9",
-        "bytes": 686
+        "path": ".runtime/object-expansion/other-equipment-input-domain-clippy-42.log",
+        "sha256": "0ebece33cfb4d2a9f4d05d462791c4716f7b0deb1e423c2e934a7b26c4721364",
+        "bytes": 794
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-fuels-docs-41.log",
-        "sha256": "ec37863d23669715f5888203e9e62fbf186c928ce363c1617594b8e780a27105",
+        "path": ".runtime/object-expansion/other-equipment-input-domain-docs-42.log",
+        "sha256": "a478e2c6720573ccc4b9733559652bbe612b91646a47812667d1bc59f0b281cf",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-fuels-41",
+      "clippy_through_build": "other-equipment-input-domain-42",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3925,12 +3925,63 @@
           "passed": true
         },
         "effective_state": "Actual Native41 and Source41 change only Test352a fuelNone to Electricity and add one Hourly MFO InteriorEquipment:Electricity to actual Native40 input. Power/Area3.7, separate negativeNone equipment, all original59 requests/weather/known fields remain unchanged. Original58 global policies and separateConstant96 exact rule are retained; the new24-J rule copies exact ExteriorLights identity-only thresholds without modifying kernel/policy. Full60/5472 actual Source-owned streams are independently recomputed, including nonemptyMTR4/96 with all signed values preserved. ActualWarmup19, complete zero-diagnostic ERR-END/fourinfo, wholeSHD, schedule32/8762 and nominal3/1160 sections match. RawMTD preserves each engines actual reportID; paired state normalizes only this reportID and file refs, retaining exact Electricity/InteriorEquipment Consumption associations. Source does not consume any Native/report/warmup value as a seed. Actual fuel/registration/target/consumption/meter/IP/report consumers, prior thermal/schedule owners, sharednumeric module and full Rust snapshot are authenticated live/archive. Electricity alone is physically exercised; all13 fuel enums/resources and GasIP table are separate owner-test evidence. Nonzero radiant, arbitrary model/error combinations and physical lexical-sign proof remain bounded."
+      },
+      {
+        "id": "other-equipment-fraction-clamp",
+        "group": "other_equipment_fraction_clamp",
+        "source_build": "other-equipment-input-domain-42",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-fraction-clamp/calibration-01/input.epJSON",
+          "sha256": "6af52df0eafd4951778e93142e3acdd007ef0a7ee4cc136367579bd90ee629f7",
+          "bytes": 38527
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-fraction-clamp/calibration-01/receipt.json",
+          "sha256": "3ee0ddd79ca116cc1a5fcb0eff15a186be086f3d134e9605067c86d39556fa09",
+          "bytes": 38545
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-fraction-clamp-42/other-equipment-fraction-clamp/receipt.json",
+          "sha256": "442c1fe08186a5e80253422fa40a8228e3948c96debe071f3214025e303f0e3d",
+          "bytes": 4173
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-fraction-clamp-42/run-summary.json",
+          "sha256": "d1832148f3963e0e5991ecf65315341295a2301fec2689d483f511e01c242c0d",
+          "bytes": 33208
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-fraction-clamp-comparisons-42/other-equipment-fraction-clamp/comparison.json",
+          "sha256": "45ecb50594a3e602412effa0a064c02c3c065ebd3fe2d7a8156569f475115281",
+          "bytes": 291456
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-fraction-clamp-42-launch/other-equipment-fraction-clamp/request.json",
+          "sha256": "2c833c1a68f07a905f8b008f328ccee99d2c3c3eb0a6c2ed7b63c0f9709dc8f3",
+          "bytes": 3414
+        },
+        "totals": {
+          "series": 60,
+          "samples": 5472,
+          "raw_operand_unequal": 3537,
+          "parsed_binary64_unequal": 3537,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual Native42 and Source42 change only Test352a radiant0.6/lost0.4005/unused Numeric3=-9 from actual Native41 input. Power/Area3.7, Electricity, negative separateNone owner, every60 request/policy/weather and all other bytes remain. Exact grouped residual abs<=0.001 clamps before negative-error check; no sum bound substitute or fraction renormalization. Full60/5472 actual Source-owned streams are independently recomputed with original58 global rules plus unchanged separate96 exactConstant and24J identity-only meter rule, retaining signed nonemptyMTR4/96. ActualWarmup19, complete zero-diagnostic ERR-END/fourinfo, wholeSHD, schedule32/8762 and actualnominal3/1160 match. Nominal.600/.401/.000 reports real formatted fractional fields; it does not directly measure internal convective zero bits. Actual cached device radiant, enclosure thermal sum/absorption, surface radiant flux, insideCTF/MRT/air and resource Consumption/meter consumers are bound through71 owners, sharednumeric module and full live/archive Rust snapshot. No Native/report/warmup value seeds production; Native41 is parent ancestry only. General latent/per-person/Space/EMS/model/error boundaries remain separate."
       }
     ],
     "totals": {
-      "paired_cases": 67,
-      "reported_samples": 492966,
-      "raw_operand_unequal": 140270,
+      "paired_cases": 68,
+      "reported_samples": 498438,
+      "raw_operand_unequal": 143807,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4632,10 +4683,27 @@
           "sha256": "057d6f1c1b0a33e5f183cd15f9281146f7d3631ec5df3d42954dd7ad15ee8f81",
           "bytes": 75911820
         }
+      },
+      {
+        "id": "other-equipment-input-domain-42",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-42/receipt.json",
+          "sha256": "79f3db4d6a34fabb8121e48e8fa8bb5273ee93d7f643997e4844a4862e48724a",
+          "bytes": 4819
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/5b/5b1943c5ceffc8b2bfcbf27ee6280e56173eb6f1da7b4a51b8cce6112a92dc4f",
+          "sha256": "5b1943c5ceffc8b2bfcbf27ee6280e56173eb6f1da7b4a51b8cce6112a92dc4f"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-42/eplus-rs.exe",
+          "sha256": "1b9113d2c6e20af727ab51fc318ca90a49b214f749f25920ad6e8f0562b6ee95",
+          "bytes": 75919851
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 798,
+      "passed": 2097,
       "logs": [
         {
           "path": ".runtime/object-expansion/other-equipment-fuels-run-tests-41.log",
@@ -4651,9 +4719,24 @@
           "path": ".runtime/object-expansion/other-equipment-fuels-meter-tests-41.log",
           "sha256": "bf3163863ec769b9b7e88a4205bc0d0061bdf538c6572c27b75cd44cf8a335f2",
           "bytes": 752
+        },
+        {
+          "path": ".runtime/object-expansion/other-equipment-input-domain-compiler-tests-42.log",
+          "sha256": "d1a3b68fea92f7e692cd258a0758736c1c7dbeab2bfefd1fffa15f3b93ca21f6",
+          "bytes": 63042
+        },
+        {
+          "path": ".runtime/object-expansion/other-equipment-input-domain-run-tests-42.log",
+          "sha256": "0c4d7a3215bc3b04e73763ee3424a1e033afcf0deb91ffd60c2278efacde09bf",
+          "bytes": 146337
+        },
+        {
+          "path": ".runtime/object-expansion/other-equipment-input-domain-owner-tests-42.log",
+          "sha256": "52eb1892049a9029b6990bda32588857e2b1ffdae632efbddaccf92e8e6f0978",
+          "bytes": 792
         }
       ],
-      "scope": "Existing ep_run796 and two actual runtime owner bodies verify real fuel/raw/getter/resource/diagnostic and NaturalGas Gas-IP predefined-table paths. No new cohort; full workspace milestone and optional compile retain their actual earlier scope."
+      "scope": "Retains the previous 798 successful focused checks; adds compiler502, ep_run796 and one actual gain-owner body for real selected/default numeric fields and exact grouped fraction clamp. No new cohort; full workspace and optional compile retain their earlier scope."
     }
   },
   "additional_native_type_calibrations": [
