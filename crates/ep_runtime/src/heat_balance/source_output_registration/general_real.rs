@@ -204,32 +204,7 @@ impl SourceOutputRegistration {
             backend,
         )
     }
-    pub(crate) fn setup_bound_general_real_source_input(
-        &mut self,
-        input: &mut SourceReportVariableInput<'_>,
-        prescan: &SourceOutputPreScan,
-        declaration: SourceRealOutputDeclaration<'_>,
-        minutes_in_time_step: i32,
-        host: &mut impl SourceOutputFileHost,
-        eio: &mut dyn std::io::Write,
-        binding: SourceRealOutputBinding<'_>,
-        options: SourceGeneralRealRegistrationOptions<'_>,
-        backend: &mut SourceErrorBackend<'_>,
-    ) -> Result<(), OrdinaryRadiationError> {
-        self.setup_bound_general_real_optional_dictionary(
-            input,
-            prescan,
-            declaration,
-            minutes_in_time_step,
-            host,
-            eio,
-            binding,
-            None,
-            options,
-            backend,
-        )
-    }
-    fn setup_bound_general_real_optional_dictionary(
+    pub(crate) fn setup_bound_general_real_optional_dictionary(
         &mut self,
         input: &mut SourceReportVariableInput<'_>,
         prescan: &SourceOutputPreScan,

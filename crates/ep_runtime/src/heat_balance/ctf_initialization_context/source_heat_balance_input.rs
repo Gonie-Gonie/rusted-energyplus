@@ -40,6 +40,7 @@ impl CtfInitializationContext<'_> {
             radiation_input,
             branch,
             None,
+            None,
         )
     }
 
@@ -58,6 +59,7 @@ impl CtfInitializationContext<'_> {
         radiation_input: OrdinaryRadiationInput,
         branch: &mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
         debug: Option<&mut dyn std::io::Write>,
+        dictionary_file: Option<super::internal_heat_gains_input::SourceGainDictionaryFile<'_>>,
     ) -> Result<(), RuntimeError> {
         // The existing driver initializes the actual ErrorsFound local, then
         // Project/Site/Material/Frame/Construction/Building Zone input in order.
@@ -94,11 +96,12 @@ impl CtfInitializationContext<'_> {
         // owner before propagating either success or failure.
         self.initialize_selected_solar_view_factors_with_debug(model, debug)?;
         // Native320 InitOnly=true reads gains before later daylighting input.
-        self.manage_selected_internal_heat_gains_input_with_clock(
+        self.manage_selected_internal_heat_gains_input_with_dictionary(
             model,
             minutes,
             output_host,
             clock,
+            dictionary_file,
         )?;
         // Native325-326 reads DataHeatBal.AnyKiva. The older selected helper
         // reads a geometry compartment member, so this genuine parent uses

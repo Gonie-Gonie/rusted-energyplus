@@ -59,7 +59,7 @@ impl SourceInitializationFiles {
         backend.with_scoped(
             &mut (&mut *reports, &mut *self),
             |call_backend, (call_reports, call_files)| {
-                let (eio, debug) = call_files.eio_and_debug_streams();
+                let (eio, debug, eso) = call_files.eio_debug_and_dictionary_streams();
                 let mut context = CtfInitializationContext {
                     reports: &mut **call_reports,
                     eio,
@@ -75,6 +75,7 @@ impl SourceInitializationFiles {
                     equipment,
                     radiation,
                     debug,
+                    crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile { eso },
                 )
             },
         )?;

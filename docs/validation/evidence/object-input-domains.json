@@ -42,7 +42,7 @@
       "same-input actual2016Feb29Monday lifecycle matches all5352 original samples and exact zero-diagnostic EIO/ERR/END; only three year-bearing DATA PERIODS fields change in existing explicitly synthetic8784-row weather"
     ],
     "Output:Variable": [
-      "real live reporting schedule identity and immutable dictionary name",
+      "real live reporting schedule identity and immutable dictionary name; bound OtherEquipment Electricity Rate/Energy requests reach the actual ESO dictionary and Source A Timestep reporting",
       "zero OFF; positive/negative ON; EMS current value at both native boundaries",
       "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
       "actual IO deletion/catalog/extraction; zero samples are not fabricated",
@@ -238,7 +238,7 @@
     ],
     "OtherEquipment": [
       "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
-      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions and its separate Hourly meter contract. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
+      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions, its separate Hourly meter and requested object Rate/Energy Timestep outputs through the actual ESO dictionary. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
     ]
   },
   "verification": {
@@ -246,37 +246,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-latent-workspace-tests-44.log",
-        "sha256": "0ae696686d3a33f5b0ac043e9a9e757c16ca2595bccd6c700a27529089937c8d",
-        "bytes": 773497
+        "path": ".runtime/object-expansion/internal-gain-dictionary-workspace-tests-46b.log",
+        "sha256": "1c422dfa5b73273e2f88f852dd32815caca364de127a78d27d83563e0d76cbae",
+        "bytes": 773376
       },
-      "scope": "Full workspace regression after Source A latent admission changed. The extended owner body checks actual gain-cache and Zone/Space latent sinks, the ordinary humidity corrector, RH and history, while preserving its genuine failed parent. Full same-input engine closure is recorded separately in the paired case. Earlier focused checks are contained in this milestone; no new cohort or optional API change."
+      "scope": "Full workspace regression after the real internal-gain output dictionary capability and its caller borrows changed. Existing owner bodies check the bound dictionary paths; the actual same-input engine pair records physical requested-output closure separately. Earlier focused checks are contained in this milestone. The original failed compile log remains preserved; only the corrected successful full run is counted."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-latent-b-clippy-45.log",
-        "sha256": "43014d0a48d84e13a798c51e9c058d8ac445a509206f4a3bd24ed9d72233c9ba",
-        "bytes": 580
+        "path": ".runtime/object-expansion/internal-gain-dictionary-clippy-46.log",
+        "sha256": "9f771a4e16d2f0ecbe019e6c33f532cfee1c8d943bd5889f75a3e01979ad5327",
+        "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-latent-b-docs-45.log",
-        "sha256": "5d9d7acac763b5cb6ced0a1c10e04b29230088a25770305091b985f310fb59e0",
+        "path": ".runtime/object-expansion/internal-gain-dictionary-docs-46.log",
+        "sha256": "a7adcf31dcd516d2a6483a1239ebb341b59ed49936d932abf8566292d0b9c75c",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-latent-b-45",
+      "clippy_through_build": "internal-gain-dictionary-46",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/schedule-json-number-native-cohort-check-36.log",
-          "sha256": "cb7f4f1a815209a7c34578a292cf412f2d0a92b53cbb07c4c8df59e8f08f44b3",
-          "bytes": 3003396
+          "path": ".runtime/object-expansion/internal-gain-dictionary-native-cohort-check-46.log",
+          "sha256": "1b78de90e237727d3a31703ae2f46eafb280756943a3974657f581d03d98f794",
+          "bytes": 1468006
         },
-        "scope": "Compile-only verification of existing optional cohort callers after the shared JSON-number-kind API and genuine schedule getter changes. Existing feature warnings remain; no feature tests or engines run.",
-        "through_build": "schedule-json-number-36"
+        "scope": "Compile-only verification of the existing optional callers after the real dictionary capability borrow API changed. Existing feature warnings remain; no optional tests or engines were run.",
+        "through_build": "internal-gain-dictionary-46"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -4129,12 +4129,63 @@
           "passed": true
         },
         "effective_state": "Actual Native45 and Source45 use the same B35 IDF input with only Noon Plug Load latent0.0 changed to0.25, retaining EquipmentLevel1000/radiant.20/lost0 and exact residual.55. The actual conditioned NoLimit/no-OA/None-humidity-control path retains real gain caches, Zone moisture corrector/history, PurchasedAir calculation/update/reporting and Zone/inlet/air-node/return humidity owners. Four humidity and eight IdealLoads latent rate/energy96 profiles are observed under all original102 unchanged policies, without extra equality or sign constraints. Full102/9792 ownstream kernel recomputation, genuine absent/deleted-empty MTR, three exact96 schedule profiles, whole28-line7420 schedule EIO and2-line957 nominal, observedWarmup6, full ERR-END and SHD agree. Current Native45 initial validationTrue/one execution is mandatory; B35 and A44 are ancestry, not this input authority. No observed report/warmup/numerical value seeds production. All110 actual source owner files plus shared numeric module/full Rust snapshot are authenticated live/archive. This bounded conditioned case does not admit arbitrary OA/humidity controls/per-person/Spaces/EMS or all model combinations."
+      },
+      {
+        "id": "internal-gain-dictionary",
+        "group": "internal_gain_dictionary",
+        "source_build": "internal-gain-dictionary-46",
+        "input": {
+          "path": ".runtime/object-expansion/native-internal-gain-dictionary/calibration-01/input.epJSON",
+          "sha256": "f4cab803482cf2a45604c5a587c93020a6296bfb31e1132b594139e268a0059b",
+          "bytes": 39548
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-internal-gain-dictionary/calibration-01/receipt.json",
+          "sha256": "a28f26d616507bef88fbe768dae76d16cbdafed9fa3df2e87d68bb2b0ae141e5",
+          "bytes": 65631
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-internal-gain-dictionary-46/internal-gain-dictionary/receipt.json",
+          "sha256": "2a47e4aa5007ccada14fb8aec35cae4c6d403db2c241cb096a5a91a9fa7891c0",
+          "bytes": 5215
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/internal-gain-dictionary-46/run-summary.json",
+          "sha256": "e0a6472fafe1892a5541b9eb4d47a8d00f0b6273b98a0b056e97a322cc3e21d9",
+          "bytes": 33643
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-internal-gain-dictionary-comparisons-46/internal-gain-dictionary/comparison.json",
+          "sha256": "e0474b91d7e9d5d57c57115657f19a5dd777f94265e2ae9abacc1eefcd8469e1",
+          "bytes": 370465
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-internal-gain-dictionary-46-launch/internal-gain-dictionary/request.json",
+          "sha256": "a0de46586a20ff6ce8263524486031aaddd95921b93ebc631947eab041418f1d",
+          "bytes": 3360
+        },
+        "totals": {
+          "series": 62,
+          "samples": 5664,
+          "raw_operand_unequal": 3457,
+          "parsed_binary64_unequal": 3457,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual Native46 and Source46 consume the same direct-JSON input with only two genuine Test352a Electricity Rate/Energy Timestep requests added to actual Native44. All physical fields, original60 requests/policies/weather and other bytes are unchanged. The sole Native46 initial packet remains validationFalse with its exact metadata-dict-versus-string checker failure; the separate authenticated read-only correction preserves that failure and all actual artifacts while checking the real raw_line/Zone/StoreType metadata dictionary. Native44 is ancestry only. Full62/5664 ownstream kernel recomputation keeps original58 plus separate exact Constant96 and InteriorEquipment24-J policies, and two separately derived96 rules (W .001/J1, Zone); all signed values are retained without added raw equality. Actual requested output observations bind Average-W and Sum-J96 profiles, not arbitrary thermal combinations. Whole32-line8762 schedule and3-line1143 nominal EIO, actualWarmup19/fullERR-END/fourinfo/SHD and bidirectional MTD agree. No observed value seeds production. All92 actual owner paths plus shared numeric utility and the full actual compiled Rust snapshot are authenticated live/archive, including the actual Root lifetime fixes rather than uncompiled patch hashes. Per-person, explicit/multiple Spaces, EMS and arbitrary models retain their bounds."
       }
     ],
     "totals": {
-      "paired_cases": 71,
-      "reported_samples": 519174,
-      "raw_operand_unequal": 150833,
+      "paired_cases": 72,
+      "reported_samples": 524838,
+      "raw_operand_unequal": 154290,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4904,18 +4955,29 @@
           "sha256": "461fb9de4852938fe5ed2b1adecd85166006db046163fde380b60f6183491561",
           "bytes": 75921621
         }
+      },
+      {
+        "id": "internal-gain-dictionary-46",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-46/receipt.json",
+          "sha256": "d2d9453db89f8c2b71f1891215bb5bc24e042d48bc3d2c18a75d2b2b9516d644",
+          "bytes": 5896
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/82/8228d3fd43ae89cb1d5e4f7608429fb726ff6b84e7d715019f6657cbbfef2cdb",
+          "sha256": "8228d3fd43ae89cb1d5e4f7608429fb726ff6b84e7d715019f6657cbbfef2cdb"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-46/eplus-rs.exe",
+          "sha256": "9303c7e16ef2fe402613358bf3ce44ed960b3950cbbfbf41b0ac2ae635f4b1b8",
+          "bytes": 75922138
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 796,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/other-equipment-latent-b-run-tests-45.log",
-          "sha256": "836e800e000bbf86218ed7548d51cd7ccabe8cc209fd46e9047910d2b040b705",
-          "bytes": 146114
-        }
-      ],
-      "scope": "Existing ep_run library checks verify the bounded Source B admission and input-adapter change. Runtime owner semantics remain covered by the preceding full workspace milestone; the separate actual same-input engine pair records the conditioned positive-latent behavior. No new cohort or optional API change."
+      "passed": 0,
+      "logs": [],
+      "scope": "Reset after the successful full workspace milestone; previous focused checks are included in the full run."
     }
   },
   "additional_native_type_calibrations": [

@@ -309,10 +309,18 @@ impl SourceInitializationFiles {
     pub fn eio_stream(&mut self) -> &mut dyn Write {
         &mut self.outputs[1]
     }
-    /// Disjoint actual EIO/debug handles, already opened at their Native calls.
-    /// This does not reopen, create, reset or replace either stream.
-    pub(crate) fn eio_and_debug_streams(&mut self) -> (&mut dyn Write, &mut dyn Write) {
-        (&mut self.outputs[1], &mut self.debug)
+    /// Same already-open physical first-input EIO/debug/ESO, without reopening.
+    /// A closed or failed ESO is retained as the real not-good dictionary state.
+    pub(crate) fn eio_debug_and_dictionary_streams(
+        &mut self,
+    ) -> (&mut dyn Write, &mut dyn Write, Option<&mut dyn Write>) {
+        let [eso, eio, _mtr, _bnd] = &mut self.outputs;
+        let dictionary = if eso.file.is_some() && !eso.failed {
+            Some(eso as &mut dyn Write)
+        } else {
+            None
+        };
+        (eio, &mut self.debug, dictionary)
     }
     /// Same already-open physical BND, without opening or replacing the stream.
     pub(crate) fn bnd_stream(&mut self) -> &mut dyn Write {

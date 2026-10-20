@@ -40,6 +40,7 @@ impl OrdinarySourceSession {
         equipment_input: OrdinaryEquipmentInput,
         radiation_input: OrdinaryRadiationInput,
         debug: &mut dyn std::io::Write,
+        dictionary_file: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile<'_>,
     ) -> Result<(), RuntimeError> {
         let result = prepare_source_manage_heat_balance_first_call(&mut SourceFirstInputHost {
             session: self,
@@ -52,6 +53,7 @@ impl OrdinarySourceSession {
             equipment_input,
             radiation_input,
             debug,
+            dictionary_file: Some(dictionary_file),
         });
         result.map_err(hb_input_error)
     }
@@ -106,7 +108,7 @@ impl OrdinarySourceSession {
     }
 }
 
-struct SourceFirstInputHost<'a, 'context> {
+struct SourceFirstInputHost<'a, 'context, 'dictionary> {
     session: &'a mut OrdinarySourceSession,
     context: &'a mut CtfInitializationContext<'context>,
     model: &'a TypedModel,
@@ -117,8 +119,9 @@ struct SourceFirstInputHost<'a, 'context> {
     equipment_input: OrdinaryEquipmentInput,
     radiation_input: OrdinaryRadiationInput,
     debug: &'a mut dyn std::io::Write,
+    dictionary_file: Option<crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile<'dictionary>>,
 }
-impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
+impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_, '_> {
     fn manager(&self) -> &SourceHeatBalanceManager {
         &self.session.heat_balance
     }
@@ -144,6 +147,7 @@ impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
                 self.radiation_input,
                 &mut self.session.hvac.ancillary.branch_node_connections,
                 Some(&mut *self.debug),
+                self.dictionary_file.take(),
             )
             .map_err(|cause| Error::SourceInput(Box::new(cause)))?;
         self.session

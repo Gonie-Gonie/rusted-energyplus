@@ -330,7 +330,7 @@ impl SelectedInternalHeatGains {
         );
         owners
             .registration
-            .setup_bound_general_real_source_input(
+            .setup_bound_general_real_optional_dictionary(
                 &mut request,
                 owners.prescan,
                 SourceRealOutputDeclaration {
@@ -347,6 +347,7 @@ impl SelectedInternalHeatGains {
                 &mut GainOutputHost(&mut *owners.host),
                 owners.eio,
                 binding,
+                owners.dictionary_host.as_deref_mut().map(|host| host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
                 SourceGeneralRealRegistrationOptions {
                     time_step: crate::heat_balance::source_output_registration::TimeStepKind::Zone,
                     meter,

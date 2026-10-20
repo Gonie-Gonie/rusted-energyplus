@@ -49,6 +49,9 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) minimum_report_frequency: &'a str,
     pub(super) minutes: i32,
     pub(super) host: &'a mut dyn SourceOutputFileHost,
+    pub(super) dictionary_host: Option<
+        &'a mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost,
+    >,
     pub(super) eio: &'a mut dyn Write,
     // The same actual DataOutRptPredefined registry and table-entry owner.
     pub(super) registry: &'a crate::heat_balance::predefined_tables::PredefinedRegistry,

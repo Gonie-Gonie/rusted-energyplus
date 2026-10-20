@@ -311,6 +311,12 @@ fn index(number: i32) -> Result<usize, E> {
         .ok_or_else(|| unavailable("positive Source internal-gain association"))
 }
 
+/// Disjoint physical ESO capability at the actual first-input call. None in
+/// `eso` is a genuine closed/bad stream, distinct from no caller capability.
+pub(crate) struct SourceGainDictionaryFile<'a> {
+    pub(crate) eso: Option<&'a mut dyn std::io::Write>,
+}
+
 impl CtfInitializationContext<'_> {
     pub(crate) fn manage_selected_internal_heat_gains_input(
         &mut self,
@@ -328,6 +334,18 @@ impl CtfInitializationContext<'_> {
         minutes: i32,
         host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
         clock: Option<&WeatherGlobalState>,
+    ) -> Result<(), crate::RuntimeError> {
+        self.manage_selected_internal_heat_gains_input_with_dictionary(
+            model, minutes, host, clock, None,
+        )
+    }
+    pub(crate) fn manage_selected_internal_heat_gains_input_with_dictionary(
+        &mut self,
+        model: &TypedModel,
+        minutes: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+        clock: Option<&WeatherGlobalState>,
+        dictionary_file: Option<SourceGainDictionaryFile<'_>>,
     ) -> Result<(), crate::RuntimeError> {
         let reports = &mut *self.reports;
         if reports.selected_internal_heat_gains.get_input_flag {
@@ -356,6 +374,16 @@ impl CtfInitializationContext<'_> {
                 .ok_or_else(|| hb_input_error(unavailable("same output minimum frequency")))?
                 .system;
             let minimum = &system.minimum_report_frequency;
+            // All fields below are disjoint borrows of the same retained
+            // reports. No owner is moved, cleared, copied or temporarily absent.
+            let mut dictionary = dictionary_file.map(|file| {
+                crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams {
+                    eso: file.eso,
+                    sqlite_present: reports.source_sqlite.present(),
+                    results_framework_output_variables: &mut reports
+                        .source_results_output_variables,
+                }
+            });
             let mut owners = getter::SourceGainInputOwners {
                 raw,
                 input,
@@ -371,6 +399,7 @@ impl CtfInitializationContext<'_> {
                 minimum_report_frequency: minimum,
                 minutes,
                 host,
+                dictionary_host: dictionary.as_mut().map(|host| host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
                 eio: self.eio,
                 registry: &reports.registry,
                 table: &mut reports.table,

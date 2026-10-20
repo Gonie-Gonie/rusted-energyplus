@@ -2337,6 +2337,189 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             parent.reports.output_registration, retained_registration,
             "InitOnly repeats skip getter"
         );
+        // Genuine dictionary capability over the same gain getter: the stream
+        // can fail, or actually be closed, without moving SQL/RF owners out.
+        for dictionary_case in 0..4 {
+            use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile;
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
+            };
+            let mut requested_model = model.typed.clone();
+            requested_model.report_inputs.output_variables =
+                vec![ep_model::SourceOutputVariableInput {
+                    object_name: "Authored gain request".into(),
+                    key: "AUTHORED GAIN 0".into(),
+                    variable_name: "Other Equipment Electricity Rate".into(),
+                    reporting_frequency: "TIMESTEP".into(),
+                    schedule_name: String::new(),
+                    alpha_blank: [false, false, false, true],
+                    default_applied: [false; 4],
+                    num_alphas: 3,
+                    is_epjson: true,
+                }];
+            let mut requested = failed_gains.clone();
+            requested.output_registration = Default::default(); // genuine fresh constructor for this authored request
+            requested
+                .heat_balance_input
+                .as_mut()
+                .ok_or("requested raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("requested gains")?[0]
+                .fields
+                .insert(
+                    "fuel_type".into(),
+                    ProjectInputValue::String("Electricity".into()),
+                );
+            let mut actual_ip = requested
+                .selected_input_processor
+                .take()
+                .ok_or("requested IP")?;
+            let mut definitions = Vec::new();
+            for family in [
+                "People",
+                "Lights",
+                "ElectricEquipment",
+                "GasEquipment",
+                "HotWaterEquipment",
+                "SteamEquipment",
+                "OtherEquipment",
+                "ElectricEquipment:ITE:AirCooled",
+                "ZoneBaseboard:OutdoorTemperatureControlled",
+                "ZoneContaminantSourceAndSink:CarbonDioxide",
+            ] {
+                let actual = actual_ip.get_object_def_max_args(family)?;
+                definitions.push(SourceObjectDefinition {
+                    object_type: family.into(),
+                    alpha_fields: actual.alphas,
+                    numeric_fields: actual.numerics,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                });
+            }
+            definitions.push(SourceObjectDefinition {
+                object_type: "Output:Variable".into(),
+                alpha_fields: 4,
+                numeric_fields: 0,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            });
+            requested.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(
+                definitions,
+                std::collections::BTreeMap::from([
+                    (
+                        "OtherEquipment".into(),
+                        actual_ip
+                            .family("OtherEquipment")
+                            .ok_or("authored family")?
+                            .clone(),
+                    ),
+                    (
+                        "Output:Variable".into(),
+                        SourceInputFamily::Objects(vec![SourceObjectShape {
+                            object_name: "Authored gain request".into(),
+                            field_sizes: Default::default(),
+                        }]),
+                    ),
+                ]),
+            )?);
+            requested
+                .output_prescan
+                .add_record("AUTHORED GAIN 0", "Other Equipment Electricity Rate")?;
+            requested
+                .source_results_output_variables
+                .push("actual prior RF entry".into());
+            let sqlite_before = requested.source_sqlite.clone();
+            let (mut state, mut error, mut console, mut eio, mut eso) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            let mut failing = OrdinaryFailingEio;
+            let file = match dictionary_case {
+                0 => Some(SourceGainDictionaryFile {
+                    eso: Some(&mut eso),
+                }),
+                1 => Some(SourceGainDictionaryFile {
+                    eso: Some(&mut failing),
+                }),
+                2 => Some(SourceGainDictionaryFile { eso: None }),
+                _ => None,
+            };
+            let outcome = CtfInitializationContext {
+                reports: &mut requested,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_dictionary(
+                &requested_model,
+                15,
+                &mut gain_host,
+                None,
+                file,
+            );
+            let succeeded = matches!(dictionary_case, 0 | 2);
+            if succeeded {
+                outcome?;
+            } else if dictionary_case == 1 {
+                assert!(
+                    matches!(outcome,Err(crate::RuntimeError::OrdinaryRadiation(error))
+                    if matches!(*error,crate::heat_balance::radiation::ordinary::OrdinaryRadiationError::Output(crate::error::WarmupOutputError::Io(_))))
+                );
+            } else {
+                assert!(
+                    matches!(outcome,Err(crate::RuntimeError::OrdinaryRadiation(error))
+                    if matches!(*error,crate::heat_balance::radiation::ordinary::OrdinaryRadiationError::Unavailable(crate::heat_balance::radiation::ordinary::OrdinaryRadiationUnavailable::InputBranch)))
+                );
+            }
+            assert_eq!(requested.source_sqlite, sqlite_before);
+            assert_eq!(
+                requested.source_results_output_variables[0],
+                "actual prior RF entry"
+            );
+            assert_eq!(
+                requested.source_results_output_variables.len(),
+                if succeeded { 2 } else { 1 }
+            );
+            assert_eq!(
+                requested.selected_internal_heat_gains.get_input_flag,
+                !succeeded
+            );
+            assert!(!requested.selected_internal_heat_gains.errors_found);
+            let rate = requested
+                .output_registration
+                .out_vars
+                .iter()
+                .find(|v| v.name == "Other Equipment Electricity Rate")
+                .ok_or("actual requested bound rate")?;
+            assert!(rate.which.is_some() && rate.report);
+            if dictionary_case == 0 {
+                assert!(
+                    String::from_utf8(eso)?
+                        .contains("AUTHORED GAIN 0,Other Equipment Electricity Rate [W] !TimeStep")
+                );
+                assert!(std::str::from_utf8(&eio)?.contains("OtherEquipment Internal Gains Nominal"));
+            } else {
+                assert!(eso.is_empty());
+            }
+            if !succeeded {
+                assert!(eio.is_empty(), "failed dictionary precedes nominal writer");
+            }
+        }
         // Same actual getter, selected local Numeric2, retained geometry and
         // live diagnostic owners. No Native observations or typed gain values
         // supply this authored boundary table.

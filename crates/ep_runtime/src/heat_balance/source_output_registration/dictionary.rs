@@ -19,14 +19,14 @@ pub(crate) trait SourceOutputDictionaryHost {
     dead_code,
     reason = "Retain the optional physical-stream dictionary host for direct registered-output consumers; current production supplies the same genuine host trait through its existing stream owner."
 )]
-pub(crate) struct SourceOutputDictionaryStreams<'a> {
+pub(crate) struct SourceOutputDictionaryStreams<'a, 'stream> {
     /// Some only when the actual Source ESO stream is open and good.
-    pub(crate) eso: Option<&'a mut dyn Write>,
+    pub(crate) eso: Option<&'stream mut dyn Write>,
     /// Read from the caller's sole SQLite owner, never inferred from filename.
     pub(crate) sqlite_present: bool,
     pub(crate) results_framework_output_variables: &'a mut Vec<String>,
 }
-impl SourceOutputDictionaryHost for SourceOutputDictionaryStreams<'_> {
+impl SourceOutputDictionaryHost for SourceOutputDictionaryStreams<'_, '_> {
     fn eso_good(&self) -> bool {
         self.eso.is_some()
     }
