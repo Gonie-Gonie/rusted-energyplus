@@ -11,6 +11,10 @@ selection is documented in [Developer Workflow](../../docs/src/guides/developer-
 - `check_completed_reported_streams.py`: validate successful paired receipts,
   fixed inputs, full reported dictionaries, timestamps and the unchanged
   per-variable tolerance policy. It launches neither engine.
+- `source_input_example.py`: prepare deterministic synthetic weather and compare
+  the separately identified composed B102 example using the unchanged physical
+  stream kernel and original B policy; see the verification guide for recorded
+  build/run commands. The checker launches neither engine.
 - `prepare_con01.py --check`: verify the frozen input/metadata/contract bytes
   without regenerating them.
 - `record_command.py`: execute an explicit command and record its exit,

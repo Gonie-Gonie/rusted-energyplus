@@ -2,11 +2,11 @@
   "schema": "object-input-domain-verification.v1",
   "reviewed_on": "2026-10-20",
   "corpus": {
-    "input_files": 187,
-    "idf_files": 175,
+    "input_files": 188,
+    "idf_files": 176,
     "epjson_files": 12,
     "canonical_object_types": 110,
-    "official_instances": 8978,
+    "official_instances": 9118,
     "excluded_unknown_diagnostic_types": 1,
     "catalog": {
       "path": "data/schema/energyplus-26.1-object-index.json",
@@ -155,8 +155,8 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/convection-docs-13.log",
-        "sha256": "ec37863d23669715f5888203e9e62fbf186c928ce363c1617594b8e780a27105",
+        "path": ".runtime/object-expansion/portable-example-docs-16.log",
+        "sha256": "dfb2f2ee66c32f5558908b7e04a63669e5c2ba8ca857b4bf98d50eea21eb8c38",
         "bytes": 354
       },
       "clippy_through_build": "live-diagnostics-14"
@@ -1834,7 +1834,40 @@
           "rmse_failures": 0,
           "passed": true
         },
-        "effective_state": "Thirteen exact base-B102 spans and two appended objects combine actual2016Feb29 synthetic weather, twelve zone steps per hour, rotated/translated Relative geometry, Groundfloor18C, used Regular/AirGap/Regular construction, FullInterior opaque control and localCeiling/MoWitt versus globalsSimple/DOE-2. Original102 requests unchanged. Both physical floor owners have288 exact18C samples; actual EIO/wholeSHD and zero-diagnostic/empty-MTR lifecycle match. Actual absence of requested DXF/detailedCTF output and allNoSun/NoWind retained; no positive wind/window/solartransport or exact earlier ACH-count claim."
+        "effective_state": "Thirteen exact base-B102 spans and two appended objects combine actual2016Feb29 synthetic weather, twelve zone steps per hour, rotated/translated Relative geometry, Groundfloor18C, used Regular/AirGap/Regular construction, FullInterior opaque control and localCeiling/MoWitt versus globalsSimple/DOE-2. Original102 requests unchanged. Both physical floor owners have288 exact18C samples; actual EIO/wholeSHD and zero-diagnostic/empty-MTR lifecycle match. Actual absence of requested DXF/detailedCTF output and allNoSun/NoWind retained; no positive wind/window/solartransport or exact earlier ACH-count claim.",
+        "portable_example": {
+          "input": {
+            "path": "data/examples/source-input-domains/composed-b102.idf",
+            "sha256": "04f14fda1e8322d3f156366b832b2d265b53995671160d0665d05a54f856b1c4",
+            "bytes": 13296
+          },
+          "case": {
+            "path": "data/examples/source-input-domains/composed-b102.json",
+            "sha256": "b67c753efdcae8d0412a96c6ac54a90b051cb6d33a987d885266cd609d38ce0e",
+            "bytes": 1467
+          },
+          "checker": {
+            "path": "tools/porting/source_input_example.py",
+            "sha256": "67d2e5f7915aaa1ae3e92dd2a63038f8138b87d6cfccb1a4c232812131522783",
+            "bytes": 20454
+          },
+          "readback": {
+            "path": ".runtime/object-expansion/portable-composed-root-check-01/comparison.json",
+            "sha256": "b2719c27ec3ce0c67e078049363dabcde45621b5c41bdab206581f264e808d4b",
+            "bytes": 152635
+          },
+          "scope": "Tracked byte-identical tested IDF and deterministic synthetic-weather preparation. Portable checker reauthenticated the existing accepted actual pair using only tracked kernel/policy and recorded receipts; no additional engine execution or paired-case count.",
+          "prepared_weather_readback": {
+            "path": ".runtime/object-expansion/portable-composed-root-weather-01.epw",
+            "sha256": "134042fbd42aa79d0886d45d852d9a5a60d53b70ffa34b2485ac8f350bc92059",
+            "bytes": 1627909
+          },
+          "checker_boundary_tests": {
+            "passed": 7,
+            "command": "python -m unittest discover -s tools/porting -p test_source_input_example.py",
+            "scope": "Deterministic weather derivation, immutable input/executable links, Native path/options and physical clock/Ground endpoint rejection; no engine execution."
+          }
+        }
       },
       {
         "id": "site-location-keep-yes",

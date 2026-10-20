@@ -1,0 +1,28 @@
+{
+  "schema": "source-input-example.v1",
+  "id": "COMPOSED-B102-LEAP12",
+  "fixed_conformance_case": false,
+  "input": "composed-b102.idf",
+  "input_sha256": "04f14fda1e8322d3f156366b832b2d265b53995671160d0665d05a54f856b1c4",
+  "scope": "B",
+  "policy_profile": "B",
+  "policy_sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+  "comparison_kernel_sha256": "f5669cd0217a3f953e08f2c96fd09fcf9067be85f6a9257b3dc1011e9297f833",
+  "golden_weather_sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+  "weather_sha256": "134042fbd42aa79d0886d45d852d9a5a60d53b70ffa34b2485ac8f350bc92059",
+  "date": "2016-02-29",
+  "weekday": "Monday",
+  "hours": 24,
+  "steps_per_hour": 12,
+  "zone_steps": 288,
+  "series": 102,
+  "numeric_records": 29376,
+  "meter_series": 0,
+  "weather_qualification": "Controlled synthetic 2016 calendar: February 29 physical fields copy February 28; not measured AMY.",
+  "ancestry": {
+    "input": "docs/validation/cases/B-NOLIMIT-24H/input.idf",
+    "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+    "requests": "All original 102 Output:Variable request bytes retained; no meter requests."
+  },
+  "scope_qualification": "One composed same-input example, separate from the fixed 15 CON-01 identities. NoSun/NoWind and no fenestration retained. Exact earlier convection-call ACH/branch/cap counts are unmeasured; no full object-domain or transport coverage claim."
+}
