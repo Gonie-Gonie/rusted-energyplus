@@ -16900,6 +16900,75 @@ fn schedule_day_type_name(day_type: ScheduleDayType) -> &'static str {
     }
 }
 
+/// Completing General two-field MonthDay projection for Compact only. Preserve
+/// the authored prefix/colon, exact separator order and first-failed-number
+/// branch; the shared calendar parser and three-field projection stay unchanged.
+fn parse_compact_source_two_field_through(value: &str) -> Option<u16> {
+    if !value.get(..7)?.eq_ignore_ascii_case("Through")
+        || value
+            .chars()
+            .any(|character| character.is_whitespace() && character != ' ')
+    {
+        return None;
+    }
+    let operand = value.get(7..)?;
+    let operand = operand
+        .strip_prefix(':')
+        .unwrap_or(operand)
+        .trim_matches(' ');
+    // ProcessDateString only reaches DetermineDateTokens after the WHOLE
+    // operand fails ProcessNumber. A successful nonzero value instead takes
+    // the Julian/LastDayInMonth branch, which Compact does not accept.
+    if ep_model::process_source_number(operand).is_ok() {
+        return None;
+    }
+    let mut normalized = operand.to_ascii_uppercase().replace(['/', ':', '-'], " ");
+    // General503-521 replaces the first two characters and leaves the third
+    // trailing space. Repeat the search: a replacement can expose another one.
+    for word in ["ST ", "ND ", "RD ", "TH ", "OF ", "IN "] {
+        while let Some(at) = normalized.find(word) {
+            normalized.replace_range(at..at + 2, "  ");
+        }
+    }
+    let fields = normalized
+        .split(' ')
+        .filter(|field| !field.is_empty())
+        .collect::<Vec<_>>();
+    let [first, second] = fields.as_slice() else {
+        return None;
+    };
+    let source_int = |text: &str| {
+        let truncated = ep_model::process_source_number(text).ok()?.trunc();
+        if !truncated.is_finite()
+            || truncated < f64::from(i32::MIN)
+            || truncated > f64::from(i32::MAX)
+        {
+            return None;
+        }
+        Some(truncated as i32)
+    };
+    let month_prefix = |text: &str| {
+        const MONTHS: [&str; 12] = [
+            "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+        ];
+        let prefix = text.get(..3)?;
+        MONTHS
+            .iter()
+            .position(|month| *month == prefix)
+            .map(|index| index as i32 + 1)
+    };
+    // Loop2: a successful numeric pair is always month/day, never day/month.
+    // Otherwise only the failed numeric field supplies its exact month prefix.
+    let (month, day) = match (source_int(first), source_int(second)) {
+        (Some(month), Some(day)) => (month, day),
+        (None, Some(day)) => (month_prefix(first)?, day),
+        (Some(day), None) => (month_prefix(second)?, day),
+        (None, None) => return None,
+    };
+    let ordinal = leap_schedule_ordinal(u32::try_from(month).ok()?, u32::try_from(day).ok()?)?;
+    u16::try_from(ordinal).ok()
+}
+
 fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
     let date = compact_directive_operand(value, "Through")?;
     // ScheduleManager1324 erases an immediate colon only, before ASCII strip.
@@ -16923,6 +16992,9 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
             // Retain the empty endpoint, not a synthetic date or day profile.
             return Some(0);
         }
+    }
+    if let Some(ordinal) = parse_compact_source_two_field_through(value) {
+        return Some(ordinal);
     }
     let (month, day_of_month) = match parse_calendar_date_rule(date) {
         Some(ep_model::CalendarDateRule::MonthDay {
@@ -18605,6 +18677,21 @@ mod tests {
             ("Through 101.0/12/31", 366),
             ("Through 2147483647.9/12/31", 366), // Truncated int remains defined.
             ("Through 2013D-1/12", 12),          // Three normalized tokens: 2013D,1,12.
+            ("Through 12.9/31.9", 366),
+            ("Through: DEC 31.9", 366),
+            ("Through 31.9 DECADE", 366), // Exact first three characters, not a full month name.
+            ("Through DECOR 31.9", 366),
+            ("Through 31ST DEC", 366),
+            ("Through 31.9 OF DECEMBER", 366),
+            ("Through DEC IN 31.9", 366),
+            ("Through 31STST DEC", 366), // Replacement can expose another ST-space match.
+            ("Through 2.9/29.9", 60),    // General's yearless validation permits February29.
+            ("Through 29TH FEBRUARY", 60),
+            ("Through12D0:31E0", 366),
+            ("Through 12E/31D", 366),
+            ("Through -12.9/-31.9", 366),
+            ("Through :12.9/31.9", 366), // This colon becomes a date separator.
+            ("Through12+E-1", 336),      // Whole parse fails; normalized12+E and1 are December1.
             ("Through 0", 0),
             ("Through: 0.0", 0),
             ("Through:-0", 0),
@@ -18656,6 +18743,23 @@ mod tests {
         }
         for through in [
             "Through 2013/2/30",
+            "Through DEC31.9", // No separating space: one token, not month/day.
+            "Through12E-1",    // Whole successful1.2 takes LastDayInMonth, never tokenized.
+            "Through12D-1",
+            "Through DE 31.9", // A short token is not an exact three-character month.
+            "Through 31.9 DE",
+            "Through 31/12", // Both numbers mean month/day, not day/month.
+            "Through DEC 32.0",
+            "Through 2.9/30.9",
+            "Through DEC 31.9ST", // DoubleChars requires a following space.
+            "Through 2013.5 OF 12.9 31.9", // Do not open the WkDayInMonth three-token branch.
+            "Through +12.9/31.9",
+            "Through 12.9/+31.9",
+            "Through 1e9999/31.9",
+            " Through 12.9/31.9", // Newly projected syntax requires keyword byte0.
+            "Through \u{00a0}12.9/31.9",
+            "Through 12.9/31.9\u{00a0}",
+            "Through 12.9\\t31.9",
             "Through 100.9/12/31", // Raw first>100 is not the truncated test.
             "Through 12/31/100.9",
             "Through 2147483648/12/31",

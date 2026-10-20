@@ -890,6 +890,21 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         ("Through -2013.5/-12/-31", 366),
         ("Through 2013.5/2.9/29.9", 60),
         ("Through 2013D-1/12", 12),
+        ("Through 12.9/31.9", 366),
+        ("Through: DEC 31.9", 366),
+        ("Through 31.9 DECADE", 366),
+        ("Through DECOR 31.9", 366),
+        ("Through 31ST DEC", 366),
+        ("Through 31.9 OF DECEMBER", 366),
+        ("Through DEC IN 31.9", 366),
+        ("Through 31STST DEC", 366),
+        ("Through 2.9/29.9", 60),
+        ("Through 29TH FEBRUARY", 60),
+        ("Through12D0:31E0", 366),
+        ("Through 12E/31D", 366),
+        ("Through -12.9/-31.9", 366),
+        ("Through :12.9/31.9", 366),
+        ("Through12+E-1", 336),
     ] {
         let mut raw = authored_raw(fixture, "Average", false);
         raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
