@@ -154,12 +154,27 @@ pub(super) fn validate_requested_hours(
     Ok(hours)
 }
 fn stream_summary(stream: &SourceReportedStream) -> Value {
-    json!({"stream":stream.stream.id(),"owned_path":stream.path,"deleted_empty":stream.deleted_empty,
+    let mut summary = json!({"stream":stream.stream.id(),"owned_path":stream.path,"deleted_empty":stream.deleted_empty,
         "reported_numeric_records":stream.record_count,"series":stream.series.len(),
-        "series_samples":stream.series.iter().map(|s|json!({"report_id":s.declaration.report_id,
+        "series_samples":stream.series.iter().map(|s| {
+            let mut row = json!({"report_id":s.declaration.report_id,
             "key":s.declaration.key,"name":s.declaration.name,"units":s.declaration.units,
             "frequency":s.declaration.frequency.id(),"store_type":s.declaration.store_type.id(),
-            "kind":s.declaration.kind.id(),"samples":s.samples.len()})).collect::<Vec<_>>()})
+            "kind":s.declaration.kind.id(),"samples":s.samples.len()});
+            if let Some(schedule) = &s.declaration.reporting_schedule {
+                row["reporting_schedule"] = json!(schedule);
+            }
+            row
+        }).collect::<Vec<_>>()});
+    if !stream.deleted_empty_declarations.is_empty() {
+        summary["deleted_empty_declarations"] =
+            json!(stream.deleted_empty_declarations.iter().map(|d| json!({
+            "report_id":d.report_id,"key":d.key,"name":d.name,"units":d.units,
+            "frequency":d.frequency.id(),"store_type":d.store_type.id(),"kind":d.kind.id(),
+            "reporting_schedule":d.reporting_schedule
+        })).collect::<Vec<_>>());
+    }
+    summary
 }
 pub(super) fn source_summary(r: &SourceRuntimeResult) -> Value {
     json!({"schema":"rusted-energyplus.source-runtime.v1","runtime_class":r.runtime_class.id(),

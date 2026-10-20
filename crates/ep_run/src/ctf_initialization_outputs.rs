@@ -373,14 +373,14 @@ impl CtfRunOutputs {
     pub(crate) fn read_completed_source_reports(
         &self,
     ) -> Result<crate::source_reported_results::SourceReportedStreams, String> {
-        let catalog = self
-            .reports
-            .source_reported_catalog()
-            .map_err(|error| error.to_string())?;
         let files = self
             .initialization_files
             .as_ref()
             .ok_or("actual retained Source file owner after620 is missing")?;
+        let catalog = self
+            .reports
+            .source_reported_catalog(files)
+            .map_err(|error| error.to_string())?;
         let (eso, mtr) = files.source_reported_paths();
         crate::source_reported_results::read_completed_source_reports(eso, mtr, &catalog)
             .map_err(|error| error.to_string())

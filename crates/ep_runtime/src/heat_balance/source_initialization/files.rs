@@ -66,6 +66,8 @@ struct SourceOutputStream {
     path: PathBuf,
     file: Option<File>,
     failed: bool,
+    // Metadata of the actual retained IO owner, set only by its successful del.
+    deleted_empty: bool,
 }
 impl SourceOutputStream {
     fn new(path: PathBuf) -> Self {
@@ -73,6 +75,7 @@ impl SourceOutputStream {
             path,
             file: None,
             failed: false,
+            deleted_empty: false,
         }
     }
     fn ensure_open(&mut self) -> io::Result<&mut Self> {
@@ -89,6 +92,7 @@ impl SourceOutputStream {
                 Ok(file) => {
                     self.file = Some(file);
                     self.failed = false;
+                    self.deleted_empty = false;
                 }
                 Err(error) => {
                     self.file = None;
@@ -242,6 +246,24 @@ impl SourceInitializationFiles {
         (&self.outputs[0].path, &self.outputs[2].path)
     }
 
+    /// Read only the real ESO/MTR handle and deletion lifecycle metadata.
+    /// These facts neither establish nor assert simulation completion.
+    pub fn source_reported_file_states(
+        &self,
+    ) -> (
+        super::super::source_reported_catalog::SourceReportedFileState,
+        super::super::source_reported_catalog::SourceReportedFileState,
+    ) {
+        let state = |index: usize| {
+            let output = &self.outputs[index];
+            super::super::source_reported_catalog::SourceReportedFileState {
+                closed: output.file.is_none() && !output.failed,
+                deleted_empty: output.deleted_empty,
+            }
+        };
+        (state(0), state(2))
+    }
+
     /// Borrow the retained EIO stream without opening it or substituting a sink.
     /// Writes to an unreached stream return the real not-connected error.
     pub fn eio_stream(&mut self) -> &mut dyn Write {
@@ -290,6 +312,29 @@ mod endrun_audit;
 mod reporting;
 pub(crate) use endrun::SourceCloseOutputFilesOwners;
 pub(crate) use reporting::{SourceRuntimeMeterStreams, SourceRuntimeReportStreams};
+
+#[cfg(test)]
+mod scheduled_filter_file_tests {
+    use super::*;
+
+    #[test]
+    fn scheduled_filter_file_deletion_is_an_actual_owner_action() -> io::Result<()> {
+        let path = std::env::temp_dir().join(format!("ep-filter-file-{}", std::process::id()));
+        let mut stream = SourceOutputStream::new(path.clone());
+        stream.delete_source_output()?;
+        assert!(!stream.deleted_empty);
+        stream.ensure_open()?.write_all(b"dictionary only\n")?;
+        stream.close_source_output();
+        assert!(!stream.deleted_empty && stream.file.is_none() && path.exists());
+        stream.ensure_open()?.write_all(b"dictionary only\n")?;
+        stream.delete_source_output()?;
+        assert!(stream.deleted_empty && stream.file.is_none() && !path.exists());
+        stream.ensure_open()?;
+        assert!(!stream.deleted_empty && stream.file.is_some() && path.exists());
+        stream.delete_source_output()?;
+        Ok(())
+    }
+}
 
 impl crate::weather::day::source_weather_initialization::SourceWeatherEio for SourceOutputStream {
     fn good(&self) -> bool {

@@ -88,18 +88,32 @@ impl SourceOutputRegistration {
             .out_vars
             .get(number)
             .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
-        if var.schedule.is_some() {
-            // Scheduled report input is already a getter boundary. Preserve
-            // the actual keyed variable if a future caller reaches it here.
-            return Err(OrdinaryRadiationUnavailable::InputBranch.into());
-        }
+        // Native2496 reads the resolved schedule's immutable Name, not the
+        // spelling of the input reference and never its mutable current value.
+        let schedule_name = match var.schedule {
+            None => "",
+            Some(schedule) => self
+                .requested_variables
+                .iter()
+                .find(|request| request.reporting_schedule == Some(schedule))
+                .map(|request| request.reporting_schedule_name.as_str())
+                .filter(|name| !name.is_empty())
+                .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?,
+        };
         let (frequency_index, arbitrary_integer, notice, frequency_name) =
             var.frequency.dictionary_format();
         let units = var.units.symbol();
         if host.eso_good() {
             let line = format!(
-                "{},{},{},{} [{}]{}\n",
-                var.report_id, arbitrary_integer, var.key, var.name, units, notice
+                "{},{},{},{} [{}]{}{}{}\n",
+                var.report_id,
+                arbitrary_integer,
+                var.key,
+                var.name,
+                units,
+                notice,
+                if schedule_name.is_empty() { "" } else { "," },
+                schedule_name
             );
             host.write_eso_dictionary(&line)
                 .map_err(|error| OrdinaryRadiationError::Output(WarmupOutputError::Io(error)))?;

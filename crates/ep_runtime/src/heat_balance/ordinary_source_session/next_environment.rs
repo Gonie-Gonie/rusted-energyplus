@@ -7,6 +7,7 @@ use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_hvac_manager::water_manager::SourceWaterManager;
 use crate::heat_balance::predefined_tables::PredefinedRegistry;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
+use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::source_initialization::SourceInitializationFiles;
 use crate::heat_balance::source_output_prescan::SourceOutputPreScan;
 use crate::heat_balance::source_output_registration::{
@@ -54,6 +55,7 @@ struct FirstWeatherChildren<'a, H> {
     prescan: &'a SourceOutputPreScan,
     report_inputs: &'a ReportInputs,
     minimum_report_frequency: &'a str,
+    schedules: &'a mut SelectedScheduleManager,
 }
 impl<H: SourceOutputFileHost> SourceWeatherInitializationChildren for FirstWeatherChildren<'_, H> {
     fn register_source_weather_outputs(
@@ -78,10 +80,11 @@ impl<H: SourceOutputFileHost> SourceWeatherInitializationChildren for FirstWeath
             daylighting_sky_clearness: &env.daylighting_sky_clearness,
             daylighting_sky_brightness: &env.daylighting_sky_brightness,
         };
-        let mut input = SourceReportVariableInput::new(
+        let mut input = SourceReportVariableInput::with_schedules(
             self.report_inputs,
             owners.input,
             self.minimum_report_frequency,
+            self.schedules,
         );
         let mut dictionary_host = DictionaryBorrow {
             files: owners.files,
@@ -242,6 +245,11 @@ impl SourceInitializationFiles {
                     prescan: &reports.output_prescan,
                     report_inputs: &model.report_inputs,
                     minimum_report_frequency: &project.system.minimum_report_frequency,
+                    schedules: reports.selected_schedule_manager.as_mut().ok_or_else(|| {
+                        hb_input_error(Error::Unavailable(
+                            "same actual schedules before output request registration",
+                        ))
+                    })?,
                 };
                 weather
                     .get_next_source_environment(&mut owners, &mut children, available)

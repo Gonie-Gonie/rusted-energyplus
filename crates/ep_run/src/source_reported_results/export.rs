@@ -12,6 +12,8 @@ struct StreamJson<'a>(&'a SourceReportedStream);
 struct EnvironmentJson<'a>(&'a ReportEnvironment);
 struct StampJson<'a>(&'a ReportStamp);
 struct SeriesJson<'a>(&'a ReportSeries);
+struct DeclarationJson<'a>(&'a SourceReportedDeclaration);
+struct DeclarationsJson<'a>(&'a [SourceReportedDeclaration]);
 struct SampleJson<'a>(&'a ReportSample);
 struct EnvironmentsJson<'a>(&'a [ReportEnvironment]);
 struct StampsJson<'a>(&'a [ReportStamp]);
@@ -41,8 +43,16 @@ impl Serialize for BundleJson<'_> {
 impl Serialize for StreamJson<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let s = self.0;
-        let mut map = serializer.serialize_map(Some(8))?;
+        let mut map = serializer.serialize_map(Some(
+            8 + usize::from(!s.deleted_empty_declarations.is_empty()),
+        ))?;
         map.serialize_entry("deleted_empty", &s.deleted_empty)?;
+        if !s.deleted_empty_declarations.is_empty() {
+            map.serialize_entry(
+                "deleted_empty_declarations",
+                &DeclarationsJson(&s.deleted_empty_declarations),
+            )?;
+        }
         map.serialize_entry("environment_tuples", &EnvironmentsJson(&s.environments))?;
         map.serialize_entry("path", &s.path)?;
         map.serialize_entry("reported_record_count", &s.record_count)?;
@@ -79,17 +89,48 @@ impl Serialize for SeriesJson<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let r = self.0;
         let d = &r.declaration;
-        let mut map = serializer.serialize_map(Some(9))?;
+        let mut map =
+            serializer.serialize_map(Some(9 + usize::from(d.reporting_schedule.is_some())))?;
         map.serialize_entry("frequency", d.frequency.id())?;
         map.serialize_entry("key", &d.key)?;
         map.serialize_entry("kind", d.kind.id())?;
         map.serialize_entry("name", &d.name)?;
         map.serialize_entry("report_id", &d.report_id)?;
+        if let Some(schedule) = &d.reporting_schedule {
+            map.serialize_entry("reporting_schedule", schedule)?;
+        }
         map.serialize_entry("sample_count", &r.samples.len())?;
         map.serialize_entry("samples", &SamplesJson(&r.samples))?;
         map.serialize_entry("store_type", d.store_type.id())?;
         map.serialize_entry("units", &d.units)?;
         map.end()
+    }
+}
+impl Serialize for DeclarationJson<'_> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let d = self.0;
+        let mut map =
+            serializer.serialize_map(Some(7 + usize::from(d.reporting_schedule.is_some())))?;
+        map.serialize_entry("frequency", d.frequency.id())?;
+        map.serialize_entry("key", &d.key)?;
+        map.serialize_entry("kind", d.kind.id())?;
+        map.serialize_entry("name", &d.name)?;
+        map.serialize_entry("report_id", &d.report_id)?;
+        if let Some(schedule) = &d.reporting_schedule {
+            map.serialize_entry("reporting_schedule", schedule)?;
+        }
+        map.serialize_entry("store_type", d.store_type.id())?;
+        map.serialize_entry("units", &d.units)?;
+        map.end()
+    }
+}
+impl Serialize for DeclarationsJson<'_> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+        for declaration in self.0 {
+            seq.serialize_element(&DeclarationJson(declaration))?;
+        }
+        seq.end()
     }
 }
 impl Serialize for SampleJson<'_> {

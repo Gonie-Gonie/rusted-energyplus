@@ -26,6 +26,10 @@ The fixed CON-01 port and its accepted results are recorded in
 3. Make setup, build, two-engine execution and comparison a documented command
    that a fresh checkout can reproduce, with inspectable result files.
 
+The [current input-domain verification](../../validation/evidence/object-input-domains.json)
+records the reviewed fields and complete same-input comparisons. The existing
+[object registry](../../../specs/object_coverage.toml) records their remaining boundaries.
+
 The current [capability registry](../../../specs/capabilities.toml) remains the
 runtime admission boundary while this expansion proceeds. A union entry or a
 field-level success does not establish arbitrary object-combination support;

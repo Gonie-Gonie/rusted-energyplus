@@ -47,6 +47,11 @@ pub(crate) enum SourceRealOutputTarget {
     Schedule {
         index: crate::heat_balance::selected_schedule_manager::SourceScheduleIndex,
     },
+    /// The live Schedule::getCurrentVal pointer used by reporting filters.
+    /// ReportScheduleVals retains its separate direct currentVal target above.
+    ReportingSchedule {
+        index: crate::heat_balance::selected_schedule_manager::SourceScheduleIndex,
+    },
     SystemReports {
         field: super::SourceSystemReportsOutputField,
     },

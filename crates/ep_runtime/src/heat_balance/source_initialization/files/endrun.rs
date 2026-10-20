@@ -47,6 +47,7 @@ impl SourceOutputStream {
                 Err(e) if e.kind() == io::ErrorKind::NotFound => {}
                 Err(e) => return Err(e),
             }
+            self.deleted_empty = true;
         }
         Ok(())
     }

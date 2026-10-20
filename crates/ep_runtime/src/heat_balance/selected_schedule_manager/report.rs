@@ -15,12 +15,20 @@ use crate::heat_balance::{
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 impl SourceRealOutputOwners for SelectedScheduleManager {
     fn real_output(&self, target: SourceRealOutputTarget) -> Result<&f64, OrdinaryRadiationError> {
-        let SourceRealOutputTarget::Schedule { index } = target else {
-            return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
+        let (index, reporting) = match target {
+            SourceRealOutputTarget::Schedule { index } => (index, false),
+            SourceRealOutputTarget::ReportingSchedule { index } => (index, true),
+            _ => return Err(OrdinaryRadiationUnavailable::StorageDomain.into()),
         };
         self.schedules
             .get(index.0)
-            .map(|row| &row.current_value)
+            .map(|row| {
+                if reporting && row.ems_actuated_on {
+                    &row.ems_value
+                } else {
+                    &row.current_value
+                }
+            })
             .ok_or_else(|| OrdinaryRadiationUnavailable::StorageDomain.into())
     }
 }

@@ -94,7 +94,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
                 .weather_outputs
                 .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?
                 .real_output(target),
-            T::Schedule { .. } => self.schedules.real_output(target),
+            T::Schedule { .. } | T::ReportingSchedule { .. } => self.schedules.real_output(target),
             T::SurfaceHeatBalance { .. } => self.surface.real_output(target),
             T::Solar { .. } => self.solar.real_output(target),
             T::Air { .. } => self.air.real_output(target),

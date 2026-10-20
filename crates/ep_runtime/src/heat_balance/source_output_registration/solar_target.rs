@@ -85,6 +85,7 @@ impl SourceRealOutputOwners for SourceCombinedOutputOwners<'_> {
             | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::Weather { .. }
             | SourceRealOutputTarget::Schedule { .. }
+            | SourceRealOutputTarget::ReportingSchedule { .. }
             | SourceRealOutputTarget::SystemReports { .. }
             | SourceRealOutputTarget::ExteriorLight { .. }
             | SourceRealOutputTarget::Comfort { .. }

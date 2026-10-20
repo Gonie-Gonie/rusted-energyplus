@@ -65,6 +65,23 @@ fn no_variable_frame(options: &SourceResultsFrameworkOptions) -> Result<(), Erro
     }
     Ok(())
 }
+
+fn reporting_schedule_is_on(
+    var: &SourceOutVarReal,
+    owners: &SourceOutputUpdateOwners<'_>,
+) -> Result<bool, Error> {
+    let Some(index) = var.schedule else {
+        return Ok(true);
+    };
+    // Native3360 and3470 each call Schedule::getCurrentVal at their own
+    // consumption point. The target resolves the same live currentVal/EMSVal;
+    // no per-interval snapshot or scalar copy is retained by OutputProcessor.
+    Ok(*owners
+        .real
+        .real_output(SourceRealOutputTarget::ReportingSchedule { index })
+        .map_err(Error::Output)?
+        != 0.0)
+}
 impl SourceOutputRegistration {
     fn current_minute(&self, kind: TimeStepKind) -> f64 {
         match kind {
@@ -201,10 +218,8 @@ impl SourceOutputRegistration {
             if !var.report {
                 continue;
             }
-            if var.schedule.is_some() {
-                return Err(Error::Unavailable(
-                    "actual OutVar schedule getCurrentVal3360",
-                ));
+            if !reporting_schedule_is_on(var, owners)? {
+                continue;
             }
             var.time_step_stored = true;
             if !var.this_time_step_stored {
@@ -252,12 +267,7 @@ impl SourceOutputRegistration {
             }
             for number in 0..self.out_vars.len() {
                 let var = &mut self.out_vars[number];
-                if var.schedule.is_some() {
-                    return Err(Error::Unavailable(
-                        "actual OutVar schedule getCurrentVal3472",
-                    ));
-                }
-                let report_now = true; // literal local; no schedule pointer admitted beyond preceding real boundary
+                let report_now = reporting_schedule_is_on(var, owners)?;
                 if !report_now || !var.report {
                     var.time_step_value = 0.0;
                 }

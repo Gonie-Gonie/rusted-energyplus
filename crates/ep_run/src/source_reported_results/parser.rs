@@ -1,6 +1,8 @@
 //! Strict complete-stream catalog/timestamp/footer parser for own Source outputs.
 use super::*;
 use std::collections::{BTreeMap, BTreeSet};
+#[cfg(test)]
+mod scheduled_filter_tests;
 fn number(s: &str, stream: Stream, line: usize) -> Result<i32, SourceReportedError> {
     s.trim()
         .parse()
@@ -135,6 +137,18 @@ pub(super) fn read_stream(
     stream: Stream,
     c: &SourceReportedCatalog,
 ) -> Result<SourceReportedStream, SourceReportedError> {
+    let file_state = if stream == Stream::Eso {
+        c.eso_file_state
+    } else {
+        c.mtr_file_state
+    };
+    if !file_state.closed {
+        return Err(invalid(
+            stream,
+            0,
+            "actual Source output handle is not successfully closed",
+        ));
+    }
     let expected_count = u64::try_from(if stream == Stream::Eso {
         c.eso_record_count
     } else {
@@ -167,6 +181,7 @@ pub(super) fn read_stream(
             d.frequency,
             d.store_type.id(),
             d.kind.id(),
+            d.reporting_schedule.clone(),
         )) {
             return Err(invalid(
                 stream,
@@ -180,7 +195,8 @@ pub(super) fn read_stream(
         Err(e)
             if e.kind() == std::io::ErrorKind::NotFound
                 && expected_count == 0
-                && declared.is_empty() =>
+                && file_state.deleted_empty
+                && declared.values().all(|d| d.reporting_schedule.is_some()) =>
         {
             return Ok(SourceReportedStream {
                 stream,
@@ -191,10 +207,23 @@ pub(super) fn read_stream(
                 series: Vec::new(),
                 record_count: 0,
                 deleted_empty: true,
+                deleted_empty_declarations: c
+                    .declarations
+                    .iter()
+                    .filter(|d| d.stream == stream)
+                    .cloned()
+                    .collect(),
             });
         }
         Err(e) => return Err(e.into()),
     };
+    if file_state.deleted_empty {
+        return Err(invalid(
+            stream,
+            0,
+            "physical stream exists after its actual owner deleted it",
+        ));
+    }
     if expected_count == 0 {
         return Err(invalid(
             stream,
@@ -434,7 +463,10 @@ pub(super) fn read_stream(
             "partial stream: dictionary/end-of-data/record footer is missing",
         ));
     }
-    if series.iter().any(|s| s.samples.is_empty()) {
+    if series
+        .iter()
+        .any(|s| s.samples.is_empty() && s.declaration.reporting_schedule.is_none())
+    {
         return Err(invalid(
             stream,
             0,
@@ -450,5 +482,6 @@ pub(super) fn read_stream(
         series,
         record_count: data_count,
         deleted_empty: false,
+        deleted_empty_declarations: Vec::new(),
     })
 }

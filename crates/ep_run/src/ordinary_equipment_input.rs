@@ -291,6 +291,15 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                         "ordinary {family} requires an actual Constant schedule"
                     ));
                 };
+                // ScheduleManager's two real built-in Constant owners exist
+                // without authored definitions (ScheduleManager.cc:316-320).
+                if family == "Output:Variable"
+                    && ["Constant-0.0", "Constant-1.0"]
+                        .iter()
+                        .any(|name| schedule.eq_ignore_ascii_case(name))
+                {
+                    continue;
+                }
                 let constant = raw
                     .objects
                     .get(&ObjectType("Schedule:Constant".into()))
@@ -312,13 +321,15 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 let schedule =
                     constant.ok_or("ordinary schedule reference is not a real Constant input")?;
                 // Original Schedule:Constant's absent hourly value is 0.0.
+                // OutputProcessor tests zero/nonzero, including negative ON
+                // values. Equipment schedules retain their consumer boundary.
                 if !field(schedule, "hourly_value")
                     .filter(|value| !blank(value))
                     .map_or(Some(0.0), number)
-                    .is_some_and(|value| value >= 0.0)
+                    .is_some_and(|value| family == "Output:Variable" || value >= 0.0)
                 {
                     return Err(format!(
-                        "ordinary {family} requires a nonnegative Constant schedule"
+                        "ordinary {family} requires a finite Constant schedule within its consumer domain"
                     ));
                 }
             }
@@ -488,6 +499,16 @@ mod tests {
                 true,
             ),
             (
+                "actual built-in output ON schedule",
+                r#", "Output:Variable":{"x":{"variable_name":"Site Outdoor Air Drybulb Temperature","schedule_name":"Constant-1.0"}}"#,
+                true,
+            ),
+            (
+                "actual built-in output OFF schedule",
+                r#", "Output:Variable":{"x":{"variable_name":"Site Outdoor Air Drybulb Temperature","schedule_name":"constant-0.0"}}"#,
+                true,
+            ),
+            (
                 "numeric operand has wrong type",
                 r#", "Material:NoMass":{"x":{"roughness":"Rough","thermal_resistance":"1"}}"#,
                 false,
@@ -496,6 +517,27 @@ mod tests {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
         }
+        for value in [-2.0, 0.0, 3.0] {
+            let addition = format!(
+                r#", "Schedule:Constant":{{"filter":{{"hourly_value":{value}}}}}, "Output:Variable":{{"v":{{"variable_name":"Site Outdoor Air Drybulb Temperature","schedule_name":"filter"}}}}"#
+            );
+            let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
+            assert!(resolve(&raw).is_ok(), "output filter value {value}");
+            let equipment = addition.replace(
+                r#""Output:Variable":{"v":{"variable_name":"Site Outdoor Air Drybulb Temperature","schedule_name":"filter"}}"#,
+                r#""Exterior:Lights":{"v":{"schedule_name":"filter","design_level":1}}"#,
+            );
+            let raw = parse_epjson_str(&format!("{{{base}{equipment}}}"))?;
+            assert_eq!(
+                resolve(&raw).is_ok(),
+                value >= 0.0,
+                "equipment schedule value {value}"
+            );
+        }
+        let raw = parse_epjson_str(&format!(
+            r#"{{{base},"Output:Variable":{{"v":{{"variable_name":"Site Outdoor Air Drybulb Temperature","schedule_name":"missing"}}}}}}"#
+        ))?;
+        assert!(resolve(&raw).is_err(), "unresolved reporting schedule");
         for (fields, accepted) in [
             (r#""surface_temperature_upper_limit":200"#, true),
             (

@@ -4,6 +4,8 @@ use super::ctf_initialization_context::CtfInitializationReports;
 use super::selected_heat_balance_input::HeatBalanceInputError as Error;
 use super::source_output_registration::{SourceOutputStoreType, SourceReportFrequency};
 use crate::OutputStoreType;
+#[cfg(test)]
+mod scheduled_filter_tests;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 /// Physical Source output stream owning a report declaration.
@@ -137,6 +139,8 @@ pub struct SourceReportedDeclaration {
     pub store_type: OutputStoreType,
     /// Actual variable, meter or cumulative-meter category.
     pub kind: SourceDeclarationKind,
+    /// Actual reporting schedule name retained at registration; no values/history.
+    pub reporting_schedule: Option<String>,
 }
 impl SourceReportedDeclaration {
     /// Number of value/date items in the native dictionary row, excluding its report ID.
@@ -152,7 +156,7 @@ impl SourceReportedDeclaration {
         let (_, notice) = self.frequency.dictionary();
         let line = match self.kind {
             SourceDeclarationKind::Variable => format!(
-                "{},{},{},{} [{}]{}",
+                "{},{},{},{} [{}]{}{}{}",
                 self.report_id,
                 self.data_items(),
                 self.key
@@ -160,7 +164,13 @@ impl SourceReportedDeclaration {
                     .ok_or(Error::Unavailable("missing actual variable key metadata"))?,
                 self.name,
                 self.units,
-                notice
+                notice,
+                if self.reporting_schedule.is_some() {
+                    ","
+                } else {
+                    ""
+                },
+                self.reporting_schedule.as_deref().unwrap_or("")
             ),
             SourceDeclarationKind::Meter => format!(
                 "{},{},{} [{}]{}",
@@ -180,6 +190,14 @@ impl SourceReportedDeclaration {
         };
         Ok(line)
     }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// Actual retained physical output lifecycle, independent of simulation success.
+pub struct SourceReportedFileState {
+    /// Actual handle has been closed and no IO failure is retained.
+    pub closed: bool,
+    /// The same actual IO owner successfully deleted its empty stream.
+    pub deleted_empty: bool,
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 /// A genuine requested variable that no actual registration marked as used.
@@ -202,6 +220,10 @@ pub struct SourceReportedCatalog {
     pub eso_record_count: i64,
     /// Actual completed meter-output record counter.
     pub mtr_record_count: i64,
+    /// Actual ESO handle/deletion facts, read from the same retained IO owner.
+    pub eso_file_state: SourceReportedFileState,
+    /// Actual MTR handle/deletion facts, read from the same retained IO owner.
+    pub mtr_file_state: SourceReportedFileState,
     /// Actual requested variables still unused after registration.
     pub unresolved_requests: Vec<SourceUnresolvedRequest>,
     /// Actual SysVars warmup-reporting setting.
@@ -211,7 +233,10 @@ impl CtfInitializationReports {
     /// After actual ManageSimulation620, borrow metadata from its same owners.
     /// This accessor neither establishes nor stores a completion flag. Its
     /// caller must already have propagated the genuine successful620 return.
-    pub fn source_reported_catalog(&self) -> Result<SourceReportedCatalog, Error> {
+    pub fn source_reported_catalog(
+        &self,
+        files: &super::source_initialization::SourceInitializationFiles,
+    ) -> Result<SourceReportedCatalog, Error> {
         let op = &self.output_registration;
         let project = self
             .selected_project_data
@@ -224,11 +249,19 @@ impl CtfInitializationReports {
             if !var.report {
                 continue;
             }
-            if var.schedule.is_some() {
-                return Err(Error::Unavailable(
-                    "scheduled Source output history requires its actual reporting schedule contract",
-                ));
-            }
+            let reporting_schedule = var
+                .schedule
+                .map(|schedule| {
+                    op.requested_variables
+                        .iter()
+                        .find(|request| request.reporting_schedule == Some(schedule))
+                        .map(|request| request.reporting_schedule_name.clone())
+                        .filter(|name| !name.is_empty())
+                        .ok_or(Error::Unavailable(
+                            "actual reporting schedule name metadata",
+                        ))
+                })
+                .transpose()?;
             declarations.push(SourceReportedDeclaration {
                 stream: SourceDeclaredStream::Eso,
                 report_id: var.report_id,
@@ -241,6 +274,7 @@ impl CtfInitializationReports {
                     SourceOutputStoreType::Sum => OutputStoreType::Sum,
                 },
                 kind: SourceDeclarationKind::Variable,
+                reporting_schedule,
             });
         }
         const FREQUENCIES: [SourceReportFrequency; 7] = [
@@ -287,6 +321,7 @@ impl CtfInitializationReports {
                             frequency: frequency(f),
                             store_type: OutputStoreType::Sum,
                             kind,
+                            reporting_schedule: None,
                         });
                     }
                 }
@@ -302,11 +337,14 @@ impl CtfInitializationReports {
                 frequency: frequency(r.frequency),
             })
             .collect();
+        let (eso_file_state, mtr_file_state) = files.source_reported_file_states();
         Ok(SourceReportedCatalog {
             declarations,
             stamp_report_numbers: op.frequency_stamp_report_numbers,
             eso_record_count: self.source_standard_output_record_count,
             mtr_record_count: self.source_standard_meter_record_count,
+            eso_file_state,
+            mtr_file_state,
             unresolved_requests,
             report_during_warmup: project.system.report_during_warmup,
         })

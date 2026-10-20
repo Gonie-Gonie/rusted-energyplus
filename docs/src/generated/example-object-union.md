@@ -118,7 +118,7 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 | `Output:Surfaces:Drawing` | 38 | 38 | 07 Reporting | unregistered / no reviewed entry |
 | `Output:Surfaces:List` | 17 | 17 | 07 Reporting | unregistered / no reviewed entry |
 | `Output:Table:SummaryReports` | 39 | 39 | 07 Reporting | unregistered / no reviewed entry |
-| `Output:Variable` | 157 | 4612 | 07 Reporting | unregistered / no reviewed entry |
+| `Output:Variable` | 157 | 4612 | 07 Reporting | typed |
 | `Output:VariableDictionary` | 84 | 84 | 07 Reporting | unregistered / no reviewed entry |
 | `OutputControl:Table:Style` | 39 | 39 | 07 Reporting | unregistered / no reviewed entry |
 | `Exterior:Lights` | 38 | 38 | 08 Other dependencies to review | unregistered / no reviewed entry |

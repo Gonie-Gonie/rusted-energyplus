@@ -46,7 +46,7 @@ impl super::SourceRealOutputOwners for SourceNonFacilityOutputOwners<'_> {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
             T::Weather { .. } => self.weather.real_output(target),
-            T::Schedule { .. } => self.schedules.real_output(target),
+            T::Schedule { .. } | T::ReportingSchedule { .. } => self.schedules.real_output(target),
             T::SystemReports { .. } => self.system_reports.real_output(target),
             T::ExteriorLight { .. } => self.exterior.real_output(target),
             T::SurfaceHeatBalance { .. } => self.surface.real_output(target),

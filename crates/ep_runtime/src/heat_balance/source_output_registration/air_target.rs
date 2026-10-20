@@ -103,7 +103,10 @@ impl SourceRealOutputOwners for SourceAllOutputOwners<'_> {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
             SourceRealOutputTarget::Weather { .. } => self.weather.real_output(target),
-            SourceRealOutputTarget::Schedule { .. } => self.schedules.real_output(target),
+            SourceRealOutputTarget::Schedule { .. }
+            | SourceRealOutputTarget::ReportingSchedule { .. } => {
+                self.schedules.real_output(target)
+            }
             SourceRealOutputTarget::SystemReports { .. } => self.system_reports.real_output(target),
             SourceRealOutputTarget::ExteriorLight { .. } => self.exterior.real_output(target),
             SourceRealOutputTarget::Facility { .. } => self.facility.real_output(target),

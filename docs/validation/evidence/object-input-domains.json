@@ -1,0 +1,487 @@
+{
+  "schema": "object-input-domain-verification.v1",
+  "reviewed_on": "2026-10-20",
+  "corpus": {
+    "input_files": 187,
+    "idf_files": 175,
+    "epjson_files": 12,
+    "canonical_object_types": 110,
+    "official_instances": 8978,
+    "excluded_unknown_diagnostic_types": 1,
+    "catalog": {
+      "path": "data/schema/energyplus-26.1-object-index.json",
+      "sha256": "d1681699f6a8e679088b242d82afa6079b14eaf09a3080a0d80c53dbd5bc19f1",
+      "bytes": 56492
+    }
+  },
+  "scope": "Input-domain expansion within the existing Source A runtime. No promotion of arbitrary object combinations, full-object completion or the frozen A24 conformance case.",
+  "reviewed_domains": {
+    "Version": [
+      "advisory strings and separate pinned engine identity",
+      "absent/explicit empty/present missing field distinctions",
+      "raw then uppercase warning order",
+      "exact empty/whitespace singleton keys"
+    ],
+    "Timestep": [
+      "all 60 schema integers normalize before calendars/schedules/axes",
+      "absent object four; present omitted/converted blank IDF field six",
+      "strict JSON integer types; invalid ranges and duplicates rejected",
+      "CondFD minimum clock metadata only; unavailable physics retained"
+    ],
+    "RunPeriod": [
+      "number-valued years truncate toward zero; zero is unspecified",
+      "raw numbers retained for actual Source getter",
+      "year relationship, rollover and leap-day unit checks",
+      "checked downstream calendar/Julian limits retained"
+    ],
+    "Output:Variable": [
+      "real live reporting schedule identity and immutable dictionary name",
+      "zero OFF; positive/negative ON; EMS current value at both native boundaries",
+      "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
+      "actual IO deletion/catalog/extraction; zero samples are not fabricated",
+      "Constant and built-in Constant admission; other explicit physics/output guards retained"
+    ]
+  },
+  "verification": {
+    "workspace_tests": {
+      "passed": 4986,
+      "ignored": 2,
+      "log": {
+        "path": ".runtime/object-expansion/workspace-tests-03.log",
+        "sha256": "7a4fcc1491b67a52b058f4f9a7a910b7e511ecbd8efaf74a2321fc14714bb180",
+        "bytes": 20018
+      },
+      "scope": "Full workspace before the subsequent year and artifact-parser additions; affected code is checked below."
+    },
+    "final_changed_crate_tests": {
+      "ep_compiler_passed": 502,
+      "ep_run_passed": 783,
+      "log": {
+        "path": ".runtime/object-expansion/changed-crate-tests-01.log",
+        "sha256": "4f12aa5f7d2d5cdc639533d1f488a1e8da5caac1aac52d6b96e2f331b2a55741",
+        "bytes": 5146
+      }
+    },
+    "final_scheduled_filter_tests": {
+      "ep_runtime_passed": 8,
+      "ep_run_passed": 2,
+      "log": {
+        "path": ".runtime/object-expansion/scheduled-filter-tests-02.log",
+        "sha256": "239ec4d007a6f6775a431bb1be0af6ee66de540273c4068f01cd70030fd7d89b",
+        "bytes": 3148
+      }
+    },
+    "quality": {
+      "clippy": "workspace --all-targets -- -D warnings passed",
+      "log": {
+        "path": ".runtime/object-expansion/clippy-02.log",
+        "sha256": "808b37f7f48cc6a1a5892209be5e3d74edc97a39543c56679db3d12ff781bd18",
+        "bytes": 1684
+      },
+      "format": "cargo fmt --all passed",
+      "documentation": "docs generator check and full mdBook docs-check passed"
+    },
+    "source_build_receipt": {
+      "path": ".runtime/porting/object-domain-20261020/build-01/receipt.json",
+      "sha256": "d691c60d7ec50be1722f95837e83fd75ec937964b493cbfb9d7858f58d0cf774",
+      "bytes": 7821
+    },
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/44/44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7",
+      "sha256": "44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7"
+    },
+    "retained_source_executable": {
+      "path": ".runtime/porting/object-domain-20261020/build-01/eplus-rs.exe",
+      "sha256": "b051cab0bde48ae201dc24c8b00e3ae74e167c762bc58309e0356c7a0d4a26d3",
+      "bytes": 75051726
+    },
+    "original_execution_path": "target/debug/eplus-rs.exe",
+    "policy": {
+      "path": "docs/validation/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+      "bytes": 45145
+    },
+    "policy_changes": 0,
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ.",
+    "cases": [
+      {
+        "id": "timestep-8",
+        "group": "project_time",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/calibration-01/timestep-8/input.idf",
+          "sha256": "53ab7f9fe91122ec15ff99d70d7ddc1981ff66738120ef1fef4bed847f6870f2",
+          "bytes": 9275
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/calibration-01/timestep-8/receipt.json",
+          "sha256": "cdf534e5e39db7b07eff88f906e678639c98b6d5dc89e8621c77921de3cb3198",
+          "bytes": 1927
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/timestep-8/receipt.json",
+          "sha256": "5ea7b943e6c946873fbb5b6cdbd688019b68b8f4d0375f18790a6c79b3f02c4d",
+          "bytes": 7017
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/runs/timestep-8/run-summary.json",
+          "sha256": "5288527fb3d0fd8d70974b997634af081406b54ae2020f29ecc80e9fb9e5440e",
+          "bytes": 32354
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-clock-comparisons-01/timestep-8/comparison.json",
+          "sha256": "64be85f4a6d68b57022177678841e2f40c15ba6c7815af10770c55033aa07836",
+          "bytes": 93721
+        },
+        "totals": {
+          "series": 58,
+          "samples": 13272,
+          "raw_operand_unequal": 7608,
+          "parsed_binary64_unequal": 7608,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "timestep-absent",
+        "group": "project_time",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/calibration-01/timestep-absent/input.idf",
+          "sha256": "61fc8b37fc4ba6aa7f42b77c460e8c2ff9e5c0446c0213f85f77a3d0fdf246b3",
+          "bytes": 9261
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/calibration-01/timestep-absent/receipt.json",
+          "sha256": "57765e874efc47a71a0d12e0d7cb85065f572484678db24e554c8026d1f8885c",
+          "bytes": 1943
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/timestep-absent/receipt.json",
+          "sha256": "52c91d7c10ffe70b904c78b3aa131f4c156825f9e5e59daef60bfa49c657722c",
+          "bytes": 7038
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/runs/timestep-absent/run-summary.json",
+          "sha256": "44d4058903c381c46440730ecd43672fa87ae8dbe2504661f0720b881aff2be5",
+          "bytes": 32439
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-clock-comparisons-01/timestep-absent/comparison.json",
+          "sha256": "88feeabe08c6b543b837352fa5fa56f939927ca56b12c9a5bc6707e6b01bd423",
+          "bytes": 93554
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "version-not-a-version",
+        "group": "project_time",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/version-boundary-03/version-not-a-version/input.idf",
+          "sha256": "91adec1cee322165fbc5f922b3883888a64c7272bca366c863d20e35fbb00211",
+          "bytes": 9284
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/version-boundary-03/version-not-a-version/receipt.json",
+          "sha256": "87d38975be7dc4da3d10b4221692e33ae23fa5d63ce4deba04ae27e60f0fbf17",
+          "bytes": 3213
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/version-not-a-version/receipt.json",
+          "sha256": "830979d3ac0dd4842c0da1a39e2aeeb378dc1b587435fab79a44cf73a8f69f3d",
+          "bytes": 7066
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/runs/version-not-a-version/run-summary.json",
+          "sha256": "d27a014fbfd2d7bb7765155b3e91aa183984807233369a4f0af835020ee582e0",
+          "bytes": 32591
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-clock-comparisons-01/version-not-a-version/comparison.json",
+          "sha256": "4d49c60e8856bf7fbdaac46d834fa5c765b32e2bc0ddb3f30425925c1bd69f31",
+          "bytes": 93808
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "year-fraction",
+        "group": "project_time",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-year/calibration-01/year-fraction/input.idf",
+          "sha256": "44287b7e82aa21fb6305f3d49808ccdb90da913371e9098f7a9ca9ffe89835b2",
+          "bytes": 9279
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-year/calibration-01/year-fraction/receipt.json",
+          "sha256": "f6682caa9ad59ce19f6c67d8b86135be6f720f034a09f90531c110a5d53e019e",
+          "bytes": 6317
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/year-fraction/receipt.json",
+          "sha256": "d090bddfc3961341d6cd385a674447e69ac07f7b411a7df8485a00599ebdd2ad",
+          "bytes": 7038
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/runs/year-fraction/run-summary.json",
+          "sha256": "a2ea76797fb9555b79155675b81b22873116cca87e9887abdadacc710629279b",
+          "bytes": 32386
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-clock-comparisons-01/year-fraction/comparison.json",
+          "sha256": "defe2d4289fa256cf8e62b5cb631a3e054810cacd9eedf543e557cb4ed07192e",
+          "bytes": 93509
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "year-zero",
+        "group": "project_time",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-year/calibration-01/year-zero/input.idf",
+          "sha256": "da694e34f6e28cb2a5bc4fcbf61cdee8aee4903940a3528fb819c7976cca195d",
+          "bytes": 9269
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-year/calibration-01/year-zero/receipt.json",
+          "sha256": "4346e6480f89f4e586564102c9ab4256aaf385a1d817198c81c63680ae4d3f99",
+          "bytes": 6210
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/year-zero/receipt.json",
+          "sha256": "dd8c8d435a200ef5c0114938f4d3b4a14ed51ba4dccfbf928bcef5586e317486",
+          "bytes": 7022
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/source-clock/runs/year-zero/run-summary.json",
+          "sha256": "1f333ab64641f39cd7618d00d8c4d1447012e3890774ace4b5c90325b923e46f",
+          "bytes": 32288
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-clock-comparisons-01/year-zero/comparison.json",
+          "sha256": "4045189b283d28b0370d95dccf3082e7f8700de9df8c345affa4724706433e99",
+          "bytes": 93441
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "negative",
+        "group": "output_filter",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/negative/input.idf",
+          "sha256": "9db28a120900058c57498070864318e65d910106686627e7fc41a9059d984423",
+          "bytes": 4619
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/negative/receipt.json",
+          "sha256": "5bbc564bdace4fdf307095edfe34e6995f319bab7ec962b935a32611bded5ea6",
+          "bytes": 3211
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-filter/negative/receipt.json",
+          "sha256": "b032f792bdb596a909399e2ff335f0244c36c72e13a070031423e3f45cd5b07e",
+          "bytes": 6879
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/filter-negative/run-summary.json",
+          "sha256": "494195b1a513c6f470488702a62665d03ad6d27cc319a853f1608de397b9d2d7",
+          "bytes": 15216
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-filter-comparisons-01/negative/comparison.json",
+          "sha256": "cdda80441ded8cfa241c88b6f57ff81e6e9c2a810caded6c5781ee755de0d33c",
+          "bytes": 19583
+        },
+        "totals": {
+          "series": 4,
+          "samples": 96,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "positive",
+        "group": "output_filter",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/positive/input.idf",
+          "sha256": "de8f7de0084873418ad12a5c631120d282e63d4ed3d94e5f438237f87040ab97",
+          "bytes": 4618
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/positive/receipt.json",
+          "sha256": "0581e6ebc58170abd5deac67cded65feb74ef080827f9a4f44e75c8f809a041c",
+          "bytes": 3223
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-filter/positive/receipt.json",
+          "sha256": "72e173daa78c84980d205d5fe3f9c2b99749cb2a7113ee77c33218d110cf9d01",
+          "bytes": 6879
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/filter-positive/run-summary.json",
+          "sha256": "35e71ad22c93133d2e710d9e7a47cf80ad439fbcbb5e64896cdb4de37f89bab9",
+          "bytes": 15214
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-filter-comparisons-01/positive/comparison.json",
+          "sha256": "0635978daeef500d61e66df7fad4c0f0ab8859cbfd43e89cc23617a00b4556f7",
+          "bytes": 19582
+        },
+        "totals": {
+          "series": 4,
+          "samples": 96,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      },
+      {
+        "id": "zero",
+        "group": "output_filter",
+        "input": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/zero/input.idf",
+          "sha256": "7a5662e0e8c494ca0e63a40ab74cf611ec11b5e99ee0def24de25240f9de4489",
+          "bytes": 4618
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-clock/output-filter-05/zero/receipt.json",
+          "sha256": "fe5709118fd54498b38910a95ba97cf2725016deb756d06fd7ac49c51454e937",
+          "bytes": 2875
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-filter/zero/receipt.json",
+          "sha256": "5421d45e17f0e75c570f3756c16d0c0957715f66c0963cd29de661b17f855dc4",
+          "bytes": 6863
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/filter-zero/run-summary.json",
+          "sha256": "f7bd33cc9a2ff4679adbe9b8c806334336b5433495bd0ce63b9a72eb3e5ffa0a",
+          "bytes": 15120
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-filter-comparisons-01/zero/comparison.json",
+          "sha256": "be3c82f6dc095fb6ed838e68abaf3807b6b5af605c2e34facb8ce6206fb7760f",
+          "bytes": 16142
+        },
+        "totals": {
+          "series": 3,
+          "samples": 72,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        }
+      }
+    ],
+    "totals": {
+      "paired_cases": 8,
+      "reported_samples": 34944,
+      "raw_operand_unequal": 21752,
+      "tolerance_failures": 0,
+      "rmse_failures": 0,
+      "passed": true
+    }
+  },
+  "additional_native_type_calibrations": [
+    {
+      "path": ".runtime/object-expansion/native-clock/version-json-edge-04/aggregate-04.json",
+      "sha256": "99346e2280be5c76e8d9c7c92b9ace1d19f51b2bfc846a1f63b40d213dcccd54",
+      "bytes": 8199
+    },
+    {
+      "path": ".runtime/object-expansion/native-clock/timestep-json-edge-05/result.json",
+      "sha256": "54d37243d44a5f58aabfc835dcb0766bda23d20f7d6fc5c1a353a7ce9f07f93c",
+      "bytes": 3145
+    },
+    {
+      "path": ".runtime/object-expansion/native-clock/timestep-json-float-06/result.json",
+      "sha256": "85fa81a589493b1fed6790d366a696985924765b198f67e65ae5cf2b16e6616d",
+      "bytes": 3138
+    }
+  ],
+  "retention": "This compact record retains current facts. Raw receipts, source objects, binaries and physical streams are local validation artifacts under .runtime; historical native command paths in detailed comparisons describe their original execution. The retained executable above preserves its verified bytes across later builds."
+}

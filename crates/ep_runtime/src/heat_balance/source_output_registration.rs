@@ -302,6 +302,9 @@ pub(crate) struct SourceRequestedVariable {
     pub(crate) used: bool,
     pub(crate) is_simple_string: bool,
     pub(crate) reporting_schedule: Option<super::selected_schedule_manager::SourceScheduleIndex>,
+    /// Immutable name read from that actual schedule for its dictionary suffix.
+    /// No schedule values or mutable schedule state are copied here.
+    pub(crate) reporting_schedule_name: String,
 }
 
 impl Default for SourceRequestedVariable {
@@ -313,6 +316,7 @@ impl Default for SourceRequestedVariable {
             used: false,
             is_simple_string: true,
             reporting_schedule: None,
+            reporting_schedule_name: String::new(),
         }
     }
 }

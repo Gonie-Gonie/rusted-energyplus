@@ -1,5 +1,4 @@
 //! Complete own Source ESO/MTR artifact results, separate from legacy hourly stores.
-//! This module is HELD and has no pipeline/runtime dispatch activation.
 mod export;
 mod parser;
 use ep_runtime::heat_balance::source_reported_catalog::{
@@ -103,6 +102,9 @@ pub(crate) struct SourceReportedStream {
     pub series: Vec<ReportSeries>,
     pub record_count: u64,
     pub deleted_empty: bool,
+    /// Actual registered metadata retained when CloseOutputFiles deleted all data.
+    /// These declarations have no fabricated physical dictionary or samples.
+    pub deleted_empty_declarations: Vec<SourceReportedDeclaration>,
 }
 #[derive(Debug)]
 pub(crate) struct SourceReportedStreams {

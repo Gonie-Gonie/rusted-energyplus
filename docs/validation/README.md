@@ -1,4 +1,4 @@
-# Fixed Porting Validation Assets
+# Porting Validation Assets
 
 The current scope and results are in [Current Status](../src/current/current-status.md),
 state ownership is in [Architecture](../src/current/architecture-overview.md),
@@ -10,11 +10,12 @@ This directory retains authenticated inputs rather than a second work plan:
 - `cases/`: fixed IDFs, metadata and unit input/weather fixtures.
 - `contracts/`: frozen scope, state, source and tolerance contracts.
 - `evidence/`: the final fifteen-case validation, SUR-02 supplement and selected
-  input/baseline dependencies used by the retained comparison tools.
+  input/baseline dependencies used by the retained comparison tools, plus the
+  [current object-domain checks](evidence/object-input-domains.json).
 - `STATE_CONTRACTS.md`: the original source bytes authenticated by
   `contracts/state-contracts.json`; current explanatory prose lives in Architecture.
 
-The JSON, ZIP and fixture bytes are unchanged. Their original
+Existing frozen JSON, ZIP and fixture bytes are unchanged. Their original
 `energyplus_porting_plan/...` references identify historical objects. Tool readers
 map that prefix to `docs/validation/` for retained files, while historical policy
 checks still read the original Git path. Do not rewrite frozen references to

@@ -4,6 +4,7 @@ use super::{
     SourceOutputRegistration, SourceReportFrequency, SourceRequestedVariable,
 };
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
+use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use ep_model::{ReportInputs, SourceOutputVariableInput};
 
 /// One temporary borrow of the typed getter operands and the sole real input owner.
@@ -12,6 +13,7 @@ pub(crate) struct SourceReportVariableInput<'a> {
     reports: &'a ReportInputs,
     processor: &'a mut SelectedInputProcessor,
     minimum_report_frequency: &'a str,
+    schedules: Option<&'a mut SelectedScheduleManager>,
 }
 impl<'a> SourceReportVariableInput<'a> {
     pub(crate) fn new(
@@ -23,6 +25,23 @@ impl<'a> SourceReportVariableInput<'a> {
             reports,
             processor,
             minimum_report_frequency,
+            schedules: None,
+        }
+    }
+
+    /// Borrow the same already initialized ScheduleManager on the first real
+    /// GetReportVariableInput call. Only native schedule identities are retained.
+    pub(crate) fn with_schedules(
+        reports: &'a ReportInputs,
+        processor: &'a mut SelectedInputProcessor,
+        minimum_report_frequency: &'a str,
+        schedules: &'a mut SelectedScheduleManager,
+    ) -> Self {
+        Self {
+            reports,
+            processor,
+            minimum_report_frequency,
+            schedules: Some(schedules),
         }
     }
 
@@ -205,12 +224,31 @@ impl SourceOutputRegistration {
             request.name = variable_name(&arguments.alphas[1]).into();
             request.frequency = frequency(&arguments.alphas[2], self.minimum_report_frequency)?;
             if !arguments.alpha_blanks[3] {
-                // Real Sched::GetSchedule and its severe/fatal diagnostics need
-                // the actual schedule owner; never invent a null-success result.
-                return Err(OrdinaryRadiationUnavailable::InputBranch.into());
+                // Native OutputProcessor538-545 resolves the actual schedule and
+                // propagates its used flag. Missing references remain rejected;
+                // their unported severe/fatal path is never a null success.
+                let schedules = input
+                    .schedules
+                    .as_deref_mut()
+                    .ok_or(OrdinaryRadiationUnavailable::InputBranch)?;
+                let schedule = schedules
+                    .get_source_schedule(&arguments.alphas[3])
+                    .map_err(|error| OrdinaryRadiationError::Input(Box::new(error)))?
+                    .ok_or(OrdinaryRadiationUnavailable::InputBranch)?;
+                request.reporting_schedule = Some(schedule);
+                request.reporting_schedule_name.clone_from(
+                    &schedules
+                        .schedules
+                        .get(schedule.0)
+                        .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?
+                        .name,
+                );
             }
             request.used = false;
         }
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod scheduled_filter_tests;
