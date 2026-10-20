@@ -1249,6 +1249,86 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
 }
 
 #[test]
+fn unnamed_geometry_rule_keys_preserve_raw_ip_identity_and_strict_alpha_scalars() {
+    const FAMILY: &str = "GlobalGeometryRules";
+    for scope in [PortingScope::A, PortingScope::B] {
+        for key in ["", " ", "Arbitrary Geometry Identity"] {
+            let mut value = input(scope);
+            value[FAMILY] = json!({(key):{"starting_vertex_position":"UpperLeftCorner","vertex_entry_direction":"Counterclockwise","coordinate_system":"World","daylighting_reference_point_coordinate_system":"","rectangular_surface_coordinate_system":"World"}});
+            let raw = parse_epjson_str(&value.to_string()).expect("schema unnamed singleton key");
+            let compiled = compile_raw_model(&raw);
+            assert!(
+                compiled.model.is_some(),
+                "{:?}",
+                compiled.report.diagnostics
+            );
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("same GGR raw/IP scalar admission");
+            assert_eq!(ip.get_num_objects_found(FAMILY), 1);
+            assert!(ip.has_object(FAMILY, key));
+            assert!(
+                ip.is_object_unused(FAMILY, key),
+                "projection is not getter usage"
+            );
+            let actual = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                .expect("same raw GGR custody");
+            assert_eq!(actual.surface.geometry_rules.len(), 1);
+            let row = &actual.surface.geometry_rules[0];
+            assert_eq!(row.object_name, key);
+            assert_eq!(
+                row.fields["coordinate_system"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    "World".into()
+                )
+            );
+            assert!(trace(&value, scope).admissible);
+        }
+        for field in [
+            "starting_vertex_position",
+            "vertex_entry_direction",
+            "coordinate_system",
+            "daylighting_reference_point_coordinate_system",
+            "rectangular_surface_coordinate_system",
+        ] {
+            for scalar in [
+                json!(null),
+                json!(1),
+                json!(true),
+                json!([]),
+                json!({}),
+                json!(" "),
+            ] {
+                let mut value = input(scope);
+                value[FAMILY]["Geometry"][field] = scalar;
+                let raw = parse_epjson_str(&value.to_string()).expect("invalid alpha remains raw");
+                assert!(
+                    match scope {
+                        PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                        PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                    }
+                    .is_err(),
+                    "{scope:?}/{field}"
+                );
+            }
+        }
+        let mut duplicate = input(scope);
+        duplicate[FAMILY] = json!({"":duplicate[FAMILY]["Geometry"].clone()," ":duplicate[FAMILY]["Geometry"].clone()});
+        let raw = parse_epjson_str(&duplicate.to_string())
+            .expect("duplicate singleton objects preserved raw");
+        assert!(
+            match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .is_err()
+        );
+    }
+}
+
+#[test]
 fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
     use ep_model::{InsideSurfaceConvectionAlgorithm as I, OutsideSurfaceConvectionAlgorithm as O};
     const INSIDE: &str = "SurfaceConvectionAlgorithm:Inside";

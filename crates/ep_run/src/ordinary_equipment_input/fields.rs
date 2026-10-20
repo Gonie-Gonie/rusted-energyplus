@@ -503,29 +503,24 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                     ],
                 )
         }
-        ("GlobalGeometryRules", "starting_vertex_position") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "LowerLeftCorner",
-                        "LowerRightCorner",
-                        "UpperLeftCorner",
-                        "UpperRightCorner",
-                    ],
-                )
-        }
+        ("GlobalGeometryRules", "starting_vertex_position") => text_is(
+            value,
+            &[
+                "LowerLeftCorner",
+                "LowerRightCorner",
+                "UpperLeftCorner",
+                "UpperRightCorner",
+            ],
+        ),
         ("GlobalGeometryRules", "vertex_entry_direction") => {
-            blank(value) || text_is(value, &["Clockwise", "Counterclockwise"])
+            text_is(value, &["Clockwise", "Counterclockwise"])
         }
-        ("GlobalGeometryRules", "coordinate_system") => {
-            blank(value) || text_is(value, &["Relative", "World"])
-        }
+        ("GlobalGeometryRules", "coordinate_system") => text_is(value, &["Relative", "World"]),
         ("GlobalGeometryRules", "daylighting_reference_point_coordinate_system") => {
-            blank(value) || text_is(value, &["", "Relative", "World"])
+            text_is(value, &["", "Relative", "World"])
         }
         ("GlobalGeometryRules", "rectangular_surface_coordinate_system") => {
-            blank(value) || text_is(value, &["", "Relative", "World"])
+            text_is(value, &["", "Relative", "World"])
         }
         ("BuildingSurface:Detailed", "surface_type") => {
             blank(value) || text_is(value, &["Ceiling", "Floor", "Roof", "Wall"])

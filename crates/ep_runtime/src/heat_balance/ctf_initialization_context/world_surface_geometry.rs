@@ -1,4 +1,4 @@
-//! Actual raw World row producers and required retained numerical properties.
+//! Actual raw row producers, canonical World output and retained numerical properties.
 //!
 //! The boolean selects this bounded prefix only. It is not a completed
 //! SetupZoneGeometry/HeatBalanceInput return or readiness flag. The admitted
@@ -15,7 +15,7 @@ use crate::heat_balance::selected_heat_balance_input::{
 use crate::heat_balance::selected_project_data::ProjectInputValue;
 use ep_model::{SurfaceId, TypedModel};
 
-fn selects_world(raw: &SelectedHeatBalanceInput) -> bool {
+fn selects_source_geometry(raw: &SelectedHeatBalanceInput) -> bool {
     let [object] = raw.surface.geometry_rules.as_slice() else {
         return false;
     };
@@ -23,16 +23,28 @@ fn selects_world(raw: &SelectedHeatBalanceInput) -> bool {
         Some(ProjectInputValue::String(value)) => Some(value.as_str()),
         _ => None,
     };
-    field("starting_vertex_position").is_some_and(|v| v.eq_ignore_ascii_case("UpperLeftCorner"))
-        && field("vertex_entry_direction").is_some_and(|v| {
-            v.eq_ignore_ascii_case("Counterclockwise") || v.eq_ignore_ascii_case("CCW")
-        })
-        && field("coordinate_system")
-            .is_some_and(|v| v.eq_ignore_ascii_case("World") || v.eq_ignore_ascii_case("Absolute"))
+    field("starting_vertex_position").is_some_and(|v| {
+        [
+            "UpperLeftCorner",
+            "LowerLeftCorner",
+            "LowerRightCorner",
+            "UpperRightCorner",
+        ]
+        .iter()
+        .any(|corner| v.eq_ignore_ascii_case(corner))
+    }) && field("vertex_entry_direction").is_some_and(|v| {
+        ["Counterclockwise", "CCW", "Clockwise", "CW"]
+            .iter()
+            .any(|direction| v.eq_ignore_ascii_case(direction))
+    }) && field("coordinate_system").is_some_and(|v| {
+        ["World", "Absolute", "Relative"]
+            .iter()
+            .any(|system| v.eq_ignore_ascii_case(system))
+    })
 }
 
 impl CtfInitializationContext<'_> {
-    /// Consume actual source raw rows on the explicitly selected World route.
+    /// Consume the admitted raw GGR through actual GetVertices to canonical World rows.
     /// Missing or different raw GGR preserves the established legacy route and
     /// leaves the actual GetSurfaceData entered guard untouched.
     pub(crate) fn prepare_selected_world_surface_geometry(
@@ -47,7 +59,7 @@ impl CtfInitializationContext<'_> {
         let Some(raw) = reports.heat_balance_input.as_ref() else {
             return Ok(false);
         };
-        if !selects_world(raw) {
+        if !selects_source_geometry(raw) {
             return Ok(false);
         }
         if reports.surface_geometry_input.entered_once {

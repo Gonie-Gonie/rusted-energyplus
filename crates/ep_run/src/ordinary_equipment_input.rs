@@ -122,6 +122,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                     family.0.as_str(),
                     "Version"
                         | "Timestep"
+                        | "GlobalGeometryRules"
                         | "Site:GroundTemperature:BuildingSurface"
                         | "SurfaceConvectionAlgorithm:Inside"
                         | "SurfaceConvectionAlgorithm:Outside"

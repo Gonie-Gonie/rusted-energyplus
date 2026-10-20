@@ -15,7 +15,7 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 | Object type | Input files | Instances | Dependency review group | Existing typing status |
 |---|---|---|---|---|
 | `Building` | 174 | 174 | 01 Project, time and site | typed |
-| `GlobalGeometryRules` | 164 | 164 | 01 Project, time and site | unregistered / no reviewed entry |
+| `GlobalGeometryRules` | 164 | 164 | 01 Project, time and site | typed |
 | `HeatBalanceAlgorithm` | 69 | 69 | 01 Project, time and site | typed |
 | `RunPeriod` | 168 | 168 | 01 Project, time and site | typed |
 | `RunPeriodControl:DaylightSavingTime` | 1 | 1 | 01 Project, time and site | typed |

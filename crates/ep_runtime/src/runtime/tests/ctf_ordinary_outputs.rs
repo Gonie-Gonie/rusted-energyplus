@@ -501,6 +501,75 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             environment: &environment,
         };
         let mut errors = false;
+        // Declared per-row entry, then the genuine GetVertices implementation.
+        // Reuse these actual borrowed owners; this does not certify the separate
+        // complete raw getter/canonical binding or a multi-zone admission.
+        {
+            let saved_zones = owners.zones.clone();
+            let saved_control = owners.control.clone();
+            let saved_shortcut = owners.shortcut.clone();
+            let points = [[0.0, -0.0, 2.0], [0.0, 0.0, 0.0],
+                [3.0, 0.0, 0.0], [3.0, -0.0, 2.0]];
+            // Fixed expected permutations from Original9248-9276. In particular,
+            // a triangle's UpperRightCorner preserves its starting vertex.
+            for (sides, orders) in [(3, [[0,1,2,0], [2,0,1,0], [1,2,0,0], [0,1,2,0]]),
+                (4, [[0,1,2,3], [3,0,1,2], [2,3,0,1], [1,2,3,0]])] {
+                for (corner, order) in orders.into_iter().enumerate() {
+                    for ccw in [true, false] {
+                        for (world, appendix) in [(true, 0.0), (true, 7.5), (false, 7.5)] {
+                            owners.control.building_azimuth = -22.5;
+                            owners.control.building_rotation_appendix_g = appendix;
+                            let zone = &mut owners.zones.zones.as_mut().ok_or("declared owning Zone")?[0];
+                            zone.relative_north = 37.5;
+                            zone.origin_m = [12.0, -7.0, 2.25];
+                            owners.shortcut.numeric_args = vec![0.0; 2];
+                            owners.shortcut.numeric_args.extend(points[..sides].iter().flatten().copied());
+                            let mut vertices = SurfaceGeometryInputState {
+                                corner: i32::try_from(corner + 1)?, counterclockwise: ccw,
+                                world_coordinates: world, pending_vertices: Some(0),
+                                surface_tmp: Some(vec![SurfaceTmpInput {
+                                    name: "declared transformed wall".into(), class: SurfaceClass::Wall,
+                                    zone: 1, sides: i32::try_from(sides)?,
+                                    vertex: Some(vec![None; sides]), ..Default::default()
+                                }]), ..Default::default()
+                            };
+                            vertices.initialize_coordinate_owners(&owners)?;
+                            vertices.get_world_vertices(0, sides, &mut owners, &mut context.backend)?;
+                            assert_eq!(vertices.pending_vertices, None);
+                            let row = &vertices.surface_tmp.as_ref().ok_or("actual transformed row")?[0];
+                            let actual = row.vertex.as_ref().ok_or("actual transformed vertices")?;
+                            for (position, point) in actual.iter().enumerate() {
+                                let source = order[position];
+                                let source = if ccw || source == 0 { source } else { sides - source };
+                                let [x, y, z] = points[source];
+                                let rad = std::f64::consts::PI / 180.0;
+                                let expected = if world {
+                                    let angle = -appendix * rad;
+                                    [x * angle.cos() - y * angle.sin(),
+                                        x * angle.sin() + y * angle.cos(), z]
+                                } else {
+                                    let angle = -37.5_f64 * rad;
+                                    let xb = x * angle.cos() - y * angle.sin() + 12.0;
+                                    let yb = x * angle.sin() + y * angle.cos() - 7.0;
+                                    let angle = -(-22.5 + appendix) * rad;
+                                    [xb * angle.cos() - yb * angle.sin(),
+                                        xb * angle.sin() + yb * angle.cos(), z + 2.25]
+                                };
+                                assert_eq!(point.ok_or("actual written point")?.map(f64::to_bits),
+                                    expected.map(f64::to_bits), "sides{sides} corner{corner} ccw{ccw} world{world}");
+                            }
+                            assert!((row.gross_area - if sides == 3 { 3.0 } else { 6.0 }).abs() < 1.0e-12);
+                            assert!(row.vertex_progress.normal_area.is_some());
+                            assert!(row.vertex_progress.properties.ok_or("actual GetVertices properties")?.is_finite());
+                        }
+                    }
+                }
+            }
+            *owners.zones = saved_zones;
+            *owners.control = saved_control;
+            *owners.shortcut = saved_shortcut;
+        }
+
         // Authored checkpoint only, not a GetVertices/World producer certificate.
         // This cube intentionally has inward floor/roof winding. Do not bypass
         // the real warning/reversal IO by calling GetVertices on these rows.

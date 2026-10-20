@@ -63,7 +63,7 @@
       "remove the stale exactly-six-surface fence; retain the real one-Zone ownership boundary",
       "closed six/ten-quad and seven-face two-triangle geometry, actual identities and dynamic shared view-factor matrices",
       "actual Source completion, exact Native geometry EIO and ordered physical triangle DXF vertices",
-      "larger polygons, geometry repair and other real physics guards retained"
+      "larger polygons, geometry repair and other real physics guards retained; all GlobalGeometryRules corners/directions and actual relative Zone/Building transforms now feed canonical world geometry"
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -96,32 +96,40 @@
       "actual no-window/TDD/subsurface conditions keep the Original extra back-surface child inactive; no zero stand-ins",
       "existing test checks all five solar enums across A/B: three nonreflection selections admitted, both reflection selections retain bounds",
       "same-input whole Source completion, actual Building EIO and byte-identical complete SHD; no arbitrary Building/window/reflection combination promotion"
+    ],
+    "GlobalGeometryRules": [
+      "all four starting corners, both vertex entry directions and World/Relative selection reach the real Source vertex consumer",
+      "literal Original clockwise reversal and independent corner index moves precede actual Zone north/origin then Building/AppendixG transforms",
+      "forty-eight connected corner/direction/coordinate triangle/quad checks preserve exact floating-point writes and geometry ownership",
+      "same-input combined LowerRightCorner/Clockwise/Relative with nonzero Zone origin/north and negative Building north completes all original58 streams and exact named ordered DXF coordinates",
+      "exact unnamed singleton identity and strict five alpha scalar fields; required enums do not accept blanks",
+      "one Zone, closed triangular/quadrilateral opaque volume, canonical output and other genuine geometry/physics boundaries remain"
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5001,
+      "passed": 5011,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/geometry-diagnostics-workspace-tests-01.log",
-        "sha256": "9cdf1df65f77bc641a056fb81f148bb922b8c8ec5748c0afc08484b7a87da585",
-        "bytes": 20646
+        "path": ".runtime/object-expansion/geometry-rules-workspace-tests-10.log",
+        "sha256": "3460c1d74cd174502193df147834709b4da98f8a25b06e79b0b464c0051ec3af",
+        "bytes": 20680
       },
-      "scope": "Workspace milestone through opaque-lifecycle-05. Subsequent builds passed the focused connected checks recorded below; this is not a full-workspace rerun for those builds."
+      "scope": "Full workspace milestone through geometry-rules-10, including all preceding input-domain changes. Only a Source-index-loop lint attribute/comment followed this test run; Clippy and format checked those final bytes."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/opaque-solar-clippy-09.log",
-        "sha256": "56a39c89f9b7cacede338f08590d8365ee79771d51b216e93f6ec696a7446dfc",
-        "bytes": 1848
+        "path": ".runtime/object-expansion/geometry-rules-clippy-10b.log",
+        "sha256": "92ec2b348a55347bfd312ae7857dc238bbabca4776bf6654ee1ec7e86d448bbb",
+        "bytes": 2170
       },
-      "format": "cargo fmt --all passed",
+      "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/opaque-solar-docs-09.log",
-        "sha256": "af94881e98d41e7b79dd9dba2ac722f3da61d2a1ec9c6f8473f3c2d1cdcf8639",
-        "bytes": 1408
+        "path": ".runtime/object-expansion/geometry-rules-docs-10b.log",
+        "sha256": "d32de6266c72d4ab6d9555b499bf7f7fe64b811454642a50b6a3453269867e03",
+        "bytes": 354
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -1436,12 +1444,63 @@
           "passed": true
         },
         "solar_state": "Original A24 Building MinimalShadowing changed only to FullInteriorAndExterior. Actual global/Zone/Building EIO, full SHD bytes, real zero back/subsurface rows and zero diagnostic/END counts match. Positive window/TDD/reflection consumers remain bounded."
+      },
+      {
+        "id": "combined-geometry-rules",
+        "group": "geometry_coordinate_rules",
+        "source_build": "geometry-rules-10",
+        "input": {
+          "path": ".runtime/object-expansion/native-geometry-rules/calibration-01/input.idf",
+          "sha256": "be27cfb1b2d5a31f40715e1853494331447c430e4e1e3079f52fa93ad3a592f1",
+          "bytes": 9284
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-geometry-rules/calibration-01/receipt.json",
+          "sha256": "e15146563229b87df268335ce0d3059542592abfd71ac48453eaea7d46702eef",
+          "bytes": 10097
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-geometry-rules-10/receipt/receipt.json",
+          "sha256": "88b453e2f1630ba6bc958f1c91dd8741f26bd36ac51d5350a98fa48b58e222f6",
+          "bytes": 4127
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/geometry-rules-10/run-summary.json",
+          "sha256": "50cfbf6af30e9e36303558c880c697c22f3c78a4935fb701853a6d708916bb04",
+          "bytes": 32414
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-geometry-rules-comparisons-01/main/comparison.json",
+          "sha256": "0173523a62378f339587b16a6937866eb606b8e29f6a0c84d092c8f8ef0fcdbb",
+          "bytes": 131293
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-geometry-rules-comparisons-01/prelaunch.json",
+          "sha256": "a21ac30f449dec9de15ee5f7e244b1a4b60b2fc71f193bb02556a739a991a5c5",
+          "bytes": 2864
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3537,
+          "parsed_binary64_unequal": 3537,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "geometry_state": "Only nine exact ancestral spans change: GGR LowerRightCorner/Clockwise/Relative, reordered authored quad vertices, Building north -22.5, Zone north 37.5 and origin 12/-7/2.25. Real two-stage transformation matches all six named ordered four-vertex DXF entities to Native five-decimal output and exact geometry EIO; zero diagnostics."
       }
     ],
     "totals": {
-      "paired_cases": 22,
-      "reported_samples": 119760,
-      "raw_operand_unequal": 68104,
+      "paired_cases": 23,
+      "reported_samples": 125112,
+      "raw_operand_unequal": 71641,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1599,75 +1658,23 @@
           "sha256": "2dcc1f476814ab8c87c74a034d83c5ccebd293cc354d8b25e14116b37ffd9bc0",
           "bytes": 75119535
         }
-      }
-    ],
-    "focused_tests": [
-      {
-        "through_build": "convection-06",
-        "passed": 44,
-        "ignored": 1,
-        "scope": "Convection filter across ep_runtime and ep_run, plus the existing scientific-algorithm rejection test. The earlier broad ep_run run exposed an obsolete Simple rejection expectation; the corrected test still rejects genuinely unimplemented algorithms.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/convection-connected-tests-02.log",
-            "sha256": "470b219f849ec37c1ba9ca3259e21989700efcf37ab292caab1375cd08da0cca",
-            "bytes": 2778
-          },
-          {
-            "path": ".runtime/object-expansion/convection-rejection-tests-02.log",
-            "sha256": "203df2e0abc173e4b1fc43be1475432ac34f449d3c93a1d110fae6acf73df43f",
-            "bytes": 2272
-          }
-        ]
       },
       {
-        "through_build": "calendar-07",
-        "passed": 124,
-        "ignored": 0,
-        "scope": "Weather filter across ep_runtime and ep_run, including the four live-calendar/header combinations, full allowed-day callback consumption and retained raw-only boundary.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/calendar-weather-tests-07.log",
-            "sha256": "c2c04473fe602cf4fc843ccd09abe6d55726cc256319a659c8fff56d988ff047",
-            "bytes": 2966
-          }
-        ]
-      },
-      {
-        "through_build": "air-gap-08b",
-        "passed": 23,
-        "ignored": 0,
-        "scope": "AirGap connected input/getter/CTF checks (4), IDF ordering/count custody (13), and actual geometry/predefined U report checks including the used interior gap (6). Existing test bodies extended where possible.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/air-gap-connected-tests-08.log",
-            "sha256": "ace60fc3c5d90a5b2f7a9dcf25c57ed0382a9561d0416b28a81057cf345e89a1",
-            "bytes": 3660
-          },
-          {
-            "path": ".runtime/object-expansion/air-gap-idf-tests-08.log",
-            "sha256": "160565700a6d9dddf6b80bdbf4bb908a9b4510ea5b1e59d93192113975444ba9",
-            "bytes": 2118
-          },
-          {
-            "path": ".runtime/object-expansion/air-gap-reports-tests-08b.log",
-            "sha256": "5e542affbd9b3fcacfae42678803f0099667a194056a6a7fa840b7395485a5b5",
-            "bytes": 2698
-          }
-        ]
-      },
-      {
-        "through_build": "opaque-solar-09",
-        "passed": 1,
-        "ignored": 0,
-        "scope": "Existing default-controls test extended with all five Building solar-distribution enums across A/B and retained actual raw ingress.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/opaque-solar-control-tests-09.log",
-            "sha256": "a3df4ceadbb09503bc40302badea6d01245eb2e774eddc33e31a4c874004820e",
-            "bytes": 2272
-          }
-        ]
+        "id": "geometry-rules-10",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-10/receipt.json",
+          "sha256": "d25ad9d81f48dcfb206d23d939bbfa53031875ca39553e64fd540cee084de9e3",
+          "bytes": 4976
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/83/83dd79b61c9da4115856efc2d1e31c081e4b814c5197a860442f179faaa30abf",
+          "sha256": "83dd79b61c9da4115856efc2d1e31c081e4b814c5197a860442f179faaa30abf"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-10/eplus-rs.exe",
+          "sha256": "4fbf7ae704fa30601063b4a81c4beab73084c5f2ed31031f0e6db7832afd4281",
+          "bytes": 75125490
+        }
       }
     ]
   },

@@ -183,13 +183,9 @@ impl SurfaceGeometryInputState {
         owners: &mut SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
-        if self.pending_vertices != Some(slot)
-            || !self.world_coordinates
-            || !self.counterclockwise
-            || self.corner != 1
-        {
+        if self.pending_vertices != Some(slot) || !(1..=4).contains(&self.corner) {
             return Err(Error::Unavailable(
-                "selected actual ULC/CCW/World GetVertices boundary",
+                "actual pending GetVertices/geometry corner owner",
             ));
         }
         if sides > self.coordinate.max_vertices_per_surface {
@@ -229,7 +225,104 @@ impl SurfaceGeometryInputState {
             ptr += 1;
             *value = Some([x, y, z]);
         }
-        if row.zone > 0 {
+        // The admitted producer is an opaque surface with a genuine owning
+        // Zone. Detached_B/shading transforms require their own real getters;
+        // a missing Zone is never replaced by a synthetic zero origin.
+        if row.zone <= 0
+            || !matches!(
+                row.class,
+                SurfaceClass::Wall | SurfaceClass::Floor | SurfaceClass::Roof
+            )
+        {
+            return Err(Error::Unavailable("actual opaque GetVertices owning Zone"));
+        }
+        // Original9230-9243 preserves vertex1 and reverses vertices2..N.
+        if !self.counterclockwise {
+            let mut source = sides;
+            let mut target = 2;
+            // Preserve Original9237's independent source/target counter writes.
+            #[allow(clippy::explicit_counter_loop)]
+            for _ in 0..sides.saturating_sub(1) / 2 {
+                vertex.swap(source - 1, target - 1);
+                source -= 1;
+                target += 1;
+            }
+        }
+        // Original9248-9276 is a sequence of swaps, not a generic rotation.
+        // The triangle UpperRightCorner break is intentional.
+        let mut this_corner = usize::try_from(self.corner)
+            .map_err(|_| Error::Unavailable("actual positive geometry corner"))?;
+        while this_corner != 1 {
+            if sides < 4 && this_corner == 4 {
+                break;
+            }
+            let mut target = this_corner;
+            let mut source = this_corner + 1;
+            if source > sides {
+                source = 1;
+            }
+            if target > sides || source > sides {
+                return Err(Error::Unavailable(
+                    "actual geometry corner permutation bounds",
+                ));
+            }
+            for _ in 0..sides.saturating_sub(1) {
+                vertex.swap(target - 1, source - 1);
+                target += 1;
+                source += 1;
+                if target > sides {
+                    target = 1;
+                }
+                if source > sides {
+                    source = 1;
+                }
+            }
+            this_corner += 1;
+            if this_corner > sides {
+                this_corner = 1;
+            }
+        }
+        if !self.world_coordinates {
+            let zone_index = usize::try_from(row.zone - 1)
+                .map_err(|_| Error::Unavailable("actual GetVertices Zone index"))?;
+            let zone = owners
+                .zones
+                .zones
+                .as_ref()
+                .and_then(|rows| rows.get(zone_index))
+                .ok_or(Error::Unavailable(
+                    "same actual GetVertices Zone allocation",
+                ))?;
+            let cos_zone = self
+                .coordinate
+                .cos_zone_relative
+                .as_ref()
+                .and_then(|rows| rows.get(zone_index))
+                .copied()
+                .ok_or(Error::Unavailable("same actual Zone cosine owner"))?;
+            let sin_zone = self
+                .coordinate
+                .sin_zone_relative
+                .as_ref()
+                .and_then(|rows| rows.get(zone_index))
+                .copied()
+                .ok_or(Error::Unavailable("same actual Zone sine owner"))?;
+            // Original9283-9290: both intermediate coordinates read the OLD
+            // x/y before either write; preserve each multiply/add and z +=.
+            for value in vertex.iter_mut() {
+                let xyz = value
+                    .as_mut()
+                    .ok_or(Error::Unavailable("actual written Vertex"))?;
+                let xb = xyz[0] * cos_zone - xyz[1] * sin_zone + zone.origin_m[0];
+                let yb = xyz[0] * sin_zone + xyz[1] * cos_zone + zone.origin_m[1];
+                xyz[0] = xb * self.coordinate.cos_building_relative
+                    - yb * self.coordinate.sin_building_relative;
+                xyz[1] = xb * self.coordinate.sin_building_relative
+                    + yb * self.coordinate.cos_building_relative;
+                xyz[2] += zone.origin_m[2];
+            }
+        } else if row.zone > 0 {
+            // Existing genuine World Appendix-G-only operations stay intact.
             for value in vertex.iter_mut() {
                 let xyz = value
                     .as_mut()
