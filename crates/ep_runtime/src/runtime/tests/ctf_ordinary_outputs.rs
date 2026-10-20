@@ -3307,6 +3307,310 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             );
             assert_eq!(backend.state.tracking.total_warning_errors, 0);
             assert_eq!(backend.state.tracking.total_severe_errors, 0);
+            if fuel_index == 0 {
+                // The parent stopped at Refrigeration above. These
+                // are explicit subsequent child-owner tests, not a successful
+                // ManageInternalHeatGains or an invented module continuation.
+                let expected_latent = 7.0_f64 * 0.1 + 3.0_f64 * 0.1;
+                assert_eq!(rows[0].rates[3].to_bits(), (7.0_f64 * 0.1).to_bits());
+                assert_eq!(rows[1].rates[3].to_bits(), (3.0_f64 * 0.1).to_bits());
+                let mut child = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainStepOwners {
+                    clock: &clock, globals, control: &reports.heat_balance_input_state,
+                    zones: reports.selected_zone_input.as_mut().ok_or("latent Zone owner")?,
+                    schedules: reports.selected_schedule_manager.as_ref().ok_or("latent schedule owner")?,
+                    backend: &mut backend, modules: &mut provider, latent: None, radiation: None,
+                    zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
+                };
+                let missing = reports
+                    .selected_internal_heat_gains
+                    .update_source_internal_gain_values(&mut child, true, true);
+                assert!(matches!(missing, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same actual Space AirHB latentGain sink"))));
+                assert_eq!(
+                    air, retained_air,
+                    "missing sink follows actual cache writes"
+                );
+                let devices = reports
+                    .selected_internal_heat_gains
+                    .allocations
+                    .space_devices
+                    .as_ref()
+                    .ok_or("latent caches")?[0]
+                    .devices
+                    .as_ref()
+                    .ok_or("latent device slots")?;
+                assert_eq!(
+                    devices[0].cached_rates[3].to_bits(),
+                    (7.0_f64 * 0.1).to_bits()
+                );
+                assert_eq!(
+                    devices[1].cached_rates[3].to_bits(),
+                    (3.0_f64 * 0.1).to_bits()
+                );
+                assert_eq!(
+                    devices[0].cached_rates[2], 0.0,
+                    "real HVAC radiation suppression"
+                );
+                let mut child = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainStepOwners {
+                    clock: &clock, globals, control: &reports.heat_balance_input_state,
+                    zones: reports.selected_zone_input.as_mut().ok_or("same latent Zone owner")?,
+                    schedules: reports.selected_schedule_manager.as_ref().ok_or("same latent schedule owner")?,
+                    backend: &mut backend, modules: &mut provider, latent: Some(&mut air), radiation: None,
+                    zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
+                };
+                reports
+                    .selected_internal_heat_gains
+                    .update_source_internal_gain_values(&mut child, true, true)?;
+                assert_eq!(
+                    air.zones.as_ref().ok_or("Zone latent sink")?[0]
+                        .air
+                        .latent_gain
+                        .to_bits(),
+                    expected_latent.to_bits()
+                );
+                assert_eq!(
+                    air.spaces.as_ref().ok_or("Space latent sink")?[0]
+                        .air
+                        .latent_gain
+                        .to_bits(),
+                    expected_latent.to_bits()
+                );
+                let air_address =
+                    &air.zones.as_ref().ok_or("same AirHB allocation")?[0].air as *const _ as usize;
+                // Real allocators and RoomAir children supply the ordinary
+                // corrector's owners. The surface arrays retain their genuine
+                // zero-convection allocation state for this authored child case.
+                use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::{
+                    SourceZoneAirOwners, SourceZoneAirPredictorCorrector,
+                };
+                let mut controller = SourceZoneAirPredictorCorrector::default();
+                let controls = &reports.heat_balance_space_controls;
+                controller
+                    .demand
+                    .allocate_source_demands(globals, controls)?;
+                controller
+                    .reports
+                    .allocate_source_reports(globals, controls)?;
+                let mut fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                fan.allocate_source_fan_zone_arrays(globals)?;
+                let mut shortcut = crate::heat_balance::selected_input_processor::SourceInputProcessorShortCut::default();
+                let mut child_eio = Vec::new();
+                controller.subsystems.room_air.get_source_model_parameters(
+                    reports
+                        .selected_zone_input
+                        .as_ref()
+                        .ok_or("RoomAir real zones")?,
+                    globals,
+                    controls,
+                    reports
+                        .selected_input_processor
+                        .as_ref()
+                        .ok_or("RoomAir actual IP")?,
+                    &mut shortcut,
+                    &mut child_eio,
+                )?;
+                assert!(controller.subsystems.room_air.get_air_model_data);
+                let geometry = &reports.surface_geometry_input;
+                let ids = geometry
+                    .final_surfaces
+                    .as_ref()
+                    .ok_or("actual opaque surfaces")?
+                    .iter()
+                    .map(|row| row.typed_id.ok_or("actual opaque Surface identity"))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let mut history = crate::heat_balance::ctf_thermal_history::CtfThermalHistoryState::new_source_unallocated(ids);
+                let mut surfaces = crate::heat_balance::ordinary_surface_initialization::SourceSurfaceHeatBalanceArrays::default();
+                surfaces.allocate(
+                    history.surface_ids.len(),
+                    reports
+                        .heat_balance_input_state
+                        .any_internal_heat_source_in_input,
+                    cache
+                        .public_initialization()
+                        .ok_or("actual CTF aggregate")?
+                        .aggregate_after_returned_calls
+                        .simple_ctf_only,
+                    globals.any_energy_management_system_in_model,
+                    &mut history,
+                )?;
+                let mut hvac =
+                    crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals {
+                        time_step_sys: 0.25,
+                        time_step_sys_seconds: 900.0,
+                        ..Default::default()
+                    };
+                let weather = crate::weather::day::WeatherEnvironmentState {
+                    current_weather: crate::weather::day::CurrentWeatherState {
+                        out_baro_press: 101325.0,
+                        out_hum_rat: 0.006,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                };
+                let availability = crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability::default();
+                let mut psychrometrics = crate::psychrometrics::SourcePsychrometricAccess;
+                // Uncontrolled correctAirTemp/HumRat never reads equipment
+                // configuration. Retain its genuine constructor, without
+                // pretending that this gain-only IP completed GetZoneEquipment.
+                let input = reports
+                    .selected_input_processor
+                    .as_ref()
+                    .ok_or("equipment inventory")?;
+                let inventory = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::FAMILIES
+                    .into_iter().filter_map(|family| match input.family(family) {
+                        Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(rows)) => Some((family, rows.len())),
+                        _ => None,
+                    });
+                let equipment_clock = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_source_family_inventory(
+                    inventory, model.typed.timestep.number_of_timesteps_per_hour as usize,
+                )?;
+                let mut latent_equipment =
+                    crate::heat_balance::ordinary_equipment::OrdinaryEquipment::new_for_source(
+                        &model.typed,
+                        equipment_clock,
+                    )?;
+                let mut owners = SourceZoneAirOwners {
+                    zones: reports
+                        .selected_zone_input
+                        .as_mut()
+                        .ok_or("corrector same Zones")?,
+                    equipment: &mut latent_equipment,
+                    geometry,
+                    surface_arrays: &surfaces,
+                    fan: &mut fan,
+                    gains: &reports.selected_internal_heat_gains,
+                    control: &mut reports.heat_balance_input_state,
+                    space_controls: controls,
+                    globals,
+                    clock: &clock,
+                    environment: &weather,
+                    hvac: &mut hvac,
+                    input: reports
+                        .selected_input_processor
+                        .as_mut()
+                        .ok_or("corrector same IP")?,
+                    shortcut: &mut shortcut,
+                    source_is_epjson: &reports
+                        .heat_balance_input
+                        .as_ref()
+                        .ok_or("actual input format")?
+                        .source_is_epjson,
+                    faults: &reports.source_faults_manager,
+                    schedules: reports
+                        .selected_schedule_manager
+                        .as_mut()
+                        .ok_or("corrector real schedules")?,
+                    availability: &availability,
+                    psychrometrics: &mut psychrometrics,
+                    backend: &mut backend,
+                };
+                let zone = &owners.zones.zones.as_ref().ok_or("unconditioned Zone")?[0];
+                assert!(!zone.is_controlled && zone.system_zone_node_number == 0);
+                let volume = zone.volume;
+                let moisture_capacity = zone.moisture_capacity_multiplier;
+                assert!(volume > 0.0 && moisture_capacity > 0.0);
+                crate::psychrometrics::with_fresh_psychrometric_state(
+                    || -> Result<(), Box<dyn std::error::Error>> {
+                        crate::psychrometrics::initialize_source_psychrometric_caches();
+                        for (previous, branch) in [
+                            ([0.008_f64; 4], 0),
+                            ([0.001, 0.010, 0.001, 0.007], -1),
+                            ([0.040; 4], 1),
+                        ] {
+                            let current =
+                                &mut air.zones.as_mut().ok_or("live humidity input")?[0].air;
+                            current.mat = 23.0;
+                            current.zt = 23.0;
+                            current.air_hum_rat = 0.008;
+                            current.xmat = [23.0; 4];
+                            current.w_prev_zone_ts = previous;
+                            let earlier_system_history = current.dsw_prev_zone_ts;
+                            for flow in [
+                                current.oamfl,
+                                current.vamfl,
+                                current.ctmfl,
+                                current.eamfl,
+                                current.eamf_lx_hum_rat,
+                                current.sum_hm_a_ra,
+                                current.sum_hm_a_ra_w,
+                                current.mixing_mass_flow_zone,
+                                current.mixing_mass_flow_x_hum_rat,
+                                current.m_dot_oa,
+                            ] {
+                                assert_eq!(flow, 0.0, "genuine no-flow constructor boundary");
+                            }
+                            // The same ordinary production corrector invokes its real
+                            // temperature, humidity, RH, Space handoff and report children.
+                            air.correct_source_zone_air_temperatures(
+                                true,
+                                &mut controller,
+                                &mut owners,
+                            )?;
+                            let current = &air.zones.as_ref().ok_or("live humidity result")?[0].air;
+                            let rho = crate::psychrometrics::energyplus_psy_rho_air_fn_pb_tdb_w(
+                                101325.0, current.zt, 0.008,
+                            );
+                            let hg = crate::psychrometrics::energyplus_psy_hg_air_fn_w_tdb(
+                                0.008, current.zt,
+                            );
+                            let capacity = rho * volume * moisture_capacity / 900.0;
+                            // Independent no-flow form of the Native third-order
+                            // moisture balance, using the actual latent sink operand.
+                            let unbounded = (3.0 * previous[0] - 1.5 * previous[1]
+                                + previous[2] / 3.0
+                                + expected_latent / hg / capacity)
+                                * (6.0 / 11.0);
+                            let saturated = owners
+                                .psychrometrics
+                                .evaluate(
+                                    crate::psychrometrics::EnergyPlusPsychrometricFunction::WFromRh,
+                                    &[current.zt, 1.0, 101325.0],
+                                )
+                                .map_err(|_| "actual saturation child")?
+                                .result;
+                            let expected = unbounded.max(0.0).min(saturated);
+                            assert!((current.air_hum_rat - expected).abs() < 1.0e-14);
+                            match branch {
+                                -1 => assert_eq!(current.air_hum_rat.to_bits(), 0.0_f64.to_bits()),
+                                1 => assert_eq!(current.air_hum_rat.to_bits(), saturated.to_bits()),
+                                _ => assert!(
+                                    current.air_hum_rat > 0.008 && current.air_hum_rat < saturated
+                                ),
+                            }
+                            assert_eq!(current.latent_gain.to_bits(), expected_latent.to_bits());
+                            assert_eq!(
+                                &air.zones.as_ref().ok_or("retained AirHB")?[0].air as *const _
+                                    as usize,
+                                air_address
+                            );
+                            let space =
+                                &air.spaces.as_ref().ok_or("same Space humidity handoff")?[0].air;
+                            assert_eq!(space.air_hum_rat.to_bits(), current.air_hum_rat.to_bits());
+                            assert_eq!(space.air_rel_hum.to_bits(), current.air_rel_hum.to_bits());
+                            assert!((0.0..=100.0).contains(&current.air_rel_hum));
+                            let actual_w = current.air_hum_rat;
+                            air.push_source_system_timestep_histories(&controller, &owners)?;
+                            assert_eq!(
+                                air.zones.as_ref().ok_or("same humidity history")?[0]
+                                    .air
+                                    .dsw_prev_zone_ts,
+                                [
+                                    actual_w,
+                                    earlier_system_history[0],
+                                    earlier_system_history[1],
+                                    earlier_system_history[2]
+                                ]
+                            );
+                        }
+                        Ok(())
+                    },
+                )?;
+                assert!(
+                    !controller.subsystems.room_air.get_air_model_data,
+                    "actual child alone completed its own getter"
+                );
+                assert_eq!(backend.state.tracking.total_warning_errors, 0);
+                assert_eq!(backend.state.tracking.total_severe_errors, 0);
+            }
         }
         // Real invalid/Water and negative-fuel diagnostics run before final
         // nominal output; the raw invalid fuel is retained in the fuel lists.

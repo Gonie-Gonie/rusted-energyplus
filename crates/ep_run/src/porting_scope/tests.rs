@@ -706,23 +706,31 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
 }
 
 #[test]
-fn latent_sources_are_blocked_inside_the_sensible_only_contract() {
-    let mut value = input(PortingScope::A);
-    value["OtherEquipment"] = json!({"Gain":{
-        "zone_or_zonelist_or_space_or_spacelist_name":"Zone", "schedule_name":"On",
-        "design_level_calculation_method":"EquipmentLevel", "design_level":100,
-        "fraction_latent":0.0, "fraction_radiant":0.0, "fraction_lost":0.0,
-    }});
-    assert!(trace(&value, PortingScope::A).admissible);
-    value["OtherEquipment"]["Gain"]["fraction_latent"] = json!(0.25);
-    let actual = trace(&value, PortingScope::A);
-    assert!(!actual.admissible);
-    assert!(
-        actual
-            .violations
-            .iter()
-            .any(|message| message.contains("latent gains"))
-    );
+fn latent_sources_reach_scope_a_while_scope_b_remains_sensible_only() {
+    for scope in [PortingScope::A, PortingScope::B] {
+        let mut value = input(scope);
+        value["OtherEquipment"] = json!({"Gain":{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Zone", "schedule_name":"On",
+            "design_level_calculation_method":"EquipmentLevel", "design_level":100,
+            "fraction_latent":0.0, "fraction_radiant":0.0, "fraction_lost":0.0,
+        }});
+        assert!(trace(&value, scope).admissible);
+        value["OtherEquipment"]["Gain"]["fraction_latent"] = json!(0.25);
+        let actual = trace(&value, scope);
+        assert_eq!(
+            actual.admissible,
+            scope == PortingScope::A,
+            "{:?}",
+            actual.violations
+        );
+        assert_eq!(
+            actual
+                .violations
+                .iter()
+                .any(|message| message.contains("latent gains")),
+            scope == PortingScope::B
+        );
+    }
 }
 
 #[test]

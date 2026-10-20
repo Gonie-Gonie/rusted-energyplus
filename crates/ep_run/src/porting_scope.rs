@@ -381,13 +381,15 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
             ));
         }
     }
-    if model
-        .other_equipment
-        .iter()
-        .any(|equipment| equipment.fraction_latent != 0.0)
+    // The one-Zone unconditioned Source route uses the real cached latent
+    // sinks and humidity corrector. Conditioned latent closure remains separate.
+    if scope == PortingScope::B
+        && model
+            .other_equipment
+            .iter()
+            .any(|equipment| equipment.fraction_latent != 0.0)
     {
-        violations
-            .push("OtherEquipment latent gains are outside the zero-latent-source scope".into());
+        violations.push("OtherEquipment latent gains remain outside sensible-only scope B".into());
     }
     match scope {
         PortingScope::A => {

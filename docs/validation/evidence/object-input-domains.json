@@ -238,7 +238,7 @@
     ],
     "OtherEquipment": [
       "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
-      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero radiant/lost fractions and its separate Hourly meter contract. Zero latent load remains required. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
+      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions and its separate Hourly meter contract. Positive latent load is connected in Source A through actual gain caches, zone moisture balance and psychrometric state; Source B retains its zero-latent bound. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
     ]
   },
   "verification": {
@@ -246,27 +246,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-area-workspace-tests-40b.log",
-        "sha256": "770d9868b476cc2e53e7b44bf97c56084a4211f675796f8a5ec5facfcd255b06",
-        "bytes": 773385
+        "path": ".runtime/object-expansion/other-equipment-latent-workspace-tests-44.log",
+        "sha256": "0ae696686d3a33f5b0ac043e9a9e757c16ca2595bccd6c700a27529089937c8d",
+        "bytes": 773497
       },
-      "scope": "Full workspace verifies actual OtherEquipment per-area selection, raw/compiler/getter custody, live Space floor area, diagnostic failure prefixes and existing thermal/report consumers. The corrected full run covers all existing workspace tests; no new cohort or optional API change."
+      "scope": "Full workspace regression after Source A latent admission changed. The extended owner body checks actual gain-cache and Zone/Space latent sinks, the ordinary humidity corrector, RH and history, while preserving its genuine failed parent. Full same-input engine closure is recorded separately in the paired case. Earlier focused checks are contained in this milestone; no new cohort or optional API change."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-json-custody-clippy-43.log",
-        "sha256": "8b16c9ca9e9fc3df477fde3135d66a9a0124f2fae2357bfb50fb378d94f4d4d9",
-        "bytes": 794
+        "path": ".runtime/object-expansion/other-equipment-latent-clippy-44.log",
+        "sha256": "3aef3d34899690175e1cc1d458549c2c2348eca7903d30904d9e1b665b21c5f9",
+        "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-json-custody-docs-43.log",
-        "sha256": "a478e2c6720573ccc4b9733559652bbe612b91646a47812667d1bc59f0b281cf",
+        "path": ".runtime/object-expansion/other-equipment-latent-docs-44.log",
+        "sha256": "4948ec3263561ec1c2e3e201af85246679f3fc31386d77a8d0fcaacbe66641e2",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-json-custody-43",
+      "clippy_through_build": "other-equipment-latent-44",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -4027,12 +4027,63 @@
           "passed": true
         },
         "effective_state": "Actual Native43 and Source43 use exactly the same original20digit JSON UInt64MAX design literal plus six harmless unknown top-level metadata kinds on each existing OtherEquipment row. The existing fuelNone/EquipmentLevel owner reports projecteddesign-1.000 and alltenminmax-1.000, including the genuine small-R ratio. The original soleNative packet remains validationFalse with its exact field7-format checker failure; a separate authenticated no-process correction is explicit evidence, never an overwritten passed producer or generic false-case exception. Original58 global policies and separate96 exactConstant plus24J meter policy remain unchanged, with full60/5472 ownstream kernel recomputation and all signed values retained. First Electricity area/radiant/lost/unused fields and all60requests/weather/otherbytes retain actualNative42 ancestry. ActualWarmup19, fullzero-diagnostic ERR-END/fourinfo/SHD, schedule32/8762 and whole3line1143 nominal plus bidirectional rawMTD match. No Native/report/warmup value seeds production and no formatted field directly measures internal JSON bits. Actual number-origin/frontend, R formatter, thermal/resource/schedule consumers are authenticated through73 owners plus sharednumeric/full Rust snapshot live/archive. Metadata raw/IP kind handling has separate owner evidence; arbitrary models/latent/per-person/Spaces/EMS retain their bounds."
+      },
+      {
+        "id": "other-equipment-latent",
+        "group": "other_equipment_latent",
+        "source_build": "other-equipment-latent-44",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-latent/calibration-01/input.epJSON",
+          "sha256": "78aeef8a1ae0223639a1393086c8909c77bd5a33316b60e91d919e28b4afb4cf",
+          "bytes": 39160
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-latent/calibration-01/receipt.json",
+          "sha256": "37c2df0d86c9371ce172d54a1b65fe9e56a878aabe9eef1f4e09657bf791a1b2",
+          "bytes": 48373
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-latent-44/other-equipment-latent/receipt.json",
+          "sha256": "bb49d64ed8fb91a378883305c5a8fd5e12f8e2e3edba37514832649415195a21",
+          "bytes": 3765
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-latent-44/run-summary.json",
+          "sha256": "644bea0b86b9d3457610efcd533cb659ac0df2be9aed91f20439af2a34db13dc",
+          "bytes": 32990
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-latent-comparisons-44/other-equipment-latent/comparison.json",
+          "sha256": "c03395a00c74506b55c954adf1621af0b09b182ca154b1737ff31c378f0a4665",
+          "bytes": 309647
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-latent-44-launch/other-equipment-latent/request.json",
+          "sha256": "f6398cf995038c88401a05371d66e2f228aac0f6287b2b62007ca2b4262674a6",
+          "bytes": 3342
+        },
+        "totals": {
+          "series": 60,
+          "samples": 5472,
+          "raw_operand_unequal": 3457,
+          "parsed_binary64_unequal": 3457,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual Native44 and Source44 consume the same direct-JSON input, changing only the selected Electricity OtherEquipment latent/radiant/lost fractions to .2/.3/.1 with grouped convective residual .4. Current Native44 initial validationTrue and exactly one execution are mandatory; parent43 originalFalse and its authenticated no-process R-format correction remain ancestry only. Real positive latent gain storage, same-host HVAC caller, moisture sums, ThirdOrder humidity corrector/history, psychrometric state and output consumers are connected in ScopeA; ScopeB positive latent remains pending. Both actual 96-value Zone Air Humidity Ratio profiles are preserved under the unchanged original 1e-9 policy, without an extra raw-equality constraint. Full60/5472 ownstream kernel recomputation retains original58 policies plus the separate96 exact Constant and24J meter policy, signed meter values, whole32-line schedule EIO and3-line1143-byte nominal EIO, observedWarmup19, complete ERR-END/fourinfo/SHD and bidirectional MTD. No observed Native/report/warmup value seeds production; formatted fractions do not measure internal binary bits. All90 actual owners plus shared numeric utility and the full Rust snapshot are authenticated live/archive. Original UInt64MAX literal and metadata remain unchanged. Per-person, explicit/multiple Spaces, EMS and arbitrary models retain their bounds."
       }
     ],
     "totals": {
-      "paired_cases": 69,
-      "reported_samples": 503910,
-      "raw_operand_unequal": 147376,
+      "paired_cases": 70,
+      "reported_samples": 509382,
+      "raw_operand_unequal": 150833,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4768,58 +4819,29 @@
           "sha256": "1e026d602cf327f0be2f3602c3fd08a6af84d1e23742cc3fd946472523d43307",
           "bytes": 75924966
         }
+      },
+      {
+        "id": "other-equipment-latent-44",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-44/receipt.json",
+          "sha256": "efcf35ff0ca550b80393cc164958cce4e2c7b0a54d50163f8f109eb79ec34c4b",
+          "bytes": 4458
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cb/cb0abc01de8e9eb03a07dea259bd05b95816a50737c8503af99aa4d7d54d98e5",
+          "sha256": "cb0abc01de8e9eb03a07dea259bd05b95816a50737c8503af99aa4d7d54d98e5"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-44/eplus-rs.exe",
+          "sha256": "94812ccf2b6c66d8c5e574322df88d162571725391b8338a2d301d61555f63b6",
+          "bytes": 75923430
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 3396,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/other-equipment-fuels-run-tests-41.log",
-          "sha256": "1e6974d1d1fc0261b6963b7d5d32bb87f5c0e59f0111371c021b19872c669399",
-          "bytes": 146229
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-fuels-owner-tests-41b.log",
-          "sha256": "3b387440a72071f0c42c6492185a3caa3571a016e29c09c1261aa2c29f98134d",
-          "bytes": 792
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-fuels-meter-tests-41.log",
-          "sha256": "bf3163863ec769b9b7e88a4205bc0d0061bdf538c6572c27b75cd44cf8a335f2",
-          "bytes": 752
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-input-domain-compiler-tests-42.log",
-          "sha256": "d1a3b68fea92f7e692cd258a0758736c1c7dbeab2bfefd1fffa15f3b93ca21f6",
-          "bytes": 63042
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-input-domain-run-tests-42.log",
-          "sha256": "0c4d7a3215bc3b04e73763ee3424a1e033afcf0deb91ffd60c2278efacde09bf",
-          "bytes": 146337
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-input-domain-owner-tests-42.log",
-          "sha256": "52eb1892049a9029b6990bda32588857e2b1ffdae632efbddaccf92e8e6f0978",
-          "bytes": 792
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-json-custody-compiler-tests-43.log",
-          "sha256": "13c58f5f236c8cceac74e0aa1f1d289a90bb3cb718f20c84976a346818b1bb23",
-          "bytes": 63042
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-json-custody-run-tests-43.log",
-          "sha256": "1b209aac8e15aaccfad2c7f72c68d449b6e75660bade27845675885674f030b7",
-          "bytes": 146231
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-json-custody-owner-tests-43.log",
-          "sha256": "d8b9ea00be9e69a8369e75ba4dc376a7ec76ad3594f57ae554e804dbe3fd0efe",
-          "bytes": 792
-        }
-      ],
-      "scope": "Retains the previous2097 successful focused checks; adds compiler502, ep_run796 and one actual gain-owner body for original JSON number-kind projection, known-field-first metadata and real direct-input producer custody. No new cohort; full workspace and optional compile retain their earlier scope."
+      "passed": 0,
+      "logs": [],
+      "scope": "Reset after the successful full workspace milestone; previous focused checks are included in the full run."
     }
   },
   "additional_native_type_calibrations": [
