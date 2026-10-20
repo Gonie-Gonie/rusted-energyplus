@@ -63,7 +63,7 @@ impl OrdinarySourceSession {
         let mut psychrometrics = SourcePsychrometricAccess;
         // Split only the actual ESO/MTR/EIO and RF metadata fields. Retaining a
         // whole reports borrow in the stream host would alias the body owners.
-        let (mut dictionary_host, eio) = files.source_report_streams_and_eio(
+        let (mut dictionary_host, eio, debug) = files.source_report_streams_eio_debug(
             &reports.source_sqlite,
             &mut reports.source_results_output_variables,
         );
@@ -136,6 +136,7 @@ impl OrdinarySourceSession {
             output_host,
             dictionary_host: &mut dictionary_host,
             eio,
+            debug,
             materials: &reports.selected_material_data,
             predefined_registry: &mut reports.registry,
             predefined_table: &mut reports.table,

@@ -414,7 +414,10 @@ impl SourceZoneAirPredictorCorrector {
             for kind in 1..5 {
                 let setpoint = &row.setpoints[kind];
                 if !setpoint.is_used {
-                    if owners.schedules.source_has_value(schedule, kind as f64)? {
+                    if owners
+                        .schedules
+                        .source_has_value(schedule, kind as f64, owners.clock)?
+                    {
                         return Err(Error::Unavailable(
                             "actual unused thermostat control ShowSevereError739",
                         ));
@@ -423,7 +426,9 @@ impl SourceZoneAirPredictorCorrector {
                 }
                 if setpoint.heat_schedule.is_none()
                     && (kind == 1 || kind == 3 || kind == 4)
-                    && owners.schedules.source_has_value(schedule, kind as f64)?
+                    && owners
+                        .schedules
+                        .source_has_value(schedule, kind as f64, owners.clock)?
                 {
                     return Err(Error::Unavailable(
                         "actual thermostat missing heat ShowSevereError755",
@@ -431,7 +436,9 @@ impl SourceZoneAirPredictorCorrector {
                 }
                 if setpoint.cool_schedule.is_none()
                     && (kind == 2 || kind == 3 || kind == 4)
-                    && owners.schedules.source_has_value(schedule, kind as f64)?
+                    && owners
+                        .schedules
+                        .source_has_value(schedule, kind as f64, owners.clock)?
                 {
                     return Err(Error::Unavailable(
                         "actual thermostat missing cool ShowSevereError769",

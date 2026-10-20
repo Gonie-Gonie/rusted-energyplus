@@ -13,6 +13,7 @@ pub(crate) mod solar_output_registration;
 pub(crate) mod solar_timestep;
 pub(crate) mod source_children;
 mod source_initialization;
+mod view_factor_report;
 pub(crate) use enclosure_setup::EnclosureOutputOwners;
 pub use radiant_exchange::OrdinaryRadiantExchangeState;
 pub(crate) use radiant_exchange::{

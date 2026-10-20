@@ -428,6 +428,24 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 "{mode} actual live lookup {ordinal}"
             );
         }
+        // The last live currentVal is175, yet the same retained Detailed graph
+        // contains10. This proves hasVal does not substitute the current value.
+        let actual_clock = WeatherGlobalState {
+            time_steps_in_hour: 4,
+            ..Default::default()
+        };
+        let constructor_clock = WeatherGlobalState {
+            time_steps_in_hour: 0,
+            ..Default::default()
+        };
+        assert_eq!(manager.source_current_schedule_value(index)?, 175.0);
+        assert!(manager.source_has_value(index, 10.0, &actual_clock)?);
+        assert!(!manager.source_has_value(index, -1.0, &actual_clock)?);
+        assert!(!manager.source_has_value(index, 10.0, &constructor_clock)?);
+        let always_on = manager
+            .get_source_schedule("CONSTANT-1.0")?
+            .ok_or("actual built-in constant")?;
+        assert!(manager.source_has_value(always_on, 1.0, &constructor_clock)?);
         assert_eq!(state.tracking.total_warning_errors, i32::from(mode == "No"));
         assert_eq!(
             state.tracking.total_warning_errors_during_warmup,

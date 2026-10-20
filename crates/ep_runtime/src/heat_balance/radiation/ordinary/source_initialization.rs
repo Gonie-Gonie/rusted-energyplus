@@ -29,13 +29,22 @@ impl CtfInitializationContext<'_> {
         &mut self,
         model: &TypedModel,
     ) -> Result<(), RuntimeError> {
+        self.initialize_selected_solar_view_factors_with_debug(model, None)
+    }
+
+    /// Actual Source caller supplies the same already-open debug stream for IDF.
+    pub(crate) fn initialize_selected_solar_view_factors_with_debug(
+        &mut self,
+        model: &TypedModel,
+        debug: Option<&mut dyn std::io::Write>,
+    ) -> Result<(), RuntimeError> {
         let mut owner = self
             .reports
             .ordinary_solar_radiation
             .take()
             .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::EnclosureDomain))?;
         // Restore this same partially written owner before any error escapes.
-        let result = owner.initialize_source_solar(model, self);
+        let result = owner.initialize_source_solar(model, self, debug);
         self.reports.ordinary_solar_radiation = Some(owner);
         result
     }
@@ -46,6 +55,7 @@ impl OrdinarySolarRadiation {
         &mut self,
         model: &TypedModel,
         output: &mut CtfInitializationContext<'_>,
+        mut debug: Option<&mut dyn std::io::Write>,
     ) -> Result<(), RuntimeError> {
         let mut errors_found = false; // Original820 local, distinct from parent HB ErrorsFound.
         let mut option = String::new();
@@ -84,10 +94,10 @@ impl OrdinarySolarRadiation {
                 }
             })?
         };
-        self.radiant_exchange.view_factor_report = report;
+        // Original InitSolar821 report is a LOCAL, not the persistent radiant
+        // ViewFactorReport member. The later radiant scan owns that write.
         if report {
-            // The first unported operation is the actual824 full-report header.
-            return Err(unavailable(OrdinaryRadiationUnavailable::ViewFactorReport));
+            super::view_factor_report::header(true, output.eio)?;
         }
         // Original834 is a local const: do not rewrite shared CurrentModuleObject.
         let user_f_count = output
@@ -318,12 +328,25 @@ impl OrdinarySolarRadiation {
                 return Err(unavailable(OrdinaryRadiationUnavailable::NumericDomain));
             }
             enclosure.f.clone_from(&approximate.view_factors);
+            // Native951-953 saves this genuine pre-Fix matrix only for reporting.
+            let saved_approximate = report.then(|| enclosure.f.clone());
             let fixed = super::super::fix_energyplus_approximate_view_factors_with_outcome(
                 &enclosure.area,
                 &enclosure.f,
             )
             .ok_or_else(|| unavailable(OrdinaryRadiationUnavailable::NumericDomain))?;
             enclosure.f.clone_from(&fixed.view_factors);
+            if let Some(saved) = saved_approximate.as_deref() {
+                super::view_factor_report::solar(
+                    enclosure,
+                    &output.reports.surface_geometry_input,
+                    saved,
+                    &option,
+                    output.eio,
+                    &mut debug,
+                )?;
+            }
+            drop(saved_approximate); // Native1077 before check-value summation.
             let mut sum = 0.0;
             for &source_position in &enclosure.source_surface_report_nums {
                 let position = index(source_position)?;

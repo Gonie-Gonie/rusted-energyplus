@@ -59,9 +59,10 @@ impl SourceInitializationFiles {
         backend.with_scoped(
             &mut (&mut *reports, &mut *self),
             |call_backend, (call_reports, call_files)| {
+                let (eio, debug) = call_files.eio_and_debug_streams();
                 let mut context = CtfInitializationContext {
                     reports: &mut **call_reports,
-                    eio: call_files.eio_stream(),
+                    eio,
                     backend: call_backend,
                 };
                 session.prepare_first_input(
@@ -72,6 +73,7 @@ impl SourceInitializationFiles {
                     output_host,
                     equipment,
                     radiation,
+                    debug,
                 )
             },
         )?;

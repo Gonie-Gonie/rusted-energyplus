@@ -57,6 +57,7 @@ pub(crate) struct SourceInitSurfaceOwners<'a, 'backend, H, D> {
     pub(crate) output_host: &'a mut H,
     pub(crate) dictionary_host: &'a mut D,
     pub(crate) eio: &'a mut dyn Write,
+    pub(crate) debug: &'a mut dyn Write,
     pub(crate) materials: &'a SelectedMaterialData,
     pub(crate) predefined_registry: &'a PredefinedRegistry,
     pub(crate) predefined_table: &'a mut PredefinedStringTable,

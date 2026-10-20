@@ -611,6 +611,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                 "Details",
                 "DetailsWithVertices",
                 "CostInfo",
+                "ViewFactorInfo",
             ],
         ),
         ("Output:Surfaces:List", "report_specifications") => {

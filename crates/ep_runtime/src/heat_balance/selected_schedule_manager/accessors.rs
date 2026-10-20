@@ -1,6 +1,7 @@
 //! Genuine native Schedule pointer use propagation and selected min/max.
 use super::{SelectedScheduleData, SelectedScheduleManager, SourceScheduleIndex};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
+use crate::weather::day::WeatherGlobalState;
 impl SelectedScheduleManager {
     pub(crate) fn get_source_schedule(
         &mut self,
@@ -80,11 +81,14 @@ impl SelectedScheduleManager {
         let max_ok = actual_maximum - maximum <= f64::from(f32::EPSILON);
         Ok(min_ok && max_ok)
     }
-    /// Exact Constant::hasVal. Detailed traversal is an explicit separate bound.
+    /// Original Constant::hasVal3428 and Detailed::hasVal3433-3470.
+    /// The caller supplies the actual DataGlobal timestep owner; no min/max
+    /// cache, typed schedule expansion or currentVal substitutes this traversal.
     pub(crate) fn source_has_value(
         &self,
         index: SourceScheduleIndex,
         value: f64,
+        clock: &WeatherGlobalState,
     ) -> Result<bool, E> {
         let row = self
             .schedules
@@ -92,8 +96,59 @@ impl SelectedScheduleManager {
             .ok_or(E::Unavailable("actual hasVal Schedule pointer"))?;
         match &row.data {
             SelectedScheduleData::Constant { .. } => Ok(value == row.current_value),
-            SelectedScheduleData::Detailed(_) => {
-                Err(E::Unavailable("actual ScheduleDetailed::hasVal3433"))
+            SelectedScheduleData::Detailed(detailed) => {
+                let mut week_checked = vec![false; self.week_schedules.len()];
+                let mut day_checked = vec![false; self.day_schedules.len()];
+                // The fixed retained array has its genuine unused slot0 and
+                // all366 original week pointers. Preserve original visit order.
+                for &week_index in detailed.week_schedules.iter().skip(1) {
+                    let week_index =
+                        week_index.ok_or(E::Unavailable("actual hasVal null week pointer"))?;
+                    let week = self
+                        .week_schedules
+                        .get(week_index)
+                        .ok_or(E::Unavailable("actual hasVal WeekSchedule pointer"))?;
+                    if *week_checked
+                        .get(week.number)
+                        .ok_or(E::Unavailable("actual hasVal weekSchedChecked Num"))?
+                    {
+                        continue;
+                    }
+                    for &day_index in week.day_schedules.iter().skip(1) {
+                        let day_index =
+                            day_index.ok_or(E::Unavailable("actual hasVal null day pointer"))?;
+                        let day = self
+                            .day_schedules
+                            .get(day_index)
+                            .ok_or(E::Unavailable("actual hasVal DaySchedule pointer"))?;
+                        if *day_checked
+                            .get(day.number)
+                            .ok_or(E::Unavailable("actual hasVal daySchedChecked Num"))?
+                        {
+                            continue;
+                        }
+                        // Original reads TimeStepsInHour only for an unvisited
+                        // Detailed day. Constant and visited branches do not.
+                        let slots = 24_i32
+                            .checked_mul(clock.time_steps_in_hour)
+                            .ok_or(E::Unavailable("actual hasVal signed timestep loop extent"))?;
+                        for at in 0..slots {
+                            let at = usize::try_from(at)
+                                .map_err(|_| E::Unavailable("actual hasVal timestep index"))?;
+                            if *day
+                                .timestep_values
+                                .get(at)
+                                .ok_or(E::Unavailable("actual hasVal day tsVals index"))?
+                                == value
+                            {
+                                return Ok(true);
+                            }
+                        }
+                        day_checked[day.number] = true;
+                    }
+                    week_checked[week.number] = true;
+                }
+                Ok(false)
             }
         }
     }

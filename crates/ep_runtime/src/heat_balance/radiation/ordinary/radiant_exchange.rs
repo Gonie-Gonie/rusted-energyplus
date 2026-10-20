@@ -70,6 +70,8 @@ pub(crate) struct RadiantInitializationOutput<'a, 'b> {
     pub(crate) report_inputs: &'a ReportInputs,
     pub(crate) backend: &'a mut SourceErrorBackend<'b>,
     pub(crate) eio: &'a mut dyn Write,
+    /// Same already-open physical debug stream; never a reconstructed sink.
+    pub(crate) debug: Option<&'a mut dyn Write>,
     pub(crate) advanced_report_variables: bool,
 }
 

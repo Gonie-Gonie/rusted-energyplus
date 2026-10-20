@@ -25,6 +25,10 @@ use ep_model::TypedModel;
 impl OrdinarySourceSession {
     /// Execute only the genuine first-input parent167-187. The later189-238
     /// body must borrow these same retained owners at its actual caller position.
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Keep actual Source owners and debug stream explicit"
+    )]
     pub(crate) fn prepare_first_input(
         &mut self,
         context: &mut CtfInitializationContext<'_>,
@@ -34,6 +38,7 @@ impl OrdinarySourceSession {
         output_host: &mut SourceMtdFileHost,
         equipment_input: OrdinaryEquipmentInput,
         radiation_input: OrdinaryRadiationInput,
+        debug: &mut dyn std::io::Write,
     ) -> Result<(), RuntimeError> {
         let result = prepare_source_manage_heat_balance_first_call(&mut SourceFirstInputHost {
             session: self,
@@ -44,6 +49,7 @@ impl OrdinarySourceSession {
             output_host,
             equipment_input,
             radiation_input,
+            debug,
         });
         result.map_err(hb_input_error)
     }
@@ -107,6 +113,7 @@ struct SourceFirstInputHost<'a, 'context> {
     output_host: &'a mut SourceMtdFileHost,
     equipment_input: OrdinaryEquipmentInput,
     radiation_input: OrdinaryRadiationInput,
+    debug: &'a mut dyn std::io::Write,
 }
 impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
     fn manager(&self) -> &SourceHeatBalanceManager {
@@ -124,7 +131,7 @@ impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
         // Partial same-owner input effects survive an error. No legacy full
         // thermal factory, re-used CTF result or copied report answer is invoked.
         self.context
-            .get_source_heat_balance_input(
+            .get_source_heat_balance_input_with_debug(
                 self.model,
                 self.environment,
                 self.minutes,
@@ -132,6 +139,7 @@ impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
                 self.equipment_input,
                 self.radiation_input,
                 &mut self.session.hvac.ancillary.branch_node_connections,
+                Some(&mut *self.debug),
             )
             .map_err(|cause| Error::SourceInput(Box::new(cause)))?;
         self.session

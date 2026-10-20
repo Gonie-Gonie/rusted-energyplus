@@ -776,6 +776,7 @@ mod source_surface_list_ingress_tests {
             "Details",
             "DetailsWithVertices",
             "CostInfo",
+            "ViewFactorInfo",
         ] {
             for specification in [None, Some("IDF")] {
                 let mut fields = serde_json::json!({"report_type": report});
@@ -807,7 +808,7 @@ mod source_surface_list_ingress_tests {
         for fields in [
             serde_json::json!({}),
             serde_json::json!({"report_type": true}),
-            serde_json::json!({"report_type": "ViewFactorInfo"}),
+            serde_json::json!({"report_type": "DecayCurvesFromComponentLoadsSummary"}),
             serde_json::json!({"report_type": "Details", "report_specifications": null}),
             serde_json::json!({"report_type": "Details", "report_specifications": ""}),
             serde_json::json!({"report_type": "Details", "report_specifications": "other"}),

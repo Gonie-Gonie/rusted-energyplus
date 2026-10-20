@@ -241,6 +241,7 @@ impl GainFactory {
             report_inputs: &self.model.report_inputs,
             backend: &mut backend,
             eio: &mut self.eio,
+            debug: None, // This gated legacy owner has no actual debug stream.
             advanced_report_variables: globals.display_advanced_report_variables,
         };
         self.radiation

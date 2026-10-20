@@ -134,12 +134,10 @@
       "Same-input authored35/-120/-8/100 keepYes case matches all58/5352 physical operands exactly, Site EIO and two genuine pressure warnings with exact phase counts; independent corrected Native completeness retains the initial readback failure."
     ],
     "Output:Surfaces:List": [
-      "Positive opaque Vertices/Details/DetailsWithVertices selections, arbitrary unnamed map identities and optional IDF specification retain real raw fields, typed ReportInputs and both actual two-alpha IP schemas.",
-      "Actual ReportSurfaces cache/order selects the real RptType1/10/11 writer; borrowed Source Zone first/last counts, final report order, Surface vertices/properties, nominalU/construction name and convection owners feed one complete buffered EIO write.",
-      "Original headers including Vertex4 typo, .2R/.3R formatting, class-only film resistances independent of Ground/Adiabatic and genuine Surface Reveal constructor0 are preserved. Unsupported children fail before the buffered stream write.",
-      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Sibling output paths require their separately recorded actual owners and evidence; positive shading/window/frame/user/OSC exporters are not promoted.",
-      "CostInfo now writes actual explicit caller-owned SCI through real local IOFilePath/outputControl defaulttrue and false dev-null; Native uniqueness mask/report order/physical ordinals/names/classes/independentArea andGrossArea are used. Live reached Fatal reads actual weather/global/project flags; partial IO prefixes remain. Same-input A58/5352 plus exact wholeSCI508B/9CRLF lines/6rows and wholeSHD/ERR-END0/0 pass. No opening/interzone/Construction0 activation claimed by this case.",
-      "Lines writes actual caller-owned SLN with outputControl false dev-null, persistent native optiondone/lastoption before open, live diagnostic phase and real local IO/Fatal failure prefix. Default emits actual final-world closing edges in F10.2; IDF emits original headers/class/name/azimuth.1R and F10.2 vertices/terminators. Separate sole-append A58/5352 cases pass unchanged limits, completeSLN default1751B/30CRLF lines/24edges and IDF2140B/38CRLF lines/24vertices, plus wholeSHD/fullERR-END0/0. Shading/window/IntMass/zero-side/general-geometry activation is not claimed; immutable copied producer9line prose is explicitly corrected only by independent physical readback."
+      "Positive opaque Vertices/Details/DetailsWithVertices, CostInfo, Lines and ViewFactorInfo retain real raw fields, typed report inputs, arbitrary unnamed map identities and actual two-alpha IP schemas. Other geometry and unsupported exporter children remain at their real boundaries.",
+      "Actual RptType1/10/11 writes final report-order surface/zone/vertices/nominalU EIO, original Vertex4 header typo and .2R/.3R formatting/class-only films. CostInfo owns a caller-selected SCI local file with native uniqueness mask, ordinals/construction/classes and independent Area/GrossArea. Lines owns SLN with retained optiondone/lastoption before open, actual world closing edges or IDF vertices/azimuth/terminators. Real outputControl dev-null, local file lifetime, partial IO and live Fatal phase effects are retained.",
+      "ViewFactorInfo reads genuine Solar pre-Fix/final F and copied-Solar radiant final F/ScriptF, actual absorption/emissivity and report-order world vertices. Native column sums, .4R EIO and .6R IDF blocks/terminator quirks use the same already-open physical debug handle. Original Solar local flag and radiant module flag are distinct. No Native matrices feed production; userF/noncopy/Carroll/window/representative and actual sizing/Decay children remain bounded.",
+      "Separate same-input A58/5352 cases pass unchanged named limits and wholeSHD/fullERR-END0/0: DetailsWithVertices12lines/6x39fields, CostInfo508B/9CRLF-lines/6rows, Lines default1751B/30lines/24closededges and IDF2140B/38lines/24vertices, ViewFactor55EIOlines/24matrixrows/144scalars/18rowsums with IDF6756B/156lines wholeDBG or genuine defaultDBGabsence. These no-opening opaque fixtures do not activate interzone CostInfo exclusion, Construction0, different net/gross areas, N1 or shading/window/IntMass/zero-side/general geometry."
     ],
     "Output:Meter": [
       "Normal and MeterFileOnly raw families retain named meter keys including wildcard/unit-suffix semantics, strict official frequencies/defaults and arbitrary unnamed object identities; unknown/empty authored keys reach the genuine not-found warning.",
@@ -170,35 +168,46 @@
       "SourceA accepts the same Compact family/raw grammar and references. Only Compact transfers full numeric/order operands; otherA raw projections and previous lexical fallback order stay unchanged. A complete all-family identity/order map preserves the existing strict IP association guard. Legacy unscoped admission remains closed.",
       "Existing No Native unit body now covers all3 interpolation modes/live currentVal and diagnostic/failure prefixes; a SourceA ingress check proves raw numbers/order/type negatives. Full workspace5046/2 and all-targetClippy pass.",
       "Same-input B102 consumed nonaligned Average and Linear each complete102/9792 raw/binary64-exact outputs under unchanged named policies, exact96schedule strings/bits, fullEIO/WarmupDays6/ERR-END0/0/wholeSHD and genuine deleted-emptyMTR. Linear endpoint overshoot/residue is retained, never clamped.",
-      "Remaining non-MM/DD Through grammar, missing/unknown type diagnostics, malformed/duplicate selectors, schedule-limit failures, some Detailed min/max/control getters, sibling public schedule families and broader calendar/model combinations retain explicit boundaries. No full-object or arbitrary-combination completion."
+      "Remaining non-MM/DD Through grammar, missing/unknown type diagnostics, malformed/duplicate selectors, schedule-limit failures, some Detailed min/max/control getters, sibling public schedule families and broader calendar/model combinations retain explicit boundaries. No full-object or arbitrary-combination completion.",
+      "Detailed hasVal now follows Original366week/12day-type pointers with actual thermostat TimeStepsInHour, visited Week/Day Num arrays and exact equality, independent of currentVal or minmax caches; Constant still ignores clock. Existing actual graph tests exercise contained10/current175 and real4-step/ctor0 distinction. A separate same-input Constant4-to-Compact control4 B102 case matches102/9792 raw/binary64-exact values, all96 requested control values and fullEIO/SHD/ERR-END0/0 with genuine deleted-emptyMTR. No internal hasVal iteration instrumentation or other thermostat/control physics claim."
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5046,
+      "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/surface-compact-workspace-tests-18.log",
-        "sha256": "c9ad024a6889124bd7ab024bb5e221b53c8eca5dfa89d42e71614bd3ee4d5d54",
-        "bytes": 1556948
+        "path": ".runtime/object-expansion/view-factor-control-workspace-tests-20.log",
+        "sha256": "658c3ce0f25ee99efe34029b0f4c2ed0553e88b4c0bd7725da6db72ab5952372",
+        "bytes": 1559106
       },
-      "scope": "Full workspace milestone through surface-compact-18: real SCI file/report owner and live Fatal, actual Compact No/Average/Linear minute producer/currentVal, live minute diagnostic/failure prefixes and final Fatal order, SourceA Compact numeric/order custody with strict complete-family association. Legacy paths retain their boundaries."
+      "scope": "Full workspace milestone through view-factor-control-20: Source Detailed hasVal over retained week/day/actual clock, Solar pre-Fix/final and copied-Solar radiant/ScriptF report writers, actual debug handle borrowing, default/IDF formatting and failure prefixes. After this successful run, two lint-only corrections gate the legacy wrapper to its existing feature/test caller and initialize the same test geometry in one expression; feature compilation and all-target Clippy cover those final bytes."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/lines-clippy-19.log",
-        "sha256": "be187f13e38b3650c887b798a8ab29ec76ccf0a209f097f24bfe8a2018791559",
-        "bytes": 2070
+        "path": ".runtime/object-expansion/view-factor-control-clippy-20b.log",
+        "sha256": "53e890fbe0e467f3fb55fc86da4aee51f334eeeaadc280cd469b633b221f9059",
+        "bytes": 2068
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/surface-lines-docs-19.log",
+        "path": ".runtime/object-expansion/view-factor-control-docs-20.log",
         "sha256": "ec57032a80a96e8c15955d284e92249fb0a4987568912610086b220dce954777",
         "bytes": 354
       },
-      "clippy_through_build": "surface-lines-19"
+      "clippy_through_build": "view-factor-control-20",
+      "native_cohort_compile": {
+        "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
+        "passed": true,
+        "log": {
+          "path": ".runtime/object-expansion/view-factor-control-native-cohort-check-20.log",
+          "sha256": "67bc8736f640f313f383d38ea39cbb4f07dba9b4edd193c52946ebf5783749fd",
+          "bytes": 3001378
+        },
+        "scope": "Compile-only verification of the preserved feature-gated legacy wrapper and changed genuine debug-owner literals; existing cohort warnings remain, no feature tests or engines run."
+      }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -2520,12 +2529,165 @@
           "passed": true
         },
         "effective_state": "Original A24 plus sole Lines idf report append. Actual whole Source/Native SLN equals all38CRLF lines/2140B: six ordered opaque surfaces and 24 World-coordinate IDF vertices, six final semicolons, literal two headers and original azimuth.1R/fixed10.2F formatting. Original58/5352 named tolerance/RMSE limits pass with actual3536raw/3536binary64 unequal operands; no tolerance changes or exact-bit claim. WholeSHD, completeERR/END0warnings0severe and source caller-owned SLN retention match; SCI is genuinely unrequested/absent. Immutable producer copied9line prose remains unchanged and is explicitly corrected only in independent readback. This unchanged opaque World fixture activates no shading/window/IntMass/zero-side/general-geometry route."
+      },
+      {
+        "id": "compact-control",
+        "group": "schedule_compact_control",
+        "source_build": "view-factor-control-20",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-control/calibration-01/input.idf",
+          "sha256": "a10f9c8547bd75fb9c776c21908f85f9e51ee49637b2c53eda2f0edd3d39ff03",
+          "bytes": 13074
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-control/calibration-01/receipt.json",
+          "sha256": "e1640fffd4ed92d83129bbcc7970f405cc368f9263578a5511ca4c05651e2ab1",
+          "bytes": 9759
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-control-20/control/receipt.json",
+          "sha256": "f8a0506dc96761d0a7fd0ff334a09f818beeeb07c2ae88eb75516eedc05a189b",
+          "bytes": 6613
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-control-20-control/run-summary.json",
+          "sha256": "f46e3f4d5085fb316cd894f48346332b1133178513c7fbeb651680b7c883dffb",
+          "bytes": 60774
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-control-comparisons-20/control/comparison.json",
+          "sha256": "f640a15b75fd0b93de76c31d03c2dd08b89f0e2daf91b59b9b26ea0506fc397a",
+          "bytes": 226049
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-control-20-launch/control/request.json",
+          "sha256": "6c0a703f4ce362a991d2e42a3a8ffdd448e45df65e421a38f0374f4d50a9ad12",
+          "bytes": 2820
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original B102 with sole ConstantControlType4 to actual Schedule:Compact Through12/31 ForAllDays Until24=4 substitution; genuine unchanged thermostat reference and actual requested control Schedule Value4 at all96clocks. All102/9792 original named policies pass with zero raw/binary64 unequal operands and zero tolerance/RMSE failures. Whole SHD, exact EIO, full ERR/END0 warnings0 severe and real deleted-empty MTR0 retained. No optional type, missing selectors, alternate Through grammar or full Compact domain promotion."
+      },
+      {
+        "id": "view-factor-info-default",
+        "group": "view_factor_info",
+        "source_build": "view-factor-control-20",
+        "input": {
+          "path": ".runtime/object-expansion/native-view-factor-info/calibration-02/default/input.idf",
+          "sha256": "fbd4c9bea7637781183b09710686835b26a8c472bc5abc801bdca4742c3b9e76",
+          "bytes": 9316
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-view-factor-info/calibration-02/default/receipt.json",
+          "sha256": "d8ebc165bb71c9aca8a1993d68422b4b8869c6aab0452352f5631e6a7f615054",
+          "bytes": 29375
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-view-factor-info-20/default/receipt/receipt.json",
+          "sha256": "46c086021d877d7fc6483c7bce2f3ece5f29f7c7e991d21d8e76bd5e96e57861",
+          "bytes": 6750
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/view-factor-info-20-default/run-summary.json",
+          "sha256": "057f0c7f6775113c87122fe6d7f30c970c88e7817a88aa97f1dfc05fd8a9dc92",
+          "bytes": 32404
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-view-factor-info-20-comparisons-01/default/main/comparison.json",
+          "sha256": "9e55f36fd702ea12b59db18ae76c69900ba4d577b523398051a5bfb4219fb7b7",
+          "bytes": 155957
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-view-factor-info-20-comparisons-01/default/view-factor-info-default-source-run-request.json",
+          "sha256": "bf778b8fc7e0c3fbb5b1e603bfa721d6da8e942ba3e33e68fb288fd04500b088",
+          "bytes": 4534
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original A24 plus sole ViewFactorInfo default append. Actual55 EIO report lines (Solar28/radiant27),10primary headers,12authored geometry/absorptance/emissivity/vertex rows,24matrix rows/144scalars and18view-factor row sums match exactly, including actual pre-Fix versus final Solar matrices and genuine copied-Solar radiant finalF/ScriptF. Actual empty defaultDBG is physically deleted/absent on both producers. Original58/5352 policies unchanged;3536raw/binary64 unequal operands pass all original tolerance/RMSE limits, no exact-bit claim. CompleteSHD/ERR-END0warnings0severe, same actual debug/EIO IO owners and output retention verified. No user-F/window/Carroll/single-surface/representative/DecayCurves or full-object-domain promotion; Native matrices never feed Source execution."
+      },
+      {
+        "id": "view-factor-info-idf",
+        "group": "view_factor_info",
+        "source_build": "view-factor-control-20",
+        "input": {
+          "path": ".runtime/object-expansion/native-view-factor-info/calibration-02/idf/input.idf",
+          "sha256": "4766e8c9c7410c548ee187f62f508aa80d8ed12f6ec40cbce280fc24ec13f318",
+          "bytes": 9323
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-view-factor-info/calibration-02/idf/receipt.json",
+          "sha256": "a75e2a7b2921e06559d0b32e0f1e0c85a711a88532dab9123902f2e3acaf1bb5",
+          "bytes": 29335
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-view-factor-info-20/idf/receipt/receipt.json",
+          "sha256": "d02ccbf097e82254ddb92ca270f2e3b6d6d829e0a0a67cfacc593acda8ace567",
+          "bytes": 6794
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/view-factor-info-20-idf/run-summary.json",
+          "sha256": "19b7a6046bb36e32a773bbdbe7fad158e5c0e681338897a341bdbb96dd8f4853",
+          "bytes": 32297
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-view-factor-info-20-comparisons-01/idf/main/comparison.json",
+          "sha256": "0672bd03e6c39eba4ad3ff517e829b9407820fb68c05c06917d1aa4f68929a88",
+          "bytes": 174684
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-view-factor-info-20-comparisons-01/idf/view-factor-info-idf-source-run-request.json",
+          "sha256": "af34363bda822ebd848ef6be6a1e0367add6028223b77ab4aef2b002ae98ca81",
+          "bytes": 4514
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original A24 plus sole ViewFactorInfo idf append. Actual55 EIO report lines (Solar28/radiant27),10primary headers,12authored geometry/absorptance/emissivity/vertex rows,24matrix rows/144scalars and18view-factor row sums match exactly, including actual pre-Fix versus final Solar matrices and genuine copied-Solar radiant finalF/ScriptF. Actual whole IDF DBG6756B/156CRLF lines/4duplicate finalF blocks/144scalar tokens equals Native. Original58/5352 policies unchanged;3536raw/binary64 unequal operands pass all original tolerance/RMSE limits, no exact-bit claim. CompleteSHD/ERR-END0warnings0severe, same actual debug/EIO IO owners and output retention verified. No user-F/window/Carroll/single-surface/representative/DecayCurves or full-object-domain promotion; Native matrices never feed Source execution."
       }
     ],
     "totals": {
-      "paired_cases": 41,
-      "reported_samples": 273294,
-      "raw_operand_unequal": 111886,
+      "paired_cases": 44,
+      "reported_samples": 293790,
+      "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -2853,24 +3015,25 @@
           "sha256": "598207e7a11486c4b29e80e084f54f78b61138fb06031c4689e69f6233d38c43",
           "bytes": 75545460
         }
-      }
-    ],
-    "focused_since_workspace": {
-      "passed": 4,
-      "scope": "Surface-lines-19 output-only change: existing owner bodies cover default closing edges, IDF world vertices/azimuth/terminators, real local SLN IO/outputControl/once state/live Fatal and partial prefix; existing ingress table includes Lines. Full workspace milestone remains surface-compact-18.",
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/lines-owner-focused-tests-19.log",
-          "sha256": "ce4ec743e5ead554ffc7c8390c3636fa4dae06e1eb4cf9495dd6feb9cf7501ed",
-          "bytes": 6684
+      },
+      {
+        "id": "view-factor-control-20",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-20/receipt.json",
+          "sha256": "4f70abbfa6c88a68ff7b93cdeb184bb4a69b37d552587a21c3a8d691a781088d",
+          "bytes": 7524
         },
-        {
-          "path": ".runtime/object-expansion/lines-ingress-focused-tests-19.log",
-          "sha256": "829cf1de54ba05b3240cac3d6bff8f5aecae1f4ccc81a92513ed10cc50f1d843",
-          "bytes": 5488
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/af/afc42856cb3fbe8dd66e8b0dbc461b99cbd8b1b292565a7fa6f45c6dc7046377",
+          "sha256": "afc42856cb3fbe8dd66e8b0dbc461b99cbd8b1b292565a7fa6f45c6dc7046377"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-20/eplus-rs.exe",
+          "sha256": "2bb54d52bb9512af9ca0ca2256c129a9823deb26b868cd64375b1eb529cb7706",
+          "bytes": 75596700
         }
-      ]
-    }
+      }
+    ]
   },
   "additional_native_type_calibrations": [
     {

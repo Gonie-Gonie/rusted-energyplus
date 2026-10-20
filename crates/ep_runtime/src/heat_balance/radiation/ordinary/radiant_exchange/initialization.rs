@@ -38,8 +38,7 @@ impl OrdinarySolarRadiation {
             ReportScanFailure::Diagnostic(error) => backend_error(error),
         })?;
         if self.radiant_exchange.view_factor_report {
-            // First unported operation is the actual full report header at475.
-            return Err(Unavailable::ViewFactorReport.into());
+            super::super::view_factor_report::header(false, output.eio)?;
         }
         self.radiant_exchange.max_num_enclosure_surfaces = 0;
         let count =
@@ -257,6 +256,15 @@ impl OrdinarySolarRadiation {
                 .script_f
                 .as_mut()
                 .ok_or(Unavailable::StorageDomain)? = calculated;
+            if self.radiant_exchange.view_factor_report {
+                super::super::view_factor_report::radiant(
+                    enclosure,
+                    source.geometry,
+                    &option,
+                    output.eio,
+                    &mut output.debug,
+                )?;
+            }
             // The useSolarViewFactors branch skips the final check-value row.
         }
         if errors_found {

@@ -17,6 +17,9 @@ impl CtfInitializationContext<'_> {
     /// metadata after the real Project timestep/reporting control writes. The
     /// actual InputProcessor, shortcuts, zones, geometry, gains and Solar owners
     /// remain on `reports` on both success and failure.
+    /// Legacy boundary callers do not own an actual debug stream. Default EIO
+    /// reports remain real; a reached positive IDF debug write stops unavailable.
+    #[cfg(all(test, feature = "native-controlled-air-cohort"))]
     pub(crate) fn get_source_heat_balance_input(
         &mut self,
         model: &TypedModel,
@@ -26,6 +29,33 @@ impl CtfInitializationContext<'_> {
         equipment_input: OrdinaryEquipmentInput,
         radiation_input: OrdinaryRadiationInput,
         branch: &mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
+    ) -> Result<(), RuntimeError> {
+        self.get_source_heat_balance_input_with_debug(
+            model,
+            environment,
+            minutes,
+            output_host,
+            equipment_input,
+            radiation_input,
+            branch,
+            None,
+        )
+    }
+
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Keep the genuine Source input/IO owners distinct"
+    )]
+    pub(crate) fn get_source_heat_balance_input_with_debug(
+        &mut self,
+        model: &TypedModel,
+        environment: &mut WeatherEnvironmentState,
+        minutes: i32,
+        output_host: &mut SourceMtdFileHost,
+        equipment_input: OrdinaryEquipmentInput,
+        radiation_input: OrdinaryRadiationInput,
+        branch: &mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
+        debug: Option<&mut dyn std::io::Write>,
     ) -> Result<(), RuntimeError> {
         // The existing driver initializes the actual ErrorsFound local, then
         // Project/Site/Material/Frame/Construction/Building Zone input in order.
@@ -60,7 +90,7 @@ impl CtfInitializationContext<'_> {
         self.continue_selected_heat_balance_input_before_solar()?;
         // The existing Solar child restores its same sole partially written
         // owner before propagating either success or failure.
-        self.initialize_selected_solar_view_factors(model)?;
+        self.initialize_selected_solar_view_factors_with_debug(model, debug)?;
         // Native320 InitOnly=true reads gains before later daylighting input.
         self.manage_selected_internal_heat_gains_input(model, minutes, output_host)?;
         // Native325-326 reads DataHeatBal.AnyKiva. The older selected helper

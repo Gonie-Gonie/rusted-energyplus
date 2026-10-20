@@ -297,6 +297,11 @@ impl SourceInitializationFiles {
     pub fn eio_stream(&mut self) -> &mut dyn Write {
         &mut self.outputs[1]
     }
+    /// Disjoint actual EIO/debug handles, already opened at their Native calls.
+    /// This does not reopen, create, reset or replace either stream.
+    pub(crate) fn eio_and_debug_streams(&mut self) -> (&mut dyn Write, &mut dyn Write) {
+        (&mut self.outputs[1], &mut self.debug)
+    }
     /// Same already-open physical BND, without opening or replacing the stream.
     pub(crate) fn bnd_stream(&mut self) -> &mut dyn Write {
         &mut self.outputs[3]

@@ -122,6 +122,31 @@ impl SourceInitializationFiles {
 }
 
 impl SourceInitializationFiles {
+    /// Same physical report/EIO/debug handles for the actual surface initializer.
+    pub(crate) fn source_report_streams_eio_debug<'a>(
+        &'a mut self,
+        sqlite: &'a SourceSqliteState,
+        output_variables: &'a mut Vec<String>,
+    ) -> (
+        SourceRuntimeReportStreams<'a>,
+        &'a mut dyn Write,
+        &'a mut dyn Write,
+    ) {
+        let [eso, eio, mtr, _bnd] = &mut self.outputs;
+        (
+            SourceRuntimeReportStreams {
+                eso,
+                mtr,
+                sqlite,
+                output_variables,
+            },
+            eio,
+            &mut self.debug,
+        )
+    }
+}
+
+impl SourceInitializationFiles {
     /// Same physical ESO/MTR plus typed same EIO goodbit; no open/reset/copy.
     pub(crate) fn source_weather_streams_and_eio<'a>(
         &'a mut self,

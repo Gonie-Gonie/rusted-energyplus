@@ -220,6 +220,7 @@ impl OrdinarySurfaceInitialization {
                 report_inputs: owners.report_inputs,
                 backend: owners.backend,
                 eio: owners.eio,
+                debug: Some(&mut *owners.debug),
                 advanced_report_variables: owners.globals.display_advanced_report_variables,
             };
             owners
