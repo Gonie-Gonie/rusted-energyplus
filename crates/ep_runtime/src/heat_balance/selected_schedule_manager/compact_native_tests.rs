@@ -587,6 +587,172 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 .all(|value| value.to_bits() == 0.0_f64.to_bits())
         );
     }
+    // Both empty events are actual authored intervals, not omitted fields.
+    // The real minute child writes1440bins; the real manager writes96samples.
+    for (mode, interpolation, source_mode) in [
+        (
+            "No",
+            ep_model::ScheduleInterpolation::No,
+            super::minute::SourceScheduleInterpolation::No,
+        ),
+        (
+            "Average",
+            ep_model::ScheduleInterpolation::Average,
+            super::minute::SourceScheduleInterpolation::Average,
+        ),
+        (
+            "Linear",
+            ep_model::ScheduleInterpolation::Linear,
+            super::minute::SourceScheduleInterpolation::Linear,
+        ),
+    ] {
+        let untils = ["UNTIL:0:0", "UNTIL:03:00", "UNTIL:12:60", "UNTIL:24:00"].map(str::to_owned);
+        let values = [2.0_f64, 0.0, 2.0, 1.0];
+        let (mut minutes, mut assigned, mut found_errors) = ([0.0; 1440], [false; 1440], false);
+        let mut diagnostics = Vec::new();
+        super::minute::process_interval_fields_with(
+            &untils,
+            &values,
+            4,
+            4,
+            &mut minutes,
+            &mut assigned,
+            &mut found_errors,
+            "ACTUAL EMPTY INTERVALS",
+            "Schedule:Compact",
+            source_mode,
+            15,
+            &mut |kind, message| {
+                diagnostics.push((kind, message.to_owned()));
+                Ok(())
+            },
+        )?;
+        assert!(!found_errors);
+        assert!(assigned.iter().all(|value| *value));
+        assert_eq!(diagnostics.len(), 2);
+        assert!(diagnostics.iter().all(|(kind, message)| *kind
+            == super::minute::SourceScheduleMinuteDiagnostic::Warning
+            && message.contains("zero time interval detected")));
+        if mode != "Linear" {
+            assert!(minutes[..180].iter().all(|value| *value == 0.0));
+            assert!(minutes[180..].iter().all(|value| *value == 1.0));
+        } else {
+            assert!(minutes[0] > 1.0 && minutes[180] > 1.0);
+        }
+        let canonical = [0, 180, 180, 1440];
+        let segments = canonical
+            .into_iter()
+            .zip(values)
+            .map(
+                |(until_minute_of_day, value)| ep_model::ScheduleCompactSegment {
+                    until_minute_of_day,
+                    value,
+                },
+            )
+            .collect::<Vec<_>>();
+        let (_, expected_steps) =
+            ep_model::populate_schedule_day_values(interpolation, &segments, Some(15));
+        let mut raw = authored_raw(fixture, mode, false);
+        raw["ScheduleTypeLimits"]["Fraction"]["upper_limit_value"] = serde_json::json!(2);
+        let mut data = vec![
+            serde_json::json!({"field":"Through:12/31"}),
+            serde_json::json!({"field":"For:AllDays"}),
+            serde_json::json!({"field":format!("Interpolate:{mode}")}),
+        ];
+        for (until, value) in untils.iter().zip(values) {
+            data.extend([
+                serde_json::json!({"field":until}),
+                serde_json::json!({"field":value}),
+            ]);
+        }
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = Value::Array(data);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut input,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )?;
+        }
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_warning_errors_during_warmup
+            ),
+            (2, 2)
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual empty interval graph")?;
+        let day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name == "INTERNAL GAIN SCHEDULE_dy_1")
+            .ok_or("actual empty interval Day owner")?;
+        assert_eq!(day.timestep_values.len(), 96);
+        for (step, value) in day.timestep_values.iter().enumerate() {
+            assert_eq!(
+                value.to_bits(),
+                expected_steps[step].to_bits(),
+                "{mode} step{step}"
+            );
+            let raw_expected = if mode == "Average" {
+                minutes[step * 15..(step + 1) * 15].iter().sum::<f64>() / 15.0
+            } else {
+                minutes[(step + 1) * 15 - 1]
+            };
+            assert_eq!(value.to_bits(), raw_expected.to_bits());
+        }
+        let maximum = manager.source_max(index)?;
+        if mode == "Linear" {
+            assert!(maximum > 1.0);
+        } else {
+            assert_eq!(maximum, 1.0);
+            assert_eq!(manager.source_min(index)?, 0.0);
+        }
+        for step in 0..96 {
+            let clock = WeatherGlobalState {
+                hour_of_day: step / 4 + 1,
+                time_step: step % 4 + 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: 1,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                expected_steps[step as usize].to_bits()
+            );
+        }
+    }
     // Actual IP distinguishes a present empty item from a missing whole entry.
     // Read the real getter count/alpha/blank, then use the genuine minute graph
     // and live clock for every reported timestep; no profile is seeded here.

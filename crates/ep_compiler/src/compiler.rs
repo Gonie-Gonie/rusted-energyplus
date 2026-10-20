@@ -16391,31 +16391,39 @@ impl<'a> Compiler<'a> {
                         text,
                         profile.profile.interpolation,
                         minutes_per_timestep,
+                        profile
+                            .profile
+                            .segments
+                            .last()
+                            .map(|segment| segment.until_minute_of_day),
                     ) else {
                         continue;
                     };
-                    if let Some(previous) = profile.profile.segments.last() {
-                        if until_minute_of_day < previous.until_minute_of_day {
-                            self.error(
-                                "InvalidScheduleCompactUntilOrder",
-                                "Schedule:Compact",
-                                Some(object_name),
-                                Some("data"),
-                                format!("Schedule:Compact/{object_name} Until times must not descend; '{text}' is earlier than the prior Until time"),
-                            );
-                            continue;
-                        }
-                        if until_minute_of_day == previous.until_minute_of_day
-                            && until_minute_of_day % 60 == 0
-                        {
-                            self.warning(
-                                "ScheduleCompactZeroTimeInterval",
-                                "Schedule:Compact",
-                                Some(object_name),
-                                Some("data"),
-                                format!("Schedule:Compact/{object_name} has a zero time interval at '{text}'"),
-                            );
-                        }
+                    if let Some(previous) = profile.profile.segments.last()
+                        && until_minute_of_day < previous.until_minute_of_day
+                    {
+                        self.error(
+                            "InvalidScheduleCompactUntilOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!("Schedule:Compact/{object_name} Until times must not descend; '{text}' is earlier than the prior Until time"),
+                        );
+                        continue;
+                    }
+                    // Native begins at00:00; an explicit initial0:0 sets the
+                    // real end to(-1,59), so it has the same whole-hour empty
+                    // interval warning as an equal later canonical endpoint.
+                    let previous_endpoint = profile
+                        .profile
+                        .segments
+                        .last()
+                        .map_or(0, |segment| segment.until_minute_of_day);
+                    if until_minute_of_day == previous_endpoint && until_minute_of_day % 60 == 0 {
+                        self.warning(
+                            "ScheduleCompactZeroTimeInterval", "Schedule:Compact", Some(object_name), Some("data"),
+                            format!("Schedule:Compact/{object_name} has a zero time interval at '{text}'"),
+                        );
                     }
                     profile.pending_until_minute_of_day = Some(until_minute_of_day);
                 }

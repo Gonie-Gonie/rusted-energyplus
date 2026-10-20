@@ -132,8 +132,11 @@ impl Compiler<'_> {
         directive: &str,
         interpolation: ScheduleInterpolation,
         minutes_per_timestep: Option<u32>,
+        previous_endpoint: Option<u32>,
     ) -> Option<u32> {
-        let Some((minute_of_day, raw_minute, clamped)) = decode_compact_until(directive) else {
+        let Some((minute_of_day, raw_minute, clamped)) =
+            decode_compact_until(directive, previous_endpoint)
+        else {
             self.error(
                 "InvalidScheduleCompactUntil",
                 "Schedule:Compact",
@@ -168,7 +171,7 @@ impl Compiler<'_> {
     }
 }
 
-fn decode_compact_until(value: &str) -> Option<(u32, u32, bool)> {
+fn decode_compact_until(value: &str, previous_endpoint: Option<u32>) -> Option<(u32, u32, bool)> {
     // Native ProcessIntervalFields2787-2795 requires the keyword at byte0
     // and erases a colon only at byte5. A space before ':' can instead be a
     // genuine blank HH (`Until :30`), not an optional keyword separator.
@@ -194,10 +197,14 @@ fn decode_compact_until(value: &str) -> Option<(u32, u32, bool)> {
     // HH at first ':' and an existing empty MM both genuinely mean zero.
     let hour = integral(hour)?;
     let minute = integral(minute)?;
-    // Preserve the bounded existing 0:0 and MM60 fences. Native MM60 keeps
-    // previous endHr/endMin locals; it must not become a next-hour endpoint.
-    if hour > 24 || minute >= 60 || (hour == 0 && minute == 0) {
+    if hour > 24 || minute > 60 {
         return None;
+    }
+    // Native MM60 does not assign endHr/endMin. Only a previous real decoded
+    // endpoint makes this completing projection defined: None is initial
+    // (-1,-1), while Some(0) is a prior explicit0:0's (-1,59).
+    if minute == 60 {
+        return Some((previous_endpoint?, minute, false));
     }
     let clamped = hour == 24 && minute > 0;
     Some((

@@ -350,6 +350,78 @@ fn equal_until_retains_the_zero_duration_segment_and_warning()
         vec![360, 360, 1440]
     );
     assert_eq!(segments[1].value.to_bits(), 0.5_f64.to_bits());
+
+    for (fields, endpoints, warnings) in [
+        (
+            r#"{"field":"Until:0:0"},{"field":2},
+            {"field":"Until:3:00"},{"field":0},
+            {"field":"Until:12:60"},{"field":2},
+            {"field":"Until:24:00"},{"field":1}"#,
+            vec![0, 180, 180, 1440],
+            2,
+        ),
+        (
+            r#"{"field":"Until:0:0"},{"field":2},
+            {"field":"Until:24:60"},{"field":2},
+            {"field":"Until:24:00"},{"field":1}"#,
+            vec![0, 0, 1440],
+            2,
+        ),
+        (
+            r#"{"field":"Until:00:20"},{"field":0},
+            {"field":"Until:12:60"},{"field":2},
+            {"field":"Until:24:00"},{"field":1}"#,
+            vec![20, 20, 1440],
+            0,
+        ),
+    ] {
+        let source = format!(
+            r#"{{"Schedule:Compact":{{"S":{{"data":[
+            {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"Interpolate:Average"}},{fields}
+        ]}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&source)?);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        assert_eq!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .filter(|row| row.code == "ScheduleCompactZeroTimeInterval")
+                .count(),
+            warnings
+        );
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("real empty Until owners"))?;
+        let segments = &model.compact_schedules[0].periods[0].day_profiles[0].segments;
+        assert_eq!(
+            segments
+                .iter()
+                .map(|row| row.until_minute_of_day)
+                .collect::<Vec<_>>(),
+            endpoints
+        );
+        assert!(
+            segments
+                .iter()
+                .any(|row| row.value.to_bits() == 2.0_f64.to_bits())
+        );
+    }
+    for fields in [
+        r#"{"field":"Until:12:60"},{"field":2},{"field":"Until:24:00"},{"field":1}"#,
+        r#"{"field":"Until:6:00"},{"field":0},{"field":"Until:12:60"},{"field":2},
+            {"field":"Until:5:00"},{"field":1},{"field":"Until:24:00"},{"field":1}"#,
+    ] {
+        let source = format!(
+            r#"{{"Schedule:Compact":{{"S":{{"data":[
+            {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{fields}
+        ]}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&source)?);
+        assert!(result.has_errors());
+        assert!(result.model.is_none());
+    }
     Ok(())
 }
 
@@ -429,6 +501,7 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
         ("Until:24:", 1440),
         ("Until 2.4D1:0E", 1440),
         ("Until::15", 15),
+        ("Until::", 0), // Real explicit initial0:0; later full-day row remains.
         ("Until :30", 30),
         ("Until::15+E0", 15),
         ("Until:-0:15", 15),
@@ -447,7 +520,7 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
             expected
         );
     }
-    // Compiler rejection is a bounded projection; 0:0/MM60 and the genuine
+    // Compiler rejection is a bounded projection; initialMM60 and the genuine
     // nonIntegral format-fatal prefix are not relabeled as Native type errors.
     for directive in [
         "Until:6.5:0",
@@ -460,7 +533,6 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
         "Until:\u{00a0}6:0",
         "Until:6:\u{00a0}0",
         "Until:6:60",
-        "Until::",
         "Until",
         "Until:",
         "Until:24",

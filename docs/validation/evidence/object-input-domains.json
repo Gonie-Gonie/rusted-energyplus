@@ -163,10 +163,10 @@
       "Same-input1/1 CustomDay1 Duration1.9 becomes1 across96actual clocks and matches all102/9792 original outputs exactly. AllDays schedules do not prove distinct day-type coefficients; ordinal-only unwritten local weekday and broader grammar/models remain bounded."
     ],
     "Schedule:Compact": [
-      "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use the shared Source ProcessNumber, including D/E forms and genuine empty/space-only or optional missing field as zero. Unknown item metadata is retained. Explicit null, a wholly missing entry and malformed numbers remain bounded; no fabricated IP sentinel or schema diagnostics. Until HH/MM uses successful integral Source ProcessNumber, including D/E suffixes and existing blank operands. Keyword must start at byte0; only the immediate colon is erased, so Until :30 is genuine blankHH0/MM30. Zero-time/MM60 and nonIntegral formatting paths remain separately bounded.",
+      "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use shared Source ProcessNumber, including D/E, empty/space-only and optional missing field as zero. Unknown item metadata is retained. Integral HH/MM includes genuine blank operands and exact byte0/immediate-colon grammar. Explicit0:0 and statefulMM60 retain every empty segment; MM60 preserves the prior decoded endpoint, with None distinct from Some0. Whole-hour empty warnings and Linear next-segment seeds remain genuine. Explicit null, missing entries, initialMM60 and nonIntegral formatting paths remain bounded.",
       "No/Average/Linear use retained minute/day/week/currentVal producers and actual type clocks. Optional blank/unknown types retain Invalid/None and original warning/continuation order. Missing For masks retain genuine MissingDay0 pointers and exact warnings. Detailed hasVal and uncached minmax follow actual366week/12day-type pointers and clocks; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects are preserved; Linear endpoint residues are never clamped.",
-      "Through invokes the real General child and leap OrdinalDay into the existing367week array for bounded fixed numeric/named/reversed/dash/space dates, including successful three-number year-first/year-last forms with Source ProcessNumber and truncation before integer selection and optional directive colons. Empty/successful finite trunc-zero Through values share the actual Source number grammar and real MonthDay0/0 empty owners. Coverage for admitted endpoints0..366 preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Broader date/Until grammar and sibling families remain bounded.",
-      "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed and three-number fractional/D/E date spellings, missing selectors, empty topology, finite-zero dates and blank/D/E values. Each verifies all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. Cases name their actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
+      "Through invokes the real General child and leap OrdinalDay into the existing367week array for bounded fixed numeric/named/reversed/dash/space dates, including successful three-number year-first/year-last forms with Source ProcessNumber and truncation before integer selection. Empty/successful finite trunc-zero Through values retain real MonthDay0/0 empty owners. Coverage for admitted endpoints0..366 preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Broader date grammar and sibling families remain bounded.",
+      "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed and three-number fractional/D/E dates, missing selectors, empty topology, finite-zero dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
     ]
   },
   "verification": {
@@ -174,27 +174,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/compact-finite-zero-workspace-tests-24.log",
-        "sha256": "4c2406d48bdaeaa3d422152a091244d19b8e7bb077ebf89530aab2f17eeefbe3",
-        "bytes": 1558342
+        "path": ".runtime/object-expansion/compact-empty-until-workspace-tests-28.log",
+        "sha256": "977a964a9a7c7b87a92e5764968c5db65df87ce5dc2e71885689567a640c347d",
+        "bytes": 1558020
       },
-      "scope": "Full workspace milestone through compact-finite-zero-24: unchanged weather prefix/ProcessNumber bodies moved to shared ep_model utilities with original caller error/cursor/reference adapters; compiler and actual Source ScheduleManager bodies cover successful finite trunc-zero/empty Through owners, reachable-only limits and overlap rejection. Existing test bodies extended; no new test cohort."
+      "scope": "Full workspace milestone through compact-empty-until-28: scalar/raw admission, integral Until, three-number dates and explicit0:0/statefulMM60 retain real owners, all authored segments and reachable-only limits. Existing tests extended; no new cohort. Completed before equivalent nested-if-to-let-chain Clippy cleanup; subsequent focused compiler25 and all-target Clippy validate the final style change."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/compact-through-numbers-clippy-27.log",
-        "sha256": "d4fd6e22470250a5daa0efdca1c32a4d87759fbd34ec2c0403c93a014c15ea63",
-        "bytes": 2280
+        "path": ".runtime/object-expansion/compact-empty-until-clippy-28b.log",
+        "sha256": "721a3cf0a6623483cdd688f11225a2b909dd43a3c0244bf00a145a09266329d7",
+        "bytes": 2064
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-through-numbers-docs-27.log",
+        "path": ".runtime/object-expansion/compact-empty-until-docs-28.log",
         "sha256": "f226614fe1cfb6afac4b38fa5b3acbe5344b3603467770c825476e8349834d8f",
         "bytes": 354
       },
-      "clippy_through_build": "compact-through-numbers-27",
+      "clippy_through_build": "compact-empty-until-28",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3139,11 +3139,62 @@
           "passed": true
         },
         "effective_state": "OriginalB102 exactlytwoThrough-token editsrecords13:3and35:3: gain2.013D+3/1.2E+1/3.1D1,availability12.9/31.9/2013.5. GenuineGeneralProcessDateString sharednumber/int/yearfirst-or-last pathselects12/31,authoredyearignoredinCompact; no typed-oracle substitution. AlloriginalUntil/valueentries/For/Fraction0..1/Constant4/gains-thermostatrefs/102requests/weather/otherbytes retained. Actual96control4/gain48zero48one/availability12zero84one raw+binary64equal. Full102/9792originalpolicies andindependentfullnumericalreread pass0raw/binaryunequal/tolerance/RMSEfailures; exactfullERR-END0warnings0severe/actualWarmup6/nominal+4daygroups0..1000W/wholeSHD/realdeletedemptyMTR0 agree. Build27actualcompiler/SourceCompact/Generaldate/sharednumber/ingresslive/archiveidentitiesauthenticated. No measuredinternalGeneraloutputs/NumAlphas/tokencounts orinvaliddate/nth/last/ordinal/negativeexponent/nonfinite/generaldate/fullCompact-domain claim."
+      },
+      {
+        "id": "compact-empty-until",
+        "group": "schedule_compact_empty_until",
+        "source_build": "compact-empty-until-28",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-empty-until/calibration-01/input.idf",
+          "sha256": "abcea7ffac6f262932ff2f3bc2376a79afe36993c7dc38baa90573e5b5e5a060",
+          "bytes": 13067
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-empty-until/calibration-01/receipt.json",
+          "sha256": "b68f82536591a928f75fdfe875fd87827a228e3cdc4717488baff38ad0dd6bca",
+          "bytes": 15674
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-empty-until-28/empty-until/receipt.json",
+          "sha256": "7d61bca52e70306d10fad040216096be22f012dd5e9c9de8f533554b57e7fc15",
+          "bytes": 4005
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-empty-until-28/run-summary.json",
+          "sha256": "718fba80ac493f7933cf9af739101af255c24bc6de3ff1c7e0b9dabec29cc6f9",
+          "bytes": 60655
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-empty-until-comparisons-28/empty-until/comparison.json",
+          "sha256": "2f308e38f41872715f4db6421e72010941211640d7ac0ae27dc8916919e0c688",
+          "bytes": 251303
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-empty-until-28-launch/empty-until/request.json",
+          "sha256": "97ac978992e01d20e3f437ffbf93ce258546d086e501c7e7307c2ce710b49e37",
+          "bytes": 3197
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "OriginalB102twoNoemptyintervalinsertions: gaininitialUntil00:00value2;availabilityafteroriginal03:00value0 insertsUntil12:60value2. Raw2underlimitedFraction0..1retained; completingactualNoemptyranges skipwritesusingrealretainedendlocals, withoutmanualclamp/deletion. Originalprofiles/Constant4/consumerrefs/102requests/weather/otherbytes retained. Actual96control4/gain48zero48one/availability12zero84one raw+binary64equal. Full102/9792originalpolicies andindependentfullnumericalreread pass0raw/binaryunequal/tolerance/RMSEfailures. Exacttwozero-timeWarningsgainthenavailability/noContinue/Severe/Fatal,warmup0/sizing0/fullERR-END2warnings0severe/actualWarmup6/nominal+4daygroups0..1000W/SHD/deletedMTR agree. Build28privatecompiler+actualrawminute+General/sharednumberowners live/archiveauthenticated. No internalendlocal/NumAlphas/callcount/Linear/fractionalFatal/overlap/generalUntil/fullCompact-domain claim; allotherzero-warningcontractsunchanged."
       }
     ],
     "totals": {
-      "paired_cases": 53,
-      "reported_samples": 381918,
+      "paired_cases": 54,
+      "reported_samples": 391710,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3608,48 +3659,35 @@
           "sha256": "002bc6cecac95cf3efda46f62216f4db9b121d63c509c5fd4ae69c41deb0d3b8",
           "bytes": 75648011
         }
+      },
+      {
+        "id": "compact-empty-until-28",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-28/receipt.json",
+          "sha256": "f18751e08f4de4d0d1c6025ef27ae57d0826b43eb3efa3abf6a8c48e5def572c",
+          "bytes": 4847
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/46/46104324a2a1c5c0088e3f043f3b9f9f15aa7544048f554a9dec3dd243b0726f",
+          "sha256": "46104324a2a1c5c0088e3f043f3b9f9f15aa7544048f554a9dec3dd243b0726f"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-28/eplus-rs.exe",
+          "sha256": "530337ec03831cb2f112bae96110e269ae8569da4e40f6f55c6b6588fa80a793",
+          "bytes": 75649464
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 79,
+      "passed": 25,
       "logs": [
         {
-          "path": ".runtime/object-expansion/compact-value-scalars-compiler-tests-25.log",
-          "sha256": "2c2a57f990142da526f38ae9b97928d3ea03bb03a3772fc5c09017b6caed5106",
-          "bytes": 7448
-        },
-        {
-          "path": ".runtime/object-expansion/compact-value-scalars-owner-tests-25.log",
-          "sha256": "5fea99ccaae56910b13d40481ae80c3ae8900bffdfb28e321f1ae51700785231",
-          "bytes": 6098
-        },
-        {
-          "path": ".runtime/object-expansion/compact-value-scalars-ingress-tests-25.log",
-          "sha256": "d296008cad3ad8d1c7954ccd409a20fa418d08ac8d23146cefc0e2de83c8e1f2",
-          "bytes": 2130
-        },
-        {
-          "path": ".runtime/object-expansion/compact-until-numbers-compiler-tests-26.log",
-          "sha256": "7eb0411dde74ca180f50c85c60968ea8332dbcb68f5a6e01c8cbd607a3dcf6e5",
-          "bytes": 7442
-        },
-        {
-          "path": ".runtime/object-expansion/compact-until-numbers-owner-tests-26.log",
-          "sha256": "53a3858cf3887358ce8dc5d494a20903121191eeea0f6af6c6849396133143ee",
-          "bytes": 6092
-        },
-        {
-          "path": ".runtime/object-expansion/compact-through-numbers-compiler-tests-27.log",
-          "sha256": "1c7ff2e3784719d940779488d286ab31ecfc4c92055393cc635fdbcfb5e5e150",
-          "bytes": 7442
-        },
-        {
-          "path": ".runtime/object-expansion/compact-through-numbers-owner-tests-27.log",
-          "sha256": "efecd8b49f167801d868dc3d88d59fb5c84be2d628e8e03abd3ceca5fa266fe1",
-          "bytes": 2368
+          "path": ".runtime/object-expansion/compact-empty-until-compiler-tests-28b.log",
+          "sha256": "5f2c3414d8a3068bb39c18fb3e5d888bbf664adf0c0f0ea69fd9772b23ae8525",
+          "bytes": 7440
         }
       ],
-      "scope": "After full workspace milestone compact-finite-zero-24: compiler Compact25+25+25, actual ScheduleManager1+1+1 and Source A ingress1 existing bodies. Scalar entries/raw admission, integral Until operands and successful three-number Through dates with truncation-before-selection, real annual pointers and96profiles are covered. No new test cohort or dependency."
+      "scope": "After full workspace5049/2 milestone28, a Clippy-only nested-if-to-let-chain cleanup preserves the identical comparison/error/continue order. Existing compiler Compact25 pass again; independent narrow peer confirms no semantic/test/other-file changes. No repeated full suite."
     }
   },
   "additional_native_type_calibrations": [

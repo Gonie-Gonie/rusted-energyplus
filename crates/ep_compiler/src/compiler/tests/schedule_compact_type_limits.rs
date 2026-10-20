@@ -109,6 +109,26 @@ fn rejects_populated_compact_values_outside_active_limits() -> Result<(), Box<dy
         assert!(overlap.has_errors());
         assert!(overlap.model.is_none());
     }
+    let empty_seed_fields = r#"{"field":"Until:0:0"},{"field":2},
+        {"field":"Until:03:00"},{"field":0},
+        {"field":"Until:12:60"},{"field":2},
+        {"field":"Until:24:00"},{"field":1}"#;
+    let no = compact_result("No", empty_seed_fields, 0.0)?;
+    assert!(!no.has_errors(), "{:?}", no.report.diagnostics);
+    let no_model = no
+        .model
+        .ok_or_else(|| std::io::Error::other("inactive2 No mode"))?;
+    assert_eq!(
+        no_model.compact_schedules[0].periods[0].day_profiles[0]
+            .segments
+            .len(),
+        4
+    );
+    // Linear retains each empty value as the next segment's genuine start;
+    // seeded2 becomes reachable ramp values and must still violate upper1.
+    let linear = compact_result("Linear", empty_seed_fields, 0.0)?;
+    assert!(has_compact_range_error(&linear));
+    assert!(linear.model.is_none());
     // The empty row cannot disable validation of a later reachable period.
     let result = topology_result(
         &[("6/30", 0.25), ("6/30", 0.5), ("12/31", 2.0)],
