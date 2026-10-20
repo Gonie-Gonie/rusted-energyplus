@@ -54,6 +54,9 @@ case manifest
 Markdown wording, smoke tests, diagnostics, arbitrary IDF runs, and performance
 results do not create compatibility claims.
 
+The [conformance contract](../conformance/overview.md) collects the case,
+output, tolerance, baseline, report and promotion procedures.
+
 ## Full-Domain Claims
 
 Heat-balance, HVAC, plant, and time full-domain claims use canonical

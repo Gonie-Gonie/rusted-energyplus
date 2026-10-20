@@ -7,15 +7,14 @@
 - [Project Contract](current/project-contract.md)
 - [Current Status](current/current-status.md)
 - [Roadmap](current/roadmap.md)
-- [Verification](current/verification.md)
 - [Architecture Overview](current/architecture-overview.md)
-- [Launcher And Run Framework](current/launcher-and-run-framework.md)
 
 # Guides
 
 - [Setup](guides/setup.md)
 - [Developer Workflow](guides/developer-workflow.md)
 - [Run Arbitrary IDF](guides/run-arbitrary-idf.md)
+- [Verify The Port](guides/verify-porting.md)
 - [Release Process](guides/release-process.md)
 
 # Generated References

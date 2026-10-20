@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-07
+last_reviewed: 2026-10-20
 ---
 
 # Docs, Specs, and Evidence Retention
@@ -34,6 +34,17 @@ they are not evidence.
   staleness.
 - ADRs record durable process or architecture decisions.
 - Old plan/readiness Markdown is removed from the tree.
+- Keep current scope, durable state/branch contracts, known limitations and the
+  command needed to verify a result. Replace obsolete explanations instead of
+  appending progress journals or repeated checkpoint tables.
+- Each decision/table has one authority: specs for machine-readable state,
+  current docs for operating context, guides for procedures, and source maps
+  for durable ownership details. Other pages link to it rather than copying it.
+- Accepted scientific evidence retains the input/source identities, policy,
+  actual commands, result and limitations needed to substantiate the claim.
+  Raw execution logs live outside the mdBook source tree. Failed outcomes that
+  still limit the current claim remain explicit; chronological attempts and
+  replaced prose are recovered from Git or the relevant immutable evidence.
 - Release evidence is generated under `.runtime/release-evidence/vX.Y.Z`.
 - GitHub Releases upload only the binary package and curated public evidence
   PDFs by default; local HTML, JSON, and Markdown evidence remains available for

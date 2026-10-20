@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-07-15
+last_reviewed: 2026-10-20
 ---
 
 # Psychrometrics Source Map
@@ -19,6 +19,23 @@ This inventory pins the public, namespace-level psychrometric free-function
 interface before implementation work is promoted. It is a source-order
 planning guard, not an implementation, numerical-equivalence, or conformance
 claim.
+
+## Current contract and evidence
+
+This general free-function inventory retains 33 `state_mapped` and 20
+`source_mapped` routines; none is required for the full-domain project gate.
+The detailed contracts below own source arithmetic, branches, cache identity,
+diagnostics, and lifecycle boundaries. The
+[algorithm ledger](../../../specs/algorithm_ledger.toml) is the status
+registry. The later finite PSY cards and their paired evidence belong to the
+[finite A/B porting plan](../../../energyplus_porting_plan/README.md); they do
+not promote this entire 53-routine inventory.
+
+Local source-derived formula vectors, IEEE edge tests, or repeated output
+stability do not establish independent Native, diagnostic, cache, or caller
+parity. Keep new numeric receipts with their card evidence rather than adding
+per-attempt test narratives here. Git history retains earlier checkpoint
+counts and experiment descriptions.
 
 ## Inventory Rule
 
@@ -93,20 +110,6 @@ that the EnergyPlus routine has been ported.
 | 53 | `CSplineint` | spline interpolation | `Psychrometrics.hh:136,303,1698`; `Psychrometrics.cc:1450` | always present | canonical fixed-table source-order spline: `ep_runtime::psychrometrics::energyplus_c_splineint` with immutable `psychrometrics_spline_tables` | full table bit folds, shifted-bin/truncation behavior, exact decimal spline factor, knots and between-knot vectors, source discontinuity, endpoint extrapolation, sample-count prefix bounds, unsupported C++-undefined inputs, and repeated-call purity |
 
 ## CP56-2 Numerical Scaffold: Density And Specific Heat
-
-This section promotes only the source/state understanding for a selected
-direct-formula pair. It does not promote either routine to `implemented`,
-does not claim that an existing Rust analogue has EnergyPlus-equivalent edge
-or diagnostic behavior, and does not add external evidence, family gating,
-conformance, or a project-contract obligation. Both tickets remain under the
-parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
-The current numerical helpers and local bit-pattern, floor, IEEE-edge,
-legacy-wrapper, and call-stability tests are in
-`crates/ep_runtime/src/psychrometrics.rs` and
-`crates/ep_runtime/src/psychrometrics_tests.rs`. Those Rust-only checks are
-scaffold evidence, not an external EnergyPlus parity oracle.
-The normal and fast Cp helpers now also own the independent saved states in
-`crates/ep_runtime/src/psychrometrics/cp_cache.rs`.
 
 ### `PsyRhoAirFnPbTdbW` (`psy_rho_air_fn_pb_tdb_w`)
 
@@ -190,18 +193,6 @@ not_claimed_branches:
 <!-- routine-state-contract:v1 end psy_cp_air_fn_w -->
 
 ## CP56-3 Direct Formula And Fast-Path Scaffold
-
-This checkpoint covers Rust numerical helpers for routines 5 through 9 and
-11 in source-interface order. The fast Cp helper now retains its own
-thread-local last-call state. The helpers and their local pinned-formula,
-evaluation-order, humidity-floor, ignored-argument, IEEE-edge, debug-assertion,
-release no-floor, repeated-call, and legacy-wrapper tests live in
-`crates/ep_runtime/src/psychrometrics.rs` and
-`crates/ep_runtime/src/psychrometrics_tests.rs`. These checks are Rust-only
-source-transcription evidence, not output captured from an external EnergyPlus
-oracle. The six tickets advance only to `state_mapped`; they do not advance to
-`implemented`, add conformance evidence, or change the parent algorithm's
-`status = "scaffold"` and `claim_level = "none"` boundary.
 
 The IdealLoads `moist_air_enthalpy_j_per_kg` helper now delegates to the normal
 canonical enthalpy helper, including its `1.0e-5` humidity floor and J/kg
@@ -424,17 +415,6 @@ not_claimed_branches:
 
 ## CP56-4 Dry-Bulb Inversion And Vapor-Density Scaffold
 
-This checkpoint adds pure Rust numerical helpers for routines 12 through 15 in
-source-interface order. The helpers and their local pinned-formula,
-source-evaluation round-trip, humidity-floor, unclamped-temperature/RH,
-pressure, IEEE-edge, debug-assertion, release no-floor, and ordinary/fast tests
-live in `crates/ep_runtime/src/psychrometrics.rs` and
-`crates/ep_runtime/src/psychrometrics_inverse_density_tests.rs`. These checks
-are Rust-only source-transcription evidence, not output captured from an
-external EnergyPlus oracle. The four tickets advance only to `state_mapped`;
-they do not advance to `implemented`, add conformance evidence, or change the
-parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
-
 The outdoor-air `dry_bulb_from_enthalpy_and_humidity_ratio` helper remains
 separate; its arithmetic grouping and lack of the canonical `1.0e-5` humidity
 floor can produce different results. The no-OA sensible cooling-capacity
@@ -589,17 +569,6 @@ not_claimed_branches:
 
 ## CP56-5 Lower-Bound Relative-Humidity Numerical Scaffold
 
-This checkpoint adds the pure Rust numerical return path for routine 17. Its
-local EMS source-fixture, forward/inverse, positive-vapor ternary,
-out-of-range-only correction, below-zero-temperature, NaN/infinity,
-signed-zero, zero-Kelvin, and exponential-pole tests live in
-`crates/ep_runtime/src/psychrometrics.rs` and
-`crates/ep_runtime/src/psychrometrics_relative_humidity_tests.rs`. These are
-Rust-only source-transcription checks, not output captured from an external
-EnergyPlus oracle. Routine 17 advances only to `state_mapped`; it does not
-advance to `implemented`, add conformance evidence, or change the parent
-algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
-
 Routine 16 remains `source_mapped`. EnergyPlus enables `USE_PSYCH_ERRORS` by
 default and leaves `USE_PSYCH_STATS` disabled by default. The error helper owns
 per-`EnergyPlusData` warning history that the current Rust runtime cannot
@@ -727,23 +696,12 @@ dependencies remain absent.
 
 ## CP56-6 Specific-Volume Numerical Scaffold
 
-This checkpoint advances only `PsyVFnTdbWPb` to `state_mapped` and leaves its
-separately named diagnostics helper `PsyVFnTdbWPb_error` at `source_mapped`.
-The parent inventory remains `status = "scaffold"`, `claim_level = "none"`,
-and all 53 routines remain outside the full-domain required set.
-
 EnergyPlus enables `USE_PSYCH_ERRORS` by default and leaves
 `USE_PSYCH_STATS` disabled by default. The Rust helper preserves the numerical
 result independently of those branches: source-style `max(dW, 1.0e-5)` keeps a
 first-argument NaN, the specific-volume expression remains left-associated,
 and every strictly negative calculated volume returns literal `0.83`. A
 calculated negative zero and NaN bypass the ordered `< 0.0` fallback.
-
-Pinned evidence includes the EnergyPlus functional-API input
-`(24 C, 0.009, 101325 Pa)`, the EMS fixture `(30 C, 0.01, 101325 Pa)`, ordinary
-formula vectors, humidity-floor and IEEE edges, and repeated/alternating calls.
-The density reciprocal check deliberately uses source tolerance because
-`PsyVFnTdbWPb` and `PsyRhoAirFnPbTdbW` retain different legacy constants.
 
 ### `PsyVFnTdbWPb_error` (`psy_v_fn_tdb_w_pb_error`)
 
@@ -798,24 +756,12 @@ not_claimed_branches:
 
 ## CP56-7 Humidity-Ratio Inversion Numerical Scaffold
 
-This checkpoint advances only `PsyWFnTdbH` to `state_mapped` and leaves its
-separately named diagnostics helper `PsyWFnTdbH_error` at `source_mapped`.
-The parent inventory remains `status = "scaffold"`, `claim_level = "none"`,
-and all 53 routines remain outside the full-domain required set.
-
 The Rust helper preserves the source grouping
 `(H - 1.00484e3 * TDB) / (2.50094e6 + 1.85895e3 * TDB)`, followed by the
 ordered `W < 0.0` correction to literal `1.0e-5`. This is not a `max`
 operation: positive results below `1.0e-5` remain unchanged, NaN and negative
 zero bypass the correction, and negative infinity is corrected. Tests also
 cover the denominator pole and both adjacent representable temperatures.
-
-Pinned evidence includes the EnergyPlus EMS vector
-`(20 C, 30000 J/kg) -> 0.00390178711`, the functional-API vector
-`(24 C, 48000 J/kg) -> approximately 0.009`, direct upstream unit-test inputs,
-canonical `PsyHFnTdbW` round trips, IEEE edges, and repeated/alternating calls.
-These checks are Rust-only source-transcription evidence, not output captured
-from an external EnergyPlus oracle.
 
 ### `PsyWFnTdbH_error` (`psy_w_fn_tdb_h_error`)
 
@@ -871,11 +817,6 @@ not_claimed_branches:
 
 ## CP56-8 Raw Saturation-Pressure Numerical Scaffold
 
-This checkpoint advances only `PsyPsatFnTemp_raw` to `state_mapped` and leaves
-the public cached/no-cache `PsyPsatFnTemp` ticket at `source_mapped`. The parent
-inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
-routines remain outside the full-domain required set.
-
 The standard EnergyPlus build enables psychrometric caching and errors, leaves
 psychrometric statistics disabled, and does not define `EP_IF97`. The canonical
 Rust raw helper therefore implements only the default Hyland-Wexler numerical
@@ -893,13 +834,6 @@ The diagnostic trigger is separate and inclusive on original input
 inferred from the numerical branch alone. Raw negative infinity returns the
 low constant; positive infinity and NaN fall through to the high constant;
 signed zero produces one common ice-branch result.
-
-Pinned evidence covers the direct EnergyPlus EMS 30 C fixture
-`4246.030243592 Pa`, the functional-API 24 C example near `2985 Pa`, low/ice/
-liquid/high branch vectors, the rounded triple-point and endpoint boundaries,
-IEEE inputs, and repeated/alternating calls. Exact Rust bits pin only the local
-source transcription; external EnergyPlus and cross-platform `exp`/`log`
-last-bit equivalence remain unclaimed.
 
 The pre-existing private `energyplus_psychrometric_saturation_pressure_pa`
 remains a guarded compatibility adapter rather than either canonical ticket.
@@ -1026,14 +960,6 @@ this routine's iteration count. Calls in the pressure-correction path
 additionally read and mutate the nested routines' cache, diagnostic,
 statistics, and caller-context state.
 
-The direct v26.1 unit evidence covers all nine polynomial regions, the low and
-high clamps, one cache miss, and the 91325 Pa correction result
-`18.819 C`. It does not cover exact polynomial boundaries, the exact pressure
-band edges, IEEE inputs, `Y2 == Y1`, 31-iteration failure, warmup and recurring
-diagnostics, or nested cache effects. The C/Python functional example only
-prints an approximate result, and the EMS fixtures do not assert a numerical
-oracle.
-
 ### `PsyTsatFnHPb` (`psy_tsat_fn_h_pb`)
 
 The default wrapper owns 1,048,576 direct-mapped entries per
@@ -1056,12 +982,6 @@ statistics increment is also source-observable: the header increments
 named raw routine and compiles the same raw body directly as public
 `PsyTsatFnHPb` on every original input.
 
-The upstream test labelled as a cache hit first stores `(H, 101325)` and later
-looks up `(H, 101330)`; those pressures have different full tags, so the test
-does not exercise a hit. There is no upstream sentinel, same-tag alias,
-collision, initialization-versus-clear, independent-state, hit-side-effect,
-or cached-versus-no-cache test.
-
 CP56-18 supplies source-order `F6` and `F7` helpers and therefore satisfies
 only that seed-helper prerequisite. Promotion of these tickets still requires
 canonical routine-25, routine-36, and routine-39 dependency contracts; all
@@ -1074,13 +994,6 @@ heat-recovery, and HVAC migration remain separate requirements.
 
 ## CP56-10 Vapor-Density And Relative-Humidity Numerical Scaffold
 
-This checkpoint advances `PsyRhovFnTdbRh` and `PsyRhFnTdbRhov` to
-`state_mapped` while leaving their stateful saturation-pressure dependency and
-the separately named `PsyRhFnTdbRhov_error` helper unimplemented. The
-inventory is now 35 source-mapped and 18 state-mapped routines. The parent
-inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
-routines remain outside the full-domain required set.
-
 Both Rust helpers model the standard EnergyPlus build's numerical projection:
 they truncate the saturation-pressure input to the routine-25 cache
 representative whose low 28 bits are zero, evaluate the default non-IF97 raw
@@ -1089,14 +1002,6 @@ arithmetic. They do not own the 1,048,576-entry cache, replay hit/miss side
 effects, or represent the no-cache or IF97 compile variants. The pre-existing
 `LBnd0C` forward and inverse helpers remain separate empirical-exponential
 routines and are not aliases for routines 28 or 30.
-
-Pinned evidence covers the EnergyPlus EMS vectors `(30 C, 0.5)` to
-`0.015174171 kg/m3` and `(30 C, 0.01 kg/m3)` to `0.3295072808`, a non-grid
-temperature that distinguishes the default cache representative from the
-no-cache raw value, valid-domain round trips, unbounded forward RH inputs,
-inverse correction branches, the positive-vapor lazy gate, absolute-zero
-denominators, signed zero, NaN, and infinities. These are source-fixture and
-local formula tests, not an external EnergyPlus domain claim.
 
 ### `PsyRhovFnTdbRh` (`psy_rhov_fn_tdb_rh`)
 
@@ -1184,12 +1089,6 @@ not_claimed_branches:
 
 ## CP56-11 Humidity-Ratio Relative-Humidity Numerical Scaffold
 
-This checkpoint advances `PsyRhFnTdbWPb` to `state_mapped` while leaving its
-separately named `PsyRhFnTdbWPb_error` helper unimplemented. The inventory is
-now 34 source-mapped and 19 state-mapped routines. The parent inventory
-remains `status = "scaffold"`, `claim_level = "none"`, and all 53 routines
-remain outside the full-domain required set.
-
 The Rust helper preserves the source's unsimplified evaluation order:
 unconditional saturation pressure first, first-argument-NaN-preserving
 `max(dW, 1.0e-5)` semantics, degree of saturation
@@ -1198,15 +1097,6 @@ unconditional saturation pressure first, first-argument-NaN-preserving
 is outside `[0.0, 1.0]`. It models the ordinary-finite standard-build
 projection by evaluating saturation pressure at the routine-25 cache
 representative. It does not own or replay that cache.
-
-Pinned evidence covers the EnergyPlus EMS vector
-`(30 C, 0.01, 101325 Pa) -> 0.377598442`, the C/Python API's print-only
-`(24 C, 0.009, 101325 Pa)` vector, a non-grid temperature that separates the
-default cache representative from no-cache evaluation, valid-domain inverse
-round trips, the humidity-ratio floor, low-positive preservation, high/low
-correction, pressure zero and saturation singularities, NaN, and infinities.
-These are source-fixture and local formula tests, not external EnergyPlus
-domain, API, EMS-dispatch, or downstream integration claims.
 
 ### `PsyRhFnTdbWPb_error` Deferral (`psy_rh_fn_tdb_w_pb_error`)
 
@@ -1332,16 +1222,6 @@ exists for them.
 
 ### Evidence And Promotion Requirements
 
-Direct EnergyPlus 26.1 evidence covers the EMS no-correction vector
-`(16 C, 101325 Pa) -> 0.0113664167`, `(99 C, 101325 Pa) -> 17.5250143`
-without correction, `(100 C, 101325 Pa)` corrected by one degree to the same
-value, and `(100 C, 81000 Pa)` corrected by seven degrees to
-`20.07942181`. The latter two tests also lock first-warning text with an
-Unknown caller. The C/Python functional examples only print the ordinary
-`(13 C, 101325 Pa)` result near `0.009`. Existing downstream tests either
-reuse the routine itself as expected data or exercise sizing, defrost, coil,
-and weather control flow without an independent oracle.
-
 Promotion requires an explicit Rust invalid-domain and cancellation policy
 that does not masquerade as the unbounded source loop; a routine-25 cache
 owner with sentinel, collision, lifecycle, and per-step side-effect tests;
@@ -1354,12 +1234,6 @@ calling an unbounded unit test directly.
 
 ## CP56-12 Relative-Humidity Humidity-Ratio Numerical Scaffold
 
-This checkpoint advances `PsyWFnTdbRhPb` to `state_mapped` while leaving its
-separately named `PsyWFnTdbRhPb_error` helper unimplemented. The inventory is
-now 33 source-mapped and 20 state-mapped routines. The parent inventory
-remains `status = "scaffold"`, `claim_level = "none"`, and all 53 routines
-remain outside the full-domain required set.
-
 The new `energyplus_psy_w_fn_tdb_rh_pb` helper is distinct from the existing
 `energyplus_psychrometric_humidity_ratio_from_rh` compatibility wrapper and
 does not migrate that wrapper's weather, heat-balance, or IdealLoads callers.
@@ -1371,18 +1245,6 @@ is strictly below the floor. The explicit ordered comparisons preserve the
 source's first-argument NaN behavior; Rust `f64::max` would instead normalize
 those NaNs. RH is not clamped, so finite values above one remain numerical
 inputs.
-
-Pinned evidence covers the EnergyPlus EMS vector
-`(30 C, 0.5, 101325 Pa) -> 0.0133109528`, the C/Python API's print-only
-`(24 C, 0.5, 101325 Pa)` vector, a non-grid temperature that separates the
-default cache representative from no-cache evaluation, valid-domain inverse
-round trips through routine 32, exact and neighboring 1000 Pa denominator
-pivots, and both sides of the `1.0e-5` return floor. Local edge tests cover
-signed zero, finite negative and above-one RH, RH and pressure NaN/infinities,
-the pure projection's nonfinite-temperature results, and intentional
-differences from the guarded `Option` wrapper. These are source-fixture and
-local formula tests, not external EnergyPlus domain, API, EMS-dispatch, or
-downstream integration claims.
 
 ### `PsyWFnTdbRhPb_error` Deferral (`psy_w_fn_tdb_rh_pb_error`)
 
@@ -1455,12 +1317,6 @@ not_claimed_branches:
 
 ## CP56-13 Wet-Bulb Humidity-Ratio Numerical Scaffold
 
-This checkpoint advances `PsyWFnTdbTwbPb` to `state_mapped` while leaving its
-two separately named diagnostic helpers at `source_mapped`. The inventory is
-now 32 source-mapped and 21 state-mapped routines. The parent inventory
-remains `status = "scaffold"`, `claim_level = "none"`, and all 53 routines
-remain outside the full-domain required set.
-
 The new `energyplus_psy_w_fn_tdb_twb_pb` helper is deliberately separate from
 the private `energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess`.
 That older compatibility function belongs to the routine-18 wet-bulb
@@ -1477,17 +1333,6 @@ representative. It forms
 without a freezing branch or pressure guard. Only a strictly negative `W`
 falls back through routine 36 at relative humidity `0.0001`; negative zero
 and NaN bypass the fallback.
-
-Pinned evidence covers the EnergyPlus EMS vector
-`(30 C, 16 C, 101325 Pa) -> 0.005624362` and the C/Python API's print-only
-`(24 C, 17 C, 101325 Pa)` vector. Local tests pin the latter to
-`0.009235642823366752`, distinguish default-cache representative evaluation
-from no-cache evaluation, exercise wet-bulb clamp values on both sides of the
-`0.01 C` diagnostic-only threshold, prove the absence of the compatibility
-helper's freezing branch, cover negative-result fallbacks whose routine-36
-returns are both floored and non-floored, and test a pressure pole, NaN,
-infinities, and repeated/alternating purity. Diagnostic dispatch, external
-API/EMS wiring, and downstream equipment integration remain unclaimed.
 
 ### `PsyWFnTdbTwbPb_temperature_error` Deferral
 
@@ -1563,11 +1408,6 @@ not_claimed_branches:
 
 ## CP56-14 Relative-Humidity Enthalpy Numerical Scaffold
 
-This checkpoint advances `PsyHFnTdbRhPb` to `state_mapped`. The inventory is
-now 31 source-mapped and 22 state-mapped routines. The parent inventory
-remains `status = "scaffold"`, `claim_level = "none"`, and all 53 routines
-remain outside the full-domain required set.
-
 The new `energyplus_psy_h_fn_tdb_rh_pb` helper preserves the source
 composition rather than fusing its algebra. It calls routine 36 with the
 original `TDB`, `RH`, and `PB`, applies routine 40's ordered
@@ -1578,13 +1418,9 @@ applies the same ordered floor again before evaluating
 uses first-argument-preserving ordered comparisons rather than Rust
 `f64::max`, so NaN is not normalized to the floor.
 
-The default cache representative affects only routine 36's saturation
-pressure. Enthalpy still uses the original dry-bulb argument, a distinction
-that the non-grid test pins. Evidence also covers the upstream EMS vector
-`(30 C, 0.5, 101325 Pa) -> 64177.426349195 J/kg`, the C/Python API's
-`(24 C, 0.5, 101325 Pa)` print vector, the inherited 1000-Pa denominator
-boundary, low-humidity floors, NaN and infinities, and repeated/alternating
-purity.
+The default cache representative affects only routine 36's saturation pressure.
+Enthalpy still uses the original dry-bulb argument. This distinction belongs to
+the composition contract rather than a new standalone numerical claim.
 
 Routine 40 owns no counter, cache, diagnostic index, warning, or loop. It is
 not globally stateless, however: its unconditional routine-36 call reaches
@@ -1632,12 +1468,6 @@ not_claimed_branches:
 <!-- routine-state-contract:v1 end psy_h_fn_tdb_rh_pb -->
 
 ## CP56-15 Saturation-Temperature Pressure Raw Numerical Scaffold
-
-This checkpoint advances only `PsyTsatFnPb_raw` to `state_mapped` and leaves
-the public cached/no-cache `PsyTsatFnPb` ticket at `source_mapped`. The
-inventory is now 30 source-mapped and 23 state-mapped routines. The parent
-inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
-routines remain outside the full-domain required set.
 
 The new `energyplus_psy_tsat_fn_pb_raw` helper models the default cached
 build's interpolation-disabled, fresh/non-saved numerical projection. It
@@ -1699,13 +1529,6 @@ pressure evaluations. On exhaustion the source loop variable is 51, adds 51
 to statistics, reports 51, and returns the next guess produced by the 50th
 evaluation without evaluating that guess again.
 
-Existing upstream tests do not close these state gaps. The nominal cache-hit
-test does not perform a second call. The spline comparison adds `1e-60` to
-50-120 kPa pressures, which is bit-identical in binary64 and takes the saved
-hit before the spline. The interpolation sample test exercises iterative
-public calls at table knots rather than `CSplineint`. None is evidence for
-public-cache history or the active spline branch.
-
 ### `PsyTsatFnPb_raw` (`psy_tsat_fn_pb_raw`)
 
 <!-- routine-state-contract:v1 begin psy_tsat_fn_pb_raw -->
@@ -1736,12 +1559,6 @@ not_claimed_branches:
 
 ## CP56-16 Humidity-Ratio Dew-Point Numerical Scaffold
 
-This checkpoint advances `PsyTdpFnWPb` to `state_mapped` while keeping its
-stateful routine-42 dependency at `source_mapped`. The inventory is now 29
-source-mapped and 24 state-mapped routines. The parent inventory remains
-`status = "scaffold"`, `claim_level = "none"`, and all 53 routines remain
-outside the full-domain required set.
-
 The new `energyplus_psy_tdp_fn_w_pb` helper preserves the complete local
 routine-43 arithmetic. It applies the source ordered
 `W0 = max(W, 1.0e-5)`, evaluates
@@ -1767,17 +1584,6 @@ deferred. A second reachable difference uses `W = 0.01` and
 `PB = -6319736.802 Pa`: the grouped arithmetic derives exactly
 `PDEW = -99999.0 Pa`, so a fresh source raw call false-hits its initial saved
 pair and returns -99999 C, while the pure non-saved projection returns -100 C.
-
-The upstream EMS test asserts `W = 0.01` and `PB = 101325 Pa` produce
-`14.044515576 C` within `1e-8`. The additional high-precision literals in
-the Rust suite are local regression vectors rather than additional upstream
-assertions. The C/Python functional example only prints a result near 13 C,
-and the DX-coil unit test checks only that the computed dew point is below an
-outlet temperature. Evidence also covers the inclusive humidity floor and
-its nextafter neighbors, NaN/infinity/signed-zero classification, exact
-composition, raw clamps and strict triple-point gap, inverse formula
-round trips, the excluded raw `-99999` saved sentinel, and distinct stable
-outputs for two derived pressures that alias one public-cache tag.
 
 Routine 43 owns no loop, counter, diagnostic, or mutable field. Its nested
 iterative path is structurally bounded at 50 pressure evaluations through
@@ -1817,12 +1623,6 @@ not_claimed_branches:
 
 ## CP56-17 Dry/Wet-Bulb Dew-Point Numerical Scaffold
 
-This checkpoint advances `PsyTdpFnTdbTwbPb` to `state_mapped` while keeping
-its errors-only helper `PsyTdpFnTdbTwbPb_error` at `source_mapped`. The
-inventory is now 28 source-mapped and 25 state-mapped routines. The parent
-inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
-routines remain outside the full-domain required set.
-
 Routine 44 is a diagnostics owner, not the owner of the numerical clamp. It is
 compiled only with `EP_psych_errors`, rechecks strict
 `TDP > TWB + 0.1`, and suppresses every effect during warmup without reading
@@ -1844,28 +1644,6 @@ Only a strict excess above `TWB + 0.1` asks routine 44 to diagnose, so an
 exact or smaller 0.1 C excess is still clamped silently. Ordered comparisons
 retain a NaN child value and preserve the source signed-zero choice; replacing
 the final branch with an unordered minimum is outside the claim.
-
-The upstream EMS test supplies the sole exact numerical assertion:
-`TDB = 30 C`, `TWB = 16 C`, and `PB = 101325 Pa` produce
-`5.573987554 C` within `1e-8`. That program executes twice and checks the
-final value, so it does not distinguish a cold miss from a cache hit. The C
-and Python functional examples only print the `24/17/101325` result. Their
-`16/17/101325` error-callback example activates routine 39's
-wet-bulb-above-dry-bulb warning before its local clamp; its dew point remains
-below the original 17 C wet bulb and is not evidence for routine 44.
-
-Rust evidence covers the EMS vector, a positive routine-39 result below
-`1e-5`, exact composition, and repeated stateless output stability. Clean
-saturated vectors isolate the diagnostic boundary without routine-39
-negative-humidity fallback: `-57/-57/101325` yields an unclamped excess of
-about `0.07057 C` and is silently capped, while `-60/-60/101325` yields an
-excess of about `3.07057 C` and would diagnose before the same cap. A
-`20/20/101325` vector pins the ordinary small numerical overshoot, a
-`10/20/101325` vector proves that the final comparison uses the original
-wet bulb rather than routine 39's corrected local value, and partial
-NaN/infinity/signed-zero cases pin ordered composition. These are unit
-oracles for the isolated projection, not proof of warning or cache sequence
-parity.
 
 Routine 45 has no intrinsic loop. Its routine-43 raw miss can reach routine
 41's structurally bounded 50-evaluation solve. Source audit finds seven
@@ -1905,12 +1683,6 @@ not_claimed_branches:
 
 ## CP56-18 Polynomial And Constant-Water Helpers
 
-This checkpoint advances `F6`, `F7`, `CPCW`, and `CPHW` to
-`state_mapped`. The inventory is now 24 source-mapped and 29 state-mapped
-routines. The parent inventory remains `status = "scaffold"`,
-`claim_level = "none"`, and all 53 routines remain outside the full-domain
-required set.
-
 `energyplus_f6` mirrors the five nested multiply/add levels of the source
 degree-5 Horner expression. `energyplus_f7` mirrors six such levels and
 divides the completed numerator by literal `1.0E10`. Neither implementation
@@ -1924,18 +1696,9 @@ early-scaled polynomial would remain finite. EnergyPlus explicitly disables
 floating-point contraction for Clang builds; cross-compiler excess precision,
 rounding mode, exception flags, and NaN payloads remain outside the claim.
 
-There are no direct upstream F6 or F7 assertions. All eight F6 call
-expressions and the sole F7 call expression are mutually exclusive seed cases
-inside source routine 26. The EMS assertion
-`PsyTsatFnHPb(30000, 101325) = 10.318382617 C` within `1e-8` forms
-`HH = 47863.7`, selects case 4, skips pressure correction, and therefore
-indirectly pins the exact F6 helper result. The upstream raw saturation-
-temperature suite reaches the case-9 F7 endpoint `HH = 45866000` but checks
-the enclosing result only as approximately 100 C within 1 C. Rust tests
-therefore distinguish the exact F6 path from the local source-literal F7
-regression and do not mislabel either as a direct helper oracle. Supplying
-these seed helpers does not promote routine 26's piecewise selection,
-pressure-correction loop, cache, statistics, or diagnostics.
+`F6` and `F7` are mutually exclusive polynomial seed cases inside routine 26.
+Direct helper vectors are source-derived local evidence; public parent-result
+assertions do not independently certify either polynomial or its boundaries.
 
 `energyplus_cpcw` and `energyplus_cphw` preserve two distinct source
 interfaces even though both return exact binary64 `4180.0` and intentionally
@@ -1946,9 +1709,6 @@ and a payload-bearing quiet NaN. Production audit finds six live CPCW calls
 across three C++ files and 21 live CPHW calls across seven; two extra
 `SteamCoils.cc` CPHW text matches are comments. No EMS dispatcher, plant,
 coil, tank, water-use, or other consumer is migrated here.
-
-All four helpers are always present, have no loop, cache, statistics,
-diagnostic, compile branch, mutable state, or cross-call history.
 
 ### `F6` (`f6`)
 
@@ -2060,12 +1820,6 @@ not_claimed_branches:
 
 ## CP56-19 Water Density And Sensible-Enthalpy Helpers
 
-This checkpoint advances `RhoH2O`, `PsyDeltaHSenFnTdb2Tdb1W`, and
-`PsyDeltaHSenFnTdb2W2Tdb1W1` to `state_mapped`. The inventory is now 21
-source-mapped and 32 state-mapped routines. The parent inventory remains
-`status = "scaffold"`, `claim_level = "none"`, and all 53 routines remain
-outside the full-domain required set.
-
 `energyplus_rho_h2o` preserves the source's independent `pow_2(TB)` and
 `pow_3(TB)` multiply chains and the left-associated coefficient expression.
 It does not convert the polynomial to Horner form, use `powi` or `mul_add`,
@@ -2094,10 +1848,6 @@ comparisons choose the second argument `W2`. Consequently `W1 = NaN` with
 finite `W2` retains `W2`, while finite `W1` with `W2 = NaN` forwards NaN and
 routine 51 replaces it with `1e-5`. The 17 production calls across seven C++
 files and their HVAC integration remain outside this checkpoint.
-
-All three helpers are always present and own no `EnergyPlusData`, cache,
-statistics, diagnostic, mutable state, loop, compile branch, or cross-call
-history.
 
 ### `RhoH2O` (`rho_h2o`)
 
@@ -2182,12 +1932,6 @@ not_claimed_branches:
 
 ## CP56-20 Fixed Saturation-Temperature Spline
 
-This checkpoint advances the final `CSplineint` inventory routine to
-`state_mapped`. The inventory is now 20 source-mapped and 33 state-mapped
-routines. The parent inventory remains `status = "scaffold"`,
-`claim_level = "none"`, and all 53 routines remain outside the full-domain
-required set.
-
 `energyplus_c_splineint` is intentionally not a general cubic-spline API. It
 reads the exact 1,651-element `tsat_fn_pb_y` and `tsat_fn_pb_d2y` tables from
 EnergyPlus 26.1, preserved as immutable Rust constants. Tests fold every
@@ -2212,17 +1956,6 @@ asserts before indexing otherwise. The upstream C++ routine has undefined
 behavior for smaller or oversized counts, nonfinite `x`, or an out-of-range
 floating-to-integer conversion, so panic identity for those inputs is not a
 parity claim.
-
-There is no direct upstream `CSplineint` assertion. The test named
-`Psychrometrics_CSpline_Test` first stores the iterative result, adds
-`1e-60` to a 50-to-120-kPa pressure (which leaves the binary64 value
-unchanged), and therefore takes the saved-value hit before the spline branch.
-The interpolation sample test likewise calls the iterative public routine at
-table knots with interpolation disabled. Rust's direct vectors and full-table
-hashes are source-derived local evidence, not mislabeled upstream helper
-oracles. Implementing this routine does not promote routine 41 or 42's
-interpolation flag, saved pair, public cache, statistics, diagnostics, or
-lifecycle.
 
 ### `CSplineint` (`c_splineint`)
 

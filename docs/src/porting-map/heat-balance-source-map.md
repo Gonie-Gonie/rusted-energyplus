@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-20
 ---
 
 # Heat Balance Source Map
@@ -227,9 +227,10 @@ and expected observation travel together. An enum variant by itself is not an
 active probe. Historical probe selectors and wrappers are closed replay
 artifacts; they are excluded from the default active suite. They remain
 reproducible through the suite's explicit `-IncludeClosed` path and retained
-direct wrapper commands. The recorded source-audit narrative below is retained
-as their closure and replay evidence; it does not reopen a closed hypothesis or
-make its lane active.
+direct wrapper commands. The concise diagnostic boundary below records their
+closure; the machine-readable ledger retains each replay identity, while Git
+history retains the per-probe results. This does not reopen a closed hypothesis
+or make its lane active.
 
 ### Active Source-State Hypothesis Registry
 
@@ -1198,931 +1199,120 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   temperature in `SurfTempInsOld` for the iterative damping term; Rust now
   preserves the previous per-surface inside-face temperature before its
   zone-air predictor pass overwrites the current face estimate.
-- The diagnostic `CTF History First-Sample Deltas` table now carries the zero
-  CTF coefficients and oracle/Rust inside/outside face temperatures next to the
-  current/history term decomposition. In the active all-CTF interleaved
-  longwave lane, `ZN001:FLR001` has `Z0=X0=58.085610 W/m2-K` and
-  `Y0=0.72354869 W/m2-K`; first-sample face-temperature deltas of only
-  `0.175831697 C` inside and `0.159122817 C` outside still expand to
-  `2345.374002 W` inside-current and `2117.149523 W` outside-current CTF term
-  deltas. The next floor work should therefore target adiabatic face
-  temperature/source handoff as well as the history vector itself.
-- An interleaved ScriptF longwave probe was added and rejected as an active
-  candidate. With the same all-CTF, previous-inside quick-outside, twenty-pass
-  interleaved coupling, replacing the grey direct-view-factor longwave exchange
-  with the current Rust ScriptF helper raises the top RMSE from
-  `108.672323` to `50142.610234`, led by `ZN001:ROOF001` inside net surface
-  thermal radiation; `ZN001:FLR001` heat-storage RMSE rises to `6586.821302`.
-  ScriptF therefore needs source-level EnergyPlus normalization/iteration
-  parity work before it can replace the grey longwave active lane.
-- A frozen-inside-convection fork of the same interleaved grey longwave lane
-  was added as a source-order probe. EnergyPlus computes inside convection
-  terms before the CTF inside loop and only re-evaluates them on the
-  `ItersReevalConvCoeff` cadence, while the previous Rust interleaved lane
-  recomputed TARP coefficients on every pass. Freezing the Rust coefficient
-  map at timestep start lowers top floor storage RMSE from `108.672323` to
-  `105.876226`, zone surface-convection RMSE from `10.438503` to `9.385594`,
-  and `ZN001:FLR001` inside-convection-coefficient RMSE from `0.073182` to
-  `0.031945`. It is a useful diagnostic candidate, but floor CTF
-  face-temperature/history handoff remains the dominant bottleneck.
-- A current-adiabatic fork of the frozen-hconv lane was added and rejected as
-  an active candidate. The EnergyPlus interzone/adiabatic branch updates
-  `SurfTempOut`/`SurfOutsideTempHist(1)` from the adjacent current inside
-  temperature during `CalcHeatBalanceInsideSurf2CTFOnly`, so the probe lets the
-  adiabatic outside face follow the current inside solve instead of the
-  timestep-start previous-inside value. This lowers `ZN001:FLR001`
-  first-sample CTF current/history term deltas (`inside_current` from
-  `2332.481555 W` to `1904.486777 W`, `outside_current` from `2104.053664 W`
-  to `1494.452520 W`, `inside_history` from `1869.921937 W` to
-  `1432.798624 W`, and `outside_history` from `1760.206936 W` to
-  `1253.666354 W`), but the annual dynamic lane regresses sharply: MAT RMSE
-  rises from `0.116074` to `0.366845`, floor heat-storage RMSE rises from
-  `105.876226` to `507.532350`, and floor outside-conduction RMSE rises from
-  `45.144665` to `471.677285`. Treat the source clue as history/report-order
-  work, not a direct current-inside adiabatic outside-face replacement in this
-  coupled lane.
-- The heat-balance digest now includes annual CTF derived current/history
-  deltas, not just first-sample rows. In the frozen-hconv best lane, the mass
-  floor dominates this latent decomposition: `ZN001:FLR001` has `8760` samples
-  with inside-current/history RMSE `1122.846780 W`/`1122.029419 W` and
-  outside-current/history RMSE `1122.860933 W`/`1122.261275 W`, while roof and
-  wall history RMSEs are near zero. The floor heat-storage RMSE is much lower
-  (`105.876226 W`) because the large current/history deltas cancel in the
-  reported storage sum. This keeps the next solver target on mass-floor
-  face/history cancellation parity rather than no-mass wall/roof history
-  bookkeeping.
-- A current-longwave fork of the frozen-hconv lane was added and rejected for
-  the floor-focused active path. EnergyPlus calls interior radiation exchange
-  with the current `SurfTempIn` vector inside the inside-surface iteration
-  loop, so the probe disables Rust's first-pass previous-inside longwave
-  temperature override while preserving the frozen hconv and adiabatic CTF
-  handoff behavior. It is effectively neutral for zone air (`Surface
-  Convection Rate` RMSE `9.385594` to `9.385137`, `Air Energy Storage Rate`
-  `16.169222` to `16.168835`) but worsens the current top floor rows:
-  `ZN001:FLR001` heat-storage RMSE `105.876226` to `105.890635`, inside
-  conduction `61.293942` to `61.302300`, outside conduction `45.144665` to
-  `45.150659`, and latent floor current/history RMSEs all rise by about
-  `0.342 W`. Keep longwave source sampling as a secondary source-order detail;
-  it is not the next floor-storage lever.
-- A third-order zone-air correction fork was added on top of the frozen-hconv
-  interleaved grey-longwave lane. It is the strongest floor/MAT probe so far:
-  MAT RMSE falls from `0.116074 C` to `0.069817 C`, floor heat-storage RMSE
-  from `105.876226 W` to `54.593582 W`, floor inside conduction from
-  `61.293942 W` to `31.581604 W`, floor outside conduction from
-  `45.144665 W` to `23.282797 W`, and floor inside longwave from
-  `30.262635 W` to `16.615214 W`. It is not a clean promotion yet because the
-  latent zone-air heat-balance rows regress: `Zone Air Heat Balance Surface
-  Convection Rate` RMSE rises from `9.385594 W` to `29.623453 W`, and
-  `Zone Air Heat Balance Air Energy Storage Rate` rises from `16.169222 W` to
-  `29.666388 W`. EnergyPlus 26.1 confirms the third-order air-storage report
-  uses `RhoAir * CpAir * Volume * (MAT - ZTM[0]) / TimeStepSysSec`, so the next
-  target is coupled zone-air source ordering and moist-air capacitance ownership
-  rather than changing the third-order storage report formula.
-- A non-frozen-hconv sibling of the third-order interleaved grey-longwave lane
-  was added to isolate that trade-off. It slightly improves MAT
-  (`0.069817 C` to `0.069191 C`) and the latent zone-air rows (`29.623453 W` to
-  `28.637227 W` for surface convection, `29.666388 W` to `28.446243 W` for air
-  storage) relative to the frozen third-order probe, but worsens the top floor
-  rows: heat storage rises from `54.593582 W` to `58.289839 W`, inside
-  conduction from `31.581604 W` to `33.704368 W`, and outside conduction from
-  `23.282797 W` to `24.970278 W`. Keep frozen-hconv third-order as the current
-  floor/MAT candidate and treat non-frozen third-order as a rejected isolation
-  probe, not a promotion path.
-- A report-only weather-air-storage fork of the frozen third-order lane keeps
-  MAT and the floor rows bit-identical to frozen third-order (`0.069817 C`,
-  `54.593582 W`, `31.581604 W`, and `23.282797 W` RMSE for MAT/floor
-  storage/inside/outside conduction), but drops `Zone Air Heat Balance Air
-  Energy Storage Rate` RMSE from `29.666388 W` to `5.845285 W`. The remaining
-  surface-convection row is unchanged at `29.623453 W`, so the air-storage
-  regression is mostly report-capacity/humidity ownership while the surface
-  convection regression is still source-order/coefficient timing.
-- A previous-MAT surface-convection report sibling of that weather-storage lane
-  was added as a report-order rejection probe. It keeps MAT, floor rows, and
-  weather-proxy air storage unchanged (`0.069817 C`, `54.593582 W`, and
-  `5.845285 W` RMSE for MAT/floor storage/air storage), but worsens `Zone Air
-  Heat Balance Surface Convection Rate` RMSE from `29.623453 W` to
-  `104.589141 W`. EnergyPlus `CalcZoneComponentLoadSums` reports
-  `SurfHConvInt * Area * (SurfTempInTmp - RefAirTemp)` after the corrected
-  zone-air state, so the remaining surface-convection mismatch is not solved by
-  using `ZTM[0]` as the report reference temperature.
-- A balance-closure surface-convection sibling of the weather-storage lane was
-  added as a lower-bound isolation probe. It leaves MAT, floor rows, and
-  weather-proxy air storage unchanged, but reports the zone surface-convection
-  row as `CzdTdt - SumIntGains` for this no-load/no-infiltration diagnostic and
-  lowers `Zone Air Heat Balance Surface Convection Rate` RMSE from
-  `29.623453 W` to `19.203798 W`. Keep this as evidence that part of the latent
-  row mismatch is air-balance/report closure, not as a source-parity output:
-  EnergyPlus still publishes `SumHADTsurfs` from the explicit
-  `SurfTempInTmp`/`SurfHConvInt` surface sum.
-- A frozen-reference-air sibling of the balance-closure lane was added to test
-  whether EnergyPlus keeps the surface-solve `RefAirTemp` fixed while the
-  inside surface loop iterates before the zone-air correction is committed. It
-  improves MAT RMSE from `0.069817 C` to `0.031508 C`, floor inside/outside
-  face-temperature RMSE from about `0.0534 C` to about `0.0322 C`, and
-  aggregate inside-face conduction from `43.069343 W` to `27.427925 W`. Floor
-  storage moves only slightly (`54.593582 W` to `54.561792 W`) and the trade-off
-  is not promotion-ready: aggregate outside-face conduction worsens from
-  `20.119228 W` to `29.132671 W`, zone surface convection from `19.203798 W` to
-  `21.039586 W`, air storage from `5.845285 W` to `7.495999 W`, and floor inside
-  longwave from `16.615214 W` to `31.074699 W`. Treat this as a strong source
-  clue for surface reference-air cadence, but the next candidate must combine it
-  with EnergyPlus inside longwave/source-order and outside aggregate reporting
-  parity instead of promoting the probe directly.
-- A current-longwave sibling of that frozen-reference-air probe was added after
-  rechecking EnergyPlus 26.1.0's CTF-only inside loop, where
-  `CalcInteriorRadExchange` receives the current `SurfTempIn` vector during the
-  inside-surface iterations. In the current Rust shell this is effectively
-  neutral relative to frozen-reference-air: MAT RMSE moves `0.031508 C` to
-  `0.031507 C`, floor storage `54.561792 W` to `54.558577 W`, floor inside
-  longwave `31.074699 W` to `31.072578 W`, and zone outside aggregate
-  conduction `29.132671 W` to `29.131216 W`, while the latent zone-air rows
-  remain at about `21.0396 W` surface convection and `7.4960 W` air storage.
-  Keep current-pass longwave sampling as source-aligned bookkeeping, not the
-  next bottleneck lever.
-- Adding EnergyPlus' inside-surface convergence cutoff on top of the
-  frozen-reference-air/current-longwave lane is a useful fixed-iteration
-  correction. EnergyPlus uses `MaxAllowedDelTemp = 0.002 C`; with the same
-  twenty-pass cap, stopping once the inside-face delta reaches that tolerance
-  lowers floor heat-storage RMSE from `54.558577 W` to `52.022146 W`, floor
-  inside/outside conduction from `31.672094 W`/`23.036538 W` to
-  `30.201354 W`/`21.976058 W`, floor inside longwave from `31.072578 W` to
-  `29.362310 W`, and zone inside/outside aggregate conduction from
-  `27.426369 W`/`29.131216 W` to `26.355358 W`/`27.990507 W`. The latent
-  zone-air rows still move the wrong way slightly (`21.039633 W` to
-  `21.105254 W` surface convection, `7.496023 W` to `7.547299 W` air storage),
-  so this is a stronger candidate cadence but not a conformance promotion.
-- Re-running that converged lane with the EnergyPlus `SurfInitialTemp`-shaped
-  CTF initial history policy is bit-identical after the diagnostic warmup loop:
-  the top floor storage, floor inside/outside conduction, MAT, zone-air
-  surface-convection, air-storage, and latent floor current/history rows all
-  remain unchanged. This rules out the pre-warmup CTF seed as the next active
-  lever; the remaining floor current/history cancellation mismatch must come
-  from warmup-to-run-period history evolution or same-timestep source/face
-  ordering after histories have already been warmed.
-- The active ScriptF-flat/current-longwave lane now preserves the previous
-  surface inside-face temperature at timestep entry for EnergyPlus-shaped
-  first-pass longwave work instead of resetting `SurfTempIn` to zone MAT.
-  EnergyPlus enters `CalcHeatBalanceInsideSurf2CTFOnly` with the carried
-  `SurfTempIn` vector, copies it to `SurfTempInsOld`, and then calls
-  `CalcInteriorRadExchange`; Rust therefore keeps the previous surface solve
-  value as the "current" iteration-zero surface temperature for this lane.
-  This sharply reduces the dominant floor current/history cancellation error:
-  active `1ZoneUncontrolled` MAT RMSE falls from `0.022448 C` to `0.009403 C`,
-  floor heat-storage RMSE from `21.090951 W` to `7.549255 W`, floor inside
-  conduction from `12.263226 W` to `4.415549 W`, and floor inside-solve
-  history RMSE from `293.529881 W` to `85.417533 W`. The top remaining rows are
-  now exterior roof/wall convection and radiation, so the next source target is
-  exterior coefficient/report timing rather than mass-floor history seeding.
-- EnergyPlus iterates inside/outside surface balances before committing CTF
-  histories for the timestep. Rust default diagnostics still use one pass, but
-  `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
-  surface-iter3 probe can repeat the face-balance pass while advancing histories
-  once at timestep end.
+### Coupled source ownership
+
 - `DataHeatBalance::SurfInitialConvCoeff = 3.076 W/m2-K` initializes inside
-  convection coefficients before the selected inside convection algorithm is
-  evaluated. `DataHeatBalance::LowHConvLimit = 0.1 W/m2-K` and
-  `HighHConvLimit = 1000 W/m2-K` bound calculated convection coefficients.
-- `DataHeatBalSurface.hh::ItersReevalConvCoeff = 30` is the EnergyPlus
-  inside-convection re-evaluation cadence inside `CalcHeatBalanceInsideSurf*`.
-  The ScriptF-flat official lane now has an explicit
-  `hconv-reeval30-iter20` wrapper using the same cadence and the
-  `energyplus-surf-initial` CTF history seed. With the active twenty-pass cap,
-  this source-aligned cadence is behaviorally neutral: MAT, zone surface
-  convection, air storage, inside-surface iteration count, floor storage, floor
-  inside/outside conduction, floor inside hconv, floor inside convection, and
-  roof outside convection RMSEs all match the no-override active lane
-  bit-for-bit. The `hconv-reeval2` wrapper remains a rejected compensation
-  probe: it lowers overall/floor storage RMSE (`28.786920 W` to
-  `27.005834 W`) and iteration-count RMSE (`10.643041` to `8.639204`), but it
-  worsens MAT (`0.037329 C` to `0.037718 C`), air storage (`9.127258 W` to
-  `9.576803 W`), floor inside hconv (`0.025744` to `0.037803 W/m2-K`), and
-  floor inside convection (`13.602803 W` to `17.038813 W`).
-- `ConvectionCoefficients.cc::CalcASHRAEDetailedIntConvCoeff` dispatches
-  inside `SurfaceConvectionAlgorithm:Inside,TARP` surfaces through
-  `CalcASHRAETARPNatural(SurfTempIn, RefAirTemp, -CosTilt)`, using ASHRAE
-  vertical-wall and Walton stable/unstable horizontal-or-tilt correlations.
-- `CalcHeatBalanceOutsideSurf` solves the no-movable-insulation exterior face
-  temperature with `-SurfCTFConstOutPart`, current `CTFCross[0] * SurfTempIn`,
-  absorbed outside source terms, and exterior convection/radiation coefficients.
-- `ConvectionCoefficients.cc::InitExtConvCoeff` dispatches
-  `SurfaceConvectionAlgorithm:Outside,DOE-2` through the DOE-2 branch:
-  windward/leeward MoWITT forced terms, ASHRAE TARP natural convection, and
-  EnergyPlus roughness multipliers. Rust now preserves explicit
-  `SurfaceConvectionAlgorithm:Outside` objects in the typed model and uses the
-  DOE-2 helper in the default exterior coefficient path when that setting is
-  `DOE-2`; full exterior iteration parity remains diagnostic work.
-- `DataSurfaces.cc::SetSurfaceWindSpeedAt` derives per-surface
-  `SurfOutWindSpeed` from EPW wind speed, weather-station wind profile
-  defaults, building terrain, and each surface centroid height. Rust now applies
-  the same terrain profile and `WeatherManager.cc::interpolateWindDirection`
-  timestep wind speed/direction values for diagnostic exterior convection
-  instead of using raw hourly EPW wind directly, and keeps `NoWind` surfaces at
-  zero local wind.
-- `ConvectionCoefficients.cc::InitExtConvCoeff` also linearizes exterior
-  longwave exchange into `SurfHSkyExt`, `SurfHGrdExt`, and `SurfHAirExt` using
-  outside thermal absorptance, `ViewFactorSkyIR`, `ViewFactorGroundIR`, and
-  `SurfAirSkyRadSplit = sqrt(0.5 * (1 + CosTilt))`. `CalcHeatBalanceOutsideSurf`
-  then uses `(SurfHConvExt + SurfHAirExt) * TempExt + SurfHSkyExt * TSky +
-  SurfHGrdExt * TGround` in the outside-face balance and reports
-  `SurfQdotRadOutRepPerArea` from the same sky/air/ground terms. Rust now
-  carries a diagnostic equivalent radiation coefficient/reference built from
-  those three terms instead of the prior fixed exterior longwave coefficient,
-  and the roof outside radiation/convection report rows share that helper.
-  The EnergyPlus-shaped quick-outside probes now cache the exterior report
-  terms from the outside balance itself so `SurfHConvExt`-like convection and
-  `SurfH*Ext`-like radiation state are reused for reporting instead of being
-  recomputed from the solved face temperature. EnergyPlus evaluates those
-  exterior coefficients through `InitExtConvCoeff` before the same-timestep
-  outside-face temperature solve, so the quick-outside diagnostic path now also
-  freezes the coefficient evaluation temperature at the timestep-start
-  `SurfOutsideTempHist(1)` analogue while still reporting heat gains from the
-  solved outside face temperature.
-- `WeatherManager.cc` sets timestep rain from interpolated liquid
-  precipitation using `IsRainThreshold = 0.8 / TimeStepsInHour`, while
-  `HeatBalanceSurfaceManager.cc::CalcHeatBalanceOutsideSurf` resets exposed wet
-  exterior surfaces to `SurfHConvExt = 1000.0` and uses
-  `SurfOutWetBulbTemp` as the convection reference. Rust now mirrors this
-  exposed wet-surface branch for the diagnostic exterior balance and hourly
-  exterior report rows by applying the EnergyPlus hourly interpolation weights
-  to liquid precipitation, mixing the dry and wet convection terms, and using
-  the EnergyPlus Psychrometrics wet-bulb formula with timestep-interpolated
-  dry-bulb, relative humidity, and barometric pressure. The run-period and
-  warmup timestep shells now pass a
-  timestep-aware weather context for exterior forcing: dry-bulb follows
-  EnergyPlus hourly interpolation, rain uses the current timestep flag,
-  exterior convection uses timestep wind speed/direction, exterior longwave
-  uses timestep-interpolated horizontal infrared radiation/sky temperature,
-  and exterior solar balance/report terms use the same timestep solar
-  interpolation helper that backs the hourly incident-solar diagnostic.
-  `SolarShading.cc::AnisoSkyViewFactors` and
-  `HeatBalanceSurfaceManager.cc` show that `SurfQRadSWOutIncident` uses
-  direct beam, Perez anisotropic sky diffuse (`SurfAnisoSkyMult *
-  DifSolarRad`), and ground-reflected beam/diffuse terms. Rust now mirrors
-  that anisotropic sky multiplier and the default ground-reflectance term for
-  unobstructed exterior opaque surfaces, keeps the EnergyPlus split between
-  shadowing-period beam incidence and current timestep `SOLCOS` for Perez
-  sky/ground diffuse terms, applies a shadowing-period 0/1 sunlit proxy to the
-  Perez circumsolar term corresponding to EnergyPlus `SurfSunlitFrac` for all
-  exterior opaque surfaces including horizontal roofs, and writes diagnostic
-  beam, sky diffuse, and ground diffuse incident component rows next to the
-  total incident solar row; detailed shadowing fractions and obstruction
-  reflection factors remain outside the diagnostic claim boundary. At
-  sunrise/sunset shadowing-period edges, current timestep `SOLCOS` still drives
-  Perez coefficients, but circumsolar brightening is gated off when the
-  averaged shadowing-period position is below the horizon, matching EnergyPlus
-  lower sky-diffuse reports at those edges. `WeatherManager.cc` derives
-  weather day-of-year from the run-period
-  calendar and the EPW leap-year allowance rather than from the source year
-  printed on each TMY record, so Rust uses the deterministic non-leap
-  run-period ordinal for solar position and shadowing-period coefficients.
-  Surface temperatures, surface/zone conduction/source report rows, and
-  latent zone-air heat-balance rate rows are averaged over the zone timesteps
-  before being written as hourly diagnostics.
-- `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
-  builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
-  `SumHATref`, internal gains, air-exchange terms, and third-order history
-  terms. `calcZoneOrSpaceSums`/`calcSumHAT` are the source anchors for the
-  surface convection sums. Rust now stores the zone-level `SumHA`,
-  `SumHATsurf`, and `SumHATref` diagnostic state from current inside
-  convection coefficients and surface temperatures, snapshots
-  `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` in
-  `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
-  and third-order zone-air temperature helpers. Heat-balance runtime selection
-  now exposes `CompatibilityHeatBalanceAlgorithm`, `DiagnosticHeatBalanceProbe`,
-  and the probe-agnostic `HeatBalanceRuntimeConfig` so compatibility and probe
-  lanes have separate typed APIs. `DiagnosticHeatBalanceProbe`, the legacy
-  `HeatBalanceZoneAirAlgorithm` selector, and all long-form probe matching live
-  under the `diagnostic_probes` module boundary. That boundary resolves each
-  selector to `HeatBalanceRuntimeConfig` before compatibility runtime code is
-  entered; the CLI delegates selector parsing and display names to the same
-  module instead of matching the diagnostic variants itself. The default
-  predictor equation itself remains the simplified diagnostic shell
-  until all coefficient inputs are wired from source-mapped runtime state.
-  Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance
-  formulas used by `AirPowerCap`
-  (`PsyRhoAirFnPbTdbW` and `PsyCpAirFnW`), and the active dynamic diagnostic
-  solver updates `ZoneHeatBalanceState::air_heat_capacity_j_per_k` from the
-  timestep weather-context pressure/RH proxy immediately before zone-air
-  coefficient construction. This source-order wiring lowered the active
-  `1ZoneUncontrolled` MAT RMSE to `0.022407 C` and the coefficient-level
-  surface-convection RMSE to `4.277641 W`. The actual EnergyPlus-owned
-  `ZoneAirHumRat` path is still a promotion blocker.
-- `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
-  Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
-  Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
-  now emits diagnostic zone series with those EnergyPlus names from the current
-  internal gain, `SumHA/SumHATsurf/SumHATref`, MAT, and air-capacity state. The
-  air energy storage output follows EnergyPlus reporting semantics by using
-  `TempIndCoef - TempDepCoef * MAT` for the analytical diagnostic lane and the
-  timestep finite-difference expression for the third-order probe, then
-  averaging the zone-timestep rate terms into the hourly diagnostic sample.
-  Official dynamic reports can compare these latent air-balance terms before a
-  conformance claim is attempted.
-- `SimulationManager.cc` documents the high-level order for the relevant
-  timestep path as `ManageSurfaceHeatBalance` ->
-  `CalcHeatBalanceOutsideSurf` -> `CalcHeatBalanceInsideSurf` ->
-  `ManageAirHeatBalance` -> `CalcHeatBalanceAir` -> `ManageHVAC` ->
-  `ManageZoneAirUpdates(PREDICT)`. `HeatBalanceAirManager.cc` confirms that
-  `CalcHeatBalanceAir` delegates to `HVACManager::ManageHVAC`, and
-  `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctAirTemp`
-  applies the `ThirdOrder`, `AnalyticalSolution`, or `EulerMethod` branch from
-  freshly calculated `SumHA/SumHATsurf/SumHATref` terms. Rust still updates the
-  default MAT through the simplified zone-air shell before the current surface
-  CTF pass, then records the EnergyPlus-shaped coefficients afterward. Any
-  future analytical/coefficient probe should therefore be isolated from the
-  default lane until the inside-surface, zone-air correction, and history-update
-  order is ported as one coherent path. The tracked
-  `official-dynamic-heat-balance-analytical-probe` currently regresses MAT and
-  zone-air heat-balance terms in the same surface-state direction as the
-  third-order probe. The analytical surface-first probe isolates the next
-  call-order step by delaying zone-air correction until after the current
-  surface pass. It lowers MAT and inside-face temperature RMSE relative to the
-  default lane, but still regresses zone-air heat-balance rates and aggregate
-  conduction, so it remains diagnostic-only until the full inside-surface,
-  HVAC/air-correction, and history-update order is ported. The combined
-  all-CTF analytical surface-first probe lowers the same air and surface
-  focus metrics further while leaving floor inside conduction as the top
-  bottleneck, which keeps mass-floor CTF face/history parity as the next
-  source-mapped target. The analytical coupled probe adds a diagnostic
-  same-timestep surface rebalance after the analytical MAT correction; it
-  lowers floor and aggregate conduction relative to the combined surface-first
-  lane, but remains behind the three-pass surface iteration lane and slightly
-  worsens MAT/air-storage. Pairing the coupled rebalance with three surface
-  passes moves the conduction and latent air-balance best-focus rows again:
-  floor inside conduction drops to RMSE `924.427599`, floor outside conduction
-  to `508.231496`, and zone aggregate conduction to `93.616120`, while MAT
-  remains best in the one-pass all-CTF analytical surface-first lane. The
-  previous-inside outdoor boundary probe then nudges floor inside conduction to
-  RMSE `923.733908` and floor outside conduction to `507.588138`, but leaves
-  zone aggregate conduction and the latent zone-air balance best rows with the
-  coupled iter3 lane. A DOE-2 exterior-only sibling isolates the
-  `SurfaceConvectionAlgorithm:Outside,DOE-2` coefficient impact without also
-  enabling the quick-conduction outside-face branch: at three surface passes it
-  lowers floor storage RMSE to `1120.518407`, floor inside conduction to
-  `766.667596`, floor outside conduction to `373.650657`, and MAT to
-  `2.186220`, while regressing zone aggregate conduction to `124.010025` RMSE.
-  This made DOE-2 exterior convection a measured source term before it was wired
-  to the default source-declared path. A direct quick-outside plus DOE-2
-  three-pass sibling lowers
-  the quick-only iter3 floor storage row to RMSE `771.500589`, floor inside
-  conduction to `587.797421`, and floor outside conduction to `227.407205`, but
-  raises zone aggregate conduction to `128.396815` and the latent air-balance
-  rows (`90.988382` surface convection, `95.018026` air storage). This narrows
-  the next target to coupled surface/zone source ordering rather than only the
-  exterior coefficient expression. Adding the EnergyPlus advanced outside-face
-  zone aggregate as a latent diagnostic row exposes the exterior side of that
-  same bottleneck: after the explicit exterior longwave split plus timestep
-  weather/solar/wind output alignment and EnergyPlus surface-local wind-speed
-  profiling, the default lane has `1926.324353` RMSE, and quick-outside iter3
-  lowers it to `584.195603`, matching the explicit quick-outside plus DOE-2
-  iter3 lane. The active tracker now carries 65 rows by
-  adding wall/roof outside convection, net thermal radiation, absorbed solar,
-  incident solar, and wall outside-conduction diagnostics so the remaining
-  outside aggregate movement can be tied to exterior source rows before runtime
-  promotion. The same source alignment
-  lowered the active rain-onset max spike and default roof outside source
-  bottleneck. Adding EnergyPlus timestep interpolation for horizontal infrared
-  radiation/sky temperature then lowers quick-outside iter3 roof net thermal
-  radiation RMSE to `177.367681`, roof outside convection heat-gain RMSE to
-  `214.438811`, and roof outside convection coefficient RMSE to `0.071865`;
-  the default roof outside convection heat-gain RMSE remains `7997.333666`.
-  The active top quick-outside bottleneck has moved back to `ZN001:FLR001`
-  surface heat storage (`695.637088` RMSE), keeping floor mass CTF
-  history/order parity and zone aggregate conduction as the next source-mapped
-  target rather than exterior wind/convection alignment. A direct runtime
-  candidate that preserved a separate adiabatic mass-CTF outside face/history
-  instead of syncing it to the current inside face was tested and rejected for
-  now: using the current zone boundary value made floor outside conduction the
-  top bottleneck, while using the previous inside face left floor heat-storage
-  RMSE essentially unchanged (`684.141484`). Re-testing the same idea after
-  timestep-interpolated exterior longwave alignment on the interleaved
-  twenty-pass lane also rejects it: freezing the adiabatic outside face at the
-  timestep-start inside temperature lowers neither the active bottleneck nor
-  the zone aggregate, raising floor heat-storage RMSE to `854.900255` and zone
-  outside aggregate conduction RMSE to `871.940554`. The EnergyPlus
-  InitHeatBalance-shaped CTF initial-history lane is a useful isolated target:
-  with five surface passes and the corrected boundary outside-history/U-value
-  flux seed, the first-sample floor history deltas drop to `462.011526 W`
-  inside and `641.143796 W` outside, while floor heat storage lands at
-  `611.120087` RMSE, floor inside conduction at `518.073223`, floor outside
-  conduction at `133.967463`, and zone outside aggregate conduction at
-  `553.316167`. The same lane badly exposes coupled source timing, however:
-  floor inside longwave and convection rise to `1390.133963` and `926.220009`
-  RMSE, MAT is `2.112462`, and the latent air-storage row is `167.005552`.
-  Keep it as a source-aligned probe lane until the zone-air/source-term ordering
-  work can absorb those air-side regressions. The same quick-outside path with
-  eight surface passes isolates
-  surface-iteration sensitivity further: floor heat storage falls to
-  `629.603383` RMSE and floor outside conduction to `140.971525`, while MAT
-  (`2.112893`) and air storage (`166.324263`) continue to regress relative to
-  the simpler paths; roof outside convection and net thermal radiation are now
-  down to `214.451575` and `177.821078`. This lane is tracked as a
-  convergence/ordering diagnostic rather than a default. An
-  eight-pass interleaved surface/zone-air correction fork then lowers floor
-  heat storage further to `618.031709`, floor inside conduction to
-  `520.860751`, floor outside conduction to `138.920627`, and zone outside
-  aggregate conduction to `581.252181`, while MAT remains slightly worse
-  (`2.115718`). Raising the same interleaved fork to twenty passes pushes the
-  floor rows further (`578.427201` heat storage, `503.533184` inside
-  conduction, and `115.570807` outside conduction) and lowers MAT to
-  `2.147988` with air storage at `172.470431`; roof outside convection and net
-  thermal radiation stay near `214.357183` and `178.357290`, so the top
-  bottleneck is again floor heat storage. Adding a grey interior-longwave
-  exchange update to the same twenty-pass interleaved fork first exposed a
-  floor outside-face reporting/order trade-off: MAT fell to `0.484295`,
-  surface-convection and air-storage RMSE to `21.126984` and `27.010902`,
-  floor inside conduction to `90.441963`, floor heat storage to `369.424200`,
-  and zone outside aggregate conduction to `328.987074`, but floor outside
-  conduction regressed to `399.588084` and became the top bottleneck. A weaker
-  per-pass previous-inside adiabatic boundary toggle was a no-op at that
-  precision. Freezing only the adiabatic outside-face CTF balance at the
-  timestep-start inside temperature across the interleaved passes matches the
-  EnergyPlus `CalcHeatBalanceOutsideSurf` before `CalcHeatBalanceInsideSurf`
-  and `UpdateThermalHistories` reporting order for regular adiabatic/partition
-  surfaces. That accepted source-order probe moves the active lane again: MAT
-  is `0.385438`, floor inside and outside face temperature RMSE are
-  `0.267604` and `0.267603`, floor inside conduction is `69.374470`, floor
-  outside conduction falls to `50.562260`, floor heat storage to `119.606076`,
-  and zone outside aggregate conduction to `155.538581`. Roof outside
-  convection and net thermal radiation become the new top source rows at
-  `189.364767` and `171.066926`, so the next source-order target is exterior
-  radiation/convection source coupling after the adiabatic floor CTF reporting
-  order is no longer the top bottleneck. Freezing the quick-outside exterior
-  convection/radiation coefficient evaluation temperature at the timestep-start
-  outside face, matching the `InitExtConvCoeff` call before the TH11 solve,
-  resolves the sharp post-rain roof spike: the active lane drops roof outside
-  convection RMSE from `177.495366` to `57.796045`, max-abs from
-  `6379.490036` to `609.232339`, and roof net thermal radiation RMSE from
-  `161.732738` to `34.308908`. At the November 11 11:00 focus hour, roof
-  outside face temperature moves from a `7.576803 C` delta to `0.000329 C`,
-  and `SurfHConvExt` analogue moves from a `0.768933` delta to `0.000757`.
-  The next active bottleneck is back on zone aggregate outside conduction,
-  floor storage, and inside-face coupling rather than exterior HConv/source
-  sampling.
-  Extending the previous-inside path with the
-  source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
-  inside conduction to RMSE
-  `812.566220`, floor outside conduction to `397.351373`, floor heat storage
-  to `1198.781640`, zone aggregate conduction to `84.217233`, and MAT to
-  `2.573470`, becoming the current best focus lane for those rows plus the
-  latent zone-air heat-balance rates. The five-pass quick-outside probe lowers
-  the active floor/aggregate bottlenecks again (`800.087434` floor inside
-  conduction RMSE, `386.128809` floor outside conduction RMSE, `1174.412273`
-  floor heat-storage RMSE, and `78.393234` zone aggregate conduction RMSE) at
-  the cost of a small MAT regression, so it is tracked as iteration-sensitivity
-  evidence rather than a default promotion. The DOE-2 exterior-convection fork
-  lowers floor storage to RMSE `752.765953`, floor inside conduction to
-  `576.102819`, and floor outside conduction to `225.936049`, but regresses the
-  zone aggregate row to `100.797367` and the latent air-balance rates. The grey
-  interior-longwave fork lowers floor storage further to RMSE `579.551277`, but
-  also gives back zone aggregate conduction (`122.199401` RMSE). Combining
-  DOE-2 exterior convection and grey interior longwave improves MAT
-  (`0.972533` RMSE), zone surface convection (`52.581726` RMSE), floor inside
-  conduction (`293.417817` RMSE), and floor storage (`575.885599` RMSE), but
-  raises floor outside conduction to `423.487145` RMSE and storage max-abs to
-  `8287.121494`. The EnergyPlus `ViewFactorInfo` EIO probe for
-  `1ZoneUncontrolled` now anchors the Script F factor orientation used by the
-  Rust diagnostic. That source-aligned ScriptF interior-longwave lane is not a
-  promotion candidate yet: it regresses floor storage and zone aggregate rows
-  relative to the grey longwave forks, which indicates the remaining bottleneck
-  is the broader coupled surface/zone/source-term path rather than only the
-  ScriptF factor math. These forks narrow the next source-mapped target to
-  coherent exterior radiation, interior longwave, quick/slow boundary branches,
-  source coupling, surface iteration, zone-air correction, and CTF history
-  commit order rather than a single post-correction surface feedback pass. The
-  previous-inside
-  outdoor/adiabatic boundary probe slightly lowers floor inside conduction
-  again to RMSE `923.728787`, but does not improve floor heat storage
-  (`1422.231349` versus `1422.193225`) or zone aggregate conduction.
+  convection before algorithm selection. `LowHConvLimit = 0.1` and
+  `HighHConvLimit = 1000` bound calculated coefficients.
+  `DataHeatBalSurface.hh::ItersReevalConvCoeff = 30` owns the inside-loop
+  re-evaluation cadence; `MaxAllowedDelTemp = 0.002 C` is the mapped
+  convergence threshold. Changing cadence to reduce a residual is not a
+  substitute for preserving source order.
+- `CalcASHRAEDetailedIntConvCoeff` dispatches inside TARP through
+  `CalcASHRAETARPNatural(SurfTempIn, RefAirTemp, -CosTilt)` using ASHRAE
+  vertical and Walton stable/unstable horizontal-or-tilt correlations.
+- `CalcHeatBalanceOutsideSurf` uses `-SurfCTFConstOutPart`, current
+  `CTFCross[0] * SurfTempIn`, absorbed sources, and exterior coefficients in
+  the no-movable-insulation balance. `InitExtConvCoeff` precedes that solve;
+  the coefficient-evaluation temperature, solved outside temperature, inside
+  solve's outside-history snapshot, and reporting state are distinct owners.
+- Outside DOE-2 combines windward/leeward MoWITT forced terms, TARP natural
+  convection, and roughness multipliers. `SetSurfaceWindSpeedAt` uses weather
+  station defaults, terrain, and surface centroid height; NoWind keeps local
+  wind zero. Timestep wind speed/direction is not raw-hourly weather.
+- Exterior longwave splits `SurfHSkyExt`, `SurfHGrdExt`, and `SurfHAirExt`
+  using outside absorptance, sky/ground IR view factors, and
+  `SurfAirSkyRadSplit = sqrt(0.5 * (1 + CosTilt))`. The balance uses
+  `(SurfHConvExt + SurfHAirExt) * TempExt + SurfHSkyExt * TSky +
+  SurfHGrdExt * TGround`; reporting reuses the corresponding coefficient
+  state rather than recomputing it from the solved face temperature.
+- Weather rain uses `IsRainThreshold = 0.8 / TimeStepsInHour`. Exposed wet
+  surfaces use `SurfHConvExt = 1000.0` and `SurfOutWetBulbTemp`. Exterior
+  forcing consumes timestep-interpolated dry bulb, wind, horizontal IR/sky
+  temperature, precipitation, and solar inputs in both warmup and reporting
+  periods. Weather day-of-year follows the run calendar and EPW leap policy,
+  not the printed TMY source year.
+- `AnisoSkyViewFactors` and the surface manager split incident shortwave into
+  beam, Perez anisotropic sky diffuse, and ground-reflected terms. Current
+  timestep `SOLCOS` and shadowing-period beam/sunlit state are separate inputs;
+  the legacy unobstructed 0/1 sunlit proxy does not establish detailed
+  obstruction/reflection parity.
+- `predictSystemLoad`, `calcZoneOrSpaceSums`, and `calcSumHAT` own
+  `TempDepCoef`, `TempIndCoef`, `SumHA`, `SumHATsurf`, and `SumHATref`.
+  Moist-air capacity and temperature history must come from the applicable
+  state owner. A weather-RH capacity proxy in a diagnostic lane does not
+  establish the `ZoneAirHumRat` path.
+- The relevant timestep order is `ManageSurfaceHeatBalance` with outside
+  then inside surface work, followed by `ManageAirHeatBalance`,
+  `CalcHeatBalanceAir`, `ManageHVAC`, and zone-air predictor/corrector work.
+  `CalcHeatBalanceAir` delegates to `HVACManager::ManageHVAC`;
+  `correctAirTemp` selects ThirdOrder, AnalyticalSolution, or EulerMethod
+  from freshly formed convection/source coefficients. Radiation, face solve,
+  air correction, and history commit form one state transition.
+- `UpdateThermalHistories` computes current inside/outside flux slot 1,
+  flips the outside flux sign for `SurfOpaqOutFaceCondFlux`, then shifts
+  temperature/flux into history slot 2 in the `SimpleCTFOnly` path. The Rust
+  retained history vectors represent slot 2 onward, not current slot 1.
+  An adiabatic report-only or history-only face replacement cannot be assumed
+  equivalent to the coupled transition.
+- `ReadWeatherForDay::firstHrInterpUseHr1` and the RunPeriod
+  `First Hour Interpolation Starting Values` choose Hour1 or Hour24 of the
+  first weather day. The default is Hour24 of that day, not the last EPW
+  file record. Source weather initialization and repeated-day warmup are
+  distinct from copying the warmup end state into the reporting period.
 
-Current Rust boundary:
+### Legacy diagnostic boundary
 
-- `ep_model::Construction.layers` stores material IDs from outside to inside;
-  `outside_layer` remains the outside-face compatibility field.
-- `ep_compare` reads EIO `CTF` coefficient rows and associates them with the
-  preceding `Construction CTF` row for coefficient-level oracle checks.
-- The diagnostic CTF seed report preserves each EIO construction's `#CTFs` and
-  `Time Step {hours}` metadata so future runtime work can distinguish
-  coefficient-term depth from actual history cadence before changing surface
-  history advancement.
-- Heat-balance report generation writes `compare-digest.json` alongside the
-  full `compare-summary.json` and markdown report. The digest keeps manifest,
-  warmup, CTF seed, bottleneck, and series-level delta metadata but omits full
-  hourly `sample_rows`, so diagnostic gates can validate large official dynamic
-  lanes without repeatedly parsing the full trace payload.
-- The compact digest and markdown report also carry Rust-only
-  `zone_air_first_sample_trace` and `surface_first_sample_trace` tables for the
-  first reported hour. The zone-air table records MAT, previous MAT history,
-  EnergyPlus-style third-order coefficients, denominator, and reconstructed
-  solution for each first-hour substep. In the active all-CTF, ScriptF-flat,
-  20-iteration lane this proves the Rust third-order solution is internally
-  consistent to about `2.5e-7 C` on the first substep, while a
-  timestep-frequency EnergyPlus oracle probe still places the first-substep
-  MAT about `0.0065655 C` lower; the remaining blocker is therefore upstream of
-  hourly averaging and downstream of the basic third-order formula. The surface
-  table exposes the timestep dry-bulb sequence and the matching per-surface
-  outside balance terms before hourly averaging. EnergyPlus `WeatherManager`
-  seeds the first weather-day
-  interpolation from either Hour 1 or Hour 24 of the first run-period weather
-  day via `firstHrInterpUseHr1` in `ReadWeatherForDay`, with the RunPeriod field
-  `First Hour Interpolation Starting Values` parsed in `GetRunPeriodData`.
-  Rust now preserves this RunPeriod enum and defaults to EnergyPlus `Hour24`
-  instead of wrapping first-hour interpolation to the final EPW record. For
-  `1ZoneUncontrolled`, the active lane's first-hour dry-bulb trace moved from
-  the file-wrap sequence `2.25, 0.50, -1.25, -3.00 C` to the source-aligned
-  `-6.00, -5.00, -4.00, -3.00 C`; first-sample zone outside opaque conduction
-  delta fell from `821.886055 W` to `3.529915 W`, and floor storage max-abs
-  fell from `701.082304 W` to `242.511509 W`.
-- EnergyPlus `UpdateThermalHistories` first computes current CTF inside and
-  outside fluxes into `SurfInsideFluxHist(1)` and `SurfOutsideFluxHist(1)`,
-  flips the outside flux into `SurfOpaqOutFaceCondFlux` for reporting, then
-  shifts the current temperature/flux slots into history slot 2 for the next
-  timestep in the `SimpleCTFOnly` path. The Rust history vectors intentionally
-  represent EnergyPlus history slot 2 and later, not the current slot 1; the
-  remaining mass-floor storage work should therefore target the warmup/run-period
-  history handoff and coupled source update order rather than another outside
-  report sign flip.
-- `ExecutionPlan.stages` now uses the EnergyPlus heat-balance source-order
-  contract from `GetHeatBalanceInput` through `CheckWarmupConvergence` as the
-  actual planning barrier sequence, including EMS callback barriers and the
-  nested `ManageSurfaceHeatBalance`/`ManageAirHeatBalance`/
-  `UpdateThermalHistories` sequence. `ExecutionPlan.compatibility_stages`
-  keeps the same heat-balance contract for reports. This is an ordering and
-  trace scaffold only; it does not promote the active official dynamic case
-  until the numerical bottlenecks below pass.
-- The active 1Zone dynamic lane now emits signed inside-solve CTF current and
-  history source splits at each surface storage max sample. For `ZN001:FLR001`
-  sample 2435, the aggregate history delta (`+312.812546 W`) decomposes as
-  inside conduction signed delta (`-150.334642 W`) minus current CTF signed
-  delta (`-463.147188 W`). The current CTF split shows only `+4.714888 W`
-  outside-current mismatch but `-467.862076 W` inside-current mismatch, so the
-  next floor-storage work should inspect inside current-term temperature
-  alignment/update timing before treating the remaining error as pure history
-  handoff.
-- The compact diagnostic also emits annual CTF current/history split RMSE by
-  surface. In the active all-CTF, ScriptF-flat, warmup-20, 20-surface-iteration
-  lane, `ZN001:FLR001` has `inside_current_inside_term_delta.rmse_delta_c =
-  231.720702 W` and `inside_current_outside_term_delta.rmse_delta_c =
-  2.886563 W`; the max current-inside split is `717.882711 W`. Roof/wall
-  current-inside RMSE stays below `0.8 W`. This confirms the next numerical
-  bottleneck is floor inside-face current-term timing/source alignment, not the
-  outside current term or a broad coefficient mismatch.
-- The same annual CTF table now exposes Rust's history temperature/flux split
-  magnitudes beside the aggregate oracle-vs-Rust history mismatch. Because
-  EnergyPlus hourly output only exposes total history contribution, these
-  split columns are zero-baseline Rust magnitudes rather than independent
-  oracle split deltas. In the active lane, `ZN001:FLR001`
-  `inside_history_delta.rmse_delta_c = 228.537244 W`, while the Rust split
-  magnitudes are `in_hist_temp_rms_w = 231910.143809 W` and
-  `in_hist_flux_rms_w = 864.878867 W`; roof/wall history split magnitudes are
-  zero in this diagnostic because their CTF history slots remain effectively
-  steady/no-mass. The next floor-storage probe should therefore focus on
-  floor temperature-history state alignment and the current inside-face source
-  timing before treating the residual as a flux-history handoff problem.
-- The diagnostic now also emits annual inside-solve source deltas for each
-  surface, using signed zero-baseline source mismatches. In the active lane,
-  `ZN001:FLR001` has `inside_face_temperature_delta.rmse_delta_c =
-  0.017176 C`, `implied_solve_numerator_delta.rmse_delta_c = 293.827236 W`,
-  `tracked_solve_source_delta.rmse_delta_c = 275.530580 W`, and
-  `solve_source_residual_delta.rmse_delta_c = 30.271817 W`. The tracked
-  source split is dominated by `inside_history_delta.rmse_delta_c =
-  228.537244 W` and `reference_air_coefficient_source_delta.rmse_delta_c =
-  117.937364 W`; `reference_air_temperature_source_delta.rmse_delta_c =
-  15.537367 W`, `inside_net_longwave_delta.rmse_delta_c = 10.514138 W`, and
-  `outside_temperature_source_delta.rmse_delta_c = 0`. This makes the next
-  numerical work a floor history-state plus inside reference-air coefficient
-  alignment problem, not an untracked solve residual problem.
-- Re-running the `hconv-reeval2` candidate with the signed split lowers the
-  active top RMSE from `28.786920` to `27.005834` W on floor storage, but it is
-  not promotion-ready: MAT RMSE rises from `0.037329` to `0.037718 C`, floor
-  inside-convection RMSE rises from `13.602803` to `17.038813 W`, and the
-  max-sample history/current split shifts to sample 1091 with reference-air
-  cancellation (`-2.107333 W` total from `79.069518 W` absolute split) while
-  current-inside mismatch remains dominant (`-542.690944 W`). Treat this as a
-  diagnostic lane for hconv/source coupling, not the next active algorithm.
-- `ep_model` and `ep_compiler` preserve material surface roughness names using
-  EnergyPlus roughness categories so future DOE-2/TARP exterior convection
-  ports can use the selected outside layer metadata directly.
-- `ep_runtime` sums layer thermal resistance and available areal heat capacity
-  for the current simplified opaque surface state, stores outside-layer
-  roughness plus CTF coefficient/history slots per surface, and can seed those
-  slots from EIO rows during diagnostic-only heat-balance runs. The default CLI
-  diagnostic seed is
-  limited to steady/no-mass `#CTFs <= 1` constructions while mass-material CTF
-  temperature histories are isolated from the simplified timestep shell. Runtime
-  helpers now encode the EnergyPlus-shaped CTF inside and outside
-  face-temperature equations, and the timestep shell uses the EnergyPlus TARP
-  inside natural convection coefficient in the inside CTF balance. Rust warmup
-  now forwards available EPW weather records into the same diagnostic exterior
-  forcing path used by run-period timesteps, so solar/radiation boundary
-  histories no longer use a dry-bulb-only warmup path. The compiler/runtime
-  shell now honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for the
-  exterior convection coefficient, applies EnergyPlus terrain/centroid
-  wind-speed profiling plus timestep wind speed/direction interpolation before
-  DOE-2/MoWITT forced-convection terms, and uses EnergyPlus-shaped
-  sky/air/ground exterior longwave coefficients in the diagnostic outside
-  balance/report path, with timestep-interpolated weather/solar/horizontal-IR
-  context, EnergyPlus Perez anisotropic sky diffuse for exterior incident
-  solar, and hourly-averaged surface diagnostics. Ground boundary surfaces use
-  the EnergyPlus default `Site:GroundTemperature:BuildingSurface` value of
-  `18.0 C` until explicit `Site:GroundTemperature:*` parsing/model selection
-  is ported. The active grey interior-longwave diagnostic now uses
-  EnergyPlus-style fixed direct surface view factors, rather than zone-area
-  weighting, before applying the grey-pair exchange emissivity. This lowers the
-  newly exposed floor inside longwave RMSE from `137.147093` to `27.742006`,
-  the floor inside convection RMSE from `123.066168` to `41.950371`, MAT RMSE
-  from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
-  from `84.712495` to `38.774428`; floor storage remains the top active
-  diagnostic row at `108.672323` RMSE. Freezing inside convection coefficients
-  at timestep start on the same lane modestly improves the analytical
-  diagnostic candidate: floor storage RMSE falls to `105.876226`, MAT RMSE to
-  `0.116074`, zone surface-convection RMSE to `9.385594`, and floor inside
-  convection RMSE to `39.128925`. A coupled third-order zone-air correction on
-  that frozen-hconv lane then cuts the floor-focused top rows again
-  (`54.593582` floor storage, `31.581604` floor inside conduction,
-  `23.282797` floor outside conduction, and `0.069817` MAT RMSE), but exposes a
-  latent zone-air report/source-order trade-off because surface-convection and
-  air-storage RMSE rise to `29.623453` and `29.666388`. Removing the hconv
-  freeze from that third-order lane slightly improves MAT and those latent
-  air-balance rows (`0.069191`, `28.637227`, and `28.446243` RMSE), but worsens
-  the floor storage/inside/outside conduction rows to `58.289839`, `33.704368`,
-  and `24.970278`, so it is only an isolation probe. A report-only
-  weather-proxy moist-air storage fork keeps the frozen third-order MAT/floor
-  rows unchanged while lowering air-storage RMSE to `5.845285`; the surface
-  convection row stays at `29.623453`, keeping source-order/coefficient timing
-  as the next zone-air target. A previous-MAT surface-convection report sibling
-  rejects the report-reference-temperature hypothesis: MAT/floor/storage rows
-  are unchanged, but the zone surface-convection RMSE rises to `104.589141`.
-  A balance-surface-convection sibling that syncs self-adiabatic outside faces
-  back to the current inside face immediately before CTF history/report commit
-  is also rejected in the current Rust interleaving shell: floor storage RMSE
-  worsens from `54.593582` to `453.783584`, floor outside conduction from
-  `23.282797` to `446.456057`, and MAT from `0.069817` to `0.335157`. This
-  rules out a simple post-inside-solve adiabatic outside-history sync as the
-  next promotion path; the remaining floor CTF error needs the broader
-  EnergyPlus inside/outside/air-balance iteration cadence, not just a final
-  history-slot assignment.
-  A narrower converged-lane follow-up that preserved reported outside-face
-  state but committed adiabatic CTF history temperature/flux from the current
-  inside face also regresses, so the rejection is not just a report-state side
-  effect: floor storage RMSE rises from `52.022146` to `500.413170`, floor
-  outside conduction from `21.976058` to `456.564008`, and the annual floor
-  current/history RMSEs jump from about `401 W` to roughly `3800 W` to
-  `3909 W`.
-  This rules out a history-only current-inside adiabatic commit as the next
-  floor-storage lever.
-  A converged-lane frozen-outside snapshot probe then holds the outside
-  boundary-balance temperature and exterior report terms from the first
-  inside-surface pass through subsequent surface iterations. This improves the
-  floor CTF/storage cancellation rows relative to the active best
-  (`52.022146` to `45.972185` floor storage RMSE, `30.201354` to
-  `26.687843` inside conduction, `21.976058` to `19.445141` outside
-  conduction, and `27.990507` to `20.835446` aggregate outside conduction),
-  but it also regresses `ZN001:ROOF001 / Surface Outside Face Convection Heat
-  Gain Rate` from `19.325833` to `67.850650` RMSE. This points to a real
-  EnergyPlus outside-snapshot cadence lever for floor CTF cancellation, but
-  rejects freezing exterior report terms wholesale; the next narrower probe
-  should separate the inside CTF solve's `SurfTempOutHist` snapshot from
-  current outside-face report-state generation.
-  That narrower converged-lane probe is now wired as an inside-CTF
-  outside-history snapshot: the current outside-face balance/report state is
-  recalculated each surface pass, but the inside CTF solve's current outside
-  temperature term reuses the first-pass outside-face snapshot. It keeps the
-  broad frozen-outside floor benefit while avoiding the roof exterior-report
-  regression: top floor storage RMSE improves from `52.022146` to `45.539704`,
-  floor inside conduction from `30.201354` to `26.437580`, floor outside
-  conduction from `21.976058` to `19.262430`, aggregate inside conduction from
-  `26.355358` to `23.838450`, aggregate outside conduction from `27.990507` to
-  `25.267733`, zone surface convection from `21.105254` to `21.080512`, and
-  air storage from `7.547299` to `7.486249`. The roof outside convection RMSE
-  only moves from `19.325833` to `19.473624`, so the next runtime promotion
-  candidate should carry the inside-CTF-only outside snapshot and leave exterior
-  report-state generation current.
-  A follow-up commit probe that also writes that same inside-CTF outside
-  snapshot into outdoor CTF history slots is a verified no-op: all 99 compared
-  series and all Rust hourly sample rows match the active inside-CTF
-  outside-history lane exactly, including floor storage RMSE `45.539704`, floor
-  inside conduction `26.437580`, floor outside conduction `19.262430`,
-  aggregate outside conduction `25.267733`, zone surface convection
-  `21.080512`, and air storage `7.486249`. This rules out a separate outdoor
-  history-commit cadence mismatch; the persistent floor storage gap is in the
-  inside CTF solve inputs/coupling itself rather than the subsequent outdoor
-  history push.
-  Replacing that lane's grey direct-view-factor interior longwave exchange with
-  the current ScriptF implementation is rejected: floor storage RMSE jumps from
-  `45.539704` to `6293.390244`, floor inside conduction from `26.437580` to
-  `3666.401318`, floor outside conduction from `19.262430` to `2659.919883`,
-  and floor inside net longwave from `24.877762` to `3613.270767`. This keeps
-  ScriptF as a source-porting target, but not as a drop-in improvement until the
-  surrounding EnergyPlus coupled radiation coefficient/update order is mapped.
-  A narrower ScriptF flat-access follow-up keeps the same Hottel ScriptF
-  coefficient generation but applies the matrix with EnergyPlus'
-  `lSR = RecSurf * NumSurfaces + SendSurf` flat access order from
-  `CalcInteriorRadExchange`. This becomes the strongest current 1Zone dynamic
-  candidate: floor storage RMSE falls from `45.539704` to `29.868130`, floor
-  inside conduction from `26.437580` to `17.354885`, floor outside conduction
-  from `19.262430` to `12.667232`, aggregate inside conduction from
-  `23.838450` to `18.204288`, aggregate outside conduction from `25.267733` to
-  `14.690801`, and floor inside longwave drops out of the top eight
-  bottlenecks. The trade-off is still visible in the latent air/report rows:
-  MAT RMSE rises from `0.031384 C` to `0.038412 C`, zone surface convection
-  from `21.080512 W` to `22.090516 W`, and air storage from `7.486249 W` to
-  `9.195009 W`. Treat flat ScriptF access as the new source-aligned promotion
-  candidate, with the next probe focused on zone-air/source reporting coupling
-  and first-sample floor storage max-abs alignment rather than reverting to the
-  grey direct-view-factor lane.
-  A live-reference-air follow-up keeps that ScriptF flat-access path, inside-CTF
-  outside-history snapshots, current longwave, converged surface cutoff, and
-  20-day warmup, but thaws the timestep-start frozen surface reference air
-  during the interleaved surface solve. It improves the latent zone
-  surface-convection row (`22.062956` to `19.657827 W` RMSE, max `212.520279`
-  to `177.745381 W`), but it is rejected for promotion because it regresses the
-  dominant floor CTF rows: floor storage RMSE rises from `28.786920` to
-  `81.570933` and max from `242.511509` to `412.045918`, floor inside
-  conduction RMSE rises from `16.729618` to `47.254164`, and aggregate inside
-  conduction rises from `18.143612` to `54.154851`. This keeps the frozen
-  surface reference air in the current active floor solve and shifts the next
-  zone-convection work toward report/coupling timing or EnergyPlus source-map
-  refinement rather than thawing the surface reference-air input.
-  A surface-reference-air report follow-up keeps that active ScriptF-flat,
-  frozen-reference-air solve but reports inside convection from each surface's
-  stored inside-solve reference-air snapshot. The compatibility-candidate alias
-  now resolves its report flags through the execution variant, so the active
-  lane applies the ScriptF-flat surface reference-air snapshot to individual
-  `SurfQdotConvInRep` rows without changing zone-air `SumHADTsurfs`. Floor
-  inside-convection RMSE drops from `20.828820` to `0.021677 W`, roof from
-  `18.955600` to `0.044044 W`, and wall rows below `0.018 W`, while MAT
-  (`0.006500 C`), zone surface convection (`0.063018 W`), floor storage
-  (`0.175929 W`), and surface conduction stay unchanged. This is now promoted
-  as report alias resolution, not as a zone-air source swap.
-  A final-hconv report sibling recomputes TARP inside convection from final
-  reported surface temperatures and report reference air while leaving the
-  frozen-hconv solver untouched. It is still rejected under the current all-EIO,
-  EnergyPlus-surf-initial compatibility setup: floor storage worsens from
-  `0.175929` to `7.535715 W` RMSE and zone surface convection from `0.063018`
-  to `11.729318 W`. This rules out a simple final `SurfTempIn` TARP-report
-  recompute as the missing EnergyPlus hconv/report timing; keep the frozen
-  solver coefficient path until a source-level `InitIntConvCoeff`/
-  inside-iteration cadence probe can be isolated.
-  A live-hconv solve sibling then keeps the same ScriptF-flat, frozen-reference
-  air, current-longwave, inside-CTF outside-history, and 20-iteration path, but
-  refreshes TARP inside convection coefficients during interleaved solves. It
-  confirms the trade-off expected from EnergyPlus' sparse `InitIntConvCoeff`
-  cadence, but it is rejected for the current all-EIO compatibility gate:
-  individual inside-convection rows improve, while promoted zone/source rows
-  regress. Floor inside-convection RMSE drops from `20.828820` to `1.674260 W`
-  and roof from `18.955600` to `1.230614 W`, but zone surface convection rises
-  from `0.063018` to `4.500161 W`, floor storage from `0.175929` to
-  `7.581421 W`, and floor outside conduction from `0.075458` to `3.321042 W`.
-  Keep frozen inside convection in the active floor solve; the remaining
-  convection work should map EnergyPlus' exact initialization/report timing
-  instead of live-updating hconv every interleaved pass.
-  The active inside-solve max-sample decomposition now splits the reference-air
-  source delta into hconv-coefficient and reference-air-temperature components.
-  At the floor storage max sample, the implied numerator delta is
-  `646.261894 W`; tracked source coverage is `557.721918 W` (`86.299676%`).
-  The reference-air source contributes `156.447929 W`, but `153.850543 W` of
-  that comes from the hconv coefficient and only `2.597386 W` from the inferred
-  reference-air temperature. The same row splits the implied numerator into
-  `508.476696 W` of inside-temperature movement and `137.785198 W` of solve
-  denominator movement. This makes `InitIntConvCoeff`/inside-iteration cadence
-  the next hconv target; it does not justify thawing the surface reference-air
-  or live-updating hconv through every interleaved solve pass.
-  Adding the EnergyPlus advanced
-  `Surface Inside Face Heat Balance Calculation Iteration Count` row now shows
-  the first-hour cadence is aligned on the active source-order compatibility lane:
-  the first ten hourly counts are `18/18`, `15/15`, `24/24`, `21/21`, `11/11`,
-  `17/17`, `18/18`, `31/31`, `34/34`, and `37/37` for oracle/Rust. The broad
-  annual row still shows occasional one-iteration differences, but this no
-  longer explains the first-substep MAT/floor offset. Keep the next solver work
-  on repeated-day surface/zone source fixed-point alignment.
-  An inside-CTF report probe then tests whether EnergyPlus report/source
-  conduction should use the outside temperature snapshot consumed by the last
-  inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
-  outside face temperature. It is rejected as a promotion path: top floor
-  storage and individual floor inside/outside conduction remain unchanged
-  (`28.786920`, `16.729618`, and `12.216935 W` RMSE), while zone opaque
-  aggregate conduction regresses from `18.143612` to `22.208305 W` inside and
-  from `11.590547` to `12.785602 W` outside. This keeps the current individual
-  surface conduction report path intact and shifts the aggregate conduction
-  question back to EnergyPlus advanced report-variable timing rather than the
-  inside-CTF outside snapshot alone.
-  A follow-on EnergyPlus source recheck of `UpdateThermalHistories` confirmed
-  that the advanced zone aggregate rows are sums of the per-surface opaque
-  report terms (`SurfOpaqInsFaceCond`/`SurfOpaqOutFaceCond`). A diagnostic Rust
-  probe therefore made the zone aggregate accumulator sum the same per-surface
-  report helpers used by individual surface conduction outputs. It is a no-op
-  against the active ScriptF-flat lane: MAT, surface convection, air storage,
-  zone opaque inside/outside aggregate conduction, floor inside/outside
-  conduction, and floor storage all keep identical RMSE values (`0.037329`,
-  `22.062956`, `9.127258`, `18.143612`, `11.590547`, `16.729618`,
-  `12.216935`, and `28.786920`). This rules out zone-state-vs-surface-report
-  accumulation as the next bottleneck; keep the remaining aggregate work on the
-  upstream surface/source/history values and EnergyPlus report timing.
-  The dynamic probe summary also carries a zone surface-convection report
-  closure check against the signed sum of individual
-  `Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`).
-  After alias-resolution, individual surface report rows are near oracle but
-  `SumHADTsurfs` remains an independent EnergyPlus report source, so EnergyPlus
-  `CalcZoneComponentLoadSums`/`SumHADTsurfs` cannot be approximated as a direct
-  negative of the individual surface report rows. Keep the remaining work on
-  `SurfTempInTmp`, reference-air timing, and hconv/source ownership. A
-  2026-06-20 warmup day-end trace adds the decisive boundary evidence:
-  EnergyPlus `Warmup {20} RUN PERIOD 1` ends at `ZONE ONE` MAT
-  `-0.606928229693 C`, while Rust day 20 and the Rust run-period initial state
-  end at `-0.600360486247 C`. The same `~0.00656 C` offset appears in the three
-  previous-MAT history slots, so the current blocker is not the copy into the
-  run period or hourly reporting; it is the warmup fixed point produced by the
-  repeated-day surface/zone source model.
-  The 2026-06-20 weather/sky and exterior-radiation split probe then removes
-  another candidate cause: dry-bulb, sky temperature, horizontal infrared, and
-  rain status are exact; wet-bulb max delta is `0.000009927010 C`; roof
-  exterior radiation-to-air and radiation-to-ground coefficients are exact; and
-  the roof radiation-to-sky coefficient RMSE is only `0.000329165799 W/m2-K`.
-  Re-running the same active lane with EnergyPlus' documented 30-iteration
-  inside-convection re-evaluation cadence is also a no-op: MAT, floor
-  inside-face temperature, floor storage, roof outside-face temperature, roof
-  net exterior radiation, and the advanced inside-surface iteration count all
-  remain bit-for-bit identical to the no-reevaluation diagnostic. This keeps the
-  next target on the coupled warmup fixed point, `SurfTempIn`/`SurfTempInTmp`
-  source ownership, and CTF history state, rather than weather forcing,
-  exterior longwave coefficients, or the 30-pass hconv cadence.
-  A 2026-06-20 adjacent-air diagnostic now exposes EnergyPlus
-  `SurfTempEffBulkAir` as `Surface Inside Face Adjacent Air Temperature` and
-  compares it directly with Rust's inside-solve reference-air snapshot. All six
-  official `1ZoneUncontrolled` surfaces carry the same annual adjacent-air
-  delta shape: floor first sample oracle `-0.621792349810 C`, Rust
-  `-0.615242190505 C`, first delta `0.006550159304 C`, RMSE
-  `0.006201912249 C`, and max `0.007134902342 C`. The zone-air surface
-  coefficient decomposition reports the same floor reference-air-temperature
-  RMSE (`0.006202000197 C`) and floor inside-face-temperature RMSE
-  (`0.006212567326 C`). This rejects a separate surface-reference-air reporting
-  bug as the current blocker; the reference air is following the same warmup
-  MAT fixed-point offset that later amplifies through `SumHATref`, inside face
-  temperatures, and CTF storage.
-  ScriptF-flat adiabatic report/history split probe also rejects syncing
-  adiabatic outside faces to current inside faces for
-  report-only state: it preserves MAT (`0.037329 C` RMSE), zone surface
-  convection (`22.062956 W` RMSE), and air storage (`9.127258 W` RMSE), but
-  regresses floor outside conduction from `12.216935 W` to `747.544527 W` RMSE
-  and floor heat storage from `28.786920 W` to `732.801403 W` RMSE. This keeps
-  `CalcHeatBalanceOutsideSurf`/`UpdateThermalHistories` adiabatic parity on the
-  pre-sync outside snapshot path rather than a report-only current-inside sync.
-  Rechecking the active
-  analytical lane with the
-  EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
-  floor RMSE rows and identical first-sample floor history deltas
-  (`1880.111844`/`1769.027186 W`), so the active warmup path washes out that
-  initial seed difference. Forcing the Rust warmup to the oracle's 20 run-period
-  warmup days only moves top RMSE from `108.672323` to `108.671673` while
-  reducing the floor first-sample inside/outside history deltas from
-  `1880.111844`/`1769.027186 W` to `1824.704274`/`1713.508910 W`. Raising the
-  same interleaved grey-longwave
-  lane from 20 to 100 surface iterations slightly worsens the top floor storage
-  RMSE (`108.672323` to `108.676973`). A trial final surface pass after the
-  active interleaved zone-air correction also worsened top RMSE to `108.674004`
-  while barely changing the first-sample floor history deltas, so the active
-  mismatch is not explained by a missing final post-correction surface pass. A
-  non-interleaved grey-longwave twenty-pass probe reduces the first-sample floor
-  history deltas to `1422.936503`/`1243.804233 W`, but it worsens top RMSE to
-  `505.688631`, floor outside conduction RMSE to `470.726229`, and floor storage
-  RMSE to `505.688631`; the active lane therefore still needs interleaved
-  surface/zone coupling while the remaining CTF history mismatch is isolated
-  elsewhere in the coupled update path. A
-  trial that froze the grey interior-longwave source after the first interleaved
-  surface pass was also rejected: top RMSE jumped to `20311.728529`, and the
-  floor first-sample inside/outside history deltas jumped to
-  `226264.768901`/`226437.862641 W`, so the EnergyPlus `InitSurfaceHeatBalance`
-  longwave timing cannot be approximated by simply holding the first-pass source
-  while keeping the current Rust interleaving loop. A one-pass full ScriptF
-  source still diverges in the current simplified coupling shell. The Rust fixed approximate
-  view-factor generation and ScriptF orientation are now unit-checked against
-  the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
-  ScriptF gap is expected to live in the coupled surface/zone iteration timing
-  rather than in the grey interchange matrix itself. The compact diagnostic
-  digest now carries first reported sample bottlenecks and Rust-only
-  first-sample CTF component rows. After the RunPeriod first-hour weather seed
-  fix, the active lane's first-sample outside opaque aggregate delta is
-  `3.529915 W`, and the mass floor first sample has Rust current/history terms
-  much closer to the oracle-inferred decomposition: inside current
-  `1751.360499 W` versus oracle `1546.858233 W`, inside history
-  `-852.644209 W` versus oracle `-650.814857 W`, outside current
-  `1338.455829 W` versus oracle `1136.823976 W`, and outside history
-  `-673.309511 W` versus oracle `-471.682586 W`. The remaining first-sample
-  deltas are now roughly `200 W` per floor CTF component rather than the prior
-  multi-kW file-wrap weather artifact, so the next EnergyPlus source-porting
-  target shifts back to mass-floor face-temperature/history alignment and the
-  coupled warmup/run-period source handoff. The digest also emits Rust
-  run-period initial CTF history slots captured after warmup and before the
-  first reported timestep; in the same active lane, the floor run-period initial
-  slot sum is `-209.595019 W` inside and `-4.314343 W` outside before the first
-  hour averages to `-852.644209 W` inside and `-673.309511 W` outside. Full
-  inside iteration order, zone predictor/corrector equations, detailed
-  shadowing/reflection, and coupled radiation coefficient update order are not
-  yet wired.
-- EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
-  timestep-dependent transfer-function validation are still unmapped runtime
-  work.
+The [probe lifecycle ledger](../../../specs/diagnostic_probe_ledger.toml)
+classifies each executable selector and wrapper. Its closed entries remain
+closed, with explicit `-IncludeClosed` replay; the unresolved observation
+hypothesis and its latest recorded sample remain in the
+[registry above](#diagnostic-probe-lifecycle-ledger). Removing repeated RMSE
+chronology does not turn rejected probes into passing results.
+
+| Diagnostic family | Durable result and limitation |
+|---|---|
+| Surface/air coupling, frozen/current convection, reference-air, ScriptF and iteration forks | Local improvements traded against other surface/zone rates. These were isolation probes, not evidence that an equation, cadence, or owner could be replaced solely to reduce error. |
+| Adiabatic outside-face, history-commit, and report-only replacements | Rejected or incomplete comparisons keep outside solve, inside history, reporting, and final commit separate; no general replacement was promoted. |
+| Report-only storage/convection and weather-capacity forks | Reporting changes can hide a state residual; they do not certify the underlying moist-air or coupled source state. |
+| Repeated-day warmup and first reported sample | The retained legacy hypothesis directly observes `SurfTempIn` mismatch. Weather forcing, first-hour averaging, and state-copy checks did not establish its upstream cause. |
+
+The legacy diagnostic implementation retains these interfaces:
+
+- `ep_model::Construction.layers` is outside-to-inside; `outside_layer` is
+  the outside-face compatibility field. Material roughness uses EnergyPlus
+  categories.
+- `ep_compare` associates EIO CTF rows with the preceding construction row;
+  diagnostic metadata retains `#CTFs` and CTF timestep separately. EIO seeding
+  belongs to diagnostic isolation, not ordinary Rust coefficient generation.
+  The simplified CLI diagnostic defaults to steady/no-mass seeds; explicit
+  all-EIO replay has its own policy.
+- `compare-digest.json` carries summary/bottleneck and CTF metadata without
+  full hourly sample rows. `zone_air_first_sample_trace` and
+  `surface_first_sample_trace` expose Rust substep coefficients, history,
+  weather, and balance inputs. Internal reconstruction or a zero-baseline
+  temperature/flux split magnitude is not an independent Native state delta.
+- `CompatibilityHeatBalanceAlgorithm`, `DiagnosticHeatBalanceProbe`, and
+  `HeatBalanceRuntimeConfig` separate compatibility selection from diagnostic
+  flags. The diagnostic module resolves selectors before compatibility code
+  runs; a probe selector cannot be relabelled conformance evidence.
+- The legacy exterior path uses source-shaped terrain, DOE-2, sky/air/ground
+  radiation, wet-surface, and unobstructed solar inputs. Its simplified
+  surface/air shell, ground default `18.0 C`, weather-capacity proxy, detailed
+  shadowing/reflection, active source/sink terms, and unobserved branches
+  remain subject to their declared contracts rather than broad parity claims.
+- `ExecutionPlan.stages` and `compatibility_stages` preserve the mapped
+  input/warmup/surface/air/history barrier sequence. A matching stage list
+  alone does not prove numerical or state-transition equivalence.
+
+The completed finite A/B work is independently documented in the
+[porting plan](../../../energyplus_porting_plan/README.md) and its
+[accepted Source validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/README.md).
+That evidence binds the recorded normal Rust executions and explicit card
+scope. It does not certify every legacy diagnostic selector, the full
+EnergyPlus surface population, general source/sink physics, or whole-file IO
+equality. The earlier rejected runs remain in Git history and their retained
+evidence; the accepted packet is unchanged by this documentation cleanup.
 
 ## Required Cases Before Porting
 

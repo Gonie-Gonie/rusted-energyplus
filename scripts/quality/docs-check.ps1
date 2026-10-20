@@ -16,11 +16,11 @@ $required = @(
     "src\current\project-contract.md",
     "src\current\current-status.md",
     "src\current\roadmap.md",
-    "src\current\verification.md",
     "src\current\architecture-overview.md",
-    "src\current\launcher-and-run-framework.md",
     "src\guides\setup.md",
     "src\guides\developer-workflow.md",
+    "src\guides\run-arbitrary-idf.md",
+    "src\guides\verify-porting.md",
     "src\guides\release-process.md",
     "src\adr\0001-docs-specs-and-evidence-retention.md",
     "src\generated\milestone-map.md",
@@ -90,9 +90,7 @@ $expectedCurrentLinks = @(
     "current/project-contract.md",
     "current/current-status.md",
     "current/roadmap.md",
-    "current/verification.md",
-    "current/architecture-overview.md",
-    "current/launcher-and-run-framework.md"
+    "current/architecture-overview.md"
 )
 $actualCurrentLinks = @()
 $inCurrentSection = $false

@@ -2,171 +2,46 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-12
+last_reviewed: 2026-10-20
 ---
 
-# Script Index
+# Commands
 
-All repository tasks are launched through one Windows wrapper:
+Run commands from the repository root through the Windows wrapper:
 
 ```powershell
+.\scripts\dev.cmd list
 .\scripts\dev.cmd <command> [args...]
 ```
 
-PowerShell users can also call `.\scripts\dev.ps1 <command> [args...]`
-directly. The implementation scripts live in field-specific folders:
+PowerShell can also invoke `.\scripts\dev.ps1 <command> [args...]`.
+The live `list` output reads the [public command catalog](../../../scripts/dev/commands.json).
+For every script's entry point, callers, classification, and artifact hints, use
+[Script Inventory](../generated/script-index.md). Artifact hints describe paths;
+they do not establish that a run succeeded.
 
-- `scripts/setup`
-- `scripts/quality`
-- `scripts/smoke`
-- `scripts/compare`
-- `scripts/conformance`
-- `scripts/release`
-- `scripts/lib`
+| Work | Choose |
+|---|---|
+| Prepare this checkout | `setup`; see [Setup](../guides/setup.md). |
+| Implement a change | `check -Package ep_runtime -Filter <test_name> -Lib`; select the affected package and test. Use `-List` to find matches or `-Plan` to preview commands. |
+| Run tests without lint | `test -Package <package> -Filter <test_name> -Lib`. |
+| Integrate a milestone | `check -Full` runs workspace tests and broader guards. See [Developer Workflow](../guides/developer-workflow.md). |
+| Edit docs or specs | `docs-generate`, then `docs-check`; update the source registry rather than a generated page. |
+| Change script registration | Edit `scripts/dev/commands.json`, regenerate docs, then run `script-inventory-check`. |
+| Package or publish evidence | Follow [Release Process](../guides/release-process.md) for the required commands and artifacts. |
 
-Run `.\scripts\dev.cmd list` for the command catalog.
+Use focused checks during implementation. `check -Full` is the integration gate;
+`test` without selectors runs workspace tests once. A filtered run must execute
+at least one non-ignored test.
 
-`scripts/dev/commands.json` is the authoritative public command catalog.
-`specs/script_inventory.toml` is a generated machine-readable registry of every
-PowerShell, batch, and compiled C# helper under `scripts/`; it records category,
-public/internal/removable classification, forward and reverse caller evidence,
-artifact hints, and reachability from `scripts/dev.cmd`. Run
-`.\scripts\dev.cmd script-inventory-check` to reject stale metadata, missing
-entrypoints, or unreachable scripts. The generated registry is an inventory
-exception to the otherwise hand-maintained decision-source role of `specs/`.
+Select comparison commands from the catalog for the relevant case. A conformance
+claim requires a case manifest with `comparison_class = "conformance"`,
+`conformance_claim = true`, declared variables, tolerances, reports, and a blocking
+gate. Smoke and diagnostic commands can help investigate behavior; their results
+do not establish compatibility. Release report generators package existing
+evidence and do not promote additional variables.
 
-Read the table by evidence lane, not just by folder:
-
-- `*-conformance` compare commands are promoted only when the matching case
-  manifest has `comparison_class = "conformance"`, `conformance_claim = true`,
-  declared variables, tolerances, reports, and a blocking gate.
-- diagnostic and smoke commands may run in `check -Full`, but they do not support a
-  compatibility claim by themselves.
-- release report commands generate evidence packages; they do not promote new
-  variables unless the promoted compare gates already exist.
-
-Scripted release and evidence documents follow the
-[Documentation Framework](documentation-framework.md): PowerShell entry points
-orchestrate repo-local Python, and Python generators use `oodocs` plus
-matplotlib for document layout and charts.
-
-| Command | Area | Purpose | Blocking release? | Main artifacts |
-|---|---|---|---:|---|
-| `setup` | setup | prepare toolchain, oracle, reference source, docs tools, portable Python, and report venv | yes | `.runtime`, `.reference` |
-| `oracle-smoke` | setup | run EnergyPlus oracle example and conversion | no | `.runtime/oracle-smoke` |
-| `source-smoke` | setup | verify reference source checkout | yes | console output |
-| `python-smoke` | setup | verify portable Python and the pinned report-generation venv | yes | console output |
-| `check` | quality | format, lint, and test `ep_runtime` or selected packages; `-Full` adds workspace integration; `-Plan` previews commands | full integration | console output |
-| `test` | quality | run workspace tests once; select packages with `-Package`, names with `-Filter`, and library targets with `-Lib` | yes | console output |
-| `docs-generate` | quality | regenerate mdBook generated references from `specs/` and tracked case manifests | yes for docs/spec changes | `docs/src/generated`, `tools/docs/generated-docs.manifest.json` |
-| `docs-check` | quality | build mdBook | yes | `docs/book` |
-| `file-size-check` | quality | warn/fail on oversized source files with explicit legacy waivers | yes | console output |
-| `ideal-loads-structure-audit` | quality | guard IdealLoads calc, dispatch, node, and zone-equipment module boundaries | yes | console output |
-| `perf` | quality | run local performance checks | no | console output |
-| `strict-no-false-conformance` | quality | scan for forbidden compatibility wording | yes | failure on wording |
-| `algorithm-ledger-check` | quality | validate source-map, EnergyPlus source, Rust target, first-case, and gate links | yes | console output |
-| `pr-port-ticket-check` | quality | require a cross-checked Algorithm Port Ticket for source-order-sensitive base/head diffs | yes for source-order PRs | failure on diff or PR body |
-| `raw-model-smoke` | smoke | inspect RawModel fixtures | no | console output |
-| `typed-model-smoke` | smoke | compile TypedModel fixtures | no | console output |
-| `model-plan-smoke` | smoke | verify graph and execution-plan summaries | no | console output |
-| `schedule-compact-smoke` | smoke | verify `Schedule:Compact` intake | no | console output |
-| `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
-| `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
-| `runtime-registry-smoke` | smoke | gate runtime output/meter registry and ResultStore diagnostics | yes | cargo test filters |
-| `heat-balance-generalization-smoke` | smoke | gate opaque no-mass boundary handling and existing heat-balance conformance gates | yes | cargo test filters, `.runtime/heat-balance-conformance`, `.runtime/surface-temperature-conformance` |
-| `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, IdealLoads typed graph, warning policy, and nonzero baseline signal | yes | `.runtime/ideal-loads-thermostat` |
-| `air-side-node-diagnostic-smoke` | smoke | gate the v0.11 air-side node baseline evidence and diagnostic Rust projection | yes | `.runtime/air-side-node-diagnostic` |
-| `plant-loop-skeleton-smoke` | smoke | gate the v0.13 PlantLoop typed graph skeleton fixture | yes | console output |
-| `plant-loop-diagnostic-smoke` | smoke | gate the v0.15 PlantLoadProfile baseline-only plant diagnostic | yes | `.runtime/plant-loop-diagnostic` |
-| `plant-loop-projection-smoke` | smoke | gate the diagnostic Rust plant-state projection addendum | yes | `.runtime/plant-loop-diagnostic/plant-state-projection` |
-| `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
-| `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
-| `compare-schedule-conformance` | compare | run the v0.22 tolerance-gated `Schedule Value` conformance case | yes | `.runtime/time-weather-schedule-conformance` |
-| `compare-weather-conformance` | compare | run the v0.22 tolerance-gated dry-bulb conformance case | yes | `.runtime/time-weather-schedule-conformance` |
-| `compare-static-model-conformance` | compare | run the v0.23 official ExampleFile static model conformance case | yes | `.runtime/static-model-conformance` |
-| `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
-| `compare-surface-geometry-smoke` | compare | compare Rust surface area, azimuth, and tilt with EIO | no | `.runtime/compare-surface-geometry` |
-| `compare-construction-materials-smoke` | compare | compare construction/material thermal inputs with EIO | no | console output |
-| `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
-| `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-gains` |
-| `compare-internal-convective-gain-conformance` | compare | run the v0.26 tolerance-gated internal convective gain conformance case | yes | `.runtime/internal-gains-conformance` |
-| `compare-ideal-loads-no-oa-sensible-conformance` | conformance | run the no-OA/no-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-no-oa-sensible` |
-| `compare-ideal-loads-blank-fuel-efficiency-conformance-candidate` | conformance | run the no-OA blank fuel-efficiency IdealLoads conformance candidate | yes | `.runtime/ideal-loads-blank-fuel-efficiency-conformance` |
-| `compare-ideal-loads-constant-fuel-efficiency-conformance-candidate` | conformance | run the no-OA constant Schedule:Constant fuel-efficiency IdealLoads conformance candidate | yes | `.runtime/ideal-loads-constant-fuel-efficiency-conformance` |
-| `compare-ideal-loads-non-constant-fuel-efficiency-conformance-candidate` | conformance | run the no-OA all-days Schedule:Compact fuel-efficiency IdealLoads conformance candidate | yes | `.runtime/ideal-loads-non-constant-fuel-efficiency-conformance` |
-| `compare-ideal-loads-no-oa-facility-meter-conformance-candidate` | conformance | run the no-OA hourly facility meter IdealLoads conformance candidate | yes | `.runtime/ideal-loads-no-oa-facility-meter-conformance` |
-| `compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate` | conformance | run the no-OA monthly/annual/run-period facility meter IdealLoads conformance candidate | yes | `.runtime/ideal-loads-no-oa-facility-meter-monthly-run-period-conformance` |
-| `compare-ideal-loads-capacity-limit-conformance` | conformance | run the no-OA numeric capacity-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-capacity-limit-conformance` |
-| `compare-ideal-loads-flow-limit-conformance` | conformance | run the no-OA numeric flow-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-flow-limit-conformance` |
-| `compare-ideal-loads-flow-capacity-limit-conformance` | conformance | run the no-OA numeric flow-and-capacity-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-flow-capacity-limit-conformance` |
-| `compare-ideal-loads-constant-shr-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSensibleHeatRatio humidity-control case | no | `.runtime/ideal-loads-constant-shr` |
-| `compare-ideal-loads-constant-shr-conformance` | conformance | run the no-OA ConstantSensibleHeatRatio cooling IdealLoads conformance case | yes | `.runtime/ideal-loads-constant-shr-conformance` |
-| `compare-ideal-loads-constant-supply-humidity-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio humidity-control case | no | `.runtime/ideal-loads-constant-supply-humidity` |
-| `compare-ideal-loads-constant-supply-humidity-cooling-conformance-candidate` | conformance | run the no-OA ConstantSupplyHumidityRatio cooling IdealLoads conformance candidate | yes | `.runtime/ideal-loads-constant-supply-humidity-cooling-conformance` |
-| `compare-ideal-loads-constant-supply-humidity-heating-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio heating case | no | `.runtime/ideal-loads-constant-supply-humidity-heating` |
-| `compare-ideal-loads-constant-supply-humidity-heating-conformance-candidate` | conformance | run the no-OA ConstantSupplyHumidityRatio heating IdealLoads conformance candidate | yes | `.runtime/ideal-loads-constant-supply-humidity-heating-conformance` |
-| `compare-ideal-loads-humidistat-dehumidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat dehumidification case | no | `.runtime/ideal-loads-humidistat-dehumidification` |
-| `compare-ideal-loads-humidistat-dehumidification-conformance-candidate` | conformance | run the no-OA Humidistat dehumidification IdealLoads conformance candidate | yes | `.runtime/ideal-loads-humidistat-dehumidification-conformance` |
-| `compare-ideal-loads-humidistat-humidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat humidification case | no | `.runtime/ideal-loads-humidistat-humidification` |
-| `compare-ideal-loads-humidistat-humidification-conformance-candidate` | conformance | run the no-OA Humidistat humidification IdealLoads conformance candidate | yes | `.runtime/ideal-loads-humidistat-humidification-conformance` |
-| `compare-ideal-loads-outdoor-air-air-changes-diagnostic` | diagnostic | run the diagnostic-only IdealLoads AirChanges/Hour outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-air-changes` |
-| `compare-ideal-loads-outdoor-air-air-changes-conformance-candidate` | conformance | run the IdealLoads AirChanges/Hour outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-air-changes-conformance` |
-| `compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-diagnostic` | diagnostic | run the diagnostic-only IdealLoads DifferentialDryBulb outdoor-air economizer case | no | `.runtime/ideal-loads-outdoor-air-differential-dry-bulb-economizer` |
-| `compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-conformance-candidate` | conformance | run the IdealLoads DifferentialDryBulb outdoor-air economizer conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-differential-dry-bulb-economizer-conformance` |
-| `compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic` | diagnostic | run the diagnostic-only IdealLoads DifferentialEnthalpy outdoor-air economizer case | no | `.runtime/ideal-loads-outdoor-air-differential-enthalpy-economizer` |
-| `compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-conformance-candidate` | conformance | run the IdealLoads DifferentialEnthalpy outdoor-air economizer conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-differential-enthalpy-economizer-conformance` |
-| `compare-ideal-loads-outdoor-air-flow-area-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Area outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-area` |
-| `compare-ideal-loads-outdoor-air-flow-area-conformance-candidate` | conformance | run the IdealLoads Flow/Area outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-area-conformance` |
-| `compare-ideal-loads-outdoor-air-flow-zone-conformance-candidate` | conformance | run the IdealLoads Flow/Zone outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-zone-conformance` |
-| `compare-ideal-loads-outdoor-air-flow-person-conformance-candidate` | conformance | run the IdealLoads Flow/Person outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-person-conformance` |
-| `compare-ideal-loads-outdoor-air-occupancy-dcv-conformance-candidate` | conformance | run the IdealLoads OccupancySchedule DCV outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-occupancy-dcv-conformance` |
-| `compare-ideal-loads-outdoor-air-co2-dcv-conformance-candidate` | conformance | run the IdealLoads CO2Setpoint DCV outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-co2-dcv-conformance` |
-| `compare-ideal-loads-outdoor-air-flow-person-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Person outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-person` |
-| `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |
-| `compare-ideal-loads-outdoor-air-maximum-conformance-candidate` | conformance | run the IdealLoads Maximum outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-maximum-conformance` |
-| `compare-ideal-loads-outdoor-air-sensible-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sensible heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery` |
-| `compare-ideal-loads-outdoor-air-sensible-heat-recovery-conformance-candidate` | conformance | run the IdealLoads Sensible heat-recovery outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery-conformance` |
-| `compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Enthalpy heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-enthalpy-heat-recovery` |
-| `compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-conformance-candidate` | conformance | run the IdealLoads Enthalpy heat-recovery outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-enthalpy-heat-recovery-conformance` |
-| `compare-ideal-loads-outdoor-air-sum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-sum` |
-| `compare-ideal-loads-outdoor-air-sum-conformance-candidate` | conformance | run the IdealLoads Sum outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-sum-conformance` |
-| `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
-| `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
-| `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
-| `official-dynamic-heat-balance-diagnostic` | diagnostic | run the official `1ZoneUncontrolled` dynamic heat-balance diagnostic with warmup metadata and no conformance claim | no | `.runtime/official-dynamic-diagnostic` with `compare-digest.json` for gate checks |
-| `official-dynamic-heat-balance-compat-candidate` | conformance | run the official dynamic source-order compatibility gate with all EIO CTF rows, EnergyPlus initial CTF histories, 20-day warmup, 20 surface iterations, and the promoted conformance output set | yes | `.runtime/official-dynamic-compat-candidate` |
-| `official-dynamic-heat-balance-all-ctf-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows enabled for mass-CTF isolation and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf` |
-| `official-dynamic-heat-balance-analytical-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus analytical zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-analytical` |
-| `official-dynamic-heat-balance-analytical-surface-first-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus analytical surface-first zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-analytical-surface-first` |
-| `official-dynamic-heat-balance-third-order-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus third-order zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-third-order` |
-| `official-dynamic-heat-balance-warmup-20-probe` | diagnostic | run the official dynamic diagnostic with Rust warmup minimum days raised to the EnergyPlus run-period count and no conformance claim | no | `.runtime/official-dynamic-diagnostic-warmup-min20` |
-| `official-dynamic-heat-balance-all-ctf-warmup-20-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus the EnergyPlus run-period warmup count and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf-warmup-min20` |
-| `official-dynamic-heat-balance-all-ctf-surface-iter3-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus three surface-balance passes per timestep and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf-surface-iter3` |
-| `official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus surface-first analytical zone-air correction and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf-analytical-surface-first` |
-| `official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus surface-first analytical zone-air correction and three surface-balance passes per timestep | no | `.runtime/official-dynamic-diagnostic-all-ctf-analytical-surface-first-surface-iter3` |
-| `official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus quick outside solves, grey interior longwave exchange, timestep-start adiabatic outside CTF reporting order, and twenty interleaved surface/zone-air passes | no | `.runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-surface-iter20` |
-| `official-dynamic-heat-balance-probe-summary` | diagnostic | summarize existing official dynamic heat-balance probe lanes with the report Python | no | `.runtime/official-dynamic-probe-summary.*` |
-| `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
-| `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
-| `launch-ui` | launcher | open the EPLaunch-style Windows UI for arbitrary IDF runs | no | local WinForms window |
-| `build-launcher-exe` | launcher | build the no-console Windows launcher exe for local testing or release packaging | yes for release package | `target/launcher/eplus-rs-launch.exe` |
-| `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
-| `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
-| `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
-| `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
-| `official-baseline-smoke` | conformance | gate v0.18 output injection and official ExampleFiles oracle baselines | yes | `.runtime/official-baseline` |
-| `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
-| `package` | release | build local package artifact | yes for package release | package zip |
-| `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
-| `conformance-index-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown conformance index coverage matrices | yes for release coverage | `.runtime/release-evidence` |
-| `support-coverage-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user-facing support coverage for inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
-| `user-coverage-handbook` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user decision guide for supported inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
-| `release-evidence-manifest` | release | generate oodocs PDF/HTML/JSON/Markdown release package and evidence asset manifest | yes for release coverage | `.runtime/release-evidence` |
-| `select-release-assets.ps1` | release | select the public GitHub Release upload set from the package and generated evidence | yes for release publishing | zip plus curated PDFs |
-| `github-release` | release | publish a release with the curated public asset set | manual fallback | GitHub Release |
-| `v0.1-verify` | release | verify the v0.1.0 public limited-conformance release gate | yes | release package, launcher exe, oracle, conformance evidence, coverage reports, release manifest |
-
-Only the current release gate is retained as a runnable script. Historical
-release gates and notes remain available through git history and tags.
-
-No diagnostic command should be listed as conformance evidence.
+[Documentation Framework](documentation-framework.md) explains the report toolchain.
+The generated [machine registry](../../../specs/script_inventory.toml) records script
+reachability and inventory metadata; it is maintained from the executable scripts
+and public catalog.

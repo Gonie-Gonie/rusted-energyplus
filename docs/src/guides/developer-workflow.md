@@ -2,61 +2,77 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-14
+last_reviewed: 2026-10-20
 ---
 
 # Developer Workflow
 
-Use `scripts/dev.cmd` as the single entry point:
+Use `scripts/dev.cmd` as the command entry point. Run from the repository root:
 
 ```powershell
 .\scripts\dev.cmd list
 .\scripts\dev.cmd check -Package ep_runtime -Filter surface_environment -Lib
-.\scripts\dev.cmd test -Package ep_compare -Filter series_v2 -Lib
 .\scripts\dev.cmd check -Full -Plan
 ```
 
-`check` defaults to the `ep_runtime` package: formatting, package lint, and one
-package test invocation. Select the package and test-name substring for the
-area being changed. `-Package ep_runtime,ep_model` selects multiple packages;
-`-Lib` selects library tests. `-Plan` prints commands without running them,
-and `-List` lists matching test names. A filtered run must execute at least one test; zero matches and ignored-only matches fail.
+## Choose The Smallest Relevant Check
 
-At integration milestones, run `.\scripts\dev.cmd check -Full` for workspace
-lint/tests and the broader conformance, documentation, and claim guards.
-`-Full` cannot be combined with partial package or test selectors.
-`.\scripts\dev.cmd test` runs workspace tests once. For docs-only work, use
-`docs-generate`, `docs-check`, and the relevant spec validator.
+| Change | Check during development |
+|---|---|
+| Runtime calculation or state | Affected package/test filter and the card's same-input Native comparison |
+| Parser, compiler, CLI or run pipeline | Affected package/test filter and its real input scenario |
+| Documentation | `docs-generate`, then `docs-check` |
+| Plan/evidence metadata | `python tools/porting/check_plan.py --check` and `python tools/porting/sync_plan_views.py --check` |
+| Claims/specs | Matching spec validator, `manifest-validate-all`, `strict-no-false-conformance` |
 
-For input and execution-plan inspection, the CLI also provides:
+`check` defaults to formatting, `ep_runtime` lint and one package test run.
+`-Package ep_runtime,ep_model` selects packages; `-Lib` limits to library tests;
+`-Filter` selects a test substring. `-Plan` prints commands, and `-List` lists
+matching tests. Zero matches and ignored-only selections fail.
 
-```powershell
-cargo run -p ep_cli -- model inspect <input.epJSON>
-cargo run -p ep_cli -- model compile <input.epJSON>
-cargo run -p ep_cli -- model plan <input.epJSON>
-```
+At an integration milestone, `check -Full` runs workspace lint/tests and
+broader guards once. It rejects partial package/test selectors. `test` without
+selectors runs the workspace once. Reuse a successful unchanged run rather
+than repeating focused and full suites. The detailed change-to-test mapping
+and optional Native cohort are in [Contributing](../../../CONTRIBUTING.md#test-selection).
 
-These commands inspect input and planning state; they do not establish
-numerical compatibility.
-
-For geometry changes, add `--trace-level surface` to the usual `run` command.
-It writes `compiled-geometry.json` and `geometry-consumers.json`, including
-retained Source owners when that route is reached. Use `full` when schedule,
-weather, psychrometric, and other detailed event traces are required. Compare
-the fields declared by the relevant porting card; tracing alone does not
-certify numerical compatibility.
-
-When changing plans, claim boundaries, object coverage, variable coverage, or
-algorithm status, update the matching file under `specs/` and regenerate the
-generated docs.
-
-When adding a conformance case, update `data/conformance_cases/<case>/case.toml`
-and run:
+## Inspect Inputs And State
 
 ```powershell
-.\scripts\dev.cmd manifest-validate-all
-.\scripts\dev.cmd strict-no-false-conformance
+cargo run --locked -p ep_cli -- model inspect <input.epJSON>
+cargo run --locked -p ep_cli -- model compile <input.epJSON>
+cargo run --locked -p ep_cli -- model plan <input.epJSON>
 ```
 
-Do not add broad compatibility wording unless a generated report and blocking
-gate support the exact case, variable or meter, and tolerance.
+Inspection and tracing do not establish numerical compatibility. Add
+`--trace-level surface` to inspect geometry, or `full` only when detailed
+schedule/weather/psychrometric events are needed. Compare the state fields
+required by the affected card. Use [Verify the port](verify-porting.md) for
+same-IDF Oracle/Rust reported-value comparisons.
+
+The optional SUR-02 isolated-history checker remains outside the default suite:
+
+```powershell
+python tools/porting/check_sur02_units.py --output .runtime/porting/SUR-02/isolated-history-local
+```
+
+It requires the pinned EnergyPlus source, C++/Rust compilers and the retained
+Source59 compiler-input plan named in the checker; use a fresh output folder.
+
+## Update Documentation And Commit
+
+Update the current contract or guide where a reader needs the change.
+Machine-readable claim/coverage decisions live under `specs/`; regenerate their
+reference pages rather than copying tables into prose:
+
+```powershell
+.\scripts\dev.cmd docs-generate
+.\scripts\dev.cmd docs-check
+```
+
+Keep one current result/limitation and the command needed to verify it. Put
+execution data under `.runtime`; publish only the curated evidence needed for
+a claim. Git retains replaced prose. See the [retention policy](../adr/0001-docs-specs-and-evidence-retention.md).
+
+Commit and push each coherent change after its relevant checks. Release
+packaging and evidence generation follow [Release Process](release-process.md).

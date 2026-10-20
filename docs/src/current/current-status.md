@@ -2,215 +2,81 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-20
 ---
 
 # Current Status
 
-## Summary
+## Fixed Porting Scope
 
-The current public release line is v0.1.0. It packages the Rust CLI, locked
-EnergyPlus 26.1.0 oracle setup, conformance/reporting infrastructure,
-arbitrary IDF/epJSON support assessment, and a small Windows launcher.
+The [64-card plan](../../../energyplus_porting_plan/README.md) is complete for
+the fixed CON-01 inputs: A is an opaque unconditioned one-zone model; B adds
+direct no-outdoor-air sensible IdealLoads with no limit or hard-sized flow,
+capacity, or combined limits. A has 54 applicable cards; B has 64.
 
-Existing files do not establish completed porting. `ep_run`, support assessment,
-arbitrary-run artifacts, launcher scripts, and IdealLoads candidate cases must
-retain source-order, capability, launcher, and evidence checks.
+The [final validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json)
+records fifteen normal runs, 16,427,880 reported values with zero tolerance or
+RMSE failures, real Surface/warmup handoffs, and Rust JSON/CSV output rereads.
+The [SUR-02 supplement](../../../energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json)
+adds the previously missing executed impulse/current-row unit checks.
+File-wide byte equality is not established; headers, elapsed times and some
+inactive registry counters differ. Original abnormal afterstates remain
+unavailable. These finite results do not establish general EnergyPlus parity.
+
+## Running And Comparing
+
+The current compatibility-mode arbitrary runtime covers the official
+`1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA
+sensible PurchasedAir binding. The completed porting route is selected with
+`--porting-scope A|B` and writes its own ESO/MTR and JSON/CSV results.
+
+**Automatic oracle comparison is not connected to this Source route.**
+Adding `--oracle-baseline` or `--compare-oracle` retains the Rust output but
+returns `SourceReportedOracleComparisonUnsupported` (exit 4). Run the two
+engines separately and use the fixed-case checker described in
+[Verify the port](../guides/verify-porting.md).
+
+Ad-hoc and launcher runs keep `conformance_claim=false`. Unsupported inputs
+are blocked; explicitly allowed diagnostic partial runs remain diagnostic.
+See [Run an IDF](../guides/run-arbitrary-idf.md) for artifacts and exit codes,
+and [Roadmap](roadmap.md) for the remaining user-facing work.
 
 ## Current Conformance Claims
 
 Current conformance evidence is limited to promoted manifests and declared
-variables/meters. The active promoted groups are:
+variables/meters. The exact case list is generated in
+`docs/src/generated/conformance-case-index.md`. Algorithm and coverage boundaries
+are generated from `specs/algorithm_ledger.toml`, `specs/object_coverage.toml`,
+and `specs/variable_coverage.toml`.
 
-- static intake, schedule, dry-bulb weather, no-mass heat balance, no-mass
-  surface temperature, and internal convective gain seed cases
-- official `1ZoneUncontrolled` dynamic source-order compatibility rows for the
-  declared weather, zone-air, surface temperature, surface conduction,
-  convection/radiation source, convection coefficient, solar, aggregate
-  conduction, floor storage, humidity-ratio, adjacent-air, longwave coefficient,
-  and iteration-count variables only
+- official `1ZoneUncontrolled` dynamic source-order compatibility rows are
+  declared-variable compatibility only.
 - IdealLoads no-OA/no-limit sensible, numeric capacity limit, numeric flow
-  limit, flow-and-capacity limit, ConstantSensibleHeatRatio, selected
+  limit, flow-and-capacity limit, ConstantSensibleHeatRatio,
   ConstantSupplyHumidityRatio, selected Humidistat, selected outdoor-air,
-  economizer, heat-recovery, ReportPurchasedAir energy/fuel, and declared
-  facility-meter candidate rows only
-
-The exact case list is generated in
-`docs/src/generated/conformance-case-index.md`. The exact algorithm and
-coverage boundaries are generated from `specs/algorithm_ledger.toml`,
-`specs/object_coverage.toml`, and `specs/variable_coverage.toml`.
-The generated algorithm ledger also reports routine completion and full-domain
-readiness from `specs/algorithm_ledger.toml` and
-`specs/project_contract.toml`. Existing limited algorithm conformance does not
-count as routine completion; every required routine must reach
-`family_gated` or `complete` before a full-domain claim can be enabled.
-
-The classification table is generated from `specs/project_contract.toml`:
+  economizer, heat-recovery and reporting evidence remain case-scoped;
+  they do not establish full IdealLoads compatibility.
 
 {{#include ../generated/current-status-classification.md}}
 
-Passed release-evidence series and tracked output variables are intentionally
-separate counts. The tracked-variable summary below is generated from
-`specs/variable_coverage.toml`:
-
 {{#include ../generated/variable-coverage.md:current-status-variable-summary}}
 
-Release-evidence pass counts remain generated by the release evidence reports
-and do not change the variable coverage total.
-
-The official `1ZoneUncontrolled` target is currently declared-variable
-compatibility only. Broad CTF storage parity, broad solar/radiation parity,
-fenestration, infiltration, and general heat-balance compatibility remain
-outside the claim. The separate historical broad diagnostic-probe ledger retains one
-first-run-period `SurfTempIn` hypothesis and one observation-only executable lane.
-Those ledger entries do not describe the frontier or outcome of the finite
-CON-01 Source cadence/handoff verification below. The 40 historical Rust
-probe selectors and 56 historical wrapper lanes are closed replay artifacts,
-excluded from the default suite; none of this diagnostic evidence is a
-promoted claim.
-
-IdealLoadsAirSystem evidence is branch-scoped and variable-scoped. No-OA
-sensible, finite-limit, ConstantSensibleHeatRatio, selected humidity,
-selected outdoor-air/economizer/heat-recovery, ReportPurchasedAir, and meter
-rows remain limited to explicitly declared candidate cases and do not imply
-full IdealLoads compatibility.
-
-## Diagnostic-Only Evidence
-
 Diagnostic-only evidence remains useful for source-order porting but does not
-create compatibility claims. Current diagnostic-only groups include broad
-official `1ZoneUncontrolled` heat-balance probes, remaining IdealLoads
-predecessor/branch probes, air-side node projection diagnostics, plant-loop
-state projection diagnostics, and smoke-level model intake checks.
+create compatibility claims. Historical diagnostic selectors and replay
+wrappers are tracked in `specs/diagnostic_probe_ledger.toml`, outside the
+default test suite. They are not additional finite-port production evidence.
 
 ## Not Claimed
 
-The project does not currently claim general EnergyPlus compatibility, broad
-heat-balance compatibility, broad HVAC/node/meter compatibility, plant
-compatibility, sizing, EMS, PythonPlugin, AirflowNetwork, fenestration,
-infiltration, broad weather-processor compatibility, broad ExampleFiles
-compatibility, or broad IdealLoads branch coverage beyond the declared
-candidate rows.
+General EnergyPlus replacement, broad heat-balance compatibility,
+broad HVAC/node/meter compatibility, Plant, sizing, EMS, PythonPlugin, AFN,
+fenestration, infiltration and broad ExampleFiles coverage are not claimed.
+There is no broad IdealLoads branch coverage beyond the declared cases.
+IdealLoads outdoor-air, economizer, heat-recovery and broader humidity branches
+remain outside arbitrary-run compatibility even when individual release cases
+have separate evidence.
 
-## Current Arbitrary-Run State
-
-The arbitrary run framework writes support assessment artifacts and classifies
-each input as `run_blocked`, `partial_supported_run`, or
-`supported_compatibility_run`. Ad-hoc runs and launcher runs always keep their
-claim boundary visible and do not become release conformance evidence unless
-promoted later through manifests, reports, and blocking gates.
-Unsupported AirLoop, PlantLoop, EMS, invalid epJSON, and missing heat-balance
-weather inputs are covered by integration tests as pre-runtime failures.
-When `--oracle-baseline` is requested for a `run_blocked` input, the
-EnergyPlus baseline can still be generated under `out/oracle`, but
-`rust_runtime` stays null, oracle comparison is skipped, and no oracle artifact
-is counted as a Rust result.
-Dry-run execution is also covered as a support-assessment-only path: even if
-oracle baseline and compare are requested, runtime, oracle, and compare remain
-skipped.
-`partial_supported_run` remains defined for explicit diagnostic/ad-hoc paths: it
-requires diagnostic mode with partial execution allowed, uses a diagnostic-only
-runtime class, and keeps `conformance_claim=false`.
-
-The current compatibility-mode arbitrary runtime covers the official
-`1ZoneUncontrolled` heat-balance path and the exact direct-Zone PurchasedAir
-binding: no-OA sensible with no limit, hard-sized finite capacity, hard-sized
-finite flow, or combined flow and capacity. It uses fixed, nonadaptive
-ThirdOrder prediction, a zero-hysteresis DualSetpoint thermostat, the declared
-no-OA/no-EMS topology, and Rust `SourceSetpointThresholds` demand.
-
-Other valid declared IdealLoads fallbacks use the diagnostic-only
-`ideal-loads-fixture-demand-diagnostic` runtime. Compatibility mode blocks that
-class; its fixed active-load-split adapter requires explicit diagnostic mode
-and partial execution. Release runs report
-`fixture_demand_injection_used=false`; diagnostic adapters report `true`.
-ConstantSensibleHeatRatio, selected humidity, mixed systems, and broad HVAC
-branches remain outside arbitrary-run release compatibility even where
-separate case-level conformance evidence exists. IdealLoads outdoor-air,
-economizer, heat-recovery branches remain outside arbitrary-run compatibility.
-
-The broad arbitrary-run and algorithm-ledger lanes retain their exact routine,
-branch and capability limits. In particular, the historical PurchasedAir
-source-map frontier at `PurchasedAirManager.cc:2375` describes that broader
-ledger lane. It is not the current frontier of the separately admitted finite
-CON-01 Source path.
-
-The finite Source path has genuine selected no-OA/hard-sized evidence through
-GetInput, initialization, sizing, Calc, node update and reporting on the same
-real equipment/Node/Demand owners. [Persistent full calls](../../../energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-surface-53/summary.json)
-and [seven input/call error outcomes plus normal control](../../../energyplus_porting_plan/evidence/SRC-06-canonical-purchased-air-admission-58/summary.json)
-retain their actual Source, inputs and scope. The observer-only59 correction
-does not change those scientific bodies. This finite result does not complete
-all PurchasedAir outdoor-air, humidity, sizing or general HVAC branches.
-
-## Finite CON-01 Verification
-
-The [64-card plan](../../../energyplus_porting_plan/README.md) fixes A's opaque unconditioned
-zone and B's direct no-OA sensible IdealLoads topology, four hard-limit modes
-and three durations. Its gates remain separate from broad domain readiness and
-promoted release manifests. The final [current-Source validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json)
-binds actual same-Source fifteen-case results, internal Surface cadence,
-two warmup handoffs, own-output rereads and the five named input outcomes.
-
-The [SUR-02 unit supplement](../../../energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json) adds the previously unexecuted isolated-history, impulse and current-row checks: 178 calls, 368 exact binary64 output values. The production compiler inputs and retained fifteen-case results are unchanged.
-
-Current finite adjudication: **15 normal cases (A3/B12), 16427880 reported samples and own JSON/CSV records; tolerance failures 0, RMSE failures 0**;
-**A 54/54, B 64/64 cards**;
-**15 scoped ancillary readbacks; owned termination/layout checked; raw physical inequalities preserved; overall ancillary IO PASS=false**. These actual references and individual
-four-gate decisions describe the fixed CON-01 scope. Unit proof, connection proof, reported values and physical serialization
-are different claims. The two abnormal Original schedule processes retain
-unavailable numerical afterstates; their named termination outcomes do not
-become82/82 numerical passes.
-
-The canonical broad algorithm and capability registries retain their existing
-lineage and forbidden-feature restrictions. This finite documentation update
-does not change their routine/domain status or promote a release manifest:
-
-- [Algorithm boundaries and routine completion](../../../specs/algorithm_ledger.toml)
-- [Capability and unsupported-feature boundaries](../../../specs/capabilities.toml)
-- [IdealLoads source map](../porting-map/ideal-loads-source-map.md)
-
-## Current Launcher State
-
-The current Windows launcher script invokes `eplus-rs run` as a CLI process. It
-can choose and remember input, weather, output folder, oracle folder, and CLI
-binary; map mode, partial policy, output format, trace level, strict warning
-failure, oracle baseline, oracle compare, and overwrite controls to CLI
-arguments; show the three run-result states; display exit-code-aware status
-details including oracle and compare status, stage timing, top diagnostics, and
-the `conformance_claim=false` boundary; open output, diagnostics, run report,
-support report, and compare report artifacts; and show that Rusted EnergyPlus
-is not a drop-in replacement.
-
-The launcher self-test covers command construction for diagnostic, oracle
-baseline, and oracle compare runs; the three run-state presentations including
-a `run_blocked` case where oracle generation is shown separately from Rust
-runtime success; phase timing formatting; and wrapper invocation through
-`scripts/dev.cmd launch-ui`.
-
-## Current Structure Gates
-
-- heat-balance compatibility and diagnostic selections have separate typed
-  APIs, the diagnostic probe enum lives under `diagnostic_probes`, and the
-  official 1Zone compatibility selector resolves directly to a probe-agnostic
-  `HeatBalanceRuntimeConfig`. Compatibility algorithm consumers receive only
-  that config; diagnostic enum and long-form variant matching stay in
-  `diagnostic_probes` (plus tests), and the CLI delegates selector parsing and
-  display names to that boundary.
-- `specs/diagnostic_probe_ledger.toml` and
-  `scripts/quality/diagnostic-probe-check.ps1` enforce exact set equality
-  between source-map hypotheses and active full executable lanes. Historical
-  selectors and wrappers are excluded from the default suite. Historical
-  replay remains explicit through `-IncludeClosed` or retained direct wrapper
-  commands.
-- heat-balance source-order stage definitions live under
-  `heat_balance::{manager,surface_manager,air_manager,zone_predictor_corrector,
-  ctf,convection,radiation,reports}` and are guarded by
-  `scripts/quality/heat-balance-structure-audit.ps1`.
-- `ExecutionPlan` records EnergyPlus heat-balance and IdealLoads source-order
-  barriers, including `ManageZoneAirUpdates` for heat balance and
-  `SimPurchasedAir`, `GetPurchasedAir`, `InitPurchasedAir`,
-  `CalcPurchAirLoads`, `UpdatePurchasedAir`, and `ReportPurchasedAir` for the
-  arbitrary-run IdealLoads lane. It writes expected/actual source-order stage
-  IDs to `execution-plan.json` and `run-summary.json`, and blocks runtime
-  execution with a Plan exit if the lists diverge.
+Routine/domain readiness is owned by the algorithm ledger and project contract;
+input support is owned by the capability registry. A finite card pass, parser
+support or successful demo does not promote those registries. The
+[project contract](project-contract.md) defines the promotion requirements.

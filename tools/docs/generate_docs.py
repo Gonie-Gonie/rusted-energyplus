@@ -500,9 +500,7 @@ CURRENT_DOCS = [
     "docs/src/current/project-contract.md",
     "docs/src/current/current-status.md",
     "docs/src/current/roadmap.md",
-    "docs/src/current/verification.md",
     "docs/src/current/architecture-overview.md",
-    "docs/src/current/launcher-and-run-framework.md",
 ]
 GENERATED_DOC_OUTPUTS = [
     "docs/src/generated/milestone-map.md",

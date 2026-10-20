@@ -15,6 +15,11 @@ smoked, or diagnostic-only before it is conformance evidence. A compatibility
 claim requires declared cases, variables, tolerances, reports, and a blocking
 gate.
 
-Start with the compatibility contract and evidence levels before reading
-milestone or runtime documents.
+Use [Current Status](current/current-status.md) for scope and limitations,
+[Setup](guides/setup.md) and [Run an IDF](guides/run-arbitrary-idf.md) to execute
+models, and [Verify the port](guides/verify-porting.md) to inspect Oracle/Rust
+comparisons. [Developer Workflow](guides/developer-workflow.md) covers focused
+checks. Technical ownership and claim rules start at the
+[project contract](current/project-contract.md) and
+[architecture overview](current/architecture-overview.md).
 
