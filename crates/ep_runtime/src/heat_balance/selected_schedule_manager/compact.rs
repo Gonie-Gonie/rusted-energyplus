@@ -10,20 +10,17 @@ fn alpha(value: Option<&V>) -> Result<String, SelectedScheduleError> {
         None | Some(V::Null) => Ok(String::new()),
         Some(V::String(text)) => Ok(text.to_ascii_uppercase()),
         Some(V::Number(text)) => {
-            if !text.contains(['.', 'e', 'E']) {
-                // Native IP829 i64toa. No floating-point roundtrip for integers.
-                return text
-                    .parse::<i64>()
-                    .map(|value| value.to_string())
-                    .map_err(|_| unavailable("actual Compact JSON signed integer alpha domain"));
+            match ep_model::classify_source_json_number(text)
+                .map_err(|_| unavailable("actual Compact JSON number-kind domain"))?
+            {
+                // Native IP829 get<int64_t>/i64toa includes the actual
+                // C++20 modulo conversion from retained unsigned storage.
+                ep_model::SourceJsonNumber::Integer(value) => Ok(value.to_string()),
+                ep_model::SourceJsonNumber::Float(value) => {
+                    crate::heat_balance::source_output_registration::source_json_alpha_number(value)
+                        .map_err(SelectedScheduleError::from)
+                }
             }
-            let value = text
-                .parse::<f64>()
-                .ok()
-                .filter(|x| x.is_finite())
-                .ok_or_else(|| unavailable("actual Compact JSON finite float alpha domain"))?;
-            crate::heat_balance::source_output_registration::source_json_alpha_number(value)
-                .map_err(SelectedScheduleError::from)
         }
         _ => Err(unavailable("actual Compact alpha JSON type")),
     }

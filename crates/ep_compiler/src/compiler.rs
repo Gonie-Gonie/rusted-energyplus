@@ -10225,13 +10225,13 @@ impl<'a> Compiler<'a> {
             model.schedule_type_limits.push(ScheduleTypeLimits {
                 id,
                 name: NormalizedName::new(&name),
-                lower_limit: self.optional_number(
+                lower_limit: self.schedule_optional_number(
                     "ScheduleTypeLimits",
                     &name,
                     &object,
                     "lower_limit_value",
                 ),
-                upper_limit: self.optional_number(
+                upper_limit: self.schedule_optional_number(
                     "ScheduleTypeLimits",
                     &name,
                     &object,
@@ -10571,7 +10571,7 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 schedule_type_limits,
-                hourly_value: self.number_default(
+                hourly_value: self.schedule_number_default(
                     "Schedule:Constant",
                     &name,
                     &object,
@@ -10800,8 +10800,13 @@ impl<'a> Compiler<'a> {
             let mut hourly_values = [0.0; 24];
             for (hour_index, hourly_value) in hourly_values.iter_mut().enumerate() {
                 let field = format!("hour_{}", hour_index + 1);
-                *hourly_value =
-                    self.number_default("Schedule:Day:Hourly", &name, &object, &field, 0.0);
+                *hourly_value = self.schedule_number_default(
+                    "Schedule:Day:Hourly",
+                    &name,
+                    &object,
+                    &field,
+                    0.0,
+                );
             }
 
             model.day_schedules.push(ScheduleDayHourly {
@@ -10914,7 +10919,7 @@ impl<'a> Compiler<'a> {
             // a real getter blank/default0; no missing row is manufactured.
             let interval_value = match field_value(&entry, "value_until_time") {
                 Some(value) => {
-                    self.number_value(OBJECT_TYPE, &entry_name, "value_until_time", value)
+                    self.schedule_number_value(OBJECT_TYPE, &entry_name, "value_until_time", value)
                 }
                 None => {
                     self.record_default(OBJECT_TYPE, &entry_name, "value_until_time", "0.0");
@@ -11136,10 +11141,12 @@ impl<'a> Compiler<'a> {
             };
             let entry_name = format!("{object_name}[{index}]");
             match field_value(&entry_object, "value") {
-                Some(value) => match self.number_value(OBJECT_TYPE, &entry_name, "value", value) {
-                    Some(value) => values.push(value),
-                    None => entries_valid = false,
-                },
+                Some(value) => {
+                    match self.schedule_number_value(OBJECT_TYPE, &entry_name, "value", value) {
+                        Some(value) => values.push(value),
+                        None => entries_valid = false,
+                    }
+                }
                 None => {
                     self.record_default(OBJECT_TYPE, &entry_name, "value", "0.0");
                     values.push(0.0);
@@ -15975,6 +15982,65 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Only actual ScheduleManager numeric fields use this projection. Raw
+    // schema bounds (Year dates/minutes_per_item) and other families keep the
+    // existing number_value behavior; string alpha ProcessNumber is separate.
+    fn schedule_number_value(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        field: &str,
+        value: &RawValue,
+    ) -> Option<f64> {
+        let RawValue::Number(text) = value else {
+            self.invalid_field_type(object_type, object_name, field, "number");
+            return None;
+        };
+        match ep_model::classify_source_json_number(text) {
+            Ok(value) => Some(value.as_f64()),
+            Err(_) => {
+                self.error(
+                    "InvalidNumber",
+                    object_type,
+                    Some(object_name),
+                    Some(field),
+                    format!(
+                        "{object_type}/{object_name} field {field} is not a finite JSON number"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
+    fn schedule_optional_number(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<f64> {
+        field_value(object, field)
+            .and_then(|value| self.schedule_number_value(object_type, object_name, field, value))
+    }
+
+    fn schedule_number_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+    ) -> f64 {
+        match self.schedule_optional_number(object_type, object_name, object, field) {
+            Some(value) => value,
+            None => {
+                self.record_default(object_type, object_name, field, &format_number(default));
+                default
+            }
+        }
+    }
+
     fn number_value(
         &mut self,
         object_type: &str,
@@ -16136,7 +16202,7 @@ impl<'a> Compiler<'a> {
             {
                 let parsed = match compact_data_field(value) {
                     Some(field @ RawValue::Number(_)) => {
-                        self.number_value("Schedule:Compact", object_name, "data", field)
+                        self.schedule_number_value("Schedule:Compact", object_name, "data", field)
                     }
                     Some(RawValue::String(text)) => match ep_model::process_source_number(text) {
                         Ok(number) => Some(number),

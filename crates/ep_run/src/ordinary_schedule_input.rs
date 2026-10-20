@@ -20,11 +20,9 @@ fn number(object: &RawObject, name: &str) -> Result<Option<f64>, String> {
     match field(object, name) {
         None | Some(RawValue::Null) => Ok(None),
         Some(RawValue::String(value)) if value.is_empty() => Ok(None),
-        Some(RawValue::Number(value)) => value
-            .parse::<f64>()
+        Some(RawValue::Number(value)) => ep_model::classify_source_json_number(value)
             .ok()
-            .filter(|x| x.is_finite())
-            .map(Some)
+            .map(|number| Some(number.as_f64()))
             .ok_or_else(|| format!("selected schedule number unavailable: {name}")),
         _ => Err(format!("selected schedule number unavailable: {name}")),
     }

@@ -184,3 +184,95 @@ pub fn process_source_number(input: &str) -> Result<f64, SourceNumberError> {
         SourceNumberOutcome::ErrorZero | SourceNumberOutcome::NonFinite => Err(SourceNumberError),
     }
 }
+
+/// The stored numeric kind selected by the pinned JSON parser, followed by
+/// InputProcessor's `get<int64_t>()` conversion for every integer (also u64).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum SourceJsonNumber {
+    /// A signed JSON integer or a u64 converted modulo 2^64 to signed i64.
+    Integer(i64),
+    /// A finite stored double; floating origins never take integer wrapping.
+    Float(f64),
+}
+
+impl SourceJsonNumber {
+    /// Native numeric-array assignment converts the integer before Real64.
+    #[must_use]
+    pub fn as_f64(self) -> f64 {
+        match self {
+            Self::Integer(value) => value as f64,
+            Self::Float(value) => value,
+        }
+    }
+}
+
+/// The operand is not a fully consumed, finite JSON number.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SourceJsonNumberError;
+
+/// JSON grammar and kind selection, distinct from alpha ProcessNumber.
+///
+/// Native nlohmann 3.12 stores unsigned integer tokens through u64::MAX, then
+/// IP829/842 retrieves them as i64. Its C++20 integral conversion is modulo
+/// 2^64. A decimal/exponent token, or integer outside both 64-bit ranges, is
+/// instead a stored double. Nonfinite doubles fail the JSON parser itself.
+/// This does not recover original lexemes already lost by an upstream parser
+/// (notably serde_json's lexical -0 versus -0.0 custody distinction).
+pub fn classify_source_json_number(input: &str) -> Result<SourceJsonNumber, SourceJsonNumberError> {
+    let bytes = input.as_bytes();
+    let mut cursor = usize::from(bytes.first() == Some(&b'-'));
+    match bytes.get(cursor) {
+        Some(b'0') => cursor += 1,
+        Some(b'1'..=b'9') => {
+            cursor += 1;
+            while bytes.get(cursor).is_some_and(u8::is_ascii_digit) {
+                cursor += 1;
+            }
+        }
+        _ => return Err(SourceJsonNumberError),
+    }
+    let mut floating = false;
+    if bytes.get(cursor) == Some(&b'.') {
+        floating = true;
+        cursor += 1;
+        let begin = cursor;
+        while bytes.get(cursor).is_some_and(u8::is_ascii_digit) {
+            cursor += 1;
+        }
+        if cursor == begin {
+            return Err(SourceJsonNumberError);
+        }
+    }
+    if matches!(bytes.get(cursor), Some(b'e' | b'E')) {
+        floating = true;
+        cursor += 1;
+        if matches!(bytes.get(cursor), Some(b'+' | b'-')) {
+            cursor += 1;
+        }
+        let begin = cursor;
+        while bytes.get(cursor).is_some_and(u8::is_ascii_digit) {
+            cursor += 1;
+        }
+        if cursor == begin {
+            return Err(SourceJsonNumberError);
+        }
+    }
+    if cursor != bytes.len() {
+        return Err(SourceJsonNumberError);
+    }
+    if !floating {
+        if let Ok(value) = input.parse::<i64>() {
+            return Ok(SourceJsonNumber::Integer(value));
+        }
+        if let Ok(value) = input.parse::<u64>() {
+            // Rust's integer `as` has the same modulo-bit conversion as C++20.
+            return Ok(SourceJsonNumber::Integer(value as i64));
+        }
+    }
+    input
+        .parse::<f64>()
+        .ok()
+        .filter(|value| value.is_finite())
+        .map(SourceJsonNumber::Float)
+        .ok_or(SourceJsonNumberError)
+}

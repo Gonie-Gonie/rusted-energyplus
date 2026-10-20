@@ -48,15 +48,9 @@ fn numeric(value: Option<&V>, default: Option<f64>) -> Result<(f64, bool), Selec
         Some(V::Number(text)) => {
             // Native numeric fields use i64->Real64 for JSON integers and the
             // actual stored double otherwise; no alpha/Milo or scalar parsing.
-            let value = if text.contains(['.', 'e', 'E']) {
-                text.parse::<f64>().ok()
-            } else {
-                text.parse::<i64>().ok().map(|n| n as f64)
-            };
-            value
-                .filter(|n| n.is_finite())
-                .map(|n| (n, false))
-                .ok_or_else(|| unavailable("actual regular schedule JSON numeric domain"))
+            ep_model::classify_source_json_number(text)
+                .map(|number| (number.as_f64(), false))
+                .map_err(|_| unavailable("actual regular schedule JSON numeric domain"))
         }
         _ => Err(unavailable("actual regular schedule schema numeric field")),
     }

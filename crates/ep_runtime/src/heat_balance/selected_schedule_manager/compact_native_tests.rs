@@ -76,7 +76,11 @@ fn alpha(fields: &Value, name: &str) -> TestResult<Option<String>> {
 fn number(fields: &Value, name: &str) -> TestResult<Option<f64>> {
     Ok(match object(fields)?.get(name) {
         None | Some(Value::Null) => None,
-        Some(Value::Number(v)) => Some(v.as_f64().ok_or_else(|| invalid("schedule number"))?),
+        Some(Value::Number(v)) => Some(
+            ep_model::classify_source_json_number(&v.to_string())
+                .map_err(|_| invalid("actual schedule JSON number-kind domain"))?
+                .as_f64(),
+        ),
         _ => return Err(invalid("actual schedule numeric field").into()),
     })
 }
@@ -647,6 +651,215 @@ fn verify_authored_regular_schedule_graph(fixture: &Value) -> TestResult<()> {
             .ok_or("actual Day discrete warning")?;
         assert!(range < integer);
         assert_eq!(manager.day_schedules[1].sum_timestep_values, 50.0);
+    }
+    // Genuine nlohmann JSON integer storage is converted to i64 before Real64
+    // or alpha formatting. This extends the same real schedule-owner body.
+    {
+        let two64 = 2.0_f64.powi(64);
+        let cases = [
+            ("18446744073709551615", -1.0),
+            ("18446744073709551614", -2.0),
+            ("18446744073709551556", -60.0),
+            ("9223372036854775808", i64::MIN as f64),
+            ("9223372036854775807", i64::MAX as f64),
+            ("18446744073709551615.0", two64),
+            ("18446744073709551615e0", two64),
+            ("18446744073709551616", two64),
+            ("-9223372036854775809", i64::MIN as f64),
+            ("-9223372036854775808", i64::MIN as f64),
+            ("1.0", 1.0),
+            ("1", 1.0),
+        ];
+        let mut raw = fixture["cohorts"][0]["raw"].clone();
+        raw["ScheduleTypeLimits"]["Wide JSON"] = serde_json::json!({});
+        raw["ScheduleTypeLimits"]["Temperature"]["lower_limit_value"] =
+            serde_json::from_str("18446744073709551556")?;
+        raw["Schedule:Constant"]["Heating Setpoint"]["hourly_value"] =
+            serde_json::from_str("18446744073709551615")?;
+        let mut hourly = serde_json::Map::new();
+        hourly.insert(
+            "schedule_type_limits_name".into(),
+            serde_json::json!("Wide JSON"),
+        );
+        for hour in 1..=24 {
+            hourly.insert(
+                format!("hour_{hour}"),
+                serde_json::from_str(cases[(hour - 1) % cases.len()].0)?,
+            );
+        }
+        raw["Schedule:Day:Hourly"] = serde_json::json!({"JSON Hourly":Value::Object(hourly)});
+        let unsigned: Value = serde_json::from_str("18446744073709551615")?;
+        raw["Schedule:Day:Interval"] = serde_json::json!({"JSON Interval":{
+            "schedule_type_limits_name":"Temperature","interpolate_to_timestep":"No",
+            "data":[{"time":"24:00","value_until_time":unsigned.clone()}]
+        }});
+        raw["Schedule:Day:List"] = serde_json::json!({"JSON List":{
+            "schedule_type_limits_name":"Temperature","interpolate_to_timestep":"No","minutes_per_item":60,
+            "extensions":(0..24).map(|_|serde_json::json!({"value":unsigned.clone()})).collect::<Vec<_>>()
+        }});
+        raw["Schedule:Week:Daily"] = serde_json::json!({"JSON Week":Value::Object(week_fields.iter().enumerate().map(|(index,field)| {
+            ((*field).into(),serde_json::json!(match index {1=>"JSON Interval",2=>"JSON List",_=>"JSON Hourly"}))
+        }).collect())});
+        raw["Schedule:Year"] = serde_json::json!({"JSON Year":{
+            "schedule_type_limits_name":"Wide JSON","schedule_weeks":[row("JSON Week",1,1,12,31)]
+        }});
+        let compact = |kind: &str, value: Value| {
+            serde_json::json!({"schedule_type_limits_name":kind,"data":[
+                {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Interpolate:No"},
+                {"field":"Until:24:00"},{"field":value}
+            ]})
+        };
+        raw["Schedule:Compact"]["JSON Integer Compact"] = compact("Temperature", unsigned);
+        raw["Schedule:Compact"]["JSON Float Compact"] =
+            compact("Wide JSON", serde_json::from_str("18446744073709551615.0")?);
+        let mut f = fixture.clone();
+        f["object_order"]["ScheduleTypeLimits"]
+            .as_array_mut()
+            .ok_or("actual JSON type order")?
+            .push(serde_json::json!("Wide JSON"));
+        f["object_order"]["Schedule:Compact"]
+            .as_array_mut()
+            .ok_or("actual JSON Compact order")?
+            .extend([
+                serde_json::json!("JSON Integer Compact"),
+                serde_json::json!("JSON Float Compact"),
+            ]);
+        for (family, name, definition) in [
+            (
+                "Schedule:Day:Hourly",
+                "JSON Hourly",
+                serde_json::json!(["Schedule:Day:Hourly", 2, 24, 0, 0, null]),
+            ),
+            (
+                "Schedule:Day:Interval",
+                "JSON Interval",
+                serde_json::json!(["Schedule:Day:Interval", 3, 0, 1, 1, "data"]),
+            ),
+            (
+                "Schedule:Day:List",
+                "JSON List",
+                serde_json::json!(["Schedule:Day:List", 3, 1, 0, 1, "extensions"]),
+            ),
+            (
+                "Schedule:Week:Daily",
+                "JSON Week",
+                serde_json::json!(["Schedule:Week:Daily", 13, 0, 0, 0, null]),
+            ),
+            (
+                "Schedule:Year",
+                "JSON Year",
+                serde_json::json!(["Schedule:Year", 2, 0, 1, 4, "schedule_weeks"]),
+            ),
+        ] {
+            f["object_order"][family] = serde_json::json!([name]);
+            let definitions = f["definitions"]
+                .as_array_mut()
+                .ok_or("actual JSON numeric definitions")?;
+            if !definitions.iter().any(|item| item[0] == family) {
+                definitions.push(definition);
+            }
+        }
+        let mut input = processor(&f, &raw)?;
+        let mut locals: super::SourceScheduleGetterLocals = (
+            vec![String::new(); 32],
+            vec![String::new(); 32],
+            vec![String::new(); 25],
+            vec![0.0; 25],
+            vec![true; 32],
+            vec![true; 25],
+        );
+        for (name, expect_integer) in [
+            ("JSON Integer Compact", true),
+            ("JSON Float Compact", false),
+        ] {
+            let ordinal = names(&f, "Schedule:Compact")?
+                .iter()
+                .position(|item| item == name)
+                .ok_or("actual JSON Compact ordinal")?;
+            assert_eq!(
+                SelectedScheduleManager::get_source_compact_object_item(
+                    &mut input,
+                    ordinal,
+                    &mut locals,
+                    true
+                )?,
+                7
+            );
+            if expect_integer {
+                assert_eq!(locals.0[6], "-1");
+            } else {
+                assert_eq!(locals.0[6].parse::<f64>()?.to_bits(), two64.to_bits());
+            }
+        }
+        let mut declarations = schedule_declarations(&f, &raw)?;
+        declarations.source_is_epjson = Some(true);
+        assert_eq!(
+            declarations
+                .types
+                .iter()
+                .find(|kind| kind.name == "TEMPERATURE")
+                .ok_or("actual wrapped type")?
+                .lower,
+            Some(-60.0)
+        );
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let year = manager
+            .get_source_schedule("JSON YEAR")?
+            .ok_or("actual JSON Year")?;
+        let heating = manager
+            .get_source_schedule("HEATING SETPOINT")?
+            .ok_or("actual wrapped Constant")?;
+        let integer = manager
+            .get_source_schedule("JSON INTEGER COMPACT")?
+            .ok_or("actual wrapped Compact")?;
+        let floating = manager
+            .get_source_schedule("JSON FLOAT COMPACT")?
+            .ok_or("actual Float Compact")?;
+        for day_type in 1..=3 {
+            for ordinal in 0..96 {
+                let clock = WeatherGlobalState {
+                    hour_of_day: ordinal / 4 + 1,
+                    time_step: ordinal % 4 + 1,
+                    time_steps_in_hour: 4,
+                    ..Default::default()
+                };
+                let environment = WeatherEnvironmentState {
+                    day_of_year_schedule: 1,
+                    day_of_week: day_type,
+                    ..Default::default()
+                };
+                manager.update_source_schedule_values(&clock, &environment)?;
+                let expected: f64 = if day_type == 1 {
+                    cases[(ordinal as usize / 4) % cases.len()].1
+                } else {
+                    -1.0
+                };
+                assert_eq!(
+                    manager.source_current_schedule_value(year)?.to_bits(),
+                    expected.to_bits(),
+                    "actual JSON Day{day_type} step{ordinal}"
+                );
+                assert_eq!(
+                    manager.source_current_schedule_value(heating)?.to_bits(),
+                    (-1.0_f64).to_bits()
+                );
+                assert_eq!(
+                    manager.source_current_schedule_value(integer)?.to_bits(),
+                    (-1.0_f64).to_bits()
+                );
+                assert_eq!(
+                    manager.source_current_schedule_value(floating)?.to_bits(),
+                    two64.to_bits()
+                );
+            }
+        }
     }
     Ok(())
 }

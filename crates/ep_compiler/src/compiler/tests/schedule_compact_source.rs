@@ -28,7 +28,7 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
         Some(ScheduleId(1))
     );
 
-    // Raw Number remains on number_value. Strings and real existing blank
+    // Raw Number uses the genuine JSON-kind getter projection. Strings and real existing blank
     // extensible objects use source ProcessNumber only while Until is pending.
     let scalar_result = |entry: &str,
                          with_until: bool|
@@ -100,6 +100,93 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
     for entry in [r#"{"field":"1D0"}"#, r#"{}"#] {
         assert!(scalar_result(entry, false)?.has_errors());
     }
+
+    // Exercise the shared JSON-kind classifier in this existing connected body.
+    // Integer overflow fallback is a stored float, never arbitrary-width wrap.
+    use ep_model::{SourceJsonNumber, classify_source_json_number};
+    for (text, expected) in [
+        ("0", 0_i64),
+        ("-0", 0),
+        ("9223372036854775807", i64::MAX),
+        ("-9223372036854775808", i64::MIN),
+        ("9223372036854775808", i64::MIN),
+        ("18446744073709551615", -1),
+    ] {
+        assert_eq!(
+            classify_source_json_number(text),
+            Ok(SourceJsonNumber::Integer(expected))
+        );
+    }
+    for (text, expected) in [
+        ("18446744073709551615.0", 18446744073709551616.0_f64),
+        ("18446744073709551615e0", 18446744073709551616.0),
+        ("18446744073709551616", 18446744073709551616.0),
+        ("-9223372036854775809", -9223372036854775808.0),
+        ("-0.0", -0.0),
+        ("1e-9999", 0.0),
+        ("-1e-9999", -0.0),
+    ] {
+        let Ok(SourceJsonNumber::Float(actual)) = classify_source_json_number(text) else {
+            return Err(std::io::Error::other(format!("actual JSON float kind: {text}")).into());
+        };
+        assert_eq!(actual.to_bits(), expected.to_bits(), "{text}");
+    }
+    for text in [
+        "", "+1", "01", "-01", ".5", "1.", "1e", "1D0", " 1", "1 ", "nan", "1e9999",
+    ] {
+        assert!(classify_source_json_number(text).is_err(), "{text}");
+    }
+    let max = "18446744073709551615";
+    let hours = (1..=24)
+        .map(|hour| format!("\"hour_{hour}\":{max}"))
+        .collect::<Vec<_>>()
+        .join(",");
+    let list = vec![format!("{{\"value\":{max}}}"); 24].join(",");
+    let projected = compile_raw_model(&parse_epjson_str(&format!(
+        r#"{{
+        "ScheduleTypeLimits":{{"Wrapped":{{"lower_limit_value":{max},"upper_limit_value":200,"numeric_type":"Continuous"}}}},
+        "Schedule:Constant":{{"C":{{"schedule_type_limits_name":"Wrapped","hourly_value":{max}}}}},
+        "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"Wrapped","data":[
+            {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"Until:24:00"}},{{"field":{max}}}]}}}},
+        "Schedule:Day:Hourly":{{"H":{{"schedule_type_limits_name":"Wrapped",{hours}}}}},
+        "Schedule:Day:Interval":{{"I":{{"schedule_type_limits_name":"Wrapped","data":[{{"time":"24:00","value_until_time":{max}}}]}}}},
+        "Schedule:Day:List":{{"L":{{"schedule_type_limits_name":"Wrapped","minutes_per_item":60,"extensions":[{list}]}}}}
+    }}"#
+    ))?);
+    assert!(
+        !projected.has_errors(),
+        "{:?}",
+        projected.report.diagnostics
+    );
+    let model = projected
+        .model
+        .ok_or_else(|| std::io::Error::other("actual unsigned schedule projection"))?;
+    assert_eq!(model.schedule_type_limits[0].lower_limit, Some(-1.0));
+    assert_eq!(model.schedule_type_limits[0].upper_limit, Some(200.0));
+    assert_eq!(model.schedules[0].hourly_value, -1.0);
+    assert_eq!(
+        model.compact_schedules[0].periods[0].day_profiles[0].segments[0].value,
+        -1.0
+    );
+    assert_eq!(model.day_schedules[0].hourly_values, [-1.0; 24]);
+    assert_eq!(model.day_interval_schedules[0].segments[0].value, -1.0);
+    assert_eq!(model.day_list_schedules[0].values, vec![-1.0; 24]);
+    for value in [
+        "18446744073709551615.0",
+        "18446744073709551615e0",
+        "18446744073709551616",
+    ] {
+        let result = scalar_result(&format!("{{\"field\":{value}}}"), true)?;
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|row| row.code == "ScheduleValueOutsideTypeLimits")
+        );
+        assert!(result.model.is_none());
+    }
+
     let excessive = scalar_result(r#"{"field":"2D0"}"#, true)?;
     assert!(
         excessive

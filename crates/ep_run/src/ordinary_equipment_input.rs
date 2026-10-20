@@ -1219,6 +1219,46 @@ mod source_a_compact_ingress {
         let mut missing = reports.clone();
         missing["Output:Schedules"][""] = serde_json::json!({});
         assert!(resolve_source_a(&ep_raw_model::parse_epjson_str(&missing.to_string())?).is_err());
+        // Actual frontend TypeLimits/Constant projection follows Native's
+        // JSON integer->signed-i64->Real64, retaining raw values for schema.
+        let mut unsigned = reports.clone();
+        unsigned["ScheduleTypeLimits"]["Wrapped"] = serde_json::json!({
+            "lower_limit_value":u64::MAX,"upper_limit_value":200,"numeric_type":"Continuous"
+        });
+        unsigned["Schedule:Constant"]["Wrapped Constant"] = serde_json::json!({
+            "schedule_type_limits_name":"Wrapped","hourly_value":u64::MAX
+        });
+        let raw = ep_raw_model::parse_epjson_str(&unsigned.to_string())?;
+        resolve_source_a(&raw)?;
+        let projected = crate::ordinary_schedule_input::resolve(&raw)?;
+        let limits = projected
+            .types
+            .iter()
+            .find(|row| row.name == "WRAPPED")
+            .ok_or("actual wrapped type")?;
+        assert_eq!((limits.lower, limits.upper), (Some(-1.0), Some(200.0)));
+        assert_eq!(
+            projected
+                .constants
+                .iter()
+                .find(|row| row.name == "WRAPPED CONSTANT")
+                .ok_or("actual wrapped Constant")?
+                .value,
+            -1.0
+        );
+        unsigned["Schedule:Constant"]["Wrapped Constant"]["hourly_value"] =
+            serde_json::json!(18446744073709551616.0_f64);
+        let raw = ep_raw_model::parse_epjson_str(&unsigned.to_string())?;
+        let projected = crate::ordinary_schedule_input::resolve(&raw)?;
+        assert_eq!(
+            projected
+                .constants
+                .iter()
+                .find(|row| row.name == "WRAPPED CONSTANT")
+                .ok_or("actual float Constant")?
+                .value,
+            18446744073709551616.0
+        );
         // The actual admission requires its Zone even for this isolated
         // format/count transfer check; no simulation or Native execution runs.
         let json = r#"{"Zone":{"actual zone":{}},"Output:Schedules":{"Output:Schedules 1":{"key_field":"Hourly"},"Output:Schedules 2":{"key_field":"Timestep"}}}"#;
