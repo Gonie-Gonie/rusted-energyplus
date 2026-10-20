@@ -170,7 +170,7 @@
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "Direct-epJSON A59 cases preserve original55 variable/3Hourly meter requests, weather and thermal consumers while exercising actual TypeLimits/Constant/Hourly/Compact. Constant96 and Day report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, positiveMTR3/72, Warmup20, three unused information rows, wholeSHD and ERR-END0. The numeric case has22-line5584-byte EIO; a sole43-byte bare LinearAverage insertion has its own Native/Source pair and22-line5594-byte EIO with both CompactDay labels Average. That constant profile proves mode selection/reporting; real nonconstant1440minute/96step behavior is owner-test evidence. Unchanged-input regression may reuse its retained Native reference; changed input has its own actual Native authority. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Day:Hourly": [
       "Actual Source A/B getter retains original declaration order, input format, local arrays, numeric/alpha field names, blanks, defaults and usage. Twenty-four admitted finite JSON numbers or omitted-zero values populate real Day timestep values and sums in hour-major order.",
@@ -179,17 +179,19 @@
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Week:Daily": [
       "Actual ordered raw/IP getter resolves all twelve named Day references in Native day-type order after Hourly and before Year/Compact. Real Week pointers and Day usage flags feed existing live calendar, DST, currentVal and min/max consumers.",
-      "Connected B102 physical evidence covers all102/9792 original operands; existing owner checks inspect every Week pointer and all twelve day-type lookups. Missing reference and duplicate object-name diagnostics and unported Day siblings remain bounded."
+      "Connected B102 physical evidence covers all102/9792 original operands; existing owner checks inspect every Week pointer and all twelve day-type lookups. Missing reference and duplicate object-name diagnostics and unported Day siblings remain bounded.",
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion."
     ],
     "Schedule:Year": [
       "Actual ordered raw/IP getter creates the real Detailed kind0 owner before Compact/Constant. It resolves and marks each Week before consuming four raw numeric dates, then calls literal General::OrdinalDay(...,1) without a civil month-length validator. The Year-only compiler projection now follows the same operation under independent official integer month1..12/day1..31 bounds and max53 ranges; schema-valid February30/31 and April/June/September/November31 fold forward. Canonical Compact/calendar helpers and numeric parsing remain unchanged.",
       "Inclusive and wrapped real leap-shaped pointers, missing day60-from59 fallback and annual coverage ordering remain intact. Optional type warnings retain actual field names and live phase flags; uncached min/max, currentVal, DST, thermostat/gains and report consumers read the genuine Day/Week/Detailed roots. Equal Day profiles do not merge distinct Week owners or their identity-based EIO report runs.",
       "The sole same-input B102 physical pair derives the consumed Interval/List/week/Year plus both OutputSchedules input, replaces only gainYear with seven alternating W/V ranges and appends one real WeekDailyV whose twelve references point to the existing IntervalGainDay. All six noncanonical end dates are exercised; both actual28-line7420-byte schedule EIO sections retain ThroughMar01/Mar02/May01/Jul01/Oct01/Dec01/Dec31 and agree byte-for-byte with each other and the independent primary/input-derived expectation. Original102/9792 output values, all96 gain/control/availability profiles, genuine nominal/day-group EIO, actualWarmup6, wholeSHD, fullERR-END0 and real deleted-emptyMTR agree. Existing owner checks independently inspect all366 actual pointer identities, wrapped ranges and February29 fallback; serialized report runs are observed physically without claiming instrumented internal pointer bits.",
-      "Large unsigned JSON storage, signed-zero custody, unsafe conversions and incomplete/overlap/reference diagnostic effects remain separately bounded. This unit adds no generic ProcessNumber/date syntax, Schedule:File/EMS behavior, new family admission or arbitrary environment/model combination claim; the existing raw/compiler/type and error-child boundaries continue to apply."
+      "Large unsigned JSON storage, signed-zero custody, unsafe conversions and incomplete/overlap/reference diagnostic effects remain separately bounded. This unit adds no generic ProcessNumber/date syntax, Schedule:File/EMS behavior, new family admission or arbitrary environment/model combination claim; the existing raw/compiler/type and error-child boundaries continue to apply.",
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion."
     ],
     "Schedule:Day:Interval": [
       "Actual Source A/B raw/IP getters retain input format, declaration order, original counts, field names, blanks/defaults and usage. Existing numeric extension items with omitted values provide real zero blanks; explicit null/string numerics and missing whole rows are not promoted.",
@@ -198,7 +200,7 @@
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Day:List": [
       "Actual Source A/B raw/IP getters preserve ordered numeric values, real omitted-value zero defaults and blank flags. The real producer checks positive minutes and item count before defined truncation/division, then expected count and divisibility into60, fills actual1440-minute storage and populates the retained Day values/sum. Source admission keeps schema-valid integer minutes1..60 and finite numbers.",
@@ -207,12 +209,13 @@
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Week:Compact": [
       "Actual Source A/B ordered mixed getters resolve and mark each real Day owner used before ProcessForDayTypes. Independent substring predicates mutate the real per-week assignment mask; successful selectors write only actual DayType slots1..12. The constructor retains nullptr/None at slot0 and genuine MissingDay pointers at unassigned slots1..12.",
       "WeekDaily precedes WeekCompact, then the existing Detailed Year/Compact/Constant and shared live calendar/currentVal/minmax consumers retain actual graph ownership. Invalid/duplicate selectors, missing Day references or required assignments remain explicit unavailable boundaries before unported severe effects; omitted assignments are not replaced by Compact's warning/zero-profile policy.",
-      "The sole same-input B102 physical pair covers an AllDays mapping to a genuine No Interval gain Day with original consumer name and all102/9792 requests unchanged. Existing authored owner tests separately inspect Weekdays/Weekends/AllOtherDays, all twelve retained pointers, usage-before-selector failure prefixes and live Year clock values. Other calendars, arbitrary selector/reference combinations and full-family runtime parity remain unclaimed. Existing finite legacy first_evidence entries retain their separate conformance identities."
+      "The sole same-input B102 physical pair covers an AllDays mapping to a genuine No Interval gain Day with original consumer name and all102/9792 requests unchanged. Existing authored owner tests separately inspect Weekdays/Weekends/AllOtherDays, all twelve retained pointers, usage-before-selector failure prefixes and live Year clock values. Other calendars, arbitrary selector/reference combinations and full-family runtime parity remain unclaimed. Existing finite legacy first_evidence entries retain their separate conformance identities.",
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion."
     ],
     "Output:Schedules": [
       "Actual Source A/B raw/IP getter consumes the required Hourly or Timestep key in physical declaration order without an authored Name. Arbitrary unnamed epJSON map keys, including empty/whitespace keys and ignored additional metadata, retain actual raw custody; IDF generated per-family identities and exact field counts, including a final unterminated zero-count field, are preserved. Legacy admission remains blocked; whole-object compiler typing remains RawOnly.",
@@ -224,14 +227,14 @@
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Constant": [
       "Actual ordinary Source Constant projection consumes the retained numeric value through the shared JSON-kind classifier and preserves its existing type-limit association and genuine scalar ScheduleManager owner. The new requested Schedule Value is independently exact; constants remain omitted from genuine Output:Schedules Detailed rows.",
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
-      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+      "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ]
   },
   "verification": {
@@ -248,18 +251,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/compact-interpolation-selector-clippy-38.log",
-        "sha256": "aec2193c27c490a017a39f3bbc6eaa8e58d8e24b92489a26cd95ab66a7da41b7",
-        "bytes": 2308
+        "path": ".runtime/object-expansion/schedule-instance-metadata-clippy-39.log",
+        "sha256": "8c6ac98b23566c61e8cece05e3a7c28edec1bb635cef024c93d2b58a9f904c71",
+        "bytes": 580
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-interpolation-selector-docs-38.log",
-        "sha256": "98774aca27649dd1ff3ea735b69c5481617dc059cbf98fa72706e7f5cd592d78",
+        "path": ".runtime/object-expansion/schedule-instance-metadata-docs-39.log",
+        "sha256": "87f138ac5e266a7b4df03c65f25769c3cba2c54baa9ccbb8dfa2f7755b23af11",
         "bytes": 354
       },
-      "clippy_through_build": "compact-interpolation-selector-38",
+      "clippy_through_build": "schedule-instance-metadata-39",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3765,12 +3768,63 @@
           "passed": true
         },
         "effective_state": "New actual Native38 and Source38 same-input pair derives from parentNative36 input with exactly43ASCII bytes inserted after UnsignedJSONCompact ForAllDays. Bare LinearAverage is consumed without an Interpolate keyword; actual NO then AVERAGE then LINEAR substring order selects Average. All other input bytes, original55variables3meters plus separate96exactScheduleValue rule, uintMAX effective-1 values/thermal consumers/weather remain unchanged. Full actual22line5594byteCRLF schedule EIO atline14 changes only the two generatedCompactDay interpolation labels No to Average; values stayconstant-1, so this physical pair proves mode selection/reporting rather than nonconstant interpolation math. Existing genuine owner tests check nonconstant1440minute/96zone Average behavior separately. Full59/5448 Source-own physical streams are independently recomputed by unchanged kernel and original58 policies plus separate96exact0/0/0 rule; Constant-1 andAlwaysOn1 raw/binary96, positiveMTR3/72, threeunusedinfo, Warmup20/fullERR-END0/wholeSHD agree. ActualBuild38 compiler selector, RawModel JSON lexemes and genuine IP/getter/minute/Day/Week/report owners plus sharednumbers are authenticated live/archive/snapshot. Native36 is retained parent ancestry only, not relabelled authority for the changed input. No physicalnegativezero sign proof, allmodel or fullfamily claim; expected values never seed producers."
+      },
+      {
+        "id": "schedule-instance-metadata",
+        "group": "schedule_instance_metadata",
+        "source_build": "schedule-instance-metadata-39",
+        "input": {
+          "path": ".runtime/object-expansion/native-schedule-instance-metadata/calibration-01/input.epJSON",
+          "sha256": "86eb76d4f660414a0810c7c4a07cf0bf50256ba420caacef9d7a2cc3775dde6d",
+          "bytes": 38281
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-schedule-instance-metadata/calibration-01/receipt.json",
+          "sha256": "845f2ee2b5b12f7d673a777dae9f36ed5a53750eb8f2d89933469127968d8faf",
+          "bytes": 23676
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-schedule-instance-metadata-39/schedule-instance-metadata/receipt.json",
+          "sha256": "ee044fb6db0620396fe309279cbb454ff873e460c3ebcbb294df33435048f6a1",
+          "bytes": 3576
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/schedule-instance-metadata-39/run-summary.json",
+          "sha256": "a29a6839d388795807c1134f8f3123b08249a84852f2ebe8b3b0e4c2a7d7993b",
+          "bytes": 32759
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-schedule-instance-metadata-comparisons-39/schedule-instance-metadata/comparison.json",
+          "sha256": "848a7e62dbb297a2bd0c8581853beddac44e9af37c9cdc426a1b9438369425cb",
+          "bytes": 265566
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-schedule-instance-metadata-39-launch/schedule-instance-metadata/request.json",
+          "sha256": "6878e977faaf4e94d68f7ec4a8c4b528400b652804d2f298afaeb5b2d6890894",
+          "bytes": 3382
+        },
+        "totals": {
+          "series": 59,
+          "samples": 5448,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "The actual Native39 and Source39 pair uses eight exact ASCII insertions into the actual parentNative38 JSON. Six harmless unknown top-level metadata kinds appear in all twelve authored instances across nine schedule families; every original known field, request, policy, thermal consumer and weather byte remains unchanged. Reserved IDF metadata and extensible-row validation are separate. Five genuine declarations create Fraction IntervalNo .25, ListNo/minutes60/24 items .75, DailyWeek linked to Interval, CompactWeek linked to List, and Year1/1..12/31 linked to DailyWeek. These are actual report-visible owners, not new thermal consumers. Complete32-line8762-byte CRLF EIO sections atline14 match each other and the independently derived primary/input expectation: type rows, Hourly/Interval/List/generatedCompact Days, Daily/Compact/generated Weeks, Year thenCompact; Constants remain omitted. Full59/5448 Source-own physical streams are independently recomputed with the unchanged kernel, original58 policies and separate96 exact rule. Constant-1/AlwaysOn1 raw/binary96, positiveMTR3/72, exact four unused information rows(3 schedules/1week/1day plusadvice), Warmup20/fullERR-END0 and wholeSHD agree. ActualBuild39 raw/IP known-field-first metadata admission, compiler/getter/report owners, sharednumbers and full Rust snapshot are authenticated live/archive. ParentNative38 is input ancestry only; actualNative39 ran exactly once for this changed input. Native36 revoked preparation history remains inherited ancestry only. Physical reports establish accepted known-owner behavior with harmless instance metadata; raw metadata retention/kinds are checked by existing actual raw/IP owner tests. No arbitrary thermal combination, extensible-row widening, physical sign-zero/internal-bit or full-family claim; expected values never seed producers."
       }
     ],
     "totals": {
-      "paired_cases": 64,
-      "reported_samples": 476598,
-      "raw_operand_unequal": 129566,
+      "paired_cases": 65,
+      "reported_samples": 482046,
+      "raw_operand_unequal": 133102,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4421,10 +4475,27 @@
           "sha256": "ef4657e9d1450ce6f7df9642729bedcb902f755316a7d2d9f69e084306f78b32",
           "bytes": 75890577
         }
+      },
+      {
+        "id": "schedule-instance-metadata-39",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-39/receipt.json",
+          "sha256": "b59b0aee85be56ae2d7f9df5a5ce1dc47c5148848010e976cc6a24ef980965db",
+          "bytes": 4246
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/d5/d5e4c359623689e2d6dc749b5b6a9dbdc6b699b58443ec55d4912e62bc8d318a",
+          "sha256": "d5e4c359623689e2d6dc749b5b6a9dbdc6b699b58443ec55d4912e62bc8d318a"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-39/eplus-rs.exe",
+          "sha256": "87b3e429945f0db1e9da2e74be213d8655818500ec25923dee1b0ecb36445e85",
+          "bytes": 75895215
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 503,
+      "passed": 1299,
       "logs": [
         {
           "path": ".runtime/object-expansion/compact-interpolation-selector-compiler-tests-38b.log",
@@ -4435,9 +4506,14 @@
           "path": ".runtime/object-expansion/compact-interpolation-selector-owner-tests-38.log",
           "sha256": "4efec569ae9ef86379bb340c391e79f984f5d204bcd4be79a2976fec6cc709de",
           "bytes": 2394
+        },
+        {
+          "path": ".runtime/object-expansion/schedule-instance-metadata-run-tests-39.log",
+          "sha256": "c9811c7ed49f12ed92d30b66911407b0abc7fd75dd1df15ddf570c30db1dfa17",
+          "bytes": 146123
         }
       ],
-      "scope": "Existing compiler and real owner bodies verify Native postFor bare/prefixed selector consumption, NO then AVERAGE then LINEAR priority, retained source enum, and genuine nonconstant1440minute/96step Average production. The leading-whitespace Until negative case correctly fails at the reached invalid-interpolation stage; only that obsolete diagnostic expectation was corrected after the preserved failed38 compiler attempt. No new cohort."
+      "scope": "Existing compiler and actual Source-owner checks since full workspace37 cover interpolation selector priority and known-property-first top-level harmless instance metadata for nine schedule families. Actual A/B raw/IP tests preserve six metadata kinds, known-field diagnostics, reserved IDF fields and the legacy guard. No new cohort; actual Source39 ep_run lib796 is added to the previous503 focused checks."
     }
   },
   "additional_native_type_calibrations": [

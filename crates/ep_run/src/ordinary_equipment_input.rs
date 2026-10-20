@@ -171,10 +171,80 @@ fn resolve_raw(
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
                 {
-                    return Err(format!(
-                        "ordinary equipment field unavailable: {}.{}",
-                        family.0, field.0
-                    ));
+                    // Native's nine connected schedule instance schemas allow
+                    // additional members. Only an unconsumed top-level member
+                    // may pass here, after both existing operand validators.
+                    // The three actual IDF metadata predicates stay unchanged.
+                    let metadata = source_calendar_ingress
+                        && !matches!(
+                            field.0.as_str(),
+                            "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
+                        )
+                        && match family.0.as_str() {
+                            "ScheduleTypeLimits" => !matches!(
+                                field.0.as_str(),
+                                "lower_limit_value"
+                                    | "upper_limit_value"
+                                    | "numeric_type"
+                                    | "unit_type"
+                            ),
+                            "Schedule:Constant" => !matches!(
+                                field.0.as_str(),
+                                "schedule_type_limits_name" | "hourly_value"
+                            ),
+                            "Schedule:Compact" => {
+                                !matches!(field.0.as_str(), "schedule_type_limits_name" | "data")
+                            }
+                            "Schedule:Year" => !matches!(
+                                field.0.as_str(),
+                                "schedule_type_limits_name" | "schedule_weeks"
+                            ),
+                            "Schedule:Day:Hourly" => {
+                                field.0 != "schedule_type_limits_name"
+                                    && !field
+                                        .0
+                                        .strip_prefix("hour_")
+                                        .and_then(|suffix| suffix.parse::<u32>().ok())
+                                        .is_some_and(|hour| {
+                                            (1..=24).contains(&hour)
+                                                && field.0 == format!("hour_{hour}")
+                                        })
+                            }
+                            "Schedule:Day:Interval" => !matches!(
+                                field.0.as_str(),
+                                "schedule_type_limits_name" | "interpolate_to_timestep" | "data"
+                            ),
+                            "Schedule:Day:List" => !matches!(
+                                field.0.as_str(),
+                                "schedule_type_limits_name"
+                                    | "interpolate_to_timestep"
+                                    | "minutes_per_item"
+                                    | "extensions"
+                            ),
+                            "Schedule:Week:Daily" => !matches!(
+                                field.0.as_str(),
+                                "sunday_schedule_day_name"
+                                    | "monday_schedule_day_name"
+                                    | "tuesday_schedule_day_name"
+                                    | "wednesday_schedule_day_name"
+                                    | "thursday_schedule_day_name"
+                                    | "friday_schedule_day_name"
+                                    | "saturday_schedule_day_name"
+                                    | "holiday_schedule_day_name"
+                                    | "summerdesignday_schedule_day_name"
+                                    | "winterdesignday_schedule_day_name"
+                                    | "customday1_schedule_day_name"
+                                    | "customday2_schedule_day_name"
+                            ),
+                            "Schedule:Week:Compact" => field.0 != "data",
+                            _ => false,
+                        };
+                    if !metadata {
+                        return Err(format!(
+                            "ordinary equipment field unavailable: {}.{}",
+                            family.0, field.0
+                        ));
+                    }
                 }
             }
             // All twelve monthly fields are schema number/default18. IDF
@@ -1356,6 +1426,282 @@ mod source_a_compact_ingress {
                 .to_bits(),
             (-0.0_f64).to_bits()
         );
+        // Unknown instance members are retained metadata, not additional
+        // schedule operands. All nine families still use the same known fields.
+        let mut metadata_input = input.clone();
+        metadata_input["Schedule:Constant"] =
+            serde_json::json!({"C":{"schedule_type_limits_name":"Fraction","hourly_value":0.25}});
+        metadata_input["Schedule:Day:Hourly"] =
+            serde_json::json!({"H":{"schedule_type_limits_name":"Fraction","hour_7":1}});
+        metadata_input["Schedule:Day:Interval"] = serde_json::json!({"I":{"schedule_type_limits_name":"Fraction","data":[{"time":"06:00","value_until_time":0},{"time":"18:00","value_until_time":1},{"time":"24:00","value_until_time":0}]}});
+        let metadata_values = (0..24)
+            .map(|hour| serde_json::json!({"value":if hour<3 {0}else{1}}))
+            .collect::<Vec<_>>();
+        metadata_input["Schedule:Day:List"] = serde_json::json!({"L":{"schedule_type_limits_name":"Fraction","minutes_per_item":60,"extensions":metadata_values}});
+        metadata_input["Schedule:Week:Daily"] = regular["Schedule:Week:Daily"].clone();
+        metadata_input["Schedule:Week:Compact"] =
+            serde_json::json!({"WI":{"data":[{"daytype_list":"AllDays","schedule_day_name":"I"}]}});
+        metadata_input["Schedule:Year"] = serde_json::json!({"Y":{"schedule_type_limits_name":"Fraction","schedule_weeks":[{"schedule_week_name":"WI","start_month":1,"start_day":1,"end_month":12,"end_day":31}]}});
+        let schedule_objects = [
+            ("ScheduleTypeLimits", "Fraction"),
+            ("Schedule:Constant", "C"),
+            ("Schedule:Compact", "variable schedule"),
+            ("Schedule:Day:Hourly", "H"),
+            ("Schedule:Day:Interval", "I"),
+            ("Schedule:Day:List", "L"),
+            ("Schedule:Week:Daily", "W"),
+            ("Schedule:Week:Compact", "WI"),
+            ("Schedule:Year", "Y"),
+        ];
+        let baseline = ep_raw_model::parse_epjson_str(&metadata_input.to_string())?;
+        let baseline_a = crate::ordinary_input_processor::resolve_source_a(&baseline)?;
+        let baseline_b = crate::ordinary_input_processor::resolve_source_b(&baseline)?;
+        let baseline_declarations = crate::ordinary_schedule_input::resolve(&baseline)?;
+        let compiled = ep_compiler::compile_raw_model(&baseline);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let baseline_model = compiled.model.ok_or("actual metadata baseline model")?;
+        let nested_full = V::Object(std::collections::BTreeMap::from([(
+            "nested".into(),
+            V::Array(vec![V::Bool(true), V::Number("1".into()), V::Null]),
+        )]));
+        let nested_statistics = V::Object(std::collections::BTreeMap::from([(
+            "nested".into(),
+            V::Array(vec![V::OtherScalar, V::OtherScalar, V::Null]),
+        )]));
+        for (metadata, full, statistics, size) in [
+            (serde_json::json!(null), V::Null, V::Null, 0_usize),
+            (serde_json::json!(true), V::Bool(true), V::OtherScalar, 1),
+            (
+                serde_json::json!(1),
+                V::Number("1".into()),
+                V::OtherScalar,
+                1,
+            ),
+            (
+                serde_json::json!("literal -0 [1E+0]"),
+                V::String("literal -0 [1E+0]".into()),
+                V::String("literal -0 [1E+0]".into()),
+                1,
+            ),
+            (
+                serde_json::json!([null, true, 1]),
+                V::Array(vec![V::Null, V::Bool(true), V::Number("1".into())]),
+                V::Array(vec![V::Null, V::OtherScalar, V::OtherScalar]),
+                3,
+            ),
+            (
+                serde_json::json!({"nested":[true,1,null]}),
+                nested_full,
+                nested_statistics,
+                1,
+            ),
+        ] {
+            let mut tagged = metadata_input.clone();
+            for (family, name) in schedule_objects {
+                tagged[family][name]["user_metadata"] = metadata.clone();
+            }
+            let raw = ep_raw_model::parse_epjson_str(&tagged.to_string())?;
+            assert!(raw.is_epjson());
+            assert_eq!(
+                crate::ordinary_schedule_input::resolve(&raw)?,
+                baseline_declarations
+            );
+            let compiled = ep_compiler::compile_raw_model(&raw);
+            assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+            assert_eq!(compiled.model.as_ref(), Some(&baseline_model));
+            for (source_b, mut ip, mut original) in [
+                (
+                    false,
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    baseline_a.clone(),
+                ),
+                (
+                    true,
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    baseline_b.clone(),
+                ),
+            ] {
+                assert_eq!(ip.get_max_schema_args()?, original.get_max_schema_args()?);
+                let mut actual_stats =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                let mut original_stats =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                ip.report_source_idf_records_stats(&mut actual_stats)?;
+                original.report_source_idf_records_stats(&mut original_stats)?;
+                assert_eq!(actual_stats, original_stats);
+                for (family, name) in schedule_objects {
+                    assert_eq!(
+                        ip.get_object_def_max_args(family)?,
+                        original.get_object_def_max_args(family)?
+                    );
+                    assert_eq!(
+                        ip.source_raw_object_names(family)?,
+                        original.source_raw_object_names(family)?
+                    );
+                    let Some(ep_runtime::heat_balance::selected_input_processor::SourceInputFamily::Objects(shapes)) = ip.family(family) else {
+                        return Err("actual metadata family shape".into());
+                    };
+                    let shape = shapes
+                        .iter()
+                        .find(|shape| shape.object_name == name)
+                        .ok_or("actual metadata object shape")?;
+                    assert_eq!(shape.field_sizes.get("user_metadata"), Some(&size));
+                    let expected = if !source_b
+                        && matches!(family, "ScheduleTypeLimits" | "Schedule:Constant")
+                    {
+                        &statistics
+                    } else {
+                        &full
+                    };
+                    assert_eq!(
+                        ip.source_raw_object_fields(family, name)?
+                            .get("user_metadata"),
+                        Some(expected)
+                    );
+                    assert!(ip.is_object_unused(family, name)); // Transfer/statistics are not getters.
+                }
+            }
+        }
+        // Unknown-member acceptance cannot hide a bad known operand. No
+        // extensible-row validator or schema scalar grammar is widened.
+        for (family, name, field, value) in [
+            (
+                "ScheduleTypeLimits",
+                "Fraction",
+                "numeric_type",
+                serde_json::json!("NotANumericType"),
+            ),
+            (
+                "Schedule:Constant",
+                "C",
+                "hourly_value",
+                serde_json::json!("not a number"),
+            ),
+            (
+                "Schedule:Compact",
+                "variable schedule",
+                "data",
+                serde_json::json!([null]),
+            ),
+            ("Schedule:Day:Hourly", "H", "hour_7", serde_json::json!("1")),
+            (
+                "Schedule:Day:Interval",
+                "I",
+                "interpolate_to_timestep",
+                serde_json::json!("Future"),
+            ),
+            (
+                "Schedule:Day:List",
+                "L",
+                "minutes_per_item",
+                serde_json::json!(1.5),
+            ),
+            (
+                "Schedule:Week:Daily",
+                "W",
+                "monday_schedule_day_name",
+                serde_json::json!(true),
+            ),
+            (
+                "Schedule:Week:Compact",
+                "WI",
+                "data",
+                serde_json::json!([{"daytype_list":"AllDays","schedule_day_name":null}]),
+            ),
+            (
+                "Schedule:Year",
+                "Y",
+                "schedule_weeks",
+                serde_json::json!([{"schedule_week_name":"W","start_month":13,"start_day":1,"end_month":12,"end_day":31}]),
+            ),
+        ] {
+            let mut invalid = metadata_input.clone();
+            invalid[family][name]["user_metadata"] = serde_json::json!({"kept":true});
+            invalid[family][name][field] = value;
+            let raw = ep_raw_model::parse_epjson_str(&invalid.to_string())?;
+            assert!(resolve_source_a(&raw).is_err(), "{family}.{field}");
+            assert!(resolve_source_b(&raw).is_err(), "{family}.{field}");
+        }
+        for (family, name) in schedule_objects {
+            for metadata in ["idf_order", "idf_max_fields", "idf_max_extensible_fields"] {
+                let mut invalid = metadata_input.clone();
+                invalid[family][name][metadata] = serde_json::json!(null);
+                let raw = ep_raw_model::parse_epjson_str(&invalid.to_string())?;
+                assert!(resolve_source_a(&raw).is_err(), "{family}.{metadata}");
+                assert!(resolve_source_b(&raw).is_err(), "{family}.{metadata}");
+            }
+        }
+        let legacy = serde_json::json!({"Zone":{"actual zone":{}},"ScheduleTypeLimits":{"T":{}},"Schedule:Constant":{"C":{"schedule_type_limits_name":"T","hourly_value":0}}});
+        resolve(&ep_raw_model::parse_epjson_str(&legacy.to_string())?)?;
+        for family in ["ScheduleTypeLimits", "Schedule:Constant"] {
+            let mut tagged = legacy.clone();
+            let name = if family == "ScheduleTypeLimits" {
+                "T"
+            } else {
+                "C"
+            };
+            tagged[family][name]["user_metadata"] = serde_json::json!([null]);
+            let raw = ep_raw_model::parse_epjson_str(&tagged.to_string())?;
+            assert!(resolve(&raw).is_err());
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+        }
+        let mut unrelated = metadata_input.clone();
+        unrelated["Building"]["b"]["user_metadata"] = serde_json::json!(true);
+        assert!(
+            resolve_source_a(&ep_raw_model::parse_epjson_str(&unrelated.to_string())?).is_err()
+        );
+        // Actual staged-IDF origin, physical counts and reverse order remain
+        // separate from arbitrary retained instance members.
+        let zeros = vec!["0"; 24].join(",");
+        let idf = format!(
+            "Zone,actual zone;ScheduleTypeLimits,T;Schedule:Day:Hourly,Z,T,{zeros};Schedule:Day:Hourly,A,T,{zeros};"
+        );
+        let mut staged = serde_json::json!({"Zone":{"actual zone":{}},"ScheduleTypeLimits":{"T":{}},"Schedule:Day:Hourly":{"Z":{"schedule_type_limits_name":"T"},"A":{"schedule_type_limits_name":"T"}}});
+        for name in ["Z", "A"] {
+            for hour in 1..=24 {
+                staged["Schedule:Day:Hourly"][name][format!("hour_{hour}")] = serde_json::json!(0);
+            }
+        }
+        let baseline = ep_raw_model::parse_epjson_str_with_idf_order(&staged.to_string(), &idf)?;
+        staged["Schedule:Day:Hourly"]["Z"]["user_metadata"] =
+            serde_json::json!({"retained":[true,null,1]});
+        let tagged = ep_raw_model::parse_epjson_str_with_idf_order(&staged.to_string(), &idf)?;
+        assert!(!baseline.is_epjson() && !tagged.is_epjson());
+        assert_eq!(
+            crate::ordinary_schedule_input::resolve(&tagged)?.source_is_epjson,
+            Some(false)
+        );
+        for (mut original, mut ip) in [
+            (
+                crate::ordinary_input_processor::resolve_source_a(&baseline)?,
+                crate::ordinary_input_processor::resolve_source_a(&tagged)?,
+            ),
+            (
+                crate::ordinary_input_processor::resolve_source_b(&baseline)?,
+                crate::ordinary_input_processor::resolve_source_b(&tagged)?,
+            ),
+        ] {
+            assert_eq!(
+                ip.source_raw_object_names("Schedule:Day:Hourly")?,
+                ["Z", "A"]
+            );
+            assert_eq!(
+                ip.get_object_def_max_args("Schedule:Day:Hourly")?,
+                original.get_object_def_max_args("Schedule:Day:Hourly")?
+            );
+            for name in ["Z", "A"] {
+                for field in ["idf_max_fields", "idf_max_extensible_fields"] {
+                    assert_eq!(
+                        ip.source_raw_object_fields("Schedule:Day:Hourly", name)?
+                            .get(field),
+                        original
+                            .source_raw_object_fields("Schedule:Day:Hourly", name)?
+                            .get(field)
+                    );
+                }
+            }
+        }
         // The actual admission requires its Zone even for this isolated
         // format/count transfer check; no simulation or Native execution runs.
         let json = r#"{"Zone":{"actual zone":{}},"Output:Schedules":{"Output:Schedules 1":{"key_field":"Hourly"},"Output:Schedules 2":{"key_field":"Timestep"}}}"#;
