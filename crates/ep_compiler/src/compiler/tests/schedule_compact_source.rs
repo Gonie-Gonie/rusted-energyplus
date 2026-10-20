@@ -402,5 +402,82 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
             "other day-family parser stays strict"
         );
     }
+    let compile_until = |directive: &str,
+                         remainder: bool|
+     -> Result<crate::CompileResult, Box<dyn std::error::Error>> {
+        let tail = if remainder {
+            r#",{"field":"Until:24:00"},{"field":0.75}"#
+        } else {
+            ""
+        };
+        let source = format!(
+            r#"{{
+            "Timestep":{{"T":{{"number_of_timesteps_per_hour":4}}}},
+            "Schedule:Compact":{{"S":{{"data":[
+                {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},
+                {{"field":"{directive}"}},{{"field":0.25}}{tail}
+            ]}}}}
+        }}"#
+        );
+        Ok(compile_raw_model(&parse_epjson_str(&source)?))
+    };
+    for (directive, expected) in [
+        ("Until:6D0:0D0", 360),
+        ("Until6.0:0.0", 360),
+        ("Until:6E:0D", 360),
+        ("Until:6E+0:0D+0", 360),
+        ("Until:24:", 1440),
+        ("Until 2.4D1:0E", 1440),
+        ("Until::15", 15),
+        ("Until :30", 30),
+        ("Until::15+E0", 15),
+        ("Until:-0:15", 15),
+    ] {
+        let result = compile_until(directive, expected < 1440)?;
+        assert!(
+            !result.has_errors(),
+            "{directive}: {:?}",
+            result.report.diagnostics
+        );
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("actual integral Until model"))?;
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0].segments[0].until_minute_of_day,
+            expected
+        );
+    }
+    // Compiler rejection is a bounded projection; 0:0/MM60 and the genuine
+    // nonIntegral format-fatal prefix are not relabeled as Native type errors.
+    for directive in [
+        "Until:6.5:0",
+        "Until:6:0.5",
+        "Until:6E-1:0",
+        "Until:+6:0",
+        "Until:6:+0",
+        "Until:1e-9999:0",
+        "Until:6:1e-9999",
+        "Until:\u{00a0}6:0",
+        "Until:6:\u{00a0}0",
+        "Until:6:60",
+        "Until::",
+        "Until",
+        "Until:",
+        "Until:24",
+        " Until:6D0:0",
+        "Until :24:00",
+    ] {
+        let result = compile_until(directive, true)?;
+        assert!(result.has_errors(), "{directive}");
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|row| row.code == "InvalidScheduleCompactUntil"),
+            "{directive}"
+        );
+        assert!(result.model.is_none());
+    }
     Ok(())
 }

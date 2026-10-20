@@ -458,6 +458,135 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 .ends_with("  Processing Schedule Input -- Complete\n")
         );
     }
+    // Equivalent integral HH/MM spellings feed the same real minute producer.
+    // Blank HH and MM are existing operand substrings, not absent directives.
+    for untils in [
+        ["Until::20", "Until:1D0:15.0", "Until:24:"],
+        ["Until :20", "Until1E:15+E0", "Until24.0:0D"],
+        ["Until:-0:2E1", "Until:1.0:1.5D1", "Until:2.4E+1:0E"],
+    ] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        for (at, text) in [3, 5, 7].into_iter().zip(untils) {
+            raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][at]["field"] =
+                serde_json::json!(text);
+        }
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual integral Until schedule")?;
+        let day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name == "INTERNAL GAIN SCHEDULE_dy_1")
+            .ok_or("actual integral Until Day owner")?;
+        assert_eq!(day.timestep_values.len(), 96);
+        for step in 0..96 {
+            let expected = match step {
+                0 => 10.0_f64,
+                1 => 120.0,
+                _ => 175.0,
+            };
+            assert_eq!(day.timestep_values[step].to_bits(), expected.to_bits());
+        }
+        for step in 0..96 {
+            let expected = match step {
+                0 => 10.0_f64,
+                1 => 120.0,
+                _ => 175.0,
+            };
+            let clock = WeatherGlobalState {
+                hour_of_day: step / 4 + 1,
+                time_step: step % 4 + 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: 1,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                expected.to_bits()
+            );
+        }
+    }
+    // Keep the real nonIntegral Warning/Continue before the unsupported native
+    // string-floating-format operation; no successful population/fatal is made up.
+    for (until, label) in [("Until:0.5:20", "HH"), ("Until:00:20.5", "MM")] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][3]["field"] =
+            serde_json::json!(until);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut input,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )
+        };
+        assert!(result.is_err());
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_warning_errors_during_warmup
+            ),
+            (1, 1)
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        let text = std::str::from_utf8(&errors)?;
+        let warning = text
+            .find(&format!("non-integer numeric in {label}"))
+            .ok_or("real nonIntegral warning")?;
+        let continuation = text
+            .find("Other errors may result.")
+            .ok_or("real nonIntegral continuation")?;
+        assert!(warning < continuation);
+        assert!(!text.contains("Until value to be used"));
+        let day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name == "INTERNAL GAIN SCHEDULE_dy_1")
+            .ok_or("actual pre-population Day owner")?;
+        assert!(
+            day.timestep_values
+                .iter()
+                .all(|value| value.to_bits() == 0.0_f64.to_bits())
+        );
+    }
     // Actual IP distinguishes a present empty item from a missing whole entry.
     // Read the real getter count/alpha/blank, then use the genuine minute graph
     // and live clock for every reported timestep; no profile is seeded here.

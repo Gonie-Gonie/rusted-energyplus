@@ -53,13 +53,9 @@ fn decode_hhmm(
         ));
     };
     let number = |text: &str| -> Result<f64, SelectedScheduleError> {
-        // Native Util::ProcessNumber returns +0 for empty/space-only text;
-        // fast_float default from_chars rejects a leading plus. Rust parse
-        // admits it, so exclude that unsupported grammar before parsing.
+        // Preserve this caller's lexical/error boundary; shared ProcessNumber
+        // supplies D/E and the source suffix behavior, including blank MM0.
         let text = text.trim_matches(' ');
-        if text.is_empty() {
-            return Ok(0.0);
-        }
         if !text.is_ascii()
             || text.starts_with('+')
             || text.bytes().any(|b| b.is_ascii_whitespace())
@@ -68,14 +64,11 @@ fn decode_hhmm(
                 "actual DecodeHHMMField Util::ProcessNumber noncanonical numeric grammar",
             ));
         }
-        text.parse::<f64>()
-            .ok()
-            .filter(|x| x.is_finite())
-            .ok_or_else(|| {
-                unavailable(
-                    "actual DecodeHHMMField Util::ProcessNumber unsupported numeric/error branch",
-                )
-            })
+        ep_model::process_source_number(text).map_err(|_| {
+            unavailable(
+                "actual DecodeHHMMField Util::ProcessNumber unsupported numeric/error branch",
+            )
+        })
     };
     let mut non_integral = false;
     let mut decode = |text: &str,

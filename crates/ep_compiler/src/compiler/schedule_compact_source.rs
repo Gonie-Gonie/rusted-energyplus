@@ -7,8 +7,7 @@ use ep_model::{
 use ep_raw_model::RawObject;
 
 use super::{
-    ALL_SCHEDULE_DAY_TYPES, CompactSchedulePeriodBuilder, Compiler, compact_directive_operand,
-    process_week_compact_day_types,
+    ALL_SCHEDULE_DAY_TYPES, CompactSchedulePeriodBuilder, Compiler, process_week_compact_day_types,
 };
 
 impl Compiler<'_> {
@@ -170,10 +169,33 @@ impl Compiler<'_> {
 }
 
 fn decode_compact_until(value: &str) -> Option<(u32, u32, bool)> {
-    let time = compact_directive_operand(value, "Until")?;
-    let (hour, minute) = time.trim().split_once(':')?;
-    let hour = hour.trim().parse::<u32>().ok()?;
-    let minute = minute.trim().parse::<u32>().ok()?;
+    // Native ProcessIntervalFields2787-2795 requires the keyword at byte0
+    // and erases a colon only at byte5. A space before ':' can instead be a
+    // genuine blank HH (`Until :30`), not an optional keyword separator.
+    if value
+        .chars()
+        .any(|character| character.is_whitespace() && character != ' ')
+        || !value.get(..5)?.eq_ignore_ascii_case("Until")
+    {
+        return None;
+    }
+    let field = value.get(5..)?;
+    let time = field.strip_prefix(':').unwrap_or(field).trim_matches(' ');
+    let (hour, minute) = time.split_once(':')?;
+    let integral = |text: &str| {
+        let value = ep_model::process_source_number(text).ok()?;
+        // Nonintegral positive operands reach Native's separate formatting-
+        // fatal path. Keep them outside this completing scalar projection.
+        if value < 0.0 || value != value.trunc() || value > f64::from(i32::MAX) {
+            return None;
+        }
+        Some(value as u32)
+    };
+    // HH at first ':' and an existing empty MM both genuinely mean zero.
+    let hour = integral(hour)?;
+    let minute = integral(minute)?;
+    // Preserve the bounded existing 0:0 and MM60 fences. Native MM60 keeps
+    // previous endHr/endMin locals; it must not become a next-hour endpoint.
     if hour > 24 || minute >= 60 || (hour == 0 && minute == 0) {
         return None;
     }
