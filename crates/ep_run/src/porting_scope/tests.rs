@@ -59,6 +59,155 @@ fn trace(value: &Value, scope: PortingScope) -> PortingScopeTrace {
 }
 
 #[test]
+fn closed_quad_counts_reach_source_layout_and_view_factor_kernel() {
+    use ep_runtime::heat_balance::inside_convection_layout::InsideConvectionLayout;
+    use ep_runtime::heat_balance::radiation::{
+        ApproximateViewFactorContext, ApproximateViewFactorSurface,
+        calculate_selected_approximate_view_factors,
+    };
+
+    for count in [6, 10] {
+        let mut value = input(PortingScope::A);
+        if count == 10 {
+            let surfaces = value["BuildingSurface:Detailed"].as_object_mut().unwrap();
+            let mut additions = Vec::new();
+            for (name, lower) in surfaces.iter_mut() {
+                if lower["surface_type"] != "Wall" {
+                    continue;
+                }
+                let mut upper = lower.clone();
+                for point in lower["vertices"].as_array_mut().unwrap() {
+                    if point["vertex_z_coordinate"].as_f64() == Some(1.0) {
+                        point["vertex_z_coordinate"] = json!(0.5);
+                    }
+                }
+                for point in upper["vertices"].as_array_mut().unwrap() {
+                    if point["vertex_z_coordinate"].as_f64() == Some(0.0) {
+                        point["vertex_z_coordinate"] = json!(0.5);
+                    }
+                }
+                additions.push((format!("{name}:Upper"), upper));
+            }
+            surfaces.extend(additions);
+        }
+        let raw = parse_epjson_str(&value.to_string()).expect("closed authored quads");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("compiled closed quads");
+        let scope = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(scope.admissible, "{count}: {:?}", scope.violations);
+        let input = crate::ordinary_input_processor::resolve(&raw).expect("Source raw input");
+        assert_eq!(
+            input.get_num_objects_found("BuildingSurface:Detailed"),
+            count
+        );
+        for name in value["BuildingSurface:Detailed"]
+            .as_object()
+            .unwrap()
+            .keys()
+        {
+            assert!(input.has_object("BuildingSurface:Detailed", name));
+        }
+
+        let layout = InsideConvectionLayout::from_typed_model(model).expect("Source associations");
+        assert_eq!(layout.groups().len(), 1);
+        assert_eq!(layout.surfaces().len(), count);
+        let group = &layout.groups()[0];
+        assert_eq!(group.zone_id, model.zones[0].id);
+        assert_eq!(group.surfaces.len(), count);
+        assert_eq!(
+            group
+                .surfaces
+                .iter()
+                .collect::<std::collections::BTreeSet<_>>()
+                .len(),
+            count
+        );
+        // The entered volume lets this public geometry helper retain closure
+        // diagnostics without claiming its separate six-face automatic route.
+        let geometry = ep_runtime::geometry::zone_geometry_properties(model, &model.zones[0])
+            .expect("shared closed-face geometry");
+        assert_eq!(geometry.faces.len(), count);
+        assert!(geometry.faces.iter().all(|face| face.vertices.len() == 4));
+        assert!(geometry.diagnostics.initially_closed);
+        assert!(geometry.diagnostics.edges_winding_consistent);
+        assert!(geometry.diagnostics.initial_edges_not_used_twice.is_empty());
+        assert_eq!(
+            geometry.diagnostics.initial_unique_vertex_count,
+            if count == 6 { 8 } else { 12 }
+        );
+        assert!((geometry.diagnostics.signed_polyhedron_volume_m3.unwrap() - 1.0).abs() < 1e-12);
+
+        let surfaces = group
+            .surfaces
+            .iter()
+            .map(|id| {
+                let surface = model
+                    .surfaces
+                    .iter()
+                    .find(|surface| surface.id == *id)
+                    .unwrap();
+                let geometry = ep_runtime::geometry::surface_geometry_properties(&surface.vertices)
+                    .expect("Source Newell geometry");
+                ApproximateViewFactorSurface {
+                    surface_id: surface.id,
+                    surface_name: surface.name.0.clone(),
+                    zone_id: surface.zone,
+                    zone_name: model.zones[0].name.0.clone(),
+                    surface_type: surface.surface_type,
+                    area_m2: geometry.area_m2,
+                    azimuth_deg: geometry.azimuth_deg,
+                    tilt_deg: geometry.tilt_deg,
+                }
+            })
+            .collect::<Vec<_>>();
+        assert!(
+            surfaces[..count - 2]
+                .iter()
+                .all(|s| s.surface_type == ep_model::SurfaceType::Wall)
+        );
+        assert_eq!(
+            surfaces[count - 2].surface_type,
+            ep_model::SurfaceType::Floor
+        );
+        assert_eq!(
+            surfaces[count - 1].surface_type,
+            ep_model::SurfaceType::Roof
+        );
+        // This is the actual shared CalcApproximateViewFactors kernel, before
+        // Fix/ScriptF and runtime activation; no initialized owner is fabricated.
+        let factors = calculate_selected_approximate_view_factors(
+            ApproximateViewFactorContext {
+                enclosure_index: 1,
+                zone_id: group.zone_id,
+            },
+            &surfaces,
+        )
+        .expect("dynamic square view-factor buffer");
+        assert_eq!(factors.ordered_surface_ids, group.surfaces);
+        assert_eq!(factors.view_factors.len(), count * count);
+        assert!(factors.warnings.is_empty());
+        assert!(
+            factors
+                .zone_area_seen_m2
+                .iter()
+                .all(|area| area.is_finite() && *area > 0.0)
+        );
+        assert!(
+            factors
+                .view_factors
+                .iter()
+                .all(|f| f.is_finite() && *f >= 0.0)
+        );
+        for from in 0..count {
+            let sum: f64 = (0..count)
+                .map(|to| factors.view_factors[to * count + from])
+                .sum();
+            assert!((sum - 1.0).abs() < 1e-12);
+        }
+    }
+}
+
+#[test]
 fn timestep_admission_compilation_and_axis_agree_for_the_full_schema_domain() {
     for requested in 1..=60 {
         let mut value = input(PortingScope::A);
@@ -620,4 +769,223 @@ fn simulation_control_inactive_hvac_request_preserves_raw_getter_and_sizing_boun
             );
         }
     }
+}
+
+#[test]
+fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() {
+    const FAMILY: &str = "Site:GroundTemperature:BuildingSurface";
+    const MONTHS: [&str; 12] = [
+        "january",
+        "february",
+        "march",
+        "april",
+        "may",
+        "june",
+        "july",
+        "august",
+        "september",
+        "october",
+        "november",
+        "december",
+    ];
+    let mut weather_text = String::from(
+        "LOCATION,Example\nDESIGN CONDITIONS\nTYPICAL/EXTREME PERIODS\nGROUND TEMPERATURES\nHOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0\nCOMMENTS 1\nCOMMENTS 2\nDATA PERIODS,1,1,Data,Friday,1/1,1/1\n",
+    );
+    for hour in 1..=24 {
+        weather_text.push_str(&format!(
+            "1999,1,1,{hour},60,Source,1.0,0.0,50,101325,0,0,300,10,20,30,0,0,0,0,180,2.5\n"
+        ));
+    }
+    let weather = ep_runtime::weather::parse_epw_weather_file(&weather_text)
+        .expect("actual in-memory EPW parser");
+    for scope in [PortingScope::A, PortingScope::B] {
+        let mut value = input(scope);
+        value[FAMILY] = json!({});
+        assert!(trace(&value, scope).admissible);
+        let raw = parse_epjson_str(&value.to_string()).expect("empty optional family map");
+        let ip = match scope {
+            PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+            PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+        }
+        .expect("zero objects use the real absent-model default path");
+        assert_eq!(ip.get_num_objects_found(FAMILY), 0);
+        value[FAMILY] = json!({"Ground":{"january_ground_temperature":26.5}});
+        let raw = parse_epjson_str(&value.to_string()).expect("actual monthly Source input");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("actual compiled monthly model");
+        let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+        assert!(admitted.admissible, "{:?}", admitted.violations);
+        assert!(
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted).is_none()
+        );
+        let environment = super::environment::environment_from_weather(
+            model,
+            &weather,
+            "embedded ground-admission weather fixture",
+        )
+        .expect("real environment preparation");
+        assert!(validate_porting_environment(&environment).is_empty());
+        admitted.environment = Some(environment);
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                .expect("same real IP validation after bounded scope and environment");
+        let assessment = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(
+            assessment.allows_rust_runtime(),
+            "{:?}",
+            assessment.diagnostics
+        );
+        assert!(
+            assessment
+                .source_consumed_objects
+                .iter()
+                .any(|entry| entry.object_type == FAMILY)
+        );
+        assert!(
+            !assessment
+                .unsupported_objects
+                .iter()
+                .any(|entry| entry.object_type == FAMILY)
+        );
+        let unscoped = assess_support(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+        );
+        assert!(!unscoped.allows_rust_runtime());
+        assert!(
+            unscoped
+                .unsupported_objects
+                .iter()
+                .any(|entry| entry.object_type == FAMILY)
+        );
+        for sibling in [
+            "Site:GroundTemperature:FCfactorMethod",
+            "Site:GroundTemperature:Shallow",
+            "Site:GroundTemperature:Deep",
+        ] {
+            let mut blocked = value.clone();
+            blocked[sibling] = json!({"Other":{}});
+            let raw = parse_epjson_str(&blocked.to_string()).expect("other ground family");
+            let blocked_trace = trace(&blocked, scope);
+            assert!(!blocked_trace.admissible);
+            assert!(
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &blocked_trace)
+                    .is_none()
+            );
+        }
+        let mut invalid = value.clone();
+        invalid[FAMILY]["Ground"]["january_ground_temperature"] = json!(null);
+        let raw = parse_epjson_str(&invalid.to_string()).expect("wrong direct JSON numeric type");
+        assert!(
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted).is_none()
+        );
+        value[FAMILY] = json!({"Ground":{}});
+        for supplied in [None, Some(-10.5), Some(18.0), Some(32.25)] {
+            value[FAMILY]["Ground"] = json!({});
+            for (index, month) in MONTHS.iter().enumerate() {
+                if let Some(supplied) = supplied {
+                    value[FAMILY]["Ground"][format!("{month}_ground_temperature")] =
+                        json!(supplied + index as f64);
+                }
+            }
+            assert!(trace(&value, scope).admissible);
+            let raw = parse_epjson_str(&value.to_string()).expect("numeric monthly input");
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("same actual raw IP admission");
+            let projected = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                .expect("same raw monthly operands for actual Source factory");
+            assert_eq!(projected.objects[FAMILY].len(), 1);
+            for (index, month) in MONTHS.iter().enumerate() {
+                let key = format!("{month}_ground_temperature");
+                let field = projected.objects[FAMILY][0].fields.get(&key);
+                if let Some(supplied) = supplied {
+                    assert_eq!(field, Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(supplied + index as f64)));
+                } else {
+                    // Absence stays absent until the actual getter's18C default.
+                    assert!(field.is_none());
+                }
+            }
+        }
+        for key in ["", " ", "Arbitrary key"] {
+            let mut keyed = input(scope);
+            keyed[FAMILY] = json!({key:{"january_ground_temperature":26.5}});
+            assert!(trace(&keyed, scope).admissible);
+            let raw = parse_epjson_str(&keyed.to_string()).expect("unnamed numeric singleton key");
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("actual raw IP preserves arbitrary singleton key");
+            assert!(ip.has_object(FAMILY, key));
+            let projected = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                .expect("same Source identity");
+            assert_eq!(projected.objects[FAMILY][0].object_name, key);
+        }
+        for invalid in [
+            json!(null),
+            json!(""),
+            json!("18"),
+            json!(false),
+            json!([]),
+            json!({}),
+        ] {
+            value[FAMILY]["Ground"]["january_ground_temperature"] = invalid;
+            let raw = parse_epjson_str(&value.to_string()).expect("wrong direct JSON field type");
+            let result = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            };
+            assert!(result.is_err());
+        }
+        value[FAMILY] = json!({"Ground":{}, "Duplicate":{}});
+        let raw = parse_epjson_str(&value.to_string()).expect("duplicate singleton");
+        let result = match scope {
+            PortingScope::A => crate::ordinary_equipment_input::resolve(&raw),
+            PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
+        };
+        assert!(result.err().is_some_and(|error| {
+            error.contains("requires unique Site:GroundTemperature:BuildingSurface")
+        }));
+        // Admitting the weather object does not admit thermal Ground boundaries.
+        value[FAMILY] = json!({"Ground":{}});
+        value["BuildingSurface:Detailed"]["Floor"]["outside_boundary_condition"] = json!("Ground");
+        let blocked = trace(&value, scope);
+        assert!(!blocked.admissible);
+        let raw = parse_epjson_str(&value.to_string()).expect("actual thermal Ground surface");
+        assert!(
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &blocked).is_none()
+        );
+    }
+    let converted = r#"{"Zone":{"z":{}},"Site:GroundTemperature:BuildingSurface":{"Site:GroundTemperature:BuildingSurface 1":{}}}"#;
+    let raw = ep_raw_model::parse_epjson_str_with_idf_order(
+        converted,
+        "Zone,z;Site:GroundTemperature:BuildingSurface;",
+    )
+    .expect("actual IDF omission overlay");
+    let ip =
+        crate::ordinary_input_processor::resolve(&raw).expect("IDF default-only ground object");
+    let projected =
+        crate::ordinary_heat_balance_input::resolve(&raw, &ip).expect("IDF raw factory operands");
+    assert_eq!(projected.objects[FAMILY][0].idf_max_fields, Some(12));
+    assert!(projected.objects[FAMILY][0].fields.is_empty());
 }

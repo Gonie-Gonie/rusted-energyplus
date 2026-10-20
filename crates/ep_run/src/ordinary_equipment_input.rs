@@ -101,6 +101,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "SimulationControl"
                 | "RunPeriod"
                 | "Site:Location"
+                | "Site:GroundTemperature:BuildingSurface"
                 | "Zone"
                 | "GlobalGeometryRules"
                 | "Output:Diagnostics"
@@ -113,7 +114,14 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
         for (name, object) in objects {
-            if name.0.trim().is_empty() && !matches!(family.0.as_str(), "Version" | "Timestep") {
+            // This numeric-only singleton has no authored Name. Its official
+            // epJSON pattern accepts arbitrary keys; keep the exact IP identity.
+            if name.0.trim().is_empty()
+                && !matches!(
+                    family.0.as_str(),
+                    "Version" | "Timestep" | "Site:GroundTemperature:BuildingSurface"
+                )
+            {
                 return Err(format!("blank ordinary {} name", family.0));
             }
             for (field, value) in &object.fields {
@@ -124,6 +132,23 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                         "ordinary equipment field unavailable: {}.{}",
                         family.0, field.0
                     ));
+                }
+            }
+            // All twelve monthly fields are schema number/default18. IDF
+            // omissions are converted/padded separately; direct epJSON null or
+            // string is not a blank/default accepted by the official schema.
+            if raw.is_epjson() && family.0 == "Site:GroundTemperature:BuildingSurface" {
+                for (field, value) in &object.fields {
+                    if !matches!(
+                        field.0.as_str(),
+                        "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
+                    ) && number(value).is_none()
+                    {
+                        return Err(format!(
+                            "{}.{} requires an actual epJSON number",
+                            family.0, field.0
+                        ));
+                    }
                 }
             }
             for &required in required_fields(&family.0) {

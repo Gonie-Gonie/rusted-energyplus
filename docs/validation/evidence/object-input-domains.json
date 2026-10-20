@@ -52,6 +52,17 @@
       "early admission/warmup uses the effective condition; raw request and pass count retained",
       "exact EIO flags and one warning plus five continuations",
       "active sizing/design-day and disabled-weather execution retain explicit boundaries"
+    ],
+    "BuildingSurface:Detailed": [
+      "remove the stale exactly-six-surface fence; retain the real one-Zone ownership boundary",
+      "closed six/ten-quadrilateral geometry, actual surface identities and dynamic shared view-factor matrices",
+      "actual ten-face Source completion and exact Native geometry EIO; triangles/repair and other real physics guards retained"
+    ],
+    "Site:GroundTemperature:BuildingSurface": [
+      "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
+      "numeric-only singleton keys/counts and converted IDF blank versus direct epJSON types",
+      "real factory warning and current-month weather/reporting owner",
+      "Source-only validated support classification; actual Ground thermal and sibling-family guards retained"
     ]
   },
   "verification": {
@@ -101,7 +112,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. The added direct-month Site Ground Temperature row has a separate explicitly exact zero-limit contract.",
     "cases": [
       {
         "id": "timestep-8",
@@ -676,12 +687,151 @@
           "sha256": "40db70714841b31c7a41721f6922980b6056384c802cb820c697c54823e3f3dd",
           "bytes": 2553
         }
+      },
+      {
+        "id": "ten-quad-wall-bands",
+        "group": "surface_and_ground",
+        "source_build": "surface-count-03",
+        "input": {
+          "path": ".runtime/object-expansion/native-surface-count/calibration-01/input.idf",
+          "sha256": "ee0b3f360025f2518776908e35b08d832033826b2e79f15ff92d0e5ae43dfa8c",
+          "bytes": 10283
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-surface-ground/ten-quad/receipt.json",
+          "sha256": "c523bceb3af0d2f70c69d64b9c1ba22851965c3311c9d0a87f65e11781608d20",
+          "bytes": 3657
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/ten-quad/run-summary.json",
+          "sha256": "736d2253539848dec3ecad283f1329399a45f5e6bdde1f9f3ea4fc3791e7d6ba",
+          "bytes": 31889
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-surface-ground-comparisons-01/ten-quad/comparison.json",
+          "sha256": "06b92b0ca979fa512d42c3b64e07992ac03066ce054ebd5821581d8b4441b4e6",
+          "bytes": 99865
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3398,
+          "parsed_binary64_unequal": 3398,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-surface-count/calibration-01/receipt.json",
+          "sha256": "7d13624fbd589476cae857ed2a750076d5b62f4b49b892b575d126ee0b76da8c",
+          "bytes": 5538
+        },
+        "geometry": "Exact Native/Source EIO: one Zone, ten surfaces, unchanged volume/height; complete original58 output identities and samples.",
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/ten-quad-source-launch-01.json",
+          "sha256": "d2a47f923bfd67ae30727fe727b247ea07a472dffd4f8863874c7469b6c9aaa4",
+          "bytes": 2375
+        }
+      },
+      {
+        "id": "ground-building-surface-monthly",
+        "group": "surface_and_ground",
+        "source_build": "ground-monthly-04",
+        "input": {
+          "path": ".runtime/object-expansion/native-ground-monthly/calibration-01/input.idf",
+          "sha256": "a0a6b03ceeb39ed14654af7699027b4cba07301f0bb9a98e753e58757c011736",
+          "bytes": 9480
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-surface-ground/ground-monthly-04/receipt.json",
+          "sha256": "3b2f1fa57a15b8f55a637052280e2dc3a38d42d5c879814fd26178226d292bcd",
+          "bytes": 3703
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/ground-monthly-04/run-summary.json",
+          "sha256": "3ec71c3d504b21c57b244c8ac6dea3f946dd4d63f39ba5b9ca30a613a0a711b9",
+          "bytes": 32708
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-surface-ground-comparisons-02/ground-monthly/comparison.json",
+          "sha256": "2e9a99b8ee825082beefdcbec8783854a2e0ef7edc0d621764dde13173c30f46",
+          "bytes": 103180
+        },
+        "totals": {
+          "series": 59,
+          "samples": 5448,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "native_request": {
+          "path": ".runtime/object-expansion/native-ground-monthly/calibration-01/request.json",
+          "sha256": "dfd7dc606581b5ddfdfdd0c218ab844ff351796a5821cf484210c6de331f1f1a",
+          "bytes": 5348
+        },
+        "native_result": {
+          "path": ".runtime/object-expansion/native-ground-monthly/calibration-01/receipt.json",
+          "sha256": "0ecee235fdade29b266c47952cd67ce7d43a78dbc570c31354aa96d923851ad3",
+          "bytes": 26678
+        },
+        "authored_monthly_values": [
+          26.5,
+          18.0,
+          -2.5,
+          0.0,
+          15.0,
+          25.0,
+          25.25,
+          17.25,
+          19.5,
+          22.75,
+          16.25,
+          24.75
+        ],
+        "added_direct_month_exact_contract": {
+          "row": {
+            "key": "Environment",
+            "variable": "Site Ground Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 0.0,
+            "rtol": 0.0,
+            "rmse_max": 0.0
+          },
+          "authored_current_month_January": 26.5,
+          "samples": 96,
+          "status": "Separate derived exact numeric equality contract, not an original profile row or tolerance-policy modification"
+        },
+        "exact_diagnostics": [
+          "   ** Warning ** Site:GroundTemperature:BuildingSurface: Some values fall outside the range of 15-25C.",
+          "   **   ~~~   ** These values may be inappropriate.  Please consult the Input Output Reference for more details."
+        ],
+        "aggregate": {
+          "path": ".runtime/object-expansion/source-surface-ground-comparisons-02/ground-monthly/aggregate-04.json",
+          "sha256": "dad6f445baa22588c0f243f08db2875c00cf9c9f12d6f9ac704292df681dfa4d",
+          "bytes": 3390
+        }
       }
     ],
     "totals": {
-      "paired_cases": 10,
-      "reported_samples": 45648,
-      "raw_operand_unequal": 25293,
+      "paired_cases": 12,
+      "reported_samples": 56448,
+      "raw_operand_unequal": 32227,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -720,6 +870,40 @@
           "sha256": "5fa07deaabdccefe3b370afb559c728ace951e82fa8917fe684d3479615167a4",
           "bytes": 75041140
         }
+      },
+      {
+        "id": "surface-count-03",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-03/receipt.json",
+          "sha256": "16b7ec4bc6ddeed6a9a467f250697164265c891278d13b11dc07a8f18a8c36df",
+          "bytes": 4465
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/8d/8d7f45be3c2e62130c21b86fece163cb64d0ddae668668b64bb711c74502306d",
+          "sha256": "8d7f45be3c2e62130c21b86fece163cb64d0ddae668668b64bb711c74502306d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-03/eplus-rs.exe",
+          "sha256": "19500d64ff925f0cd2447c94269eb388718b9a9ba76327fc8714a12b0efb56e2",
+          "bytes": 75040116
+        }
+      },
+      {
+        "id": "ground-monthly-04",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-04/receipt.json",
+          "sha256": "bfba8917ae40fddd8779a720d11a17627fd697d68ce36ced236f177d1e360c17",
+          "bytes": 4574
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/46/4646c9cd544d13ae637c7e57b5749655acc483bd2789b3ba534dada6317c79d3",
+          "sha256": "4646c9cd544d13ae637c7e57b5749655acc483bd2789b3ba534dada6317c79d3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-04/eplus-rs.exe",
+          "sha256": "f2f190af9e36c2ac34e8076f86d9d2d3f9f169d41c842cf9c47d7f67cbc6f654",
+          "bytes": 75049179
+        }
       }
     ],
     "project_control_tests": {
@@ -743,6 +927,29 @@
         "path": ".runtime/object-expansion/project-controls-docs-01.log",
         "sha256": "86156767647ff80c1804cc5c81d82578983e6509dbd960fb35e3e5423585250f",
         "bytes": 1406
+      }
+    },
+    "surface_ground_tests": {
+      "ep_run_passed": 788,
+      "log": {
+        "path": ".runtime/object-expansion/surface-ground-tests-02.log",
+        "sha256": "70ff3a70b6bdfc89524815ab1ed3f9601b6bda1a3b46fed4a33409c5cdb969f7",
+        "bytes": 3816
+      }
+    },
+    "surface_ground_quality": {
+      "clippy": "ep_run --all-targets -- -D warnings passed",
+      "log": {
+        "path": ".runtime/object-expansion/surface-ground-clippy-02.log",
+        "sha256": "71f4cfd441412c46c0eae680b8d80a4f9989505adaf9d12d08af145b6c5a72f9",
+        "bytes": 1650
+      },
+      "format": "cargo fmt --all passed",
+      "documentation": "docs generator --check and full mdBook docs-check passed",
+      "documentation_log": {
+        "path": ".runtime/object-expansion/surface-ground-docs-01.log",
+        "sha256": "63f95d7d432c21e04b9e1476f8f6b451b5e76133de62106f41ca0f85324fffc1",
+        "bytes": 1408
       }
     }
   },

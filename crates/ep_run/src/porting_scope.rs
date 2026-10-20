@@ -167,6 +167,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Timestep"
             | "RunPeriod"
             | "Site:Location"
+            | "Site:GroundTemperature:BuildingSurface"
             | "SizingPeriod:DesignDay"
             | "Exterior:Lights"
             | "GlobalGeometryRules"
@@ -303,8 +304,8 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     if model.version != ep_model::Version::oracle_26_1_0() {
         violations.push("effective engine must match the locked EnergyPlus 26.1.0".into());
     }
-    if model.zones.len() != 1 || model.surfaces.len() != 6 {
-        violations.push("exactly one opaque zone with six detailed surfaces is required".into());
+    if model.zones.len() != 1 {
+        violations.push("exactly one opaque zone is required".into());
     }
     if model.building.is_none()
         || model.global_geometry_rules.is_none()

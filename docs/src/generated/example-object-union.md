@@ -21,7 +21,7 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 | `RunPeriodControl:DaylightSavingTime` | 1 | 1 | 01 Project, time and site | typed |
 | `RunPeriodControl:SpecialDays` | 18 | 24 | 01 Project, time and site | typed |
 | `SimulationControl` | 114 | 114 | 01 Project, time and site | typed |
-| `Site:GroundTemperature:BuildingSurface` | 15 | 15 | 01 Project, time and site | unregistered / no reviewed entry |
+| `Site:GroundTemperature:BuildingSurface` | 15 | 15 | 01 Project, time and site | typed |
 | `Site:Location` | 116 | 116 | 01 Project, time and site | typed |
 | `SizingPeriod:DesignDay` | 42 | 81 | 01 Project, time and site | unregistered / no reviewed entry |
 | `SurfaceConvectionAlgorithm:Inside` | 69 | 69 | 01 Project, time and site | unregistered / no reviewed entry |
@@ -68,7 +68,7 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 | `WindowMaterial:Shade` | 1 | 2 | 03 Materials and constructions | typed |
 | `WindowMaterial:Shade:EquivalentLayer` | 1 | 3 | 03 Materials and constructions | typed |
 | `WindowMaterial:SimpleGlazingSystem` | 1 | 3 | 03 Materials and constructions | typed |
-| `BuildingSurface:Detailed` | 112 | 670 | 04 Zones, surfaces and gains | unregistered / no reviewed entry |
+| `BuildingSurface:Detailed` | 112 | 670 | 04 Zones, surfaces and gains | typed |
 | `FenestrationSurface:Detailed` | 13 | 35 | 04 Zones, surfaces and gains | unregistered / no reviewed entry |
 | `OtherEquipment` | 85 | 123 | 04 Zones, surfaces and gains | typed |
 | `People` | 3 | 3 | 04 Zones, surfaces and gains | typed |
