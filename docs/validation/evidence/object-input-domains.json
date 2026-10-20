@@ -238,7 +238,7 @@
     ],
     "OtherEquipment": [
       "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
-      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions and its separate Hourly meter contract. Positive latent load is connected in Source A through actual gain caches, zone moisture balance and psychrometric state; Source B retains its zero-latent bound. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
+      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions and its separate Hourly meter contract. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
     ]
   },
   "verification": {
@@ -255,18 +255,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-latent-clippy-44.log",
-        "sha256": "3aef3d34899690175e1cc1d458549c2c2348eca7903d30904d9e1b665b21c5f9",
-        "bytes": 686
+        "path": ".runtime/object-expansion/other-equipment-latent-b-clippy-45.log",
+        "sha256": "43014d0a48d84e13a798c51e9c058d8ac445a509206f4a3bd24ed9d72233c9ba",
+        "bytes": 580
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-latent-docs-44.log",
-        "sha256": "4948ec3263561ec1c2e3e201af85246679f3fc31386d77a8d0fcaacbe66641e2",
+        "path": ".runtime/object-expansion/other-equipment-latent-b-docs-45.log",
+        "sha256": "5d9d7acac763b5cb6ced0a1c10e04b29230088a25770305091b985f310fb59e0",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-latent-44",
+      "clippy_through_build": "other-equipment-latent-b-45",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -4078,11 +4078,62 @@
           "passed": true
         },
         "effective_state": "Actual Native44 and Source44 consume the same direct-JSON input, changing only the selected Electricity OtherEquipment latent/radiant/lost fractions to .2/.3/.1 with grouped convective residual .4. Current Native44 initial validationTrue and exactly one execution are mandatory; parent43 originalFalse and its authenticated no-process R-format correction remain ancestry only. Real positive latent gain storage, same-host HVAC caller, moisture sums, ThirdOrder humidity corrector/history, psychrometric state and output consumers are connected in ScopeA; ScopeB positive latent remains pending. Both actual 96-value Zone Air Humidity Ratio profiles are preserved under the unchanged original 1e-9 policy, without an extra raw-equality constraint. Full60/5472 ownstream kernel recomputation retains original58 policies plus the separate96 exact Constant and24J meter policy, signed meter values, whole32-line schedule EIO and3-line1143-byte nominal EIO, observedWarmup19, complete ERR-END/fourinfo/SHD and bidirectional MTD. No observed Native/report/warmup value seeds production; formatted fractions do not measure internal binary bits. All90 actual owners plus shared numeric utility and the full Rust snapshot are authenticated live/archive. Original UInt64MAX literal and metadata remain unchanged. Per-person, explicit/multiple Spaces, EMS and arbitrary models retain their bounds."
+      },
+      {
+        "id": "other-equipment-latent-b",
+        "group": "other_equipment_latent_b",
+        "source_build": "other-equipment-latent-b-45",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-latent-b/calibration-01/input.idf",
+          "sha256": "a434511019e92452f4df4ad7ea3297572bde27367fd42b9ee02368ca2b14b538",
+          "bytes": 14521
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-latent-b/calibration-01/receipt.json",
+          "sha256": "79720996bc7182677e6eee34c05ca4f748d5b9431f7719f6378da273b424cfde",
+          "bytes": 64935
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-latent-b-45/other-equipment-latent-b/receipt.json",
+          "sha256": "4739ca8401f01d173751677296f463f210fbdf19beb2dc76e4fc031c59286995",
+          "bytes": 3528
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-latent-b-45/run-summary.json",
+          "sha256": "2213c3c12270f9b07293d6a9db6766342e59a0172985dbc80306e6c74516a450",
+          "bytes": 60793
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-latent-b-comparisons-45/other-equipment-latent-b/comparison.json",
+          "sha256": "596d9abdaa84dd0f66ad839cc89e79de194cc73844b16e5af37f21c3ab7844a7",
+          "bytes": 567852
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-latent-b-45-launch/other-equipment-latent-b/request.json",
+          "sha256": "1cc8fd08d09bdd82669b3a55cd95d25c6fcbef3fb45389b6c2241e230a755302",
+          "bytes": 3245
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual Native45 and Source45 use the same B35 IDF input with only Noon Plug Load latent0.0 changed to0.25, retaining EquipmentLevel1000/radiant.20/lost0 and exact residual.55. The actual conditioned NoLimit/no-OA/None-humidity-control path retains real gain caches, Zone moisture corrector/history, PurchasedAir calculation/update/reporting and Zone/inlet/air-node/return humidity owners. Four humidity and eight IdealLoads latent rate/energy96 profiles are observed under all original102 unchanged policies, without extra equality or sign constraints. Full102/9792 ownstream kernel recomputation, genuine absent/deleted-empty MTR, three exact96 schedule profiles, whole28-line7420 schedule EIO and2-line957 nominal, observedWarmup6, full ERR-END and SHD agree. Current Native45 initial validationTrue/one execution is mandatory; B35 and A44 are ancestry, not this input authority. No observed report/warmup/numerical value seeds production. All110 actual source owner files plus shared numeric module/full Rust snapshot are authenticated live/archive. This bounded conditioned case does not admit arbitrary OA/humidity controls/per-person/Spaces/EMS or all model combinations."
       }
     ],
     "totals": {
-      "paired_cases": 70,
-      "reported_samples": 509382,
+      "paired_cases": 71,
+      "reported_samples": 519174,
       "raw_operand_unequal": 150833,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -4836,12 +4887,35 @@
           "sha256": "94812ccf2b6c66d8c5e574322df88d162571725391b8338a2d301d61555f63b6",
           "bytes": 75923430
         }
+      },
+      {
+        "id": "other-equipment-latent-b-45",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-45/receipt.json",
+          "sha256": "3b9fe7d162e16aaac0ffa3d6881a8edfbde01284e9bc70234a5bde64f8d903c2",
+          "bytes": 4323
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e9/e94b1a057f042abf1f80324e1fcd582e931a92a5389662134be5adfe3b374cde",
+          "sha256": "e94b1a057f042abf1f80324e1fcd582e931a92a5389662134be5adfe3b374cde"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-45/eplus-rs.exe",
+          "sha256": "461fb9de4852938fe5ed2b1adecd85166006db046163fde380b60f6183491561",
+          "bytes": 75921621
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "Reset after the successful full workspace milestone; previous focused checks are included in the full run."
+      "passed": 796,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/other-equipment-latent-b-run-tests-45.log",
+          "sha256": "836e800e000bbf86218ed7548d51cd7ccabe8cc209fd46e9047910d2b040b705",
+          "bytes": 146114
+        }
+      ],
+      "scope": "Existing ep_run library checks verify the bounded Source B admission and input-adapter change. Runtime owner semantics remain covered by the preceding full workspace milestone; the separate actual same-input engine pair records the conditioned positive-latent behavior. No new cohort or optional API change."
     }
   },
   "additional_native_type_calibrations": [

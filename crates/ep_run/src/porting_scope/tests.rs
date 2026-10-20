@@ -706,7 +706,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
 }
 
 #[test]
-fn latent_sources_reach_scope_a_while_scope_b_remains_sensible_only() {
+fn latent_sources_reach_both_scope_moisture_correctors() {
     for scope in [PortingScope::A, PortingScope::B] {
         let mut value = input(scope);
         value["OtherEquipment"] = json!({"Gain":{
@@ -717,18 +717,12 @@ fn latent_sources_reach_scope_a_while_scope_b_remains_sensible_only() {
         assert!(trace(&value, scope).admissible);
         value["OtherEquipment"]["Gain"]["fraction_latent"] = json!(0.25);
         let actual = trace(&value, scope);
-        assert_eq!(
-            actual.admissible,
-            scope == PortingScope::A,
-            "{:?}",
-            actual.violations
-        );
-        assert_eq!(
-            actual
+        assert!(actual.admissible, "{:?}", actual.violations);
+        assert!(
+            !actual
                 .violations
                 .iter()
-                .any(|message| message.contains("latent gains")),
-            scope == PortingScope::B
+                .any(|message| message.contains("latent gains"))
         );
     }
 }
