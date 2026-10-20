@@ -144,7 +144,8 @@
       "Real getter sets actual period flags, frequency tracking, original MTR-then-ESO dictionaries and separate physical counters. Duplicate and frequency/not-found diagnostics borrow actual kickoff/developer/warmup/doingSizing and actual owned file basenames, retaining effect/failure order.",
       "Rust-only successful physical dictionary observations retain original Detailed/EachCall frequency while scientific storage stays the actual TimeStep slot; observations never feed physics/report values.",
       "Actual ResultsFramework Annual variables_scanned provenance follows the real year-end variable/meter child. Only an unreached Annual boundary permits genuine zero samples; present/deleted ESO/MTR require matching exact declarations, actual closed/deleted0 state and unchanged raw pair checks. Missing/reached/wrong-frequency/name/partner cases stay rejected.",
-      "Same-input appendedElectricity:Facility Hourly completes60/5400: original58 policies unchanged, added ESO24 and MTR24 exactraw/binary64 under explicit derived0/0/0. Actual initial Native duplicate-warning prediction was wrong and is preserved; no duplicate physical proof claimed yet. Custom/cumulative/SQLite ingress and broader models remain bounded."
+      "Same-input appendedElectricity:Facility Hourly completes60/5400: original58 policies unchanged, added ESO24 and MTR24 exactraw/binary64 under explicit derived0/0/0. Actual initial Native duplicate-warning prediction was wrong and is preserved; no duplicate physical proof claimed yet. Custom/cumulative/SQLite ingress and broader models remain bounded.",
+      "same-input all8frequency requests verify69physical declarations/5574rows, actual duplicate warning, Detailed/RunPeriod aliases, full min/max operands with exact dates and two genuinely unreached Annual0 declarations; positive year-end Annual remains unproved"
     ]
   },
   "verification": {
@@ -168,8 +169,8 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/reporting-docs-15.log",
-        "sha256": "47e9b54031504a04dcc250bb52d713e8a1cb12e87a5a01e37420932216091920",
+        "path": ".runtime/object-expansion/all-frequency-docs-15.log",
+        "sha256": "a4fe96be74011773397a478691f536a103a75362daf96a7b2fc3230ca937c125",
         "bytes": 354
       },
       "clippy_through_build": "reporting-15"
@@ -181,7 +182,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics.",
     "cases": [
       {
         "id": "timestep-8",
@@ -2085,12 +2086,64 @@
           "passed": true
         },
         "effective_state": "Appended normal Electricity:Facility Hourly is new in both ESO and MTR; the ancestral MFO requests are ExteriorLights:Electricity and EnergyTransfer:Building/Facility. Actual60 physical declarations/5400 rows include all original58 under unchanged named policies and two added24row Electricity declarations under a separate strict raw/binary64-exact0/0/0 contract. Both added series are exact; cleanERR/END0/0 and actual mixed120interval clock groups match. The sole Native initial mistaken duplicate-warning expectation is retained and independently corrected without rerun; this case does not exercise the duplicate-warning branch. Real live-phase duplicate diagnostics, Detailed dictionary provenance and Annual-unreached empty/deleted pairing have connected unit checks; custom/cumulative/SQLite positive ingress remains bounded."
+      },
+      {
+        "id": "all-frequency-existing-meter",
+        "group": "meter_reporting",
+        "source_build": "reporting-15",
+        "input": {
+          "path": ".runtime/object-expansion/native-all-frequency-meter/calibration-01/input.idf",
+          "sha256": "6d79e07a2873f9e357c67bd8eec1605ee0d350082c07616be82f47107bbf7610",
+          "bytes": 9728
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-all-frequency-meter/calibration-01/receipt.json",
+          "sha256": "214616df166e999d0eda90d6cd047186b6334be0393439d2735693f337a0e26a",
+          "bytes": 11271
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-all-frequency-meter-15/receipt/receipt.json",
+          "sha256": "5103532da484d4debb601d360e82a0f29bac170d34500b5c05b19d04901fcd6d",
+          "bytes": 6772
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/all-frequency-meter-15/run-summary.json",
+          "sha256": "84d9af2d9da8fff73386b97d99f511ef084b6f9c2698fe266e4273200f1c3ade",
+          "bytes": 35336
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-all-frequency-meter-15-comparisons-01/main/comparison.json",
+          "sha256": "a38f0f0460e147668127f72fdb28df1d069c258ff5f956311bec0146a4c9062b",
+          "bytes": 181052
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-all-frequency-meter-15-comparisons-01/all-frequency-existing-meter-source-run-request.json",
+          "sha256": "e34748d5bbea7c3234f1810e6ee2eebd3a1ed137eddb2113f186894221163171",
+          "bytes": 4598
+        },
+        "totals": {
+          "series": 69,
+          "samples": 5574,
+          "energy_operand_samples": 5586,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Eight appended normal ExteriorLights:Electricity requests exercise Detailed/Timestep, Hourly, Daily, Monthly, RunPeriod/Environment and Annual ownership. All69 actual declarations/5574 physical rows and5586 numeric energy operands match; original58 policies remain unchanged, newly requested energy Value/Min/Max roles explicitly derive1J/0rtol/1J-RMSE from the same named Hourly meter, with exact integer extrema dates and physical ordering. Detailed-first retains actual Each Call dictionary text; aliases share their genuine period. Two Annual declarations have0rows because the actual year-end child was not reached; both exported live-owner flags are required and no numeric metrics or RMSE are invented. Full original58, same-producer ESO/MTR, wholeSHD and fullERR/END1/0 including the actual duplicate MFO warning pass. This proves the listed composed requests, not arbitrary meter/model combinations or positive Annual year-end execution."
       }
     ],
     "totals": {
-      "paired_cases": 33,
-      "reported_samples": 212496,
-      "raw_operand_unequal": 97742,
+      "paired_cases": 34,
+      "reported_samples": 218070,
+      "raw_operand_unequal": 101278,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
