@@ -33,6 +33,7 @@ fn declaration(id: i32, schedule: Option<&str>) -> SourceReportedDeclaration {
         store_type: OutputStoreType::Average,
         kind: SourceDeclarationKind::Variable,
         reporting_schedule: schedule.map(str::to_owned),
+        unreached_annual_reporting_boundary: false,
     }
 }
 fn catalog(declarations: Vec<SourceReportedDeclaration>, count: i64) -> SourceReportedCatalog {
@@ -66,6 +67,7 @@ fn physical(c: &SourceReportedCatalog) -> Result<String, Box<dyn std::error::Err
     lines.extend(
         c.declarations
             .iter()
+            .filter(|d| d.stream == Stream::Eso)
             .map(SourceReportedDeclaration::dictionary_line)
             .collect::<Result<Vec<_>, _>>()?,
     );
@@ -162,6 +164,90 @@ fn scheduled_filter_deleted_stream_requires_actual_io_deletion_and_zero_counter(
     };
     c.eso_record_count = 0;
     c.declarations[0].reporting_schedule = None;
+    assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
+    Ok(())
+}
+
+#[test]
+fn source_annual_empty_series_requires_unreached_actual_boundary() -> TestResult {
+    let directory = Directory::new()?;
+    let eso = directory.0.join("annual.eso");
+    let mtr = directory.0.join("annual.mtr");
+    let mut annual = declaration(8, None);
+    annual.key = None;
+    annual.name = "Electricity:Facility".into();
+    annual.units = "J".into();
+    annual.frequency = Frequency::Annual;
+    annual.store_type = OutputStoreType::Sum;
+    annual.kind = SourceDeclarationKind::Meter;
+    annual.unreached_annual_reporting_boundary = true;
+    let mut meter_partner = annual.clone();
+    meter_partner.stream = Stream::Mtr;
+    let mut c = catalog(
+        vec![declaration(7, None), annual.clone(), meter_partner.clone()],
+        1,
+    );
+    std::fs::write(&eso, physical(&c)?)?;
+    let result = read_completed_source_reports(&eso, &mtr, &c)?;
+    assert!(result.eso.series[1].samples.is_empty());
+    assert!(
+        result.eso.series[1]
+            .declaration
+            .unreached_annual_reporting_boundary
+    );
+    c.declarations[1].unreached_annual_reporting_boundary = false;
+    assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
+    c.declarations[1].unreached_annual_reporting_boundary = true;
+    c.declarations[1].frequency = Frequency::Monthly;
+    std::fs::write(&eso, physical(&c)?)?;
+    assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
+    c = catalog(vec![annual.clone(), meter_partner.clone()], 0);
+    std::fs::remove_file(&eso)?;
+    assert!(
+        read_completed_source_reports(&eso, &mtr, &c)?
+            .eso
+            .deleted_empty
+    );
+    // Both physically deleted streams still require both exact declarations.
+    for invalid in [
+        {
+            let mut v = annual.clone();
+            v.unreached_annual_reporting_boundary = false;
+            vec![v, meter_partner.clone()]
+        },
+        vec![annual.clone()],
+        {
+            let mut v = meter_partner.clone();
+            v.name = "wrong meter".into();
+            vec![annual.clone(), v]
+        },
+        {
+            let mut v = meter_partner.clone();
+            v.frequency = Frequency::Monthly;
+            vec![annual.clone(), v]
+        },
+        {
+            let mut v = meter_partner.clone();
+            v.unreached_annual_reporting_boundary = false;
+            vec![annual.clone(), v]
+        },
+    ] {
+        let invalid_catalog = catalog(invalid, 0);
+        assert!(read_completed_source_reports(&eso, &mtr, &invalid_catalog).is_err());
+    }
+    c.declarations[0].unreached_annual_reporting_boundary = false;
+    assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
+    // The same Annual child follows variable reports even without any meter.
+    let mut variable = declaration(8, None);
+    variable.frequency = Frequency::Annual;
+    variable.unreached_annual_reporting_boundary = true;
+    c = catalog(vec![variable], 0);
+    assert!(
+        read_completed_source_reports(&eso, &mtr, &c)?
+            .eso
+            .deleted_empty
+    );
+    c.declarations[0].unreached_annual_reporting_boundary = false;
     assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
     Ok(())
 }

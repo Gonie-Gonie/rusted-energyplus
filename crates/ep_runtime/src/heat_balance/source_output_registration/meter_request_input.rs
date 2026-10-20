@@ -1,6 +1,6 @@
 //! Genuine UpdateMeterReporting3804-4026 on the existing meters and real raw requests.
 use super::{SourceOutputRegistration, SourceReportFrequency};
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, SelectedHeatBalanceInput,
 };
@@ -17,15 +17,7 @@ mod frequency;
 pub(crate) trait SourceMeterReportingHost: super::SourceOutputReportStreams {
     fn write_mtd(&mut self, bytes: &[u8]) -> io::Result<()>;
     fn results_framework_output_variables(&mut self) -> &mut Vec<String>;
-    #[allow(
-        dead_code,
-        reason = "The meter host retains the real ESO/MTR pathname contract from OutputProcessor error/report children even when the selected caller does not query both paths."
-    )]
     fn eso_file_path(&self) -> &std::path::Path;
-    #[allow(
-        dead_code,
-        reason = "The meter host retains the real ESO/MTR pathname contract from OutputProcessor error/report children even when the selected caller does not query both paths."
-    )]
     fn mtr_file_path(&self) -> &std::path::Path;
 }
 pub(crate) struct SourceMeterReportingOwners<'a, 'backend> {
@@ -33,6 +25,7 @@ pub(crate) struct SourceMeterReportingOwners<'a, 'backend> {
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
+    pub(crate) diagnostic_flags: SourceDiagnosticFlags<'a>,
 }
 
 impl SourceOutputRegistration {
@@ -74,6 +67,7 @@ impl SourceOutputRegistration {
                     &alphas[1].to_ascii_uppercase(),
                     self.minimum_report_frequency,
                     o.backend,
+                    &o.diagnostic_flags,
                 )?;
                 if !self.setup_source_meter_from_name(
                     &mut alphas[0],
@@ -81,16 +75,20 @@ impl SourceOutputRegistration {
                     meter_file_only,
                     cumulative,
                     host,
+                    o,
                 )? {
                     let field_name = o
                         .shortcut
                         .alpha_field_names
                         .first()
                         .ok_or(Error::Unavailable("actual shared meter Key Name field"))?;
-                    o.backend.show_warning_error(&format!(
-                        "{}: invalid {}=\"{}\" - not found.",
-                        o.shortcut.current_module_object, field_name, alphas[0],
-                    ))?;
+                    o.backend.show_source_warning_error(
+                        &format!(
+                            "{}: invalid {}=\"{}\" - not found.",
+                            o.shortcut.current_module_object, field_name, alphas[0],
+                        ),
+                        &o.diagnostic_flags,
+                    )?;
                 }
             }
         }
@@ -115,6 +113,7 @@ impl SourceOutputRegistration {
         meter_file_only: bool,
         cumulative: bool,
         host: &mut impl SourceMeterReportingHost,
+        diagnostics: &mut SourceMeterReportingOwners<'_, '_>,
     ) -> Result<bool, Error> {
         let mut result = false;
         if let Some(position) = name.find('[') {
@@ -133,6 +132,7 @@ impl SourceOutputRegistration {
                         frequency,
                         cumulative,
                         host,
+                        diagnostics,
                     )?;
                     result = true;
                 }
@@ -145,6 +145,7 @@ impl SourceOutputRegistration {
                 frequency,
                 cumulative,
                 host,
+                diagnostics,
             )?;
             result = true;
         }
@@ -158,6 +159,7 @@ impl SourceOutputRegistration {
         frequency: SourceReportFrequency,
         cumulative: bool,
         host: &mut impl SourceMeterReportingHost,
+        diagnostics: &mut SourceMeterReportingOwners<'_, '_>,
     ) -> Result<(), Error> {
         let meter = self
             .meters
@@ -171,9 +173,15 @@ impl SourceOutputRegistration {
         };
         if !cumulative {
             if meter_file_only && meter.periods[period_index].report {
-                return Err(Error::Unavailable(
-                    "actual duplicate MeterFileOnly warning filesystem filename formatting",
-                ));
+                let frequency_name = if frequency == SourceReportFrequency::EachCall {
+                    SourceReportFrequency::TimeStep.dictionary_format().3
+                } else {
+                    frequency.dictionary_format().3
+                };
+                diagnostics.backend.show_source_warning_error(&format!(
+                    "Output:Meter:MeterFileOnly requested for \"{}\" ({}), already on \"Output:Meter\". Will report to both {} and {}",
+                    meter.name, frequency_name, source_filename(host.eso_file_path())?, source_filename(host.mtr_file_path())?,
+                ), &diagnostics.diagnostic_flags)?;
             }
             if !meter.periods[period_index].report {
                 meter.periods[period_index].report = true;
@@ -183,7 +191,7 @@ impl SourceOutputRegistration {
                     self.frequency_tracking_variables[frequency as usize] = true;
                 }
                 meter.index_group = details::determine_index_group(meter)?;
-                dictionary::write_meter_dictionary(
+                let (mtr_written, eso_written) = dictionary::write_meter_dictionary(
                     frequency,
                     meter.periods[period_index].report_number,
                     meter,
@@ -191,12 +199,21 @@ impl SourceOutputRegistration {
                     meter_file_only,
                     host,
                 )?;
+                self.meter_dictionary_observations
+                    .push(super::SourceMeterDictionaryObservation {
+                        meter_index: number,
+                        frequency,
+                        cumulative: false,
+                        mtr_written,
+                        eso_written,
+                    });
             }
         } else {
             if meter_file_only && meter.periods[period_index].accumulated_report {
-                return Err(Error::Unavailable(
-                    "actual duplicate cumulative MeterFileOnly warning filesystem filename formatting",
-                ));
+                diagnostics.backend.show_source_warning_error(&format!(
+                    "Output:Meter:MeterFileOnly requested for \"Cumulative {}\" (TimeStep), already on \"Output:Meter\". Will report to both {} and {}",
+                    meter.name, source_filename(host.eso_file_path())?, source_filename(host.mtr_file_path())?,
+                ), &diagnostics.diagnostic_flags)?;
             }
             if !meter.periods[period_index].accumulated_report {
                 meter.periods[period_index].accumulated_report = true;
@@ -204,7 +221,7 @@ impl SourceOutputRegistration {
                     meter.periods[period_index].accumulated_file_only = true;
                 }
                 meter.index_group = details::determine_index_group(meter)?;
-                dictionary::write_meter_dictionary(
+                let (mtr_written, eso_written) = dictionary::write_meter_dictionary(
                     frequency,
                     meter.periods[period_index].accumulated_report_number,
                     meter,
@@ -212,8 +229,30 @@ impl SourceOutputRegistration {
                     meter_file_only,
                     host,
                 )?;
+                self.meter_dictionary_observations
+                    .push(super::SourceMeterDictionaryObservation {
+                        meter_index: number,
+                        frequency,
+                        cumulative: true,
+                        mtr_written,
+                        eso_written,
+                    });
             }
         }
         Ok(())
     }
 }
+
+// Original FileSystem.hh327–353 formats path via toString without quoting.
+// The real output pathname owns filename selection; no Native file is borrowed.
+fn source_filename(path: &std::path::Path) -> Result<&str, Error> {
+    path.file_name()
+        .unwrap_or_else(|| std::ffi::OsStr::new(""))
+        .to_str()
+        .ok_or(Error::Unavailable(
+            "actual meter output filename UTF-8 formatting",
+        ))
+}
+
+#[cfg(test)]
+mod tests;

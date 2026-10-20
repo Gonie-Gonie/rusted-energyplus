@@ -10,10 +10,10 @@ pub(super) fn write_meter_dictionary(
     cumulative: bool,
     meter_file_only: bool,
     host: &mut impl SourceMeterReportingHost,
-) -> Result<(), Error> {
+) -> Result<(bool, bool), Error> {
     let (_, arbitrary_integer, notice, _) = frequency.dictionary_format();
     let short_notice = notice.split_once('[').map_or(notice, |(before, _)| before);
-    let mut out = |stream: SourceReportStream| -> Result<(), Error> {
+    let mut out = |stream: SourceReportStream| -> Result<bool, Error> {
         if stream.good(host) {
             if meter.units == SourceOutputUnits::Invalid {
                 return Err(Error::Unavailable(
@@ -34,13 +34,16 @@ pub(super) fn write_meter_dictionary(
                 )
             };
             stream.write(host, line.as_bytes())?;
+            return Ok(true);
         }
-        Ok(())
+        Ok(false)
     };
-    out(SourceReportStream::Mtr)?;
-    if !meter_file_only {
-        out(SourceReportStream::Eso)?;
-    }
+    let mtr_written = out(SourceReportStream::Mtr)?;
+    let eso_written = if !meter_file_only {
+        out(SourceReportStream::Eso)?
+    } else {
+        false
+    };
     if host.sqlite_present() {
         return Err(Error::Unavailable(
             "actual SQLite createReportDictionaryRecord meter dictionary",
@@ -57,5 +60,5 @@ pub(super) fn write_meter_dictionary(
         meter.units.symbol(),
         frequency,
     );
-    Ok(())
+    Ok((mtr_written, eso_written))
 }

@@ -89,13 +89,18 @@ impl Serialize for SeriesJson<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let r = self.0;
         let d = &r.declaration;
-        let mut map =
-            serializer.serialize_map(Some(9 + usize::from(d.reporting_schedule.is_some())))?;
+        let mut map = serializer.serialize_map(Some(
+            9 + usize::from(d.reporting_schedule.is_some())
+                + usize::from(d.unreached_annual_reporting_boundary),
+        ))?;
         map.serialize_entry("frequency", d.frequency.id())?;
         map.serialize_entry("key", &d.key)?;
         map.serialize_entry("kind", d.kind.id())?;
         map.serialize_entry("name", &d.name)?;
         map.serialize_entry("report_id", &d.report_id)?;
+        if d.unreached_annual_reporting_boundary {
+            map.serialize_entry("unreached_annual_reporting_boundary", &true)?;
+        }
         if let Some(schedule) = &d.reporting_schedule {
             map.serialize_entry("reporting_schedule", schedule)?;
         }
@@ -109,13 +114,18 @@ impl Serialize for SeriesJson<'_> {
 impl Serialize for DeclarationJson<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let d = self.0;
-        let mut map =
-            serializer.serialize_map(Some(7 + usize::from(d.reporting_schedule.is_some())))?;
+        let mut map = serializer.serialize_map(Some(
+            7 + usize::from(d.reporting_schedule.is_some())
+                + usize::from(d.unreached_annual_reporting_boundary),
+        ))?;
         map.serialize_entry("frequency", d.frequency.id())?;
         map.serialize_entry("key", &d.key)?;
         map.serialize_entry("kind", d.kind.id())?;
         map.serialize_entry("name", &d.name)?;
         map.serialize_entry("report_id", &d.report_id)?;
+        if d.unreached_annual_reporting_boundary {
+            map.serialize_entry("unreached_annual_reporting_boundary", &true)?;
+        }
         if let Some(schedule) = &d.reporting_schedule {
             map.serialize_entry("reporting_schedule", schedule)?;
         }

@@ -198,6 +198,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Output:Meter:MeterFileOnly", 2, 0, 0, 0, None),
         ("Output:Schedules", 1, 0, 0, 0, None),
         ("Output:Surfaces:Drawing", 3, 0, 0, 0, None),
+        ("Output:Surfaces:List", 2, 0, 0, 0, None),
         ("Output:Table:Monthly", 1, 1, 2, 0, Some("variable_details")),
         ("Output:Table:Annual", 3, 0, 2, 1, Some("variable_details")),
         ("Output:Table:TimeBins", 4, 3, 0, 0, None),

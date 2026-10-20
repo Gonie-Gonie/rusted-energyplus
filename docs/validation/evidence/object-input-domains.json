@@ -132,34 +132,47 @@
       "Actual GetLocationInfo, EPW precedence and keepYes selection feed CheckLocationValidity, standard barometric pressure/density, solar coordinates and weather/reporting owners; separate WeatherStation/HeightVariation and moving-building families remain bounded.",
       "Design-day pressure correction now borrows real kickoff/developer/current warmup/doingSizing flags after the actual warmup=true write. Warning then Continue then pressure assignment and optional failure prefix preserve Original order.",
       "Same-input authored35/-120/-8/100 keepYes case matches all58/5352 physical operands exactly, Site EIO and two genuine pressure warnings with exact phase counts; independent corrected Native completeness retains the initial readback failure."
+    ],
+    "Output:Surfaces:List": [
+      "Positive opaque Vertices/Details/DetailsWithVertices selections, arbitrary unnamed map identities and optional IDF specification retain real raw fields, typed ReportInputs and both actual two-alpha IP schemas.",
+      "Actual ReportSurfaces cache/order selects the real RptType1/10/11 writer; borrowed Source Zone first/last counts, final report order, Surface vertices/properties, nominalU/construction name and convection owners feed one complete buffered EIO write.",
+      "Original headers including Vertex4 typo, .2R/.3R formatting, class-only film resistances independent of Ground/Adiabatic and genuine Surface Reveal constructor0 are preserved. Unsupported children fail before the buffered stream write.",
+      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Lines/CostInfo/VRML and positive shading/window/frame/user/OSC exporters are not promoted."
+    ],
+    "Output:Meter": [
+      "Normal and MeterFileOnly raw families retain named meter keys including wildcard/unit-suffix semantics, strict official frequencies/defaults and arbitrary unnamed object identities; unknown/empty authored keys reach the genuine not-found warning.",
+      "Real getter sets actual period flags, frequency tracking, original MTR-then-ESO dictionaries and separate physical counters. Duplicate and frequency/not-found diagnostics borrow actual kickoff/developer/warmup/doingSizing and actual owned file basenames, retaining effect/failure order.",
+      "Rust-only successful physical dictionary observations retain original Detailed/EachCall frequency while scientific storage stays the actual TimeStep slot; observations never feed physics/report values.",
+      "Actual ResultsFramework Annual variables_scanned provenance follows the real year-end variable/meter child. Only an unreached Annual boundary permits genuine zero samples; present/deleted ESO/MTR require matching exact declarations, actual closed/deleted0 state and unchanged raw pair checks. Missing/reached/wrong-frequency/name/partner cases stay rejected.",
+      "Same-input appendedElectricity:Facility Hourly completes60/5400: original58 policies unchanged, added ESO24 and MTR24 exactraw/binary64 under explicit derived0/0/0. Actual initial Native duplicate-warning prediction was wrong and is preserved; no duplicate physical proof claimed yet. Custom/cumulative/SQLite ingress and broader models remain bounded."
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5029,
+      "passed": 5038,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/convection-workspace-tests-13b.log",
-        "sha256": "20db322db1ea98ee0ed38d723d7e30290c4baf6721d7d531610ab41971118407",
-        "bytes": 9729
+        "path": ".runtime/object-expansion/reporting-workspace-tests-15b.log",
+        "sha256": "2f1a4cd567792bda4df22b916552ba30c26ace3b56bd892645536382a624d0b6",
+        "bytes": 1554280
       },
-      "scope": "Full workspace milestone through convection-13: actual-year/Ground, effectful property dependencies, whole-Zone Ceiling and local enum admission; all final production/test bytes included."
+      "scope": "Full workspace milestone through reporting-15: live weather/warmup phases, opaque surface report owners, normal/MFO meter ingress, genuine dictionary provenance and actual Annual-boundary empty/deleted output pairing. Subsequent Clippy-only range-pattern spelling is equivalent."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/live-diagnostics-clippy-14.log",
-        "sha256": "c083d8dd8bc21ceef90711678c144cd2423a19deab3ee8e52ba8a0f4e7460596",
-        "bytes": 686
+        "path": ".runtime/object-expansion/reporting-clippy-15b.log",
+        "sha256": "fa8c041ec60f3ca89ce25d038ea31e90904e4f3ec79bcb130464716f6183f14e",
+        "bytes": 2080
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/portable-example-docs-16.log",
-        "sha256": "dfb2f2ee66c32f5558908b7e04a63669e5c2ba8ca857b4bf98d50eea21eb8c38",
+        "path": ".runtime/object-expansion/reporting-docs-15.log",
+        "sha256": "47e9b54031504a04dcc250bb52d713e8a1cb12e87a5a01e37420932216091920",
         "bytes": 354
       },
-      "clippy_through_build": "live-diagnostics-14"
+      "clippy_through_build": "reporting-15"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -168,7 +181,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. The added direct-month Site Ground Temperature row has a separate explicitly exact zero-limit contract.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity.",
     "cases": [
       {
         "id": "timestep-8",
@@ -1970,12 +1983,114 @@
           "passed": true
         },
         "effective_state": "Building minimum/maximum warmup days1 and both convergence tolerances1e-6 drive real convergence/reset owners. All original58/5352 physical samples pass unchanged limits; exact two Severe and seven Continue diagnostics, full Loads Initialization category summary, warmupSevere2/sizing0/END0warnings2severe and EIOWarmupDays1 match. Source Severe calls borrow actual kickoff/developer/warmup/doingSizing flags, preserving first-failure effects and counter reset order. No arbitrary warmup/phase or active sizing promotion."
+      },
+      {
+        "id": "surface-details-with-vertices",
+        "group": "surface_reporting",
+        "source_build": "reporting-15",
+        "input": {
+          "path": ".runtime/object-expansion/native-surface-list/calibration-01/input.idf",
+          "sha256": "15f6d92b2d45dd57a51b3ac47e72b38b52d37eecdacff43cb681b472e65a4fcc",
+          "bytes": 9321
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-surface-list/calibration-01/receipt.json",
+          "sha256": "29667b0c16b57ad4ebc577e32491970942282a5ca5684cc93480aa3ec41480f7",
+          "bytes": 12590
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-surface-list-15/receipt/receipt.json",
+          "sha256": "0ca9b0797b2eb4b73bec0ffb2fd5db82f9ee94f6286af82e56ea35f9a2e40f93",
+          "bytes": 6362
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/surface-list-15/run-summary.json",
+          "sha256": "8a63ef1e72e2d8268a034f469c7a7c8da8ef07816245297a08badfb89c223f4b",
+          "bytes": 32081
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-surface-list-15-comparisons-01/main/comparison.json",
+          "sha256": "1cf91e8a6fe621debc7a18c9f73aba596ca996d82a2d071c085e74f20e94f9a4",
+          "bytes": 158711
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-surface-list-15-comparisons-01/surface-details-with-vertices-source-run-request.json",
+          "sha256": "71a0272ea259e0bbfb53aeb6bcbed697571aae0552a5b7b28b9763e0eb42ea32",
+          "bytes": 4342
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "One appended DetailsWithVertices request keeps original A24 geometry/weather/55variable+3meter requests unchanged. All5352 physical samples pass original limits. The complete12line EIO report has six ordered39field rows with actual Source vertices/areas/orientation/viewfactors/convection/construction nominal-U, Original class-only film resistances even for Adiabatic and genuine Reveal constructor0. WholeSHD and complete cleanERR/END match. Native first readback used an incorrect shortened SHD label; its sole failure remains bound beside independently complete corrected verification, with no producer rerun. Vertices/Details sibling print variants have connected owner/table tests; shading/window/user-convection/Lines/CostInfo/VRML children remain bounded."
+      },
+      {
+        "id": "normal-meter-hourly",
+        "group": "meter_reporting",
+        "source_build": "reporting-15",
+        "input": {
+          "path": ".runtime/object-expansion/native-normal-meter/calibration-01/input.idf",
+          "sha256": "49c08bb3617a5c42e2ba0b42600a6751aa4e58eac1608e0cc163569333cb6da4",
+          "bytes": 9324
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-normal-meter/calibration-01/receipt.json",
+          "sha256": "165d1b9b6470bc7e0fde9b2c9dec008342f9bb0ec0c43a10bb1249c92da367b7",
+          "bytes": 15309
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-normal-meter-15/receipt/receipt.json",
+          "sha256": "dd8097f2ac9b0fb0616610c719b994ea39293cf9281da284d15f2b5dbacfa479",
+          "bytes": 6382
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/normal-meter-15/run-summary.json",
+          "sha256": "f8f6ff4551f9814e4492eb0c3c01f5d3d67af6ad924e28489c051774f8aaf9f5",
+          "bytes": 32625
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-normal-meter-comparisons-15/main/comparison.json",
+          "sha256": "526b41c7bfb6e5e6e015757bc4fdc116a5e942d56fb716f00053391c96188410",
+          "bytes": 121019
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-normal-meter-comparisons-15/normal-meter-hourly-source-run-request.json",
+          "sha256": "8c2c720852542400cef8e370d5fec3cd53b5c0a7cf6af4bbfa82e4a7a29dc7df",
+          "bytes": 4538
+        },
+        "totals": {
+          "series": 60,
+          "samples": 5400,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Appended normal Electricity:Facility Hourly is new in both ESO and MTR; the ancestral MFO requests are ExteriorLights:Electricity and EnergyTransfer:Building/Facility. Actual60 physical declarations/5400 rows include all original58 under unchanged named policies and two added24row Electricity declarations under a separate strict raw/binary64-exact0/0/0 contract. Both added series are exact; cleanERR/END0/0 and actual mixed120interval clock groups match. The sole Native initial mistaken duplicate-warning expectation is retained and independently corrected without rerun; this case does not exercise the duplicate-warning branch. Real live-phase duplicate diagnostics, Detailed dictionary provenance and Annual-unreached empty/deleted pairing have connected unit checks; custom/cumulative/SQLite positive ingress remains bounded."
       }
     ],
     "totals": {
-      "paired_cases": 31,
-      "reported_samples": 201744,
-      "raw_operand_unequal": 90670,
+      "paired_cases": 33,
+      "reported_samples": 212496,
+      "raw_operand_unequal": 97742,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -2218,30 +2333,25 @@
           "sha256": "aa4c4edb6ce0424fe7aab53c6a7be8d68ab9f1c9144eb27c392c2b5b13ece87a",
           "bytes": 75194367
         }
-      }
-    ],
-    "focused_tests": {
-      "source_build": "live-diagnostics-14",
-      "command_filters": [
-        "warmup",
-        "source_design_day_pressure_"
-      ],
-      "passed": 34,
-      "ignored": 1,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/live-diagnostics-warmup-tests-14.log",
-          "sha256": "0d998646d5c4cdb8213ff18a53a1d991c7cf810b1fa13cc99f69353a3e47e740",
-          "bytes": 2433
+      },
+      {
+        "id": "reporting-15",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-15/receipt.json",
+          "sha256": "9b94b7177d69f9cb9568df064c7e44b2f67313808cd4c95303dcbfec6a3f7aa9",
+          "bytes": 7148
         },
-        {
-          "path": ".runtime/object-expansion/live-diagnostics-pressure-tests-14.log",
-          "sha256": "edbab6ebe4e1448a13c5421ed519cd7d91216ff4a8c5124bcd3d559d4e7f9d94",
-          "bytes": 2192
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/59/59b897df5b99ed40381ea9e4595d5b7836720f7def15ac37303f12f6a29bd377",
+          "sha256": "59b897df5b99ed40381ea9e4595d5b7836720f7def15ac37303f12f6a29bd377"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-15/eplus-rs.exe",
+          "sha256": "e302468715330ba00f11215453b8daad4fb55c6003c7f04ce98de00548324df2",
+          "bytes": 75295135
         }
-      ],
-      "scope": "Focused workspace library checks for actual live warmup diagnostic flags/reset order and authored-pressure warning prefix; the full workspace milestone remains through convection-13."
-    }
+      }
+    ]
   },
   "additional_native_type_calibrations": [
     {

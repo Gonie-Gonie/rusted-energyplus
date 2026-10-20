@@ -1133,22 +1133,22 @@ name = "Output:Meter"
 family = "reporting"
 status = "raw_source_getter"
 compiler_coverage = "raw_only"
-source_admission = "blocked"
-source_boundary = "A real meter-family raw getter and frequency/ownership consumers exist, but the ordinary Source positive-family whitelist admits MeterFileOnly only. Positive Output:Meter is currently ingress-blocked."
-source_refs = ["crates/ep_runtime/src/heat_balance/source_output_registration/meter_request_input.rs", "crates/ep_run/src/ordinary_equipment_input.rs"]
+source_admission = "bounded_a_b"
+source_boundary = "Normal and MeterFileOnly getters, official frequency consumers and real dual ESO/MTR dictionary/record owners are connected on ordinary Source A/B. Detailed retains actual dictionary frequency; an actual unreached Annual child permits only genuine empty output. Same-input Hourly60/5400 passes original58 policies plus two explicitly exact added rows. Custom/cumulative/SQLite and broader model combinations remain unavailable."
+source_refs = ["crates/ep_runtime/src/heat_balance/source_output_registration/meter_request_input.rs", "crates/ep_runtime/src/heat_balance/source_reported_catalog.rs", "crates/ep_run/src/source_reported_results.rs", "crates/ep_run/src/ordinary_equipment_input.rs", "docs/validation/evidence/object-input-domains.json"]
 first_evidence = "crates/ep_runtime/src/heat_balance/source_output_registration/meter_request_input.rs"
-support_boundary = "A real meter-family raw getter and frequency/ownership consumers exist, but the ordinary Source positive-family whitelist admits MeterFileOnly only. Positive Output:Meter is currently ingress-blocked. This is an implementation/admission review, not a numerical conformance promotion."
+support_boundary = "Normal and MeterFileOnly getters, official frequency consumers and real dual ESO/MTR dictionary/record owners are connected on ordinary Source A/B. Detailed retains actual dictionary frequency; an actual unreached Annual child permits only genuine empty output. Same-input Hourly60/5400 passes original58 policies plus two explicitly exact added rows. Custom/cumulative/SQLite and broader model combinations remain unavailable. Field/case scoped; no full-object, arbitrary-combination or conformance identity promotion."
 
 [[object]]
 name = "Output:Surfaces:List"
 family = "reporting"
 status = "typed"
 compiler_coverage = "typed"
-source_admission = "blocked"
-source_boundary = "Typed report input and real list scanner exist, but positive family admission is blocked. Details/Vertices/CostInfo writers also retain genuine unavailable children; admitting the family alone would not complete it."
-source_refs = ["crates/ep_runtime/src/heat_balance/report_scan.rs", "crates/ep_runtime/src/heat_balance/source_initialization/primary_startup_surfaces.rs", "crates/ep_run/src/ordinary_equipment_input.rs"]
+source_admission = "bounded_a_b"
+source_boundary = "Opaque Vertices, Details and DetailsWithVertices reach real RptType1/10/11 over Source Zone/surface/construction/convection owners and one buffered EIO write. Same-input six-surface DetailsWithVertices matches all12report lines/39fields, wholeSHD and original58/5352. Lines/CostInfo/VRML and positive shading/window/frame/user-convection/OSC exporters remain unavailable."
+source_refs = ["crates/ep_runtime/src/heat_balance/source_initialization/primary_startup_surfaces.rs", "crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs", "crates/ep_run/src/ordinary_equipment_input.rs", "docs/validation/evidence/object-input-domains.json"]
 first_evidence = "crates/ep_runtime/src/heat_balance/report_scan.rs"
-support_boundary = "Typed report input and real list scanner exist, but positive family admission is blocked. Details/Vertices/CostInfo writers also retain genuine unavailable children; admitting the family alone would not complete it. This is an implementation/admission review, not a numerical conformance promotion."
+support_boundary = "Opaque Vertices, Details and DetailsWithVertices reach real RptType1/10/11 over Source Zone/surface/construction/convection owners and one buffered EIO write. Same-input six-surface DetailsWithVertices matches all12report lines/39fields, wholeSHD and original58/5352. Lines/CostInfo/VRML and positive shading/window/frame/user-convection/OSC exporters remain unavailable. Field/case scoped; no full-object, arbitrary-combination or conformance identity promotion."
 
 [[object]]
 name = "AirLoopHVAC"

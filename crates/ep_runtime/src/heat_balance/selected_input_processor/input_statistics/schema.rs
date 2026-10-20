@@ -4244,6 +4244,24 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "Output:Surfaces:List" => SchemaDefinition {
+            has_name: false,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "report_type",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "report_specifications",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "Output:Surfaces:Drawing" => SchemaDefinition {
             has_name: false,
             name_has_default: false,

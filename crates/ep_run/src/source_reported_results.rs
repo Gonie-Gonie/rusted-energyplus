@@ -112,6 +112,53 @@ pub(crate) struct SourceReportedStreams {
     pub mtr: SourceReportedStream,
 }
 
+// Empty Annual is not a missing meter sample: its actual year-end report
+// child was never reached. Both real stream declarations must still agree.
+fn same_meter_declaration(a: &SourceReportedDeclaration, b: &SourceReportedDeclaration) -> bool {
+    a.report_id == b.report_id
+        && a.key == b.key
+        && a.name == b.name
+        && a.units == b.units
+        && a.frequency == b.frequency
+        && a.store_type == b.store_type
+        && a.kind == b.kind
+        && a.reporting_schedule == b.reporting_schedule
+        && a.unreached_annual_reporting_boundary == b.unreached_annual_reporting_boundary
+}
+fn matching_unreached_annual_meter(
+    d: &SourceReportedDeclaration,
+    mtr: &SourceReportedStream,
+) -> bool {
+    if d.stream != Stream::Eso
+        || d.frequency != Frequency::Annual
+        || !d.unreached_annual_reporting_boundary
+        || !matches!(
+            d.kind,
+            SourceDeclarationKind::Meter | SourceDeclarationKind::CumulativeMeter
+        )
+    {
+        return false;
+    }
+    let partner = if mtr.deleted_empty {
+        if mtr.record_count != 0 || !mtr.series.is_empty() {
+            return false;
+        }
+        mtr.deleted_empty_declarations
+            .iter()
+            .find(|m| m.report_id == d.report_id)
+    } else {
+        mtr.series
+            .iter()
+            .find(|m| m.declaration.report_id == d.report_id && m.samples.is_empty())
+            .map(|m| &m.declaration)
+    };
+    partner.is_some_and(|other| {
+        other.stream == Stream::Mtr
+            && other.unreached_annual_reporting_boundary
+            && same_meter_declaration(d, other)
+    })
+}
+
 /// Caller must first propagate actual successful ManageSimulation620. Footers
 /// independently certify only completed reported streams, not whole simulation.
 /// Paths must be exact borrows of the existing SourceInitializationFiles owner.
@@ -143,23 +190,21 @@ pub(crate) fn read_completed_source_reports(
         if e.declaration.kind == SourceDeclarationKind::Variable {
             continue;
         }
-        let other = mtr
+        let Some(other) = mtr
             .series
             .iter()
             .find(|m| m.declaration.report_id == e.declaration.report_id)
-            .ok_or_else(|| {
-                invalid(
-                    Stream::Mtr,
-                    0,
-                    "ESO meter is unpaired with the same actual MTR report ID",
-                )
-            })?;
-        if e.declaration.key != other.declaration.key
-            || e.declaration.name != other.declaration.name
-            || e.declaration.units != other.declaration.units
-            || e.declaration.frequency != other.declaration.frequency
-            || e.declaration.store_type != other.declaration.store_type
-            || e.declaration.kind != other.declaration.kind
+        else {
+            if e.samples.is_empty() && matching_unreached_annual_meter(&e.declaration, &mtr) {
+                continue;
+            }
+            return Err(invalid(
+                Stream::Mtr,
+                0,
+                "ESO meter is unpaired with the same actual MTR report ID",
+            ));
+        };
+        if !same_meter_declaration(&e.declaration, &other.declaration)
             || e.samples.len() != other.samples.len()
         {
             return Err(invalid(
@@ -185,6 +230,22 @@ pub(crate) fn read_completed_source_reports(
                     "shared ESO/MTR meter raw value/stamp/environment tuples differ",
                 ));
             }
+        }
+    }
+    for declaration in &eso.deleted_empty_declarations {
+        if declaration.kind == SourceDeclarationKind::Variable {
+            continue;
+        }
+        if !eso.deleted_empty
+            || eso.record_count != 0
+            || !eso.series.is_empty()
+            || !matching_unreached_annual_meter(declaration, &mtr)
+        {
+            return Err(invalid(
+                Stream::Mtr,
+                0,
+                "deleted-empty ESO Annual meter lacks the same unreached actual MTR declaration",
+            ));
         }
     }
     Ok(SourceReportedStreams { eso, mtr })

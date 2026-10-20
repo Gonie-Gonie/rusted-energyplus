@@ -3,6 +3,13 @@ use super::*;
 use std::collections::{BTreeMap, BTreeSet};
 #[cfg(test)]
 mod scheduled_filter_tests;
+// A declared Annual series legitimately has no rows until its real year-end
+// report child is reached. This fact is read from the actual completed RF frame;
+// it never licenses missing other frequencies or a reached reporting boundary.
+fn may_have_no_samples(d: &SourceReportedDeclaration) -> bool {
+    d.reporting_schedule.is_some()
+        || (d.unreached_annual_reporting_boundary && d.frequency == Frequency::Annual)
+}
 fn number(s: &str, stream: Stream, line: usize) -> Result<i32, SourceReportedError> {
     s.trim()
         .parse()
@@ -196,7 +203,7 @@ pub(super) fn read_stream(
             if e.kind() == std::io::ErrorKind::NotFound
                 && expected_count == 0
                 && file_state.deleted_empty
-                && declared.values().all(|d| d.reporting_schedule.is_some()) =>
+                && declared.values().copied().all(may_have_no_samples) =>
         {
             return Ok(SourceReportedStream {
                 stream,
@@ -465,7 +472,7 @@ pub(super) fn read_stream(
     }
     if series
         .iter()
-        .any(|s| s.samples.is_empty() && s.declaration.reporting_schedule.is_none())
+        .any(|s| s.samples.is_empty() && !may_have_no_samples(&s.declaration))
     {
         return Err(invalid(
             stream,

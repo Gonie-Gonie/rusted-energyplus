@@ -41,6 +41,47 @@ impl SourceSupportAdmission {
                 return None;
             }
         }
+        // The same real IP/raw projection retains every normal meter request
+        // (including unnamed blank keys) for UpdateMeterReporting. This proves
+        // custody, not arbitrary meter-resource/SQLite or cumulative support.
+        if ["Output:Meter", "Output:Meter:MeterFileOnly"]
+            .iter()
+            .any(|family| {
+                raw.objects
+                    .get(&ObjectType((*family).into()))
+                    .is_some_and(|rows| !rows.is_empty())
+            })
+        {
+            let input = match trace.scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(raw),
+            }
+            .ok()?;
+            let projected = crate::ordinary_heat_balance_input::resolve(raw, &input).ok()?;
+            for family in ["Output:Meter", "Output:Meter:MeterFileOnly"] {
+                let raw_names = raw
+                    .objects
+                    .get(&ObjectType(family.into()))
+                    .map(|rows| {
+                        rows.keys()
+                            .map(|key| key.0.as_str())
+                            .collect::<BTreeSet<_>>()
+                    })
+                    .unwrap_or_default();
+                let names = projected
+                    .objects
+                    .get(family)
+                    .map(|rows| {
+                        rows.iter()
+                            .map(|row| row.object_name.as_str())
+                            .collect::<BTreeSet<_>>()
+                    })
+                    .unwrap_or_default();
+                if raw_names != names {
+                    return None;
+                }
+            }
+        }
         let covered_objects = [
             "HeatBalanceAlgorithm",
             "SimulationControl",
@@ -50,6 +91,8 @@ impl SourceSupportAdmission {
             // model; admitted thermal boundary branches remain scope-validated.
             "Site:GroundTemperature:BuildingSurface",
             "Output:Variable",
+            "Output:Meter",
+            "Output:Meter:MeterFileOnly",
         ]
         .into_iter()
         .filter(|family| {

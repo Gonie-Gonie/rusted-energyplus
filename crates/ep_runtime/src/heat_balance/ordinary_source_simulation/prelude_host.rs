@@ -89,7 +89,7 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
         )?;
         self.reports.report_source_surfaces(
             &self.model.report_inputs,
-            self.files,
+            &mut *self.files,
             &session.daylighting,
             self.backend,
         )
@@ -286,8 +286,13 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
     }
     fn update_meter_reporting(&mut self) -> Result<(), RuntimeError> {
         self.backend.with_scoped(
-            &mut (&mut *self.reports, &mut *self.files, &mut *self.output_host),
-            |mut backend, (reports, files, output_host)| {
+            &mut (
+                &mut *self.reports,
+                &mut *self.files,
+                &mut *self.output_host,
+                &*self.weather,
+            ),
+            |mut backend, (reports, files, output_host, weather)| {
                 let raw = required(
                     reports.heat_balance_input.as_ref(),
                     "actual raw input before UpdateMeterReporting",
@@ -309,6 +314,25 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
                             input,
                             shortcut: &mut reports.input_processor_shortcut,
                             backend: &mut backend,
+                            diagnostic_flags: SourceDiagnosticFlags {
+                                kickoff: &required(
+                                    reports.selected_heat_balance_globals.as_ref(),
+                                    "actual meter globals",
+                                )?
+                                .kickoff_simulation,
+                                developer: &required(
+                                    reports.selected_project_data.as_ref(),
+                                    "actual meter SystemVariables",
+                                )?
+                                .system
+                                .developer_flag,
+                                warmup: &weather.state.global.warmup_flag,
+                                doing_sizing: &required(
+                                    reports.selected_heat_balance_globals.as_ref(),
+                                    "actual meter sizing flag",
+                                )?
+                                .doing_sizing,
+                            },
                         },
                         &mut meters,
                     )

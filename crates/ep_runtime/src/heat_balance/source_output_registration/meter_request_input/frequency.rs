@@ -1,9 +1,10 @@
 //! Genuine determineFrequency354-418 including actual warning/continue order.
-use super::{Error, SourceErrorBackend, SourceReportFrequency as Frequency};
+use super::{Error, SourceDiagnosticFlags, SourceErrorBackend, SourceReportFrequency as Frequency};
 pub(super) fn determine_frequency(
     text: &str,
     minimum: Frequency,
     backend: &mut SourceErrorBackend<'_>,
+    flags: &SourceDiagnosticFlags<'_>,
 ) -> Result<Frequency, Error> {
     let mut frequency = Frequency::Hour;
     let upper = text.to_ascii_uppercase();
@@ -24,9 +25,9 @@ pub(super) fn determine_frequency(
     ] {
         if prefix == possible.as_bytes() {
             if upper != exact_upper {
-                backend.show_warning_error(&format!(
+                backend.show_source_warning_error(&format!(
                     "DetermineFrequency: Entered frequency=\"{text}\" is not an exact match to key strings."
-                ))?;
+                ), flags)?;
                 backend.show_continue_error(&format!("Frequency={exact} will be used."))?;
             }
             frequency = value.max(minimum);

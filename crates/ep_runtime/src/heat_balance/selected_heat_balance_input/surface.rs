@@ -117,6 +117,8 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) exterior_wind: bool,
     /// Genuine SurfaceData constructor0; positive window getter remains excluded.
     pub(crate) frame_divider: i32,
+    /// Actual SurfaceData.hh834 constructor0; positive window Reveal writes stay excluded.
+    pub(crate) reveal: f64,
     /// SurfaceData constructor false; positive mirror/air-boundary getters stay excluded.
     pub(crate) mirrored_surface: bool,
     pub(crate) is_air_boundary_surface: bool,
@@ -163,6 +165,7 @@ impl Default for SurfaceTmpInput {
             is_convex: true,
             exterior_wind: Default::default(),
             frame_divider: Default::default(),
+            reveal: 0.0,
             mirrored_surface: Default::default(),
             is_air_boundary_surface: Default::default(),
             is_shadow_possible_obstruction: Default::default(),
@@ -496,5 +499,254 @@ impl SurfaceGeometryInputState {
                 parallel.surf_t_air_ref[at] = *reference;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod source_surface_report_tests {
+    use super::super::zone::{SelectedZoneData, SelectedZoneInputOwners};
+    use super::*;
+    use crate::heat_balance::ctf_initialization_context::CtfInitializationReports;
+    use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+    use crate::heat_balance::selected_heat_balance_input::{
+        SelectedConstructionUsage, SelectedHeatTransferModel,
+    };
+    use crate::heat_balance::source_initialization::primary_startup_surfaces::write_source_surface_details;
+    use ep_model::{
+        InsideSurfaceConvectionAlgorithm as Inside, OutsideSurfaceConvectionAlgorithm as Outside,
+        Point3,
+    };
+
+    fn owners() -> CtfInitializationReports {
+        // Boundary test using genuine Source constructors/allocators, not an active simulation claim.
+        let mut reports = CtfInitializationReports {
+            selected_heat_balance_globals: Some(SelectedHeatBalanceGlobals {
+                num_of_zones: 1,
+                ..Default::default()
+            }),
+            selected_zone_input: Some(SelectedZoneInputOwners {
+                zones: Some(vec![SelectedZoneData {
+                    name: "ACTUAL ZONE".into(),
+                    all_surface_first: 1,
+                    all_surface_last: 3,
+                    inside_algorithm: Inside::CeilingDiffuser,
+                    outside_algorithm: Outside::MoWitt,
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        reports.heat_balance_input_state.total_constructions = 1;
+        reports.heat_balance_input_state.construction_usage = vec![SelectedConstructionUsage {
+            name: "LIVE CONSTRUCTION".into(),
+            ..Default::default()
+        }];
+        reports.heat_balance_input_state.nominal_u = Some(vec![2.0]);
+        reports.heat_balance_input_state.inside_convection_algorithm = Inside::Simple;
+        reports
+            .heat_balance_input_state
+            .outside_convection_algorithm = Outside::Doe2;
+        let geometry = &mut reports.surface_geometry_input;
+        geometry.total_surfaces = 3;
+        geometry.final_surfaces = Some(vec![final_mapping::FinalSurface::default(); 3]);
+        geometry.parallel_arrays = Some(parallel_arrays::SurfaceParallelArrays::allocate(3));
+        geometry.all_surface_list_report_order = vec![1, 3, 2];
+        let points = [
+            Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 3.0,
+            },
+            Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            Point3 {
+                x_m: 2.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            Point3 {
+                x_m: 2.0,
+                y_m: 0.0,
+                z_m: 3.0,
+            },
+        ];
+        let normal = crate::geometry::source_normal_area(&points);
+        let orientation = crate::geometry::orientation_from_normal(&points, normal.newell_normal);
+        let properties = crate::geometry::finish_get_vertices_properties(normal, orientation);
+        for (index, (name, class, boundary)) in [
+            ("WALL", SurfaceClass::Wall, 0),
+            ("FLOOR", SurfaceClass::Floor, -1),
+            ("ROOF", SurfaceClass::Roof, 3),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let row = &mut geometry.final_surfaces.as_mut().unwrap()[index].row;
+            row.name = name.into();
+            row.class = class;
+            row.zone = 1;
+            row.base_surface = i32::try_from(index + 1).unwrap();
+            row.heat_transfer_algorithm = SelectedHeatTransferModel::Ctf;
+            row.construction = 1;
+            row.exterior_boundary = boundary;
+            row.exterior_boundary_name = name.into();
+            row.exterior_wind = true;
+            row.area = 5.0;
+            row.gross_area = 6.0;
+            row.net_area_shadow_calc = 6.0;
+            row.sides = 4;
+            row.vertex = Some(points.iter().map(|p| Some([p.x_m, p.y_m, p.z_m])).collect());
+            row.vertex_progress.properties = Some(properties);
+            row.vertex_progress.width = 2.0;
+            row.vertex_progress.height = 3.0;
+            row.view_factor_ground = 0.5;
+            row.vertex_progress.view_factor_sky = 0.5;
+            row.vertex_progress.view_factor_ground_ir = 0.25;
+            row.vertex_progress.view_factor_sky_ir = 0.75;
+        }
+        reports
+    }
+    #[test]
+    fn details_report_types_preserve_real_order_owner_fields_class_films_and_headers() {
+        for (kind, columns, vertices) in [(1, 18, true), (10, 27, false), (11, 39, true)] {
+            let reports = owners();
+            let mut bytes = Vec::new();
+            write_source_surface_details(&reports, kind, &mut bytes).unwrap();
+            let text = String::from_utf8(bytes).unwrap();
+            assert!(text.contains("Zone Surfaces,ACTUAL ZONE,3\n"));
+            assert_eq!(text.contains("Vertex 1 X {m}"), vertices);
+            if vertices {
+                assert!(text.contains("Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m}"));
+            }
+            let rows: Vec<Vec<&str>> = text
+                .lines()
+                .filter(|line| line.starts_with("HeatTransfer Surface,"))
+                .map(|line| line.split(',').collect())
+                .collect();
+            assert_eq!(
+                rows.iter().map(|r| r[1]).collect::<Vec<_>>(),
+                ["WALL", "ROOF", "FLOOR"]
+            );
+            assert!(rows.iter().all(|r| r.len() == columns
+                && r[3].is_empty()
+                && r[4] == "CTF - ConductionTransferFunction"));
+            if kind == 1 {
+                assert_eq!(
+                    &rows[0][5..],
+                    [
+                        "4", "0.00", "0.00", "3.00", "0.00", "0.00", "0.00", "2.00", "0.00",
+                        "0.00", "2.00", "0.00", "3.00"
+                    ]
+                );
+            } else {
+                assert_eq!(
+                    rows.iter().map(|r| r[7]).collect::<Vec<_>>(),
+                    ["1.539", "1.453", "1.346"]
+                );
+                assert_eq!(
+                    &rows[0][5..12],
+                    [
+                        "LIVE CONSTRUCTION",
+                        "2.000",
+                        "1.539",
+                        "",
+                        "5.00",
+                        "6.00",
+                        "6.00"
+                    ]
+                );
+                assert_eq!(&rows[0][18..20], ["MoWitt", "CeilingDiffuser"]);
+                assert_eq!(
+                    &rows[2][17..20],
+                    ["Ground", "N/A-Ground", "CeilingDiffuser"]
+                );
+                assert_eq!(
+                    &rows[1][17..20],
+                    ["ROOF", "Other/Same Surface Int Conv", "CeilingDiffuser"]
+                );
+                assert_eq!(&rows[0][22..27], ["0.50", "0.50", "0.25", "0.75", "4"]);
+                assert_eq!(rows[0][16], "0.00");
+            }
+        }
+    }
+    #[test]
+    fn details_report_reads_surface_override_and_invalid_nominal_owners_without_substituting_geometry()
+     {
+        let mut reports = owners();
+        reports
+            .surface_geometry_input
+            .parallel_arrays
+            .as_mut()
+            .unwrap()
+            .interior_convection[0]
+            .model = 3;
+        reports.heat_balance_input_state.nominal_u.as_mut().unwrap()[0] = 0.0;
+        let mut bytes = Vec::new();
+        write_source_surface_details(&reports, 10, &mut bytes).unwrap();
+        let text = String::from_utf8(bytes).unwrap();
+        assert!(text.contains("LIVE CONSTRUCTION,0.000,[invalid],"));
+        assert!(text.contains("ExternalEnvironment,MoWitt,ASHRAESimple,"));
+        reports
+            .surface_geometry_input
+            .final_surfaces
+            .as_mut()
+            .unwrap()[0]
+            .row
+            .construction = 0;
+        bytes = Vec::new();
+        write_source_surface_details(&reports, 10, &mut bytes).unwrap();
+        assert!(
+            String::from_utf8(bytes)
+                .unwrap()
+                .contains("**invalid**,**,**,")
+        );
+    }
+    #[test]
+    fn details_report_buffers_until_complete_and_propagates_one_actual_eio_failure() {
+        let mut reports = owners();
+        reports
+            .surface_geometry_input
+            .parallel_arrays
+            .as_mut()
+            .unwrap()
+            .interior_convection[1]
+            .user_model_num = 1;
+        let mut bytes = b"existing EIO prefix\n".to_vec();
+        assert!(matches!(
+            write_source_surface_details(&reports, 11, &mut bytes),
+            Err(Error::Unavailable(_))
+        ));
+        assert_eq!(bytes, b"existing EIO prefix\n");
+        reports
+            .surface_geometry_input
+            .parallel_arrays
+            .as_mut()
+            .unwrap()
+            .interior_convection[1]
+            .user_model_num = 0;
+        struct FailedEio(usize);
+        impl std::io::Write for FailedEio {
+            fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
+                self.0 += 1;
+                Err(std::io::Error::other("actual test writer failure"))
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        let mut writer = FailedEio(0);
+        assert!(matches!(
+            write_source_surface_details(&reports, 10, &mut writer),
+            Err(Error::Io(_))
+        ));
+        assert_eq!(writer.0, 1);
+        reports.surface_geometry_input.final_surfaces = None;
+        bytes = b"existing EIO prefix\n".to_vec();
+        write_source_surface_details(&reports, 11, &mut bytes).unwrap();
+        assert_eq!(bytes, b"existing EIO prefix\n");
     }
 }

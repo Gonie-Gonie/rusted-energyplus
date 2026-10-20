@@ -385,6 +385,12 @@ fn setup(
                 input: &mut s.input,
                 shortcut: &mut s.shortcut,
                 backend: &mut backend,
+                diagnostic_flags: hb::error_backend::SourceDiagnosticFlags {
+                    kickoff: &s.globals.kickoff_simulation,
+                    developer: &s.project.system.developer_flag,
+                    warmup: &s.weather.global.warmup_flag,
+                    doing_sizing: &s.globals.doing_sizing,
+                },
             },
             &mut host,
         )?;

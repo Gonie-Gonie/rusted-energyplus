@@ -75,7 +75,9 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "Output:Diagnostics"
                 | "Output:VariableDictionary"
                 | "Output:Surfaces:Drawing"
+                | "Output:Surfaces:List"
                 | "Output:Constructions"
+                | "Output:Meter"
                 | "Output:Meter:MeterFileOnly"
                 | "OutputControl:Table:Style"
                 | "Output:Table:SummaryReports"
@@ -126,6 +128,9 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                         | "Site:GroundTemperature:BuildingSurface"
                         | "SurfaceConvectionAlgorithm:Inside"
                         | "SurfaceConvectionAlgorithm:Outside"
+                        | "Output:Surfaces:List"
+                        | "Output:Meter"
+                        | "Output:Meter:MeterFileOnly"
                 )
             {
                 return Err(format!("blank ordinary {} name", family.0));
@@ -157,8 +162,28 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                     }
                 }
             }
+            // The optional enum has no epJSON empty-string/null value.
+            // IDF blank conversion keeps its separately owned blank semantics.
+            if raw.is_epjson()
+                && family.0 == "Output:Surfaces:List"
+                && field(object, "report_specifications")
+                    .is_some_and(|value| !text_is(value, &["IDF"]))
+            {
+                return Err("Output:Surfaces:List.report_specifications requires IDF when explicitly supplied in epJSON".into());
+            }
             for &required in required_fields(&family.0) {
-                if field(object, required).is_none_or(blank) {
+                // Meter keys are required strings but the schema has no
+                // minLength: an authored empty key reaches the real not-found warning.
+                let required_is_missing = if matches!(
+                    family.0.as_str(),
+                    "Output:Meter" | "Output:Meter:MeterFileOnly"
+                ) && required == "key_name"
+                {
+                    !matches!(field(object, required), Some(RawValue::String(_)))
+                } else {
+                    field(object, required).is_none_or(blank)
+                };
+                if required_is_missing {
                     return Err(format!("missing {}.{}", family.0, required));
                 }
             }
@@ -282,7 +307,9 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                             <= 1.0
                 }
                 "Output:Variable" => text(object, "variable_name").is_some(),
-                "Output:Meter:MeterFileOnly" => text(object, "key_name").is_some(),
+                "Output:Meter" | "Output:Meter:MeterFileOnly" => {
+                    matches!(field(object, "key_name"), Some(RawValue::String(_)))
+                }
                 _ => true,
             };
             if !allowed {
@@ -686,3 +713,146 @@ mod tests {
 #[cfg(test)]
 #[path = "ordinary_design_day_input_tests.rs"]
 mod design_day_projection;
+
+#[cfg(test)]
+mod source_surface_list_ingress_tests {
+    use super::*;
+
+    fn project_with_report(fields: serde_json::Value) -> serde_json::Value {
+        serde_json::json!({
+            "Version": {"v": {"version_identifier": "26.1"}},
+            "Building": {"b": {"solar_distribution": "MinimalShadowing"}},
+            "Timestep": {"t": {"number_of_timesteps_per_hour": 4}},
+            "Zone": {"actual zone": {}},
+            "Output:Surfaces:List": {"": fields}
+        })
+    }
+
+    #[test]
+    fn source_opaque_surface_list_keeps_raw_identity_and_requires_real_report_branches()
+    -> Result<(), Box<dyn std::error::Error>> {
+        for report in ["Vertices", "Details", "DetailsWithVertices"] {
+            for specification in [None, Some("IDF")] {
+                let mut fields = serde_json::json!({"report_type": report});
+                if let Some(value) = specification {
+                    fields["report_specifications"] = value.into();
+                }
+                let raw = ep_raw_model::parse_epjson_str(&project_with_report(fields).to_string())?;
+                resolve(&raw)?;
+                // Requires the companion exact2alpha schema patch: actual IP
+                // shape/identity and typed report source must remain associated.
+                let input = crate::ordinary_input_processor::resolve(&raw)?;
+                assert!(input.has_object("Output:Surfaces:List", ""));
+                let compiled = ep_compiler::compile_raw_model(&raw);
+                let [request] = compiled
+                    .model
+                    .as_ref()
+                    .ok_or("report compiler rejected valid source")?
+                    .report_inputs
+                    .objects
+                    .as_slice()
+                else {
+                    return Err("one typed report request required".into());
+                };
+                assert_eq!(request.object_name, "");
+                assert_eq!(request.alphas[0], report.to_ascii_uppercase());
+                assert_eq!(request.alphas[1], specification.unwrap_or(""));
+            }
+        }
+        for fields in [
+            serde_json::json!({}),
+            serde_json::json!({"report_type": true}),
+            serde_json::json!({"report_type": "Lines"}),
+            serde_json::json!({"report_type": "CostInfo"}),
+            serde_json::json!({"report_type": "ViewFactorInfo"}),
+            serde_json::json!({"report_type": "Details", "report_specifications": null}),
+            serde_json::json!({"report_type": "Details", "report_specifications": ""}),
+            serde_json::json!({"report_type": "Details", "report_specifications": "other"}),
+            serde_json::json!({"report_type": "Details", "unknown": 1}),
+        ] {
+            let raw = ep_raw_model::parse_epjson_str(&project_with_report(fields).to_string())?;
+            let error = resolve(&raw).expect_err("unsupported report input accepted");
+            assert!(error.contains("Output:Surfaces:List"), "{error}");
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod meter_domain_tests {
+    use super::*;
+    fn project(family: &str, fields: serde_json::Value, name: &str) -> serde_json::Value {
+        serde_json::json!({"Version":{"v":{"version_identifier":"26.1"}},
+            "Building":{"b":{"solar_distribution":"MinimalShadowing"}},
+            "Timestep":{"t":{"number_of_timesteps_per_hour":4}}, "Zone":{"actual zone":{}},
+            (family): {(name): fields}})
+    }
+
+    #[test]
+    fn source_normal_meter_ingress_preserves_schema_strings_and_raw_ip_identity()
+    -> Result<(), Box<dyn std::error::Error>> {
+        for family in ["Output:Meter", "Output:Meter:MeterFileOnly"] {
+            for frequency in [
+                None,
+                Some(""),
+                Some("Detailed"),
+                Some("Timestep"),
+                Some("Hourly"),
+                Some("Daily"),
+                Some("Monthly"),
+                Some("RunPeriod"),
+                Some("Environment"),
+                Some("Annual"),
+            ] {
+                // The official unnamed pattern is .*; the blank epJSON key and
+                // empty required key_name string are genuine preserved inputs.
+                let mut fields = serde_json::json!({"key_name": ""});
+                if let Some(value) = frequency {
+                    fields["reporting_frequency"] = value.into();
+                }
+                let raw = ep_raw_model::parse_epjson_str(&project(family, fields, "").to_string())?;
+                resolve(&raw)?;
+                let input = crate::ordinary_input_processor::resolve(&raw)?;
+                let projected = crate::ordinary_heat_balance_input::resolve(&raw, &input)?;
+                let [request] = projected
+                    .objects
+                    .get(family)
+                    .ok_or("meter projection absent")?
+                    .as_slice()
+                else {
+                    return Err("one exact meter projection required".into());
+                };
+                assert_eq!(input.get_num_objects_found(family), 1);
+                assert_eq!(request.object_name, "");
+                assert_eq!(
+                    request.fields.get("key_name"),
+                    Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            String::new()
+                        )
+                    )
+                );
+                assert_eq!(request.fields.get("reporting_frequency"), frequency.map(|value| ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(value.into())).as_ref());
+            }
+            for fields in [
+                serde_json::json!({}),
+                serde_json::json!({"key_name": null}),
+                serde_json::json!({"key_name": 1}),
+                serde_json::json!({"key_name": true}),
+                serde_json::json!({"key_name": "Electricity:*", "reporting_frequency": null}),
+                serde_json::json!({"key_name": "Electricity:*", "reporting_frequency": 1}),
+                serde_json::json!({"key_name": "Electricity:*", "reporting_frequency": "Weekly"}),
+                serde_json::json!({"key_name": "Electricity:*", "unexpected": "field"}),
+            ] {
+                let raw = ep_raw_model::parse_epjson_str(
+                    &project(family, fields, "request").to_string(),
+                )?;
+                assert!(
+                    resolve(&raw).is_err(),
+                    "wrong scalar/field admitted for {family}"
+                );
+            }
+        }
+        Ok(())
+    }
+}

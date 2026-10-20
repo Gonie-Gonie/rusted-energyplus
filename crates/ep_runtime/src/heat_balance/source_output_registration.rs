@@ -331,6 +331,18 @@ pub(crate) struct SourceEndUseCategory {
     pub(crate) space_type_names: Option<Vec<String>>,
 }
 
+/// Rust-only observation of a successful genuine physical dictionary call.
+/// Never read by scientific/reporting execution; preserves EachCall's original
+/// dictionary frequency when the actual meter period is the TimeStep slot.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct SourceMeterDictionaryObservation {
+    pub(crate) meter_index: usize,
+    pub(crate) frequency: SourceReportFrequency,
+    pub(crate) cumulative: bool,
+    pub(crate) mtr_written: bool,
+    pub(crate) eso_written: bool,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceOutputRegistration {
     // Native OutputProcessor.hh931: assigned only by actual ProduceRDDMDD.
@@ -358,6 +370,7 @@ pub(crate) struct SourceOutputRegistration {
     pub(crate) dictionary_variables: Vec<SourceDictionaryVariable>,
     pub(crate) out_vars: Vec<SourceOutVarReal>,
     pub(crate) meters: meters::SourceMeters,
+    pub(crate) meter_dictionary_observations: Vec<SourceMeterDictionaryObservation>,
     pub(crate) frequency_tracking_variables: [bool; 7],
     dictionary_by_name: BTreeMap<String, usize>,
     pub(crate) num_total_real_variables: i32,
@@ -398,6 +411,7 @@ impl Default for SourceOutputRegistration {
             dictionary_variables: Vec::new(),
             out_vars: Vec::new(),
             meters: meters::SourceMeters::default(),
+            meter_dictionary_observations: Vec::new(),
             frequency_tracking_variables: [false; 7],
             dictionary_by_name: BTreeMap::new(),
             num_total_real_variables: 0,

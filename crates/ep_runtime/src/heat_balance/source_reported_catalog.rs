@@ -141,6 +141,9 @@ pub struct SourceReportedDeclaration {
     pub kind: SourceDeclarationKind,
     /// Actual reporting schedule name retained at registration; no values/history.
     pub reporting_schedule: Option<String>,
+    /// Metadata-only: the actual Annual meter frame was never initialized by
+    /// ReportMeters, which follows Annual variable reporting. No year-end child ran.
+    pub unreached_annual_reporting_boundary: bool,
 }
 impl SourceReportedDeclaration {
     /// Number of value/date items in the native dictionary row, excluding its report ID.
@@ -275,56 +278,71 @@ impl CtfInitializationReports {
                 },
                 kind: SourceDeclarationKind::Variable,
                 reporting_schedule,
+                unreached_annual_reporting_boundary: var.frequency == SourceReportFrequency::Year
+                    && !self.source_results_framework.meter_frames
+                        [SourceReportFrequency::Year as usize]
+                        .variables_scanned,
             });
         }
-        const FREQUENCIES: [SourceReportFrequency; 7] = [
-            SourceReportFrequency::EachCall,
-            SourceReportFrequency::TimeStep,
-            SourceReportFrequency::Hour,
-            SourceReportFrequency::Day,
-            SourceReportFrequency::Month,
-            SourceReportFrequency::Simulation,
-            SourceReportFrequency::Year,
-        ];
-        for meter in &op.meters.meters {
-            for f in FREQUENCIES {
-                let period = &meter.periods[f as usize];
-                for (enabled, only, id, kind) in [
-                    (
-                        period.report,
-                        period.report_file_only,
-                        period.report_number,
-                        SourceDeclarationKind::Meter,
-                    ),
-                    (
-                        period.accumulated_report,
-                        period.accumulated_file_only,
-                        period.accumulated_report_number,
-                        SourceDeclarationKind::CumulativeMeter,
-                    ),
-                ] {
-                    if !enabled {
-                        continue;
-                    }
-                    for stream in [SourceDeclaredStream::Mtr, SourceDeclaredStream::Eso] {
-                        if stream == SourceDeclaredStream::Eso && only {
-                            continue;
-                        }
-                        // Native meter dictionary declares StoreType::Sum. No
-                        // name/unit inference or post-run value read occurs.
-                        declarations.push(SourceReportedDeclaration {
-                            stream,
-                            report_id: id,
-                            key: None,
-                            name: meter.name.clone(),
-                            units: meter.units.symbol().to_string(),
-                            frequency: frequency(f),
-                            store_type: OutputStoreType::Sum,
-                            kind,
-                            reporting_schedule: None,
-                        });
-                    }
+        // This Rust observation retains the original successful dictionary
+        // call, not the aliased scientific period slot (Detailed uses TimeStep).
+        for event in &op.meter_dictionary_observations {
+            let meter = op
+                .meters
+                .meters
+                .get(event.meter_index)
+                .ok_or(Error::Unavailable(
+                    "actual observed meter dictionary ordinal",
+                ))?;
+            let slot = if event.frequency == SourceReportFrequency::EachCall {
+                SourceReportFrequency::TimeStep
+            } else {
+                event.frequency
+            };
+            let period = &meter.periods[slot as usize];
+            let (enabled, only, id, kind) = if event.cumulative {
+                (
+                    period.accumulated_report,
+                    period.accumulated_file_only,
+                    period.accumulated_report_number,
+                    SourceDeclarationKind::CumulativeMeter,
+                )
+            } else {
+                (
+                    period.report,
+                    period.report_file_only,
+                    period.report_number,
+                    SourceDeclarationKind::Meter,
+                )
+            };
+            if !enabled || (only && event.eso_written) {
+                return Err(Error::Unavailable(
+                    "observed meter dictionary differs from actual period",
+                ));
+            }
+            for (stream, written) in [
+                (SourceDeclaredStream::Mtr, event.mtr_written),
+                (SourceDeclaredStream::Eso, event.eso_written),
+            ] {
+                if !written {
+                    continue;
                 }
+                declarations.push(SourceReportedDeclaration {
+                    stream,
+                    report_id: id,
+                    key: None,
+                    name: meter.name.clone(),
+                    units: meter.units.symbol().to_string(),
+                    frequency: frequency(event.frequency),
+                    store_type: OutputStoreType::Sum,
+                    kind,
+                    reporting_schedule: None,
+                    unreached_annual_reporting_boundary: event.frequency
+                        == SourceReportFrequency::Year
+                        && !self.source_results_framework.meter_frames
+                            [SourceReportFrequency::Year as usize]
+                            .variables_scanned,
+                });
             }
         }
         let unresolved_requests = op

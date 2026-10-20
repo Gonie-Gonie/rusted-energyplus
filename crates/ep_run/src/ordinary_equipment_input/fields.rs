@@ -35,6 +35,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             | "ZoneAirHeatBalanceAlgorithm"
             | "Output:VariableDictionary"
             | "Output:Surfaces:Drawing"
+            | "Output:Surfaces:List"
             | "Output:Constructions"
             | "Output:Variable"
             | "Output:Meter"
@@ -584,6 +585,12 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("Output:VariableDictionary", "sort_option") => {
             blank(value) || text_is(value, &["Name", "Unsorted"])
         }
+        ("Output:Surfaces:List", "report_type") => {
+            text_is(value, &["Vertices", "Details", "DetailsWithVertices"])
+        }
+        ("Output:Surfaces:List", "report_specifications") => {
+            blank(value) || text_is(value, &["IDF"])
+        }
         ("Output:Surfaces:Drawing", "report_type") => {
             blank(value) || text_is(value, &["DXF", "DXF:WireFrame", "VRML"])
         }
@@ -603,26 +610,23 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("Output:Constructions", "details_type_2") => {
             blank(value) || text_is(value, &["Constructions", "Materials"])
         }
-        ("Output:Meter:MeterFileOnly", "key_name") => {
-            blank(value) || matches!(value, RawValue::String(_))
+        ("Output:Meter" | "Output:Meter:MeterFileOnly", "key_name") => {
+            matches!(value, RawValue::String(_))
         }
-        ("Output:Meter:MeterFileOnly", "reporting_frequency") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "Annual",
-                        "Daily",
-                        "Detailed",
-                        "Environment",
-                        "Hourly",
-                        "Monthly",
-                        "RunPeriod",
-                        "Timestep",
-                    ],
-                )
-        }
+        ("Output:Meter" | "Output:Meter:MeterFileOnly", "reporting_frequency") => text_is(
+            value,
+            &[
+                "",
+                "Annual",
+                "Daily",
+                "Detailed",
+                "Environment",
+                "Hourly",
+                "Monthly",
+                "RunPeriod",
+                "Timestep",
+            ],
+        ),
         ("OutputControl:Table:Style", "column_separator") => {
             blank(value)
                 || text_is(
@@ -820,8 +824,8 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
             "zone_name",
             "outside_boundary_condition",
         ],
-        "Output:Surfaces:Drawing" => &["report_type"],
-        "Output:Meter:MeterFileOnly" => &["key_name"],
+        "Output:Surfaces:List" | "Output:Surfaces:Drawing" => &["report_type"],
+        "Output:Meter" | "Output:Meter:MeterFileOnly" => &["key_name"],
         "Exterior:Lights" => &["schedule_name", "design_level"],
         "OtherEquipment" => &[
             "zone_or_zonelist_or_space_or_spacelist_name",
