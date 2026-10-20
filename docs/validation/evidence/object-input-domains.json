@@ -32,7 +32,10 @@
       "number-valued years truncate toward zero; zero is unspecified",
       "raw numbers retained for actual Source getter",
       "year relationship, rollover and leap-day unit checks",
-      "checked downstream calendar/Julian limits retained"
+      "checked downstream calendar/Julian limits retained",
+      "actual whole-environment nonactual-weather 48h December/January rollover and 24h February29 completion",
+      "Source raw weather reads the real CurrentYearIsLeapYear separately from EPW leap permission; both must allow physical February29",
+      "leap proof uses explicitly derived synthetic Feb28-copy weather; nonleap skip/retry, actual-weather, DST and special-day children retain their guards"
     ],
     "Output:Variable": [
       "real live reporting schedule identity and immutable dictionary name",
@@ -91,20 +94,20 @@
         "sha256": "9cdf1df65f77bc641a056fb81f148bb922b8c8ec5748c0afc08484b7a87da585",
         "bytes": 20646
       },
-      "scope": "Workspace milestone through opaque-lifecycle-05. Convection-06 subsequently passed the focused connected and unsupported-branch checks below; this is not a full-workspace rerun for that build."
+      "scope": "Workspace milestone through opaque-lifecycle-05. Subsequent builds passed the focused connected checks recorded below; this is not a full-workspace rerun for those builds."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/convection-clippy-02.log",
-        "sha256": "7777137e7e5a6cb5481509b2433d755468bca0447d1653e80261365dbb5052e4",
-        "bytes": 2060
+        "path": ".runtime/object-expansion/calendar-clippy-07.log",
+        "sha256": "2810fe386316b01bd431ccd58a9486cb7cc33d358d452069a3f9d8f25ab1b1ff",
+        "bytes": 2062
       },
       "format": "cargo fmt --all passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/convection-docs-06.log",
-        "sha256": "31b13980e0eab0cee69cfc6c768d568b38267c0abf66f5f1f54813af528a40af",
+        "path": ".runtime/object-expansion/calendar-docs-07.log",
+        "sha256": "dff208d3e2bd93e68378a46592a0730c1e6feb4e7c195e6e48502480224c6728",
         "bytes": 1408
       }
     },
@@ -1173,12 +1176,138 @@
           "outside": "TARP"
         },
         "effective_state": "Exact global and inherited Zone EIO, successful END with zero warnings/severe and no diagnostic markers; full original wind flags and reported streams retained."
+      },
+      {
+        "id": "leap-day",
+        "group": "weather_calendar",
+        "source_build": "calendar-07",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/leap-day/input.idf",
+          "sha256": "01e00f84910fc69255682d277b0e05467a11f1c67b3d396a377a493b6e8e2506",
+          "bytes": 9276
+        },
+        "weather": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/leap-day/Golden-controlled-synthetic-leap-2016.epw",
+          "sha256": "70e5290902b0e62ae567001e1be9bc30d6b491e626af4a290d415ae0330777a5",
+          "bytes": 1627901
+        },
+        "weather_qualification": "Controlled synthetic leap calibration EPW derived exactly from original Golden; inserted Feb29 physical values copied from Feb28, not measured Feb29 data.",
+        "weather_derivation": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/leap-day/weather-derivation.json",
+          "sha256": "d0361d0e00e17d090a22a9800793e17c7e7db6e77f05bf58b9218b25bc667bf9",
+          "bytes": 2059
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/leap-day/receipt.json",
+          "sha256": "28c0274d239596fffc8d0e5fed3490fe6f988125ac776b69266f1b07a5762196",
+          "bytes": 9597
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-calendar/leap-day/receipt.json",
+          "sha256": "18afe3aa0ffd18cfd62bf9c634ee497e07f136bc3c516022286dd12fb734b91e",
+          "bytes": 3799
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/calendar-leap-day/run-summary.json",
+          "sha256": "7709c2887428de91319ba45bfb2c6a10793e57f41f8c858ddb4ee119fd3bcd70",
+          "bytes": 32185
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-calendar-comparisons-01/leap-day/comparison.json",
+          "sha256": "8241fbaa955806eaec281bf2aa923b0034355ed5b313a223f541ee85d9234667",
+          "bytes": 113647
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-calendar-comparisons-01/leap-day-source-run-request.json",
+          "sha256": "dd094668bb0bdc46450c45faa9420c3d855b296634ea032e7509455bc7774c7a",
+          "bytes": 4407
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3450,
+          "parsed_binary64_unequal": 3450,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "calendar": {
+          "begin": "2016-02-29",
+          "end": "2016-02-29",
+          "weekday": "Monday",
+          "days": 1,
+          "hours": 24,
+          "zone_steps": 96
+        },
+        "effective_state": "Exact Native/Source requested calendar EIO and complete physical civil timestamps; natural whole-environment duration without a supplied --hours value; zero diagnostic markers and END warnings/severe."
+      },
+      {
+        "id": "year-rollover",
+        "group": "weather_calendar",
+        "source_build": "calendar-07",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/year-rollover/input.idf",
+          "sha256": "6ff45d6613e1be89a429060323431be292bfda77d9424144fa0072d7e34e72d3",
+          "bytes": 9277
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "weather_qualification": "Original Golden TMY3 bytes unchanged.",
+        "weather_derivation": null,
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/year-rollover/receipt.json",
+          "sha256": "f2d1e5e14e6e4f161abb4bba3a39e7295d235d073a83a1cae4bb64115a955d4c",
+          "bytes": 9511
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-calendar/year-rollover/receipt.json",
+          "sha256": "9e38429a010847a742c9f5c4386d63ba3e628206ba6005adf223a2e8303da977",
+          "bytes": 3778
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/calendar-year-rollover/run-summary.json",
+          "sha256": "1f0928d6e1214a51da5d9e061e1f5a13d1431dade193c3a01ff28ea67d3b323b",
+          "bytes": 32337
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-calendar-comparisons-01/year-rollover/comparison.json",
+          "sha256": "8ca12117194aec5e84428cd47ecf79d7f9824d39ff473b0e6bb9a152d2d7bfce",
+          "bytes": 113304
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-calendar-comparisons-01/year-rollover-source-run-request.json",
+          "sha256": "fabdbef6f28165c0aaa2aa337c246825a34fd2421251e4ba5df9c11d7d8f8c0b",
+          "bytes": 4017
+        },
+        "totals": {
+          "series": 58,
+          "samples": 10704,
+          "raw_operand_unequal": 7185,
+          "parsed_binary64_unequal": 7185,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "calendar": {
+          "begin": "2013-12-31",
+          "end": "2014-01-01",
+          "weekday": "Tuesday",
+          "days": 2,
+          "hours": 48,
+          "zone_steps": 192
+        },
+        "effective_state": "Exact Native/Source requested calendar EIO and complete physical civil timestamps; natural whole-environment duration without a supplied --hours value; zero diagnostic markers and END warnings/severe."
       }
     ],
     "totals": {
-      "paired_cases": 18,
-      "reported_samples": 93000,
-      "raw_operand_unequal": 49485,
+      "paired_cases": 20,
+      "reported_samples": 109056,
+      "raw_operand_unequal": 60120,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1285,26 +1414,58 @@
           "sha256": "24271a310d768c8d823354ad31bc92bd863c791c3b230b1b324fd981966aed2c",
           "bytes": 75079423
         }
+      },
+      {
+        "id": "calendar-07",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-07/receipt.json",
+          "sha256": "bceb85c8cf65306f68e280789d3856bce5164e8ad052fa4d23503a3d59243468",
+          "bytes": 4541
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/17/178789d3c14340f20ccf9247f9bf5cd5cb6f7af34636dc7e10fbe5fede8a478d",
+          "sha256": "178789d3c14340f20ccf9247f9bf5cd5cb6f7af34636dc7e10fbe5fede8a478d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-07/eplus-rs.exe",
+          "sha256": "5c24c5666aff7534de2bddec20afbd348b36cd5627343f28f7bf9ad0797b73cc",
+          "bytes": 75071342
+        }
       }
     ],
-    "focused_tests": {
-      "through_build": "convection-06",
-      "passed": 44,
-      "ignored": 1,
-      "scope": "Convection filter across ep_runtime and ep_run, plus the existing scientific-algorithm rejection test. The earlier broad ep_run run exposed an obsolete Simple rejection expectation; the corrected test still rejects genuinely unimplemented algorithms.",
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/convection-connected-tests-02.log",
-          "sha256": "470b219f849ec37c1ba9ca3259e21989700efcf37ab292caab1375cd08da0cca",
-          "bytes": 2778
-        },
-        {
-          "path": ".runtime/object-expansion/convection-rejection-tests-02.log",
-          "sha256": "203df2e0abc173e4b1fc43be1475432ac34f449d3c93a1d110fae6acf73df43f",
-          "bytes": 2272
-        }
-      ]
-    }
+    "focused_tests": [
+      {
+        "through_build": "convection-06",
+        "passed": 44,
+        "ignored": 1,
+        "scope": "Convection filter across ep_runtime and ep_run, plus the existing scientific-algorithm rejection test. The earlier broad ep_run run exposed an obsolete Simple rejection expectation; the corrected test still rejects genuinely unimplemented algorithms.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/convection-connected-tests-02.log",
+            "sha256": "470b219f849ec37c1ba9ca3259e21989700efcf37ab292caab1375cd08da0cca",
+            "bytes": 2778
+          },
+          {
+            "path": ".runtime/object-expansion/convection-rejection-tests-02.log",
+            "sha256": "203df2e0abc173e4b1fc43be1475432ac34f449d3c93a1d110fae6acf73df43f",
+            "bytes": 2272
+          }
+        ]
+      },
+      {
+        "through_build": "calendar-07",
+        "passed": 124,
+        "ignored": 0,
+        "scope": "Weather filter across ep_runtime and ep_run, including the four live-calendar/header combinations, full allowed-day callback consumption and retained raw-only boundary.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/calendar-weather-tests-07.log",
+            "sha256": "c2c04473fe602cf4fc843ccd09abe6d55726cc256319a659c8fff56d988ff047",
+            "bytes": 2966
+          }
+        ]
+      }
+    ]
   },
   "additional_native_type_calibrations": [
     {

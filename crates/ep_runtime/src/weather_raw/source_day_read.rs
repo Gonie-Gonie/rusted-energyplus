@@ -10,6 +10,8 @@ use super::{
 /// A Source sink borrows its WeatherDayState once and implements these methods
 /// directly against WeatherOwner CurDayOfWeek/ReadEPlusWeatherCurTime/LastHourSet.
 pub(crate) trait SourceRawDayReadClock {
+    /// Actual CurrentYearIsLeapYear; a raw-only adapter has no calendar owner.
+    fn current_year_is_leap_year(&self) -> Result<bool, RawDayFailure>;
     fn current_day_of_week(&self) -> i32;
     fn set_current_day_of_week(&mut self, value: i32);
     fn set_read_time(&mut self, value: f64);
@@ -69,6 +71,13 @@ pub(super) struct LegacyDayReadCallbacks<'a, C> {
     pub(super) callbacks: &'a mut C,
 }
 impl<C> SourceRawDayReadClock for LegacyDayReadCallbacks<'_, C> {
+    fn current_year_is_leap_year(&self) -> Result<bool, RawDayFailure> {
+        // This retained raw-only entry never owned CurrentYearIsLeapYear.
+        // Keep its Feb29 unavailable result rather than infer a calendar flag.
+        Err(RawDayFailure::OutsideBoundedDomain(
+            "February 29 daily retry",
+        ))
+    }
     fn current_day_of_week(&self) -> i32 {
         self.state.current_day_of_week
     }
@@ -176,9 +185,13 @@ impl RawEpwCursorOwner {
                 );
             }
             let slot = self.slot(&read);
-            // Feb29 retry/physical processing is outside this frozen nonleap
-            // domain. Do not turn that native skip branch into a source fatal.
-            if hour == 1 && slot.raw.dates[1..3] == [2, 29] {
+            // Original WeatherManager.cc2826: only a disallowed Feb29 takes
+            // the unported skip/retry branch. Read the live calendar owner;
+            // header leap permission and CurrentYearIsLeapYear are distinct.
+            if hour == 1
+                && slot.raw.dates[1..3] == [2, 29]
+                && (!callbacks.current_year_is_leap_year()? || !self.header.allows_leap_years)
+            {
                 return Err(RawDayFailure::OutsideBoundedDomain("February 29 daily retry").into());
             }
             callbacks

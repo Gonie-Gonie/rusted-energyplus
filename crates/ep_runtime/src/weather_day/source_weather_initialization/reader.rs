@@ -18,6 +18,9 @@ struct SourceDayReadSink<'a, 'backend> {
     backend: &'a mut SourceErrorBackend<'backend>,
 }
 impl SourceRawDayReadClock for SourceDayReadSink<'_, '_> {
+    fn current_year_is_leap_year(&self) -> Result<bool, RawDayFailure> {
+        Ok(self.state.environment.current_year_is_leap_year)
+    }
     fn current_day_of_week(&self) -> i32 {
         self.state.weather.cur_day_of_week
     }

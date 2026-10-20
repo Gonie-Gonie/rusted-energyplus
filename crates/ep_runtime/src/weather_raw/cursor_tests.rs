@@ -385,3 +385,153 @@ fn get_next_style_reopen_skips_without_reprocessing_shared_header() {
     assert_eq!(cursor.last_arguments(), &arguments_before);
     assert_eq!(cursor.interpret_count(), 25);
 }
+
+/// Unit boundary only: borrow genuine weather state for raw-day control checks.
+/// Event callbacks observe consumption; they make no physical-processing claim.
+struct CalendarRead<'a> {
+    state: &'a mut crate::weather::day::WeatherDayState,
+    events: Vec<(char, usize)>,
+}
+impl SourceRawDayReadClock for CalendarRead<'_> {
+    fn current_year_is_leap_year(&self) -> Result<bool, RawDayFailure> {
+        Ok(self.state.environment.current_year_is_leap_year)
+    }
+    fn current_day_of_week(&self) -> i32 {
+        self.state.weather.cur_day_of_week
+    }
+    fn set_current_day_of_week(&mut self, value: i32) {
+        self.state.weather.cur_day_of_week = value;
+    }
+    fn set_read_time(&mut self, value: f64) {
+        self.state.weather.read_e_plus_weather_cur_time = value;
+    }
+    fn set_last_hour_set(&mut self, value: bool) {
+        self.state.weather.last_hour_set = value;
+    }
+    fn interpret_record(
+        &mut self,
+        cursor: &mut RawEpwCursorOwner,
+        read: &RawEpwLineRead,
+    ) -> Result<(), RawDayFailure> {
+        cursor.interpret_with_live_source_counter(read, &mut self.state.missed_counts.weath_codes)
+    }
+}
+impl SourceRawDayReadCallbacks for CalendarRead<'_> {
+    type Error = String;
+    fn first_day_selected(
+        &mut self,
+        _: &RawWeatherSlot,
+        _: &mut RawEpwHeaderState,
+        _: &mut RawEpwOutputs,
+    ) -> Result<(), String> {
+        self.events.push(('s', 0));
+        Ok(())
+    }
+    fn clear_source_interval(&mut self, hour: usize, interval: usize) -> Result<(), String> {
+        assert_eq!(interval, 1);
+        self.events.push(('c', hour));
+        Ok(())
+    }
+    fn parsed_hour(
+        &mut self,
+        hour: usize,
+        slot: &RawWeatherSlot,
+        _: &mut RawEpwHeaderState,
+        _: &mut RawEpwOutputs,
+    ) -> Result<(), String> {
+        assert_eq!(slot.raw.dates[1..4], [2, 29, hour as i32]);
+        self.events.push(('p', hour));
+        Ok(())
+    }
+    fn complete_day(&mut self, _: &RawWeatherDay, _: &mut RawEpwHeaderState) -> Result<(), String> {
+        self.events.push(('d', 24));
+        Ok(())
+    }
+}
+
+fn leap_selection() -> RawDayReadSelection {
+    RawDayReadSelection {
+        start_month: 2,
+        start_day: 29,
+        start_year: 2016,
+        match_year: false,
+        days_in_year: 366,
+    }
+}
+fn leap_raw_text(header_allows: bool) -> String {
+    let header = if header_allows {
+        header("12/31").replace(
+            "HOLIDAYS/DAYLIGHT SAVINGS,No,",
+            "HOLIDAYS/DAYLIGHT SAVINGS,Yes,",
+        )
+    } else {
+        header("12/31")
+    };
+    header + &day(2016, 29, "9").replace("2016,7,29,", "2016,2,29,")
+}
+
+#[test]
+fn leap_day_reads_all_hours_only_when_live_calendar_and_header_both_allow_it() {
+    for (calendar_leap, header_allows) in
+        [(false, false), (false, true), (true, false), (true, true)]
+    {
+        let mut cursor = owner(leap_raw_text(header_allows));
+        let mut state = crate::weather::day::WeatherDayState {
+            environment: crate::weather::day::WeatherEnvironmentState {
+                current_year_is_leap_year: calendar_leap,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let mut sink = CalendarRead {
+            state: &mut state,
+            events: Vec::new(),
+        };
+        let result = cursor.read_day_with_live_source_state(
+            leap_selection(),
+            RawDayReadMode::FirstDay,
+            false,
+            &mut sink,
+        );
+        if calendar_leap && header_allows {
+            let read = result.unwrap();
+            assert_eq!(read.hours.len(), 24);
+            assert_eq!(cursor.interpret_count(), 25);
+            assert_eq!(sink.events.len(), 50);
+            assert_eq!(&sink.events[..3], &[('s', 0), ('c', 1), ('p', 1)]);
+            assert_eq!(sink.events.last(), Some(&('d', 24)));
+        } else {
+            assert!(matches!(
+                result,
+                Err(SourceRawDayReadFailure::Native(
+                    RawDayFailure::OutsideBoundedDomain("February 29 daily retry")
+                ))
+            ));
+            // The genuine parse/clear effects occur before the unavailable retry.
+            assert_eq!(cursor.interpret_count(), 2);
+            assert_eq!(sink.events, [('s', 0), ('c', 1)]);
+            assert_eq!(cursor.last_arguments().dates[1..4], [2, 29, 1]);
+        }
+    }
+}
+
+#[test]
+fn raw_only_reader_keeps_feb29_unavailable_without_a_live_calendar_owner() {
+    let mut cursor = owner(leap_raw_text(true));
+    let mut writes = Writes::default();
+    let error = cursor
+        .read_day(
+            leap_selection(),
+            &mut RawDayReadState::default(),
+            RawDayReadMode::FirstDay,
+            false,
+            &mut writes,
+        )
+        .unwrap_err();
+    assert_eq!(
+        error,
+        RawDayFailure::OutsideBoundedDomain("February 29 daily retry")
+    );
+    assert_eq!(writes.events, [('s', 0), ('c', 1)]);
+    assert_eq!(cursor.interpret_count(), 2);
+}
