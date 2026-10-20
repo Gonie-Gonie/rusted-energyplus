@@ -605,7 +605,13 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         }
         ("Output:Surfaces:List", "report_type") => text_is(
             value,
-            &["Vertices", "Details", "DetailsWithVertices", "CostInfo"],
+            &[
+                "Lines",
+                "Vertices",
+                "Details",
+                "DetailsWithVertices",
+                "CostInfo",
+            ],
         ),
         ("Output:Surfaces:List", "report_specifications") => {
             blank(value) || text_is(value, &["IDF"])

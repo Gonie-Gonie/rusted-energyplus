@@ -137,8 +137,9 @@
       "Positive opaque Vertices/Details/DetailsWithVertices selections, arbitrary unnamed map identities and optional IDF specification retain real raw fields, typed ReportInputs and both actual two-alpha IP schemas.",
       "Actual ReportSurfaces cache/order selects the real RptType1/10/11 writer; borrowed Source Zone first/last counts, final report order, Surface vertices/properties, nominalU/construction name and convection owners feed one complete buffered EIO write.",
       "Original headers including Vertex4 typo, .2R/.3R formatting, class-only film resistances independent of Ground/Adiabatic and genuine Surface Reveal constructor0 are preserved. Unsupported children fail before the buffered stream write.",
-      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Lines/CostInfo/VRML and positive shading/window/frame/user/OSC exporters are not promoted.",
-      "CostInfo now writes actual explicit caller-owned SCI through real local IOFilePath/outputControl defaulttrue and false dev-null; Native uniqueness mask/report order/physical ordinals/names/classes/independentArea andGrossArea are used. Live reached Fatal reads actual weather/global/project flags; partial IO prefixes remain. Same-input A58/5352 plus exact wholeSCI508B/9CRLF lines/6rows and wholeSHD/ERR-END0/0 pass. No opening/interzone/Construction0 activation claimed by this case."
+      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Sibling output paths require their separately recorded actual owners and evidence; positive shading/window/frame/user/OSC exporters are not promoted.",
+      "CostInfo now writes actual explicit caller-owned SCI through real local IOFilePath/outputControl defaulttrue and false dev-null; Native uniqueness mask/report order/physical ordinals/names/classes/independentArea andGrossArea are used. Live reached Fatal reads actual weather/global/project flags; partial IO prefixes remain. Same-input A58/5352 plus exact wholeSCI508B/9CRLF lines/6rows and wholeSHD/ERR-END0/0 pass. No opening/interzone/Construction0 activation claimed by this case.",
+      "Lines writes actual caller-owned SLN with outputControl false dev-null, persistent native optiondone/lastoption before open, live diagnostic phase and real local IO/Fatal failure prefix. Default emits actual final-world closing edges in F10.2; IDF emits original headers/class/name/azimuth.1R and F10.2 vertices/terminators. Separate sole-append A58/5352 cases pass unchanged limits, completeSLN default1751B/30CRLF lines/24edges and IDF2140B/38CRLF lines/24vertices, plus wholeSHD/fullERR-END0/0. Shading/window/IntMass/zero-side/general-geometry activation is not claimed; immutable copied producer9line prose is explicitly corrected only by independent physical readback."
     ],
     "Output:Meter": [
       "Normal and MeterFileOnly raw families retain named meter keys including wildcard/unit-suffix semantics, strict official frequencies/defaults and arbitrary unnamed object identities; unknown/empty authored keys reach the genuine not-found warning.",
@@ -186,18 +187,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/surface-compact-clippy-18.log",
-        "sha256": "ff55f390352f9f4bc76ebc2736a41380951425fc9384f4c3826af8f24659bb9a",
-        "bytes": 2068
+        "path": ".runtime/object-expansion/lines-clippy-19.log",
+        "sha256": "be187f13e38b3650c887b798a8ab29ec76ccf0a209f097f24bfe8a2018791559",
+        "bytes": 2070
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/surface-compact-docs-18.log",
-        "sha256": "458728d835dc49082fd9e9bbcc899b1b1b2e9d373f798099128e96fdc9767e1e",
+        "path": ".runtime/object-expansion/surface-lines-docs-19.log",
+        "sha256": "ec57032a80a96e8c15955d284e92249fb0a4987568912610086b220dce954777",
         "bytes": 354
       },
-      "clippy_through_build": "surface-compact-18"
+      "clippy_through_build": "surface-lines-19"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -2417,12 +2418,114 @@
           "passed": true
         },
         "effective_state": "One original B102 Internal Gain Schedule span selects Linear with the same four Until endpoints, retaining actual03:00-to-24:00 HVACavailability and bothNoLimit. Actual minute rising/flat/falling repeated additions drive real1000WOtherEquipment, with all102/9792 original-policy outputs raw/binary64 exact. Actual96schedule strings/bits retain07:15=1.0000000000000002 and24:00=3.0470417855532617e-15; no clamp/normalization. FullEIO/WarmupDays6/ERR-END0/0/SHD and genuine deleted-emptyMTR0 match. These consumed profiles do not establish every Compact grammar/calendar/model combination."
+      },
+      {
+        "id": "surface-lines-default",
+        "group": "surface_lines",
+        "source_build": "surface-lines-19",
+        "input": {
+          "path": ".runtime/object-expansion/native-surface-lines/calibration-01/default/input.idf",
+          "sha256": "00c355a5c545e22ace3372bdff9605f194a97e2b2d7c2a757fda18111a3757ce",
+          "bytes": 9307
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-surface-lines/calibration-01/default/receipt.json",
+          "sha256": "f716b2cca14d862e299930c98daa1345f50bfcadbc4ed8df2b2c3d2cd9f47f82",
+          "bytes": 27613
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-surface-lines-19/default/receipt.json",
+          "sha256": "0f377649f3cdfc09ed7e32d0249587e0c5accbdefd329fa6ac06ab1bc43805d6",
+          "bytes": 5451
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/surface-lines-19-default/run-summary.json",
+          "sha256": "adc802303b22de2a5a5b02730615ab73f0f85939f3d0dbe8020f77a59e2e564b",
+          "bytes": 32321
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-surface-lines-comparisons-19/default/comparison.json",
+          "sha256": "782883a69f0edd39be370005666661c6aaa15e34c275231db4a27d557f0ef26c",
+          "bytes": 133778
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-surface-lines-19-launch/default/request.json",
+          "sha256": "307083069e4ab6098120aeb98478b1dee942d5eaf90bfac39be1e3b3e0a74472",
+          "bytes": 2939
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original A24 plus sole Lines default report append. Actual whole Source/Native SLN equals all30CRLF lines/1751B: six ordered opaque surfaces and 24 closed six-coordinate segments using fixed10.2F. Original58/5352 named tolerance/RMSE limits pass with actual3536raw/3536binary64 unequal operands; no tolerance changes or exact-bit claim. WholeSHD, completeERR/END0warnings0severe and source caller-owned SLN retention match; SCI is genuinely unrequested/absent. Immutable producer copied9line prose remains unchanged and is explicitly corrected only in independent readback. This unchanged opaque World fixture activates no shading/window/IntMass/zero-side/general-geometry route."
+      },
+      {
+        "id": "surface-lines-idf",
+        "group": "surface_lines",
+        "source_build": "surface-lines-19",
+        "input": {
+          "path": ".runtime/object-expansion/native-surface-lines/calibration-01/idf/input.idf",
+          "sha256": "05a9484d644eb31801db995e7512387a213241f5b46b17fcc216e34a09a271e2",
+          "bytes": 9314
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-surface-lines/calibration-01/idf/receipt.json",
+          "sha256": "6553823352b4fc7d509e36e2ea5b7c5dd5bf8ad2e251168be8acc1242bba8175",
+          "bytes": 27573
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-surface-lines-19/idf/receipt.json",
+          "sha256": "29cc47ba16f53d5aafd66fb1c35e8b59cda1777a9797e68365321930d6b8152a",
+          "bytes": 5434
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/surface-lines-19-idf/run-summary.json",
+          "sha256": "599e9b60537bb94fa4d2062aa9c135328c04df773020ec156e23816e612ec076",
+          "bytes": 32224
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-surface-lines-comparisons-19/idf/comparison.json",
+          "sha256": "1f87b7875e4ec87f73cb7e3691c1c79d7f948fdef869ad3835f6e60807b64c37",
+          "bytes": 134503
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-surface-lines-19-launch/idf/request.json",
+          "sha256": "7e236234b3b6a75feb703840244a94d458da149fa50772c05563841a141e3da9",
+          "bytes": 2919
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original A24 plus sole Lines idf report append. Actual whole Source/Native SLN equals all38CRLF lines/2140B: six ordered opaque surfaces and 24 World-coordinate IDF vertices, six final semicolons, literal two headers and original azimuth.1R/fixed10.2F formatting. Original58/5352 named tolerance/RMSE limits pass with actual3536raw/3536binary64 unequal operands; no tolerance changes or exact-bit claim. WholeSHD, completeERR/END0warnings0severe and source caller-owned SLN retention match; SCI is genuinely unrequested/absent. Immutable producer copied9line prose remains unchanged and is explicitly corrected only in independent readback. This unchanged opaque World fixture activates no shading/window/IntMass/zero-side/general-geometry route."
       }
     ],
     "totals": {
-      "paired_cases": 39,
-      "reported_samples": 262590,
-      "raw_operand_unequal": 104814,
+      "paired_cases": 41,
+      "reported_samples": 273294,
+      "raw_operand_unequal": 111886,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -2733,8 +2836,41 @@
           "sha256": "d5a593ccb987f87df245bfd1b2add8a3549f07c88108dba9896a2ac69a54ac46",
           "bytes": 75525625
         }
+      },
+      {
+        "id": "surface-lines-19",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-19/receipt.json",
+          "sha256": "0e7066a2964e3b645284553ab3ffefbf73950c1fee3e8ceb0da2f64dcb4f6f6d",
+          "bytes": 6063
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/86/866647c5ac7be435e2994ba7722f4b2279a22fa071b638b48d8745f6b693e723",
+          "sha256": "866647c5ac7be435e2994ba7722f4b2279a22fa071b638b48d8745f6b693e723"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-19/eplus-rs.exe",
+          "sha256": "598207e7a11486c4b29e80e084f54f78b61138fb06031c4689e69f6233d38c43",
+          "bytes": 75545460
+        }
       }
-    ]
+    ],
+    "focused_since_workspace": {
+      "passed": 4,
+      "scope": "Surface-lines-19 output-only change: existing owner bodies cover default closing edges, IDF world vertices/azimuth/terminators, real local SLN IO/outputControl/once state/live Fatal and partial prefix; existing ingress table includes Lines. Full workspace milestone remains surface-compact-18.",
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/lines-owner-focused-tests-19.log",
+          "sha256": "ce4ec743e5ead554ffc7c8390c3636fa4dae06e1eb4cf9495dd6feb9cf7501ed",
+          "bytes": 6684
+        },
+        {
+          "path": ".runtime/object-expansion/lines-ingress-focused-tests-19.log",
+          "sha256": "829cf1de54ba05b3240cac3d6bff8f5aecae1f4ccc81a92513ed10cc50f1d843",
+          "bytes": 5488
+        }
+      ]
+    }
   },
   "additional_native_type_calibrations": [
     {

@@ -18,6 +18,8 @@ pub struct SourceInitializationFilePaths {
     pub bnd: PathBuf,
     /// Actual DXF drawing path; opened freshly at each reached DXF call.
     pub dxf: PathBuf,
+    /// Actual surface-lines path; a fresh local IOFilePath at LinesOut.
+    pub sln: PathBuf,
     /// Actual cost-information path; a fresh local IOFilePath at CostInfoOut.
     pub sci: PathBuf,
     /// Actual report-variable dictionary path.
@@ -160,6 +162,8 @@ pub struct SourceInitializationFiles {
     dfs: SourceOutputStream,
     // Native IOFilePath owns only the path, not a permanently opened stream.
     dxf: PathBuf,
+    // Actual IOFiles.hh633 local Lines path, never inferred from another file.
+    sln: PathBuf,
     // Actual IOFiles.hh635 local report path, never inferred from another file.
     sci: PathBuf,
     tabular_paths: [PathBuf; 5],
@@ -184,6 +188,7 @@ impl SourceInitializationFiles {
             error: paths.error,
             dfs: SourceOutputStream::new(paths.dfs),
             dxf: paths.dxf,
+            sln: paths.sln,
             sci: paths.sci,
             tabular_paths: [
                 paths.tabular_csv,
@@ -222,6 +227,15 @@ impl SourceInitializationFiles {
             .create(true)
             .truncate(true)
             .open(&self.dxf)
+    }
+    pub(super) fn source_lines_path(&self) -> &Path {
+        &self.sln
+    }
+    pub(super) fn open_source_lines(
+        &self,
+        output_to_file: bool,
+    ) -> io::Result<SourceLocalReportFile> {
+        open_local_report(&self.sln, output_to_file)
     }
     pub(super) fn source_cost_info_path(&self) -> &Path {
         &self.sci

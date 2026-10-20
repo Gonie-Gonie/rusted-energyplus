@@ -1,6 +1,7 @@
 //! Actual OutputReports::ReportSurfaces on the retained report cache and geometry.
 //! Optional unported exporters stop only at their reached native child call.
 pub(crate) mod cost_info;
+pub(crate) mod lines;
 mod wireframe;
 use super::SourceInitializationFiles;
 use crate::RuntimeError;
@@ -115,9 +116,8 @@ impl CtfInitializationReports {
         let mut option1 = String::new();
         let mut option2 = String::new();
         if self.scan_source_surface_report(input, "Lines", Some(&mut option1), None, backend)? {
-            return Err(unavailable(
-                "actual OutputReports105 LinesOut183 optional exporter",
-            ));
+            lines::write_source_lines(self, files, &option1, warmup, backend)
+                .map_err(hb_input_error)?;
         }
         if self.scan_source_surface_report(input, "Vertices", None, None, backend)?
             && !surface_vertices

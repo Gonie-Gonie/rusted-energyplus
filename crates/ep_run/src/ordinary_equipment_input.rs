@@ -770,7 +770,13 @@ mod source_surface_list_ingress_tests {
     #[test]
     fn source_opaque_surface_list_keeps_raw_identity_and_requires_real_report_branches()
     -> Result<(), Box<dyn std::error::Error>> {
-        for report in ["Vertices", "Details", "DetailsWithVertices", "CostInfo"] {
+        for report in [
+            "Lines",
+            "Vertices",
+            "Details",
+            "DetailsWithVertices",
+            "CostInfo",
+        ] {
             for specification in [None, Some("IDF")] {
                 let mut fields = serde_json::json!({"report_type": report});
                 if let Some(value) = specification {
@@ -801,7 +807,6 @@ mod source_surface_list_ingress_tests {
         for fields in [
             serde_json::json!({}),
             serde_json::json!({"report_type": true}),
-            serde_json::json!({"report_type": "Lines"}),
             serde_json::json!({"report_type": "ViewFactorInfo"}),
             serde_json::json!({"report_type": "Details", "report_specifications": null}),
             serde_json::json!({"report_type": "Details", "report_specifications": ""}),

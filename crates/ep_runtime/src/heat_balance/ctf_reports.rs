@@ -11,6 +11,13 @@ use std::io::{self, Write};
 #[path = "ctf_reports_format.rs"]
 pub(super) mod formatting;
 
+/// Sole OutputReports.hh79-95 constructor state, retained across exporters.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceOutputReports {
+    pub(crate) option_done: bool,
+    pub(crate) last_option: String,
+}
+
 /// Honest scope/representation boundaries; none is an inferred Native guard.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CtfReportUnavailable {

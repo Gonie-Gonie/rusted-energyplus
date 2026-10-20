@@ -158,7 +158,7 @@ mod live_open_failure_tests {
     #[test]
     fn source_cost_info_fatal_borrows_real_phase_instead_of_backend_ctor_and_preserves_summary() {
         // Unit constructors only, not an active Source simulation claim.
-        let reports = CtfInitializationReports {
+        let mut reports = CtfInitializationReports {
             selected_heat_balance_globals: Some(SelectedHeatBalanceGlobals {
                 kickoff_simulation: true,
                 ..Default::default()
@@ -174,6 +174,7 @@ mod live_open_failure_tests {
             mtr: path.clone(),
             bnd: path.clone(),
             dxf: path.clone(),
+            sln: path.clone(),
             sci: path.clone(),
             rdd: path.clone(),
             mdd: path.clone(),
@@ -234,7 +235,35 @@ mod live_open_failure_tests {
                 error_callback: None,
                 sqlite: None,
             };
-            write_source_cost_info(&reports, &files, &live_warmup, &mut backend)
+            let result = write_source_cost_info(&reports, &files, &live_warmup, &mut backend);
+            let lines = super::super::lines::write_source_lines(
+                &mut reports,
+                &files,
+                "IDF",
+                &live_warmup,
+                &mut backend,
+            );
+            assert!(matches!(lines, Err(Error::Io(_))));
+            assert!(reports.source_output_reports.option_done);
+            assert_eq!(reports.source_output_reports.last_option, "IDF");
+            reports
+                .selected_heat_balance_globals
+                .as_mut()
+                .unwrap()
+                .kickoff_simulation = false;
+            // The failed open already set the genuine once flag. A repeated
+            // request warns (using live warmup=true), then returns before open.
+            super::super::lines::write_source_lines(
+                &mut reports,
+                &files,
+                "",
+                &live_warmup,
+                &mut backend,
+            )
+            .unwrap();
+            assert_eq!(reports.source_output_reports.last_option, "IDF");
+            assert_eq!(backend.state.tracking.total_warning_errors_during_warmup, 1);
+            result
         };
         assert!(matches!(result, Err(Error::Io(_))));
         // Live kickoff=true/developer=false suppresses display. The stale
@@ -244,6 +273,9 @@ mod live_open_failure_tests {
         assert!(
             err.contains(" **  Fatal  ** CostInfoOut: Could not open file  for output (write).")
         );
+        assert!(err.contains(" **  Fatal  ** LinesOut: Could not open file  for output (write)."));
+        assert!(err.contains(" ** Warning ** Report of Surfaces/Lines Option has already been completed with option=IDF"));
+        assert!(err.contains(" **   ~~~   ** ..option=\"\" will not be done this time."));
         assert!(err.contains(" ..... Reference severe error count=2"));
         assert!(err.contains(" ..... Last severe error=actual prior unit severe"));
         assert_eq!(

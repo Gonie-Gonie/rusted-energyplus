@@ -19,6 +19,7 @@ fn scheduled_filter_catalog_reads_actual_registered_name_and_retains_report_ids(
         mtr: path.clone(),
         bnd: path.clone(),
         dxf: path.clone(),
+        sln: path.clone(),
         sci: path.clone(),
         rdd: path.clone(),
         mdd: path.clone(),

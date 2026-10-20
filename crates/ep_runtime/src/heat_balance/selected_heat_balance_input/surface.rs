@@ -675,6 +675,54 @@ mod source_surface_report_tests {
         ));
         assert_eq!(writer.bytes, header.as_bytes());
         let mut reports = reports;
+        use crate::heat_balance::source_initialization::primary_startup_surfaces::lines::write_lines_body;
+        for row in reports
+            .surface_geometry_input
+            .final_surfaces
+            .as_mut()
+            .unwrap()
+        {
+            row.row.zone_name = "ACTUAL ZONE".into();
+        }
+        let mut lines = Vec::new();
+        write_lines_body(&reports, "", &mut lines).unwrap();
+        let lines = String::from_utf8(lines).unwrap();
+        let lines: Vec<_> = lines.lines().collect();
+        assert_eq!(
+            [lines[0], lines[5], lines[10]],
+            ["ACTUAL ZONE:WALL", "ACTUAL ZONE:ROOF", "ACTUAL ZONE:FLOOR"]
+        );
+        assert_eq!(
+            lines[4],
+            "      2.00,      0.00,      3.00,      0.00,      0.00,      3.00"
+        );
+        let mut idf = Vec::new();
+        write_lines_body(&reports, "IDF", &mut idf).unwrap();
+        let idf = String::from_utf8(idf).unwrap();
+        assert!(idf.starts_with(" Building North Axis = 0\nGlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;\n Surface=Wall, Name=WALL, Azimuth=180.0\n"));
+        assert_eq!(idf.matches(";  !- X,Y,Z ==> Vertex 4").count(), 3);
+        // The genuine IntMass and zero-side skips do not inspect vertices.
+        let rows = reports
+            .surface_geometry_input
+            .final_surfaces
+            .as_mut()
+            .unwrap();
+        rows[2].row.class = SurfaceClass::IntMass;
+        rows[2].row.vertex = None;
+        rows[1].row.sides = 0;
+        rows[1].row.vertex = None;
+        let mut prefix = HeaderOnly {
+            bytes: Vec::new(),
+            limit: "ACTUAL ZONE:WALL\n".len(),
+        };
+        assert!(matches!(
+            write_lines_body(&reports, "", &mut prefix),
+            Err(Error::Io(_))
+        ));
+        assert_eq!(prefix.bytes, b"ACTUAL ZONE:WALL\n");
+        let mut one = Vec::new();
+        write_lines_body(&reports, "", &mut one).unwrap();
+        assert_eq!(String::from_utf8(one).unwrap().lines().count(), 5);
         reports.surface_geometry_input.final_surfaces = None;
         assert_eq!(unique_cost_surfaces(&reports).unwrap(), None);
     }

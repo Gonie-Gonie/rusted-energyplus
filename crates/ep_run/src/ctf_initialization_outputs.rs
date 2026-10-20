@@ -103,6 +103,7 @@ impl CtfRunOutputs {
                     mtr: output_dir.join("eplusrs.mtr"),
                     bnd: output_dir.join("eplusrs.bnd"),
                     dxf: output_dir.join("eplusrs.dxf"),
+                    sln: output_dir.join("eplusrs.sln"),
                     sci: output_dir.join("eplusrs.sci"),
                     rdd: output_dir.join("eplusrs.rdd"),
                     mdd: output_dir.join("eplusrs.mdd"),

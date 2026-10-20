@@ -167,6 +167,8 @@ pub struct CtfInitializationReports {
     pub table: PredefinedStringTable,
     /// Genuine first-scan/cache state, not a requested result flag.
     pub scan: ReportScanState,
+    /// Sole actual OutputReports module: Lines once flag and last option.
+    pub(crate) source_output_reports: super::ctf_reports::SourceOutputReports,
     /// Sole SurfaceColorData constructor colors used by actual surface drawings.
     pub(crate) source_surface_colors:
         super::source_initialization::primary_startup_surfaces::SourceSurfaceColors,
