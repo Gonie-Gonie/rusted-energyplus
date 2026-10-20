@@ -2337,6 +2337,375 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             parent.reports.output_registration, retained_registration,
             "InitOnly repeats skip getter"
         );
+        // Same actual getter, selected local Numeric2, retained geometry and
+        // live diagnostic owners. No Native observations or typed gain values
+        // supply this authored boundary table.
+        for (method, density, area, remainder, prior_error, warmup, kickoff, sizing, idf) in [
+            (
+                "Watts/Area",
+                Some(3.7),
+                25.0,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                Some(7.5),
+                25.0,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+            ),
+            (
+                "Power/Area",
+                Some(0.0),
+                25.0,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Watts/Area",
+                Some(-0.0),
+                25.0,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                None,
+                25.0,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                Some(3.7),
+                0.0,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Watts/Area",
+                Some(3.7),
+                0.0,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                Some(3.7),
+                0.0,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                None,
+                0.0,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                None,
+                25.0,
+                false,
+                false,
+                true,
+                true,
+                false,
+                false,
+            ),
+            (
+                "Power/Area",
+                None,
+                25.0,
+                false,
+                false,
+                true,
+                false,
+                true,
+                false,
+            ),
+            (
+                "Power/Area",
+                Some(-0.125),
+                25.0,
+                false,
+                false,
+                true,
+                true,
+                false,
+                false,
+            ),
+        ] {
+            let mut reports = failed_gains.clone();
+            reports.selected_internal_heat_gains.errors_found = prior_error;
+            let globals = reports
+                .selected_heat_balance_globals
+                .as_mut()
+                .ok_or("area globals")?;
+            globals.kickoff_simulation = kickoff;
+            globals.doing_sizing = sizing;
+            let space = &mut reports
+                .selected_zone_input
+                .as_mut()
+                .and_then(|z| z.spaces.as_mut())
+                .ok_or("area Space")?[0];
+            assert!(
+                !space.is_remainder_space,
+                "actual implicit Space constructor"
+            );
+            space.floor_area = area;
+            space.is_remainder_space = remainder;
+            // Distinct caller-owned Zone area cannot replace the selected
+            // Space operand. This unit override makes a wrong read observable.
+            reports
+                .selected_zone_input
+                .as_mut()
+                .and_then(|z| z.zones.as_mut())
+                .ok_or("area Zone")?[0]
+                .floor_area = 81.0;
+            let raw = reports.heat_balance_input.as_mut().ok_or("area raw")?;
+            raw.source_is_epjson = !idf;
+            let objects = raw
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("area objects")?;
+            let fields = &mut objects[0].fields;
+            fields.insert(
+                "design_level_calculation_method".into(),
+                ProjectInputValue::String(method.into()),
+            );
+            fields.insert("design_level".into(), ProjectInputValue::Number(352.0));
+            fields.insert("power_per_person".into(), ProjectInputValue::Number(9.0));
+            if let Some(value) = density {
+                fields.insert(
+                    "power_per_floor_area".into(),
+                    ProjectInputValue::Number(value),
+                );
+            } else {
+                fields.remove("power_per_floor_area");
+            }
+            if idf {
+                for object in objects {
+                    object.idf_max_fields = Some(13);
+                }
+            }
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: warmup,
+                ..Default::default()
+            };
+            let (mut state, mut errors, mut console, mut eio) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            let result = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            let negative = density.is_some_and(|v| v < 0.0);
+            let fatal = prior_error || negative;
+            if fatal {
+                assert!(matches!(
+                    result,
+                    Err(crate::RuntimeError::HeatBalanceInput(_))
+                ));
+            } else {
+                result?;
+            }
+            let gains = &reports.selected_internal_heat_gains;
+            assert_eq!(gains.get_input_flag, fatal);
+            assert_eq!(gains.errors_found, fatal);
+            let rows = gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("actual area rows")?;
+            let expected = if density.is_none() || fatal {
+                0.0
+            } else {
+                density.ok_or("density")? * area
+            };
+            assert_eq!(rows[0].design_level.to_bits(), expected.to_bits());
+            assert_eq!(rows[1].design_level, if fatal { 0.0 } else { -3.0 });
+            assert_eq!(
+                rows[0].nominal_min_design_level.to_bits(),
+                expected.to_bits()
+            );
+            assert_eq!(
+                rows[0].nominal_max_design_level.to_bits(),
+                expected.to_bits()
+            );
+            assert_eq!(
+                rows[0].fraction_radiant, 0.2,
+                "fractions follow design-level return"
+            );
+            let warnings = i32::from(density.is_none() || (!fatal && area <= 0.0 && !remainder));
+            assert_eq!(state.tracking.total_warning_errors, warnings);
+            assert_eq!(
+                state.tracking.total_warning_errors_during_warmup,
+                if warmup && !kickoff && !sizing {
+                    warnings
+                } else {
+                    0
+                }
+            );
+            assert_eq!(
+                state.tracking.total_warning_errors_during_sizing,
+                if sizing { warnings } else { 0 }
+            );
+            assert_eq!(state.tracking.total_severe_errors, i32::from(negative));
+            assert_eq!(
+                state.tracking.total_severe_errors_during_warmup,
+                if warmup && !kickoff && !sizing {
+                    i32::from(negative)
+                } else {
+                    0
+                }
+            );
+            assert!(
+                !state.warmup_flag && !state.kickoff_simulation && !state.doing_sizing,
+                "backend constructor flags never synchronized"
+            );
+            let text = String::from_utf8(errors)?;
+            let field = if idf {
+                "Power per Floor Area"
+            } else {
+                "power_per_floor_area"
+            };
+            if density.is_none() {
+                assert!(text.contains(&format!(
+                    "specifies {field}, but that field is blank.  0 OtherEquipment will result."
+                )));
+            }
+            if warnings > 0 && density.is_some() {
+                assert!(text.contains("Space Floor Area = 0.  0 OtherEquipment will result."));
+            }
+            if negative {
+                assert!(text.contains("invalid power_per_floor_area, value  [<0.0]=-0.125"));
+            }
+            if fatal {
+                assert!(text.contains(" **  Fatal  ** GetInternalHeatGains: Errors found"));
+                assert!(!String::from_utf8(eio)?.contains("OtherEquipment Internal Gains Nominal"));
+            } else {
+                assert!(String::from_utf8(eio)?.contains("OtherEquipment Internal Gains Nominal"));
+            }
+        }
+        {
+            // A failed warning happens before the child returns and before the
+            // equipment assignment/nominal/fraction/device writes.
+            let mut area_failure = failed_gains.clone();
+            let fields = &mut area_failure
+                .heat_balance_input
+                .as_mut()
+                .ok_or("warning raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("warning rows")?[0]
+                .fields;
+            fields.insert(
+                "design_level_calculation_method".into(),
+                ProjectInputValue::String("Power/Area".into()),
+            );
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: true,
+                ..Default::default()
+            };
+            let (mut state, mut console, mut eio, mut errors) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                OrdinaryFailingEio,
+            );
+            let result = CtfInitializationContext {
+                reports: &mut area_failure,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            assert!(matches!(result, Err(crate::RuntimeError::WarmupOutput(_))));
+            let gains = &area_failure.selected_internal_heat_gains;
+            assert!(gains.get_input_flag && !gains.errors_found);
+            let rows = gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("failed area rows")?;
+            assert_eq!(rows[0].design_level.to_bits(), 0.0_f64.to_bits());
+            assert_eq!(rows[0].fraction_radiant, 0.0);
+            assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
+            assert!(eio.is_empty(), "nominal EIO remains unreached");
+        }
         failed_gains
             .heat_balance_input
             .as_mut()

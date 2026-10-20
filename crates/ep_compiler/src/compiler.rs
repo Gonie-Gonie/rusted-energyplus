@@ -13778,14 +13778,23 @@ impl<'a> Compiler<'a> {
                     0.0,
                     0.0..=f64::INFINITY,
                 ),
-                power_per_person_w: self.number_range_default(
-                    "OtherEquipment",
-                    &name,
-                    &object,
-                    "power_per_person",
-                    0.0,
-                    0.0..=f64::INFINITY,
-                ),
+                power_per_person_w: if design_level_calculation_method
+                    == OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+                {
+                    // Native selects Numeric2 for either per-area alias; the
+                    // finite unselected Numeric3 is retained without a made-up
+                    // sign restriction. Other methods keep their old boundary.
+                    self.number_default("OtherEquipment", &name, &object, "power_per_person", 0.0)
+                } else {
+                    self.number_range_default(
+                        "OtherEquipment",
+                        &name,
+                        &object,
+                        "power_per_person",
+                        0.0,
+                        0.0..=f64::INFINITY,
+                    )
+                },
                 fraction_latent,
                 fraction_radiant,
                 fraction_lost,

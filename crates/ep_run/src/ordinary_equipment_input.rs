@@ -393,15 +393,26 @@ fn resolve_raw(
                 }
                 "OtherEquipment" => {
                     selected(object, "fuel_type", &["None"])
-                        && selected(
+                        && (if selected(
                             object,
                             "design_level_calculation_method",
                             &["EquipmentLevel"],
-                        )
-                        && field(object, "design_level").and_then(number).is_some()
-                        && ["power_per_floor_area", "power_per_person"]
-                            .iter()
-                            .all(|name| field(object, name).is_none_or(blank))
+                        ) {
+                            // Keep the existing legacy/direct-level boundary.
+                            field(object, "design_level").and_then(number).is_some()
+                                && ["power_per_floor_area", "power_per_person"]
+                                    .iter()
+                                    .all(|name| field(object, name).is_none_or(blank))
+                        } else {
+                            source_calendar_ingress
+                                && text_is(field(object, "design_level_calculation_method").unwrap_or(&RawValue::Null), &["Watts/Area", "Power/Area"])
+                                // A genuinely absent selected field reaches the
+                                // real warning/default child. Explicit JSON
+                                // null/strings are not schema-number blanks.
+                                && field(object, "power_per_floor_area")
+                                    .is_none_or(|value| number(value).is_some_and(|n| n >= 0.0))
+                                && field(object, "power_per_person").is_none_or(|value| number(value).is_some())
+                        })
                         && ["fraction_latent", "fraction_radiant", "fraction_lost"]
                             .iter()
                             .map(|name| field(object, name).and_then(number).unwrap_or(0.0))
@@ -1701,6 +1712,86 @@ mod source_a_compact_ingress {
                     );
                 }
             }
+        }
+        // Source-only per-area methods preserve the unused direct level and
+        // selected raw Numeric2. Legacy and known operand domains stay bounded.
+        for method in ["Watts/Area", "Power/Area"] {
+            for density in [None, Some(0.0), Some(-0.0), Some(3.7)] {
+                let mut value = serde_json::json!({
+                    "Zone":{"actual zone":{}},
+                    "Schedule:Constant":{"on":{"hourly_value":1}},
+                    "OtherEquipment":{"area":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone",
+                        "schedule_name":"on","design_level_calculation_method":method,"design_level":352}}
+                });
+                if let Some(density) = density {
+                    value["OtherEquipment"]["area"]["power_per_floor_area"] =
+                        serde_json::json!(density);
+                }
+                let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+                assert!(resolve(&raw).is_err());
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                let compiled = ep_compiler::compile_raw_model(&raw);
+                let typed = compiled
+                    .model
+                    .ok_or_else(|| format!("{:?}", compiled.report.diagnostics))?;
+                assert_eq!(typed.other_equipment[0].design_level_w, 352.0);
+                let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                let fields = &hb.objects["OtherEquipment"][0].fields;
+                assert_eq!(fields.get("power_per_floor_area"), density.map(ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number).as_ref());
+                assert_eq!(
+                    fields.get("design_level"),
+                    Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                            352.0
+                        )
+                    )
+                );
+            }
+        }
+        for invalid in [
+            serde_json::json!(-0.1),
+            serde_json::json!(null),
+            serde_json::json!(""),
+            serde_json::json!(true),
+        ] {
+            let value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                "OtherEquipment":{"area":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                    "design_level_calculation_method":"Power/Area","design_level":352,"power_per_floor_area":invalid}}});
+            let bad = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert!(resolve_source_a(&bad).is_err() && resolve_source_b(&bad).is_err());
+        }
+        // Numeric3 remains retained, but it is not the per-area selected
+        // operand. Native imposes no sign restriction on this unused field.
+        for unused in [9.0_f64, -9.0] {
+            let value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                "OtherEquipment":{"area":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                    "design_level_calculation_method":"Power/Area","design_level":352,"power_per_floor_area":3.7,"power_per_person":unused}}});
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert!(resolve(&raw).is_err());
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            let compiled = ep_compiler::compile_raw_model(&raw);
+            let typed = compiled
+                .model
+                .ok_or_else(|| format!("{:?}", compiled.report.diagnostics))?;
+            assert_eq!(
+                typed.other_equipment[0].power_per_person_w.to_bits(),
+                unused.to_bits()
+            );
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+            assert_eq!(
+                hb.objects["OtherEquipment"][0]
+                    .fields
+                    .get("power_per_person"),
+                Some(
+                    &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                        unused
+                    )
+                )
+            );
         }
         // The actual admission requires its Zone even for this isolated
         // format/count transfer check; no simulation or Native execution runs.

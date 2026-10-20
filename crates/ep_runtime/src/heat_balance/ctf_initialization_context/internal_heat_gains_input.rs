@@ -258,12 +258,12 @@ impl CtfInitializationContext<'_> {
                 .selected_schedule_manager
                 .as_mut()
                 .ok_or_else(|| hb_input_error(unavailable("same actual ScheduleManager")))?;
-            let minimum = &reports
+            let system = &reports
                 .selected_project_data
                 .as_ref()
                 .ok_or_else(|| hb_input_error(unavailable("same output minimum frequency")))?
-                .system
-                .minimum_report_frequency;
+                .system;
+            let minimum = &system.minimum_report_frequency;
             let mut owners = getter::SourceGainInputOwners {
                 raw,
                 input,
@@ -271,6 +271,7 @@ impl CtfInitializationContext<'_> {
                 zones,
                 schedules,
                 clock,
+                developer: &system.developer_flag,
                 backend: &mut self.backend,
                 registration: &mut reports.output_registration,
                 prescan: &reports.output_prescan,

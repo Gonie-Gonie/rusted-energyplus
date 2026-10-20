@@ -235,6 +235,10 @@
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
       "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
       "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
+    ],
+    "OtherEquipment": [
+      "The ordinary one-Zone opaque Source A/B route retains direct EquipmentLevel and connects Power/Area and Watts/Area to the selected numeric operand, then multiplies by the actual post-geometry Space.FloorArea. Unselected direct-level fields never seed per-area heat. The real equipment owner feeds nominal reports, scheduled timestep rates and existing air/surface heat-balance consumers.",
+      "Source admission requires fuel None and zero latent load. Per-person sizing, other fuels, explicit or multiple Space/grouping, and EMS remain unavailable. Finite unused Numeric3 may have either sign; per-area selection ignores it. Existing owner bodies cover both aliases, omitted-field defaults, zero-area warnings, live phases and failure prefixes. Same-input physical evidence exercises Power/Area with convective fraction1/radiant0; nonzero radiant combinations remain field-scoped, and report values never seed production."
     ]
   },
   "verification": {
@@ -242,27 +246,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/json-number-lexemes-workspace-tests-37b.log",
-        "sha256": "74ecd1e661e0441a7c94b7511fd056ef48f45d9333d069d012db8741f2fff43a",
-        "bytes": 1557614
+        "path": ".runtime/object-expansion/other-equipment-area-workspace-tests-40b.log",
+        "sha256": "770d9868b476cc2e53e7b44bf97c56084a4211f675796f8a5ec5facfcd255b06",
+        "bytes": 773385
       },
-      "scope": "Corrected full workspace37b verifies generic RawModel JSON-number lexeme preservation plus existing real raw/compiler/SourceA-B IP and TypeLimits/Constant frontend bodies. JSON numeric -0 is retained lexically and classified Integer0; decimal/exponent -0.0/-0e0 retain Float negative zero, with actual bits checked by existing consumer bodies. SourceB full numeric families retain Number; SourceA Compact/regular families retain Number while TypeLimits/Constant statistics intentionally stay OtherScalar and their genuine ordinary_schedule_input RawModel projection is checked separately. Initial37 test-only incorrect statistics expectation was corrected; successful37b is the recorded milestone. No new dependency or cohort."
+      "scope": "Full workspace verifies actual OtherEquipment per-area selection, raw/compiler/getter custody, live Space floor area, diagnostic failure prefixes and existing thermal/report consumers. The corrected full run covers all existing workspace tests; no new cohort or optional API change."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/schedule-instance-metadata-clippy-39.log",
-        "sha256": "8c6ac98b23566c61e8cece05e3a7c28edec1bb635cef024c93d2b58a9f904c71",
-        "bytes": 580
+        "path": ".runtime/object-expansion/other-equipment-area-clippy-40.log",
+        "sha256": "d3d2f472039c39235e1e3809ec8d1208cf637e9e8772e3613d1725f6b9e2956f",
+        "bytes": 794
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/schedule-instance-metadata-docs-39.log",
-        "sha256": "87f138ac5e266a7b4df03c65f25769c3cba2c54baa9ccbb8dfa2f7755b23af11",
+        "path": ".runtime/object-expansion/other-equipment-area-docs-40.log",
+        "sha256": "353122d244616a6a49df68244e13b947d5adaafd97dae739de8844d0bd6b1668",
         "bytes": 354
       },
-      "clippy_through_build": "schedule-instance-metadata-39",
+      "clippy_through_build": "other-equipment-area-40",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3819,12 +3823,63 @@
           "passed": true
         },
         "effective_state": "The actual Native39 and Source39 pair uses eight exact ASCII insertions into the actual parentNative38 JSON. Six harmless unknown top-level metadata kinds appear in all twelve authored instances across nine schedule families; every original known field, request, policy, thermal consumer and weather byte remains unchanged. Reserved IDF metadata and extensible-row validation are separate. Five genuine declarations create Fraction IntervalNo .25, ListNo/minutes60/24 items .75, DailyWeek linked to Interval, CompactWeek linked to List, and Year1/1..12/31 linked to DailyWeek. These are actual report-visible owners, not new thermal consumers. Complete32-line8762-byte CRLF EIO sections atline14 match each other and the independently derived primary/input expectation: type rows, Hourly/Interval/List/generatedCompact Days, Daily/Compact/generated Weeks, Year thenCompact; Constants remain omitted. Full59/5448 Source-own physical streams are independently recomputed with the unchanged kernel, original58 policies and separate96 exact rule. Constant-1/AlwaysOn1 raw/binary96, positiveMTR3/72, exact four unused information rows(3 schedules/1week/1day plusadvice), Warmup20/fullERR-END0 and wholeSHD agree. ActualBuild39 raw/IP known-field-first metadata admission, compiler/getter/report owners, sharednumbers and full Rust snapshot are authenticated live/archive. ParentNative38 is input ancestry only; actualNative39 ran exactly once for this changed input. Native36 revoked preparation history remains inherited ancestry only. Physical reports establish accepted known-owner behavior with harmless instance metadata; raw metadata retention/kinds are checked by existing actual raw/IP owner tests. No arbitrary thermal combination, extensible-row widening, physical sign-zero/internal-bit or full-family claim; expected values never seed producers."
+      },
+      {
+        "id": "other-equipment-area",
+        "group": "other_equipment_area",
+        "source_build": "other-equipment-area-40",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-area/calibration-02/input.epJSON",
+          "sha256": "12f270f7d2e8b94cc0ea31455912e1126c814d6a0a3105dcc751aac1d5d07eaa",
+          "bytes": 38318
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-area/calibration-02/receipt.json",
+          "sha256": "ea14569acd6fe69c4446796a70da16eb353a7d9f30d4568549b3fca75e2083fb",
+          "bytes": 29152
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-area-40/other-equipment-area/receipt.json",
+          "sha256": "b7fd334ebe77301eae78774ae5811ab13fc962703017b12b42f70aec33d0238f",
+          "bytes": 4347
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-area-40/run-summary.json",
+          "sha256": "c7f5b2249e5251bb0830350742b98d89c3be93b7c36d5af1ef01a302cd961025",
+          "bytes": 32596
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-area-comparisons-40/other-equipment-area/comparison.json",
+          "sha256": "079e8e13b8375e62de62abe320b4a2bf7a02dee9fa1031a2c4a7066c5a8db7b1",
+          "bytes": 277267
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-area-40-launch/other-equipment-area/request.json",
+          "sha256": "be993daa66e4b133111dca532173f8a33802b852813b5d49fc7c68fe3581e06f",
+          "bytes": 3324
+        },
+        "totals": {
+          "series": 59,
+          "samples": 5448,
+          "raw_operand_unequal": 3584,
+          "parsed_binary64_unequal": 3584,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual Native40 and Source40 use only two recognized-field edits to the actual Native39 JSON: OtherEquipment Test352a selects Power/Area3.7 while unselected design352 and the separate minus352 object remain authored. The real getter multiplies by actual Space.FloorArea after geometry; no rounded EIO area, report value, expected warmup or Native number seeds production. All original59 requests/weather, original58 policies and separate96 exact rule remain unchanged. Full59/5448 actual Source-owned numerical streams are independently recomputed; positive MTR3/72, Constant-1/AlwaysOn1 raw/binary96, wholeSHD, actualWarmup19 and complete observed zero-warning/error ERR-END/four unused information rows agree. Complete32-line8762-byte schedule EIO and real OtherEquipment nominal3-line1160-byte sections match byte-for-byte. Reported859.353W and3.700 are observed evidence only. ActualBuild40 compiler/raw/getter/caller/liveSpace/floorArea/nominal/timestep and air/surface-radiation owners plus sharednumbers/full Rust snapshot are authenticated live/archive. The physical case has convected fraction1/radiant0: it does not prove a nonzero radiant branch, other sizing aliases, warning prefixes, arbitrary equipment/models or lexical-bit preservation. Those bounded owners remain separately tested."
       }
     ],
     "totals": {
-      "paired_cases": 65,
-      "reported_samples": 482046,
-      "raw_operand_unequal": 133102,
+      "paired_cases": 66,
+      "reported_samples": 487494,
+      "raw_operand_unequal": 136686,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4492,28 +4547,29 @@
           "sha256": "87b3e429945f0db1e9da2e74be213d8655818500ec25923dee1b0ecb36445e85",
           "bytes": 75895215
         }
+      },
+      {
+        "id": "other-equipment-area-40",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-40/receipt.json",
+          "sha256": "6864b7c3f38445bfb4b34cb63673cd1a0a30b3a3de79f86badc38b7b915210e3",
+          "bytes": 5052
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a9/a93fb1f1b97a73b8bb5980d9c8ede5ad9106ef431dd3e7ef4e55252ebc9c031c",
+          "sha256": "a93fb1f1b97a73b8bb5980d9c8ede5ad9106ef431dd3e7ef4e55252ebc9c031c"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-40/eplus-rs.exe",
+          "sha256": "780beaec856bdb0990effca123ea59621eb1f7ad5e0bbe50de04c35995ddc41d",
+          "bytes": 75901881
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 1299,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/compact-interpolation-selector-compiler-tests-38b.log",
-          "sha256": "76f8547f86978cbcb4700ae1382b1c16420620ac44d7e335db772fb6ec14a5eb",
-          "bytes": 127814
-        },
-        {
-          "path": ".runtime/object-expansion/compact-interpolation-selector-owner-tests-38.log",
-          "sha256": "4efec569ae9ef86379bb340c391e79f984f5d204bcd4be79a2976fec6cc709de",
-          "bytes": 2394
-        },
-        {
-          "path": ".runtime/object-expansion/schedule-instance-metadata-run-tests-39.log",
-          "sha256": "c9811c7ed49f12ed92d30b66911407b0abc7fd75dd1df15ddf570c30db1dfa17",
-          "bytes": 146123
-        }
-      ],
-      "scope": "Existing compiler and actual Source-owner checks since full workspace37 cover interpolation selector priority and known-property-first top-level harmless instance metadata for nine schedule families. Actual A/B raw/IP tests preserve six metadata kinds, known-field diagnostics, reserved IDF fields and the legacy guard. No new cohort; actual Source39 ep_run lib796 is added to the previous503 focused checks."
+      "passed": 0,
+      "logs": [],
+      "scope": "Reset after the successful full workspace milestone."
     }
   },
   "additional_native_type_calibrations": [

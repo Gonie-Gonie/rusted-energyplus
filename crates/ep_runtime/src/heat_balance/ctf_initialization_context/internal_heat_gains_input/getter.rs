@@ -3,7 +3,7 @@ use super::{
     E, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject, SourceOtherEquipment,
     SourceOtherFuel, index, unavailable,
 };
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
     SelectedHeatBalanceInput, zone::SelectedZoneInputOwners,
@@ -41,6 +41,7 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) zones: &'a mut SelectedZoneInputOwners,
     pub(super) schedules: &'a mut SelectedScheduleManager,
     pub(super) clock: Option<&'a WeatherGlobalState>,
+    pub(super) developer: &'a bool,
     pub(super) backend: &'a mut SourceErrorBackend<'b>,
     pub(super) registration: &'a mut SourceOutputRegistration,
     pub(super) prescan: &'a SourceOutputPreScan,
@@ -182,9 +183,22 @@ impl SelectedInternalHeatGains {
         }
         drop(rep_var_set); // Original2630 precedes the fatal, outputs and EIO.
         if self.errors_found {
-            return match owners.backend.show_fatal_error(
-                "GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped") {
-                Err(error) => Err(E::Fatal(error)), Ok(never) => match never {},
+            let message = "GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped";
+            if let Some(clock) = owners.clock {
+                let flags = SourceDiagnosticFlags {
+                    kickoff: &owners.globals.kickoff_simulation,
+                    developer: owners.developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &owners.globals.doing_sizing,
+                };
+                return match owners.backend.show_source_fatal_error(message, &flags) {
+                    Err(error) => Err(error),
+                    Ok(never) => match never {},
+                };
+            }
+            return match owners.backend.show_fatal_error(message) {
+                Err(error) => Err(E::Fatal(error)),
+                Ok(never) => match never {},
             };
         }
         self.setup_outputs(owners)?;
@@ -359,9 +373,16 @@ impl SelectedInternalHeatGains {
                 owners.backend.show_continue_error(&message)?;
                 self.errors_found = true;
             }
-            if values.alphas[4] != "EQUIPMENTLEVEL" {
-                return Err(unavailable("positive OtherEquipment sizing method"));
-            }
+            // Native1833-1853 selects all three operands before the Space
+            // loop; the unselected direct level must never seed per-area heat.
+            let level_field = match values.alphas[4].as_str() {
+                "EQUIPMENTLEVEL" => 0,
+                "WATTS/AREA" | "POWER/AREA" => 1,
+                _ => return Err(unavailable("positive OtherEquipment sizing method")),
+            };
+            let level_value = values.numbers[level_field];
+            let level_blank = local.numeric_field_blanks[level_field];
+            let level_name = &local.numeric_field_names[level_field];
             for (position, &space_number) in object.space_nums.iter().enumerate() {
                 let space = owners
                     .zones
@@ -412,20 +433,61 @@ impl SelectedInternalHeatGains {
                         space.other_equipment_fuels.push(fuel);
                     }
                 }
-                if local.numeric_field_blanks[0] {
-                    owners.backend.show_warning_error(&format!(
+                // Real setDesignLevel3431-3535. Its local result is assigned
+                // to the actual equipment only AFTER every reached diagnostic
+                // returns; failure preserves the constructor/previous prefix.
+                let mut design_level = 0.0;
+                if level_blank {
+                    let message = format!(
                         "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but that field is blank.  0 OtherEquipment will result.",
-                        object.name, local.numeric_field_names[0]))?;
-                    row.design_level = 0.0;
-                } else if self.errors_found {
-                    row.design_level = 0.0;
+                        object.name, level_name
+                    );
+                    if level_field == 0 {
+                        owners.backend.show_warning_error(&message)?;
+                    } else {
+                        sizing_warning(owners, &message)?;
+                    }
                 } else {
-                    row.design_level = values.numbers[0] * 1.0;
+                    if level_field == 1 && level_value < 0.0 {
+                        let value = crate::heat_balance::source_round_format::round(level_value, 3)
+                            .map_err(|e| E::Format(format!("IHG design level .3R: {e:?}")))?;
+                        sizing_severe(
+                            owners,
+                            &format!(
+                                "GetInternalHeatGains: OtherEquipment=\"{}\", invalid {}, value  [<0.0]={value}",
+                                object.name, level_name
+                            ),
+                        )?;
+                        self.errors_found = true;
+                    }
+                    if !self.errors_found {
+                        if level_field == 0 {
+                            design_level = level_value * 1.0;
+                        } else {
+                            let space = owners
+                                .zones
+                                .spaces
+                                .as_ref()
+                                .and_then(|rows| index(space_number).ok().and_then(|i| rows.get(i)))
+                                .ok_or_else(|| unavailable("same OtherEquipment per-area Space"))?;
+                            design_level = level_value * space.floor_area;
+                            if space.floor_area <= 0.0 && !space.is_remainder_space {
+                                sizing_warning(
+                                    owners,
+                                    &format!(
+                                        "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but Space Floor Area = 0.  0 OtherEquipment will result.",
+                                        object.name, level_name
+                                    ),
+                                )?;
+                            }
+                        }
+                    }
                 }
+                row.design_level = design_level;
                 if row.design_level < 0.0 && row.fuel == SourceOtherFuel::Propane {
                     owners.backend.show_severe_error(&format!(
                         "GetInternalHeatGains: OtherEquipment=\"{}\", {} is not allowed to be negative",
-                        object.name, local.numeric_field_names[0],
+                        object.name, level_name,
                     ))?;
                     owners
                         .backend
@@ -492,4 +554,31 @@ impl SelectedInternalHeatGains {
         }
         Ok(())
     }
+}
+
+// New per-area diagnostics require actual Source phase owners. Legacy entry
+// points have no clock and stop here instead of inventing its warmup flag.
+fn sizing_warning(owners: &mut SourceGainInputOwners<'_, '_>, message: &str) -> Result<(), E> {
+    let clock = owners
+        .clock
+        .ok_or_else(|| unavailable("actual OtherEquipment sizing diagnostic clock"))?;
+    let flags = SourceDiagnosticFlags {
+        kickoff: &owners.globals.kickoff_simulation,
+        developer: owners.developer,
+        warmup: &clock.warmup_flag,
+        doing_sizing: &owners.globals.doing_sizing,
+    };
+    owners.backend.show_source_warning_error(message, &flags)
+}
+fn sizing_severe(owners: &mut SourceGainInputOwners<'_, '_>, message: &str) -> Result<(), E> {
+    let clock = owners
+        .clock
+        .ok_or_else(|| unavailable("actual OtherEquipment sizing diagnostic clock"))?;
+    let flags = SourceDiagnosticFlags {
+        kickoff: &owners.globals.kickoff_simulation,
+        developer: owners.developer,
+        warmup: &clock.warmup_flag,
+        doing_sizing: &owners.globals.doing_sizing,
+    };
+    owners.backend.show_source_severe_error(message, &flags)
 }

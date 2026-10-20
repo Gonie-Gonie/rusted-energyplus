@@ -207,6 +207,9 @@ pub(crate) struct SelectedSpaceData {
     pub(crate) floor_area: f64,
     pub(crate) has_floor: bool,
     pub(crate) fraction_zone_floor_area: f64,
+    /// Native SpaceData.hh468 ctorfalse; positive remainder-Space creation
+    /// remains outside the selected implicit-Space getter.
+    pub(crate) is_remainder_space: bool,
     /// SpaceData constructor zeros; later SetupZoneGeometry367+ writes these same fields.
     pub(crate) exterior_window_area: f64,
     pub(crate) total_surface_area: f64,
@@ -250,6 +253,7 @@ impl Default for SelectedSpaceData {
             floor_area: 0.0,
             has_floor: false,
             fraction_zone_floor_area: 0.0,
+            is_remainder_space: false,
             exterior_window_area: 0.0,
             total_surface_area: 0.0,
             exterior_gross_wall_area: 0.0,
