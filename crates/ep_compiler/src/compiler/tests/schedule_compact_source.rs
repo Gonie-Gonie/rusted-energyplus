@@ -57,6 +57,7 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
         (r#"{"field":"1D0"}"#, 1.0_f64),
         (r#"{"field":"-5D-1"}"#, -0.5),
         (r#"{"field":"0E"}"#, 0.0),
+        (r#"{"field":"-0"}"#, -0.0), // String alpha ProcessNumber keeps its sign.
         (r#"{"field":"1e-9999"}"#, 0.0),
         (r#"{"field":"-1e-9999"}"#, -0.0),
         (r#"{"field":"1D-9999"}"#, 0.0),
@@ -136,41 +137,95 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
     ] {
         assert!(classify_source_json_number(text).is_err(), "{text}");
     }
-    let max = "18446744073709551615";
-    let hours = (1..=24)
-        .map(|hour| format!("\"hour_{hour}\":{max}"))
-        .collect::<Vec<_>>()
-        .join(",");
-    let list = vec![format!("{{\"value\":{max}}}"); 24].join(",");
-    let projected = compile_raw_model(&parse_epjson_str(&format!(
-        r#"{{
-        "ScheduleTypeLimits":{{"Wrapped":{{"lower_limit_value":{max},"upper_limit_value":200,"numeric_type":"Continuous"}}}},
-        "Schedule:Constant":{{"C":{{"schedule_type_limits_name":"Wrapped","hourly_value":{max}}}}},
-        "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"Wrapped","data":[
-            {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"Until:24:00"}},{{"field":{max}}}]}}}},
-        "Schedule:Day:Hourly":{{"H":{{"schedule_type_limits_name":"Wrapped",{hours}}}}},
-        "Schedule:Day:Interval":{{"I":{{"schedule_type_limits_name":"Wrapped","data":[{{"time":"24:00","value_until_time":{max}}}]}}}},
-        "Schedule:Day:List":{{"L":{{"schedule_type_limits_name":"Wrapped","minutes_per_item":60,"extensions":[{list}]}}}}
-    }}"#
-    ))?);
-    assert!(
-        !projected.has_errors(),
-        "{:?}",
-        projected.report.diagnostics
-    );
-    let model = projected
-        .model
-        .ok_or_else(|| std::io::Error::other("actual unsigned schedule projection"))?;
-    assert_eq!(model.schedule_type_limits[0].lower_limit, Some(-1.0));
-    assert_eq!(model.schedule_type_limits[0].upper_limit, Some(200.0));
-    assert_eq!(model.schedules[0].hourly_value, -1.0);
-    assert_eq!(
-        model.compact_schedules[0].periods[0].day_profiles[0].segments[0].value,
-        -1.0
-    );
-    assert_eq!(model.day_schedules[0].hourly_values, [-1.0; 24]);
-    assert_eq!(model.day_interval_schedules[0].segments[0].value, -1.0);
-    assert_eq!(model.day_list_schedules[0].values, vec![-1.0; 24]);
+    // Parse the original literal bytes, never a serde Value/to_string roundtrip:
+    // lexical -0 is a JSON Integer, whereas the decimal/exponent forms are Float.
+    for (operand, expected, integer) in [
+        ("-0", 0.0_f64, true),
+        ("-0.0", -0.0, false),
+        ("-0e0", -0.0, false),
+        ("1e-9999", 0.0, false),
+        ("-1e-9999", -0.0, false),
+        ("1E+00", 1.0, false),
+        ("18446744073709551615", -1.0, true),
+    ] {
+        let hours = (1..=24)
+            .map(|hour| format!("\"hour_{hour}\":{operand}"))
+            .collect::<Vec<_>>()
+            .join(",");
+        let list = vec![format!("{{\"value\":{operand}}}"); 24].join(",");
+        let raw = parse_epjson_str(&format!(
+            r#"{{
+            "ScheduleTypeLimits":{{"Wrapped":{{"lower_limit_value":{operand},"upper_limit_value":200,"numeric_type":"Continuous"}}}},
+            "Schedule:Constant":{{"C":{{"schedule_type_limits_name":"Wrapped","hourly_value":{operand}}}}},
+            "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"Wrapped","data":[
+                {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"Until:24:00"}},{{"field":{operand}}}]}}}},
+            "Schedule:Day:Hourly":{{"H":{{"schedule_type_limits_name":"Wrapped",{hours}}}}},
+            "Schedule:Day:Interval":{{"I":{{"schedule_type_limits_name":"Wrapped","data":[{{"time":"24:00","value_until_time":{operand}}}]}}}},
+            "Schedule:Day:List":{{"L":{{"schedule_type_limits_name":"Wrapped","minutes_per_item":60,"extensions":[{list}]}}}}
+        }}"#
+        ))?;
+        let constants = raw.ordered_instances("Schedule:Constant")?;
+        let field = constants
+            .first()
+            .and_then(|(_, object)| {
+                object
+                    .fields
+                    .get(&ep_raw_model::FieldName("hourly_value".into()))
+            })
+            .ok_or_else(|| std::io::Error::other("actual literal numeric field"))?;
+        let ep_raw_model::RawValue::Number(text) = field else {
+            return Err(std::io::Error::other("actual numeric-kind custody").into());
+        };
+        assert_eq!(text, operand);
+        let kind = classify_source_json_number(text)
+            .map_err(|_| std::io::Error::other("actual retained JSON kind"))?;
+        assert_eq!(matches!(kind, SourceJsonNumber::Integer(_)), integer);
+        assert_eq!(kind.as_f64().to_bits(), expected.to_bits());
+        let projected = compile_raw_model(&raw);
+        assert!(
+            !projected.has_errors(),
+            "{operand}: {:?}",
+            projected.report.diagnostics
+        );
+        let model = projected
+            .model
+            .ok_or_else(|| std::io::Error::other("actual literal schedule projection"))?;
+        assert_eq!(
+            model.schedule_type_limits[0]
+                .lower_limit
+                .ok_or_else(|| std::io::Error::other("actual lower bound"))?
+                .to_bits(),
+            expected.to_bits()
+        );
+        assert_eq!(model.schedule_type_limits[0].upper_limit, Some(200.0));
+        assert_eq!(
+            model.schedules[0].hourly_value.to_bits(),
+            expected.to_bits()
+        );
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0].segments[0]
+                .value
+                .to_bits(),
+            expected.to_bits()
+        );
+        assert!(
+            model.day_schedules[0]
+                .hourly_values
+                .iter()
+                .all(|value| value.to_bits() == expected.to_bits())
+        );
+        assert_eq!(
+            model.day_interval_schedules[0].segments[0].value.to_bits(),
+            expected.to_bits()
+        );
+        assert_eq!(model.day_list_schedules[0].values.len(), 24);
+        assert!(
+            model.day_list_schedules[0]
+                .values
+                .iter()
+                .all(|value| value.to_bits() == expected.to_bits())
+        );
+    }
     for value in [
         "18446744073709551615.0",
         "18446744073709551615e0",

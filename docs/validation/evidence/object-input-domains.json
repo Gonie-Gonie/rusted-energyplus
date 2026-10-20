@@ -167,19 +167,19 @@
       "No/Average/Linear use retained minute/day/week/currentVal producers and actual type clocks. Optional blank/unknown types retain Invalid/None and original warning/continuation order. Missing For masks retain genuine MissingDay0 pointers and exact warnings. Detailed hasVal and uncached minmax follow actual366week/12day-type pointers and clocks; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects are preserved; Linear endpoint residues are never clamped.",
       "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow \u00b10, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
       "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E and folded/zero dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Day:Hourly": [
       "Actual Source A/B getter retains original declaration order, input format, local arrays, numeric/alpha field names, blanks, defaults and usage. Twenty-four admitted finite JSON numbers or omitted-zero values populate real Day timestep values and sums in hour-major order.",
       "Optional blank/unknown types retain Invalid and emit genuine warnings/continuations using live phase flags. Strict Day range and defined discrete-integer warnings preserve order without eager min/max caching. Year and shared live calendar/minmax consumers use these Day owners; unsupported error effects remain bounded.",
       "The connected Hourly to WeekDaily to Year B102 case preserves the original gain name and all102/9792 requested operands. Existing owner checks cover defaults, all96 values across twelve day types, annual wrap, leap fallback and warning prefixes; no full-object or arbitrary-model claim.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Week:Daily": [
       "Actual ordered raw/IP getter resolves all twelve named Day references in Native day-type order after Hourly and before Year/Compact. Real Week pointers and Day usage flags feed existing live calendar, DST, currentVal and min/max consumers.",
@@ -195,19 +195,19 @@
       "Actual Source A/B raw/IP getters retain input format, declaration order, original counts, field names, blanks/defaults and usage. Existing numeric extension items with omitted values provide real zero blanks; explicit null/string numerics and missing whole rows are not promoted.",
       "The retained Day owner calls the real ProcessIntervalFields minute producer and its No/Average/Linear population. The compiler reuses the bounded shared integral HH/MM decoder: finite D/E and underflow-zero forms, genuine blank HH/MM, explicit0:0, equal endpoints and MM60 retaining a previous endpoint; original-minute alignment warnings precede24:mm clamping. Nonintegral formatting-Fatal, unsafe conversions and unsupported severe children remain bounded. Real minute errors carry the actual parent ErrorsFound through population/checks to its existing final Fatal.",
       "The sole same-input B102 physical pair consumes a No Interval06:00=0/18:00=1/24:00=0 through AllDays WeekCompact and Year, plus the newly consumed List availability chain. All original102/9792 reported operands, unchanged tolerance/RMSE policies, actual96 gain/control/availability profiles, fullERR-END0, actualWarmup6, nominal/day-group EIO, wholeSHD and genuine deleted-emptyMTR are checked. Existing authored owner tests separately cover three modes,1440 minutes to96 values, default blanks, empty/MM60 warnings and failure prefixes; these are not additional paired mode proofs. No full-object or arbitrary-combination claim.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Day:List": [
       "Actual Source A/B raw/IP getters preserve ordered numeric values, real omitted-value zero defaults and blank flags. The real producer checks positive minutes and item count before defined truncation/division, then expected count and divisibility into60, fills actual1440-minute storage and populates the retained Day values/sum. Source admission keeps schema-valid integer minutes1..60 and finite numbers.",
       "Average alone accumulates minute windows; Linear uses the same constant-minute endpoint sampling as No and does not manufacture a ramp. Independent strict range and defined integer warnings use live phase flags in original order, including this family's \"not integer for\" wording. Missing/invalid count, unsupported severe paths, unsafe division/conversion remain bounded.",
       "The sole same-input B102 physical pair consumes List No/60 with24 values0x3,1x21 through WeekDaily and Year, while its gain consumes Interval/WeekCompact. All original102/9792 operands and original policies are retained. Existing authored owner tests separately exercise No/Average/Linear with10-minute items, real blank defaults,1440-to96 population, sums, warning order and live Year/current-value consumers. Physical pairing does not establish all minute/timestep/mode combinations or full ScheduleManager parity.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Week:Compact": [
       "Actual Source A/B ordered mixed getters resolve and mark each real Day owner used before ProcessForDayTypes. Independent substring predicates mutate the real per-week assignment mask; successful selectors write only actual DayType slots1..12. The constructor retains nullptr/None at slot0 and genuine MissingDay pointers at unassigned slots1..12.",
@@ -221,17 +221,17 @@
     ],
     "ScheduleTypeLimits": [
       "Actual ordinary Source TypeLimits projection consumes the retained raw numeric lower/upper fields through the shared JSON-kind classifier; inclusive validators and actual getter declarations retain their existing bounds and consumers.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "Schedule:Constant": [
       "Actual ordinary Source Constant projection consumes the retained numeric value through the shared JSON-kind classifier and preserves its existing type-limit association and genuine scalar ScheduleManager owner. The new requested Schedule Value is independently exact; constants remain omitted from genuine Output:Schedules Detailed rows.",
-      "The actual schedule-only JSON-number getter distinguishes integer and float storage before Real64 conversion. Signed int64 and unsigned uint64 integer storage follows Native C++20 int64 modular conversion, so uint64MAX becomes signed-1; decimal/exponent and out-of-integer-range finite float-origin values retain floating presentation and never wrap. Compact alpha uses exact signed integer text or the existing Milo float formatter. Raw schema/admission numeric checks, calendar/minutes fields and generic number_value remain unchanged.",
-      "One direct-epJSON A59 same-input pair keeps every ancestral A24 byte except four declared ASCII insertions, all original55 variable and3Hourly meter requests and all weather/geometry/thermal consumers. It adds the uint64MAX lower limit, Constant, Hourly and Compact declarations plus one requested Constant Schedule Value. Actual new Constant96 values and complete Hourly/Compact Day report values are-1; both22-line5584-byte CRLF schedule EIO sections atline14 match the primary/input-derived expectation. The full59/5448 physical comparison retains original58 policies and a separate exact96 rule; genuine MTR3/72, wholeSHD, actualWarmup20, exactly three unused informational rows and fullERR-END0 are checked. The declarations are not additional thermal consumers.",
-      "Existing compiler and actual Source owner bodies separately cover signed/unsigned integer boundaries, float-origin distinctions and numeric fields across TypeLimits, Constant, Compact, Hourly, Interval and List, including actual retained Day/Week/Detailed/current-value owners. Interval/List kind matrices and float-origin cases are unit/compiler evidence, not additional physical pairs or engine-internal numeric-bit instrumentation.",
-      "Raw lexical negative-zero origin remains unresolved until a separate parser-custody change. Unsupported nonfinite/unsafe integer/error effects, arbitrary JSON values, Schedule:File/EMS, full family completion and arbitrary model combinations are not established. Historical fixed conformance and cache/performance evidence retain their original scope; no status, typing or Source admission category changes."
+      "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
+      "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
+      "The direct-epJSON A59 case adds TypeLimits/Constant/Hourly/Compact declarations and one Constant Schedule Value while preserving original55 variable/3Hourly meter requests and weather/thermal inputs. Constant96 and Hourly/Compact report values are-1. Full59/5448 streams retain original58 policies plus the separate96 exact rule, real MTR3/72, both22-line5584-byte EIO sections, Warmup20, three unused information rows, wholeSHD and ERR-END0. Source37 regresses against the same retained sole Native36 run; no new Native37 process. Physical reports do not prove negative-zero sign custody.",
+      "Raw schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ]
   },
   "verification": {
@@ -239,27 +239,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/schedule-json-number-workspace-tests-36.log",
-        "sha256": "d9d6b876cd5607470546793be9a3be6e660571064436ebcd40dac66b3dfcfeb7",
-        "bytes": 1558246
+        "path": ".runtime/object-expansion/json-number-lexemes-workspace-tests-37b.log",
+        "sha256": "74ecd1e661e0441a7c94b7511fd056ef48f45d9333d069d012db8741f2fff43a",
+        "bytes": 1557614
       },
-      "scope": "Full workspace milestone36 verifies the shared strict JSON-number-kind classifier and genuine schedule-only compiler/TypeLimits/Constant/Compact/Hourly/Interval/List getter projections, retained numeric/alpha presentation and actual Day/Week/Detailed owners. Existing signed/u64/float-origin matrices use the real compiler, IP and owner bodies; raw lexical negative-zero custody remains a separate gap. No new dependency or test cohort."
+      "scope": "Corrected full workspace37b verifies generic RawModel JSON-number lexeme preservation plus existing real raw/compiler/SourceA-B IP and TypeLimits/Constant frontend bodies. JSON numeric -0 is retained lexically and classified Integer0; decimal/exponent -0.0/-0e0 retain Float negative zero, with actual bits checked by existing consumer bodies. SourceB full numeric families retain Number; SourceA Compact/regular families retain Number while TypeLimits/Constant statistics intentionally stay OtherScalar and their genuine ordinary_schedule_input RawModel projection is checked separately. Initial37 test-only incorrect statistics expectation was corrected; successful37b is the recorded milestone. No new dependency or cohort."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/schedule-json-number-clippy-36.log",
-        "sha256": "a5e5bfee598acbad4e4d5ab14d6e934b0860aedbfdfddab39ee6cb605e92a1a2",
-        "bytes": 2506
+        "path": ".runtime/object-expansion/json-number-lexemes-clippy-37.log",
+        "sha256": "4eae2a172d2b7669b78183ce01c9ad830bae5daef6d36bfea14a25c487c6b1af",
+        "bytes": 2314
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/schedule-json-number-docs-36.log",
-        "sha256": "6c36f29f17bab965bf36610fbd40c5926bc6b80ceabee7545cfe322702c07303",
+        "path": ".runtime/object-expansion/json-number-lexemes-docs-37.log",
+        "sha256": "87f138ac5e266a7b4df03c65f25769c3cba2c54baa9ccbb8dfa2f7755b23af11",
         "bytes": 354
       },
-      "clippy_through_build": "schedule-json-number-36",
+      "clippy_through_build": "json-number-lexemes-37",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -279,7 +279,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. Unit36 retains all original58 A policies and adds only one separately declared96-sample Unsigned JSON Constant Schedule Value exact0/0/0 rule with raw-token and binary64 equality; actual MTR3/72 stays physically present. This new rule is not an original named policy identity or a frozen-case promotion.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion.",
     "cases": [
       {
         "id": "timestep-8",
@@ -3663,12 +3663,63 @@
           "passed": true
         },
         "effective_state": "Direct original A24 converted epJSON remains byte-preserved via four ASCII insertions, all original55 variable/3Hourly meter requests, physical thermal consumers, values/weather/geometry/calendar unchanged. One genuine uint64MAX limits lower becomes effective-1 while upper200 remains; new Constant actual96 requested ScheduleValue operands and full Hourly/Compact Day report values are-1. Actual22line5584byteCRLF schedule EIO sections atline14 are identical to each other and primary/input-derived whole expectation. Constants are omitted by the genuine report writer. Every original58 policy remains unchanged, with a separate new96 exact0/0/0 rule requiring numeric-1 and paired raw/binary64 equality. Full59/5448 own physical streams independently recomputed with unchanged kernel pass alloriginal tolerances/RMSE, positive actualMTR3series72records and fullfooters; no deleted-empty substitute. FullERR includes exactly2 unusedSchedules and1 unusedDay three informational rows, no unusedWeek message, 0warning/severe/continue/warmup/sizing and actualWarmup20; END0 and wholeSHD agree. Actual fullBuild36 allRustsnapshot, shared strictJSONnumber module and genuine compiler/frontend/raw/IP/getter/report owners live/archive authenticated. Revoked calibration01 stays unexecuted; sole actual Native is corrected-header calibration02. No raw lexical negative-zero origin, all JSON number values, errors, arbitrary models, Native-internal allocation/bit instrumentation or full family completion claim. Expected values never seed a producer."
+      },
+      {
+        "id": "json-number-lexemes",
+        "group": "json_number_lexeme_regression",
+        "source_build": "json-number-lexemes-37",
+        "input": {
+          "path": ".runtime/object-expansion/native-schedule-json-numbers/calibration-02/input.epJSON",
+          "sha256": "4a28387efcfa779c3e91b796bbf3831c808f4a704d39475b4fafb5494cd30006",
+          "bytes": 30182
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-schedule-json-numbers/calibration-02/receipt.json",
+          "sha256": "58626dfd616b7037d66bcd0b6c66fbac33d47328d98a9305ee0cadb1e1f0edcc",
+          "bytes": 16939
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-json-number-lexemes-37/json-number-lexemes/receipt.json",
+          "sha256": "7d11c5ed7da88eb2a9f2a1c20eeb9ff4bea3230978bdf458f9c3aa61350afd61",
+          "bytes": 3760
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/json-number-lexemes-37/run-summary.json",
+          "sha256": "798e93b346db02f962d4d9b9d61f7d5e994c9e2994235b25c319e857b3af7bd1",
+          "bytes": 32570
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-json-number-lexemes-comparisons-37/json-number-lexemes/comparison.json",
+          "sha256": "be1c005e6ba8e515906ed39a65c30fe31e0924e7947bd85b08562d47403409d0",
+          "bytes": 254187
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-json-number-lexemes-37-launch/json-number-lexemes/request.json",
+          "sha256": "0b32db4696dd6d0b59811b4ecc6a7938fce176da13576c1866103c8f7ea63ae9",
+          "bytes": 3611
+        },
+        "totals": {
+          "series": 59,
+          "samples": 5448,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Source37 regression against the retained sole actual Native36 calibration02; no new Native37 process or Native input. Identical A59 directJSON input/weather preserves all original58 requests/policies and separate96 exact0/0/0 ScheduleValue rule. Full59/5448 own streams use unchanged comparison kernel, positiveMTR3series72records, exactnewConstant-1 andAlwaysOn1 raw/binary96, whole22line5584byteCRLF schedule EIO atline14, exactthree unused informational rows, Warmup20/fullERR-END0 and wholeSHD. Full actual Build37 Rust snapshot/live/archive and actual raw_model/lib.rs plus classifier/frontend/compiler/A-B IP/getter/report owners are authenticated. This same-input physical regression does not prove raw lexical negative-zero sign preservation: .2R serialization and report averaging can normalize zero signs. Existing real raw/compiler/A-B IP owner tests check JSON lexemes and kind/bits separately; no physical sign-zero instrumentation or allJSON/allmodel claim. Revoked Native36 calibration01 remains unexecuted. Expected values never seed a producer."
       }
     ],
     "totals": {
-      "paired_cases": 62,
-      "reported_samples": 465702,
-      "raw_operand_unequal": 122494,
+      "paired_cases": 63,
+      "reported_samples": 471150,
+      "raw_operand_unequal": 126030,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -4285,12 +4336,29 @@
           "sha256": "a8c66b0994ccfc42f2f73196c3a04c799707c792fbe5586fae75e4b340abb3a0",
           "bytes": 75933555
         }
+      },
+      {
+        "id": "json-number-lexemes-37",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-37/receipt.json",
+          "sha256": "faaea6ecbd8c8627db173059176094176db1483d4862da595730303eddffa493",
+          "bytes": 4505
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/d5/d549d3e3ae459adbe470038c42f178394d33d508ffdbb8bbbda7d9123444a181",
+          "sha256": "d549d3e3ae459adbe470038c42f178394d33d508ffdbb8bbbda7d9123444a181"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-37/eplus-rs.exe",
+          "sha256": "2cf2f634fa73f82dfd6de9b9cd798a85a8fbb8cb4a2bebcce8d21cc68d58a21e",
+          "bytes": 75889553
+        }
       }
     ],
     "focused_since_workspace": {
       "passed": 0,
       "logs": [],
-      "scope": "Full workspace milestone36 includes the existing Unit35 Year folding and all Unit36 numeric projection checks; focused counts reset after the actual full workspace pass."
+      "scope": "Full workspace37b includes all previous numeric projection checks plus raw lexeme and actual compiler/A-B consumer custody; focused counts reset after this successful full run."
     }
   },
   "additional_native_type_calibrations": [

@@ -335,46 +335,44 @@ pub fn load_epjson_file_with_idf_order(
 /// Parses epJSON text into a RawModel.
 pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
     let contents = contents.trim_start_matches('\u{feff}');
-    let value: serde_json::Value = serde_json::from_str(contents)?;
-    let root = value.as_object().ok_or(EpJsonError::TopLevelNotObject)?;
+    // Keep the existing complete semantic validation first. In particular,
+    // an out-of-range number in an overwritten duplicate must still fail.
+    // No serde feature or generic Number behavior is changed.
+    let _: serde_json::Value = serde_json::from_str(contents)?;
+    let RawValue::Object(root) = ValidatedJsonLexemes {
+        contents,
+        cursor: 0,
+    }
+    .value()?
+    else {
+        return Err(EpJsonError::TopLevelNotObject);
+    };
     let mut model = RawModel::default();
-
-    for (object_type_name, instances_value) in root {
-        let instances =
-            instances_value
-                .as_object()
-                .ok_or_else(|| EpJsonError::ObjectTypeNotObject {
-                    object_type: object_type_name.clone(),
-                })?;
+    for (FieldName(object_type_name), instances_value) in root {
+        let RawValue::Object(instances) = instances_value else {
+            return Err(EpJsonError::ObjectTypeNotObject {
+                object_type: object_type_name,
+            });
+        };
         let mut raw_instances = BTreeMap::new();
-
-        for (object_name, fields_value) in instances {
-            let fields =
-                fields_value
-                    .as_object()
-                    .ok_or_else(|| EpJsonError::ObjectInstanceNotObject {
-                        object_type: object_type_name.clone(),
-                        object_name: object_name.clone(),
-                    })?;
-            let raw_fields = fields
-                .iter()
-                .map(|(field_name, value)| {
-                    (FieldName(field_name.clone()), raw_value_from_json(value))
-                })
-                .collect();
-
+        for (FieldName(object_name), fields_value) in instances {
+            let RawValue::Object(fields) = fields_value else {
+                return Err(EpJsonError::ObjectInstanceNotObject {
+                    object_type: object_type_name.clone(),
+                    object_name,
+                });
+            };
             raw_instances.insert(
-                ObjectName(object_name.clone()),
+                ObjectName(object_name),
                 RawObject {
-                    fields: raw_fields,
+                    fields,
                     source_span: None,
                 },
             );
         }
-
         model
             .objects
-            .insert(ObjectType(object_type_name.clone()), raw_instances);
+            .insert(ObjectType(object_type_name), raw_instances);
     }
 
     model.version = extract_version(&model);
@@ -388,23 +386,118 @@ pub fn parse_epjson_str_with_idf_order(epjson: &str, idf: &str) -> Result<RawMod
     Ok(model)
 }
 
-fn raw_value_from_json(value: &serde_json::Value) -> RawValue {
-    match value {
-        serde_json::Value::Null => RawValue::Null,
-        serde_json::Value::Bool(value) => RawValue::Bool(*value),
-        serde_json::Value::Number(value) => RawValue::Number(value.to_string()),
-        serde_json::Value::String(value) => RawValue::String(value.clone()),
-        serde_json::Value::Array(values) => {
-            RawValue::Array(values.iter().map(raw_value_from_json).collect())
+// This cursor is private and is used only after the full serde_json::Value
+// validation above. It does not broaden JSON syntax, finite-number admission,
+// depth, BOM or comment behavior. Strings still use the same serde decoder;
+// only the original number token is copied instead of Number::to_string().
+struct ValidatedJsonLexemes<'a> {
+    contents: &'a str,
+    cursor: usize,
+}
+
+impl ValidatedJsonLexemes<'_> {
+    fn whitespace(&mut self) {
+        while matches!(
+            self.contents.as_bytes().get(self.cursor),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
+            self.cursor += 1;
         }
-        serde_json::Value::Object(values) => RawValue::Object(
-            values
-                .iter()
-                .map(|(field_name, value)| {
-                    (FieldName(field_name.clone()), raw_value_from_json(value))
-                })
-                .collect(),
-        ),
+    }
+
+    fn string(&mut self) -> Result<String, serde_json::Error> {
+        let begin = self.cursor;
+        self.cursor += 1; // Opening quote, already validated.
+        while let Some(&byte) = self.contents.as_bytes().get(self.cursor) {
+            self.cursor += 1;
+            if byte == b'"' {
+                break;
+            }
+            if byte == b'\\' && self.cursor < self.contents.len() {
+                // Skip an escaped quote/backslash without interpreting it.
+                // Full Unicode/surrogate decoding stays with serde below.
+                self.cursor += 1;
+            }
+        }
+        serde_json::from_str(&self.contents[begin..self.cursor])
+    }
+
+    fn value(&mut self) -> Result<RawValue, serde_json::Error> {
+        self.whitespace();
+        match self.contents.as_bytes().get(self.cursor) {
+            Some(b'n') => {
+                self.cursor += 4;
+                Ok(RawValue::Null)
+            }
+            Some(b't') => {
+                self.cursor += 4;
+                Ok(RawValue::Bool(true))
+            }
+            Some(b'f') => {
+                self.cursor += 5;
+                Ok(RawValue::Bool(false))
+            }
+            Some(b'"') => self.string().map(RawValue::String),
+            Some(b'[') => {
+                self.cursor += 1;
+                self.whitespace();
+                let mut values = Vec::new();
+                if self.contents.as_bytes().get(self.cursor) != Some(&b']') {
+                    loop {
+                        values.push(self.value()?);
+                        self.whitespace();
+                        if self.contents.as_bytes().get(self.cursor) == Some(&b']') {
+                            break;
+                        }
+                        self.cursor += 1; // Validated comma.
+                    }
+                }
+                self.cursor += 1;
+                Ok(RawValue::Array(values))
+            }
+            Some(b'{') => {
+                self.cursor += 1;
+                self.whitespace();
+                let mut values = BTreeMap::new();
+                if self.contents.as_bytes().get(self.cursor) != Some(&b'}') {
+                    loop {
+                        self.whitespace();
+                        let name = self.string()?;
+                        self.whitespace();
+                        self.cursor += 1; // Validated colon.
+                        let value = self.value()?;
+                        // Decode keys before insertion; a duplicate replaces
+                        // its entire earlier subtree, exactly Value's map.
+                        values.insert(FieldName(name), value);
+                        self.whitespace();
+                        if self.contents.as_bytes().get(self.cursor) == Some(&b'}') {
+                            break;
+                        }
+                        self.cursor += 1; // Validated comma.
+                    }
+                }
+                self.cursor += 1;
+                Ok(RawValue::Object(values))
+            }
+            _ => {
+                let begin = self.cursor;
+                while self
+                    .contents
+                    .as_bytes()
+                    .get(self.cursor)
+                    .is_some_and(|byte| {
+                        !matches!(byte, b' ' | b'\t' | b'\n' | b'\r' | b',' | b']' | b'}')
+                    })
+                {
+                    self.cursor += 1;
+                }
+                let token = &self.contents[begin..self.cursor];
+                // Retain ordinary JSON's finite Number check and error type.
+                // Its parsed representation is deliberately not stored.
+                let _: serde_json::Number = serde_json::from_str(token)?;
+                Ok(RawValue::Number(token.to_owned()))
+            }
+        }
     }
 }
 
@@ -490,6 +583,110 @@ mod tests {
 
         let summary = model.summary();
         assert_eq!(summary.object_type_counts.get("Unknown:Object"), Some(&1));
+
+        // Number spelling survives actual text parsing, while nonnumeric
+        // strings/keys/DOM and duplicate-key replacement remain unchanged.
+        let lexical = parse_epjson_str(
+            r#"{"Unknown:Object":{"Kept":{
+            "integer":-0,"decimal":-0.0,"exponent":-0e0,"positive":1E+0,
+            "underflow":-1e-9999,"uint":18446744073709551615,"outside":18446744073709551616,
+            "nested":[-0,{"n":-0.0,"text":"escaped\\\" -0 [1E+0]"},null,true,false],
+            "reserved":{"$serde_json::private::RawValue":"hello","$serde_json::private::Number":"0"},
+            "string":"\u002d0",
+            "v":{"stale":-0},"\u0076":{"kept":-0.0}
+        }}}"#,
+        )?;
+        let fields = &lexical.objects[&ObjectType("Unknown:Object".into())]
+            [&ObjectName("Kept".into())]
+            .fields;
+        for (name, token) in [
+            ("integer", "-0"),
+            ("decimal", "-0.0"),
+            ("exponent", "-0e0"),
+            ("positive", "1E+0"),
+            ("underflow", "-1e-9999"),
+            ("uint", "18446744073709551615"),
+            ("outside", "18446744073709551616"),
+        ] {
+            assert_eq!(
+                fields.get(&FieldName(name.into())),
+                Some(&RawValue::Number(token.into()))
+            );
+        }
+        assert_eq!(
+            fields.get(&FieldName("string".into())),
+            Some(&RawValue::String("-0".into()))
+        );
+        let Some(RawValue::Array(nested)) = fields.get(&FieldName("nested".into())) else {
+            return Err(std::io::Error::other("actual nested lexical array").into());
+        };
+        assert_eq!(nested[0], RawValue::Number("-0".into()));
+        let RawValue::Object(object) = &nested[1] else {
+            return Err(std::io::Error::other("actual nested lexical object").into());
+        };
+        assert_eq!(
+            object.get(&FieldName("n".into())),
+            Some(&RawValue::Number("-0.0".into()))
+        );
+        assert_eq!(
+            object.get(&FieldName("text".into())),
+            Some(&RawValue::String("escaped\\\" -0 [1E+0]".into()))
+        );
+        assert_eq!(
+            &nested[2..],
+            &[RawValue::Null, RawValue::Bool(true), RawValue::Bool(false)]
+        );
+        let Some(RawValue::Object(reserved)) = fields.get(&FieldName("reserved".into())) else {
+            return Err(std::io::Error::other("actual reserved metadata object").into());
+        };
+        assert_eq!(
+            reserved.get(&FieldName("$serde_json::private::RawValue".into())),
+            Some(&RawValue::String("hello".into()))
+        );
+        assert_eq!(
+            reserved.get(&FieldName("$serde_json::private::Number".into())),
+            Some(&RawValue::String("0".into()))
+        );
+        let Some(RawValue::Object(last)) = fields.get(&FieldName("v".into())) else {
+            return Err(std::io::Error::other("actual escaped duplicate key").into());
+        };
+        assert_eq!(last.len(), 1);
+        assert_eq!(
+            last.get(&FieldName("kept".into())),
+            Some(&RawValue::Number("-0.0".into()))
+        );
+        let duplicate = parse_epjson_str(
+            r#"{"X":{"Old":{"n":-0}},"\u0058":{"Same":{"old":-0},"Same":{"new":[-0e0]}}}"#,
+        )?;
+        assert_eq!(duplicate.object_count(), 1);
+        let same = &duplicate.objects[&ObjectType("X".into())][&ObjectName("Same".into())];
+        assert_eq!(same.fields.len(), 1);
+        assert_eq!(
+            same.fields.get(&FieldName("new".into())),
+            Some(&RawValue::Array(vec![RawValue::Number("-0e0".into())]))
+        );
+        for text in [
+            r#"{"X":{"Y":{"n":1e9999,"n":0}}}"#,
+            r#"{"X":{"Y":{"n":1e9999},"Y":{}}}"#,
+            r#"{"X":{"Y":{"n":1e9999}},"X":{}}"#,
+            r#"{"X":{"Y":{"n":NaN}}}"#,
+            r#"{"X":{"Y":{"n":1.}}}"#,
+        ] {
+            assert!(
+                matches!(parse_epjson_str(text), Err(super::EpJsonError::Json(_))),
+                "{text}"
+            );
+        }
+        assert!(matches!(
+            parse_epjson_str("[]"),
+            Err(super::EpJsonError::TopLevelNotObject)
+        ));
+        assert!(
+            matches!(parse_epjson_str(r#"{"X":[]}"#),Err(super::EpJsonError::ObjectTypeNotObject{object_type})if object_type=="X")
+        );
+        assert!(
+            matches!(parse_epjson_str(r#"{"X":{"Y":[]}}"#),Err(super::EpJsonError::ObjectInstanceNotObject{object_type,object_name})if object_type=="X"&&object_name=="Y")
+        );
 
         Ok(())
     }

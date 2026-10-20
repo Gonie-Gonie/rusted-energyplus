@@ -1259,6 +1259,103 @@ mod source_a_compact_ingress {
                 .value,
             18446744073709551616.0
         );
+        // Direct literal text retains numeric kind through actual RawModel and
+        // Source A/B IP. A serde Value roundtrip here would hide bare -0.
+        for (operand, expected, integer) in [
+            ("-0", 0.0_f64, true),
+            ("-0.0", -0.0, false),
+            ("-0e0", -0.0, false),
+            ("1e-9999", 0.0, false),
+            ("-1e-9999", -0.0, false),
+            ("1E+00", 1.0, false),
+            ("18446744073709551615", -1.0, true),
+        ] {
+            let source = format!(
+                r#"{{
+                "Version":{{"v":{{"version_identifier":"26.1"}}}},"Building":{{"b":{{}}}},
+                "Timestep":{{"t":{{"number_of_timesteps_per_hour":4}}}},"Zone":{{"actual zone":{{}}}},
+                "ScheduleTypeLimits":{{"T":{{"lower_limit_value":{operand},"upper_limit_value":200,"numeric_type":"Continuous"}}}},
+                "Schedule:Constant":{{"C":{{"schedule_type_limits_name":"T","hourly_value":{operand}}}}},
+                "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"T","data":[
+                    {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"Until:24:00"}},{{"field":{operand}}}]}}}}
+            }}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&source)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            // A retains statistics-only scalars for these two families; its
+            // real numeric values come from the raw-model projection below.
+            // B retains the complete raw scalar. Compact is complete in both.
+            for (ip, scalar) in [
+                (
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    V::OtherScalar,
+                ),
+                (
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    V::Number(operand.into()),
+                ),
+            ] {
+                assert_eq!(
+                    ip.source_raw_object_fields("Schedule:Constant", "C")?
+                        .get("hourly_value"),
+                    Some(&scalar)
+                );
+                assert_eq!(
+                    ip.source_raw_object_fields("ScheduleTypeLimits", "T")?
+                        .get("lower_limit_value"),
+                    Some(&scalar)
+                );
+                let V::Array(data) = &ip.source_raw_object_fields("Schedule:Compact", "S")?["data"]
+                else {
+                    return Err("actual raw Compact array".into());
+                };
+                let V::Object(value) = &data[3] else {
+                    return Err("actual raw Compact scalar".into());
+                };
+                assert_eq!(value.get("field"), Some(&V::Number(operand.into())));
+            }
+            let kind = ep_model::classify_source_json_number(operand)
+                .map_err(|_| "actual retained JSON kind")?;
+            assert_eq!(
+                matches!(kind, ep_model::SourceJsonNumber::Integer(_)),
+                integer
+            );
+            let projected = crate::ordinary_schedule_input::resolve(&raw)?;
+            assert_eq!(
+                projected.types[0]
+                    .lower
+                    .ok_or("actual lower value")?
+                    .to_bits(),
+                expected.to_bits()
+            );
+            assert_eq!(projected.constants[0].value.to_bits(), expected.to_bits());
+        }
+        let raw = ep_raw_model::parse_epjson_str(
+            r#"{
+            "Zone":{"actual zone":{}},"ScheduleTypeLimits":{"T":{"lower_limit_value":-1,"upper_limit_value":1,"numeric_type":"Continuous"}},
+            "Schedule:Compact":{"S":{"schedule_type_limits_name":"T","data":[
+                {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":"-0"}]}}
+        }"#,
+        )?;
+        resolve_source_a(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let V::Array(data) = &ip.source_raw_object_fields("Schedule:Compact", "S")?["data"] else {
+            return Err("actual String Compact array".into());
+        };
+        let V::Object(value) = &data[3] else {
+            return Err("actual String Compact scalar".into());
+        };
+        assert_eq!(value.get("field"), Some(&V::String("-0".into())));
+        let compiled = ep_compiler::compile_raw_model(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.ok_or("actual String Compact model")?;
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0].segments[0]
+                .value
+                .to_bits(),
+            (-0.0_f64).to_bits()
+        );
         // The actual admission requires its Zone even for this isolated
         // format/count transfer check; no simulation or Native execution runs.
         let json = r#"{"Zone":{"actual zone":{}},"Output:Schedules":{"Output:Schedules 1":{"key_field":"Hourly"},"Output:Schedules 2":{"key_field":"Timestep"}}}"#;
