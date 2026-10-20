@@ -163,13 +163,10 @@
       "Same-input1/1 CustomDay1 Duration1.9 becomes1 across96actual clocks and matches all102/9792 original outputs exactly. AllDays schedules do not prove distinct day-type coefficients; ordinal-only unwritten local weekday and broader grammar/models remain bounded."
     ],
     "Schedule:Compact": [
-      "Actual retained DaySchedule enum0/1/2 selects No/Average/Linear through the existing Original minute expansion/population; no preview cache or Native output is supplied to runtime. Real day/week graph, UpdateScheduleVals/currentVal and DST/hour24 consumers remain owned by Source.",
-      "Actual Source initialization borrows live kickoff/developer/weather warmup/doingSizing into minute Warning/Severe/Continue callbacks. Parent error Continue follows child; retained population precedes later ProcessScheduleInput Fatal. Callback/IO failures keep completed prefixes.",
-      "SourceA accepts the same Compact family/raw grammar and references. Only Compact transfers full numeric/order operands; otherA raw projections and previous lexical fallback order stay unchanged. A complete all-family identity/order map preserves the existing strict IP association guard. Legacy unscoped admission remains closed.",
-      "Existing No Native unit body now covers all3 interpolation modes/live currentVal and diagnostic/failure prefixes; a SourceA ingress check proves raw numbers/order/type negatives. Full workspace5046/2 and all-targetClippy pass.",
-      "Same-input B102 consumed nonaligned Average and Linear each complete102/9792 raw/binary64-exact outputs under unchanged named policies, exact96schedule strings/bits, fullEIO/WarmupDays6/ERR-END0/0/wholeSHD and genuine deleted-emptyMTR. Linear endpoint overshoot/residue is retained, never clamped.",
-      "Remaining non-MM/DD Through grammar, missing/unknown type diagnostics, malformed/duplicate selectors, schedule-limit failures, some Detailed min/max/control getters, sibling public schedule families and broader calendar/model combinations retain explicit boundaries. No full-object or arbitrary-combination completion.",
-      "Detailed hasVal now follows Original366week/12day-type pointers with actual thermostat TimeStepsInHour, visited Week/Day Num arrays and exact equality, independent of currentVal or minmax caches; Constant still ignores clock. Existing actual graph tests exercise contained10/current175 and real4-step/ctor0 distinction. A separate same-input Constant4-to-Compact control4 B102 case matches102/9792 raw/binary64-exact values, all96 requested control values and fullEIO/SHD/ERR-END0/0 with genuine deleted-emptyMTR. No internal hasVal iteration instrumentation or other thermostat/control physics claim."
+      "Actual Source A/B preserves raw/IP numeric fields and complete original family/order custody, retained day/week/currentVal and genuine No/Average/Linear minute producers. Live child/parent/population/finalFatal diagnostic order and partial-owner/IO prefixes remain; Linear endpoint residues are never clamped.",
+      "Omitted/blank/unknown optional type retains actual Invalid/None and Warning plus two Continues before week/day population; referenced unlimited types retain their real identity. Actual weather.global is borrowed through first-input/HB to gains, while thermostat/exterior use existing real clocks. Uncached Detailed minmax/day-group reduction reads actual TimeStepsInHour only when needed; cached and Constant paths ignore it. Legacy callers without clock remain bounded; no eager typed-cache or derived60/minutes substitute.",
+      "Detailed hasVal follows all366week/12day-type pointers with actual thermostat clock, visited Week/Day Num arrays and exact equality independent of currentVal; Constant remains unchanged. Through now invokes the genuine General child and actual leap OrdinalDay into the existing367week array for fixed numeric/named/reversed/dash/space MonthDay spellings. Reached invalid-date diagnostics, ordinal/Nth/Last, broader compiler syntax, missing selectors and sibling schedule families remain bounded.",
+      "Consumed B102 Average/Linear, Constant4-to-Compact control4, composed unlimited Fraction plus blank-gain/unknown-control types, and two Through token spellings each match all102/9792 raw/binary64 values under original unchanged policies. All96 relevant schedule profiles, nominal/day-group EIO, exact ERR-END0/0 or actual2Warnings4Continues with warmup0/sizing0, wholeSHD and real deleted-emptyMTR are checked. The four fixed-date spellings and failure-prefix edge cases also use existing actual-owner test bodies; no arbitrary calendar/model/thermostat physics or full-object completion claim."
     ]
   },
   "verification": {
@@ -186,27 +183,27 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/view-factor-control-clippy-20b.log",
-        "sha256": "53e890fbe0e467f3fb55fc86da4aee51f334eeeaadc280cd469b633b221f9059",
-        "bytes": 2068
+        "path": ".runtime/object-expansion/compact-clock-through-clippy-21.log",
+        "sha256": "9b689ec6e04b052468f1e814011bc3a10244e6aa807ef62bdecdb974cbdf5db8",
+        "bytes": 2070
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/view-factor-control-docs-20.log",
+        "path": ".runtime/object-expansion/compact-clock-through-docs-21.log",
         "sha256": "ec57032a80a96e8c15955d284e92249fb0a4987568912610086b220dce954777",
         "bytes": 354
       },
-      "clippy_through_build": "view-factor-control-20",
+      "clippy_through_build": "compact-clock-through-21",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/view-factor-control-native-cohort-check-20.log",
-          "sha256": "67bc8736f640f313f383d38ea39cbb4f07dba9b4edd193c52946ebf5783749fd",
-          "bytes": 3001378
+          "path": ".runtime/object-expansion/compact-clock-through-native-cohort-check-21.log",
+          "sha256": "c00a36d50685826399735404f27b9bf67ee1e97ce6507c34a2eec470c1c189be",
+          "bytes": 3001242
         },
-        "scope": "Compile-only verification of the preserved feature-gated legacy wrapper and changed genuine debug-owner literals; existing cohort warnings remain, no feature tests or engines run."
+        "scope": "Compile-only verification of changed live clock/debug owner calls and preserved legacy optional-clock wrapper; existing cohort warnings remain, no feature tests or engines run."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -2682,11 +2679,113 @@
           "passed": true
         },
         "effective_state": "Original A24 plus sole ViewFactorInfo idf append. Actual55 EIO report lines (Solar28/radiant27),10primary headers,12authored geometry/absorptance/emissivity/vertex rows,24matrix rows/144scalars and18view-factor row sums match exactly, including actual pre-Fix versus final Solar matrices and genuine copied-Solar radiant finalF/ScriptF. Actual whole IDF DBG6756B/156CRLF lines/4duplicate finalF blocks/144scalar tokens equals Native. Original58/5352 policies unchanged;3536raw/binary64 unequal operands pass all original tolerance/RMSE limits, no exact-bit claim. CompleteSHD/ERR-END0warnings0severe, same actual debug/EIO IO owners and output retention verified. No user-F/window/Carroll/single-surface/representative/DecayCurves or full-object-domain promotion; Native matrices never feed Source execution."
+      },
+      {
+        "id": "compact-optional-types",
+        "group": "schedule_compact_optional_types",
+        "source_build": "compact-clock-through-21",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-optional-types/calibration-01/input.idf",
+          "sha256": "0fbd1650cf6ac2743b10b3b106cfc8cc06fda52a51c21545700fe2a1af7bd8e7",
+          "bytes": 13072
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-optional-types/calibration-01/receipt.json",
+          "sha256": "78dadec9852f02b5f5c0fc3fdbf67c695a67f21faeaa1e74b8e32652e239895b",
+          "bytes": 10884
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-optional-types-21/optional-types/receipt.json",
+          "sha256": "4b98610d6135b7dfa471be9c4f785834a56b16f92201a820997f5a4beb172d74",
+          "bytes": 6040
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-optional-types-21/run-summary.json",
+          "sha256": "662c0b3ee3734b730e883e2cba3d94ef6e8d5138a9215ab6522f85298935c3e6",
+          "bytes": 60739
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-optional-types-comparisons-21/optional-types/comparison.json",
+          "sha256": "31ff0f4c033d3d0e7ac56c29a7ce214ee379ad4efc060778b2e995aadf835381",
+          "bytes": 248162
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-optional-types-21-launch/optional-types/request.json",
+          "sha256": "2ac6bdaa41ec219f90675f72e52e12e805642443dc3d38068bb548dcb5239c30",
+          "bytes": 2914
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original B102 with exactly3 authored schedule/type spans: named Fraction bounds blank (isLimited=false), InternalGain optional type blank, and ConstantControl4 replaced by same-name CompactAllDays4 referencing PORTING UNKNOWN TYPE. Genuine unchanged gains/thermostat refs consume the real retained Detailed schedules; observed96control4, gain48zero/48one and availability12zero/84one. All102/9792 original named policies pass with zero raw/binary64 unequal operands and zero tolerance/RMSE failures. Exact2Warnings+4Continues in control-unknown then gain-blank order, warmup0/sizing0, fullERR/END2warnings0severe, wholeSHD, nominal and fourdaygroup gains extrema0..1000W, and real deleted-empty MTR0 match. No alternateThrough grammar, missingselector, integer/fractional General boundary, topology or fullCompact-domain promotion."
+      },
+      {
+        "id": "compact-through-fixed-monthday-B102",
+        "group": "compact_through_monthday",
+        "source_build": "compact-clock-through-21",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-through-spelling/calibration-01/input.idf",
+          "sha256": "dfe19711ec93558dc28b61ed7333fa24712cd954409f7d11796b4ff5070d5c68",
+          "bytes": 13031
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-through-spelling/calibration-01/receipt.json",
+          "sha256": "eb58bedbea9a8b101f8c25e1e8795df6679fffd74e9b3e293ff8ae8f634279a5",
+          "bytes": 20217
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-through-21/receipt/receipt.json",
+          "sha256": "74c07d50d48706d7bf7a2cf96e465e655491609f96e23313b941327e81ba3ef4",
+          "bytes": 5987
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-through-21/run-summary.json",
+          "sha256": "d002bc5d2eb768c1395727e3d2b1e6a49977db2968f709a1b31db39d1e86525c",
+          "bytes": 60549
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-through-21-comparisons-01/main/comparison.json",
+          "sha256": "bfc269bafa731c7ef89cf6559e2bcb5504cdce8aff1d7610c9e94275894c8d37",
+          "bytes": 240980
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-through-21-launch/main/request.json",
+          "sha256": "51b431100dc19b709540de4c1d66d9f435857791abc31b986950492d048ed6e9",
+          "bytes": 3506
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original B102 only Internal Gain Schedule Through12/31 toDECEMBER31 and System Availability Through12/31 to12-31; original Constant4 and every other byte/request/weather/value unchanged. Actual96 ordered gain0x24/1x48/0x24 (zero48/one48), availability0x12/1x84 and Constant4x96 physical operands match. All102/9792 original raw operands and parsed binary64 values equal, with0tolerance/RMSE failures under unchanged original policies/kernel. Actual calendar/control/Zone/warmup6 EIO rows, wholeSHD, fullERR-END0warnings0severe and genuine deleted-empty MTR match. Native12-artifact and retained Source10-file custody rechecked. This completes only two fixed MonthDay spelling branches; no ordinal/Nth/Last/invalid-date/general Compact/full-domain or internal hasVal-bit claim, and Native values never feed Source runtime."
       }
     ],
     "totals": {
-      "paired_cases": 44,
-      "reported_samples": 293790,
+      "paired_cases": 46,
+      "reported_samples": 313374,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3032,8 +3131,41 @@
           "sha256": "2bb54d52bb9512af9ca0ca2256c129a9823deb26b868cd64375b1eb529cb7706",
           "bytes": 75596700
         }
+      },
+      {
+        "id": "compact-clock-through-21",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-21/receipt.json",
+          "sha256": "84349e38c9d6f3192238417809527a34c51c8b7dc71ceab92b48df44a3961e05",
+          "bytes": 6898
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/20/203a534f9c9bd8e790c877d7a16ae393bfcd1ab2089f6f94dc510d103edb5dd4",
+          "sha256": "203a534f9c9bd8e790c877d7a16ae393bfcd1ab2089f6f94dc510d103edb5dd4"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-21/eplus-rs.exe",
+          "sha256": "b2886ed881fb0d39c868323d6c202fe19268375fca664fe093afb18efda40f40",
+          "bytes": 75617652
+        }
       }
-    ]
+    ],
+    "focused_since_workspace": {
+      "passed": 5,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/compact-clock-through-focused-tests-21.log",
+          "sha256": "9bb0f352a148efd23ba80f154ffb66febb575662b357c2859c4eb4684bb6c018",
+          "bytes": 5880
+        },
+        {
+          "path": ".runtime/object-expansion/compact-through-calendar-tests-21.log",
+          "sha256": "41d88a8d1b588cac8d422ba9469c3b142eeeb6effdabe611c86af8e9217afa04",
+          "bytes": 6292
+        }
+      ],
+      "scope": "Clock-through-21: existing actual ScheduleManager body now covers optional/missing/unknown type warnings, genuine uncached minmax/day-group clock operands and fixed named/reversed/dash/space Through dates; existing four Source calendar tests regress the shared General date child/legacy wrapper. Full workspace milestone remains view-factor-control-20; no repeated broad suite."
+    }
   },
   "additional_native_type_calibrations": [
     {

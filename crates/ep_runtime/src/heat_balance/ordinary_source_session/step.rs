@@ -69,6 +69,7 @@ impl SourceInitializationFiles {
                     &mut context,
                     model,
                     &mut weather.environment,
+                    &weather.global,
                     weather.global.minutes_in_time_step,
                     output_host,
                     equipment,

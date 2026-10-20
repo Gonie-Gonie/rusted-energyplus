@@ -1,12 +1,29 @@
 //! Native ScheduleManager3534-3610 day-group cache on the retained manager.
 use super::{SelectedScheduleData, SelectedScheduleManager, SourceScheduleIndex};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
+use crate::weather::day::WeatherGlobalState;
 
 impl SelectedScheduleManager {
     pub(crate) fn source_day_group_min_max(
         &mut self,
         index: SourceScheduleIndex,
         group: usize,
+    ) -> Result<(f64, f64), Error> {
+        self.source_day_group_min_max_with_optional_clock(index, group, None)
+    }
+    pub(crate) fn source_day_group_min_max_with_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        group: usize,
+        clock: &WeatherGlobalState,
+    ) -> Result<(f64, f64), Error> {
+        self.source_day_group_min_max_with_optional_clock(index, group, Some(clock))
+    }
+    fn source_day_group_min_max_with_optional_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        group: usize,
+        clock: Option<&WeatherGlobalState>,
     ) -> Result<(f64, f64), Error> {
         let schedule = self
             .schedules
@@ -17,7 +34,11 @@ impl SelectedScheduleManager {
             return Ok((schedule.current_value, schedule.current_value));
         }
         if !schedule.is_min_max_set {
-            self.ensure_source_min_max(index)?;
+            if let Some(clock) = clock {
+                self.ensure_source_min_max_with_clock(index, clock)?;
+            } else {
+                self.ensure_source_min_max(index)?;
+            }
         }
         let SelectedScheduleData::Detailed(detailed) = &self.schedules[index.0].data else {
             return Err(Error::Unavailable("actual Detailed day-group payload"));
@@ -97,7 +118,11 @@ impl SelectedScheduleManager {
                         continue;
                     }
                     if !day_schedule.is_min_max_set {
-                        self.source_day_min_max(day_index)?;
+                        if let Some(clock) = clock {
+                            self.source_day_min_max_with_clock(day_index, clock)?;
+                        } else {
+                            self.source_day_min_max(day_index)?;
+                        }
                     }
                     let day_schedule = &self.day_schedules[day_index];
                     let (minimum, maximum) = (day_schedule.min_value, day_schedule.max_value);

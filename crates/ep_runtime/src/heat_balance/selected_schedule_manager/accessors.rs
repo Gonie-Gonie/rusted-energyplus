@@ -47,8 +47,16 @@ impl SelectedScheduleManager {
         }
         Ok(Some(index))
     }
-    fn source_selected_min_max(&mut self, index: SourceScheduleIndex) -> Result<(f64, f64), E> {
-        self.ensure_source_min_max(index)?;
+    fn source_selected_min_max(
+        &mut self,
+        index: SourceScheduleIndex,
+        clock: Option<&WeatherGlobalState>,
+    ) -> Result<(f64, f64), E> {
+        if let Some(clock) = clock {
+            self.ensure_source_min_max_with_clock(index, clock)?;
+        } else {
+            self.ensure_source_min_max(index)?;
+        }
         let row = self
             .schedules
             .get(index.0)
@@ -56,10 +64,10 @@ impl SelectedScheduleManager {
         Ok((row.min_value, row.max_value))
     }
     pub(crate) fn source_min(&mut self, index: SourceScheduleIndex) -> Result<f64, E> {
-        Ok(self.source_selected_min_max(index)?.0)
+        Ok(self.source_selected_min_max(index, None)?.0)
     }
     pub(crate) fn source_max(&mut self, index: SourceScheduleIndex) -> Result<f64, E> {
-        Ok(self.source_selected_min_max(index)?.1)
+        Ok(self.source_selected_min_max(index, None)?.1)
     }
     pub(crate) fn source_check_min(
         &mut self,
@@ -69,14 +77,38 @@ impl SelectedScheduleManager {
         Ok(f64::from(f32::EPSILON) >= minimum - self.source_min(index)?)
     }
 
+    pub(crate) fn source_min_with_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        clock: &WeatherGlobalState,
+    ) -> Result<f64, E> {
+        Ok(self.source_selected_min_max(index, Some(clock))?.0)
+    }
+    pub(crate) fn source_max_with_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        clock: &WeatherGlobalState,
+    ) -> Result<f64, E> {
+        Ok(self.source_selected_min_max(index, Some(clock))?.1)
+    }
+    pub(crate) fn source_check_min_with_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        minimum: f64,
+        clock: &WeatherGlobalState,
+    ) -> Result<bool, E> {
+        Ok(f64::from(f32::EPSILON) >= minimum - self.source_min_with_clock(index, clock)?)
+    }
+
     /// Actual ScheduleBase::checkMinMaxVals for the caller's two inclusive bounds.
     pub(crate) fn source_check_min_max_inclusive(
         &mut self,
         index: SourceScheduleIndex,
         minimum: f64,
         maximum: f64,
+        clock: &WeatherGlobalState,
     ) -> Result<bool, E> {
-        let (actual_minimum, actual_maximum) = self.source_selected_min_max(index)?;
+        let (actual_minimum, actual_maximum) = self.source_selected_min_max(index, Some(clock))?;
         let min_ok = f64::from(f32::EPSILON) >= minimum - actual_minimum;
         let max_ok = actual_maximum - maximum <= f64::from(f32::EPSILON);
         Ok(min_ok && max_ok)

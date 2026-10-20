@@ -5,7 +5,10 @@ use super::header_state::{source_count, strip_ascii_spaces, to_source_int};
 use super::{DateType, RawDayFailure, RawEpwHeaderError, RawEpwHeaderState, RawEpwInput};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::weather::day::SourceWeatherInitializationError as Error;
-pub(crate) use dates::{SourceDateScratch, process_source_date_string, source_ordinal_day};
+pub(crate) use dates::{
+    SourceDateScratch, process_source_date_string, process_source_date_string_with_diagnostic,
+    source_ordinal_day,
+};
 fn raw(e: RawEpwHeaderError) -> Error {
     RawDayFailure::Header(e).into()
 }

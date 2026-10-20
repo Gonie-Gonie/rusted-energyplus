@@ -458,6 +458,253 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 .ends_with("  Processing Schedule Input -- Complete\n")
         );
     }
+    // Compiler-accepted fixed MonthDay spellings reach the same actual General
+    // child and retain genuine Detailed -> Week -> Day pointers, not a preview.
+    for through in [
+        "Through: DECEMBER 31",
+        "Through: 31 DEC",
+        "Through: 12-31",
+        "Through: 12 31",
+    ] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
+            serde_json::json!(through);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual named-month Compact pointer")?;
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+            return Err("actual named-month Detailed owner".into());
+        };
+        let week = detail.week_schedules[1].ok_or("actual first-day Week owner")?;
+        assert!(
+            detail.week_schedules[1..]
+                .iter()
+                .all(|slot| *slot == Some(week)),
+            "{through}"
+        );
+        assert!(
+            manager.week_schedules[week].day_schedules[1..]
+                .iter()
+                .all(Option::is_some)
+        );
+        for (time_step, expected) in [(1, 10.0_f64), (2, 120.0_f64)] {
+            let clock = WeatherGlobalState {
+                hour_of_day: 1,
+                time_step,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: 366,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                expected.to_bits(),
+                "{through}"
+            );
+        }
+    }
+    // Blank, unresolved and named-unlimited types leave this Detailed
+    // schedule uncached. Its real downstream getter must use the live clock,
+    // not currentVal, an inferred minutes clock, or an eager input reduction.
+    for type_case in ["missing", "blank", "unknown", "unlimited"] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        let gain = raw["Schedule:Compact"]["Internal Gain Schedule"]
+            .as_object_mut()
+            .ok_or("actual Compact fields")?;
+        match type_case {
+            "missing" => {
+                gain.remove("schedule_type_limits_name");
+            }
+            "blank" => {
+                gain.insert("schedule_type_limits_name".into(), serde_json::json!(""));
+            }
+            "unknown" => {
+                gain.insert(
+                    "schedule_type_limits_name".into(),
+                    serde_json::json!("UNKNOWN LIMIT"),
+                );
+            }
+            "unlimited" => {
+                let limits = raw["ScheduleTypeLimits"]["Fraction"]
+                    .as_object_mut()
+                    .ok_or("actual type fields")?;
+                limits.remove("lower_limit_value");
+                limits.remove("upper_limit_value");
+            }
+            _ => return Err("unknown authored type case".into()),
+        }
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut input,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )?;
+        }
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual Compact pointer")?;
+        assert_eq!(
+            manager.schedules[index.0].schedule_type_number.is_some(),
+            type_case == "unlimited"
+        );
+        assert!(!manager.schedules[index.0].is_min_max_set);
+        assert_eq!(manager.source_current_schedule_value(index)?, 0.0);
+        let actual_clock = WeatherGlobalState {
+            time_steps_in_hour: 4,
+            ..Default::default()
+        };
+        assert!(manager.source_has_value(index, 10.0, &actual_clock)?);
+        assert!(!manager.schedules[index.0].is_min_max_set);
+        assert!(manager.source_min(index).is_err()); // legacy owner still missing
+        assert!(!manager.schedules[index.0].is_min_max_set);
+        assert_eq!(manager.source_min_with_clock(index, &actual_clock)?, 10.0);
+        assert_eq!(manager.source_max_with_clock(index, &actual_clock)?, 175.0);
+        assert!(manager.source_check_min_with_clock(index, 0.0, &actual_clock)?);
+        assert!(!manager.source_check_min_max_inclusive(index, 0.0, 4.0, &actual_clock)?);
+        for group in 0..4 {
+            assert_eq!(
+                manager.source_day_group_min_max_with_clock(index, group, &actual_clock)?,
+                (10.0, 175.0)
+            );
+        }
+        let expected_warning = i32::from(type_case != "unlimited");
+        assert_eq!(state.tracking.total_warning_errors, expected_warning);
+        assert_eq!(
+            state.tracking.total_warning_errors_during_warmup,
+            expected_warning
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        assert!(!state.warmup_flag);
+        let text = std::str::from_utf8(&errors)?;
+        if expected_warning == 1 {
+            let header = text
+                .find("ProcessScheduleInput: Schedule:Compact = INTERNAL GAIN SCHEDULE")
+                .ok_or("actual warning header")?;
+            let field = text
+                .find(if type_case == "unknown" {
+                    "Schedule Type Limits Name = UNKNOWN LIMIT, item not found."
+                } else {
+                    "Schedule Type Limits Name is empty."
+                })
+                .ok_or("actual field title")?;
+            let last = text
+                .find("Schedule will not be validated.")
+                .ok_or("actual final Continue")?;
+            assert!(header < field && field < last);
+        } else {
+            assert!(text.is_empty());
+        }
+    }
+    // Retain AddDetailed/type and the successful Warning/first Continue when
+    // the final Continue sink fails; week/day population has not been reached.
+    struct FailTypeContinue {
+        bytes: Vec<u8>,
+    }
+    impl io::Write for FailTypeContinue {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            if String::from_utf8_lossy(bytes).contains("Schedule will not be validated.") {
+                return Err(io::Error::other("actual Compact type Continue sink"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let mut raw = authored_raw(fixture, "Average", false);
+    raw["Schedule:Compact"]["Internal Gain Schedule"]
+        .as_object_mut()
+        .ok_or("actual Compact fields")?
+        .remove("schedule_type_limits_name");
+    let mut input = processor(fixture, &raw)?;
+    let declarations = schedule_declarations(fixture, &raw)?;
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let (mut state, mut errors, mut console, mut audit) = (
+        interpolation_error_state(),
+        FailTypeContinue { bytes: Vec::new() },
+        Vec::new(),
+        MemoryAudit::default(),
+    );
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend(
+            &mut input,
+            &declarations,
+            4,
+            &mut audit,
+            &mut backend,
+            &flags,
+        )
+    };
+    assert!(result.is_err());
+    assert_eq!(state.tracking.total_warning_errors, 1);
+    assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
+    let index = manager
+        .schedule_map
+        .get("INTERNAL GAIN SCHEDULE")
+        .ok_or("retained Detailed name")?;
+    let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+        return Err("retained Detailed dynamic type".into());
+    };
+    assert_eq!(detail.schedule_kind, 1);
+    assert!(manager.schedules[index.0].schedule_type_number.is_none());
+    assert!(manager.week_schedules.is_empty());
+    assert_eq!(manager.day_schedules.len(), 1); // genuine built-in MissingDay only
+    let text = std::str::from_utf8(&errors.bytes)?;
+    assert!(text.contains("Schedule Type Limits Name is empty."));
+    assert!(!text.contains("Schedule will not be validated."));
+    assert!(!std::str::from_utf8(&audit.bytes)?.contains("Processing Schedule Input -- Complete"));
+
     // One real Warning succeeded, then its Continue fails before population.
     struct FailContinue {
         bytes: Vec<u8>,

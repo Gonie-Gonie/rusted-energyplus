@@ -56,14 +56,28 @@ fn inverse_ordinal(number: i32, out: &mut SourceDateScratch) {
     out.month = Some(month as i32);
     out.day = Some(number - END[month - 1]);
 }
-// Preserve Original explicit signed-integer boundary predicates and branch order.
-#[allow(clippy::manual_range_contains)]
+/// Existing weather callers retain the same genuine backend diagnostic effects.
 pub(crate) fn process_source_date_string(
     text: &str,
     out: &mut SourceDateScratch,
     want_year: bool,
     errors: &mut bool,
     backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), Error> {
+    process_source_date_string_with_diagnostic(text, out, want_year, errors, &mut |message| {
+        backend.show_severe_error(message).map_err(Error::from)
+    })
+}
+/// Same General child, with the reached diagnostic effect supplied by its actual
+/// caller. A caller lacking that owner must stop before any diagnostic effect.
+// Preserve Original explicit signed-integer boundary predicates and branch order.
+#[allow(clippy::manual_range_contains)]
+pub(crate) fn process_source_date_string_with_diagnostic(
+    text: &str,
+    out: &mut SourceDateScratch,
+    want_year: bool,
+    errors: &mut bool,
+    diagnostic: &mut impl FnMut(&str) -> Result<(), Error>,
 ) -> Result<(), Error> {
     let (first, numeric_error) = number(text)?;
     out.date_type = DateType::Invalid;
@@ -73,14 +87,15 @@ pub(crate) fn process_source_date_string(
             out.day = Some(0);
             out.date_type = DateType::MonthDay;
         } else if first < 0 || first > 366 {
-            backend.show_severe_error(&format!("Invalid Julian date Entered={text}"))?;
+            diagnostic(&format!("Invalid Julian date Entered={text}"))?;
             *errors = true;
         } else {
             inverse_ordinal(first, out);
             out.date_type = DateType::LastDayInMonth;
         }
     } else {
-        let tokens = determine_date_tokens(text, want_year, &mut out.date_type, errors, backend)?;
+        let tokens =
+            determine_date_tokens(text, want_year, &mut out.date_type, errors, diagnostic)?;
         // Only the nonnumeric route writes PYear, after the child returns.
         if want_year {
             out.year = Some(tokens.year);
@@ -121,7 +136,7 @@ fn validate_month_day(
     day: i32,
     month: i32,
     errors: &mut bool,
-    backend: &mut SourceErrorBackend<'_>,
+    diagnostic: &mut impl FnMut(&str) -> Result<(), Error>,
 ) -> Result<(), Error> {
     const END: [i32; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     let mut internal_error = month < 1 || month > 12;
@@ -129,7 +144,7 @@ fn validate_month_day(
         internal_error = true;
     }
     if internal_error {
-        backend.show_severe_error(&format!("Invalid Month Day date format={text}"))?;
+        diagnostic(&format!("Invalid Month Day date format={text}"))?;
         *errors = true;
     } else {
         *errors = false;
@@ -141,7 +156,7 @@ fn determine_date_tokens(
     want_year: bool,
     date_type: &mut DateType,
     errors: &mut bool,
-    backend: &mut SourceErrorBackend<'_>,
+    diagnostic: &mut impl FnMut(&str) -> Result<(), Error>,
 ) -> Result<Tokens, Error> {
     const MONTHS: [&str; 12] = [
         "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
@@ -166,7 +181,7 @@ fn determine_date_tokens(
     }
     strip_ascii_spaces(&mut current);
     if current.is_empty() {
-        backend.show_severe_error(&format!("Invalid date field={text}"))?;
+        diagnostic(&format!("Invalid date field={text}"))?;
         *errors = true;
     } else {
         let mut count = 0;
@@ -181,7 +196,7 @@ fn determine_date_tokens(
             strip_ascii_spaces(&mut current);
         }
         if !current.is_empty() {
-            backend.show_severe_error(&format!("Invalid date field={text}"))?;
+            diagnostic(&format!("Invalid date field={text}"))?;
             *errors = true;
         } else if count == 2 {
             internal_error = false;
@@ -189,13 +204,19 @@ fn determine_date_tokens(
             if first_error {
                 let (second, second_error) = number(&fields[1])?;
                 if second_error {
-                    backend.show_severe_error(&format!("Invalid date field={text}"))?;
+                    diagnostic(&format!("Invalid date field={text}"))?;
                     internal_error = true;
                 } else {
                     tokens.day = second;
                 }
                 tokens.month = lookup_prefix(&fields[0], &MONTHS);
-                validate_month_day(text, tokens.day, tokens.month, &mut internal_error, backend)?;
+                validate_month_day(
+                    text,
+                    tokens.day,
+                    tokens.month,
+                    &mut internal_error,
+                    diagnostic,
+                )?;
                 if !internal_error {
                     *date_type = DateType::MonthDay;
                 } else {
@@ -211,7 +232,7 @@ fn determine_date_tokens(
                         tokens.day,
                         tokens.month,
                         &mut internal_error,
-                        backend,
+                        diagnostic,
                     )?;
                     if !internal_error {
                         *date_type = DateType::MonthDay;
@@ -226,7 +247,7 @@ fn determine_date_tokens(
                         tokens.day,
                         tokens.month,
                         &mut internal_error,
-                        backend,
+                        diagnostic,
                     )?;
                     if !internal_error {
                         *date_type = DateType::MonthDay;
@@ -277,9 +298,7 @@ fn determine_date_tokens(
                     }
                 } else {
                     // Native deliberately leaves caller ErrorsFound unchanged here.
-                    backend.show_severe_error(&format!(
-                        "First date field not numeric, field={text}"
-                    ))?;
+                    diagnostic(&format!("First date field not numeric, field={text}"))?;
                 }
             } else {
                 let (first, _) = number(&fields[0])?;
@@ -301,7 +320,7 @@ fn determine_date_tokens(
                 }
             }
         } else {
-            backend.show_severe_error(&format!("Invalid date field={text}"))?;
+            diagnostic(&format!("Invalid date field={text}"))?;
             *errors = true;
         }
     }

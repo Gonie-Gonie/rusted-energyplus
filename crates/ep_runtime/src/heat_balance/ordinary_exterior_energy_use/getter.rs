@@ -62,7 +62,7 @@ impl SourceExteriorEnergyUse {
             let pointer = pointer.ok_or(Error::Unavailable(
                 "actual Exterior Schedule not-found severe158",
             ))?;
-            let minimum = o.schedules.source_min(pointer)?;
+            let minimum = o.schedules.source_min_with_clock(pointer, o.clock)?;
             // Native explicitly initializes int SchMin from the Real64 getMinVal result.
             let integer_minimum = minimum.trunc();
             if !integer_minimum.is_finite()

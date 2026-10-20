@@ -7,7 +7,7 @@ use crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput;
 use crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
 use crate::heat_balance::source_output_registration::SourceMtdFileHost;
-use crate::weather::day::WeatherEnvironmentState;
+use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::TypedModel;
 
 impl CtfInitializationContext<'_> {
@@ -33,6 +33,7 @@ impl CtfInitializationContext<'_> {
         self.get_source_heat_balance_input_with_debug(
             model,
             environment,
+            None,
             minutes,
             output_host,
             equipment_input,
@@ -50,6 +51,7 @@ impl CtfInitializationContext<'_> {
         &mut self,
         model: &TypedModel,
         environment: &mut WeatherEnvironmentState,
+        clock: Option<&WeatherGlobalState>,
         minutes: i32,
         output_host: &mut SourceMtdFileHost,
         equipment_input: OrdinaryEquipmentInput,
@@ -92,7 +94,12 @@ impl CtfInitializationContext<'_> {
         // owner before propagating either success or failure.
         self.initialize_selected_solar_view_factors_with_debug(model, debug)?;
         // Native320 InitOnly=true reads gains before later daylighting input.
-        self.manage_selected_internal_heat_gains_input(model, minutes, output_host)?;
+        self.manage_selected_internal_heat_gains_input_with_clock(
+            model,
+            minutes,
+            output_host,
+            clock,
+        )?;
         // Native325-326 reads DataHeatBal.AnyKiva. The older selected helper
         // reads a geometry compartment member, so this genuine parent uses
         // the actual HeatBalance owner directly, without synchronizing aliases.

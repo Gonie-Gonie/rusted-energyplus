@@ -17,6 +17,7 @@ use crate::heat_balance::source_output_prescan::SourceOutputPreScan;
 use crate::heat_balance::source_output_registration::{
     SourceOutputFileHost, SourceOutputRegistration,
 };
+use crate::weather::day::WeatherGlobalState;
 use ep_model::ReportInputs;
 use std::io::Write;
 
@@ -39,6 +40,7 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) globals: &'a SelectedHeatBalanceGlobals,
     pub(super) zones: &'a mut SelectedZoneInputOwners,
     pub(super) schedules: &'a mut SelectedScheduleManager,
+    pub(super) clock: Option<&'a WeatherGlobalState>,
     pub(super) backend: &'a mut SourceErrorBackend<'b>,
     pub(super) registration: &'a mut SourceOutputRegistration,
     pub(super) prescan: &'a SourceOutputPreScan,
@@ -331,10 +333,17 @@ impl SelectedInternalHeatGains {
                     "{} = {}, item not found.",
                     local.alpha_field_names[3], values.alphas[3]
                 ))
-            } else if !owners
-                .schedules
-                .source_check_min(schedule.ok_or_else(|| unavailable("actual schedule"))?, 0.0)?
-            {
+            } else if !match owners.clock {
+                Some(clock) => owners.schedules.source_check_min_with_clock(
+                    schedule.ok_or_else(|| unavailable("actual schedule"))?,
+                    0.0,
+                    clock,
+                )?,
+                None => owners.schedules.source_check_min(
+                    schedule.ok_or_else(|| unavailable("actual schedule"))?,
+                    0.0,
+                )?,
+            } {
                 Some(format!(
                     "{} = {}, schedule contains values that are < 0",
                     local.alpha_field_names[3], values.alphas[3]
@@ -426,10 +435,16 @@ impl SelectedInternalHeatGains {
                 let schedule = schedule.ok_or_else(|| {
                     unavailable("invalid schedule before actual pointer dereference")
                 })?;
-                row.nominal_min_design_level =
-                    row.design_level * owners.schedules.source_min(schedule)?;
-                row.nominal_max_design_level =
-                    row.design_level * owners.schedules.source_max(schedule)?;
+                row.nominal_min_design_level = row.design_level
+                    * match owners.clock {
+                        Some(clock) => owners.schedules.source_min_with_clock(schedule, clock)?,
+                        None => owners.schedules.source_min(schedule)?,
+                    };
+                row.nominal_max_design_level = row.design_level
+                    * match owners.clock {
+                        Some(clock) => owners.schedules.source_max_with_clock(schedule, clock)?,
+                        None => owners.schedules.source_max(schedule)?,
+                    };
                 row.fraction_latent = values.numbers[3];
                 row.fraction_radiant = values.numbers[4];
                 row.fraction_lost = values.numbers[5];

@@ -3,6 +3,7 @@
 use super::{CtfInitializationContext, hb_input_error};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
+use crate::weather::day::WeatherGlobalState;
 use ep_model::TypedModel;
 
 mod allocations;
@@ -225,6 +226,17 @@ impl CtfInitializationContext<'_> {
         minutes: i32,
         host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
     ) -> Result<(), crate::RuntimeError> {
+        self.manage_selected_internal_heat_gains_input_with_clock(model, minutes, host, None)
+    }
+    /// Source first-input owns the real clock. Older boundary-only callers
+    /// keep None and stop if an uncached Detailed getter reaches that operand.
+    pub(crate) fn manage_selected_internal_heat_gains_input_with_clock(
+        &mut self,
+        model: &TypedModel,
+        minutes: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+        clock: Option<&WeatherGlobalState>,
+    ) -> Result<(), crate::RuntimeError> {
         let reports = &mut *self.reports;
         if reports.selected_internal_heat_gains.get_input_flag {
             let raw = reports
@@ -258,6 +270,7 @@ impl CtfInitializationContext<'_> {
                 globals,
                 zones,
                 schedules,
+                clock,
                 backend: &mut self.backend,
                 registration: &mut reports.output_registration,
                 prescan: &reports.output_prescan,

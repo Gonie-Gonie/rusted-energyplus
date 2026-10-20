@@ -19,7 +19,7 @@ use crate::heat_balance::selected_heat_balance_input::{
 use crate::heat_balance::selected_heat_balance_space_controls::SelectedHeatBalanceSpaceControls;
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::heat_balance::source_output_registration::SourceMtdFileHost;
-use crate::weather::day::WeatherEnvironmentState;
+use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::TypedModel;
 
 impl OrdinarySourceSession {
@@ -34,6 +34,7 @@ impl OrdinarySourceSession {
         context: &mut CtfInitializationContext<'_>,
         model: &TypedModel,
         environment: &mut WeatherEnvironmentState,
+        clock: &WeatherGlobalState,
         minutes: i32,
         output_host: &mut SourceMtdFileHost,
         equipment_input: OrdinaryEquipmentInput,
@@ -45,6 +46,7 @@ impl OrdinarySourceSession {
             context,
             model,
             environment,
+            clock,
             minutes,
             output_host,
             equipment_input,
@@ -109,6 +111,7 @@ struct SourceFirstInputHost<'a, 'context> {
     context: &'a mut CtfInitializationContext<'context>,
     model: &'a TypedModel,
     environment: &'a mut WeatherEnvironmentState,
+    clock: &'a WeatherGlobalState,
     minutes: i32,
     output_host: &'a mut SourceMtdFileHost,
     equipment_input: OrdinaryEquipmentInput,
@@ -134,6 +137,7 @@ impl SourceManageHeatBalanceFirstCallChildren for SourceFirstInputHost<'_, '_> {
             .get_source_heat_balance_input_with_debug(
                 self.model,
                 self.environment,
+                Some(self.clock),
                 self.minutes,
                 self.output_host,
                 self.equipment_input,

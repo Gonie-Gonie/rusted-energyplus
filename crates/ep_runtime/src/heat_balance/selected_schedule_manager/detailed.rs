@@ -18,6 +18,22 @@ impl SelectedScheduleManager {
         }
         Ok((row.min_value, row.max_value))
     }
+    pub(super) fn source_day_min_max_with_clock(
+        &mut self,
+        number: usize,
+        clock: &WeatherGlobalState,
+    ) -> Result<(f64, f64), E> {
+        let row = self
+            .day_schedules
+            .get(number)
+            .ok_or_else(|| unavailable("actual native DaySchedule pointer"))?;
+        if !row.is_min_max_set {
+            let steps = usize::try_from(clock.time_steps_in_hour)
+                .map_err(|_| unavailable("actual DaySchedule live TimeStepsInHour"))?;
+            self.set_source_day_min_max(number, steps)?;
+        }
+        self.source_day_min_max(number)
+    }
     fn set_source_day_min_max(&mut self, number: usize, steps: usize) -> Result<(), E> {
         let row = self
             .day_schedules
@@ -146,6 +162,27 @@ impl SelectedScheduleManager {
         }
         self.schedules[index.0].is_min_max_set = true;
         Ok(())
+    }
+    /// The actual caller's retained DataGlobal owner supplies the reducer's
+    /// timestep operand. Cached and Constant branches do not read that cell.
+    pub(super) fn ensure_source_min_max_with_clock(
+        &mut self,
+        index: SourceScheduleIndex,
+        clock: &WeatherGlobalState,
+    ) -> Result<(), E> {
+        let row = self
+            .schedules
+            .get(index.0)
+            .ok_or_else(|| unavailable("actual Schedule min/max pointer"))?;
+        if row.is_min_max_set {
+            return Ok(());
+        }
+        if matches!(row.data, SelectedScheduleData::Constant { .. }) {
+            return self.ensure_source_min_max_with_steps(index, 0);
+        }
+        let steps = usize::try_from(clock.time_steps_in_hour)
+            .map_err(|_| unavailable("actual Detailed live TimeStepsInHour"))?;
+        self.ensure_source_min_max_with_steps(index, steps)
     }
     /// Cached getters do not fabricate the unpassed Native global clock.
     pub(super) fn ensure_source_min_max(&mut self, index: SourceScheduleIndex) -> Result<(), E> {

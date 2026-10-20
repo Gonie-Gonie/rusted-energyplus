@@ -19,7 +19,9 @@ mod source_open;
 mod source_typical;
 mod source_user_input;
 pub(crate) use source_header::source_julian_date;
-pub(crate) use source_typical::source_ordinal_day;
+pub(crate) use source_typical::{
+    SourceDateScratch, process_source_date_string_with_diagnostic, source_ordinal_day,
+};
 
 #[cfg(test)]
 mod cursor_tests;

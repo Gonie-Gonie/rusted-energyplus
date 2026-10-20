@@ -41,19 +41,45 @@ fn through_day(value: &str) -> Result<usize, SelectedScheduleError> {
         .strip_prefix("THROUGH")
         .ok_or_else(|| unavailable("actual Compact expecting Through diagnostic"))?;
     let value = value.strip_prefix(':').unwrap_or(value).trim();
-    let (month, day) = value
-        .split_once('/')
-        .ok_or_else(|| unavailable("actual Compact ProcessDateString non-MM/DD branch"))?;
-    let month = month
-        .trim()
-        .parse::<i32>()
-        .map_err(|_| unavailable("actual Compact Through month"))?;
-    let day = day
-        .trim()
-        .parse::<i32>()
-        .map_err(|_| unavailable("actual Compact Through day"))?;
-    let ordinal = crate::weather::raw::source_ordinal_day(month, day, 1)
-        .map_err(|_| unavailable("actual Compact ProcessDateString invalid fixed date"))?;
+    use crate::weather::raw::{
+        DateType, RawDayFailure, RawEpwHeaderError, SourceDateScratch,
+        process_source_date_string_with_diagnostic, source_ordinal_day,
+    };
+    let mut date = SourceDateScratch::default();
+    let mut errors = false;
+    // Native ScheduleManager1330 calls the same real General child. Valid
+    // fixed MonthDay spellings produce no diagnostic. The invalid-date effect
+    // branch stays unavailable until this caller supplies its live backend.
+    process_source_date_string_with_diagnostic(value, &mut date, false, &mut errors, &mut |_| {
+        Err(
+            RawDayFailure::Header(RawEpwHeaderError::OutsideBoundedDomain(
+                "actual Compact General date diagnostic owner",
+            ))
+            .into(),
+        )
+    })
+    .map_err(|_| {
+        unavailable("actual Compact ProcessDateString diagnostic or signed date domain")
+    })?;
+    if matches!(
+        date.date_type,
+        DateType::NthDayInMonth | DateType::LastDayInMonth
+    ) {
+        return Err(unavailable(
+            "actual Compact invalid Through date diagnostic",
+        ));
+    }
+    if errors || date.date_type != DateType::MonthDay {
+        return Err(unavailable(
+            "actual Compact invalid Through date diagnostic",
+        ));
+    }
+    let (month, day) = date
+        .month
+        .zip(date.day)
+        .ok_or_else(|| unavailable("actual Compact defined General MonthDay outputs"))?;
+    let ordinal = source_ordinal_day(month, day, 1)
+        .map_err(|_| unavailable("actual Compact ProcessDateString signed ordinal domain"))?;
     usize::try_from(ordinal)
         .ok()
         .filter(|day| (1..=366).contains(day))
@@ -137,6 +163,10 @@ impl SelectedScheduleManager {
         locals.3.fill(0.0);
         if full {
             locals.1.fill(String::new());
+            // Actual legacy_idd fixed alpha field titles; no extensible title
+            // is read by this warning path.
+            locals.1[0] = "Name".into();
+            locals.1[1] = "Schedule Type Limits Name".into();
             locals.2.fill(String::new());
             locals.4.fill(true);
             locals.5.fill(true);
@@ -278,15 +308,29 @@ impl SelectedScheduleManager {
                 return Err(unavailable("actual AddDetailed type"));
             };
             detail.schedule_kind = 1;
-            if locals.4[1] {
-                return Err(unavailable("actual Compact blank type warning"));
+            // Original1299-1309: keep AddDetailed/type before diagnostics;
+            // a missing/unresolved optional type remains Invalid, never a
+            // replacement Fraction type or a fatal input error.
+            if !locals.4[1] {
+                self.schedules[schedule.0].schedule_type_number =
+                    self.schedule_type_map.get(&locals.0[1]).copied();
             }
-            self.schedules[schedule.0].schedule_type_number = Some(
-                *self
-                    .schedule_type_map
-                    .get(&locals.0[1])
-                    .ok_or_else(|| unavailable("actual Compact type-not-found warning"))?,
-            );
+            if self.schedules[schedule.0].schedule_type_number.is_none() {
+                use super::minute::SourceScheduleMinuteDiagnostic::{Continue, Warning};
+                schedule_diagnostic(
+                    backend,
+                    flags,
+                    Warning,
+                    &format!("ProcessScheduleInput: Schedule:Compact = {name}"),
+                )?;
+                let message = if locals.4[1] {
+                    format!("{} is empty.", locals.1[1])
+                } else {
+                    format!("{} = {}, item not found.", locals.1[1], locals.0[1])
+                };
+                schedule_diagnostic(backend, flags, Continue, &message)?;
+                schedule_diagnostic(backend, flags, Continue, "Schedule will not be validated.")?;
+            }
             let mut days_in_year = [0i32; 367];
             let mut field = 2usize;
             let mut start = 1usize;

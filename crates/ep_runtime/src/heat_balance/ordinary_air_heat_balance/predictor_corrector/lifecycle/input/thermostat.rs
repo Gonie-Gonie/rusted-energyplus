@@ -192,10 +192,12 @@ impl SourceZoneAirPredictorCorrector {
                         let schedule = row.control_type_schedule.ok_or(Error::Unavailable(
                             "actual thermostat control schedule ShowSevereItemNotFound451",
                         ))?;
-                        if !owners
-                            .schedules
-                            .source_check_min_max_inclusive(schedule, 0.0, 4.0)?
-                        {
+                        if !owners.schedules.source_check_min_max_inclusive(
+                            schedule,
+                            0.0,
+                            4.0,
+                            owners.clock,
+                        )? {
                             return Err(Error::Unavailable(
                                 "actual thermostat control schedule ShowSevereBadMinMax454",
                             ));
@@ -374,8 +376,12 @@ impl SourceZoneAirPredictorCorrector {
             let Some(schedule) = row.control_type_schedule else {
                 continue;
             };
-            let minimum = owners.schedules.source_min(schedule)?;
-            let maximum = owners.schedules.source_max(schedule)?;
+            let minimum = owners
+                .schedules
+                .source_min_with_clock(schedule, owners.clock)?;
+            let maximum = owners
+                .schedules
+                .source_max_with_clock(schedule, owners.clock)?;
             // Prior real inclusive0..4 validation establishes this defined int
             // conversion domain; do not replace these casts by rounded values.
             let schedule_minimum = minimum as i32;
