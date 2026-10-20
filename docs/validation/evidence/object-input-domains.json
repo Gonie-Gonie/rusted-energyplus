@@ -14,7 +14,7 @@
       "bytes": 56492
     }
   },
-  "scope": "Input-domain expansion within the existing Source A runtime. No promotion of arbitrary object combinations, full-object completion or the frozen A24 conformance case.",
+  "scope": "Input-domain expansion within the existing Source A/B runtime. No promotion of arbitrary object combinations, full-object completion or frozen A24/B conformance identities.",
   "reviewed_domains": {
     "Version": [
       "advisory strings and separate pinned engine identity",
@@ -45,7 +45,10 @@
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
       "live Source CTF temperature limits and low convection clamp",
       "no invented cross-field ordering or global CTF maximum clamp",
-      "other algorithms and unavailable positive diagnostic children retain explicit boundaries"
+      "other algorithms and genuine fatal children retain explicit boundaries",
+      "actual continuing low/high diagnostics, per-surface recurring indices and persistent once-per-Zone details",
+      "actual AFN reference, phase counts, optional backend effects and complete recurring-summary serialization",
+      "successful same-input B102 case with exact 951 nonfatal severe occurrences; genuine fatal children retain boundaries"
     ],
     "SimulationControl": [
       "authored HVAC-sizing Yes with plant sizing No follows the actual warning-and-reset getter",
@@ -55,8 +58,9 @@
     ],
     "BuildingSurface:Detailed": [
       "remove the stale exactly-six-surface fence; retain the real one-Zone ownership boundary",
-      "closed six/ten-quadrilateral geometry, actual surface identities and dynamic shared view-factor matrices",
-      "actual ten-face Source completion and exact Native geometry EIO; triangles/repair and other real physics guards retained"
+      "closed six/ten-quad and seven-face two-triangle geometry, actual identities and dynamic shared view-factor matrices",
+      "actual Source completion, exact Native geometry EIO and ordered physical triangle DXF vertices",
+      "larger polygons, geometry repair and other real physics guards retained"
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -67,43 +71,29 @@
   },
   "verification": {
     "workspace_tests": {
-      "passed": 4986,
+      "passed": 5001,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/workspace-tests-03.log",
-        "sha256": "7a4fcc1491b67a52b058f4f9a7a910b7e511ecbd8efaf74a2321fc14714bb180",
-        "bytes": 20018
+        "path": ".runtime/object-expansion/geometry-diagnostics-workspace-tests-01.log",
+        "sha256": "9cdf1df65f77bc641a056fb81f148bb922b8c8ec5748c0afc08484b7a87da585",
+        "bytes": 20646
       },
-      "scope": "Full workspace before the subsequent year and artifact-parser additions; affected code is checked below."
-    },
-    "final_changed_crate_tests": {
-      "ep_compiler_passed": 502,
-      "ep_run_passed": 783,
-      "log": {
-        "path": ".runtime/object-expansion/changed-crate-tests-01.log",
-        "sha256": "4f12aa5f7d2d5cdc639533d1f488a1e8da5caac1aac52d6b96e2f331b2a55741",
-        "bytes": 5146
-      }
-    },
-    "final_scheduled_filter_tests": {
-      "ep_runtime_passed": 8,
-      "ep_run_passed": 2,
-      "log": {
-        "path": ".runtime/object-expansion/scheduled-filter-tests-02.log",
-        "sha256": "239ec4d007a6f6775a431bb1be0af6ee66de540273c4068f01cd70030fd7d89b",
-        "bytes": 3148
-      }
+      "scope": "Current runtime code through opaque-lifecycle-05; subsequent object registry/documentation changes are metadata only."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/clippy-02.log",
-        "sha256": "808b37f7f48cc6a1a5892209be5e3d74edc97a39543c56679db3d12ff781bd18",
-        "bytes": 1684
+        "path": ".runtime/object-expansion/geometry-diagnostics-clippy-01.log",
+        "sha256": "5405dee0ea203310c5dd6aca4ab9290fc764c28504319a5ce740d117689030be",
+        "bytes": 2062
       },
       "format": "cargo fmt --all passed",
-      "documentation": "docs generator check and full mdBook docs-check passed",
-      "scope": "Workspace check for input-domains-01; subsequent project controls checked below."
+      "documentation": "docs generator --check and full mdBook docs-check passed",
+      "documentation_log": {
+        "path": ".runtime/object-expansion/geometry-diagnostics-docs-01.log",
+        "sha256": "8c6a4dcbe17a468400c73b4f7cb33c7d821534a0cd8b566f3a54d768ef72ab95",
+        "bytes": 1408
+      }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -826,12 +816,136 @@
           "sha256": "dad6f445baa22588c0f243f08db2875c00cf9c9f12d6f9ac704292df681dfa4d",
           "bytes": 3390
         }
+      },
+      {
+        "id": "triangle-roof-pair",
+        "group": "opaque_heat_balance_lifecycle",
+        "source_build": "opaque-lifecycle-05",
+        "input": {
+          "path": ".runtime/object-expansion/native-triangle-roof/calibration-01/input.idf",
+          "sha256": "da9c2f244acb327e12a4ad34cd760cc972c9c6afccc6bbac4e7d5e29cec48677",
+          "bytes": 9481
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-triangle-diagnostics/triangle/receipt.json",
+          "sha256": "d1e79a00b5fe44a97ce931fa129bdd535fd22ca0652a9a73edf35ac3e26dd0aa",
+          "bytes": 5116
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/triangle-roof/run-summary.json",
+          "sha256": "19c1ceb85dc87695b6f85279cb0e896bc83118e306ad7834247a045331f779a4",
+          "bytes": 32025
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-triangle-diagnostics-comparisons-01/triangle/comparison.json",
+          "sha256": "c8ed3272a8a76d66a5d1b71a1aa37d24900b2ed57f264ecf2ed4530fd06bf191",
+          "bytes": 109508
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 2930,
+          "parsed_binary64_unequal": 2930,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-triangle-roof/calibration-01/receipt.json",
+          "sha256": "7a6db5056afbe8708a20ab5fa4e0c17403483693fd32d5e57724fb51a4bf1426",
+          "bytes": 5736
+        },
+        "geometry": "Exact Native/Source EIO: one Zone, seven faces and unchanged volume/height; actual ordered DXF vertices confirm two triangular roofs and five quads. No internal Shape ordinal memory claim.",
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/triangle-roof-source-launch-01.json",
+          "sha256": "b685dc3c1b0ad1d51d1066c4e8d8adba93fa46be56394a293965f74c3cc2d909",
+          "bytes": 2398
+        }
+      },
+      {
+        "id": "continuing-surface-temperature-diagnostics",
+        "group": "opaque_heat_balance_lifecycle",
+        "source_build": "opaque-lifecycle-05",
+        "input": {
+          "path": ".runtime/object-expansion/native-temperature-diagnostics/probe-01/input.idf",
+          "sha256": "8bda9dd6d541f7f7f7d61b03290b15279d09586ba52700118023b0fac4cc18f7",
+          "bytes": 13025
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-triangle-diagnostics/temperature/receipt.json",
+          "sha256": "fc46222eed2a614c68813b0b24979dad5e0af03a938e3713f4ee3a369143d3b4",
+          "bytes": 5118
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/temperature-diagnostics/run-summary.json",
+          "sha256": "30ad4711fc76f701f58cf991d87f290877cd016f840a75e9178eeeb91c817644",
+          "bytes": 60683
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-triangle-diagnostics-comparisons-01/temperature/comparison.json",
+          "sha256": "e8bebfa6dcb650ae32facfdfbc2b34ba475b7dc56dbfd2436a7d00678b087eb9",
+          "bytes": 178922
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 2595,
+          "parsed_binary64_unequal": 2595,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-temperature-diagnostics/probe-01/receipt.json",
+          "sha256": "59a6f9475f565ff10cfdc2d258316b996c21d3ea3b986e8dd0a521d3091a0579",
+          "bytes": 6327
+        },
+        "native_request": {
+          "path": ".runtime/object-expansion/native-temperature-diagnostics/probe-01/request.json",
+          "sha256": "236dcc73f6aec4fad17605547c486cc22967ff2749fec5e91960836a589f16fa",
+          "bytes": 7283
+        },
+        "native_result": {
+          "path": ".runtime/object-expansion/native-temperature-diagnostics/probe-01/result.json",
+          "sha256": "4462466bc4b2ed3a8c0ed26bbf27a2179033d6d30e6997163dfe0f81d5da6e79",
+          "bytes": 42787
+        },
+        "continuing_temperature_diagnostics": {
+          "initial_high_temperature_messages": 6,
+          "once_per_zone_details": true,
+          "recurring_rows": 6,
+          "total_severe_occurrences": 951,
+          "warmup_severe": 0,
+          "sizing_severe": 0,
+          "warnings": 0,
+          "fatal": false,
+          "native_exit_code": 0,
+          "source_exit_code": 0,
+          "genuine_deleted_empty_MTR": true
+        },
+        "final_readback": {
+          "path": ".runtime/object-expansion/source-triangle-diagnostics-comparisons-01/temperature/final-readback.json",
+          "sha256": "d226215b187c9895fa7c2628fd8e128feb1d6f84403dd5925bfbb9c27880b50b",
+          "bytes": 34566
+        }
       }
     ],
     "totals": {
-      "paired_cases": 12,
-      "reported_samples": 56448,
-      "raw_operand_unequal": 32227,
+      "paired_cases": 14,
+      "reported_samples": 71592,
+      "raw_operand_unequal": 37752,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -904,54 +1018,25 @@
           "sha256": "f2f190af9e36c2ac34e8076f86d9d2d3f9f169d41c842cf9c47d7f67cbc6f654",
           "bytes": 75049179
         }
-      }
-    ],
-    "project_control_tests": {
-      "ep_run_passed": 786,
-      "log": {
-        "path": ".runtime/object-expansion/project-controls-tests-02.log",
-        "sha256": "41133405b7caaaca5a837245d60c7695ca69615d19b40b585277c375541789b9",
-        "bytes": 3830
-      }
-    },
-    "project_control_quality": {
-      "clippy": "ep_run --all-targets -- -D warnings passed",
-      "log": {
-        "path": ".runtime/object-expansion/project-controls-clippy-01.log",
-        "sha256": "2490160c05dc0558be2a02a334e6451f4af279a15b3da132a508de1df3abd953",
-        "bytes": 1668
       },
-      "format": "cargo fmt --all passed",
-      "documentation": "docs generator --check and full mdBook docs-check passed",
-      "documentation_log": {
-        "path": ".runtime/object-expansion/project-controls-docs-01.log",
-        "sha256": "86156767647ff80c1804cc5c81d82578983e6509dbd960fb35e3e5423585250f",
-        "bytes": 1406
+      {
+        "id": "opaque-lifecycle-05",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-05/receipt.json",
+          "sha256": "b9f98117c059934943bcef1cd9b39493ce94f8001240b4164e448c48a385bc34",
+          "bytes": 5907
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/05/05c2a37426fda74eed2dc67bfafd1aa639343a9608d5158a766d6b5ee17bbe02",
+          "sha256": "05c2a37426fda74eed2dc67bfafd1aa639343a9608d5158a766d6b5ee17bbe02"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-05/eplus-rs.exe",
+          "sha256": "f24ad18bc17553f071bf7070a2aa4d50dc3d6dda1064d7ad279e483115796546",
+          "bytes": 75077553
+        }
       }
-    },
-    "surface_ground_tests": {
-      "ep_run_passed": 788,
-      "log": {
-        "path": ".runtime/object-expansion/surface-ground-tests-02.log",
-        "sha256": "70ff3a70b6bdfc89524815ab1ed3f9601b6bda1a3b46fed4a33409c5cdb969f7",
-        "bytes": 3816
-      }
-    },
-    "surface_ground_quality": {
-      "clippy": "ep_run --all-targets -- -D warnings passed",
-      "log": {
-        "path": ".runtime/object-expansion/surface-ground-clippy-02.log",
-        "sha256": "71f4cfd441412c46c0eae680b8d80a4f9989505adaf9d12d08af145b6c5a72f9",
-        "bytes": 1650
-      },
-      "format": "cargo fmt --all passed",
-      "documentation": "docs generator --check and full mdBook docs-check passed",
-      "documentation_log": {
-        "path": ".runtime/object-expansion/surface-ground-docs-01.log",
-        "sha256": "63f95d7d432c21e04b9e1476f8f6b451b5e76133de62106f41ca0f85324fffc1",
-        "bytes": 1408
-      }
-    }
+    ]
   },
   "additional_native_type_calibrations": [
     {

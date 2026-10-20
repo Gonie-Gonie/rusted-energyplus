@@ -294,8 +294,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
         // Keep the once-invoked observer closure: local Result propagation must not bypass the after-call exit observation.
         #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
-            self.surface
-                .calculate_source_inside_surface_heat_balance(&mut self.owners)
+            self.surface.calculate_source_inside_surface_heat_balance(
+                &mut self.owners,
+                &self.controller.subsystems.airflow_network.control_type,
+            )
         })();
         if cadence_result.is_ok() {
             crate::heat_balance::source_surface_cadence::record(

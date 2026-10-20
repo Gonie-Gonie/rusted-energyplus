@@ -59,14 +59,14 @@ fn trace(value: &Value, scope: PortingScope) -> PortingScopeTrace {
 }
 
 #[test]
-fn closed_quad_counts_reach_source_layout_and_view_factor_kernel() {
+fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
     use ep_runtime::heat_balance::inside_convection_layout::InsideConvectionLayout;
     use ep_runtime::heat_balance::radiation::{
         ApproximateViewFactorContext, ApproximateViewFactorSurface,
         calculate_selected_approximate_view_factors,
     };
 
-    for count in [6, 10] {
+    for count in [6, 10, 7] {
         let mut value = input(PortingScope::A);
         if count == 10 {
             let surfaces = value["BuildingSurface:Detailed"].as_object_mut().unwrap();
@@ -90,9 +90,21 @@ fn closed_quad_counts_reach_source_layout_and_view_factor_kernel() {
             }
             surfaces.extend(additions);
         }
-        let raw = parse_epjson_str(&value.to_string()).expect("closed authored quads");
+        if count == 7 {
+            let surfaces = value["BuildingSurface:Detailed"].as_object_mut().unwrap();
+            let mut second = surfaces["Roof"].clone();
+            let points = second["vertices"].as_array().unwrap().clone();
+            surfaces.get_mut("Roof").unwrap()["vertices"] =
+                json!([points[0], points[1], points[2]]);
+            second["vertices"] = json!([points[0], points[2], points[3]]);
+            surfaces.insert("Roof:Second".into(), second);
+        }
+        let raw = parse_epjson_str(&value.to_string()).expect("closed authored opaque faces");
         let compiled = compile_raw_model(&raw);
-        let model = compiled.model.as_ref().expect("compiled closed quads");
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("compiled closed opaque faces");
         let scope = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
         assert!(scope.admissible, "{count}: {:?}", scope.violations);
         let input = crate::ordinary_input_processor::resolve(&raw).expect("Source raw input");
@@ -127,13 +139,39 @@ fn closed_quad_counts_reach_source_layout_and_view_factor_kernel() {
         let geometry = ep_runtime::geometry::zone_geometry_properties(model, &model.zones[0])
             .expect("shared closed-face geometry");
         assert_eq!(geometry.faces.len(), count);
-        assert!(geometry.faces.iter().all(|face| face.vertices.len() == 4));
+        let triangle_count = if count == 7 { 2 } else { 0 };
+        assert!(
+            geometry
+                .faces
+                .iter()
+                .all(|face| matches!(face.vertices.len(), 3 | 4))
+        );
+        assert_eq!(
+            geometry
+                .faces
+                .iter()
+                .filter(|face| face.vertices.len() == 3)
+                .count(),
+            triangle_count
+        );
+        assert_eq!(
+            model
+                .surfaces
+                .iter()
+                .filter(|surface| surface
+                    .computed_geometry
+                    .as_ref()
+                    .is_some_and(|geometry| geometry.shape_category
+                        == ep_model::SurfaceShapeCategory::Triangular))
+                .count(),
+            triangle_count
+        );
         assert!(geometry.diagnostics.initially_closed);
         assert!(geometry.diagnostics.edges_winding_consistent);
         assert!(geometry.diagnostics.initial_edges_not_used_twice.is_empty());
         assert_eq!(
             geometry.diagnostics.initial_unique_vertex_count,
-            if count == 6 { 8 } else { 12 }
+            if count == 10 { 12 } else { 8 }
         );
         assert!((geometry.diagnostics.signed_polyhedron_volume_m3.unwrap() - 1.0).abs() < 1e-12);
 
@@ -160,18 +198,17 @@ fn closed_quad_counts_reach_source_layout_and_view_factor_kernel() {
                 }
             })
             .collect::<Vec<_>>();
+        let walls = if count == 10 { 8 } else { 4 };
         assert!(
-            surfaces[..count - 2]
+            surfaces[..walls]
                 .iter()
                 .all(|s| s.surface_type == ep_model::SurfaceType::Wall)
         );
-        assert_eq!(
-            surfaces[count - 2].surface_type,
-            ep_model::SurfaceType::Floor
-        );
-        assert_eq!(
-            surfaces[count - 1].surface_type,
-            ep_model::SurfaceType::Roof
+        assert_eq!(surfaces[walls].surface_type, ep_model::SurfaceType::Floor);
+        assert!(
+            surfaces[walls + 1..]
+                .iter()
+                .all(|s| s.surface_type == ep_model::SurfaceType::Roof)
         );
         // This is the actual shared CalcApproximateViewFactors kernel, before
         // Fix/ScriptF and runtime activation; no initialized owner is fabricated.

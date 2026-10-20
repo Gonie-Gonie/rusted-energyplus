@@ -36,7 +36,7 @@ pub(crate) trait SourceInsideCtfProviders {
         temperature: f64,
         surface: i32,
         zone: i32,
-        geometry: &SurfaceGeometryInputState,
+        geometry: &mut SurfaceGeometryInputState,
         zones: &mut SelectedZoneInputOwners,
         warmup_error_count: &mut i32,
         backend: &mut SourceErrorBackend<'_>,

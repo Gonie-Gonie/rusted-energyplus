@@ -405,14 +405,7 @@ impl SourceInitializationFiles {
                 "actual positive ReportSurfaceErrors SurfErrorReported.dimension11661",
             ));
         }
-        if reports.source_recurring_errors.number > 0 {
-            backend.show_message("")?;
-            backend.show_message("===== Recurring Error Summary =====")?;
-            backend.show_message("The following recurring error messages occurred.")?;
-            return Err(missing(
-                "actual positive ShowRecurringErrors RecurringErrors row1485",
-            ));
-        }
+        backend.show_source_recurring_errors(&reports.source_recurring_errors)?;
         summarize(backend)?;
         session
             .as_ref()

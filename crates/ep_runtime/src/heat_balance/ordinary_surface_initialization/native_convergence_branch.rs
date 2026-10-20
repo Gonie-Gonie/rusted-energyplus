@@ -260,7 +260,7 @@ impl SourceInsideCtfProviders for DiagnosticOwners<'_> {
         _temperature: f64,
         _surface: i32,
         _zone: i32,
-        _geometry: &SurfaceGeometryInputState,
+        _geometry: &mut SurfaceGeometryInputState,
         _zones: &mut SelectedZoneInputOwners,
         _warmup_error_count: &mut i32,
         _backend: &mut SourceErrorBackend<'_>,

@@ -47,6 +47,7 @@ impl OrdinarySurfaceInitialization {
     >(
         &mut self,
         o: &mut SourceManageSurfaceOwners<'_, '_, H, D>,
+        afn_control_type: &i32,
     ) -> Result<(), Error> {
         if self.inside_entry_first_time {
             if o.control.any_empd {
@@ -179,6 +180,7 @@ impl OrdinarySurfaceInitialization {
                 clock: o.clock,
                 environment: o.environment,
                 hvac: &o.startup.hvac_globals,
+                afn_control_type,
                 recurring_errors: o.recurring_errors,
             };
             let cadence_scope = crate::heat_balance::source_surface_cadence::enter(

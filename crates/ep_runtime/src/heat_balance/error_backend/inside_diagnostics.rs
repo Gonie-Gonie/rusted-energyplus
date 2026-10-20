@@ -1,4 +1,4 @@
-//! Actual timestamp and recurring warning helpers over their existing owners.
+//! Actual timestamp and recurring diagnostics over their existing owners.
 use super::{MESSAGE_SEARCH, SourceErrorBackend, SourceErrorBackendFailure, effect, increment};
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
@@ -214,6 +214,185 @@ impl SourceErrorBackend<'_> {
             minimum_units,
             sum_units,
         )
+    }
+
+    /// UtilityRoutines1049-1098. Recurring severe increments the total only;
+    /// the real row store separately records the current warmup/sizing phases.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn show_source_recurring_severe_at_end(
+        &mut self,
+        message: &str,
+        message_index: &mut i32,
+        state: &mut SourceRecurringErrorState,
+        clock: &WeatherGlobalState,
+        globals: &SelectedHeatBalanceGlobals,
+        maximum: Option<f64>,
+        minimum: Option<f64>,
+        sum: Option<f64>,
+        maximum_units: &str,
+        minimum_units: &str,
+        sum_units: &str,
+    ) -> Result<(), Error> {
+        for (needle, count) in MESSAGE_SEARCH
+            .iter()
+            .zip(&mut self.state.tracking.match_counts)
+        {
+            if message.contains(needle) {
+                increment(count, "MatchCounts")?;
+                break;
+            }
+        }
+        let full_message = " ** Severe  ** ".to_owned() + message;
+        let mut found = false;
+        for ordinal in 1..=state.number {
+            let row = state
+                .rows
+                .as_deref()
+                .and_then(|v| v.get((ordinal - 1) as usize))
+                .ok_or(Error::Unavailable(
+                    "actual allocated RecurringErrors search row",
+                ))?;
+            if row.message.eq_ignore_ascii_case(&full_message) {
+                *message_index = ordinal;
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            *message_index = 0;
+        }
+        increment(
+            &mut self.state.tracking.total_severe_errors,
+            "TotalSevereErrors",
+        )?;
+        self.store_source_recurring_error_message(
+            &full_message,
+            message_index,
+            state,
+            clock,
+            globals,
+            maximum,
+            minimum,
+            sum,
+            maximum_units,
+            minimum_units,
+            sum_units,
+        )
+    }
+
+    /// UtilityRoutines1466-1547: actual completion serialization and optional
+    /// borrowed SQLite/callback effects, without recounting severe messages.
+    pub(crate) fn show_source_recurring_errors(
+        &mut self,
+        state: &SourceRecurringErrorState,
+    ) -> Result<(), Error> {
+        if state.number > 0 {
+            self.show_message("")?;
+            self.show_message("===== Recurring Error Summary =====")?;
+            self.show_message("The following recurring error messages occurred.")?;
+            for ordinal in 1..=state.number {
+                let row = state
+                    .rows
+                    .as_deref()
+                    .and_then(|rows| rows.get((ordinal - 1) as usize))
+                    .ok_or(Error::Unavailable(
+                        "actual ShowRecurringErrors allocated row1485",
+                    ))?;
+                if row.message.starts_with(" **   ~~~   ** ") {
+                    self.show_message(&row.message)?;
+                    if let Some(sqlite) = self.sqlite.as_deref_mut() {
+                        effect(
+                            "SQLite update recurring continue",
+                            sqlite.update_error_record(&row.message),
+                        )?;
+                    }
+                    if let Some(callback) = self.error_callback.as_deref_mut() {
+                        callback(self.state, super::SourceErrorLevel::Continue, &row.message);
+                    }
+                } else {
+                    let warning = row.message.starts_with(" ** Warning ** ");
+                    let severe = row.message.starts_with(" ** Severe  ** ");
+                    self.show_message("")?;
+                    self.show_message(&row.message)?;
+                    self.show_message(&format!(
+                        " **   ~~~   **   This error occurred {} total times;",
+                        row.count
+                    ))?;
+                    self.show_message(&format!(
+                        " **   ~~~   **   during Warmup {} times;",
+                        row.warmup_count
+                    ))?;
+                    self.show_message(&format!(
+                        " **   ~~~   **   during Sizing {} times.",
+                        row.sizing_count
+                    ))?;
+                    if let Some(sqlite) = self.sqlite.as_deref_mut() {
+                        if warning || severe {
+                            let message = row.message.get(15..).ok_or(Error::Unavailable(
+                                "actual recurring diagnostic ASCII prefix substring1505",
+                            ))?;
+                            effect(
+                                "SQLite create recurring error",
+                                sqlite.create_error_record(
+                                    1,
+                                    i32::from(severe),
+                                    message,
+                                    row.count,
+                                ),
+                            )?;
+                        }
+                    }
+                    if let Some(callback) = self.error_callback.as_deref_mut() {
+                        callback(
+                            self.state,
+                            if severe {
+                                super::SourceErrorLevel::Severe
+                            } else {
+                                super::SourceErrorLevel::Warning
+                            },
+                            &row.message,
+                        );
+                        callback(self.state, super::SourceErrorLevel::Continue, "");
+                    }
+                }
+                let mut statistics = String::new();
+                for (report, label, value, units) in [
+                    (row.report_max, "Max", row.max_value, &row.max_units),
+                    (row.report_min, "Min", row.min_value, &row.min_units),
+                    (row.report_sum, "Sum", row.sum_value, &row.sum_units),
+                ] {
+                    if report {
+                        // fmt8 .6f uses lower-case signed nonfinite spellings.
+                        // This is text formatting only, never a thermal operand.
+                        let value = if value.is_nan() {
+                            if value.is_sign_negative() {
+                                "-nan".into()
+                            } else {
+                                "nan".into()
+                            }
+                        } else if value.is_infinite() {
+                            if value.is_sign_negative() {
+                                "-inf".into()
+                            } else {
+                                "inf".into()
+                            }
+                        } else {
+                            format!("{value:.6}")
+                        };
+                        statistics.push_str(&format!("  {label}={value}"));
+                        if !units.is_empty() {
+                            statistics.push(' ');
+                            statistics.push_str(units);
+                        }
+                    }
+                }
+                if row.report_max || row.report_min || row.report_sum {
+                    self.show_message(&format!(" **   ~~~   ** {statistics}"))?;
+                }
+            }
+            self.show_message("")?;
+        }
+        Ok(())
     }
 
     /// UtilityRoutines1293-1379: true Array1D redimension preserves old rows;

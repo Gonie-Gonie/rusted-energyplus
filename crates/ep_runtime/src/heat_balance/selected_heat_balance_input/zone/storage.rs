@@ -73,6 +73,8 @@ pub(crate) struct SelectedZoneData {
     pub(crate) is_return_plenum: bool,
     pub(crate) leakage_parallel_piu_numbers: Vec<f64>,
     pub(crate) no_heat_to_return_air: bool,
+    /// DataHeatBalance.hh661 ctorfalse; first TestSurfTemp detail writes once.
+    pub(crate) temp_out_of_bounds_reported: bool,
     /// Native DataHeatBalance.hh662: same Zone, false until small-enclosure Fix.
     pub(crate) enforced_reciprocity: bool,
     pub(crate) adjusted_return_temperature_by_ite: f64,
@@ -157,6 +159,7 @@ impl Default for SelectedZoneData {
             is_return_plenum: false,
             leakage_parallel_piu_numbers: Vec::new(),
             no_heat_to_return_air: false,
+            temp_out_of_bounds_reported: false,
             enforced_reciprocity: false,
             adjusted_return_temperature_by_ite: 0.0,
             sensible_capacity_multiplier: 1.0,

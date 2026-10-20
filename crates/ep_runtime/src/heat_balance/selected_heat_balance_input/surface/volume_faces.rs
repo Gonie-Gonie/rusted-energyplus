@@ -41,8 +41,15 @@ impl SurfaceGeometryInputState {
                 .vertex
                 .as_ref()
                 .ok_or(Error::Unavailable("actual volume FacePoints source"))?;
-            if vertices.len() != 4 || row.sides != 4 {
-                return Err(Error::Unavailable("selected six-quad volume admission"));
+            // Original12077-12080 copies this row's complete FacePoints before
+            // the shared Newell/closure/polyhedron calls. Triangles use that
+            // same owner path; general polygon recovery remains separately held.
+            if !matches!(vertices.len(), 3 | 4)
+                || usize::try_from(row.sides).ok() != Some(vertices.len())
+            {
+                return Err(Error::Unavailable(
+                    "complete Source triangle/quad volume face",
+                ));
             }
             let points = vertices
                 .iter()
