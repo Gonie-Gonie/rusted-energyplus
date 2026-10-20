@@ -1,4 +1,0 @@
-        get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
-        if (!cEnvValue.empty()) {
-            state.dataEnvrn->IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
-        }

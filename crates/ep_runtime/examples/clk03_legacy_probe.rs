@@ -60,7 +60,7 @@ fn run() -> Result<()> {
     let mut contracts = serde_json::Map::new();
     for name in ["source", "cases", "tolerances"] {
         let relative = format!("energyplus_porting_plan/contracts/CLK-03-{name}.json");
-        let file = root.join(&relative).canonicalize()?;
+        let file = asset_path(&root, &relative).canonicalize()?;
         require(
             file.starts_with(&root),
             "contract reference escapes repository",
@@ -164,8 +164,17 @@ fn relative(root: &Path, path: &Path) -> Result<String> {
         .replace('\\', "/"))
 }
 
+fn asset_path(root: &Path, relative: &str) -> PathBuf {
+    // Keep immutable request identities while resolving their relocated bytes.
+    let relative = Path::new(relative);
+    match relative.strip_prefix("energyplus_porting_plan") {
+        Ok(suffix) => root.join("docs/validation").join(suffix),
+        Err(_) => root.join(relative),
+    }
+}
+
 fn bound_file(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
-    let path = root.join(text(&binding["path"])?).canonicalize()?;
+    let path = asset_path(root, text(&binding["path"])?).canonicalize()?;
     require(path.starts_with(root), "input reference escapes repository")?;
     let bytes = std::fs::read(&path)?;
     require(

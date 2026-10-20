@@ -1,7 +1,0 @@
-# Held ordinary observer stack correction
-
-Source only; no canonical writes, builds, tests, engine execution or numerical output reads.
-
-The genuine prior A CLI invokes its full run on an explicit8 MiB named worker. The passive observer previously called its full run on the platform main stack; the scoped attempt02 ended with Windows stack overflow and an empty stream. This proposal copies the CLI worker/join/resume-unwind pattern. run(), strict A admission, Deny, all inputs, solver calls, TLS sink registration and stream policy remain byte-exact. The closure resolves Result<i32, Box<dyn Error>> inside the worker and returns only i32, so no non-Send error or Rc sink crosses threads. A spawn error keeps observer error exit2; a worker panic is resumed.
-
-The second Rust row removes exactly one final blankLF from the fixture, with no token or test change. The separate card paragraph retains the failed attempt and requires truthful future reachability/comparison. Parent04f and failed scoped receipt are immutable. Root must review/apply, record formatting, and run all four same-Source quality commands plus a genuine Cargo artifact build before a fresh ordinary attempt. No success is inferred here.

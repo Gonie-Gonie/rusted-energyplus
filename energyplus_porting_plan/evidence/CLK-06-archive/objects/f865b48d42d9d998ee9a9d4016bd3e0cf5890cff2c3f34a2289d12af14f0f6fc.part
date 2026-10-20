@@ -1,2 +1,0 @@
-        state.dataEnvrn->TotalCloudCover = today.TotalSkyCover;
-        state.dataEnvrn->OpaqueCloudCover = today.OpaqueSkyCover;

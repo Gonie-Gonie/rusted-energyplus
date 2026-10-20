@@ -6,6 +6,8 @@ engine, or a scientific comparer, and does not turn old runs into new runs.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import hashlib
 import json
@@ -24,11 +26,11 @@ def require(condition, message):
 
 
 def path(value):
-    p = Path(value)
-    return p.resolve() if p.is_absolute() else (ROOT / p).resolve()
+    return resolve_path(value)
 
 
 def read(p):
+    p = resolve_path(p)
     return json.loads(Path(p).read_text(encoding="utf-8"))
 
 
@@ -38,6 +40,7 @@ def fingerprint(p):
 
 
 def sha(p):
+    p = resolve_path(p)
     p = Path(p).resolve()
     state = fingerprint(p)
     if p in CACHE:
@@ -53,8 +56,9 @@ def sha(p):
 
 
 def ref(p):
+    p = resolve_path(p)
     p = Path(p).resolve()
-    return {"path": p.relative_to(ROOT).as_posix(), "sha256": sha(p)}
+    return {"path": legacy_relative(p), "sha256": sha(p)}
 
 
 def binding(v):
@@ -125,7 +129,7 @@ def audit(args):
     require(committed["source_worktree_clean"] is True and fixed["source_worktree_clean"] is False,
             "Preserve committed-clean versus historical modified build state")
     require(committed["implementation_commit"] == committed["repository_head"], "Committed build revision differs")
-    contracts = {k: ref(ROOT / "energyplus_porting_plan/contracts" / f"GEO-01-{k}.json")
+    contracts = {k: ref(ROOT / "docs/validation/contracts" / f"GEO-01-{k}.json")
                  for k in ["source", "cases", "tolerances"]}
     for document in [matrix, comparison, provenance]:
         require(exact(document["contracts"], contracts), "Frozen contract binding differs")
@@ -150,7 +154,7 @@ def audit(args):
             and comparison["physics_executed"] is False and comparison["production_connection_compared"] is False,
             "Historical mathematical proof boundary differs")
     require(exact(comparison["original_matrix"], matrix["original_first_matrix"]), "Original reference differs")
-    frozen_cases = read(ROOT / "energyplus_porting_plan/contracts/GEO-01-cases.json")["cases"]
+    frozen_cases = read(ROOT / "docs/validation/contracts/GEO-01-cases.json")["cases"]
     expected = {c["id"]: c for c in frozen_cases}
     require(len(matrix["cases"]) == len(comparison["cases"]) == len(provenance["cases"]) == 37,
             "Exactly 37 historical result rows required")

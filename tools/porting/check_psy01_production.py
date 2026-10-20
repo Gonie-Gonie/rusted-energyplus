@@ -7,6 +7,8 @@ does not supply numerical operands/results to Rust or change card gates.
 
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from collections import Counter
 import hashlib
@@ -19,21 +21,24 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / "energyplus_porting_plan/evidence/PSY-01"
+EVIDENCE = ROOT / "docs/validation/evidence/PSY-01"
 CASES = ["A-24H", "B-NOLIMIT-24H", "B-FLOW-24H", "B-CAPACITY-24H", "B-BOTH-24H"]
 EXECUTED_SOURCE = None
 
 
 def read(path: Path):
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write(path: Path, value: dict) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 
 
 def sha(path: Path) -> str:
+    path = resolve_path(path)
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
@@ -42,7 +47,8 @@ def sha(path: Path) -> str:
 
 
 def ref(path: Path) -> dict:
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    path = resolve_path(path)
+    return {"path": legacy_relative(path), "sha256": sha(path)}
 
 
 def require(condition: bool, message: str) -> None:
@@ -183,9 +189,9 @@ def run_case(case: str, binary: Path, build: dict, output_root: Path, review_exi
     require(directory.exists() if review_existing else not directory.exists(),
             f"Expected {'existing' if review_existing else 'fresh'} evidence directory: {directory}")
     directory.mkdir(parents=True, exist_ok=review_existing)
-    metadata_path = ROOT / f"energyplus_porting_plan/cases/{case}/metadata.json"
+    metadata_path = ROOT / f"docs/validation/cases/{case}/metadata.json"
     metadata = read(metadata_path)
-    input_path, weather_path = ROOT / metadata["input"]["path"], ROOT / metadata["weather"]["path"]
+    input_path, weather_path = resolve_path(ROOT / metadata["input"]["path"]), resolve_path(ROOT / metadata["weather"]["path"])
     require(sha(input_path) == metadata["input"]["sha256"] and sha(weather_path) == metadata["weather"]["sha256"], "Case input/weather pin differs")
     require(metadata["expected_zone_steps_excluding_warmup"] == 96, "Case is not the 96-step contract")
     commands = []
@@ -197,8 +203,8 @@ def run_case(case: str, binary: Path, build: dict, output_root: Path, review_exi
             receipt = read(directory / ("cli-" + level + "-execution.json"))
             require(receipt["command"] == command and receipt["exit_code"] == 0, "Existing ordinary CLI command differs")
             receipt.setdefault("orchestrator_source", ref(output_root / "source/check_psy01_production.before-scope-review.py"))
-            require(ref(ROOT / receipt["stdout"]["path"]) == receipt["stdout"]
-                    and ref(ROOT / receipt["stderr"]["path"]) == receipt["stderr"], "Original CLI raw logs changed")
+            require(ref(resolve_path(ROOT / receipt["stdout"]["path"])) == receipt["stdout"]
+                    and ref(resolve_path(ROOT / receipt["stderr"]["path"])) == receipt["stderr"], "Original CLI raw logs changed")
             commands.append(receipt)
         else:
             commands.append(execute(command, directory, "cli-" + level))
@@ -255,7 +261,7 @@ def main() -> int:
     build_path = EVIDENCE / "build-receipt.json"
     build = read(build_path)
     binary_row = next(row for row in build["artifacts"] if Path(row["path"]).name == "eplus-rs.exe")
-    binary = ROOT / binary_row["path"]
+    binary = resolve_path(ROOT / binary_row["path"])
     require(sha(binary) == binary_row["sha256"], "Archived committed CLI hash differs")
     require(git("rev-parse", "HEAD:crates") == build["crates_tree"], "Committed production crates tree differs")
     require(subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "crates"], cwd=ROOT).returncode == 0, "Uncommitted production crates edits")

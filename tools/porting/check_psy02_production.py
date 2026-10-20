@@ -6,6 +6,8 @@ values to the Rust executable, mutates scientific inputs, or updates card gates.
 
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from collections import Counter
 import hashlib
@@ -18,16 +20,18 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / "energyplus_porting_plan/evidence/PSY-02"
+EVIDENCE = ROOT / "docs/validation/evidence/PSY-02"
 CASES = ["A-24H", "A-72H", "B-NOLIMIT-24H", "B-FLOW-24H",
          "B-CAPACITY-24H", "B-BOTH-24H", "B-BOTH-72H"]
 
 
 def read(path: Path):
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write(path: Path, value) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n",
                     encoding="utf-8", newline="\n")
@@ -50,16 +54,18 @@ def same_metadata(left, right) -> bool:
 
 
 def sha(path: Path) -> str:
+    path = resolve_path(path)
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def ref(path: Path) -> dict:
-    return {"path": path.resolve().relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    path = resolve_path(path)
+    return {"path": legacy_relative(path.resolve()), "sha256": sha(path)}
 
 
 def verify(binding: dict) -> Path:
-    path = (ROOT / binding["path"]).resolve()
+    path = (resolve_path(ROOT / binding["path"])).resolve()
     require(path.is_relative_to(ROOT), "Artifact escapes repository")
     require(ref(path) == binding, f"Artifact changed: {binding['path']}")
     return path
@@ -224,7 +230,7 @@ def actual_intervals(directory: Path, metadata: dict, trace: dict) -> dict:
 
 def run_case(case: str, build: dict, binary: Path, driver_build: Path, output_root: Path,
              source: Path, review: bool) -> dict:
-    metadata_path = ROOT / f"energyplus_porting_plan/cases/{case}/metadata.json"
+    metadata_path = ROOT / f"docs/validation/cases/{case}/metadata.json"
     metadata = read(metadata_path)
     input_path, weather = verify(metadata["input"]), verify(metadata["weather"])
     directory = output_root / case
@@ -279,7 +285,7 @@ def run_case(case: str, build: dict, binary: Path, driver_build: Path, output_ro
             and replay["command_exit_code"] == 0, "Original replay did not execute every actual root")
     for key in ["original_stdout", "original_stderr", "executed_checker"]:
         verify(replay[key])
-    require(replay["contracts"] == [ref(ROOT / "energyplus_porting_plan/contracts" / name)
+    require(replay["contracts"] == [ref(ROOT / "docs/validation/contracts" / name)
             for name in ["PSY-02-source.json", "PSY-02-cases.json", "PSY-02-tolerances.json"]],
             "Replayed frozen contracts differ")
     return {"schema": "psy02-production-case.v1", "case_id": case, "scope": metadata["scope"],

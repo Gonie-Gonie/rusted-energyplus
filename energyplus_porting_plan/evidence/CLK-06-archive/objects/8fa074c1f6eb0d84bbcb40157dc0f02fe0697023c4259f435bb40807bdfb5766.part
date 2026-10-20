@@ -1,2 +1,0 @@
-    Real64 TotalCloudCover = 5.0;                               // Total Sky Cover (tenth of sky)
-    Real64 OpaqueCloudCover = 5.0;                              // Opaque Sky Cover (tenth of sky)

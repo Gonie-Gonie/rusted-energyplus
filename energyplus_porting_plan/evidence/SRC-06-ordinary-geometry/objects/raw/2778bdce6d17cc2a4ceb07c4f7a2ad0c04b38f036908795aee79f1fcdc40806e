@@ -1,4 +1,0 @@
-        Real64 CeilingHeight = Constant::AutoCalculate; // Ceiling Height entered by user [m] or calculated
-        Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
-        Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
-        Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone

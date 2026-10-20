@@ -1,6 +1,0 @@
-fn ctf_ordinary_output_test_model() -> TypedModel {
-    let mut model=cube_model();
-    model.ctf_report_names.materials=vec![(MaterialId(0),"R1".into())];
-    model.ctf_report_names.constructions=vec![(ConstructionId(0),"Wall".into())];
-    model
-}

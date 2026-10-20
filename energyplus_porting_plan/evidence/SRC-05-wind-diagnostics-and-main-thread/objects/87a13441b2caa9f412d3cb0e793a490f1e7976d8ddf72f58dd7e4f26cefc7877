@@ -1,5 +1,0 @@
-   Compiling ep_model v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_model)
-   Compiling serde_json v1.0.150
-   Compiling ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
-   Compiling src05_wind_pow_probe v0.0.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\wind-pow-isolation-prep-03\rust)
-    Finished `dev` profile [unoptimized] target(s) in 31.17s

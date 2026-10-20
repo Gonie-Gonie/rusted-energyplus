@@ -1,7 +1,0 @@
-    constexpr int ExternalEnvironment(0);
-    constexpr int Ground(-1);
-    constexpr int OtherSideCoefNoCalcExt(-2);
-    constexpr int OtherSideCoefCalcExt(-3);
-    constexpr int OtherSideCondModeledExt(-4);
-    constexpr int GroundFCfactorMethod(-5);
-    constexpr int KivaFoundation(-6);

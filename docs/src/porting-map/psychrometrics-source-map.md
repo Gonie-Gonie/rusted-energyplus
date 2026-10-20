@@ -27,14 +27,14 @@ This general free-function inventory retains 33 `state_mapped` and 20
 The detailed contracts below own source arithmetic, branches, cache identity,
 diagnostics, and lifecycle boundaries. The
 [algorithm ledger](../../../specs/algorithm_ledger.toml) is the status
-registry. The later finite PSY cards and their paired evidence belong to the
-[finite A/B porting plan](../../../energyplus_porting_plan/README.md); they do
+registry. The later paired PSY evidence belongs to the
+[finite A/B scope](../current/current-status.md#fixed-porting-scope); it does
 not promote this entire 53-routine inventory.
 
 Local source-derived formula vectors, IEEE edge tests, or repeated output
 stability do not establish independent Native, diagnostic, cache, or caller
-parity. Keep new numeric receipts with their card evidence rather than adding
-per-attempt test narratives here. Git history retains earlier checkpoint
+parity. Keep new numeric receipts with the corresponding validation evidence
+rather than adding per-attempt test narratives here. Git history retains earlier checkpoint
 counts and experiment descriptions.
 
 ## Inventory Rule

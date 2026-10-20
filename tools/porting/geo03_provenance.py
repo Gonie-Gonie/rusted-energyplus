@@ -7,6 +7,8 @@ Original helper diagnostics and ordinary input admission remain distinct.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from datetime import datetime
 import hashlib
@@ -72,6 +74,7 @@ def exact(actual, expected):
 
 
 def read(path):
+    path = resolve_path(path)
     def invalid(token):
         raise ValueError("Nonstandard JSON token: " + token)
     def object_pairs(pairs):
@@ -86,20 +89,21 @@ def read(path):
 
 def path_of(value):
     require(type(value) is str and bool(value), "Expected a nonempty path")
-    path = Path(value)
-    path = (path if path.is_absolute() else ROOT / path).resolve()
+    path = resolve_path(value)
     require(path.is_relative_to(ROOT), "Artifact path escapes repository: " + value)
     return path
 
 
 def sha(path):
+    path = resolve_path(path)
     with Path(path).open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def ref(path):
+    path = resolve_path(path)
     path = path_of(str(path))
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    return {"path": legacy_relative(path), "sha256": sha(path)}
 
 
 class Bindings:
@@ -144,7 +148,7 @@ class Bindings:
             require(path.is_file() and self.stamp(path) == stamp, "Artifact changed during inspection")
 
     def report(self):
-        return [{"path": p.relative_to(ROOT).as_posix(), "sha256": item[1]}
+        return [{"path": legacy_relative(p), "sha256": item[1]}
                 for p, item in sorted(self.checked.items())]
 
 
@@ -202,7 +206,7 @@ def verify_contract_bindings(actual, expected, bindings):
 
 
 def frozen_contracts(declared, bindings):
-    refs = {k: ref(ROOT / f"energyplus_porting_plan/contracts/GEO-03-{k}.json") for k in FROZEN}
+    refs = {k: ref(ROOT / f"docs/validation/contracts/GEO-03-{k}.json") for k in FROZEN}
     require(all(refs[k]["sha256"] == v for k, v in FROZEN.items()), "Frozen GEO-03 contract changed")
     if declared is not None:
         verify_contract_bindings(declared, refs, bindings)
@@ -233,7 +237,7 @@ def verify_sources(source, bindings):
     for item in source["source_files"]:
         path = (SOURCE / item["path"]).resolve()
         require(path.is_relative_to(SOURCE) and item["path"] not in files, "Original source path/identity differs")
-        files[item["path"]] = bindings.check({"path": path.relative_to(ROOT).as_posix(), "sha256": item["sha256"]}).read_bytes()
+        files[item["path"]] = bindings.check({"path": legacy_relative(path), "sha256": item["sha256"]}).read_bytes()
     seen = set()
     for row in source["selected_ranges"]:
         key = (row["path"], integer(row["start"], "source range start", 1), integer(row["end"], "source range end", 1))
@@ -451,7 +455,7 @@ def verify_native_driver(receipt, refs, source, bindings):
                 and identical_content(archived["archive"], expected, bindings), "Reviewed contract archive differs")
     request = contract_review["reviewed_contracts"]["helper_request"]
     require(request["archive"]["sha256"] == REQUEST_SHA, "Independent reviewed request differs")
-    require(path_of(request["historical_path"]) == ROOT / "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+    require(path_of(request["historical_path"]) == ROOT / "docs/validation/cases/GEO-03/helper-request.json",
             "Independent reviewed request historical owner differs")
     bindings.check(request["archive"])
     require(timestamp(contract_review["review_completed_utc"]) <= started[0], "Native configuration preceded contract review")

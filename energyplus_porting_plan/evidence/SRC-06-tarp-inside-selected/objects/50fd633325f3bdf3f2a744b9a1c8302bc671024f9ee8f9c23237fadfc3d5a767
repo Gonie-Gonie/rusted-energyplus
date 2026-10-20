@@ -1,8 +1,0 @@
-        Vector3<Real64> NewellSurfaceNormalVector; // same as OutNormVec in vector notation
-        Vector3<Real64> OutNormVec;                // Direction cosines (outward normal vector) for surface
-        Real64 SinAzim;                            // Sine of surface azimuth angle
-        Real64 CosAzim;                            // Cosine of surface azimuth angle
-        Real64 SinTilt;                            // Sine of surface tilt angle
-        Real64 CosTilt;                            // Cosine of surface tilt angle
-        bool IsConvex;                             // true if the surface is convex.
-        bool IsDegenerate;                         // true if the surface is degenerate.

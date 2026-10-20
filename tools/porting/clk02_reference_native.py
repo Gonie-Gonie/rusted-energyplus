@@ -6,6 +6,8 @@ independent build review is required before Root authorizes original execution.
 """
 from __future__ import annotations
 
+from validation_paths import legacy_relative
+
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -25,7 +27,7 @@ spec.loader.exec_module(util)
 require, read, sha, ref, verify = util.require, util.read, util.sha, util.ref, util.verify
 SOURCE, BUILD, CORE, PIN = util.SOURCE, util.BUILD, util.CORE, util.PIN
 RAW = ROOT / ".runtime/porting/CLK-02"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 PRIOR = ROOT / ".runtime/porting/ZON-01/native-build-01/native-driver-build.json"
 REGISTRY_SHA = "f2455dc3cc74f5840fab60b58aba79b01b250bb15dcf399932915ddd6a43abc6"
 PRIOR_SHA = "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
@@ -270,7 +272,7 @@ def archive_sources(directory, old, utility):
         require(not archived.exists(), "Source archive basename collision")
         shutil.copyfile(original, archived)
         require(sha(original) == sha(archived), "Source changed while archiving")
-        rows.append({"historical_path": original.relative_to(ROOT).as_posix(), "archive": ref(archived)})
+        rows.append({"historical_path": legacy_relative(original), "archive": ref(archived)})
     for name, binding in utility.items():
         shutil.copyfile(verify(binding), destination / (name + ".json"))
     return rows
@@ -359,7 +361,7 @@ def build_driver(args):
         require(compiled["exit_code"] == 0, "Targeted compile/link failed; actual receipt/logs preserved")
         receipt["preservation_observations"]["after_compile_link"] = preservation(baseline, frozen, core, source_before, sources, registry_path)
         live = BUILD / "Products" / (TARGET + ".exe")
-        linked = {"historical_path": live.relative_to(ROOT).as_posix(), "sha256": sha(live), "size_bytes": live.stat().st_size}
+        linked = {"historical_path": legacy_relative(live), "sha256": sha(live), "size_bytes": live.stat().st_size}
         receipt["linked_original"] = linked
         write(directory / "linked-original-identity.json", linked)
         for name in ("CMakeCache.txt", "compile_commands.json"):

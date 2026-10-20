@@ -7,6 +7,8 @@ invokes the real bounded dry-run production entrypoint and compares settings.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import collections
 import csv
@@ -37,12 +39,13 @@ PHASES = {
 
 
 def read_json(path: Path) -> dict:
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def load_case_metadata(binding: dict) -> dict:
     metadata = binding["metadata"]
-    path = ROOT / metadata["path"]
+    path = resolve_path(ROOT / metadata["path"])
     if sha(path.read_bytes()) != metadata["sha256"]:
         raise ValueError(f"case metadata hash mismatch: {metadata['path']}")
     case = read_json(path)
@@ -53,7 +56,8 @@ def load_case_metadata(binding: dict) -> dict:
 
 
 def relative(path: Path) -> str:
-    return path.resolve().relative_to(ROOT).as_posix()
+    path = resolve_path(path)
+    return legacy_relative(path.resolve())
 
 
 def hashed(path: Path) -> dict:
@@ -128,7 +132,7 @@ def eio_settings(path: Path, expected: dict) -> tuple[dict, list[str], dict]:
 
 def rust_settings(case: dict, output: Path, cli: Path, zone_rows: list[dict]) -> dict:
     output.mkdir(parents=True, exist_ok=True)
-    command = [str(cli), "run", str(ROOT / case["input"]["path"]), "--weather", str(ROOT / case["weather"]["path"]),
+    command = [str(cli), "run", str(resolve_path(ROOT / case["input"]["path"])), "--weather", str(resolve_path(ROOT / case["weather"]["path"])),
                "--output-dir", str(output), "--porting-scope", case["scope"], "--dry-run", "--keep-intermediate", "--overwrite"]
     run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     (output / "command.json").write_bytes(json_bytes(command))
@@ -233,7 +237,7 @@ def rust_settings(case: dict, output: Path, cli: Path, zone_rows: list[dict]) ->
 
 def run_case(case: dict, outputs: list[dict], ep_root: Path, raw_root: Path, evidence_root: Path, rust_cli: Path | None) -> dict:
     for binding in (case["input"], case["weather"]):
-        if sha((ROOT / binding["path"]).read_bytes()) != binding["sha256"]:
+        if sha((resolve_path(ROOT / binding["path"])).read_bytes()) != binding["sha256"]:
             raise ValueError(f"hash mismatch: {binding['path']}")
     raw = raw_root / case["id"]
     raw.mkdir(parents=True, exist_ok=True)
@@ -312,7 +316,7 @@ def run_case(case: dict, outputs: list[dict], ep_root: Path, raw_root: Path, evi
         messages.write(message.decode("utf-8", errors="replace") + "\n")
     api.runtime.callback_message(state, message_callback)
     api.runtime.set_console_output_status(state, False)
-    command = ["-w", str(ROOT / case["weather"]["path"]), "-d", str(raw), str(ROOT / case["input"]["path"])]
+    command = ["-w", str(resolve_path(ROOT / case["weather"]["path"])), "-d", str(raw), str(resolve_path(ROOT / case["input"]["path"]))]
     try:
         exit_code = api.runtime.run_energyplus(state, command)
     finally:

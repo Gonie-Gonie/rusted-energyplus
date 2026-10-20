@@ -5,6 +5,8 @@ No geometry formula, expected answer, Rust edit or automatic gate update belongs
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import copy
 import hashlib
@@ -22,8 +24,8 @@ import time
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
-EVIDENCE = ROOT / "energyplus_porting_plan/evidence/GEO-01"
+CONTRACTS = ROOT / "docs/validation/contracts"
+EVIDENCE = ROOT / "docs/validation/evidence/GEO-01"
 RAW = ROOT / ".runtime/porting/GEO-01"
 BUILD = ROOT / ".runtime/ep261-gcc13-o0"
 CORE_RECEIPT = ROOT / ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json"
@@ -73,6 +75,7 @@ def require(condition, message):
 
 
 def sha(path):
+    path = resolve_path(path)
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for block in iter(lambda: f.read(1048576), b""):
@@ -81,15 +84,18 @@ def sha(path):
 
 
 def ref(path):
+    path = resolve_path(path)
     p = Path(path).resolve()
-    return {"path": p.relative_to(ROOT).as_posix(), "sha256": sha(p)}
+    return {"path": legacy_relative(p), "sha256": sha(p)}
 
 
 def read(path):
+    path = resolve_path(path)
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def write(path, data):
+    path = resolve_path(path)
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
@@ -212,9 +218,9 @@ def prepare():
         row = {k: copy.deepcopy(case[k]) for k in ["id", "scope", "duration", "input", "weather"]}
         row["kind"] = "con-production-input"
         row["metadata"] = copy.deepcopy(case["metadata"])
-        row["geometry_input"] = input_projection(objects((ROOT / case["input"]["path"]).read_text(encoding="utf-8")))
+        row["geometry_input"] = input_projection(objects((resolve_path(ROOT / case["input"]["path"])).read_text(encoding="utf-8")))
         rows.append(row)
-    base_path = ROOT / scope["cases"][0]["input"]["path"]
+    base_path = resolve_path(ROOT / scope["cases"][0]["input"]["path"])
     base = objects(base_path.read_text(encoding="utf-8"))
     corners = ["UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner"]
     for ident, coord, corner, direction, building_angle, zone_angle, origin, zero_policy in diagnostic_specs():
@@ -239,7 +245,7 @@ def prepare():
         for before, after in zip(base, objs):
             if before != after:
                 patches.append({"object_type": before[0], "name": before[1], "before_fields": before[1:], "after_fields": after[1:]})
-        target = ROOT / f"energyplus_porting_plan/cases/GEO-01/{ident}/input.idf"
+        target = ROOT / f"docs/validation/cases/GEO-01/{ident}/input.idf"
         text = "! GEO-01 input-only geometry diagnostic; no expected vertices.\n" + "\n\n".join(x[0]+",\n  "+",\n  ".join(x[1:])+";" for x in objs) + "\n"
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8", newline="\n")
@@ -282,8 +288,8 @@ def check():
     require(cases["case_count"] == len(cases["cases"]) == 37 and cases["production_case_count"] == 15, "Fixed case cardinality changed")
     for row in cases["cases"]:
         for key in ["input", "weather", "metadata"]:
-            require(ref(ROOT / row[key]["path"]) == row[key], f"{row['id']} {key} changed")
-        require(input_projection(objects((ROOT / row["input"]["path"]).read_text(encoding="utf-8"))) == row["geometry_input"], "Recorded geometryinputs changed")
+            require(ref(resolve_path(ROOT / row[key]["path"])) == row[key], f"{row['id']} {key} changed")
+        require(input_projection(objects((resolve_path(ROOT / row["input"]["path"])).read_text(encoding="utf-8"))) == row["geometry_input"], "Recorded geometryinputs changed")
     require(len({x["id"] for x in cases["cases"]}) == 37, "Duplicate input identity")
     return {"status": "pass", "case_count": 37, "source_files": len(source["source_files"]), "selected_ranges": len(source["selected_ranges"]), "comparison_run": False}
 
@@ -343,7 +349,7 @@ def build_driver(directory):
     after = read(BUILD / "compile_commands.json")
     require(all(x in after for x in before) and all(x in after for x in frozen), "Originalcompilecommands changed")
     for binding in old_refs + [core["artifacts"][k] for k in ["core_library", "api_library"]]:
-        require(sha(ROOT / binding["path"]) == binding["sha256"], "An original/priorcard binary changed")
+        require(sha(resolve_path(ROOT / binding["path"])) == binding["sha256"], "An original/priorcard binary changed")
     require(sha(objexx) == objexx_ref["sha256"] and objexx.stat().st_size == objexx_ref["bytes"], "Original container library changed")
     binary = BUILD / "Products/geo01_reference.exe"
     archived = directory / binary.name
@@ -371,7 +377,7 @@ def run_original(directory, driver_receipt, requested_ids):
     require(not directory.exists(), "Use fresh original execution root")
     driver = read(driver_receipt)
     require(driver["checks_passed"] is True and driver["energyplus_commit"] == PIN, "Unverified native driver")
-    binary = ROOT / driver["binary"]["path"]
+    binary = resolve_path(ROOT / driver["binary"]["path"])
     require(ref(binary) == driver["binary"], "Archived originalbinary changed")
     rows = read(CONTRACTS / "GEO-01-cases.json")["cases"]
     if requested_ids:
@@ -387,7 +393,7 @@ def run_original(directory, driver_receipt, requested_ids):
     for row in rows:
         output = directory / row["id"]
         output.mkdir()
-        command = [str(binary), str(ROOT), str(CORE_RECEIPT), row["id"], str(ROOT / row["input"]["path"]), str(ROOT / row["weather"]["path"]), str(idd), str(output / "native")]
+        command = [str(binary), str(ROOT), str(CORE_RECEIPT), row["id"], str(resolve_path(ROOT / row["input"]["path"])), str(resolve_path(ROOT / row["weather"]["path"])), str(idd), str(output / "native")]
         execution = process(command, output, "original", environment())
         require(execution["exit_code"] == 0, "Originalrun failed " + row["id"] + "; raw retained")
         result = output / "native/geometry-observation.json"
@@ -408,7 +414,7 @@ def run_original(directory, driver_receipt, requested_ids):
 
 def validate_ref(binding):
     require(isinstance(binding, dict) and type(binding.get("path")) is str and type(binding.get("sha256")) is str, "Malformed artifact binding")
-    path = ROOT / binding["path"]
+    path = resolve_path(ROOT / binding["path"])
     require(sha(path) == binding["sha256"], "Artifact hash changed: " + binding["path"])
     return path
 

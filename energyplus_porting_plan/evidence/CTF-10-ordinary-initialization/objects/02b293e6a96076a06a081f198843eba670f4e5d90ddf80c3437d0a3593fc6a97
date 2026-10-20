@@ -1,7 +1,0 @@
---- .runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/runtime/tests.rs
-+++ .runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/runtime/tests.rs
-@@ -14,3 +14,4 @@
- include!("tests/part14_geometry.rs");
- include!("tests/production_weather.rs");
- include!("tests/ctf02_surface_integration.rs");
-+include!("tests/ctf_ordinary_outputs.rs");

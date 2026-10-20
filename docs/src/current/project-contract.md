@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-20
 ---
 
 # Project Contract
@@ -57,6 +57,20 @@ results do not create compatibility claims.
 The [conformance contract](../conformance/overview.md) collects the case,
 output, tolerance, baseline, report and promotion procedures.
 
+## Reviewing A Porting Change
+
+Pin the EnergyPlus commit, actual source function/branch range, direct helpers,
+input and initial state, declared reads/writes, and invocation timing. Preserve
+equations, branches, initialization and history-update order when reusing Rust
+code. Review four independent conditions: scope, same-input unit comparison,
+real producer/consumer connection, and production execution using Rust-owned
+calculation. Cover normal cases, both sides of boundaries, zero/nonzero,
+multistep and failure cases as applicable; unexecuted or unavailable outcomes
+remain explicit. A file or
+successful build alone establishes none of these conditions. Record the actual
+command, input/source identity, result and remaining limitation with the change;
+do not tune tolerances or supply oracle/fixture answers to production.
+
 ## Full-Domain Claims
 
 Heat-balance, HVAC, plant, and time full-domain claims use canonical
@@ -77,9 +91,9 @@ historical checkpoint prose is not additional evidence.
 Source maps retain durable routine/state ownership and source-order details:
 [heat balance](../porting-map/heat-balance-source-map.md),
 [zone air](../porting-map/zone-air-update-map.md), and
-[IdealLoads](../porting-map/ideal-loads-source-map.md). Implementations follow
-the [source-faithful porting plan](../../../energyplus_porting_plan/README.md)
-without changing these claim requirements.
+[IdealLoads](../porting-map/ideal-loads-source-map.md). The completed
+[finite scope](current-status.md#fixed-porting-scope) and its retained validation
+do not change these claim requirements.
 
 ## Run States
 

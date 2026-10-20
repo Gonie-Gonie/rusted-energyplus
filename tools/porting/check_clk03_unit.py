@@ -7,6 +7,8 @@ or reconstructs original scientific right-hand sides.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from datetime import datetime, timezone
 import json
@@ -57,12 +59,13 @@ def selected_policy():
 
 
 def write(path, value):
+    path = resolve_path(path)
     with path.open('xb') as stream:
         stream.write((json.dumps(value,indent=2,allow_nan=False)+'\n').encode('utf-8'))
 
 
 def packet(bindings):
-    refs = {key:{'path':f'energyplus_porting_plan/contracts/CLK-03-{key}.json','sha256':digest} for key,digest in FROZEN.items()}
+    refs = {key:{'path':legacy_relative(f'docs/validation/contracts/CLK-03-{key}.json'),'sha256':digest} for key,digest in FROZEN.items()}
     source,cases,tolerances = [read(bindings.check(refs[key])) for key in FROZEN]
     require(all(row['card'] == 'CLK-03' and row['energyplus_commit'] == PIN and row['packet_revision'] == 3
                 and row['frozen_before_numerical_execution'] is True and row['status'] == 'frozen-before-numerical-execution'
@@ -228,7 +231,7 @@ def main():
         archived = source_dir/path.name
         shutil.copyfile(path,archived)
         require(path.read_bytes() == archived.read_bytes(), 'Executed comparer archive differs')
-        archives.append({'historical_path':path.relative_to(ROOT).as_posix(),'archive':ref(archived)})
+        archives.append({'historical_path':legacy_relative(path),'archive':ref(archived)})
     report = {
         'schema':'clk03-unit-comparison.v1',
         'status':'pass-exact-selected-carrier-and-lifecycle-state' if check.mismatch_count == 0 else 'fail-selected-carrier-or-lifecycle-state',

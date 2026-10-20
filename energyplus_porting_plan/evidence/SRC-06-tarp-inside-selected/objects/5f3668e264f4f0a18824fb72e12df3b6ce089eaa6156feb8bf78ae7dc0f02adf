@@ -1,4 +1,0 @@
-EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)
-C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1908
-EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)
-C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1960

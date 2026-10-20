@@ -6,12 +6,14 @@ Historical commands, implementation revisions and evidence remain unchanged.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import hashlib
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = ROOT / "energyplus_porting_plan"
+PLAN = ROOT / "docs/validation"
 REVIEW = PLAN / "evidence/GEO-01/independent-review.json"
 REVIEW_SHA = "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
 SELECTED = {"A-24H", "A-72H", "B-NOLIMIT-24H", "B-FLOW-24H",
@@ -24,19 +26,21 @@ def require(condition: bool, message: str) -> None:
 
 
 def ref(path: Path) -> dict:
+    path = resolve_path(path)
     with path.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest}
+    return {"path": legacy_relative(path), "sha256": digest}
 
 
 def verify(binding: dict) -> Path:
-    path = (ROOT / binding["path"]).resolve()
+    path = resolve_path(binding["path"])
     require(path.is_relative_to(ROOT), "Evidence path escapes repository")
     require(ref(path) == binding, f"Evidence bytes differ: {path}")
     return path
 
 
 def read(path: Path) -> dict:
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -57,7 +61,7 @@ def main() -> None:
         full = [run for run in case["runs"] if run["trace_level"] == "full"]
         require(len(full) == 1, "Expected exactly one retained Full projection")
         path = ROOT / full[0]["output_directory"] / "compiled-geometry.json"
-        binding = next(item for item in full[0]["artifacts"] if item["path"] == path.relative_to(ROOT).as_posix())
+        binding = next(item for item in full[0]["artifacts"] if item["path"] == legacy_relative(path))
         geometry = read(verify(binding))
         require(geometry["preparation_only"] is True and geometry["physics_executed"] is False,
                 "Coordinate projection must retain its preparation-only meaning")

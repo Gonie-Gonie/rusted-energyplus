@@ -1,8 +1,0 @@
-	// Dimension by IndexRange
-	Array1D &
-	allocate( IR const & I )
-	{
-		dimension_real( I );
-		return *this;
-	}
-

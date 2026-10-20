@@ -6,6 +6,8 @@ values are never compared or used as answers. Mathematical comparison status
 remains pending regardless of this provenance result.
 """
 from __future__ import annotations
+
+from validation_paths import resolve_path, legacy_relative
 import argparse
 from collections import Counter
 import hashlib
@@ -16,7 +18,7 @@ import sys
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 CACHE = {}
 
 
@@ -26,11 +28,11 @@ def require(condition, message):
 
 
 def path(value):
-    p = Path(value)
-    return p.resolve() if p.is_absolute() else (ROOT / p).resolve()
+    return resolve_path(value)
 
 
 def read(p):
+    p = resolve_path(p)
     return json.loads(Path(p).read_text(encoding="utf-8"))
 
 
@@ -40,6 +42,7 @@ def fingerprint(p):
 
 
 def sha(p):
+    p = resolve_path(p)
     p = Path(p).resolve()
     state = fingerprint(p)
     if p in CACHE:
@@ -55,8 +58,9 @@ def sha(p):
 
 
 def ref(p):
+    p = resolve_path(p)
     p = Path(p).resolve()
-    return {"path": p.relative_to(ROOT).as_posix(), "sha256": sha(p)}
+    return {"path": legacy_relative(p), "sha256": sha(p)}
 
 
 def binding(v):

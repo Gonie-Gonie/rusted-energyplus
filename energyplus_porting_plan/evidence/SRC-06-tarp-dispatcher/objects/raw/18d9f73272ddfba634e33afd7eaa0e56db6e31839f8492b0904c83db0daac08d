@@ -1,1 +1,0 @@
-    constexpr Real64 ZoneInitialTemp(23.0);       // Zone temperature for initialization

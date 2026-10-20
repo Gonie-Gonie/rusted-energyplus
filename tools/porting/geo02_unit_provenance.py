@@ -2,6 +2,8 @@
 """Read-only hash and scalar validation for preserved GEO-02 helper runs."""
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 from collections import Counter
 from datetime import datetime
 import hashlib
@@ -23,27 +25,29 @@ def require(condition, message):
 
 
 def read(path):
+    path = resolve_path(path)
     def invalid(token):
         raise ValueError("Nonstandard JSON numerical token: " + token)
     return json.loads(Path(path).read_text(encoding="utf-8"), parse_constant=invalid)
 
 
 def sha(path):
+    path = resolve_path(path)
     with Path(path).open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def path_of(value):
     require(type(value) is str and bool(value), "Expected a nonempty path")
-    path = Path(value)
-    path = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
+    path = resolve_path(value)
     require(path.is_relative_to(ROOT), "Proof path escapes repository: " + value)
     return path
 
 
 def ref(path):
+    path = resolve_path(path)
     path = path_of(str(path))
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    return {"path": legacy_relative(path), "sha256": sha(path)}
 
 
 class Bindings:
@@ -60,7 +64,7 @@ class Bindings:
         if key not in self.checked:
             require(path.is_file() and sha(path) == value["sha256"],
                     "Changed or missing artifact: " + value["path"])
-            self.checked[key] = {"path": path.relative_to(ROOT).as_posix(),
+            self.checked[key] = {"path": legacy_relative(path),
                                  "sha256": value["sha256"]}
         return path
 

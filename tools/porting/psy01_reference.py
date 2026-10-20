@@ -6,6 +6,8 @@ remain in .runtime; contracts and source receipts are reviewable repository file
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from array import array
 from collections import Counter
@@ -21,8 +23,8 @@ import sys
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
-EVIDENCE = ROOT / "energyplus_porting_plan/evidence/PSY-01"
+CONTRACTS = ROOT / "docs/validation/contracts"
+EVIDENCE = ROOT / "docs/validation/evidence/PSY-01"
 DEFAULT_RUNTIME = ROOT / ".runtime/porting/PSY-01"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
 DLL = ROOT / ".runtime/energyplus/26.1.0/energyplusapi.dll"
@@ -59,6 +61,7 @@ FUNCTIONS = {
 
 
 def sha(path: Path) -> str:
+    path = resolve_path(path)
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
@@ -67,6 +70,7 @@ def data_bytes(value: object) -> bytes:
 
 
 def write_json(path: Path, value: object) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(value, dict) and "ordered_ids" in value:
         # Stream the u32 sequence without building millions of JSON fragments.
@@ -91,14 +95,16 @@ def write_json(path: Path, value: object) -> None:
 
 
 def ref(path: Path) -> dict:
+    path = resolve_path(path)
     try:
-        name = path.resolve().relative_to(ROOT).as_posix()
+        name = legacy_relative(path.resolve())
     except ValueError:
         name = str(path.resolve())
     return {"path": name, "sha256": sha(path)}
 
 
 def read_json(path: Path) -> dict:
+    path = resolve_path(path)
     with path.open(encoding="utf-8") as source:
         result = json.load(source)
     if isinstance(result, dict) and "ordered_ids" in result:

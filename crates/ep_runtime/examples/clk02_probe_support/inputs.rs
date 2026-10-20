@@ -84,8 +84,17 @@ pub(super) fn outputs(input: &Value) -> Result<RawEpwOutputs> {
     })
 }
 
+pub(super) fn asset_path(root: &Path, relative: &str) -> PathBuf {
+    // Keep immutable request identities while resolving their relocated bytes.
+    let relative = Path::new(relative);
+    match relative.strip_prefix("energyplus_porting_plan") {
+        Ok(suffix) => root.join("docs/validation").join(suffix),
+        Err(_) => root.join(relative),
+    }
+}
+
 pub(super) fn file(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
-    let path = root.join(text(&binding["path"])?).canonicalize()?;
+    let path = asset_path(root, text(&binding["path"])?).canonicalize()?;
     require(
         path.starts_with(root),
         "input file must be inside repository",

@@ -1,2 +1,0 @@
-{"receipt": {"path": ".runtime/porting/CTF-10/report-input-scan-format-command-01/receipt.json", "sha256": "d4bae09cc844e40e6ef477cecd037afcf90b35fa1e425431c07a079c62c10990"}, "exit_code": 0, "source_bytes_match_before_and_after": false}
-Root applied report-input and Scan Source unit1; no gate promoted {'path': '.runtime/porting/CTF-10/report-input-scan-applied-01/record.json', 'sha256': 'f7f6c3b52aca53ae456a25629563ea8f7ac3256d6eef3a25644a08f75a123e61', 'size_bytes': 9109}

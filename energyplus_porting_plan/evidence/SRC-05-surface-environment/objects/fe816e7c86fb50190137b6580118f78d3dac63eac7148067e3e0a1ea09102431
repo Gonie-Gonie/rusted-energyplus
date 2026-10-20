@@ -1,6 +1,0 @@
-
-    // Surface HB arrays
-    Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
-    Array1D<Real64> SurfOutWetBulbTemp; // Surface outside wet bulb air temperature, for surface heat balance (C)
-    Array1D<Real64> SurfOutWindSpeed;   // Surface outside wind speed, for surface heat balance (m/s)
-    Array1D<Real64> SurfOutWindDir;     // Surface outside wind direction, for surface heat balance and ventilation(degree)

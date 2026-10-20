@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-ordinary-initialization-quality-04.py", line 15, in <module>
-    assert result.returncode == 0 and actual['exit_code'] == 0 and actual['source_bytes_match_before_and_after'] is True
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError

@@ -1,7 +1,0 @@
---- d3/crates/ep_run/tests/arbitrary_run/direct_zone_coupled.rs
-+++ 6c/crates/ep_run/tests/arbitrary_run/direct_zone_coupled.rs
-@@ -3278,4 +3278,3 @@
-         "expected {expected}, got {actual}, tolerance {tolerance}"
-     );
- }
--

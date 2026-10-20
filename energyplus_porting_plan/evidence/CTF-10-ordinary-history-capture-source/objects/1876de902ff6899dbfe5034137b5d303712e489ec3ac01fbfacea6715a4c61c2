@@ -1,3 +1,0 @@
-Held Source-only card supplement for PORTING_INSTRUCTIONS.md item 3.
-
-Adds the prospective ordinary capture input/owner/caller/boundary and availability contract. All existing card text and gate markers remain byte-identical; this is an append only. No canonical edit, execution or result claim. Root must review and apply the exact diff.

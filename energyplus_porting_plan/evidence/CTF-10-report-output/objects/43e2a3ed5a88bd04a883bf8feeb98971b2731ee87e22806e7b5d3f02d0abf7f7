@@ -1,2 +1,0 @@
-{"receipt": {"path": ".runtime/porting/CTF-10/report-output-format-command-01/receipt.json", "sha256": "c5bde96867e584624019c63e164305d9b51fe32d345e37e62ce74f7665c38b30"}, "exit_code": 0, "source_bytes_match_before_and_after": false}
-Root applied predefined table and EIO report Source unit2; no gate promoted {'path': '.runtime/porting/CTF-10/report-output-applied-01/record.json', 'sha256': 'd1069357fd2bff8cffbcf07d74debf789e597d8b630663735c5dc8388bdbfaf0', 'size_bytes': 9130}

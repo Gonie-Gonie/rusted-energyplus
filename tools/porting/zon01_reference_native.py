@@ -7,6 +7,8 @@ Root owns actual CMake/build/engine invocations; writing this tool is preparatio
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import hashlib
 import importlib.util
@@ -24,7 +26,7 @@ spec.loader.exec_module(util)
 require, read, write, sha, ref, verify = util.require, util.read, util.write, util.sha, util.ref, util.verify
 SOURCE, BUILD, CORE, PIN = util.SOURCE, util.BUILD, util.CORE, util.PIN
 RAW = ROOT / ".runtime/porting/ZON-01"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 OLD_BUILD = ROOT / ".runtime/porting/GEO-03/native-build-02/native-driver-build.json"
 OWN_NAMES = ["zon01_reference.cpp", "zon01_reference_helper.cpp", "zon01_reference_fields.hh",
              "zon01_reference.cmake", "zon01_reference_native.py"]
@@ -86,7 +88,7 @@ def archive_sources(directory):
         archived = destination / original.name
         require(not archived.exists(), "Source archive basename collision")
         shutil.copyfile(original, archived)
-        rows.append({"historical_path": original.relative_to(ROOT).as_posix(), "archive": ref(archived)})
+        rows.append({"historical_path": legacy_relative(original), "archive": ref(archived)})
     return rows
 
 
@@ -94,7 +96,7 @@ def prior_native_identity():
     old = read(OLD_BUILD)
     require(old["checks_passed"] is True and old["energyplus_commit"] == PIN, "Prior actual GEO03 build missing")
     for row in old["executed_source_archives"]:
-        require((ROOT / row["historical_path"]).read_bytes() == verify(row["archive"]).read_bytes(), "Prior-card source changed")
+        require((resolve_path(ROOT / row["historical_path"])).read_bytes() == verify(row["archive"]).read_bytes(), "Prior-card source changed")
     old_commands = read(verify(old["compile_commands"]))
     require(len(old_commands) == 652, "Prior-card compile inventory differs")
     for name in ("binary", "helper_binary"):
@@ -162,7 +164,7 @@ def build_driver(directory, contract_review):
         archived = directory / live.name
         shutil.copyfile(live, archived)
         binaries[name] = {"binary": ref(archived), "linked_build_binary":
-                          {"historical_path": live.relative_to(ROOT).as_posix(), "sha256": sha(live)},
+                          {"historical_path": legacy_relative(live), "sha256": sha(live)},
                           "matching_archive": ref(archived)}
     for name in ("CMakeCache.txt", "compile_commands.json"):
         shutil.copyfile(BUILD / name, directory / name)
@@ -195,7 +197,7 @@ def verified_driver(path, review_path):
     for key in ("binary", "helper_binary"):
         verify(driver[key])
     for row in driver["executed_source_archives"]:
-        require((ROOT / row["historical_path"]).read_bytes() == verify(row["archive"]).read_bytes(), "Built/current driver source differs")
+        require((resolve_path(ROOT / row["historical_path"])).read_bytes() == verify(row["archive"]).read_bytes(), "Built/current driver source differs")
     review = read(review_path)
     require(review["schema"] == "zon01-independent-native-build-final-review.v1" and
             review["status"] == "pass-build-identity-before-original-numerical-execution" and

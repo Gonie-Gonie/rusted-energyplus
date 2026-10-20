@@ -1,2 +1,0 @@
-        auto const &today = state.dataWeather->wvarsHrTsToday(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        state.dataEnvrn->OutDryBulbTemp = today.OutDryBulbTemp;

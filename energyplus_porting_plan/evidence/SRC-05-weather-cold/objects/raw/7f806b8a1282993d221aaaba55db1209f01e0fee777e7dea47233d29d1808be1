@@ -1,7 +1,0 @@
---- d3/crates/ep_run/tests/arbitrary_run/ideal_loads.rs
-+++ 6c/crates/ep_run/tests/arbitrary_run/ideal_loads.rs
-@@ -1170,4 +1170,3 @@
-     let results = read_json(&output_dir.join("results").join("result-store.json"))?;
-     Ok((summary, results))
- }
--

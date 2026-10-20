@@ -1,3 +1,0 @@
-    bool doSpaceHeatBalanceSizing = false;         // Do space heat balance during sizing
-    bool doSpaceHeatBalanceSimulation = false;     // Do space heat balance during simulation
-    bool doSpaceHeatBalance = false;               // Do space heat balance currently

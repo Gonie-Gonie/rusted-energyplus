@@ -1,9 +1,0 @@
-                    if (TotalSkyCover >= 99.0) {
-                        TotalSkyCover = state.dataWeather->wvarsMissing.TotalSkyCover;
-                        ++state.dataWeather->wvarsMissedCounts.TotalSkyCover;
-                    }
-
-                    if (OpaqueSkyCover >= 99.0) {
-                        OpaqueSkyCover = state.dataWeather->wvarsMissing.OpaqueSkyCover;
-                        ++state.dataWeather->wvarsMissedCounts.OpaqueSkyCover;
-                    }

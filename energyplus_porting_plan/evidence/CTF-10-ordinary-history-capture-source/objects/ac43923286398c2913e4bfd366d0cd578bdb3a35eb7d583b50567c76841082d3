@@ -1,3 +1,0 @@
-Updated energyplus_porting_plan\energyplus_porting_checklist.html
-PASS: checklist and embedded HTML plan match validated gate metadata.
-{"summary": {"path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-capture-source/summary.json", "sha256": "b88c5cebab7f153b402ae2320a043bcabd78426d5b0b3ed8669c6208f991a70c", "size_bytes": 6917}, "document_recovery": {"path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-capture-source/document-recovery-and-first-preflight.json", "sha256": "df1a8fb56d73c4e6f72960bd9a02cae28614a50a00a7c328bf333ea480be7542", "size_bytes": 9049}, "Source_or_gate_changes": false}

@@ -6,6 +6,8 @@ calendar rows do not constitute physical invocation or building/HVAC proof.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path
+
 import argparse
 from collections import Counter
 import json
@@ -23,6 +25,7 @@ DAY_FIELDS = ["year", "month", "day_of_month", "gregorian_day_of_year", "weather
 
 
 def read(path: Path) -> dict:
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -190,7 +193,7 @@ def calendars(request: dict, original: dict, rust: dict, checks: Checks) -> dict
             for field in DAY_FIELDS:
                 checks.equal(f"{cid}.month[{position}].{field}", row.get(field), source.get(field))
             checks.equal(f"{cid}.month[{position}].source_array", row.get("day_of_week"), monthly[row["month"] - 1])
-        metadata = read(ROOT / item["source_metadata"]["metadata"]["path"])
+        metadata = read(resolve_path(ROOT / item["source_metadata"]["metadata"]["path"]))
         designs = metadata["object_counts"].get("sizingperiod:designday", 0)
         checks.equal(cid + ".source_environment_mapping", env.get("selected_source_environment_ordinal"), designs + 1)
         checks.equal(cid + ".parser_design_count", cpp["state_before_setup_environment"].get("total_design_day_definitions"), designs)

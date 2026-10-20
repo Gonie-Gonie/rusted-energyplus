@@ -1,7 +1,0 @@
-    // Functions
-
-    void InitIntConvCoeff(EnergyPlusData &state,
-                          const Array1D<Real64> &SurfaceTemperatures,        // Temperature of surfaces for evaluation of HcIn
-                          ObjexxFCL::Optional_int_const ZoneToResimulate = _ // if passed in, then only calculate surfaces that have this zone
-    );
-

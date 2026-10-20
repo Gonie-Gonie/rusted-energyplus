@@ -1,9 +1,0 @@
-
-namespace EnergyPlus {
-
-// Forward declarations
-struct EnergyPlusData;
-
-namespace Weather {
-
-    enum class EpwHeaderType

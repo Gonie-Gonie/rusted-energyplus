@@ -6,6 +6,8 @@ reference answers, changes tolerance profiles or closes card gates.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
@@ -44,6 +46,7 @@ UNPAIRED = (
 
 
 def write(path: Path, value: object) -> None:
+    path = resolve_path(path)
     with path.open("xb") as stream:
         stream.write((json.dumps(value, indent=2, allow_nan=False) + "\n").encode("utf-8"))
 
@@ -114,8 +117,8 @@ def stream(check: Comparison, actual: dict, original: dict, location: str) -> No
         # The original default closed InputFile has no assigned path yet.
         check.compare(actual["file_path"], original["file_path"], location + "/unassigned_file_path", "input_identity")
     else:
-        check.compare(path_of(actual["file_path"]).relative_to(ROOT).as_posix(),
-                      path_of(original["file_path"]).relative_to(ROOT).as_posix(), location + "/actual_file_path", "input_identity")
+        check.compare(legacy_relative(path_of(actual["file_path"])),
+                      legacy_relative(path_of(original["file_path"])), location + "/actual_file_path", "input_identity")
 
 
 def outcome(check: Comparison, actual: dict, original: dict, location: str) -> None:
@@ -189,7 +192,7 @@ def header_call(check: Comparison, actual: dict, original: dict, source: dict, l
 
 
 def packet(bindings: Bindings) -> tuple:
-    refs = {key: {"path": f"energyplus_porting_plan/contracts/CLK-02-{key}.json", "sha256": sha} for key, sha in FROZEN.items()}
+    refs = {key: {"path": legacy_relative(f"docs/validation/contracts/CLK-02-{key}.json"), "sha256": sha} for key, sha in FROZEN.items()}
     source, cases, tolerances = [read(bindings.check(refs[key])) for key in FROZEN]
     require(all(value["frozen_before_numerical_execution"] is True and value["card"] == "CLK-02" for value in (source, cases, tolerances)),
             "Frozen CLK-02 packet required")
@@ -377,7 +380,7 @@ def main() -> None:
         archived = source_dir / path.name
         shutil.copyfile(path, archived)
         require(path.read_bytes() == archived.read_bytes(), "Comparer archive identity differs")
-        archives.append({"historical_path": path.relative_to(ROOT).as_posix(), "archive": ref(archived)})
+        archives.append({"historical_path": legacy_relative(path), "archive": ref(archived)})
     report = {
         "schema": "clk02-unit-comparison.v1", "status": "pass-exact-selected-raw-and-header-state" if check.mismatch_count == 0 else "fail-selected-raw-or-header-state",
         "scientific_certification_passed": check.mismatch_count == 0, "baseline_diagnostic": False,

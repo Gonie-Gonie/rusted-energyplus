@@ -7,6 +7,8 @@ independent actual-build review is required before original helper execution.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_path, legacy_relative
+
 import argparse
 import copy
 from datetime import datetime, timezone
@@ -22,7 +24,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "tools/porting"
 RAW = ROOT / ".runtime/porting/CLK-03"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 PRIOR = ROOT / ".runtime/porting/CLK-02/native-build-01/native-driver-build.json"
 PRIOR_SHA = "b9f727f19b6835a17457322a64446d1e904aabc92add04ef6871a62ec4af617b"
 REGISTRY_SHA = "9fbc167c88860561601caa8ac6eec53caad6505fdf1b24e15ae9269def279564"
@@ -40,19 +42,18 @@ def require(condition, message):
 
 
 def path(value):
-    item = Path(value)
-    result = (ROOT / item).resolve() if not item.is_absolute() else item.resolve()
+    result = resolve_path(value)
     require(result.is_relative_to(ROOT) and result != ROOT, "Path outside repository")
     return result
 
 
 def sha(value):
-    with Path(value).open("rb") as stream:
+    with resolve_path(value).open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def read(value):
-    return json.loads(Path(value).read_text(encoding="utf-8"))
+    return json.loads(resolve_path(value).read_text(encoding="utf-8"))
 
 
 def verify(binding):
@@ -66,7 +67,7 @@ def verify(binding):
 
 def ref(value):
     item = path(value)
-    return {"path": item.relative_to(ROOT).as_posix(), "sha256": sha(item)}
+    return {"path": legacy_relative(item), "sha256": sha(item)}
 
 
 def write(destination, value):
@@ -127,7 +128,7 @@ def check_contracts():
         require(type(start) is int and type(end) is int and 1 <= start <= end <= len(lines), "Invalid original range")
         require(hashlib.sha256(b"".join(lines[start - 1:end])).hexdigest() == row["range_sha256"], "Pinned original range differs")
     request_path = verify(cases["helper_request"])
-    require(request_path == ROOT / "energyplus_porting_plan/cases/CLK-03/helper-request.json", "Explicit CLK-03 request required")
+    require(request_path == ROOT / "docs/validation/cases/CLK-03/helper-request.json", "Explicit CLK-03 request required")
     request = read(request_path)
     require(request["schema"] == "clk03-helper-cases.v1" and request["expected_values_supplied"] is False
             and request["expected_exits_supplied"] is False, "Input-only genuine-call request required")
@@ -240,7 +241,7 @@ def registry(value):
             "Actual single-file native action differs")
     require(timestamp(record["admission_utc"]) <= timestamp(removal["action_started_utc"])
             <= timestamp(removal["action_completed_utc"]) <= timestamp(removal["completed_utc"]), "Actual retirement chronology differs")
-    original = ROOT / entry["original_link"]["historical_path"]
+    original = resolve_path(ROOT / entry["original_link"]["historical_path"])
     require(original.resolve().parent == (BUILD / "Products").resolve() and original.name == entry["target"] + ".exe"
             and not original.exists() and not original.is_symlink(), "Retired original must remain absent")
     require(entry["unstripped_original"]["full_debug_bytes_available"] is False
@@ -273,7 +274,7 @@ def archive_sources(directory, previous, utility, reviews, registry_path):
         require(not archived.exists(), "Source archive basename collision")
         shutil.copyfile(item, archived)
         require(sha(item) == sha(archived), "Source changed while archiving")
-        rows.append({"historical_path": item.relative_to(ROOT).as_posix(), "archive": ref(archived)})
+        rows.append({"historical_path": legacy_relative(item), "archive": ref(archived)})
     for name, binding in {**utility, **reviews, "retained_registry": ref(registry_path)}.items():
         shutil.copyfile(verify(binding), destination / (name + ".json"))
     return rows
@@ -357,7 +358,7 @@ def build_driver(args):
         require(compiled["exit_code"] == 0, "Targeted compile/link failed; actual receipt/logs preserved")
         receipt["preservation_observations"]["after_compile_link"] = observe()
         live = BUILD / "Products" / (TARGET + ".exe")
-        linked = {"historical_path": live.relative_to(ROOT).as_posix(), "sha256": sha(live), "size_bytes": live.stat().st_size}
+        linked = {"historical_path": legacy_relative(live), "sha256": sha(live), "size_bytes": live.stat().st_size}
         receipt["linked_original"] = linked
         write(directory / "linked-original-identity.json", linked)
         for name in ("CMakeCache.txt", "compile_commands.json"):

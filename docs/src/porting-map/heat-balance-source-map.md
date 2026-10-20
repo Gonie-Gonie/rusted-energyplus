@@ -1306,9 +1306,9 @@ The legacy diagnostic implementation retains these interfaces:
   alone does not prove numerical or state-transition equivalence.
 
 The completed finite A/B work is independently documented in the
-[porting plan](../../../energyplus_porting_plan/README.md) and its
-[accepted Source validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/README.md).
-That evidence binds the recorded normal Rust executions and explicit card
+[current scope](../current/current-status.md#fixed-porting-scope) and its
+[accepted Source validation](../../validation/evidence/SRC-06-final-current-source-validation-60/README.md).
+That evidence binds the recorded normal Rust executions and explicit input
 scope. It does not certify every legacy diagnostic selector, the full
 EnergyPlus surface population, general source/sink physics, or whole-file IO
 equality. The earlier rejected runs remain in Git history and their retained

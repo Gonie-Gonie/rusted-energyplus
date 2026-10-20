@@ -1,3 +1,0 @@
-        SetupEnvironmentTypes(state);
-
-        GetWeatherProperties(state, ErrorsFound);

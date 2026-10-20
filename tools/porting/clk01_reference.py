@@ -8,6 +8,8 @@ helpers or GetRunPeriodData. Raw reference output remains under .runtime.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from collections import Counter
 from datetime import date, timedelta
@@ -21,7 +23,7 @@ import sys
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 DEFAULT_RUNTIME = ROOT / ".runtime/porting/CLK-01/preparation"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
 SOURCE_PINS = {
@@ -57,6 +59,7 @@ WEEKDAYS = {"Sunday": 1, "Monday": 2, "Tuesday": 3, "Wednesday": 4, "Thursday": 
 
 
 def sha(path: Path) -> str:
+    path = resolve_path(path)
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
@@ -65,24 +68,27 @@ def encoded(value: object) -> bytes:
 
 
 def read(path: Path) -> dict:
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write(path: Path, value: object) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(encoded(value))
 
 
 def ref(path: Path) -> dict:
+    path = resolve_path(path)
     try:
-        name = path.resolve().relative_to(ROOT).as_posix()
+        name = legacy_relative(path.resolve())
     except ValueError:
         name = str(path.resolve())
     return {"path": name, "sha256": sha(path)}
 
 
 def verify_ref(item: dict) -> None:
-    if sha(ROOT / item["path"]) != item["sha256"]:
+    if sha(resolve_path(ROOT / item["path"])) != item["sha256"]:
         raise ValueError(f"Input/provenance hash mismatch: {item['path']}")
 
 
@@ -189,7 +195,7 @@ def source_contract() -> dict:
 def calendar_cases() -> list[dict]:
     out = []
     for item in read(CONTRACTS / "scope.json")["cases"]:
-        metadata = read(ROOT / item["metadata"]["path"])
+        metadata = read(resolve_path(ROOT / item["metadata"]["path"]))
         values = metadata["expected_settings"]["run_periods"]
         if len(values) != 1:
             raise ValueError("Frozen case must have one RunPeriod")
@@ -415,7 +421,7 @@ def main() -> None:
             if pure_receipt.exists():
                 build = read(pure_receipt)
                 if sha(args.reference_exe) == build["binary"]["sha256"]:
-                    runtime_bins.append((ROOT / build["compiler"]["path"]).parent)
+                    runtime_bins.append((resolve_path(ROOT / build["compiler"]["path"])).parent)
             env = os.environ.copy()
             if runtime_bins:
                 env["PATH"] = os.pathsep.join(str(p.resolve()) for p in runtime_bins) + os.pathsep + env.get("PATH", "")

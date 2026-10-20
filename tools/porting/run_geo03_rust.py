@@ -6,6 +6,8 @@ are never read or supplied to Rust. Numerical comparison and gates are separate.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import json
 from pathlib import Path
@@ -52,6 +54,7 @@ ORIGINAL = {
 
 
 def write(path, value):
+    path = resolve_path(path)
     Path(path).write_bytes((json.dumps(value, indent=2, allow_nan=False) + "\n").encode("utf-8"))
 
 
@@ -120,7 +123,7 @@ def main():
         archive = source_dir / current.name
         shutil.copyfile(current, archive)
         require(archive.read_bytes() == current.read_bytes(), "Launcher/dependency archive differs")
-        sources.append({"historical_path": current.relative_to(ROOT).as_posix(), "archive": ref(archive)})
+        sources.append({"historical_path": legacy_relative(current), "archive": ref(archive)})
     executed_launcher = sources[0]["archive"]
     matrix = {
         "schema": "geo03-production-matrix.v1", "implementation_commit": build["implementation_commit"],
@@ -164,7 +167,7 @@ def main():
                 "schema": "geo03-Rust-cli-execution.v1", "command_receipt": actual_ref,
                 "build": build_ref, "binary": build["binary"], "input": case["input"], "weather": case["weather"],
                 "metadata": case["metadata"], "run_summary": summary_ref,
-                "output_directory": output.relative_to(ROOT).as_posix(), "artifacts": artifacts,
+                "output_directory": legacy_relative(output), "artifacts": artifacts,
                 "executed_launcher": executed_launcher, "executed_recorder": actual["executed_launcher"],
                 "trace_level": level, "configured_porting_scope": configured_scope,
                 "implementation_commit": build["implementation_commit"],

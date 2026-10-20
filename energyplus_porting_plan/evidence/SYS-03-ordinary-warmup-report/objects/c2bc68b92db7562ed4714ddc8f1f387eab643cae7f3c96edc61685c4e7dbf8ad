@@ -1,7 +1,0 @@
---- crates/ep_runtime/src/runtime/tests.rs (actual before)
-+++ crates/ep_runtime/src/runtime/tests.rs (Source proposal)
-@@ -15,3 +15,4 @@
- include!("tests/production_weather.rs");
- include!("tests/ctf02_surface_integration.rs");
- include!("tests/ctf_ordinary_outputs.rs");
-+include!("tests/warmup_ordinary_reports.rs");

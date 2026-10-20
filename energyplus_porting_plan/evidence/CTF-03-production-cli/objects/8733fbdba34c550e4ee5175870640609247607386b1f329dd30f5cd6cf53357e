@@ -1,3 +1,0 @@
-error: no bin target named `eplus-rs` in `ep_run` package
-help: available bin in `ep_cli` package:
-    eplus-rs

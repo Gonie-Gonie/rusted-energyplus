@@ -4,6 +4,8 @@
 No expected numerical answers, Rust edits, gate updates, or physical-input expansion.
 """
 from __future__ import annotations
+
+from validation_paths import resolve_path, legacy_relative
 import argparse
 from collections import Counter
 import hashlib
@@ -20,8 +22,8 @@ import time
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
-EVIDENCE = ROOT / "energyplus_porting_plan/evidence/PSY-02"
+CONTRACTS = ROOT / "docs/validation/contracts"
+EVIDENCE = ROOT / "docs/validation/evidence/PSY-02"
 RAW = ROOT / ".runtime/porting/PSY-02"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
 CORE_RECEIPT = ROOT / ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json"
@@ -74,11 +76,17 @@ FUNCTIONS = {
     "PsyHFnTdbW": (["t_db_c", "w_kg_per_kg"], "J/kg"),
 }
 
-def read(path): return json.loads(path.read_text(encoding="utf-8"))
+def read(path):
+    path = resolve_path(path)
+    return json.loads(path.read_text(encoding="utf-8"))
 def sha(path):
+    path = resolve_path(path)
     with path.open("rb") as stream: return hashlib.file_digest(stream, "sha256").hexdigest()
-def ref(path): return {"path": path.resolve().relative_to(ROOT).as_posix(), "sha256": sha(path)}
+def ref(path):
+    path = resolve_path(path)
+    return {"path": legacy_relative(path.resolve()), "sha256": sha(path)}
 def write(path, data):
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 def require(condition, message):
@@ -251,7 +259,7 @@ def build_driver(directory, driver_target='psy02_reference'):
     require('-DEP_psych_stats' not in row['command'] and '-DEP_nocache_Psychrometrics' not in row['command'] and '-ffast-math' not in row['command'],'Unexpected original mode')
     write(directory/'actual-driver-compile-command.json',row)
     for key in ['core_library','api_library']:
-        binding=core['artifacts'][key];require(sha(ROOT/binding['path'])==binding['sha256'],'Original core/API bytes changed')
+        binding=core['artifacts'][key];require(sha(resolve_path(ROOT/binding['path']))==binding['sha256'],'Original core/API bytes changed')
     binary=BUILD/('Products/'+driver_target+'.exe');archived=directory/(driver_target+'.exe');shutil.copyfile(binary,archived)
     shutil.copyfile(BUILD/'CMakeCache.txt',directory/'CMakeCache.txt');shutil.copyfile(BUILD/'compile_commands.json',directory/'compile_commands.json')
     receipt={'schema':'psy02-native-driver-build.v1','checks_passed':True,'energyplus_commit':PIN,'target':driver_target,'core_build':ref(CORE_RECEIPT),'binary':ref(archived),'linked_build_binary':ref(binary),'executed_source_archives':sources,'configure':ref(directory/'configure-command.json'),'compile_link':ref(directory/'build-command.json'),'actual_compile_command':ref(directory/'actual-driver-compile-command.json'),'cache':ref(directory/'CMakeCache.txt'),'compile_commands':ref(directory/'compile_commands.json'),'original_core_compile_commands_unchanged':True,'original_core_compile_command_count':len(after_core),'frozen_original_build_commands':ref(original_commands_path),'frozen_original_build_command_count':len(original_commands),'frozen_original_build_commands_unchanged':True,'original_core_and_API_bytes_unchanged':True,'same_compiler_owned_state':True,'actual_EP_psych_errors':True,'actual_EP_psych_stats':False,'assertions_enabled':True,'fp_contract':'off','gates_updated':False}
@@ -260,7 +268,7 @@ def build_driver(directory, driver_target='psy02_reference'):
 def run_original(directory, driver_receipt):
     require(not directory.exists(),'Use a fresh original execution directory');check()
     build=read(driver_receipt);require(build['checks_passed'] is True and build['energyplus_commit']==PIN,'Driver build unverified')
-    binary=ROOT/build['binary']['path'];require(ref(binary)==build['binary'],'Archived original driver changed')
+    binary=resolve_path(ROOT/build['binary']['path']);require(ref(binary)==build['binary'],'Archived original driver changed')
     env=os.environ.copy();compiler=ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin';env['PATH']=str(compiler)+os.pathsep+env.get('PATH','')
     directory.mkdir(parents=True);executed=directory/'psy02_reference.executed.py';shutil.copyfile(Path(__file__),executed)
     rows=[]
@@ -342,7 +350,7 @@ def production_trace(trace_path,directory,driver_receipt):
     require(trace['total_root_count']==len(trace['ordered_ids']),'Root count/order mismatch')
     require(trace['recorded_root_count']==len(trace['ordered_ids']),'Recorded root count mismatch')
     require(all(type(i) is int and 0<=i<len(trace['dictionary']) for i in trace['ordered_ids']),'Invalid actual dictionary ID')
-    build=read(driver_receipt);require(build['checks_passed'] is True,'Unverified original driver');binary=ROOT/build['binary']['path'];require(ref(binary)==build['binary'],'Changed archived driver')
+    build=read(driver_receipt);require(build['checks_passed'] is True,'Unverified original driver');binary=resolve_path(ROOT/build['binary']['path']);require(ref(binary)==build['binary'],'Changed archived driver')
     directory.mkdir(parents=True);executed=directory/'psy02_reference.executed.py';shutil.copyfile(Path(__file__),executed)
     env=os.environ.copy();env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env.get('PATH','')
     receipt=process([str(binary),str(trace_path)],directory,'reference',env);require(receipt['exit_code']==0,'Original root replay failed; raw logs retained')
@@ -372,9 +380,9 @@ def compare_units(original_dir,rust_dir,directory):
         require(receipt['exit_code']==0 and receipt['reference_kind']=='unchanged-linked-original-and-header-with-genuine-state','Original first peer unavailable')
         require(receipt['contract_refs']==[ref(CONTRACTS/n) for n in ['PSY-02-source.json','PSY-02-cases.json','PSY-02-tolerances.json']],'Original frozen contract differs')
         for key in ['binary','request','results','stdout','stderr','driver_build','native_core_build','executed_launcher']:
-            require(ref(ROOT/receipt[key]['path'])==receipt[key],'Original execution reference changed: '+key)
-        require(read(ROOT/receipt['request']['path'])==process['request'],'Original numerical request changed')
-        cpp=read(ROOT/receipt['results']['path']);require(cpp==read(ROOT/receipt['stdout']['path']),'Original result differs from actual stdout')
+            require(ref(resolve_path(ROOT/receipt[key]['path']))==receipt[key],'Original execution reference changed: '+key)
+        require(read(resolve_path(ROOT/receipt['request']['path']))==process['request'],'Original numerical request changed')
+        cpp=read(resolve_path(ROOT/receipt['results']['path']));require(cpp==read(resolve_path(ROOT/receipt['stdout']['path'])),'Original result differs from actual stdout')
         rust_path=rust_dir/name/'results.json';rust=read(rust_path)
         require(cpp['schema']==rust['schema']=='psy02-results.v1','Unit response schema mismatch')
         require(len(cpp['calls'])==len(rust['calls'])==len(process['request']['calls']),'Unit ordered row count mismatch')

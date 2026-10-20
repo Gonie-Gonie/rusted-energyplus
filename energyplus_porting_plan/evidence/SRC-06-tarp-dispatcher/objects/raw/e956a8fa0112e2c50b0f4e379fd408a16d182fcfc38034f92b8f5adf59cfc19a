@@ -1,1 +1,0 @@
-    Real64 constexpr BigNumber = std::numeric_limits<Real64>::max();      // Max Number real used for initializations

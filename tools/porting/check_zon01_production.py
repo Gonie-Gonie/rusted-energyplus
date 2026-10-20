@@ -7,6 +7,8 @@ initializer formula is rebuilt and no reference result is supplied to Rust.
 """
 from __future__ import annotations
 
+from validation_paths import legacy_relative
+
 import argparse
 from datetime import datetime, timezone
 import json
@@ -375,7 +377,7 @@ def main():
         archive = source_dir / current.name
         with archive.open("xb") as stream:
             stream.write(current.read_bytes())
-        reader_sources.append({"historical_path": current.relative_to(ROOT).as_posix(), "sha256": ref(current)["sha256"],
+        reader_sources.append({"historical_path": legacy_relative(current), "sha256": ref(current)["sha256"],
                                "matching_archive": ref(archive)})
     report = {
         "schema": "zon01-production-comparison.v1", "status": "pass" if not check.failures else "fail",

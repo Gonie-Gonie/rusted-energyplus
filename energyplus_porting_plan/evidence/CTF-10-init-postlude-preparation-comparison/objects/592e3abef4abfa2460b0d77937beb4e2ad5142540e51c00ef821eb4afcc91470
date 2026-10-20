@@ -1,9 +1,0 @@
-
-running 4 tests
-test compile_report_inputs::tests::project_overrides_are_explicitly_unrepresented ... ok
-test compile_report_inputs::tests::project_writer_retains_real_caller_prefix_when_sink_fails ... ok
-test compile_report_inputs::tests::actual_compiled_timestep_and_raw_version_supply_earlier_caller ... ok
-test fields::preparation_tests::genuine_preparation_reads_report_cache_before_registry_and_retains_prefix ... ok
-
-test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
-

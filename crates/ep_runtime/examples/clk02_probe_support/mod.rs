@@ -36,7 +36,7 @@ pub(super) fn run(request_path: &Path) -> Result<Value> {
     let mut contracts = Map::new();
     for name in ["source", "cases", "tolerances"] {
         let relative = format!("energyplus_porting_plan/contracts/CLK-02-{name}.json");
-        let path = root.join(&relative).canonicalize()?;
+        let path = inputs::asset_path(&root, &relative).canonicalize()?;
         inputs::require(
             path.starts_with(&root),
             "contract must be inside repository",

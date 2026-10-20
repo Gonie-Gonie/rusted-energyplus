@@ -1,3 +1,0 @@
-        auto &s_ipsc = state.dataIPShortCut;
-        s_ipsc->cCurrentModuleObject = "SurfaceProperty:ExteriorNaturalVentedCavity";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);

@@ -1,7 +1,0 @@
-Program Version,,
-   ** Severe  ** InitConductionTransferFunctions: Material too thick for CTF calculation
-   **   ~~~   ** material name = UNIT MATERIAL
-   **  Fatal  ** Program terminated for reasons listed (InitConductionTransferFunctions)
-   ...Summary of Errors that led to program termination:
-   ..... Reference severe error count=1
-   ..... Last severe error=InitConductionTransferFunctions: Material too thick for CTF calculation

@@ -1,9 +1,0 @@
-# Dispatcher test-import correction - held
-
-The actual dispatcher Clippy run failed with four E0433 errors: lifecycle child tests use SurfaceType through their parent module. This adds only a cfg(test) import, preserving production imports, numerical code, all eight original application rows and the failed quality receipt.
-
-Root may execute apply.py only with this sealed manifest and a fresh ignored output directory. It validates the original eight-path application/current 3937-file Source, applies this one row, runs genuine cargo fmt, retains full before/literal/final snapshots and verifies the other 3936 files byte-exact. It refreshes the actual ordered runtime packet. Root and independent formatter review of the new record precede validation02. No target observation is performed by this applicator.
-
-The authors have not read any dispatcher Native numerical result. No equations, tolerance, policy, expected values, gate or ordinary-cadence activation changes.
-
-Successor02 preserves the unexecuted01 draft and its literal test-import proposal. Only receipt-reference joins use authenticated path/SHA/size identity instead of comparing documentary line_count metadata. This applicator takes its reviewed manifest and a fresh output directory; Root alone executes.

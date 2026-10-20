@@ -21,6 +21,7 @@
 namespace {
 using Clk02::json;
 namespace fs = std::filesystem;
+fs::path repository_root;
 
 void require(bool condition, std::string const &message)
 {
@@ -87,7 +88,11 @@ std::string file_sha(fs::path const &path)
 
 json file_ref(fs::path const &path)
 {
-    return {{"path", fs::absolute(path).lexically_normal().generic_string()}, {"sha256", file_sha(path)}, {"bytes", fs::file_size(path)}};
+    auto reported = fs::absolute(path).lexically_normal();
+    auto const relative = reported.lexically_relative(repository_root / "docs/validation");
+    if (!relative.empty() && !relative.is_absolute() && *relative.begin() != "..")
+        reported = repository_root / "energyplus_porting_plan" / relative;
+    return {{"path", reported.generic_string()}, {"sha256", file_sha(path)}, {"bytes", fs::file_size(path)}};
 }
 
 json read_json(fs::path const &path)
@@ -110,7 +115,10 @@ void write_text(fs::path const &path, std::string const &value)
 fs::path bound_path(fs::path const &root, json const &binding)
 {
     require(binding.at("path").is_string() && binding.at("sha256").is_string(), "Input file binding needs path and SHA256");
-    fs::path const path = root / binding.at("path").get<std::string>();
+    fs::path const relative = fs::path(binding.at("path").get<std::string>()).lexically_normal();
+    fs::path const path = !relative.empty() && *relative.begin() == "energyplus_porting_plan"
+        ? root / "docs/validation" / relative.lexically_relative("energyplus_porting_plan")
+        : root / relative;
     require(file_sha(path) == binding.at("sha256").get<std::string>(), "Frozen input artifact hash differs");
     return path;
 }
@@ -391,6 +399,7 @@ int main(int argc, char const *argv[])
     try {
         require(argc == 4, "Usage: clk02_reference_helper <repo_root> <input-only-request.json> <fresh_output_dir>");
         fs::path const root = fs::absolute(argv[1]).lexically_normal();
+        repository_root = root;
         fs::path const request_path = fs::absolute(argv[2]).lexically_normal();
         fs::path const output = fs::absolute(argv[3]).lexically_normal();
         require(!fs::exists(output), "Native output directory must be fresh");
@@ -400,7 +409,7 @@ int main(int argc, char const *argv[])
                 "Wrong input-only helper schema/policy");
         json contracts = json::object();
         for (char const *name : {"source", "cases", "tolerances"}) {
-            auto const path = root / "energyplus_porting_plan/contracts" / (std::string("CLK-02-") + name + ".json");
+            auto const path = root / "docs/validation/contracts" / (std::string("CLK-02-") + name + ".json");
             auto const contract = read_json(path);
             require(contract.at("status").get<std::string>() == "frozen-before-numerical-execution" &&
                     contract.at("frozen_before_numerical_execution") == true, "Unfrozen contract");

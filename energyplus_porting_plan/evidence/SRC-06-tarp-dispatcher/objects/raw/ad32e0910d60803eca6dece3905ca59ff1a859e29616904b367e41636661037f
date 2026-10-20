@@ -1,1 +1,0 @@
-    Real64 constexpr OneCentimeter = 0.01;     // Geometric tolerance in meters

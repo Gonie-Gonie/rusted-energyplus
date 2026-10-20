@@ -1,8 +1,0 @@
-    int ZoneNodeNum = thisZone.SystemZoneNodeNumber;
-    if (spaceNum > 0) {
-        ZoneNodeNum = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
-    }
-
-    Real64 SNLoad = 0.0;
-
-    if (ZoneNodeNum > 0) { // This zone is controlled by a zone equipment configuration or zone plenum

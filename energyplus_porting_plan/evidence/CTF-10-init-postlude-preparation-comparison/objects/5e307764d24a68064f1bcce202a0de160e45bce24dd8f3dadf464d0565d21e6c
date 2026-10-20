@@ -1,8 +1,0 @@
-{
-  "post_application_workflow_preparation": {
-    "path": ".runtime/porting/CTF-10/init-postlude-post-application-correction-prep-01/manifest.json",
-    "sha256": "eba6f68630a9a9485dde8057c194dbc5d5b46648eedc54731e68f10629f560c6",
-    "size_bytes": 12724,
-    "line_count": 224
-  }
-}

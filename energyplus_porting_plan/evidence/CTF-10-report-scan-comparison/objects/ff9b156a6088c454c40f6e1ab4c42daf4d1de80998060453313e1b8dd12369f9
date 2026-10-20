@@ -1,3 +1,0 @@
-# Keep the exact existing consumer target graph, then add the reviewed Scan chain.
-include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_reference.cmake")
-include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_reference.cmake")

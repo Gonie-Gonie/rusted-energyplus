@@ -6,6 +6,8 @@ starts Rust, compares scientific results, changes source math, or updates gates.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -22,7 +24,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
 RAW = ROOT / ".runtime/porting/GEO-03"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 BUILD = ROOT / ".runtime/ep261-gcc13-o0"
 CORE = ROOT / ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
@@ -40,14 +42,17 @@ def require(condition, message):
 
 
 def read(path):
+    path = resolve_path(path)
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def write(path, data):
+    path = resolve_path(path)
     Path(path).write_text(json.dumps(data, indent=2, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
 
 
 def sha(path):
+    path = resolve_path(path)
     digest = hashlib.sha256()
     with Path(path).open("rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
@@ -56,13 +61,14 @@ def sha(path):
 
 
 def ref(path):
+    path = resolve_path(path)
     path = Path(path).resolve()
     require(path.is_relative_to(ROOT), "Reference outside repository")
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    return {"path": legacy_relative(path), "sha256": sha(path)}
 
 
 def verify(binding):
-    path = (ROOT / binding["path"]).resolve()
+    path = (resolve_path(ROOT / binding["path"])).resolve()
     require(path.is_relative_to(ROOT) and path.is_file(), "Missing/outside bound file: " + str(path))
     require(sha(path) == binding["sha256"], "Bound bytes changed: " + str(path))
     if "bytes" in binding:
@@ -150,7 +156,7 @@ def archive_sources(directory):
         original = ROOT / "tools/porting" / name
         archived = destination / name
         shutil.copyfile(original, archived)
-        rows.append({"historical_path": original.relative_to(ROOT).as_posix(), "archive": ref(archived)})
+        rows.append({"historical_path": legacy_relative(original), "archive": ref(archived)})
     return rows
 
 
@@ -248,7 +254,7 @@ def build_driver(directory, review_path):
         archived = directory / live.name
         shutil.copyfile(live, archived)
         binaries[name] = {"binary": ref(archived),
-                          "linked_build_binary": {"historical_path": live.relative_to(ROOT).as_posix(), "sha256": sha(live)},
+                          "linked_build_binary": {"historical_path": legacy_relative(live), "sha256": sha(live)},
                           "matching_archive": ref(archived)}
     for name in ("CMakeCache.txt", "compile_commands.json"):
         shutil.copyfile(BUILD / name, directory / name)
@@ -286,7 +292,7 @@ def verified_driver(path, native_review_path):
         verify(driver[key])
     for item in driver["executed_source_archives"]:
         archive = verify(item["archive"])
-        require((ROOT / item["historical_path"]).read_bytes() == archive.read_bytes(), "Built source/current source differs")
+        require((resolve_path(ROOT / item["historical_path"])).read_bytes() == archive.read_bytes(), "Built source/current source differs")
     review = read(native_review_path)
     require(review["schema"] == "geo03-independent-native-build-final-review.v1" and
             review["status"] == "pass-build-identity-before-original-numerical-execution", "Independent native build review required")
@@ -301,7 +307,7 @@ def run_helpers(directory, driver_path, native_review_path):
     request = frozen["helper_request"]
     directory = fresh(directory)
     sources = archive_sources(directory)
-    execution = process([str(ROOT / driver["helper_binary"]["path"]), str(ROOT / request["path"])], directory, "helper")
+    execution = process([str(resolve_path(ROOT / driver["helper_binary"]["path"])), str(resolve_path(ROOT / request["path"]))], directory, "helper")
     output = directory / "helper-stdout.log"
     result = read(output) if output.stat().st_size else None
     if result is not None:
@@ -338,8 +344,8 @@ def run_original(directory, driver_path, native_review_path, requested_ids):
     for row in rows:
         output = directory / row["id"]
         output.mkdir()
-        command = [str(ROOT / driver["binary"]["path"]), str(ROOT), str(CORE), row["id"],
-                   str(ROOT / row["input"]["path"]), str(ROOT / row["weather"]["path"]), str(idd), str(output / "native")]
+        command = [str(resolve_path(ROOT / driver["binary"]["path"])), str(ROOT), str(CORE), row["id"],
+                   str(resolve_path(ROOT / row["input"]["path"])), str(resolve_path(ROOT / row["weather"]["path"])), str(idd), str(output / "native")]
         execution = process(command, output, "original")
         result_path = output / "native/volume-observation.json"
         data = read(result_path) if result_path.exists() else None

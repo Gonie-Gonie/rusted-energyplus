@@ -1,2 +1,0 @@
-{"receipt": {"path": ".runtime/porting/CTF-10/report-scan-observer-format-command-01/receipt.json", "sha256": "0a6733a1e7d1ebd290609c969021dfe706abb34dbb0904b0bb791e859a113975"}, "exit_code": 0, "source_bytes_match_before_and_after": false}
-{'path': '.runtime/porting/CTF-10/report-scan-observer-applied-01/record.json', 'sha256': '00c80d108c458c57ce2b3cc000a53b016f9af714a64e28fbb6cb9d7e7109fc82', 'size_bytes': 1490}

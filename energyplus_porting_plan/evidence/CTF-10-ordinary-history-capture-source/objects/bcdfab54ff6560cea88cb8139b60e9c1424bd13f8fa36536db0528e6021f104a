@@ -1,8 +1,0 @@
---- .runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/CTF-10.md.before
-+++ energyplus_porting_plan/cards/CTF-10.md
-@@ -201,3 +201,5 @@
- 
- Actual Source `a0d63dbd95735e9fd1f6288be64576dfc61f0f9f5131a8ec4a2598ef7051ca8c` keeps3,915 files;3,914 unrelated files are byte-exact. The example now uses the existing strict A ordinary entry with Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. The initial unscoped exit4/zero-event attempt remains preserved. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
- Evidence: [scoped caller and quality](../evidence/CTF-10-ordinary-history-capture-source/scoped-caller-and-quality.json) (`5f4065edfeae47e64eb7f169b0d744076d7ee7ff355f9d73efac070a7a749526`).
-+
-+Scoped observer attempt02 terminated with Windows stack overflow (0xC00000FD) before any stream record; its retained0B stream has no completion footer. The passive example requires the same explicit8 MiB worker stack as the existing successfulCLI, with the sink and ordinary runtime on that worker. Inputs, Deny and numerical policy remain unchanged. Ordinary reachability and comparison remain unverified; no gates change. The failed receipt remains `.runtime/porting/CTF-10/ordinary-history-invocation-02/ordinary-execution-command/receipt.json`.

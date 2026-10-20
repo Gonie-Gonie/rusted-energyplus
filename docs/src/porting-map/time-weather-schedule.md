@@ -237,9 +237,9 @@ calendar/report fixtures. Fixture inputs, expected vectors, warnings, and
 comparison commands belong in the [case index](../generated/conformance-case-index.md)
 and its manifests and scripts. The
 [algorithm ledger](../../../specs/algorithm_ledger.toml) owns promotion status.
-The later [finite A/B port](../../../energyplus_porting_plan/README.md) has its
-own completed card contracts and accepted evidence; the historical fixture
-limits below do not redefine those cards. Earlier experiment narratives are
+The later [finite A/B port](../current/current-status.md#fixed-porting-scope) has
+its own accepted scope and evidence; the historical fixture limits below do
+not redefine that scope. Earlier experiment narratives are
 available in Git history.
 
 ## Ordered Exact Hourly and Weather-Effective Leap Evidence Checkpoint
@@ -789,14 +789,14 @@ retain engine-specific failures and do not become numeric PASS results.
 
 Use the [case index](../generated/conformance-case-index.md),
 [algorithm ledger](../../../specs/algorithm_ledger.toml), and
-[finite porting plan](../../../energyplus_porting_plan/README.md) for the
+[finite scope](../current/current-status.md#fixed-porting-scope) for the
 applicable status and evidence. A passing fixture or representation change
 cannot widen another claim.
 
 ## CLK-02: bounded raw EPW parsing and actual production handoff
 
 The CLK-02 evidence packet at
-[`energyplus_porting_plan/evidence/CLK-02.json`](../../../energyplus_porting_plan/evidence/CLK-02.json)
+[`docs/validation/evidence/CLK-02.json`](../../validation/evidence/CLK-02.json)
 binds the EnergyPlus 26.1.0 source contract, actual original helper output,
 canonical Rust probe, production CLI runs, and their recorded comparisons.
 Its scope is raw record interpretation and the selected header state; it does

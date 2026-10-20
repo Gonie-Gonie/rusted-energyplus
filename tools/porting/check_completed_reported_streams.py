@@ -3,6 +3,7 @@
 Only receipt0, completed Source outcomes are accepted. The paired physical ESO/MTR
 scan retains per-series metrics, not sample histories or exported JSON trees.
 """
+from validation_paths import resolve_path, legacy_relative
 from pathlib import Path
 import argparse
 import hashlib
@@ -16,8 +17,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 POLICY_SHA = "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698"
 POLICY_REV = "2fffe68fb9131c80efcd3232de3a81d5290045c6"
-POLICY_PATH = "energyplus_porting_plan/contracts/output-tolerances.json"
-PUBLIC_CHECKPOINT_PATH = "energyplus_porting_plan/evidence/SRC-06-canonical-completed-source-activation-11/summary.json"
+POLICY_PATH = "docs/validation/contracts/output-tolerances.json"
+HISTORY_POLICY_PATH = "energyplus_porting_plan/contracts/output-tolerances.json"
+PUBLIC_CHECKPOINT_PATH = "docs/validation/evidence/SRC-06-canonical-completed-source-activation-11/summary.json"
 PUBLIC_CHECKPOINT_SHA = "49bc529e949c23e3ccf92880db6dccdef42decd183c3ed8a6fa30d32a7adba60"
 
 
@@ -27,6 +29,7 @@ def require(ok, message):
 
 
 def digest(path):
+    path = resolve_path(path)
     h = hashlib.sha256()
     with path.open("rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -35,28 +38,30 @@ def digest(path):
 
 
 def ref(path):
+    path = resolve_path(path)
     path = path.resolve()
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest(path), "bytes": path.stat().st_size}
+    return {"path": legacy_relative(path), "sha256": digest(path), "bytes": path.stat().st_size}
 
 
 def read(path):
+    path = resolve_path(path)
     return json.loads(path.read_bytes())
 
 
 def authenticated(path, sha):
-    path = path.resolve()
+    path = resolve_path(path)
     require(digest(path) == sha, f"SHA256 mismatch: {path}")
     return read(path)
 
 
 def project_ref(row):
-    p = ROOT / row["path"]
+    p = resolve_path(row["path"])
     require(digest(p) == row["sha256"], f"changed input contract: {p}")
     return p.resolve()
 
 
 def normalized_path(value):
-    return str(Path(value).resolve()).replace("\\", "/").casefold()
+    return str(resolve_path(value)).replace("\\", "/").casefold()
 
 
 def option(command, name):
@@ -108,7 +113,7 @@ class PhysicalLines:
     def finish(self):
         require(self.file.read(1) == b"", f"bytes after footer: {self.path}")
         self.file.close()
-        return {"path": self.path.relative_to(ROOT).as_posix(), "sha256": self.sha.hexdigest(), "bytes": self.bytes,
+        return {"path": legacy_relative(self.path), "sha256": self.sha.hexdigest(), "bytes": self.bytes,
                 "physical_lines": self.line, "line_endings": self.endings}
 
 
@@ -327,12 +332,12 @@ def main():
     args = p.parse_args()
     policy_file = ROOT / POLICY_PATH
     policy = authenticated(policy_file, POLICY_SHA)
-    historical = subprocess.check_output(["git", "show", POLICY_REV + ":" + POLICY_PATH], cwd=ROOT)
+    historical = subprocess.check_output(["git", "show", POLICY_REV + ":" + HISTORY_POLICY_PATH], cwd=ROOT)
     require(historical == policy_file.read_bytes(), "policy differs from precomparison historical version")
     require(policy["schema_version"] == "con01-output-tolerances.v2", "wrong policy version")
     require(all(r["rtol"] == 0 for rows in policy["profiles"].values() for r in rows), "unexpected nonzero finite-policy rtol")
     checkpoint = authenticated(ROOT / PUBLIC_CHECKPOINT_PATH, PUBLIC_CHECKPOINT_SHA)
-    scope_file = ROOT / "energyplus_porting_plan/contracts/scope.json"
+    scope_file = ROOT / "docs/validation/contracts/scope.json"
     cases = {c["id"]: c for c in read(scope_file)["cases"]}
     require(args.case in cases, "not a declared finite case")
     case = cases[args.case]
@@ -357,7 +362,7 @@ def main():
     require(len(selected) == metadata["expected_weather_environments"]
             and all(e["kind_of_environment"] == 3 for e in selected)
             and sum(e["total_days"] for e in selected) * 24 == runtime["native_environment_hour_scope"], "actual Source selected environment scope differs")
-    require(digest(Path(summary["input"]["original"])) == case["input"]["sha256"], "Source original input artifact differs")
+    require(digest(resolve_path(summary["input"]["original"])) == case["input"]["sha256"], "Source original input artifact differs")
     source_rdd_path, native_rdd_path = source_dir / "eplusrs.rdd", native_dir / "energyplusout.rdd"
     source_mdd_path, native_mdd_path = source_dir / "eplusrs.mdd", native_dir / "energyplusout.mdd"
     source_rdd, native_rdd = available_variables(source_rdd_path), available_variables(native_rdd_path)

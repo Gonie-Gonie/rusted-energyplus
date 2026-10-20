@@ -1,9 +1,0 @@
-{
-  "schema": "ctf10-ordinary-output-manifest-correction.v1",
-  "canonical_path": "crates/ep_run/tests/arbitrary_run/output_manifest.rs",
-  "before_sha256": "35ab4cecab7f1b91a116b8e6585058c79f12c116dad7482f3a42e903e7476db7",
-  "after_sha256": "d5e08f272b8de7c072a3cd12aa12066bb36127c8fc6d259b09515b40934b9495",
-  "production_implementation_changed": false,
-  "change": "Require the three actual persistent CTF outputs in the exact successful runtime file inventory; blocked-before-runtime inventory remains unchanged.",
-  "actual_failure_receipt": "ordinary-initialization-workspace-command-03/receipt.json"
-}

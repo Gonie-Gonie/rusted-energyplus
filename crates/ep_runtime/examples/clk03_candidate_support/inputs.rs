@@ -50,8 +50,17 @@ pub(super) fn relative(root: &Path, path: &Path) -> Result<String> {
         .replace('\\', "/"))
 }
 
+pub(super) fn asset_path(root: &Path, relative: &str) -> PathBuf {
+    // Keep immutable request identities while resolving their relocated bytes.
+    let relative = Path::new(relative);
+    match relative.strip_prefix("energyplus_porting_plan") {
+        Ok(suffix) => root.join("docs/validation").join(suffix),
+        Err(_) => root.join(relative),
+    }
+}
+
 pub(super) fn bound_file(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
-    let path = root.join(text(&binding["path"])?).canonicalize()?;
+    let path = asset_path(root, text(&binding["path"])?).canonicalize()?;
     require(path.starts_with(root), "input reference escapes repository")?;
     let bytes = std::fs::read(&path)?;
     require(

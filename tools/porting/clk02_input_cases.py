@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import hashlib
 import json
@@ -9,7 +11,7 @@ import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = ROOT / "energyplus_porting_plan"
+PLAN = ROOT / "docs/validation"
 CASES = PLAN / "cases/CLK-02"
 AUDIT = ROOT / ".runtime/porting/CLK-02/source-audit-01/freeze-02/audit.json"
 DRAFT = ROOT / ".runtime/porting/CLK-02/input-author-draft-02"
@@ -36,7 +38,8 @@ def sha(data: bytes) -> str:
 
 
 def ref(path: Path) -> dict:
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}
+    path = resolve_path(path)
+    return {"path": legacy_relative(path), "sha256": sha(path.read_bytes())}
 
 
 def bits(value: float) -> str:
@@ -44,6 +47,7 @@ def bits(value: float) -> str:
 
 
 def write_json(path: Path, value: dict) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     # Compact JSON retains all exact values while keeping each contract <800 lines.
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -202,7 +206,7 @@ def author() -> None:
     audit = json.loads(AUDIT.read_text(encoding="utf-8"))
     scope_path = PLAN / "contracts/scope.json"
     scope = json.loads(scope_path.read_text(encoding="utf-8"))
-    weather = ROOT / scope["cases"][0]["weather"]["path"]
+    weather = resolve_path(ROOT / scope["cases"][0]["weather"]["path"])
     for row in scope["cases"]:
         if row["weather"] != scope["cases"][0]["weather"]:
             raise RuntimeError("all fixed CON inputs must retain same weather binding")
@@ -318,7 +322,7 @@ def author() -> None:
     for path in files:
         target = DRAFT / path.name
         target.write_bytes(path.read_bytes())
-        archives.append({"historical_path": path.relative_to(ROOT).as_posix(), "archive": ref(target)})
+        archives.append({"historical_path": legacy_relative(path), "archive": ref(target)})
     manifest = {"schema": "clk02-input-author-draft.v1", "status": "draft-no-scientific-execution",
                 "source_audit": ref(AUDIT), "files": archives, "counts": cases["counts"],
                 "engines_executed": False, "Rust_modified": False, "gates_changed": False}
@@ -329,14 +333,14 @@ def author() -> None:
 def check() -> None:
     manifest = json.loads((DRAFT / "draft.json").read_text(encoding="utf-8"))
     for row in manifest["files"]:
-        archive = ROOT / row["archive"]["path"]
-        live = ROOT / row["historical_path"]
+        archive = resolve_path(ROOT / row["archive"]["path"])
+        live = resolve_path(ROOT / row["historical_path"])
         if sha(archive.read_bytes()) != row["archive"]["sha256"] or archive.read_bytes() != live.read_bytes():
             raise RuntimeError("draft archive/current byte mismatch")
     request = json.loads((CASES / "helper-request.json").read_text(encoding="utf-8"))
     for case in request["header_cases"]:
         binding = case.get("stream", case.get("file"))
-        if ref(ROOT / binding["path"]) != binding:
+        if ref(resolve_path(ROOT / binding["path"])) != binding:
             raise RuntimeError("header stream identity mismatch")
     for seq in request["record_sequences"]:
         for op in seq["operations"]:
@@ -355,7 +359,7 @@ def preserve() -> None:
     for path in files:
         target = DRAFT / path.name
         target.write_bytes(path.read_bytes())
-        rows.append({"historical_path": path.relative_to(ROOT).as_posix(), "archive": ref(target)})
+        rows.append({"historical_path": legacy_relative(path), "archive": ref(target)})
     cases = json.loads(files[1].read_text(encoding="utf-8"))
     write_json(DRAFT / "draft.json", {
         "schema": "clk02-input-author-draft.v1", "status": "draft-no-scientific-execution",

@@ -154,7 +154,7 @@ fn b_reports_weather_source_fatal_without_thermal_or_end_environment_fallback()
     let schedules = precompute_schedule_cache(&model.typed, 24 * 4)?;
     let bytes = include_bytes!(concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw"
+        "/../../docs/validation/cases/CLK-03/missing-target-complete-days.epw"
     ));
     let live = ProductionWeatherTimestepSeries::from_bytes(bytes.to_vec(), config)?;
     let result = simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather(

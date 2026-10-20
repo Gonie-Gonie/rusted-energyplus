@@ -1,8 +1,0 @@
---- .runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/before/README.md
-+++ .runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/README.md
-@@ -21,3 +21,5 @@
- The policy is frozen before outputs. Future pairing must admit full literal/initial/preowner equality and authentic current custody before reached endpoints. Retained cells use exact bits/class; selected finite arithmetic uses zero absolute/relative/ULP tolerance. Required missing or unreached rows remain required unavailable and cannot PASS. All first-call/setup/report/backend observations remain factual; no whole SRC06, SUR05 cadence, ordinary integration or gate closure follows from this unit.
- 
- `author_inputs.py` only writes literal input/IDF Source objects. `seal.py` only snapshots Source ranges/templates and writes this held manifest/diffs. Neither imports a porting runner or executes a target. The local caller audit is historical Source rationale; its read-time plan bindings are not current execution authorities.
-+
-+The narrow02 successor distinguishes actual container shapes: both zero-user curve families are Objexx Array1D and now retain allocation, size, lower and upper bounds through the existing array copier. The two user-model EPVectors retain their real one-based indexing shape. Unexpected nonempty unread families expose unavailable rows, never fabricated values. All inputs, calls, selected equations, other owners and policy bytes are literal01.

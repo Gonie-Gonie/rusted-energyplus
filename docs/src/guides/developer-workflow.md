@@ -19,10 +19,10 @@ Use `scripts/dev.cmd` as the command entry point. Run from the repository root:
 
 | Change | Check during development |
 |---|---|
-| Runtime calculation or state | Affected package/test filter and the card's same-input Native comparison |
+| Runtime calculation or state | Affected package/test filter and the same-input Native comparison for the changed behavior |
 | Parser, compiler, CLI or run pipeline | Affected package/test filter and its real input scenario |
 | Documentation | `docs-generate`, then `docs-check` |
-| Plan/evidence metadata | `python tools/porting/check_plan.py --check` and `python tools/porting/sync_plan_views.py --check` |
+| Validation metadata | Affected input/source hashes and the relevant comparison or evidence reader |
 | Claims/specs | Matching spec validator, `manifest-validate-all`, `strict-no-false-conformance` |
 
 `check` defaults to formatting, `ep_runtime` lint and one package test run.
@@ -47,7 +47,7 @@ cargo run --locked -p ep_cli -- model plan <input.epJSON>
 Inspection and tracing do not establish numerical compatibility. Add
 `--trace-level surface` to inspect geometry, or `full` only when detailed
 schedule/weather/psychrometric events are needed. Compare the state fields
-required by the affected card. Use [Verify the port](verify-porting.md) for
+required by the changed behavior. Use [Verify the port](verify-porting.md) for
 same-IDF Oracle/Rust reported-value comparisons.
 
 The optional SUR-02 isolated-history checker remains outside the default suite:
@@ -56,8 +56,12 @@ The optional SUR-02 isolated-history checker remains outside the default suite:
 python tools/porting/check_sur02_units.py --output .runtime/porting/SUR-02/isolated-history-local
 ```
 
-It requires the pinned EnergyPlus source, C++/Rust compilers and the retained
-Source59 compiler-input plan named in the checker; use a fresh output folder.
+This is a historical Source59 check. It requires the matching tested Source
+checkout, pinned EnergyPlus source, C++/Rust compilers and retained compiler-input
+plan named in the checker. Fixture paths changed during repository cleanup, so
+the checker does not certify this reorganized checkout. Use a fresh output
+folder. The [accepted supplement](../../validation/evidence/SUR-02-isolated-history-impulse-61/summary.json)
+retains the actual executed result.
 
 ## Update Documentation And Commit
 

@@ -40,7 +40,7 @@ checks. Packaging and historical release verification are separate operations.
 | IDF/epJSON parsing or compilation | `check -Package ep_raw_model,ep_compiler -Filter <area> -Lib` | Workspace tests, including affected model/run consumers |
 | Run pipeline or CLI | `check -Package ep_run,ep_cli -Filter <area>` | Workspace tests; the affected end-to-end scenario |
 | Shared model, public API or Cargo configuration | Relevant package checks | Workspace Clippy and tests once |
-| Plan or evidence metadata | `python tools/porting/check_plan.py --check` and `python tools/porting/sync_plan_views.py --check` | Affected documentation/spec checks |
+| Validation inputs, contracts or evidence | Preserve authenticated bytes; run the affected comparer or input checker | Affected documentation/spec checks; see `docs/validation/README.md` |
 | Test runner or PowerShell script | Parse scripts; inspect `-Plan` and invalid selector combinations | Run the affected real command and relevant script/spec checks |
 
 Package lists use commas through `dev.cmd`. A filter that selects no tests is

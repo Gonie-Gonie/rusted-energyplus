@@ -216,7 +216,7 @@ fn run() -> Result<()> {
     let mut contracts = serde_json::Map::new();
     for name in ["source", "cases", "tolerances"] {
         let relative = format!("energyplus_porting_plan/contracts/CLK-03-{name}.json");
-        let file = root.join(&relative).canonicalize()?;
+        let file = inputs::asset_path(&root, &relative).canonicalize()?;
         require(file.starts_with(&root), "contained contract required")?;
         contracts.insert(
             name.into(),

@@ -1,3 +1,0 @@
-ninja: Entering directory `C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0'
-[1/2] Building CXX object CMakeFiles/source_round_format_unit_helper.dir/016e860dd827d019126356d85ecfd32a/rusted-energyplus/.runtime/porting/SYS-03/round-format-prep-01/round_unit_helper.cpp.obj
-[2/2] Linking CXX executable D:\CodexBuild\rusted-energyplus\SYS-03\round-format-native-build-01\bin\source_round_format_unit_helper.exe

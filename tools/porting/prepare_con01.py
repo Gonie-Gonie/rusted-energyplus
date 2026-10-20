@@ -6,6 +6,8 @@ Use --check to compare every generated artifact without changing the filesystem.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import copy
 import datetime as dt
@@ -16,7 +18,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = Path("energyplus_porting_plan")
+PLAN = Path("docs/validation")
 EP_ROOT = Path(".runtime/energyplus/26.1.0")
 EP_SOURCE = Path(".reference/energyplus-src/26.1.0/src/EnergyPlus")
 EP_COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
@@ -197,8 +199,8 @@ def make_case(scope: str, period: str, variant: str | None) -> tuple[dict, bytes
     }
     days = (end - begin).days + 1
     metadata = {"schema_version": "con01-case.v1", "id": case_id, "scope": scope, "duration": period, "limit_variant": variant,
-                "source": {"path": path.as_posix(), "sha256": digest}, "weather": {"path": WEATHER.as_posix(), "sha256": WEATHER_HASH},
-                "input": {"path": (PLAN / "cases" / case_id / "input.idf").as_posix(), "sha256": sha(data)},
+                "source": {"path": legacy_relative(path), "sha256": digest}, "weather": {"path": legacy_relative(WEATHER), "sha256": WEATHER_HASH},
+                "input": {"path": legacy_relative(PLAN / "cases" / case_id / "input.idf"), "sha256": sha(data)},
                 "serialization": "UTF-8/LF; comments removed; object/field order retained except documented added defaults and replaced Output:Variable collection",
                 "patches": patches, "object_counts": dict(sorted(Counter(o[0].lower() for o in objects).items())),
                 "expected_zone_steps_excluding_warmup": days * 96, "expected_weather_environments": 1,
@@ -245,7 +247,7 @@ def boundaries() -> dict:
         path = EP_SOURCE / file
         data = (ROOT / path).read_bytes()
         lines = data.splitlines(keepends=True)
-        result.append({"path": path.as_posix(), "upstream_path": "src/EnergyPlus/" + file, "symbol": symbol,
+        result.append({"path": legacy_relative(path), "upstream_path": "src/EnergyPlus/" + file, "symbol": symbol,
                        "start_line": start, "end_line": end, "file_sha256": sha(data),
                        "range_sha256": sha(b"".join(lines[start-1:end])), "purpose": purpose, "branch": active,
                        "numerical_body_certified": False})
@@ -290,9 +292,9 @@ def state_contracts() -> dict:
     ]:
         path = EP_SOURCE / file
         raw = (ROOT / path).read_bytes()
-        declarations.append({"path": path.as_posix(), "start_line": start, "end_line": end, "fields": fields,
+        declarations.append({"path": legacy_relative(path), "start_line": start, "end_line": end, "fields": fields,
                              "file_sha256": sha(raw), "range_sha256": sha(b"".join(raw.splitlines(keepends=True)[start-1:end]))})
-    return {"schema_version": "con01-state-contracts.v1", "normative_origin": {"path": (PLAN / "STATE_CONTRACTS.md").as_posix(), "sha256": sha((ROOT / PLAN / "STATE_CONTRACTS.md").read_bytes())},
+    return {"schema_version": "con01-state-contracts.v1", "normative_origin": {"path": legacy_relative(PLAN / "STATE_CONTRACTS.md"), "sha256": sha((ROOT / PLAN / "STATE_CONTRACTS.md").read_bytes())},
             "status": "design contract; ownership mappings do not certify numerical implementation",
             "mutation_rule": "each card may write only declared output/mutable fields; compare changed caches, flags and arrays as well as return values",
             "temperature_semantics": {"MAT": "end-of-zone-step mean air temperature", "ZT": "air temperature averaged over the system time step", "ZTAV": "air temperature averaged over the zone time step"},
@@ -303,7 +305,7 @@ def state_contracts() -> dict:
 
 def audit_patch_record(metadata: dict, data: bytes) -> None:
     """Replay the declared patch record independently to detect silent changes."""
-    objects = parse_idf((ROOT / metadata["source"]["path"]).read_bytes())
+    objects = parse_idf((resolve_path(ROOT / metadata["source"]["path"])).read_bytes())
     for patch in metadata["patches"]:
         kind = patch["object_type"].lower()
         operation = patch.get("operation")
@@ -354,7 +356,7 @@ def unit_settings_cases() -> list[tuple[dict, bytes]]:
         metadata["source_setting_branches"] = ["Building north axis uses signed C++ mod(value,360)",
                                                "maximum warmup days raised to minimum" if minimum == "30" else "blank warmup limits use defaults max25/min1"]
         data = serialize(objects, case_id)
-        metadata["input"] = {"path": (PLAN / "evidence/CON-01/unit-settings" / case_id / "input.idf").as_posix(), "sha256": sha(data)}
+        metadata["input"] = {"path": legacy_relative(PLAN / "evidence/CON-01/unit-settings" / case_id / "input.idf"), "sha256": sha(data)}
         audit_patch_record(metadata, data)
         result.append((metadata, data))
     return result
@@ -375,7 +377,7 @@ def artifacts() -> dict[Path, bytes]:
                 metadata_data = json_bytes(meta)
                 files[metadata_path] = metadata_data
                 cases.append({key: meta[key] for key in ("id", "scope", "duration", "limit_variant", "input", "weather")} |
-                             {"metadata": {"path": metadata_path.as_posix(), "sha256": sha(metadata_data)}})
+                             {"metadata": {"path": legacy_relative(metadata_path), "sha256": sha(metadata_data)}})
                 if scope in profiles and outputs != profiles[scope]:
                     raise ValueError(f"case {meta['id']} no longer shares the declared {scope} output profile")
                 profiles[scope] = outputs
@@ -394,7 +396,7 @@ def artifacts() -> dict[Path, bytes]:
         files[input_path] = data
         files[metadata_path] = metadata_data
         units.append({key: metadata[key] for key in ("id", "scope", "duration", "limit_variant", "input", "weather")} |
-                     {"metadata": {"path": metadata_path.as_posix(), "sha256": sha(metadata_data)}})
+                     {"metadata": {"path": legacy_relative(metadata_path), "sha256": sha(metadata_data)}})
         unit_settings_profiles[metadata["id"]] = "A"
     scope = {"schema_version": "con01-scope.v2", "energyplus": {"version": "26.1.0", "commit": EP_COMMIT}, "original_rust_baseline": RUST_BASELINE,
              "calendar": {"civil_year": 2013, "time_steps_per_hour": 4, "nominal_zone_step_seconds": 900, "time_zone_hours": -7, "leap_year": False,
@@ -424,10 +426,10 @@ def main() -> int:
     files = artifacts()
     mismatches = []
     for path, data in files.items():
-        target = ROOT / path
+        target = resolve_path(path)
         if args.check:
             if not target.is_file() or target.read_bytes() != data:
-                mismatches.append(path.as_posix())
+                mismatches.append(legacy_relative(path))
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)

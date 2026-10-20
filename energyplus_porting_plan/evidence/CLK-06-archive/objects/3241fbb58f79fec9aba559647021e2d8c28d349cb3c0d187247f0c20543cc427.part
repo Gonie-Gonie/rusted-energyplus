@@ -1,3 +1,0 @@
-        state.dataWeather->HorizIRSky = today.HorizIRSky;
-        state.dataEnvrn->SkyTemp = today.SkyTemp;
-        state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + Constant::Kelvin;

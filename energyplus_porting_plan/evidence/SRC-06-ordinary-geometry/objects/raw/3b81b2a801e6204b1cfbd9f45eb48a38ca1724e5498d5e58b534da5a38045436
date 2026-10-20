@@ -1,9 +1,0 @@
-    std::unique_ptr<IdfParser> idf_parser;
-    std::unique_ptr<Validation> validation;
-    std::unique_ptr<DataStorage> data;
-    static const json &schema();
-
-public:
-    json epJSON;
-
-private:

@@ -19,7 +19,8 @@ keep `comparison_class = "diagnostic-only"` and `conformance_claim = false`.
 Use the [current status](../current/current-status.md) for accepted claims and
 the [case index](../generated/conformance-case-index.md) for tracked cases.
 The completed CON-01 A/B port has its own
-[task contract and evidence](../../../energyplus_porting_plan/README.md);
+[fixed scope](../current/current-status.md#fixed-porting-scope) and
+[validation assets](../../validation/README.md);
 it does not establish general EnergyPlus compatibility or make every older
 diagnostic case a standalone Rust simulation.
 

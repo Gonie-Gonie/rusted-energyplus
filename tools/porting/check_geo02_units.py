@@ -6,6 +6,8 @@ angle wrapping, tolerance adjustment, artifact write or gate update is performed
 """
 from __future__ import annotations
 
+
+
 import argparse
 import hashlib
 import json
@@ -20,7 +22,7 @@ from geo02_unit_provenance import (
     require, same_binding, scalar, sha, timestamp, value_class,
 )
 
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
 FIELDS = {
     "area_m2": ("area_m2", 1), "gross_area_m2": ("area_m2", 1),

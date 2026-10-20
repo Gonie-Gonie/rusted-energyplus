@@ -1,7 +1,0 @@
-# Dispatcher comparison04 - held custody correction
-
-The comparer and owner projection remain the exact physical01 files. The new custody04 file changes only the historical BUILD archive size lookup: existing N.bind verifies the full archive SHA, and N.full obtains its actual byte size. Both the declared historical SHA and size must still match the authentic archive. An archive descriptor need not itself repeat optional size metadata.
-
-Policy ff49, validation04, application02, Rust03, the immutable observer request parent, the complete 8/20/700 input contract and every owner/profile/pairing rule remain unchanged. Source03 and all preceding runtime files are immutable. The genuine comparison01 integrity failure and its closed exit2 receipt are retained; scientific endpoint pairing was not performed.
-
-Root invokes the unchanged physical01 compare.py with this04 manifest via --source-preparation path#SHA, the authentic existing seven-key --custody packet, and a fresh --output-dir. No target, comparator or Native/Rust result computation is executed by this Source author. No formulas, tolerances, inputs, scientific scope or gates change.

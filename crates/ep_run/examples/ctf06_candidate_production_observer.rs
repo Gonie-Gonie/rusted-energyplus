@@ -42,7 +42,12 @@ fn bound(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
         relative.is_relative(),
         "relative input/source path required",
     )?;
-    let path = root.join(relative).canonicalize()?;
+    // Frozen bindings retain historical names; only the physical assets moved.
+    let path = match relative.strip_prefix("energyplus_porting_plan") {
+        Ok(suffix) => root.join("docs/validation").join(suffix),
+        Err(_) => root.join(relative),
+    }
+    .canonicalize()?;
     require(
         path.starts_with(root) && path != root && path.is_file(),
         "contained regular input/source required",

@@ -1,7 +1,0 @@
-// Distance
-template< typename T >
-inline
-T
-distance( Vector3< T > const & a, Vector3< T > const & b )
-{
-	return std::sqrt( Vector3< T >::square( a.x - b.x ) + Vector3< T >::square( a.y - b.y ) + Vector3< T >::square( a.z - b.z ) );

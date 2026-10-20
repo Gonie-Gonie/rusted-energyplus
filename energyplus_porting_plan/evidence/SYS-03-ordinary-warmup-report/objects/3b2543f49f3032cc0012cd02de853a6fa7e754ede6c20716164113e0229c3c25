@@ -1,8 +1,0 @@
---- .runtime/porting/SYS-03/ordinary-warmup-report-publication-prep-03/before/README.md
-+++ .runtime/porting/SYS-03/ordinary-warmup-report-publication-prep-03/README.md
-@@ -14,3 +14,5 @@
- Binary/map/weather payloads are excluded. Historical live canonical descriptors are not treated as archived before bytes; selected archival refs are used, and only current final files are checked live. All full snapshot members are authenticated, but only the selected nineteen application owners and explicit Source records are archived, so selected closure is not claimed transitively replayable. Both full observation byte streams are retained without parsing them. A14/54 and B14/64 gates, docs and production Source are untouched.
- 
- Successor02 authenticates both selected-application descriptors independently by full SHA/size and compares resolved file identity, admitting optional line_count metadata on only one descriptor. Both original descriptors remain retained. The other historical custody refs keep their actual shapes; no Source/scientific/status/archive behavior changes. The README also clarifies eighteen unchanged Rust rows plus one test row.
-+
-+Successor03 recognizes typed Source range descriptors before whole-file refs: literal_archive SHA/size and the declared slice SHA/size must agree. For immutable Original/helper paths the exact physical-line slice is also verified against the whole Source, whose computed full ref and bytes are retained. Historical canonical Rust slice archives are authenticated without pretending their old line numbers refer to current canonical files. The failed publication01 receipt/logs remain immutable and the evidence directory was absent; no outcome, pairing or quality rule changes.

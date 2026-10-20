@@ -22,6 +22,7 @@ namespace {
 using Clk03::json;
 using Clk03::require;
 namespace fs = std::filesystem;
+fs::path repository_root;
 namespace Weather = EnergyPlus::Weather;
 
 // Read-only Windows SHA plumbing; the weather engine never receives hashes/results.
@@ -67,7 +68,11 @@ std::string file_sha(fs::path const &path)
 }
 json file_ref(fs::path const &path)
 {
-    return {{"path", fs::absolute(path).lexically_normal().generic_string()}, {"sha256", file_sha(path)}, {"bytes", fs::file_size(path)}};
+    auto reported = fs::absolute(path).lexically_normal();
+    auto const relative = reported.lexically_relative(repository_root / "docs/validation");
+    if (!relative.empty() && !relative.is_absolute() && *relative.begin() != "..")
+        reported = repository_root / "energyplus_porting_plan" / relative;
+    return {{"path", reported.generic_string()}, {"sha256", file_sha(path)}, {"bytes", fs::file_size(path)}};
 }
 json read_json(fs::path const &path)
 {
@@ -83,9 +88,12 @@ void write_text(fs::path const &path, std::string const &value)
 fs::path bound_path(fs::path const &root, json const &binding)
 {
     require(binding.at("path").is_string() && binding.at("sha256").is_string(), "Input binding requires path/SHA256");
-    fs::path const relative(binding.at("path").get<std::string>());
+    fs::path const relative = fs::path(binding.at("path").get<std::string>()).lexically_normal();
     require(relative.is_relative(), "Input binding must be repository-relative");
-    auto const path = fs::weakly_canonical(root / relative);
+    auto const mapped = !relative.empty() && *relative.begin() == "energyplus_porting_plan"
+        ? root / "docs/validation" / relative.lexically_relative("energyplus_porting_plan")
+        : root / relative;
+    auto const path = fs::weakly_canonical(mapped);
     auto const inside = path.lexically_relative(root);
     require(!inside.empty() && *inside.begin() != ".." && fs::is_regular_file(path), "Input outside repository or not regular file");
     require(file_sha(path) == binding.at("sha256").get<std::string>(), "Frozen input hash differs"); return path;
@@ -269,6 +277,7 @@ int main(int argc, char **argv)
     try {
         require(argc == 4, "Usage: clk03_reference_helper <repo_root> <input-only-request.json> <fresh_output_dir>");
         auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+        repository_root = root;
         auto const request_path = fs::absolute(argv[2]).lexically_normal(), output = fs::absolute(argv[3]).lexically_normal();
         require(!fs::exists(output), "Native output directory must be fresh"); auto const request = read_json(request_path);
         require(request.at("schema") == "clk03-helper-cases.v1" && request.at("expected_values_supplied") == false &&
@@ -277,7 +286,7 @@ int main(int argc, char **argv)
         check_preparation(request.at("native_preparation")); bound_path(root, request.at("fixed_scope"));
         json contracts = json::object(), frozen_counts;
         for (char const *name : {"source", "cases", "tolerances"}) {
-            auto const path = root / "energyplus_porting_plan/contracts" / (std::string("CLK-03-") + name + ".json");
+            auto const path = root / "docs/validation/contracts" / (std::string("CLK-03-") + name + ".json");
             auto const contract = read_json(path);
             require(contract.at("status") == "frozen-before-numerical-execution" && contract.at("frozen_before_numerical_execution") == true,
                     "Unfrozen original contract");

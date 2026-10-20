@@ -11,8 +11,8 @@ The fixed A/B cases can run independently through EnergyPlus and Rust and be
 compared from files. This developer procedure uses existing commands; the
 single-command Source `--compare-oracle` integration is still outstanding.
 
-The [accepted fifteen-case validation](../../../energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json)
-records the current numerical result. Comparison means the declared reported
+The [accepted fifteen-case validation](../../validation/evidence/SRC-06-final-current-source-validation-60/summary.json)
+records the accepted numerical baseline. Comparison means the declared reported
 values meet their fixed per-variable absolute/RMSE policy. Whole-file byte
 identity, all ancillary files and arbitrary new IDFs are separate claims.
 
@@ -25,12 +25,14 @@ No special Cargo feature or fixture-demand mode is required.
 
 The example is A-24H. Start with a fresh run folder; do not overwrite accepted
 evidence. Other fixed IDs and their scope/input/weather hashes are listed in
-[scope.json](../../../energyplus_porting_plan/contracts/scope.json).
+[scope.json](../../validation/contracts/scope.json).
+Retained JSON/ZIP provenance keeps historical paths and hashes; current asset
+locations are described in the [validation README](../../validation/README.md).
 
 ```powershell
 $py = (Resolve-Path .runtime/python/3.11.9/python.exe).Path
 $oracle = (Resolve-Path .runtime/energyplus/26.1.0).Path
-$idf = (Resolve-Path energyplus_porting_plan/cases/A-24H/input.idf).Path
+$idf = (Resolve-Path docs/validation/cases/A-24H/input.idf).Path
 $weather = (Resolve-Path "$oracle/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw").Path
 $caseId = "A-24H"
 $scope = "A"
@@ -70,7 +72,7 @@ if ($LASTEXITCODE -ne 0) { throw "Reported-value comparison failed" }
 
 The checker validates the fixed case/input hashes, successful receipts, full
 reported dictionaries, IDs, timestamps/intervals, counts and values under the
-unchanged [tolerance policy](../../../energyplus_porting_plan/contracts/output-tolerances.json).
+unchanged [tolerance policy](../../validation/contracts/output-tolerances.json).
 A different IDF cannot be relabeled as an accepted fixed case.
 
 | File under the run folder | Inspect |

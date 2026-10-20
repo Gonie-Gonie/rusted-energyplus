@@ -7,6 +7,8 @@ clock/year-end fields. This tool never supplies C++ results to Rust or closes ga
 
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import hashlib
 import json
@@ -17,28 +19,32 @@ import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = ROOT / "energyplus_porting_plan"
+PLAN = ROOT / "docs/validation"
 FIELDS = ["year", "month", "day_of_month", "gregorian_day_of_year", "weather_day_of_year",
           "schedule_day_of_year", "gregorian_day_of_week", "day_of_week", "day_type",
           "gregorian_year_is_leap_year", "weather_effective_year_is_leap_year", "leap_year_add"]
 
 
 def read(path: Path):
+    path = resolve_path(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write(path: Path, value) -> None:
+    path = resolve_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 
 
 def sha(path: Path) -> str:
+    path = resolve_path(path)
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def ref(path: Path) -> dict:
-    return {"path": path.resolve().relative_to(ROOT).as_posix(), "sha256": sha(path)}
+    path = resolve_path(path)
+    return {"path": legacy_relative(path.resolve()), "sha256": sha(path)}
 
 
 def require(condition: bool, message: str) -> None:
@@ -64,23 +70,23 @@ def native_review(case: dict, original: dict, native_root: Path) -> dict:
     receipt = read(directory / "receipt.json")
     require(receipt["observation_checks_passed"] and receipt["errors"] == [], "Native observation failed")
     require(receipt["input"] == case["input"] and receipt["weather"] == case["weather"], "Native inputs differ")
-    require(ref(ROOT / receipt["observer_source"]["path"]) == receipt["observer_source"], "Executed native observer changed")
+    require(ref(resolve_path(ROOT / receipt["observer_source"]["path"])) == receipt["observer_source"], "Executed native observer changed")
     for key in ["native_library", "native_error_file", "api_messages"]:
-        require(receipt[key] is not None and ref(ROOT / receipt[key]["path"]) == receipt[key],
+        require(receipt[key] is not None and ref(resolve_path(ROOT / receipt[key]["path"])) == receipt[key],
                 f"Native {key} changed/missing")
     require(receipt["native_library"]["sha256"] == "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2",
             "Native library no longer matches the source-pinned original DLL")
     for binding in receipt["python_api_sources"]:
-        require(ref(ROOT / binding["path"]) == binding, "Native Python API source changed")
+        require(ref(resolve_path(ROOT / binding["path"])) == binding, "Native Python API source changed")
     for binding in receipt["native_outputs"]:
-        require(ref(ROOT / binding["path"]) == binding, "Native output changed after execution")
+        require(ref(resolve_path(ROOT / binding["path"])) == binding, "Native output changed after execution")
     for binding in receipt["frozen_contracts"]:
-        current = ROOT / binding["path"]
+        current = resolve_path(ROOT / binding["path"])
         preserved = native_root / "source/frozen-contracts" / current.name
         require((current.is_file() and sha(current) == binding["sha256"])
                 or (preserved.is_file() and sha(preserved) == binding["sha256"]),
                 "Initial native contract bytes unavailable")
-    raw = ROOT / receipt["raw_callbacks"]["path"]
+    raw = resolve_path(ROOT / receipt["raw_callbacks"]["path"])
     require(ref(raw) == receipt["raw_callbacks"], "Native raw callbacks changed")
     rows = [json.loads(line) for line in raw.read_text(encoding="utf-8").splitlines()]
     before = [row for row in rows if row["phase"] == "before_init_heat_balance"]
@@ -134,8 +140,8 @@ def execute(command: list[str], directory: Path, label: str, source: Path, revie
         result = read(path)
         require(result["command"] == command and result["exit_code"] == 0, "Preserved CLI command failed/differs")
         for key in ["stdout", "stderr"]:
-            require(ref(ROOT / result[key]["path"]) == result[key], "Preserved CLI log changed")
-        require(ref(ROOT / result["executed_checker"]["path"]) == result["executed_checker"], "Originally executed checker changed")
+            require(ref(resolve_path(ROOT / result[key]["path"])) == result[key], "Preserved CLI log changed")
+        require(ref(resolve_path(ROOT / result["executed_checker"]["path"])) == result["executed_checker"], "Originally executed checker changed")
         return result
     started = time.perf_counter()
     stdout, stderr = directory / (label + "-stdout.log"), directory / (label + "-stderr.log")
@@ -157,13 +163,13 @@ def run_case(case: dict, original: dict, native_root: Path, binary: Path, output
     require(directory.exists() if review else not directory.exists(), "Fresh CLI output root required")
     directory.mkdir(parents=True, exist_ok=review)
     for binding in [case["input"], case["weather"]]:
-        require(sha(ROOT / binding["path"]) == binding["sha256"], "Fixed input/weather pin changed")
+        require(sha(resolve_path(ROOT / binding["path"])) == binding["sha256"], "Fixed input/weather pin changed")
     require(original["source_metadata"]["input"] == case["input"]
             and original["source_metadata"]["weather"] == case["weather"], "Original C++ calendar used different inputs")
     native = native_review(case, original, native_root)
     commands = []
     for level in (["full", "summary"] if actual else ["summary"]):
-        command = [str(binary), "run", str(ROOT / case["input"]["path"]), "--weather", str(ROOT / case["weather"]["path"]),
+        command = [str(binary), "run", str(resolve_path(ROOT / case["input"]["path"])), "--weather", str(resolve_path(ROOT / case["weather"]["path"])),
                    "--output-dir", str(directory / level), "--porting-scope", case["scope"],
                    "--mode", "compatibility", "--partial", "deny", "--trace-level", level]
         if not actual:
@@ -284,7 +290,7 @@ def main() -> int:
     build_path = PLAN / "evidence/CLK-01/build-receipt.json"
     build = read(build_path)
     binary_binding = next(item for item in build["artifacts"] if Path(item["path"]).name == "eplus-rs.exe")
-    binary = ROOT / binary_binding["path"]
+    binary = resolve_path(ROOT / binary_binding["path"])
     require(ref(binary) == binary_binding, "Archived committed CLI changed")
     require(subprocess.check_output(["git", "rev-parse", "HEAD:crates"], cwd=ROOT, text=True).strip() == build["crates_tree"]
             and subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "crates"], cwd=ROOT).returncode == 0,
@@ -295,15 +301,15 @@ def main() -> int:
             and cpp_reference["reference_kind"] == "linked-original-inputprocessor-and-genuine-state",
             "Original genuine-state C++ calendar reference unavailable/changed")
     for key in ["binary", "request", "source_contract", "native_core_build", "native_driver_build"]:
-        require(ref(ROOT / cpp_reference[key]["path"]) == cpp_reference[key], f"Original CPP {key} provenance changed")
+        require(ref(resolve_path(ROOT / cpp_reference[key]["path"])) == cpp_reference[key], f"Original CPP {key} provenance changed")
     for binding in cpp_reference["artifacts"]:
-        require(ref(ROOT / binding["path"]) == binding, "Original CPP command/stdout/stderr changed")
+        require(ref(resolve_path(ROOT / binding["path"])) == binding, "Original CPP command/stdout/stderr changed")
     require(cpp_reference["source_contract"] == ref(PLAN / "contracts/CLK-01-source.json"), "Original CPP source contract differs")
-    request = read(ROOT / cpp_reference["request"]["path"])
+    request = read(resolve_path(ROOT / cpp_reference["request"]["path"]))
     require(request == read(PLAN / "contracts/CLK-01-cases.json")["calendar_request"], "Original CPP semantic request differs from frozen cases")
     stdout_binding = next(binding for binding in cpp_reference["artifacts"] if binding["path"].endswith("calendar-stdout.log"))
-    require(read(ROOT / stdout_binding["path"]) == read(args.cpp_calendar), "Original CPP results differ from actual stdout")
-    core_build = read(ROOT / cpp_reference["native_core_build"]["path"])
+    require(read(resolve_path(ROOT / stdout_binding["path"])) == read(args.cpp_calendar), "Original CPP results differ from actual stdout")
+    core_build = read(resolve_path(ROOT / cpp_reference["native_core_build"]["path"]))
     require(core_build["checks_passed"] is True and core_build["energyplus_commit"] == "6f2e40d10250a105b49966baa24d843711e61048",
             "Original complete native core build is unverified")
     originals = {case["case_id"]: case for case in read(args.cpp_calendar)["cases"]}
@@ -312,7 +318,7 @@ def main() -> int:
             "Frozen exact clock precision policy changed")
     cases = {}
     for binding in read(PLAN / "contracts/scope.json")["cases"]:
-        path = ROOT / binding["metadata"]["path"]
+        path = resolve_path(ROOT / binding["metadata"]["path"])
         require(ref(path) == binding["metadata"], "Frozen case metadata changed")
         case = read(path)
         require(all(case[key] == binding[key] for key in ["id", "scope", "duration", "limit_variant", "input", "weather"]),

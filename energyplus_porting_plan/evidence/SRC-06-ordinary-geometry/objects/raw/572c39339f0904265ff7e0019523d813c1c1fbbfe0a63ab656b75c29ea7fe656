@@ -1,6 +1,0 @@
-PASS original source: 13534 byte-identical official blobs
-PASS winlibs-gcc: pinned executable/installation evidence; version query skipped
-PASS cmake: pinned executable/installation evidence; version query skipped
-PASS ninja: pinned executable/installation evidence; version query skipped
-PASS native core: EnergyPlus, Version 26.1.0-6f2e40d102; API0.2; genuine state lifecycle
-PASS explicit O0 reference; default optimized failure remains disclosed; no files written.

@@ -1,7 +1,0 @@
-# Input projector04 Source preparation
-
-Only the Native manifest SHA literal changes from reviewed projector03 to06.
-Native06 fixes five numeric direct seeds against the unchanged literal request.
-The fixed15 transport, conversion proofs, separate direct lane, own4/API58 and
-all other121-line Source bytes are preserved by exact inverse substitution.
-No projector, engine, Cargo, canonical or Git action or output read occurs here.

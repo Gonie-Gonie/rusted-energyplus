@@ -10,26 +10,17 @@ basis for compatibility claims.
 
 ## Porting Work
 
-The [fixed porting plan](energyplus_porting_plan/README.md) records the completed
-64-card A/B scope: an unconditioned opaque one-zone model and a single-zone,
-direct, no-outdoor-air sensible IdealLoads model with explicit limits.
-New scope starts with the `CON-01` contract and applicable predecessor gates.
-The packet's Rust commit is the reviewed baseline; each new result records its
-actual implementation and execution commit.
+The completed finite A/B scope and its limits are recorded in
+[Current Status](docs/src/current/current-status.md). Source/state review rules
+live in the [project contract](docs/src/current/project-contract.md) and
+[architecture](docs/src/current/architecture-overview.md). Fixed inputs,
+tolerances and accepted evidence live in [validation assets](docs/validation/README.md).
+The completed task cards, plan and offline checklist are retained in Git history.
 
-For each card, fix the original EnergyPlus source range and state ownership,
-compare equal inputs and initial states with EnergyPlus, verify the connected
-execution, and confirm that Rust performs the production calculation.
-Record commands, results, unresolved issues, and the four gates in the card,
-`CHECKLIST.md`, and `plan.json`. Existing code and skipped branches do not
-establish numerical equivalence.
-
-Use focused checks while implementing a card:
+Use focused checks while implementing a change:
 
 ```powershell
-python tools/porting/check_plan.py --check
-python tools/porting/sync_plan_views.py --check
-.\scripts\dev.cmd check -Package ep_runtime -Filter <card_test_filter> -Lib
+.\scripts\dev.cmd check -Package ep_runtime -Filter <test_filter> -Lib
 ```
 
 Use `dev test -Package <crate> -Filter <test_filter>` for a single test area,
@@ -39,14 +30,12 @@ running them. The default `dev check` covers `ep_runtime`; select every affected
 package explicitly when changing another layer or a public interface. See
 [Contributing](CONTRIBUTING.md#test-selection) for the change-to-test mapping.
 
-Run the card's EnergyPlus comparison and execution test before closing its
-gates. Commit and push each reviewable unit after its relevant validation.
+Run the affected same-input EnergyPlus comparison and connected execution.
+The [verification guide](docs/src/guides/verify-porting.md) describes the fixed
+cases and inspectable comparison files. Commit and push each reviewable unit
+after its relevant validation.
 Do not repeat a focused suite after the same unchanged code has passed the
 workspace suite.
-After reviewing a card and updating its evidence and gate metadata, run
-`python tools/porting/sync_plan_views.py --write` to refresh the checklist and
-offline HTML plan. Browser checks are local work notes; recorded repository
-evidence governs completion.
 
 ## Compatibility Contract
 
@@ -80,8 +69,8 @@ Current counts are tracked outside the README. Generated coverage specs track
 the output-variable inventory, and release evidence separates passed
 release-evidence series from broader declared conformance/output requests.
 
-The [accepted finite validation](energyplus_porting_plan/evidence/SRC-06-final-current-source-validation-60/summary.json)
-and [SUR-02 unit supplement](energyplus_porting_plan/evidence/SUR-02-isolated-history-impulse-61/summary.json)
+The [accepted finite validation](docs/validation/evidence/SRC-06-final-current-source-validation-60/summary.json)
+and [SUR-02 unit supplement](docs/validation/evidence/SUR-02-isolated-history-impulse-61/summary.json)
 retain the actual commands, policies, results and limitations. Declared reported
 values pass their fixed tolerances; whole-file byte equality and general
 EnergyPlus compatibility are separate claims. See [Current Status](docs/src/current/current-status.md)

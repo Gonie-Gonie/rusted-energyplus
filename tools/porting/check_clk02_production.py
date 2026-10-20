@@ -6,6 +6,8 @@ physical conversion, selection, interpolation and warmup science stay unpaired.
 """
 from __future__ import annotations
 
+from validation_paths import legacy_relative
+
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
@@ -392,7 +394,7 @@ def main() -> None:
     matrix = read(bindings.check(matrix_ref))
     require(matrix["schema"] == "clk02-production-matrix.v1" and matrix["complete"] is True and matrix["actual_command_count"] == 6
             and matrix["original_outputs_supplied_to_Rust"] is False and matrix["gates_updated"] is False, "Complete actual six-command matrix required")
-    refs = {key: {"path": f"energyplus_porting_plan/contracts/CLK-02-{key}.json", "sha256": digest} for key, digest in FROZEN.items()}
+    refs = {key: {"path": legacy_relative(f"docs/validation/contracts/CLK-02-{key}.json"), "sha256": digest} for key, digest in FROZEN.items()}
     verify_contract_bindings(matrix["contracts"], refs, bindings)
     source, cases = [read(bindings.check(refs[key])) for key in ("source", "cases")]
     require(matrix["declared_plan"]["sha256"] == PLAN_SHA, "Frozen before-execution physical plan differs")
@@ -475,7 +477,7 @@ def main() -> None:
         archive = output / path.name
         shutil.copyfile(path, archive)
         require(path.read_bytes() == archive.read_bytes(), "Executed reader archive differs")
-        archives.append({"historical_path": path.relative_to(ROOT).as_posix(), "archive": ref(archive)})
+        archives.append({"historical_path": legacy_relative(path), "archive": ref(archive)})
     report = {
         "schema": "clk02-production-comparison.v1", "status": "pass-literal-raw-owner-and-consumer-handoff" if check.mismatch_count == 0 else "fail-production-handoff",
         "started_utc": started, "completed_utc": datetime.now(timezone.utc).isoformat(), "actual_reader_command": list(sys.orig_argv),

@@ -6,6 +6,8 @@ comparison, tolerance change or automatic gate update is performed here.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from collections import Counter
 import hashlib
@@ -18,7 +20,7 @@ import sys
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
 
 
@@ -33,10 +35,12 @@ def integer(value, label):
 
 
 def read(path):
+    path = resolve_path(path)
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def sha(path):
+    path = resolve_path(path)
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for block in iter(lambda: f.read(1048576), b""):
@@ -45,13 +49,13 @@ def sha(path):
 
 
 def ref(path):
+    path = resolve_path(path)
     p = Path(path).resolve()
-    return {"path": p.relative_to(ROOT).as_posix(), "sha256": sha(p)}
+    return {"path": legacy_relative(p), "sha256": sha(p)}
 
 
 def path_of(value):
-    p = Path(value)
-    return p.resolve() if p.is_absolute() else (ROOT / p).resolve()
+    return resolve_path(value)
 
 
 def binding(value):

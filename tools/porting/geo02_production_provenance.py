@@ -2,6 +2,8 @@
 """Read-only provenance for GEO-02 physical runs; never launch an engine."""
 from __future__ import annotations
 
+from validation_paths import legacy_relative
+
 import hashlib
 import json
 import math
@@ -17,7 +19,7 @@ from geo02_unit_provenance import (
     scalar, sha, timestamp, value_class,
 )
 
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 FROZEN = {
     "source": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09",
     "cases": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435",
@@ -108,7 +110,7 @@ class Bindings:
             require(path.is_file() and self.stamp(path) == stamp, "File changed during proof inspection")
 
     def report(self):
-        return [{"path": path.relative_to(ROOT).as_posix(), "sha256": data[1]}
+        return [{"path": legacy_relative(path), "sha256": data[1]}
                 for path, data in sorted(self.checked.items())]
 
 

@@ -66,7 +66,7 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
         &mut ordered,
         include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../energyplus_porting_plan/cases/A-24H/input.idf"
+            "/../../docs/validation/cases/A-24H/input.idf"
         )),
         &[IdfOrderTarget {
             object_type: "SizingPeriod:DesignDay",

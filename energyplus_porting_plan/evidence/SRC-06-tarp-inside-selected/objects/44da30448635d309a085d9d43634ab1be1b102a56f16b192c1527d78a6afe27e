@@ -1,7 +1,0 @@
-    Real64 CalcASHRAETARPNatural(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);
-
-    void CalcASHRAEDetailedIntConvCoeff(EnergyPlusData &state,
-                                        int SurfNum,                  // surface number for which coefficients are being calculated
-                                        Real64 SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
-                                        Real64 ZoneMeanAirTemperature // Mean Air Temperature of Zone
-    );

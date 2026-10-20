@@ -6,6 +6,8 @@ Native build/execution modes dispatch to a separate receipt-preserving module.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 import copy
 from datetime import datetime, timezone
@@ -21,7 +23,7 @@ from geo01_reference import input_projection, objects
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / ".reference/energyplus-src/26.1.0"
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 RAW = ROOT / ".runtime/porting/GEO-02"
 PIN = "6f2e40d10250a105b49966baa24d843711e61048"
 SELECTED = ["A-24H", "A-72H", "B-NOLIMIT-24H", "B-FLOW-24H", "B-CAPACITY-24H", "B-BOTH-24H", "B-BOTH-72H"]
@@ -81,6 +83,7 @@ def require(condition, message):
 
 
 def sha(p):
+    p = resolve_path(p)
     h = hashlib.sha256()
     with Path(p).open("rb") as f:
         for b in iter(lambda: f.read(1048576), b""):
@@ -89,15 +92,18 @@ def sha(p):
 
 
 def ref(p):
+    p = resolve_path(p)
     p = Path(p).resolve()
-    return {"path": p.relative_to(ROOT).as_posix(), "sha256": sha(p)}
+    return {"path": legacy_relative(p), "sha256": sha(p)}
 
 
 def read(p):
+    p = resolve_path(p)
     return json.loads(Path(p).read_text(encoding="utf-8"))
 
 
 def write(p, value):
+    p = resolve_path(p)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 
@@ -222,7 +228,7 @@ def prepare():
         p = CONTRACTS / f"GEO-02-{name}.json"
         if p.exists():
             shutil.copyfile(p, archive / p.name)
-    cases_dir = ROOT / "energyplus_porting_plan/cases/GEO-02"
+    cases_dir = ROOT / "docs/validation/cases/GEO-02"
     if cases_dir.exists():
         shutil.copytree(cases_dir, archive / "prior-cases")
     scope = read(CONTRACTS / "scope.json")
@@ -233,7 +239,7 @@ def prepare():
     prior_indices = {c["id"]: i for i,c in enumerate(prior["cases"])}
     native = [{**copy.deepcopy(con[k]), "kind": "unchanged-CON-input",
                "geometry_input_source": {"artifact": prior_ref, "json_pointer": f"/cases/{prior_indices[k]}/geometry_input"}} for k in SELECTED]
-    base_path = ROOT / con["A-24H"]["input"]["path"]
+    base_path = resolve_path(ROOT / con["A-24H"]["input"]["path"])
     base = objects(base_path.read_text(encoding="utf-8"))
     for name, transform, description in [
         ("OBLIQUE-AFFINE", lambda x,y,z: (x+.375*y, y+.25*z, z+.2*x), "input-only orientation-preserving affine box shear"),
@@ -289,12 +295,12 @@ def prepare():
         "native_invalid_policy": "actual ordinary API nonzero exit and zero physical callbacks; preserve error logs and available states without demanding successful output fields. Later Rust normal entrypoint admission is separate, no source error-string equality",
         "Rust_physical_case_ids": ["A-24H", "A-72H", "B-BOTH-24H"], "Rust_physical_trace_levels": ["full", "summary"],
         "physical_scope_statement": "three fresh representative Rust cases, not fresh per-limit/B72/annual consumption; original native selected7 plus4diagnostics; no new CON admission",
-        "static_geometry_family_projection": ref(ROOT / "energyplus_porting_plan/evidence/GEO-02/input-families.json"),
+        "static_geometry_family_projection": ref(ROOT / "docs/validation/evidence/GEO-02/input-families.json"),
         "helper_request": ref(request), "helper_quad_count": 17, "valid_helper_quads": 15, "source_only_degenerate_quads": 2,
         "cen_precision_input_count": 526, "cen_generation": {"edge_count": 11, "random_count": 512, "special_three_operand_count": 3, "seed_hex": "47454f303243454e", "algorithm": "xorshift64: x^=x<<13; x^=x>>7; x^=x<<17 with64bitmask; sign=bit63; exponent=((x>>52)%401)-200; significand=low52; no output search", "call": "unchanged ObjexxFCL::cen(Vector3(a,0,0),Vector3(b,0,0),Vector3(c,0,0)); actual source ordered binary64 sum precedes extended product; first523 operands are [rawvalue,+0,+0]; special triples preserve all-negative-zero and distinct cancellation orders"},
         "valid_helper_domain": {"rules": "World/UpperLeftCorner/CounterClockWise", "appendix_g_rotation_deg": 0, "zero_input_sign": "positive geometric zero only", "required_original_first_guard": "actual post-GetVertices ordered vertex bits == frozen request input_vertex_bits, no repair/aspect/count change", "required_Rust_guard": "own stored TypedModel vertex bits == frozen request input_vertex_bits", "identity_failure": "stop before comparison; retain failure; no native-output seed; unchanged-input compiler adapter required"},
         "request_policy": "input-only finite vertices/state and raw cen bits; C++ and Rust compute own values; no original output is a request field",
-        "historical_reuse": {"GEO01_cases": ref(CONTRACTS / "GEO-01-cases.json"), "GEO01_comparison": ref(ROOT / "energyplus_porting_plan/evidence/GEO-01/comparison-report.json"),
+        "historical_reuse": {"GEO01_cases": ref(CONTRACTS / "GEO-01-cases.json"), "GEO01_comparison": ref(ROOT / "docs/validation/evidence/GEO-01/comparison-report.json"),
             "allowed": "already observed coordinate/input identities and area/azimuth/tilt only", "not_observed": ["raw/snapped normals", "centroid", "gross/net area", "height/incidence operand consumption"]},
         "comparison_run": False, "gates_updated": False}
     profiles = {}
@@ -325,18 +331,18 @@ def check():
     require(len(cases["native_invalid_cases"])==cases["native_invalid_case_count"]==2,"Native invalid case count differs")
     for row in cases["native_cases"] + cases["native_invalid_cases"]:
         for k in ["input","weather","metadata"]:
-            require(ref(ROOT/row[k]["path"])==row[k],"Native input binding differs")
+            require(ref(resolve_path(ROOT/row[k]["path"]))==row[k],"Native input binding differs")
         binding = row["geometry_input_source"]
-        require(ref(ROOT/binding["artifact"]["path"]) == binding["artifact"], "Geometry input source binding differs")
-        projection = read(ROOT/binding["artifact"]["path"])
+        require(ref(resolve_path(ROOT/binding["artifact"]["path"])) == binding["artifact"], "Geometry input source binding differs")
+        projection = read(resolve_path(ROOT/binding["artifact"]["path"]))
         for key in binding["json_pointer"].strip("/").split("/"):
             projection = projection[int(key)] if isinstance(projection,list) else projection[key]
-        require(input_projection(objects((ROOT/row["input"]["path"]).read_text(encoding="utf-8")))==projection,"Native input projection differs")
-    require(ref(ROOT/cases["helper_request"]["path"])==cases["helper_request"],"Helper request hash differs")
-    h=read(ROOT/cases["helper_request"]["path"])
+        require(input_projection(objects((resolve_path(ROOT/row["input"]["path"])).read_text(encoding="utf-8")))==projection,"Native input projection differs")
+    require(ref(resolve_path(ROOT/cases["helper_request"]["path"]))==cases["helper_request"],"Helper request hash differs")
+    h=read(resolve_path(ROOT/cases["helper_request"]["path"]))
     require(h=={"schema":"geo02-helper-cases.v1","cases":quad_cases(),"cen_calls":cen_calls()},"Input-only helper generation differs")
     require(len(h["cases"])==17 and len(h["cen_calls"])==526,"Helper/precision counts differ")
-    require(ref(ROOT/cases["static_geometry_family_projection"]["path"])==cases["static_geometry_family_projection"],"Family proof binding differs")
+    require(ref(resolve_path(ROOT/cases["static_geometry_family_projection"]["path"]))==cases["static_geometry_family_projection"],"Family proof binding differs")
     return {"status":"pass","source_files":len(source["source_files"]),"selected_ranges":len(source["selected_ranges"]),"native_case_count":11,"native_invalid_case_count":2,"helper_quad_count":17,"cen_precision_input_count":526,"numerical_execution":False}
 
 

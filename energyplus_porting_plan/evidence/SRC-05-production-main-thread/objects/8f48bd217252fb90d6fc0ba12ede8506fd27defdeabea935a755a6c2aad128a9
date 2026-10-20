@@ -1,5 +1,0 @@
-#[test]
-#[ignore = "Root-only input observation with explicit recorded input/output and Source custody"]
-fn observe_literal_selected_warmup_methods() -> Result<(), String> {
-    observe()
-}

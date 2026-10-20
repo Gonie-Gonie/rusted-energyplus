@@ -1,3 +1,0 @@
-ninja: Entering directory `C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\ep261-gcc13-o0'
-[1/2] Building CXX object CMakeFiles/src05_surface_environment_helper.dir/44792a8c6ee3b90dcbdea4797f06507c/SRC-05/native-surface-environment-prep-02/surface_environment_reference_helper.cpp.obj
-[2/2] Linking CXX executable D:\CodexBuild\rusted-energyplus\SRC-05\native-build-02\bin\src05_surface_environment_helper.exe

@@ -34,8 +34,44 @@ lookup. Keep source-level input shape available for diagnostics.
 Mutable state must reset between runs. Pass model, plan, cache, state, result,
 diagnostic, and trace owners explicitly; core runtime must not depend on hidden
 singletons, `static mut`, or ambient process-wide simulation state. Initialization,
-warmup, history updates, and producer/consumer timing must follow the applicable
-[state contracts](../../../energyplus_porting_plan/STATE_CONTRACTS.md).
+warmup, history updates, and producer/consumer timing follow the contracts below.
+
+### State Contracts
+
+These are logical interfaces, not a requirement to copy EnergyPlus structs or
+use matching Rust type names. The retained
+[machine contract](../../validation/contracts/state-contracts.json) records their
+fields and units; source maps below refine each routine's actual ownership.
+
+| Contract | Producer to consumer | State and update boundary |
+|---|---|---|
+| Geometry | Geometry initialization to CTF, radiation, surface and zone calculations | Vertices/centroids [m], area [m2], volume [m3], normals and angles; immutable after initialization |
+| CalendarFrame | Calendar/weather lifecycle to schedules, weather and reporting | Civil date, weather/schedule ordinals, day type, hour/timestep and environment; advance at the original boundary |
+| WeatherStep | Weather and psychrometrics to surface/zone balance | Temperatures [C], humidity ratio [kg/kg], pressure [Pa], wind, rain and radiation [W/m2]; update before zone-step consumers |
+| ScheduleValue | Schedule evaluator to gains, setpoints, availability and efficiency | Schedule ID/scalar, queried date/time and update stage; preserve original lookup timing |
+| CtfCoefficients | Construction initialization to surface balance | X/Y/Z/flux arrays, term count, CTF timestep and history count; immutable after initialization |
+| CtfHistory | History initialization/commit to surface calculation | Current, lagged and master temperatures [C] and fluxes [W/m2]; freeze through retries/iterations and shift at accepted zone-step commit |
+| SurfaceIterationInput | Exterior solve, radiation and surface state to interior iteration | Exterior temperature, frozen history constants, previous-iteration temperature, reference air, h and radiant sources; snapshot each iteration |
+| ZoneAirState | Zone predictor/corrector to demand and equipment | MAT, ZT, ZTAV [C], humidity [kg/kg], zone/system histories, dt [s] and retry flags; keep each time meaning distinct |
+| ZoneCoefficients | Zone/equipment feedback to predictor/corrector | SumHA and mass-flow heat capacities [W/K], temperature-weighted terms/gains [W], AirPowerCap [W/K]; stage-specific snapshots |
+| Demand | Zone prediction to equipment dispatch | Heating/cooling thresholds and active demand [W], deadband and zone/group multipliers; resolve before dispatch |
+| SupplyState | PurchasedAir calculation to nodes, zone feedback and reports | T [C], W [kg/kg], h [J/kg], mass flow [kg/s], delivered sensible/moisture; commit at calculation tail before downstream consumers |
+| StepReport | Surface/equipment reporting to OutputProcessor | Rates [W], energy [J], Average/Sum and accepted dt [s]; overwrite iteration values and accumulate each accepted step once |
+| WarmupConvergence | Day-end extrema to warmup/RunPeriod transition | Temperature extrema/differences [C], load extrema [W], normalized load differences [1] and previous-day state |
+
+`MAT` is end-of-zone-step mean air temperature, `ZT` is averaged over the system
+timestep, and `ZTAV` over the zone timestep. Previous-zone, previous-system,
+iteration-start/end, accepted-step and reporting-average values are distinct.
+Civil simulation year and EPW record year are also distinct; preserve separate
+weather/civil and leap-shaped schedule ordinals.
+
+Today/Tomorrow weather buffers, schedule state, zone/system histories and CTF
+histories retain their own owners across environment initialization, warmup and
+RunPeriod handoff. The surface parent preserves exterior solve, interior
+iteration, air calculation, final surface update and history commit order.
+Compare the declared changed caches, flags and arrays as well as return values;
+preserve cache keys and invalidation timing. Observe actual owner state rather
+than substituting report averages or inferred unobserved values.
 
 ## Crates and Runtime Boundaries
 

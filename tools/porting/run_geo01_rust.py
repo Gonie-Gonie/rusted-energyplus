@@ -6,6 +6,8 @@ Both scientific comparison and card gate changes are separate operations.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -17,7 +19,7 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTRACTS = ROOT / "energyplus_porting_plan/contracts"
+CONTRACTS = ROOT / "docs/validation/contracts"
 PRODUCTION = ["A-24H", "A-72H", "B-NOLIMIT-24H", "B-FLOW-24H",
               "B-CAPACITY-24H", "B-BOTH-24H", "B-BOTH-72H"]
 
@@ -28,25 +30,28 @@ def require(condition, message):
 
 
 def read(path):
+    path = resolve_path(path)
     return Path(path).read_text(encoding="utf-8")
 
 
 def ref(path):
+    path = resolve_path(path)
     path = Path(path).resolve()
     require(path.is_relative_to(ROOT), "File outside repository")
     with path.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest}
+    return {"path": legacy_relative(path), "sha256": digest}
 
 
 def verify(binding):
     require(type(binding) is dict and type(binding.get("path")) is str, "Invalid reference")
-    path = ROOT / binding["path"]
+    path = resolve_path(ROOT / binding["path"])
     require(ref(path) == binding, "Changed reference: " + binding["path"])
     return path
 
 
 def write(path, payload):
+    path = resolve_path(path)
     Path(path).write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n",
                           encoding="utf-8", newline="\n")
 
@@ -141,7 +146,7 @@ def main():
                 projection = json.loads(read(output / "compiled-geometry.json"))
                 require(projection["physics_executed"] is False and projection["preparation_only"] is True,
                         "Compile projection boundary differs")
-            row["runs"].append({"trace_level": level, "output_directory": output.resolve().relative_to(ROOT).as_posix(),
+            row["runs"].append({"trace_level": level, "output_directory": legacy_relative(output.resolve()),
                                 "execution": ref(execution_path), "run_summary": ref(summary_path),
                                 "artifacts": [ref(p) for p in sorted(output.rglob("*")) if p.is_file()]})
             matrix["cases"] = [*matrix["cases"], row] if level == "full" else matrix["cases"]

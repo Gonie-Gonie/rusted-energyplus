@@ -1,9 +1,10 @@
 * text=auto eol=lf
 
 # Evidence payloads retain their original bytes, including line endings.
-energyplus_porting_plan/evidence/**/*.part binary
-energyplus_porting_plan/evidence/**/objects/** binary
-energyplus_porting_plan/evidence/**/evidence.zip binary
+docs/validation/** -text
+docs/validation/evidence/**/*.part binary
+docs/validation/evidence/**/objects/** binary
+docs/validation/evidence/**/evidence.zip binary
 # Native-selected test data must survive checkout with its authenticated bytes.
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_temperature_selected_cases.json binary
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_readiness_tmp_selected_cases.json binary

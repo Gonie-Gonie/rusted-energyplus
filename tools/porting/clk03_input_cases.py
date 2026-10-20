@@ -1,4 +1,5 @@
 """Prepare input-only CLK03 selection/lifecycle diagnostics; never expected outputs."""
+from validation_paths import resolve_path, legacy_relative
 from pathlib import Path
 import hashlib
 import json
@@ -6,7 +7,7 @@ import struct
 from datetime import date
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'energyplus_porting_plan/cases/CLK-03'
+OUT = ROOT / 'docs/validation/cases/CLK-03'
 DAY_INTS = ['DayOfYear', 'DayOfYear_Schedule', 'Year', 'Month', 'DayOfMonth',
             'DayOfWeek', 'DaylightSavingIndex', 'HolidayIndex']
 DAY_REALS = ['SinSolarDeclinAngle', 'CosSolarDeclinAngle', 'EquationOfTime']
@@ -25,7 +26,8 @@ def bits(value):
 
 
 def ref(path):
-    return {'path': path.relative_to(ROOT).as_posix(),
+    path = resolve_path(path)
+    return {'path': legacy_relative(path),
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
@@ -142,8 +144,8 @@ def lifecycle_operations(total_days, warmup_days=0):
 
 
 def main():
-    scope = json.loads((ROOT / 'energyplus_porting_plan/contracts/scope.json').read_text(encoding='utf-8'))
-    calendar = json.loads((ROOT / 'energyplus_porting_plan/contracts/CLK-01-cases.json').read_text(encoding='utf-8'))
+    scope = json.loads((ROOT / 'docs/validation/contracts/scope.json').read_text(encoding='utf-8'))
+    calendar = json.loads((ROOT / 'docs/validation/contracts/CLK-01-cases.json').read_text(encoding='utf-8'))
     fixed = []
     for case_id in ['A-24H', 'A-72H', 'B-BOTH-24H']:
         source = next(c for c in calendar['calendar_request']['cases'] if c['case_id'] == case_id)
@@ -183,7 +185,7 @@ def main():
                             'run_period': rp, 'time_steps_per_hour': 4,
                             'prepared_environment_lane': True, 'operations': calls})
     request = {'schema': 'clk03-helper-cases.draft.v1', 'expected_values_supplied': False,
-               'expected_exits_supplied': False, 'fixed_scope': ref(ROOT / 'energyplus_porting_plan/contracts/scope.json'),
+               'expected_exits_supplied': False, 'fixed_scope': ref(ROOT / 'docs/validation/contracts/scope.json'),
                'handoff_sequences': [{'id': 'CTOR-COPY-DEFAULTS', 'time_steps_per_hour': 4,
                                      'initial': {}, 'operations': [{'id': 'copy-defaults',
                                      'kind': 'UpdateWeatherData', 'before': {}}]},

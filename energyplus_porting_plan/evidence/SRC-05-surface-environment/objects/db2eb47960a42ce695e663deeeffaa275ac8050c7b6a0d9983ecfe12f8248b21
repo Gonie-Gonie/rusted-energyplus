@@ -1,1 +1,0 @@
-    void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);

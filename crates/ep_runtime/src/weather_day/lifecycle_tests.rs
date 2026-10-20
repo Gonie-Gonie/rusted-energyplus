@@ -10,11 +10,11 @@ use ep_model::{
 
 pub(crate) const DECOY_BYTES: &[u8] = include_bytes!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw"
+    "/../../docs/validation/cases/CLK-03/decoy-three-days.epw"
 ));
 const MISSING_BYTES: &[u8] = include_bytes!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw"
+    "/../../docs/validation/cases/CLK-03/missing-target-complete-days.epw"
 ));
 
 pub(crate) fn site() -> SiteLocation {

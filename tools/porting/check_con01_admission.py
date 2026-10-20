@@ -4,6 +4,8 @@ Checks original input contracts, prepared calendars/schedules, and rejection
 traces. No EnergyPlus/Rust physics execution or automatic card/gate updates.
 """
 from __future__ import annotations
+
+from validation_paths import resolve_path, legacy_relative
 import datetime as dt
 import json
 import subprocess
@@ -22,12 +24,13 @@ REVISION = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output
 
 
 def artifact(path):
-    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}
+    path = resolve_path(path)
+    return {"path": legacy_relative(path), "sha256": sha(path.read_bytes())}
 
 
 def command_run(case, output):
     output.mkdir(parents=True, exist_ok=True)
-    command = [str(CLI), "run", str(ROOT / case["input"]["path"]), "--weather", str(ROOT / case["weather"]["path"]),
+    command = [str(CLI), "run", str(resolve_path(ROOT / case["input"]["path"])), "--weather", str(resolve_path(ROOT / case["weather"]["path"])),
                "--output-dir", str(output), "--porting-scope", case["scope"], "--dry-run", "--keep-intermediate", "--overwrite"]
     run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     (output / "command.json").write_bytes(json_bytes(command))
@@ -95,13 +98,13 @@ def compare_admission(case, trace, exit_code):
     for key, value in {"day_of_week": begin.strftime("%A"), "day_type": begin.strftime("%A"), "day_of_year": begin.timetuple().tm_yday,
                        "schedule_day_of_year": dt.date(2012,begin.month,begin.day).timetuple().tm_yday, "dst": False}.items():
         check("calendar.first." + key, first.get(key), value)
-    weather_lines = (ROOT / case["weather"]["path"]).read_text().splitlines()[8:]
+    weather_lines = (resolve_path(ROOT / case["weather"]["path"])).read_text().splitlines()[8:]
     first_weather_index = (begin.timetuple().tm_yday - 1) * 24
     check("source_start_record_index", environment.get("source_start_record_index"), first_weather_index)
     check("weather_record_year", environment.get("weather_record_year"), int(weather_lines[first_weather_index].split(",")[0]))
     indices = environment.get("selected_source_record_indices", [])
     check("selected_source_record_indices", indices, list(range(first_weather_index, first_weather_index + case["expected_zone_steps_excluding_warmup"] // 4)))
-    objects = parse_idf((ROOT / case["input"]["path"]).read_bytes())
+    objects = parse_idf((resolve_path(ROOT / case["input"]["path"])).read_bytes())
     declared = {o[1].upper(): o for o in objects if o[0].lower() in ("schedule:constant", "schedule:compact")}
     schedules = environment.get("schedule_values", [])
     check("schedule_count", len(schedules), len(declared))
@@ -157,12 +160,12 @@ def main():
     admissions = []
     for case in cases:
         for binding in (case["input"],case["weather"]):
-            if sha((ROOT / binding["path"]).read_bytes()) != binding["sha256"]:
+            if sha((resolve_path(ROOT / binding["path"])).read_bytes()) != binding["sha256"]:
                 raise ValueError(f"input/weather hash mismatch: {binding['path']}")
         command, trace = command_run(case, RAW / case["id"])
         comparison = compare_admission(case, trace, command["exit_code"])
         row = {"case_id": case["id"], "scope": case["scope"], "duration": case["duration"], "limit_variant": case["limit_variant"],
-               "metadata": artifact((ROOT / case["input"]["path"]).with_name("metadata.json")),
+               "metadata": artifact((resolve_path(ROOT / case["input"]["path"])).with_name("metadata.json")),
                "input": case["input"], "weather": case["weather"], "command_result": command, "comparison": comparison,
                "admission_checks_passed": not comparison["errors"], "EP_physics_executed_in_this_admission_run": False,
                "Rust_physics_executed": False, "gate_status": "unreviewed"}
@@ -171,7 +174,7 @@ def main():
     base = next(c for c in cases if c["id"] == "B-BOTH-24H")
     negatives = []
     for name, feature in (("NEG-LATENT", "latent"), ("NEG-OUTDOOR-AIR", "outdoor_air"), ("NEG-AUTOSIZE", "autosize")):
-        objects = parse_idf((ROOT / base["input"]["path"]).read_bytes())
+        objects = parse_idf((resolve_path(ROOT / base["input"]["path"])).read_bytes())
         patches = []
         if feature == "latent":
             patch_field(only(objects,"OtherEquipment"),9,"0.1",patches,"fraction_latent")

@@ -7,6 +7,8 @@ separate reader. A partial failed matrix is retained with the actual exit code.
 """
 from __future__ import annotations
 
+from validation_paths import legacy_relative
+
 import argparse
 import json
 from pathlib import Path
@@ -147,7 +149,7 @@ def run_production(directory, build_ref, build, compilation, completed, refs, ca
                 "schema": "zon01-Rust-cli-execution.v1", "build": build_ref, "binary": build["binary"],
                 "command_receipt": actual_ref, "input": case["input"], "weather": case["weather"],
                 "metadata": case["metadata"], "run_summary": summary_ref, "artifacts": artifacts,
-                "output_directory": output.relative_to(ROOT).as_posix(), "trace_level": level,
+                "output_directory": legacy_relative(output), "trace_level": level,
                 "configured_porting_scope": case["scope"], "executed_launcher": sources[0]["archive"],
                 "executed_recorder": actual["executed_launcher"], "implementation_commit": build["implementation_commit"],
                 "execution_repository_head": actual["repository_before"]["head"],

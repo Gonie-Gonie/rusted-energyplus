@@ -7,6 +7,8 @@ No geometry, solar, weather-height, calendar or convection formula is evaluated.
 """
 from __future__ import annotations
 
+
+
 import argparse
 from collections import Counter, defaultdict
 from datetime import datetime, timezone

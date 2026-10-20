@@ -7,6 +7,8 @@ Actual execution and numerical comparison are separate.
 """
 from __future__ import annotations
 
+from validation_paths import resolve_path, legacy_relative
+
 import json
 from pathlib import Path
 import shutil
@@ -34,12 +36,13 @@ REQUEST_SHA = "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
 
 
 def write(path, value):
+    path = resolve_path(path)
     with Path(path).open("xb") as stream:
         stream.write((json.dumps(value, indent=2, allow_nan=False) + "\n").encode("utf-8"))
 
 
 def packet(bindings):
-    refs = {key: {"path": f"energyplus_porting_plan/contracts/ZON-01-{key}.json", "sha256": digest}
+    refs = {key: {"path": legacy_relative(f"docs/validation/contracts/ZON-01-{key}.json"), "sha256": digest}
             for key, digest in FROZEN.items()}
     for binding in refs.values():
         bindings.check(binding)
@@ -123,5 +126,5 @@ def archive_sources(directory, paths):
         require(not target.exists(), "Duplicate archive basename")
         shutil.copyfile(current, target)
         require(target.read_bytes() == current.read_bytes(), "Source archive byte identity differs")
-        rows.append({"historical_path": current.relative_to(ROOT).as_posix(), "archive": ref(target)})
+        rows.append({"historical_path": legacy_relative(current), "archive": ref(target)})
     return rows

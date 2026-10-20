@@ -1,7 +1,0 @@
-// max( double, double )
-inline
-double
-max( double const a, double const b )
-{
-	return ( a < b ? b : a );
-}

@@ -1,6 +1,0 @@
-	// Allocated
-	bool
-	allocated() const
-	{
-		return ( data_ != nullptr );
-	}

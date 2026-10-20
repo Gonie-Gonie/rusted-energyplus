@@ -1,3 +1,0 @@
-Program Version,,
-   ** Severe  ** InitConductionTransferFunctions: Material=THIN_belowR Value below lowest allowed value
-   **   ~~~   ** Lowest allowed value=[1.000E-003], Material R Value=[1.000E-006].
