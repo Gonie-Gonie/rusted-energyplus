@@ -36,8 +36,11 @@ SUPPORT_BOUNDARY = (
 
 
 OBJECT_STATUS_LABELS = {
-    "typed": "Typed input support",
+    "typed": "Reviewed input projection",
     "typed_graph_only": "Typed graph only",
+    "raw_source_getter": "Raw Source getter",
+    "partial_input": "Partial input projection",
+    "unimplemented": "No connected implementation",
 }
 
 VARIABLE_STATUS_LABELS = {
@@ -175,6 +178,10 @@ def collect_object_rows(repo_root: Path) -> list[dict[str, Any]]:
                 "family": str(item.get("family", "")),
                 "status": status,
                 "user_status": status_label(status, OBJECT_STATUS_LABELS),
+                "compiler_coverage": str(item.get("compiler_coverage", "unreviewed")),
+                "source_admission": str(item.get("source_admission", "unreviewed")),
+                "source_boundary": str(item.get("source_boundary", "Not reviewed for ordinary Source admission.")),
+                "source_refs": list(item.get("source_refs", [])),
                 "notes": list_value(item.get("notes", [])),
                 "first_evidence": str(item.get("first_evidence", item.get("first_case", ""))),
                 "support_boundary": str(item.get("support_boundary", "")),
@@ -423,15 +430,16 @@ def build_input_table(report: dict[str, Any]) -> Table:
             row["name"],
             row["family"],
             row["user_status"],
-            row["first_evidence"],
-            compact_text(row["support_boundary"], 110),
+            row["compiler_coverage"],
+            row["source_admission"],
+            compact_text(row["source_boundary"] + " " + row["support_boundary"], 150),
         ]
         for row in report["input_objects"]
     ]
     return doc_table(
-        ["Input object", "Family", "Support", "First evidence", "Boundary"],
+        ["Input object", "Family", "Input handling", "Compiler", "Source admission", "Boundary"],
         rows,
-        "Supported input object coverage.",
+        "Input handling and bounded Source admission; no row means full-object support.",
     )
 
 
@@ -607,7 +615,7 @@ def build_document(report: dict[str, Any], chart: Any) -> Document:
             build_metric_table(report),
             Figure(chart, caption="Input, output, and algorithm support status counts.", width=7.2),
         ),
-        Chapter("Supported Inputs", build_input_table(report)),
+        Chapter("Input Handling and Source Admission", build_input_table(report)),
         Chapter("Supported Outputs", build_output_table(report)),
         Chapter("Supported Algorithms", build_algorithm_table(report)),
         Chapter("Evidence Cases", build_case_table(report)),
@@ -648,8 +656,10 @@ def render_markdown(report: dict[str, Any]) -> str:
             row["name"],
             row["family"],
             row["user_status"],
+            row["compiler_coverage"],
+            row["source_admission"],
             row["first_evidence"],
-            row["support_boundary"],
+            row["source_boundary"] + " " + row["support_boundary"],
         ]
         for row in report["input_objects"]
     ]
@@ -689,8 +699,9 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- manifest_output_requests: {aggregate['manifest_output_request_count']}\n"
         f"- algorithms: {aggregate['algorithm_count']}\n"
         f"- cases: {aggregate['case_count']}\n\n"
-        "## Supported Inputs\n\n"
-        + markdown_table(["Input", "Family", "Support", "First evidence", "Boundary"], input_rows)
+        "## Input Handling and Source Admission\n\n"
+        + "Compiler typing, registry input projections and Source admission are separate. No input row creates arbitrary-combination support or numerical conformance.\n\n"
+        + markdown_table(["Input", "Family", "Input handling", "Compiler", "Source admission", "First evidence", "Boundary"], input_rows)
         + "\n## Supported Outputs\n\n"
         + markdown_table(
             ["Output", "Domain", "Support", "First evidence", "Freq", "Source", "Levels", "Boundary"],

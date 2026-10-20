@@ -2,14 +2,15 @@
 status: active
 claim_level: reporting-infrastructure
 owner: conformance
-last_reviewed: 2026-06-08
+last_reviewed: 2026-10-20
 ---
 
 # Support Coverage Report
 
 The support coverage report is the user-facing answer to three questions:
 
-- which EnergyPlus input objects are currently parsed or typed
+- which corpus objects have typed models, raw getters, partial projections or missing implementations
+- which positive families are admitted to the bounded ordinary Source A/B route
 - which output variables are currently requested, diagnostic, or conformance-gated
 - which algorithm families have limited conformance evidence versus diagnostic-only scaffolding
 
@@ -47,7 +48,10 @@ The generator reads:
 
 | Status | User meaning |
 |---|---|
-| typed input support | the input object is parsed into the Rust model |
+| reviewed input projection | historical registry `typed`; inspect the separate compiler column for actual whole-object typed coverage |
+| raw Source getter | real raw-input getter, without a whole-object typed compiler model |
+| partial input projection | selected fields/references retained; whole-object compiler coverage remains raw-only |
+| no connected implementation | no connected positive object implementation; raw retention is not support |
 | typed graph only | the input object is represented structurally, but no numerical algorithm parity is claimed |
 | tolerance-gated output | the output is promoted in a manifest, tolerance, report, and blocking gate |
 | diagnostic output | the output is compared or emitted for development visibility only |
@@ -59,8 +63,9 @@ The generator reads:
 The report is a coverage map. It does not create new conformance claims. A
 supported row is only as strong as its status, first case, tolerance, and gate.
 
-As of v0.28.0, every tracked input object includes a first evidence reference
-and a support boundary in `specs/object_coverage.toml`.
+The [public corpus table](../generated/example-object-union.md) classifies every canonical object type found in current repository input files. The [full object registry](../generated/object-coverage.md) also retains reviewed types outside that corpus. Every registry entry has an input-handling status, actual compiler coverage and an explicit Source admission classification; types outside the corpus can remain unreviewed for Source.
+
+`bounded_a_b` and `bounded_b` admit only selected positive inputs on the declared one-Zone opaque/direct-IdealLoads route. `inactive_only` does not permit active design-day execution. `blocked` remains blocked even when compiler graphs, partial projections or separate fixed-case/legacy conformance exist. Code references establish implementation/admission facts, not additional Oracle evidence. No row means full-object or arbitrary-combination support, and all existing conformance identities and tolerances remain unchanged.
 
 As of v0.29.0, output variable first evidence is resolved from the strongest available evidence level for that variable. For example, a variable that
 appears first in a diagnostic fixture but is later promoted in a conformance

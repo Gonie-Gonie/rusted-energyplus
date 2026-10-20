@@ -2,7 +2,7 @@
 status: active
 claim_level: reporting-infrastructure
 owner: conformance
-last_reviewed: 2026-06-08
+last_reviewed: 2026-10-20
 ---
 
 # User Coverage Handbook
@@ -13,7 +13,8 @@ JSON, then rendered with `oodocs` as PDF/HTML/JSON/Markdown.
 
 Use it to answer:
 
-- which input objects are typed versus structural only
+- which input objects have typed models, raw getters, partial projections or missing implementations
+- which ordinary Source A/B inputs are admitted, inactive-only or blocked
 - which output variables are promoted conformance, diagnostic, or baseline only
 - which algorithm families have limited conformance evidence versus diagnostic projection evidence
 - which conformance cases define the current public numerical claim
@@ -45,6 +46,8 @@ The support coverage report is the detailed matrix. The handbook is the user dec
 It keeps detailed rows, but organizes them
 around decision rules, promoted outputs, diagnostic/baseline outputs, declared
 versus passed numerical series, algorithm scope, and known gaps.
+
+The [public corpus table](../generated/example-object-union.md) gives the current input-file union with separate compiler and Source columns. The handbook keeps every reviewed input entry visible, including blocked or missing implementations. Its legacy JSON `supported_inputs` key retains registry typed projections only; it is not a runtime-supported-object list. Use `input_objects` and their `source_admission`/boundary fields for that distinction.
 
 ## Boundary
 

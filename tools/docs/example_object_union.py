@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tomllib
@@ -18,6 +19,99 @@ OUTPUT = "docs/src/generated/example-object-union.md"
 SCHEMA_SHA = "60b24d904e6fa553f773b38037a8a09730e6da1538647df552cd77db8d6704a9"
 EP_COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
 ASCII_FOLD = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
+
+
+
+OBJECT_STATUS_LABELS = {
+    "typed": "Reviewed input projection", "typed_graph_only": "Typed graph only",
+    "diagnostic": "Diagnostic input projection", "raw_source_getter": "Raw Source getter",
+    "partial_input": "Partial input projection", "unimplemented": "No connected implementation",
+}
+SOURCE_ADMISSION_LABELS = {
+    "bounded_a_b": "Bounded A/B", "bounded_b": "Bounded B only",
+    "inactive_only": "Inactive declaration only", "blocked": "Blocked", "unreviewed": "Not reviewed",
+}
+
+
+def compiler_typed_names(repo_root: Path) -> set[str]:
+    """Read the compiler's explicit whole-object bitmap, including string constants.
+
+    This is documentation of typed_coverage_status, never a runtime inference.
+    Refuse a changed expression grammar rather than silently dropping entries.
+    """
+    text = (repo_root / "crates/ep_compiler/src/compiler.rs").read_text(encoding="utf8")
+    constants = dict(re.findall(r'const ([A-Z_]+): &str = "([^"\\]*)";', text))
+    match = re.search(r'const TYPED_OBJECT_TYPES: &\[&str\] = &\[(.*?)\];', text, re.S)
+    if match is None:
+        raise ValueError("compiler typed-object bitmap is missing")
+    result: set[str] = set()
+    for token in (part.strip() for part in match[1].split(",")):
+        if not token:
+            continue
+        if re.fullmatch(r'"[^"\\]+"', token):
+            name = json.loads(token)
+        elif token in constants:
+            name = constants[token]
+        else:
+            raise ValueError(f"unreviewed compiler bitmap expression: {token}")
+        if name in result:
+            raise ValueError(f"duplicate compiler typed object: {name}")
+        result.add(name)
+    return result
+
+
+def object_registry(repo_root: Path) -> dict[str, dict[str, Any]]:
+    with (repo_root / "specs/object_coverage.toml").open("rb") as stream:
+        spec = tomllib.load(stream)
+    if spec.get("coverage_schema") != 2:
+        raise ValueError("object registry classification schema differs")
+    typed = compiler_typed_names(repo_root)
+    result: dict[str, dict[str, Any]] = {}
+    for row in spec.get("object", []):
+        name, status = row["name"], row["status"]
+        if name in result:
+            raise ValueError(f"duplicate object registry entry: {name}")
+        if status not in OBJECT_STATUS_LABELS:
+            raise ValueError(f"unknown object handling status: {name}: {status}")
+        actual = "typed" if name in typed else "raw_only"
+        if row.get("compiler_coverage") != actual:
+            raise ValueError(f"compiler coverage differs from actual bitmap: {name}")
+        if status == "typed_graph_only" and actual != "typed":
+            raise ValueError(f"typed graph entry has no typed compiler model: {name}")
+        if status in {"raw_source_getter", "partial_input", "unimplemented"} and actual != "raw_only":
+            raise ValueError(f"raw/partial/missing entry incorrectly hides a typed model: {name}")
+        admission = row.get("source_admission")
+        if admission not in SOURCE_ADMISSION_LABELS:
+            raise ValueError(f"unknown Source admission: {name}: {admission}")
+        if admission != "unreviewed":
+            refs = row.get("source_refs")
+            if not row.get("source_boundary") or not isinstance(refs, list) or not refs:
+                raise ValueError(f"reviewed Source admission needs boundary and refs: {name}")
+            for ref in refs:
+                path = (repo_root / ref).resolve()
+                if not path.is_relative_to(repo_root.resolve()) or not path.is_file():
+                    raise ValueError(f"missing/escaping Source review reference: {name}: {ref}")
+        if status == "unimplemented" and admission not in {"blocked", "unreviewed"}:
+            raise ValueError(f"missing implementation cannot have positive admission: {name}")
+        result[name] = row
+    return result
+
+
+def input_typing(row: dict[str, Any]) -> str:
+    if row["compiler_coverage"] == "typed":
+        return "Typed model; graph only" if row["status"] == "typed_graph_only" else "Typed model"
+    if row["status"] == "partial_input":
+        return "Raw only; partial projection"
+    if row["status"] == "raw_source_getter" or row["source_admission"] in {"bounded_a_b", "bounded_b", "inactive_only"}:
+        return "Raw only; Source getter"
+    return "Raw only"
+
+
+def source_review_cell(row: dict[str, Any]) -> str:
+    boundary = row.get("source_boundary", "Not reviewed for the ordinary Source route.")
+    refs = row.get("source_refs", [])
+    links = ", ".join(f"[`{Path(ref).name}`](../../../{ref})" for ref in refs)
+    return (boundary + (" Review: " + links + "." if links else "")).replace("|", "\\|").replace("\n", " ")
 
 
 def catalog_from_schema(path: Path) -> dict[str, Any]:
@@ -159,8 +253,7 @@ def collect_union(repo_root: Path) -> dict[str, Any]:
     canonical = {name.translate(ASCII_FOLD): name for name in names}
     if len(canonical) != len(names):
         raise ValueError("case-ambiguous canonical object names")
-    with (repo_root / "specs/object_coverage.toml").open("rb") as stream:
-        reviewed = {row["name"]: row["status"] for row in tomllib.load(stream)["object"]}
+    reviewed = object_registry(repo_root)
     rows: dict[str, dict[str, Any]] = {}
     paths = sample_paths(repo_root)
     formats: Counter[str] = Counter()
@@ -177,10 +270,13 @@ def collect_union(repo_root: Path) -> dict[str, Any]:
             row = rows.setdefault(name, {
                 "name": name, "schema_known": name in names, "files": 0, "instances": 0,
                 "group": dependency_group(name), "schema_group": names.get(name),
-                "typing_status": reviewed.get(name, "unregistered / no reviewed entry"),
+                "review": reviewed.get(name),
             })
             row["files"] += 1
             row["instances"] += count
+    for row in rows.values():
+        if row["schema_known"] and (row["review"] is None or row["review"]["source_admission"] == "unreviewed"):
+            raise ValueError(f"canonical corpus object lacks reviewed classification: {row['name']}")
     return {
         "files": len(paths), "idf_files": formats[".idf"], "epjson_files": formats[".epjson"],
         "rows": sorted(rows.values(), key=lambda row: (row["group"], row["name"])),
@@ -193,19 +289,21 @@ def markdown(repo_root: Path) -> str:
     unknown = [row for row in inventory["rows"] if not row["schema_known"]]
     lines = [
         "<!-- DO NOT EDIT. Generated from repository samples, the pinned object catalog and specs/object_coverage.toml by tools/docs/generate_docs.py. -->",
-        "", "# Example Object Union", "",
+        "", "# Example Objects and Source Boundaries", "",
         f"The selected corpus has **{inventory['files']} files** ({inventory['idf_files']} IDF, {inventory['epjson_files']} epJSON), **{len(known)} canonical object types**, and **{sum(row['instances'] for row in known)} instances** of those types.",
         "",
         "Selection includes tracked and ordinary untracked input files under `data/` and `docs/validation/`, respecting Git ignores. It excludes runtime/reference trees and immutable `objects` stores. Invalid-field and negative fixtures remain included; embedded code literals and compressed artifacts are outside this file corpus.",
         "",
-        "This is an occurrence inventory, not schema validation or evidence that arbitrary fields, values, object combinations or runtime consumers are supported. Counts include inactive and unused declarations. A typing status is copied from the existing [object registry](../../../specs/object_coverage.toml); unregistered means that registry has no reviewed entry, even when a separate runtime getter exists. [Capabilities](../../../specs/capabilities.toml) govern admitted runtime combinations.",
+        "This public corpus list separates occurrence counts, whole-object compiler typing and actual ordinary Source admission. **No row means full-object or arbitrary-combination support.** Counts include negative fixtures, inactive declarations and unused objects. Compiler typing comes from `Compiler::typed_coverage_status`; raw-only objects can still have genuine Source getters or partial projections. The [full registry](object-coverage.md) retains other reviewed types outside this corpus. [Capabilities](../../../specs/capabilities.toml), raw admission guards and connected consumers jointly bound execution; legacy/fixed-case evidence is not automatically Source support.",
         "",
         "Review groups provide a development queue, not IDF declaration order or runtime execution order. Cross-group references and cycles require explicit register, resolve and consume phases. The [roadmap](../current/roadmap.md) defines the expansion work and [project contract](../current/project-contract.md#reviewing-a-porting-change) defines its evidence requirements.",
         "",
         "Canonical names and official groups come from the compact [EnergyPlus 26.1 catalog](../../../data/schema/energyplus-26.1-object-index.json). It records the original schema SHA256 and pinned source commit; installed EnergyPlus is not needed to regenerate this page.",
-        "", "| Object type | Input files | Instances | Dependency review group | Existing typing status |", "|---|---|---|---|---|",
+        "",
+        "Source labels are bounded A/B, bounded B only, inactive declaration only, or blocked. B is the declared direct-Zone sensible no-OA IdealLoads route. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
+        "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Scope and review references |", "|---|---|---|---|---|---|---|",
     ]
-    lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {row['typing_status']} |" for row in known)
+    lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_review_cell(row['review'])} |" for row in known)
     if unknown:
         lines += ["", "## Unknown Input Types", "", "These names are absent from the pinned schema. `Unknown:Diagnostic` is an intentional local diagnostic fixture, not an EnergyPlus object type.", "", "| Input type | Input files | Instances |", "|---|---|---|"]
         lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} |" for row in unknown)

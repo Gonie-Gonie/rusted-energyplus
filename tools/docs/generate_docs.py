@@ -16,7 +16,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from example_object_union import markdown as example_object_union
+from example_object_union import (
+    OBJECT_STATUS_LABELS, SOURCE_ADMISSION_LABELS, input_typing, object_registry, source_review_cell,
+    markdown as example_object_union,
+)
 from script_inventory import collect_script_inventory, script_inventory_toml
 from validate_algorithm_ledger import ROUTINE_COMPLETION_RANK
 
@@ -351,22 +354,18 @@ def conformance_case_index(repo_root: Path) -> str:
 
 
 def object_coverage(repo_root: Path) -> str:
-    spec = load_toml(repo_root / "specs" / "object_coverage.toml")
     rows = [
-        [
-            str(item.get("name", "")),
-            str(item.get("family", "")),
-            str(item.get("status", "")),
-            str(item.get("first_evidence", item.get("first_case", ""))),
-            support_boundary_value(item),
-        ]
-        for item in spec.get("object", [])
+        [item["name"], item["family"], OBJECT_STATUS_LABELS[item["status"]],
+         input_typing(item), SOURCE_ADMISSION_LABELS[item["source_admission"]],
+         str(item.get("first_evidence", item.get("first_case", ""))),
+         source_review_cell(item) + " Registered input boundary: " + boundary_summary(item, "support_boundary", "object_coverage.toml")]
+        for item in object_registry(repo_root).values()
     ]
     return (
-        GENERATED_NOTICE
-        + "# Object Coverage\n\n"
-        + "Object coverage is maintained in `specs/object_coverage.toml`.\n\n"
-        + table(["Object", "Family", "Status", "First evidence", "Boundary"], rows)
+        GENERATED_NOTICE + "# Object Coverage\n\n"
+        + "The [example-object table](example-object-union.md) classifies every canonical type in the current file corpus. This full registry also retains reviewed objects outside that corpus.\n\n"
+        + "Input handling and compiler typing are separate from actual Source admission. Legacy `typed` status means a reviewed input projection; the explicit compiler column alone states whole-object TypedModel coverage. A real raw getter is not a typed model, an inactive declaration is not active simulation, and a blocked typed graph is not runtime support. No category means full-object support or promotes numerical conformance. Code review references establish implementation/admission facts; first evidence can be a unit/code reference rather than an Oracle comparison. Exact fields, remaining consumers and numerical claims remain bounded by the registry and promoted manifests.\n\n"
+        + table(["Object", "Family", "Input handling", "Compiler input typing", "Ordinary Source admission", "First evidence", "Scoped boundary and review references"], rows)
     )
 
 
@@ -838,6 +837,7 @@ def generated_manifest(repo_root: Path) -> str:
             "scripts/dev/commands.json",
             "tools/docs/generate_docs.py",
             "tools/docs/example_object_union.py",
+            "crates/ep_compiler/src/compiler.rs",
             "tools/docs/routine_completion_contract.py",
             "tools/docs/read_claim_boundaries.py",
             "tools/docs/script_inventory.py",

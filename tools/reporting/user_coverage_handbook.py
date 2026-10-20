@@ -207,11 +207,14 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
         },
         "user_decision_rules": [
             "Use conformance rows only when the input, output, frequency, evidence case, tolerance, and gate match your intended scope.",
+            "Input typing, raw Source getters, partial projections and graph rows never imply full-object or arbitrary-combination runtime support. Check explicit Source admission and every boundary; inactive declarations are not active simulation.",
             "Treat diagnostic, baseline, and typed-graph-only rows as visibility into development progress, not as compatibility claims.",
             "For unsupported objects or outputs, prefer an explicit gap over extrapolating from a neighboring row.",
             "Use the release evidence manifest to confirm that this handbook and its source reports were published as release assets.",
         ],
-        "supported_inputs": typed_inputs,
+        "input_objects": sorted_rows(input_rows, "family", "name"),
+        "supported_inputs": typed_inputs,  # Legacy JSON key: registry typed projections only, not runtime support.
+        "supported_inputs_meaning": "Legacy registry typed projections; use input_objects compiler_coverage/source_admission for execution boundaries.",
         "structural_inputs": structural_inputs,
         "conformance_outputs": conformance_outputs,
         "diagnostic_outputs": diagnostic_outputs,
@@ -267,13 +270,14 @@ def build_metric_table(handbook: dict[str, Any]) -> Table:
 
 def input_table(rows: list[dict[str, Any]], caption: str) -> Table:
     return doc_table(
-        ["Input object", "Family", "First evidence", "Boundary"],
+        ["Input object", "Input handling", "Compiler", "Source admission", "Boundary"],
         [
             [
                 row.get("name", ""),
-                row.get("family", ""),
-                row.get("first_evidence", ""),
-                pdf_boundary_text(row),
+                row.get("user_status", row.get("status", "")),
+                row.get("compiler_coverage", "unreviewed"),
+                row.get("source_admission", "unreviewed"),
+                row.get("source_boundary", "Not reviewed for ordinary Source.") + " " + pdf_boundary_text(row),
             ]
             for row in rows
         ],
@@ -467,11 +471,7 @@ def build_document(handbook: dict[str, Any], chart: Any) -> Document:
                 "How to read support rows without overstating compatibility.",
             ),
         ),
-        Chapter("Typed Inputs", input_table(handbook["supported_inputs"], "Input objects with typed support.")),
-        Chapter(
-            "Structural Inputs",
-            input_table(handbook["structural_inputs"], "Input objects represented structurally without numerical conformance."),
-        ),
+        Chapter("Input Handling and Source Admission", input_table(handbook["input_objects"], "All reviewed input entries, including blocked, partial and missing implementations. Typing is not runtime support.")),
         Chapter(
             "Conformance Outputs",
             output_table(handbook["conformance_outputs"], "Output variables with promoted tolerance-gated evidence."),
@@ -538,8 +538,8 @@ def markdown_table(headers: list[str], rows: list[list[Any]]) -> str:
 def render_markdown(handbook: dict[str, Any]) -> str:
     aggregate = handbook["aggregate"]
     input_rows = [
-        [row["name"], row["family"], row["first_evidence"], boundary_text(row)]
-        for row in handbook["supported_inputs"]
+        [row["name"], row["user_status"], row.get("compiler_coverage", "unreviewed"), row.get("source_admission", "unreviewed"), row["first_evidence"], row.get("source_boundary", "Not reviewed for ordinary Source.") + " " + boundary_text(row)]
+        for row in handbook["input_objects"]
     ]
     output_rows = [
         [row["name"], row["domain"], row["first_evidence"], boundary_text(row)]
@@ -587,8 +587,9 @@ def render_markdown(handbook: dict[str, Any]) -> str:
         f"- diagnostic_algorithms: {aggregate['diagnostic_algorithm_count']}\n\n"
         "## Decision Rules\n\n"
         + "\n".join(f"- {rule}" for rule in handbook["user_decision_rules"])
-        + "\n\n## Typed Inputs\n\n"
-        + markdown_table(["Input", "Family", "First evidence", "Boundary"], input_rows)
+        + "\n\n## Input Handling and Source Admission\n\n"
+        + "All registry entries remain visible, including blocked/raw/partial/missing cases. Compiler typing does not establish runtime or numerical compatibility.\n\n"
+        + markdown_table(["Input", "Input handling", "Compiler", "Source admission", "First evidence", "Boundary"], input_rows)
         + "\n## Conformance Outputs\n\n"
         + markdown_table(["Output", "Domain", "First evidence", "Boundary"], output_rows)
         + "\n## Declared vs Passed Numerical Series\n\n"

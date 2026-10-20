@@ -79,8 +79,8 @@ none
 | docs/src/conformance/overview.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/conformance/release-evidence-manifest.md | spec-explanation | not in SUMMARY | n/a | present | active | release | 2026-06-08 |
 | docs/src/conformance/report-format.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
-| docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
-| docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
+| docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
+| docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-20 |
