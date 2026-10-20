@@ -475,6 +475,50 @@ fn default_controls_and_source_adjustments_are_observable() {
     assert_eq!(actual.production["conformance_claim"], false);
     value["Building"]["Building"]["maximum_number_of_warmup_days"] = json!(0);
     assert!(!trace(&value, PortingScope::A).admissible);
+
+    // This tests the input boundary only, not Source activation or window
+    // transport. Actual opaque consumers already branch on the real enum;
+    // reflection and positive window/TDD children remain separately guarded.
+    for scope in [PortingScope::A, PortingScope::B] {
+        for (distribution, accepted) in [
+            ("MinimalShadowing", true),
+            ("FullExterior", true),
+            ("FullInteriorAndExterior", true),
+            ("FullExteriorWithReflections", false),
+            ("FullInteriorAndExteriorWithReflections", false),
+        ] {
+            let mut authored = input(scope);
+            authored["Building"]["Building"]["solar_distribution"] = json!(distribution);
+            let actual = trace(&authored, scope);
+            assert_eq!(
+                actual.admissible, accepted,
+                "{scope:?}/{distribution}: {:?}",
+                actual.violations
+            );
+            assert_eq!(
+                actual.settings["building"]["solar_distribution"],
+                distribution
+            );
+            assert_eq!(actual.production["conformance_claim"], false);
+            if !accepted {
+                assert!(
+                    actual
+                        .violations
+                        .iter()
+                        .any(|message| message.contains("solar reflection"))
+                );
+            }
+            let raw = parse_epjson_str(&authored.to_string()).expect("schema-valid solar enum");
+            let ordinary = match scope {
+                PortingScope::A => crate::ordinary_equipment_input::resolve(&raw),
+                PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
+            };
+            assert!(
+                ordinary.is_ok(),
+                "raw field ingress differs for {distribution}: {ordinary:?}"
+            );
+        }
+    }
 }
 
 #[test]

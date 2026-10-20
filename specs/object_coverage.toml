@@ -10,7 +10,7 @@ name = "Building"
 family = "building"
 status = "typed"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Typed for model metadata and simple building scope; no global building simulation claim."
+support_boundary = "Typed Building fields feed the actual Source getter and bounded opaque runtime. MinimalShadowing, FullExterior and FullInteriorAndExterior now reach the existing real retained-enum solar consumers. For the admitted no-window/TDD/subsurface route, the Original HasWindow condition genuinely leaves the extra back-surface search inactive; no synthetic zero transport replaces it. An existing connected input test checks all five solar enums across A/B, and a same-input FullInteriorAndExterior Source case completes every original reported stream with unchanged tolerances, exact Building EIO and byte-identical full SHD. Both reflection algorithms, positive window/TDD transport and arbitrary Building/object combinations remain outside this expansion; no global building simulation or full-object conformance claim is established."
 
 [[object]]
 name = "HeatBalanceAlgorithm"

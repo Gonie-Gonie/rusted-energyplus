@@ -324,9 +324,12 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     if let Some(building) = &model.building {
         if !matches!(
             building.solar_distribution,
-            SolarDistribution::MinimalShadowing | SolarDistribution::FullExterior
+            SolarDistribution::MinimalShadowing
+                | SolarDistribution::FullExterior
+                | SolarDistribution::FullInteriorAndExterior
         ) {
-            violations.push("solar reflection/interior distribution branches are outside the selected opaque scope".into());
+            violations
+                .push("solar reflection branches are outside the selected opaque scope".into());
         }
         if building.loads_convergence_tolerance_w <= 0.0
             || building.temperature_convergence_tolerance_delta_c <= 0.0

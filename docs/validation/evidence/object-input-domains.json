@@ -90,6 +90,12 @@
       "real interior CTF layer preprocessing, ordered nominal-U/report bridges and actual Source postlude AirGap row selection",
       "used Regular/AirGap/Regular three-layer nine-term same-input Source completion under original58 policies",
       "existing endpoint validation and genuine used low-resistance CTF error boundary retained; dedicated Material:Air writer checked at unit boundary because physical case requests Constructions only"
+    ],
+    "Building": [
+      "opaque FullInteriorAndExterior admission now follows real retained solar enum and existing consumers",
+      "actual no-window/TDD/subsurface conditions keep the Original extra back-surface child inactive; no zero stand-ins",
+      "existing test checks all five solar enums across A/B: three nonreflection selections admitted, both reflection selections retain bounds",
+      "same-input whole Source completion, actual Building EIO and byte-identical complete SHD; no arbitrary Building/window/reflection combination promotion"
     ]
   },
   "verification": {
@@ -106,15 +112,15 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/air-gap-clippy-08b.log",
-        "sha256": "2ea9904459eb4fa888e13939e99304ea33a6b01d21d7862d58e197853d258892",
-        "bytes": 2060
+        "path": ".runtime/object-expansion/opaque-solar-clippy-09.log",
+        "sha256": "56a39c89f9b7cacede338f08590d8365ee79771d51b216e93f6ec696a7446dfc",
+        "bytes": 1848
       },
       "format": "cargo fmt --all passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/air-gap-docs-08b.log",
-        "sha256": "e5dea36a78d3856165c9d61ad79c8aac093477558683d1e83f313f91546f4fd2",
+        "path": ".runtime/object-expansion/opaque-solar-docs-09.log",
+        "sha256": "af94881e98d41e7b79dd9dba2ac722f3da61d2a1ec9c6f8473f3c2d1cdcf8639",
         "bytes": 1408
       }
     },
@@ -1379,12 +1385,63 @@
           "numerical_comparison_performed": false,
           "reason": "Build08 stopped at stale nominal-U material report admission before Source completion. Two concrete report adapters were connected and the existing report test extended before fresh build08b; original failed files were rehashed unchanged."
         }
+      },
+      {
+        "id": "opaque-full-interior",
+        "group": "opaque_solar_distribution",
+        "source_build": "opaque-solar-09",
+        "input": {
+          "path": ".runtime/object-expansion/native-opaque-interior-solar/calibration-01/input.idf",
+          "sha256": "b091cc03aafdfa793cd2ca707bf7be17b4e7728f0430f703447a09bfd6f9dd8b",
+          "bytes": 9282
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-opaque-interior-solar/calibration-01/receipt.json",
+          "sha256": "6f0af3536dff258482dbc2b5867dc8e9b19a352d4361ae5280289ba86e0dfd6f",
+          "bytes": 10372
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-opaque-solar/receipt/receipt.json",
+          "sha256": "ca509eef18a9128ab3e2bb332b6d7f437517f4ac3b19a508372ea0b94b132e3d",
+          "bytes": 3546
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/opaque-interior-solar/run-summary.json",
+          "sha256": "fae17733003043fcda7bd2e6bd5545a8a44d047deae889a51464d22714f7c68a",
+          "bytes": 32242
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-opaque-solar-comparisons-01/main/comparison.json",
+          "sha256": "6e594f730b2daf69195d185ef07a61ea29a2c57eef3d668aed87293a068c7eac",
+          "bytes": 114542
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-opaque-solar-comparisons-01/opaque-full-interior-source-run-request.json",
+          "sha256": "c37ecea5ba263c6975b2ea89ff702ec245b9b129e5dfffe9178a51d9686c7eeb",
+          "bytes": 4095
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "solar_state": "Original A24 Building MinimalShadowing changed only to FullInteriorAndExterior. Actual global/Zone/Building EIO, full SHD bytes, real zero back/subsurface rows and zero diagnostic/END counts match. Positive window/TDD/reflection consumers remain bounded."
       }
     ],
     "totals": {
-      "paired_cases": 21,
-      "reported_samples": 114408,
-      "raw_operand_unequal": 64568,
+      "paired_cases": 22,
+      "reported_samples": 119760,
+      "raw_operand_unequal": 68104,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1525,6 +1582,23 @@
           "sha256": "24adb54aa429ccef84a456988e358cb12eba3745dca2f10853278f7cb323f398",
           "bytes": 75119535
         }
+      },
+      {
+        "id": "opaque-solar-09",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-09/receipt.json",
+          "sha256": "be52ffee1ab07575c75878c48a61b7b99b2a4ff056bd7fadee223eac11314bbc",
+          "bytes": 4322
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/5f/5f3a54b4ae9016ed74f2700b196d3972986452716ff3436ea28099567d2baac1",
+          "sha256": "5f3a54b4ae9016ed74f2700b196d3972986452716ff3436ea28099567d2baac1"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-09/eplus-rs.exe",
+          "sha256": "2dcc1f476814ab8c87c74a034d83c5ccebd293cc354d8b25e14116b37ffd9bc0",
+          "bytes": 75119535
+        }
       }
     ],
     "focused_tests": [
@@ -1579,6 +1653,19 @@
             "path": ".runtime/object-expansion/air-gap-reports-tests-08b.log",
             "sha256": "5e542affbd9b3fcacfae42678803f0099667a194056a6a7fa840b7395485a5b5",
             "bytes": 2698
+          }
+        ]
+      },
+      {
+        "through_build": "opaque-solar-09",
+        "passed": 1,
+        "ignored": 0,
+        "scope": "Existing default-controls test extended with all five Building solar-distribution enums across A/B and retained actual raw ingress.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/opaque-solar-control-tests-09.log",
+            "sha256": "a3df4ceadbb09503bc40302badea6d01245eb2e774eddc33e31a4c874004820e",
+            "bytes": 2272
           }
         ]
       }
