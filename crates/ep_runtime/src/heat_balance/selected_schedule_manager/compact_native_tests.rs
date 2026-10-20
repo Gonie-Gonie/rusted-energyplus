@@ -2947,6 +2947,122 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
         assert!(!state.warmup_flag);
         completed.push((mode, files.eio.bytes));
     }
+    // Seven genuine Year ranges preserve the schema-valid folded month/day
+    // operands and produce distinct Week pointer runs despite identical Days.
+    // This stays in the existing owner body and reaches the same real EIO.
+    {
+        let mut raw = make_raw("Average");
+        let mut f = fixture_for(&raw)?;
+        raw["Output:Schedules"]
+            .as_object_mut()
+            .ok_or("actual Output schedules map")?
+            .remove("again");
+        f["object_order"]["Output:Schedules"] = serde_json::json!(["", " "]);
+        raw["Schedule:Week:Daily"]["V"] = raw["Schedule:Week:Daily"]["W"].clone();
+        let ranges = [
+            ("W", 1, 1, 2, 30),
+            ("V", 3, 2, 2, 31),
+            ("W", 3, 3, 4, 31),
+            ("V", 5, 2, 6, 31),
+            ("W", 7, 2, 9, 31),
+            ("V", 10, 2, 11, 31),
+            ("W", 12, 2, 12, 31),
+        ];
+        raw["Schedule:Year"]["Y"]["schedule_weeks"] = serde_json::json!(ranges.into_iter().map(|(week,sm,sd,em,ed)| {
+            serde_json::json!({"schedule_week_name":week,"start_month":sm,"start_day":sd,"end_month":em,"end_day":ed})
+        }).collect::<Vec<_>>());
+        let mut input = processor(&f, &raw)?;
+        let mut declarations = schedule_declarations(&f, &raw)?;
+        declarations.source_is_epjson = Some(true);
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut files) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            ReportFiles::default(),
+        );
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend_and_clock(
+                &mut input,
+                &declarations,
+                4,
+                &mut files,
+                &mut backend,
+                &flags,
+                &clock,
+            )?;
+        }
+        let w = *manager.week_schedule_map.get("W").ok_or("actual W Week")?;
+        let v = *manager.week_schedule_map.get("V").ok_or("actual V Week")?;
+        assert_ne!(w, v);
+        assert_eq!(
+            manager.week_schedules[w].day_schedules,
+            manager.week_schedules[v].day_schedules
+        );
+        let y = manager
+            .get_source_schedule("Y")?
+            .ok_or("actual folded Year")?;
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[y.0].data else {
+            return Err(invalid("actual folded Year Detailed owner").into());
+        };
+        assert_eq!(detail.week_schedules[0], None);
+        let ends = [61, 62, 122, 183, 275, 336, 366];
+        for day in 1..=366 {
+            let range = ends
+                .iter()
+                .position(|end| day <= *end)
+                .ok_or("actual full Year extent")?;
+            let expected = if range % 2 == 0 { w } else { v };
+            assert_eq!(
+                detail.week_schedules[day],
+                Some(expected),
+                "actual folded Year day{day}"
+            );
+        }
+        let eio = std::str::from_utf8(&files.eio.bytes)?;
+        let through = "Through Mar 01,W,Through Mar 02,V,Through May 01,W,Through Jul 01,V,Through Oct 01,W,Through Dec 01,V,Through Dec 31,W";
+        for level in ["Hourly", "Timestep"] {
+            let prefix = format!("Schedule - {level},Y,FRACTION,");
+            let actual = eio
+                .lines()
+                .filter(|line| line.starts_with(&prefix))
+                .collect::<Vec<_>>();
+            let expected = format!("{prefix}{through}");
+            assert_eq!(actual, vec![expected.as_str()]);
+        }
+        assert_eq!(files.opens, 1);
+        assert_eq!(
+            std::str::from_utf8(&files.audit)?,
+            "  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+        );
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_severe_errors
+            ),
+            (0, 0)
+        );
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors_during_warmup,
+                state.tracking.total_severe_errors_during_warmup
+            ),
+            (0, 0)
+        );
+        assert!(errors.is_empty());
+    }
     // A real partial EIO write retains exactly its completed prefix. Processing
     // owners and usage before that failure remain; Audit Complete is not emitted.
     let raw = make_raw("Average");

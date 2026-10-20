@@ -178,9 +178,10 @@
       "Connected B102 physical evidence covers all102/9792 original operands; existing owner checks inspect every Week pointer and all twelve day-type lookups. Missing reference and duplicate object-name diagnostics and unported Day siblings remain bounded."
     ],
     "Schedule:Year": [
-      "Actual ordered raw/IP getter creates the real Detailed kind0 owner before Compact/Constant. It resolves and marks each Week before consuming four raw dates, fills canonical inclusive or wrapped leap-shaped ranges, copies day59 to missing day60 and checks annual coverage in Native order.",
-      "Optional type warnings use real field names and live phase flags; existing uncached min/max, currentVal, DST, thermostat/gains and report owners consume actual pointers. Noncanonical date projection, incomplete/overlapping/reference error effects, EMS and broader environment/model physics remain bounded.",
-      "The same-input B102 Hourly/WeekDaily/Year replacement checks all102/9792 values, original96 gain/control/availability profiles, genuine nominal/day-group EIO, actualWarmup6, wholeSHD, fullERR-END0 and real deleted-emptyMTR. Existing owner checks additionally exercise wrapped ranges and February29 fallback."
+      "Actual ordered raw/IP getter creates the real Detailed kind0 owner before Compact/Constant. It resolves and marks each Week before consuming four raw numeric dates, then calls literal General::OrdinalDay(...,1) without a civil month-length validator. The Year-only compiler projection now follows the same operation under independent official integer month1..12/day1..31 bounds and max53 ranges; schema-valid February30/31 and April/June/September/November31 fold forward. Canonical Compact/calendar helpers and numeric parsing remain unchanged.",
+      "Inclusive and wrapped real leap-shaped pointers, missing day60-from59 fallback and annual coverage ordering remain intact. Optional type warnings retain actual field names and live phase flags; uncached min/max, currentVal, DST, thermostat/gains and report consumers read the genuine Day/Week/Detailed roots. Equal Day profiles do not merge distinct Week owners or their identity-based EIO report runs.",
+      "The sole same-input B102 physical pair derives the consumed Interval/List/week/Year plus both OutputSchedules input, replaces only gainYear with seven alternating W/V ranges and appends one real WeekDailyV whose twelve references point to the existing IntervalGainDay. All six noncanonical end dates are exercised; both actual28-line7420-byte schedule EIO sections retain ThroughMar01/Mar02/May01/Jul01/Oct01/Dec01/Dec31 and agree byte-for-byte with each other and the independent primary/input-derived expectation. Original102/9792 output values, all96 gain/control/availability profiles, genuine nominal/day-group EIO, actualWarmup6, wholeSHD, fullERR-END0 and real deleted-emptyMTR agree. Existing owner checks independently inspect all366 actual pointer identities, wrapped ranges and February29 fallback; serialized report runs are observed physically without claiming instrumented internal pointer bits.",
+      "Large unsigned JSON storage, signed-zero custody, unsafe conversions and incomplete/overlap/reference diagnostic effects remain separately bounded. This unit adds no generic ProcessNumber/date syntax, Schedule:File/EMS behavior, new family admission or arbitrary environment/model combination claim; the existing raw/compiler/type and error-child boundaries continue to apply."
     ],
     "Schedule:Day:Interval": [
       "Actual Source A/B raw/IP getters retain input format, declaration order, original counts, field names, blanks/defaults and usage. Existing numeric extension items with omitted values provide real zero blanks; explicit null/string numerics and missing whole rows are not promoted.",
@@ -217,18 +218,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/output-schedules-clippy-34.log",
-        "sha256": "81d6d143cd9d384c5db990bc8d1cfc2d255a0a6bfce2d5e5d1dfff782e2f2151",
-        "bytes": 2520
+        "path": ".runtime/object-expansion/schedule-year-folding-clippy-35.log",
+        "sha256": "046e4b5b4458b23c837e59cfc12441cb6b777645a86c846c8561c3e3bbfb720b",
+        "bytes": 2302
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/output-schedules-docs-34.log",
-        "sha256": "84484d8e9107bdfdf500aedad2fcecad10c8c97c7bfa0d7c8c0e9c2c6c5c610f",
+        "path": ".runtime/object-expansion/schedule-year-folding-docs-35.log",
+        "sha256": "cf39bcb30c98128c955997d7220b10312d5f4cd85578cf7dba3e1fe24658990a",
         "bytes": 354
       },
-      "clippy_through_build": "output-schedules-34",
+      "clippy_through_build": "year-folding-35",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3530,11 +3531,62 @@
           "passed": true
         },
         "effective_state": "Frozen real33 consumed Interval/List/WeekCompact/WeekDaily/Year input is preserved byte-for-byte; exactly two distinct Output:Schedules Hourly and Timestep requests append. The original102requests/weather/Constant4/Fraction0..1/realconsumer references and all original schedule profiles are unchanged. Actual Source raw/IP report getters reach the live schedule manager report stage and genuine open EIO capability. All retained type/day/week/Detailed owners, MissingDay0, real4step/15minute clock, Hourly last-step values versus all Timestep values, twelve real day pointers, constant omission and actual leap1 inverse date compression are read rather than supplied from a preview. The complete actual26line6244byteCRLF schedule report section agrees byte-for-byte with the independent primary/input-derived expectation and between engines at actual line14. Full102/9792 original physical streams independently recomputed with the unchanged kernel show zero raw/binary64/tolerance/RMSE differences; all96profiles/fullERR-END0/warmup0/sizing0/actualWarmup6/nominal plus fourdaygroup0..1000W/wholeSHD/genuine deletedMTR agree. ActualBuild34 report, disjoint EIO/Audit capabilities, clock/General inverse owners plus existing real minute/regular/compiler/IDF/admission/sharednumber owners are authenticated against actual live/archive/snapshot bytes. Sole physical pair uses No-mode days; separate owner tests cover other interpolation and duplicate effects, with no all-combination or full schedule/report-domain claim."
+      },
+      {
+        "id": "year-folding",
+        "group": "schedule_year_folded_dates",
+        "source_build": "year-folding-35",
+        "input": {
+          "path": ".runtime/object-expansion/native-year-folding/calibration-01/input.idf",
+          "sha256": "9b38c63034d8040d385f3afcdfc667e2f47276e387b07c68b366bd88305f6a1d",
+          "bytes": 14520
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-year-folding/calibration-01/receipt.json",
+          "sha256": "27eac28a8d765bb24d93a4d0a6fb53da35ead16b89ade9a37d8ff195ab25b40d",
+          "bytes": 17425
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-year-folding-35/year-folding/receipt.json",
+          "sha256": "7bec745da54fa893948c91591b19034e61aa94165df0556bf52eb37fe83fcd34",
+          "bytes": 3670
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/year-folding-35/run-summary.json",
+          "sha256": "8d5ae98cd06c1c28568f709817afcb0c7a8e912093169b6c5b3fb7ef6223b39a",
+          "bytes": 60468
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-year-folding-comparisons-35/year-folding/comparison.json",
+          "sha256": "89c52e6200d880cf5a429bbd29647cd9c811f6b60379395e61f961a388b4bd6e",
+          "bytes": 270664
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-year-folding-35-launch/year-folding/request.json",
+          "sha256": "bc5c9a6e9e61347ed33662dd5b84c8a5c5f04f0f39f7a5d4adbc1f9ccd12d53a",
+          "bytes": 3141
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Frozen34 consumed Interval/List/week/Year and both OutputSchedules requests change only the genuine gainYear full record and append realWeekDailyV with twelve existing gainDay references. Seven retained W/V ranges use allsix schema-valid noncanonical endpoints2/30,2/31,4/31,6/31,9/31,11/31 through literalYearOrdinalLeap1, covering1..366 once; exact inverse labels areMar01/Mar02/May01/Jul01/Oct01/Dec01/Dec31. W and V are distinct actual Week identities with identical Day profiles, and both wholeactual28line7420byteCRLF schedule reports preserve seven runs and the new Week row without profile-based merging. Full physical sections atline14 agree byte-for-byte with each other and the independent primary/input-derived expectation. Every other34byte, all102requests/weather/Constant4/Fraction/values/consumerrefs/bothreports and selected96profiles are unchanged. Actual Source raw/IP getters still populate the real minute/Day/Week/Detailed owners; only compilerYear date projection is relaxed within independent official integer bounds, and canonicalCompact/calendar rules remain unchanged. Full102/9792 original streams independently recomputed with the unchanged kernel have zero raw/binary64/tolerance/RMSE differences; fullERR-END0/warmup0/sizing0/actualWarmup6/nominal plus fourdaygroup0..1000W/wholeSHD/genuine deletedMTR agree. ActualBuild35 compilerYear projection and existing real schedule/report/clock/General inverse/EIO/IDF/admission/sharednumber owners are authenticated against live/archive/snapshot bytes. Serialized Week runs are physically observed; internal pointer/allocation bits are not instrumented. No produced values seed engines or all-date/all-model/family-domain claim is made."
       }
     ],
     "totals": {
-      "paired_cases": 60,
-      "reported_samples": 450462,
+      "paired_cases": 61,
+      "reported_samples": 460254,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -4118,12 +4170,40 @@
           "sha256": "5b191c08b0fc25ed9449c486a8355fc2d0a6f6e1fc4d32d6ae3f02be82951629",
           "bytes": 75933835
         }
+      },
+      {
+        "id": "year-folding-35",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-35/receipt.json",
+          "sha256": "5ceaef4d00e70f73d741fc948fa002a2b26846f704d8f69e74dfc7000018ac08",
+          "bytes": 4534
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/0a/0a340b964e879ce307e07e36963cb1f799d16d6401c64d51439e8435f7fa0a4e",
+          "sha256": "0a340b964e879ce307e07e36963cb1f799d16d6401c64d51439e8435f7fa0a4e"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-35/eplus-rs.exe",
+          "sha256": "f011ab5c454d01aedbc4cb52c6205f9f08abbc652df4acdeafc0f88e30abed98",
+          "bytes": 75935159
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "No subsequent Rust changes after full workspace milestone34."
+      "passed": 503,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/schedule-year-folding-compiler-tests-35.log",
+          "sha256": "8247aae61f96f6a82563bd6bf81a4b319b0e2a8e4f001fea9edf0abf30dabb66",
+          "bytes": 128028
+        },
+        {
+          "path": ".runtime/object-expansion/schedule-year-folding-owner-tests-35.log",
+          "sha256": "4256040aaa3a98915c5cbdba417402a984cac3af5ae7b204f3d0081a32e3f19a",
+          "bytes": 2388
+        }
+      ],
+      "scope": "After workspace milestone34, actual compiler library and the sole existing Source schedule owner body verify Year-only schema-bounded noncanonical date projection, all366 W/V root pointers, six folded endpoints, real equal-profile Week identity and both complete EIO report levels. No new test cohort, numeric classifier, runtime production or shared calendar API change; actual successful focused counts are summed from the two logs."
     }
   },
   "additional_native_type_calibrations": [

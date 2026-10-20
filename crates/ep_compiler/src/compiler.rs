@@ -11902,7 +11902,7 @@ impl<'a> Compiler<'a> {
                 ranges_valid = false;
                 continue;
             };
-            let Some(start_ordinal) = leap_schedule_ordinal(start_month, start_day) else {
+            let Some(start_ordinal) = schedule_year_ordinal(start_month, start_day) else {
                 self.error(
                     "InvalidScheduleYearDate",
                     OBJECT_TYPE,
@@ -11915,7 +11915,7 @@ impl<'a> Compiler<'a> {
                 ranges_valid = false;
                 continue;
             };
-            let Some(end_ordinal) = leap_schedule_ordinal(end_month, end_day) else {
+            let Some(end_ordinal) = schedule_year_ordinal(end_month, end_day) else {
                 self.error(
                     "InvalidScheduleYearDate",
                     OBJECT_TYPE,
@@ -17048,6 +17048,23 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
     // Loop2/shared fixed dates retain canonical validity. Plain3 above returns
     // its actual bounded OrdinalDay directly, without inventing a civil date.
     u16::try_from(leap_schedule_ordinal(month, day_of_month)?).ok()
+}
+
+/// ScheduleManager1204 calls General::OrdinalDay(...,1) without the
+/// civil-date validator. Keep this Year-only projection separate from the
+/// canonical Compact/calendar helper: official integer month/day bounds still
+/// apply independently, but schema-valid February30/April31 may fold forward.
+fn schedule_year_ordinal(month: u32, day: u32) -> Option<usize> {
+    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    const END_BEFORE_MONTH: [u32; 12] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let ordinal = day
+        .checked_add(END_BEFORE_MONTH[month as usize - 1])?
+        .checked_add(u32::from(month > 2))?;
+    usize::try_from(ordinal)
+        .ok()
+        .filter(|n| (1..=366).contains(n))
 }
 
 fn leap_schedule_ordinal(month: u32, day_of_month: u32) -> Option<usize> {
