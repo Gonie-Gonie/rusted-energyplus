@@ -392,7 +392,26 @@ fn resolve_raw(
                         .is_some_and(|value| value >= 0.0)
                 }
                 "OtherEquipment" => {
-                    selected(object, "fuel_type", &["None"])
+                    (selected(object, "fuel_type", &["None"])
+                        || source_calendar_ingress
+                            && text_is(
+                                field(object, "fuel_type").unwrap_or(&RawValue::Null),
+                                &[
+                                    "Electricity",
+                                    "NaturalGas",
+                                    "Gasoline",
+                                    "Diesel",
+                                    "Coal",
+                                    "Propane",
+                                    "FuelOilNo1",
+                                    "FuelOilNo2",
+                                    "OtherFuel1",
+                                    "OtherFuel2",
+                                    "DistrictCooling",
+                                    "DistrictHeatingWater",
+                                    "DistrictHeatingSteam",
+                                ],
+                            ))
                         && (if selected(
                             object,
                             "design_level_calculation_method",
@@ -1792,6 +1811,54 @@ mod source_a_compact_ingress {
                     )
                 )
             );
+        }
+        // The same selected raw gain getter consumes the real eFuel, while
+        // legacy admission retains its original None-only boundary.
+        for fuel in [
+            "Electricity",
+            "NaturalGas",
+            "Gasoline",
+            "Diesel",
+            "Coal",
+            "Propane",
+            "FuelOilNo1",
+            "FuelOilNo2",
+            "OtherFuel1",
+            "OtherFuel2",
+            "DistrictCooling",
+            "DistrictHeatingWater",
+            "DistrictHeatingSteam",
+        ] {
+            let value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                "OtherEquipment":{"fuel":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                    "fuel_type":fuel,"design_level_calculation_method":"Power/Area","design_level":352,"power_per_floor_area":3.7}}});
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert!(resolve(&raw).is_err());
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            let result = ep_compiler::compile_raw_model(&raw);
+            let typed = result
+                .model
+                .ok_or_else(|| format!("{:?}", result.report.diagnostics))?;
+            assert_eq!(
+                typed.other_equipment[0].fuel_type.0,
+                fuel.to_ascii_uppercase()
+            );
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+            assert_eq!(
+                hb.objects["OtherEquipment"][0].fields["fuel_type"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    fuel.into()
+                )
+            );
+        }
+        for fuel in ["Water", "Unrecognized fuel"] {
+            let value = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+                "OtherEquipment":{"fuel":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                    "fuel_type":fuel,"design_level_calculation_method":"EquipmentLevel","design_level":7}}});
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert!(resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err());
         }
         // The actual admission requires its Zone even for this isolated
         // format/count transfer check; no simulation or Native execution runs.

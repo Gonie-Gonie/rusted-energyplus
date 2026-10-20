@@ -2706,6 +2706,416 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
             assert!(eio.is_empty(), "nominal EIO remains unreached");
         }
+        // Genuine enum/resource registration and the existing timestep prefix
+        // all retain the same real gain rows. The gain-only IP fixture lacks
+        // refrigeration schema definitions, an explicit first child boundary.
+        for (fuel_index, fuel_name) in [
+            "Electricity",
+            "NaturalGas",
+            "Gasoline",
+            "Diesel",
+            "Coal",
+            "Propane",
+            "FuelOilNo1",
+            "FuelOilNo2",
+            "OtherFuel1",
+            "OtherFuel2",
+            "DistrictCooling",
+            "DistrictHeatingWater",
+            "DistrictHeatingSteam",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            use crate::heat_balance::source_output_registration::SourceRealOutputOwners;
+            let mut reports = failed_gains.clone();
+            for (i, object) in reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("fuel raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("fuel objects")?
+                .iter_mut()
+                .enumerate()
+            {
+                object.fields.insert(
+                    "fuel_type".into(),
+                    ProjectInputValue::String(fuel_name.into()),
+                );
+                object.fields.insert(
+                    "design_level".into(),
+                    ProjectInputValue::Number(if i == 0 { 7.0 } else { 3.0 }),
+                );
+            }
+            let clock = crate::weather::day::WeatherGlobalState {
+                time_step_zone_sec: 900.0,
+                ..Default::default()
+            };
+            let (mut state, mut console, mut eio, mut error) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            )?;
+            let gains = &reports.selected_internal_heat_gains;
+            assert!(!gains.get_input_flag && !gains.errors_found);
+            assert!(
+                gains
+                    .allocations
+                    .other_equipment
+                    .as_ref()
+                    .ok_or("fuel rows")?
+                    .iter()
+                    .all(|r| r.fuel as usize == fuel_index)
+            );
+            let zones = reports
+                .selected_zone_input
+                .as_ref()
+                .ok_or("fuel associations")?;
+            assert_eq!(
+                zones.zones.as_ref().ok_or("fuel Zone")?[0].other_equipment_fuels,
+                [fuel_index as i32]
+            );
+            assert_eq!(
+                zones.spaces.as_ref().ok_or("fuel Space")?[0].other_equipment_fuels,
+                [fuel_index as i32]
+            );
+            let meter = reports
+                .output_registration
+                .meters
+                .meters
+                .iter()
+                .find(|m| m.name == format!("{fuel_name}:Facility"))
+                .ok_or("real fuel facility meter")?;
+            assert_eq!(meter.resource as usize, fuel_index);
+            assert_eq!(
+                meter.source_variable_numbers.len(),
+                2,
+                "both real equipment owners share one meter"
+            );
+            assert_eq!(
+                meter.ip_units.map(|v| v as i32),
+                Some(match fuel_index {
+                    0 => 1,
+                    1 => 2,
+                    10 => 3,
+                    _ => 0,
+                })
+            );
+            for index in &meter.source_variable_numbers {
+                let target = reports.output_registration.out_vars[*index]
+                    .which
+                    .ok_or("real fuel output binding")?;
+                assert_eq!(
+                    *gains.real_output(target)?,
+                    0.0,
+                    "constructor Consumption is retained until reporting"
+                );
+            }
+            for prefix in [
+                "Other Equipment",
+                "Zone Other Equipment",
+                "Space Other Equipment",
+            ] {
+                for suffix in ["Rate", "Energy"] {
+                    assert!(
+                        reports
+                            .output_registration
+                            .dictionary_variables
+                            .iter()
+                            .any(|v| v.name == format!("{prefix} {fuel_name} {suffix}"))
+                    );
+                }
+            }
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut error),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let globals = reports
+                .selected_heat_balance_globals
+                .as_ref()
+                .ok_or("fuel globals")?;
+            // GetZoneData allocates these real report rows before gain resets.
+            reports
+                .selected_zone_input
+                .as_mut()
+                .ok_or("fuel predefined Zone reports")?
+                .zone_predefined = Some(vec![
+                crate::heat_balance::selected_heat_balance_input::zone::ZonePredefined::default();
+                globals.num_of_zones as usize
+            ]);
+            let mut air =
+                crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+            air.allocate_source_arrays(globals)?;
+            let retained_air = air.clone();
+            let mut modules =
+                crate::heat_balance::selected_gain_modules::SourceGainModules::default();
+            let mut facility =
+                crate::heat_balance::facility_electric_service::FacilityElectricService::new();
+            let mut provider =
+                crate::heat_balance::selected_gain_modules::SourceModuleGainProvider {
+                    modules: &mut modules,
+                    input: reports.selected_input_processor.as_mut().ok_or("fuel IP")?,
+                    facility: Some(&mut facility),
+                };
+            let mut step = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainStepOwners {
+                clock: &clock, globals, control: &reports.heat_balance_input_state,
+                zones: reports.selected_zone_input.as_mut().ok_or("live fuel zones")?,
+                schedules: reports.selected_schedule_manager.as_ref().ok_or("live fuel schedules")?,
+                backend: &mut backend, modules: &mut provider, latent: Some(&mut air), radiation: None,
+                zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
+            };
+            let reached = reports
+                .selected_internal_heat_gains
+                .manage_timestep(&mut step);
+            assert!(
+                matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))),
+                "actual fuel timestep prefix: {reached:?}"
+            );
+            let gains = &reports.selected_internal_heat_gains;
+            let rows = gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("updated fuel rows")?;
+            assert_eq!([rows[0].rates[0], rows[1].rates[0]], [7.0, 3.0]);
+            let space_report = &gains
+                .allocations
+                .space_report
+                .as_ref()
+                .ok_or("fuel rate report")?[0];
+            assert_eq!(space_report.other_power[fuel_index], 10.0);
+            assert!(
+                space_report
+                    .other_power
+                    .iter()
+                    .enumerate()
+                    .all(|(i, q)| i == fuel_index || *q == 0.0)
+            );
+            assert_eq!(
+                rows[0].energies[0], 0.0,
+                "the failed module child precedes ReportInternalHeatGains"
+            );
+            assert_eq!(
+                air, retained_air,
+                "latent sinks follow the failed module child"
+            );
+            assert!(
+                gains
+                    .allocations
+                    .space_devices
+                    .as_ref()
+                    .ok_or("fuel device cache")?
+                    .iter()
+                    .all(|space| space
+                        .devices
+                        .as_ref()
+                        .is_some_and(|rows| rows.iter().all(|row| row.cached_rates == [0.0; 7]))),
+                "cache writes also remain unreached"
+            );
+            assert_eq!(backend.state.tracking.total_warning_errors, 0);
+            assert_eq!(backend.state.tracking.total_severe_errors, 0);
+        }
+        // Real invalid/Water and negative-fuel diagnostics run before final
+        // nominal output; the raw invalid fuel is retained in the fuel lists.
+        for (fuel, code, level, expected) in [
+            ("Water", 13, 7.0, "invalid fuel_type entered=WATER"),
+            (
+                "Unrecognized fuel",
+                -1,
+                7.0,
+                "invalid fuel_type entered=UNRECOGNIZED FUEL",
+            ),
+            (
+                "NaturalGas",
+                1,
+                -7.0,
+                "design_level is not allowed to be negative",
+            ),
+        ] {
+            let mut reports = failed_gains.clone();
+            let object = &mut reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("invalid fuel raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("invalid fuel objects")?[0];
+            object
+                .fields
+                .insert("fuel_type".into(), ProjectInputValue::String(fuel.into()));
+            object
+                .fields
+                .insert("design_level".into(), ProjectInputValue::Number(level));
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: true,
+                ..Default::default()
+            };
+            let (mut state, mut console, mut eio, mut error) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            let outcome = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            assert!(
+                matches!(outcome, Err(crate::RuntimeError::HeatBalanceInput(e)) if matches!(*e, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(_)))
+            );
+            assert!(
+                reports.selected_internal_heat_gains.get_input_flag
+                    && reports.selected_internal_heat_gains.errors_found
+            );
+            assert_eq!(
+                reports
+                    .selected_zone_input
+                    .as_ref()
+                    .ok_or("invalid fuel zones")?
+                    .zones
+                    .as_ref()
+                    .ok_or("invalid Zone")?[0]
+                    .other_equipment_fuels,
+                [code]
+            );
+            assert!(
+                eio.is_empty(),
+                "fuel errors precede the real nominal EIO writer"
+            );
+            let text = String::from_utf8(error)?;
+            assert!(text.contains(expected));
+            if level < 0.0 {
+                assert!(text.contains("... when a fuel type of NaturalGas is specified."));
+            }
+            assert_eq!(state.tracking.total_severe_errors_during_warmup, 1);
+            assert!(
+                !state.warmup_flag,
+                "live flags do not rewrite backend constructor phase"
+            );
+        }
+        {
+            let mut reports = failed_gains.clone();
+            reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("fuel failure raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("fuel failure objects")?[0]
+                .fields
+                .insert(
+                    "fuel_type".into(),
+                    ProjectInputValue::String("Unrecognized fuel".into()),
+                );
+            let clock = crate::weather::day::WeatherGlobalState {
+                warmup_flag: true,
+                ..Default::default()
+            };
+            let (mut state, mut console, mut eio, mut error) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                OrdinaryFailingEio,
+            );
+            let outcome = CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            );
+            assert!(matches!(outcome, Err(crate::RuntimeError::WarmupOutput(_))));
+            let gains = &reports.selected_internal_heat_gains;
+            assert!(
+                gains.get_input_flag && !gains.errors_found,
+                "failed severe precedes ErrorsFound"
+            );
+            let row = &gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("fuel failure allocated rows")?[0];
+            assert_eq!(
+                row.fuel as i32, -1,
+                "fuel lookup precedes the failed diagnostic"
+            );
+            assert_eq!(row.design_level, 0.0);
+            assert!(
+                reports
+                    .selected_zone_input
+                    .as_ref()
+                    .ok_or("fuel failure zones")?
+                    .zones
+                    .as_ref()
+                    .ok_or("fuel failure Zone")?[0]
+                    .other_equipment_fuels
+                    .is_empty(),
+                "list insertion follows the returned severe"
+            );
+            assert_eq!(state.tracking.total_severe_errors_during_warmup, 1);
+            assert!(eio.is_empty());
+        }
         failed_gains
             .heat_balance_input
             .as_mut()

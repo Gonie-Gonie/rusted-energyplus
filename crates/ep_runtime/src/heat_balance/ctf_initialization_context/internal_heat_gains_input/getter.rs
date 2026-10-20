@@ -401,18 +401,21 @@ impl SelectedInternalHeatGains {
                 row.space_index = space_number;
                 row.zone_ptr = zone_number;
                 row.schedule = schedule;
-                row.fuel = match values.alphas[1].as_str() {
-                    "NONE" => SourceOtherFuel::None,
-                    "PROPANE" => SourceOtherFuel::Propane,
-                    // Other enum/invalid/Water diagnostics remain an actual
-                    // unresolved fuel-validation operation, never a None alias.
-                    _ => {
-                        return Err(unavailable(
-                            "actual OtherEquipment unrepresented fuel lookup/diagnostics1868",
-                        ));
-                    }
-                };
+                row.fuel = SourceOtherFuel::from_source_name(&values.alphas[1]);
                 if row.fuel != SourceOtherFuel::None {
+                    if matches!(row.fuel, SourceOtherFuel::Invalid | SourceOtherFuel::Water) {
+                        sizing_severe(
+                            owners,
+                            &format!(
+                                "GetInternalHeatGains: OtherEquipment: invalid {} entered={} for {}={}",
+                                local.alpha_field_names[1],
+                                values.alphas[1],
+                                local.alpha_field_names[0],
+                                object.name
+                            ),
+                        )?;
+                        self.errors_found = true;
+                    }
                     let fuel = row.fuel as i32;
                     let zone = owners
                         .zones
@@ -484,14 +487,20 @@ impl SelectedInternalHeatGains {
                     }
                 }
                 row.design_level = design_level;
-                if row.design_level < 0.0 && row.fuel == SourceOtherFuel::Propane {
-                    owners.backend.show_severe_error(&format!(
-                        "GetInternalHeatGains: OtherEquipment=\"{}\", {} is not allowed to be negative",
-                        object.name, level_name,
+                if row.design_level < 0.0
+                    && !matches!(row.fuel, SourceOtherFuel::Invalid | SourceOtherFuel::None)
+                {
+                    sizing_severe(
+                        owners,
+                        &format!(
+                            "GetInternalHeatGains: OtherEquipment=\"{}\", {} is not allowed to be negative",
+                            object.name, level_name,
+                        ),
+                    )?;
+                    owners.backend.show_continue_error(&format!(
+                        "... when a fuel type of {} is specified.",
+                        row.fuel.source_name()?
                     ))?;
-                    owners
-                        .backend
-                        .show_continue_error("... when a fuel type of Propane is specified.")?;
                     self.errors_found = true;
                 }
                 let schedule = schedule.ok_or_else(|| {

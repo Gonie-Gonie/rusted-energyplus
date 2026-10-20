@@ -312,6 +312,73 @@ fn source_meter_getter_preserves_all_frequencies_and_real_dual_stream_duplicate_
             );
         }
     }
+    // Genuine AddMeter resource classification and the final retained meter
+    // period feed the existing tabular writer. These authored completed-period
+    // operands are unit inputs, not a Native/Source physical comparison.
+    {
+        use crate::heat_balance::ctf_reports::PredefinedStringTable;
+        use crate::heat_balance::predefined_tables::PredefinedRegistry;
+        use crate::heat_balance::source_output_registration::meters::SourceMeterIpUnits;
+
+        let mut gas = SourceOutputRegistration::default();
+        gas.out_vars.push(SourceOutVarReal {
+            units: SourceOutputUnits::J,
+            ..SourceOutVarReal::default()
+        });
+        gas.attach_source_general_meters(
+            SourceOutputUnits::J,
+            SourceGeneralMeterArguments {
+                resource: SourceMeterResource::NaturalGas,
+                end_use: SourceMeterEndUse::Invalid,
+                end_use_subcategory: "",
+                group: SourceMeterGroup::Invalid,
+                zone_name: "",
+                space_type: "",
+                zone_multiplier: 1,
+                zone_list_multiplier: 1,
+            },
+            0,
+        )?;
+        assert_eq!(gas.meters.meters.len(), 1);
+        let meter = &mut gas.meters.meters[0];
+        assert_eq!(meter.name, "NaturalGas:Facility");
+        assert_eq!(meter.resource, SourceMeterResource::NaturalGas);
+        assert_eq!(meter.ip_units, Some(SourceMeterIpUnits::Gas));
+        assert_eq!(SourceMeterIpUnits::Gas as i32, 2);
+        assert_eq!(meter.source_variable_numbers, vec![0]);
+        let period = &mut meter.period_final_year_simulation;
+        period.value = 3_600_000_000.0;
+        period.minimum = 900_000.0;
+        period.minimum_date = 1_021_015;
+        period.maximum = 1_800_000.0;
+        period.maximum_date = 2_031_230;
+        let mut registry = PredefinedRegistry::default();
+        registry.set_predefined_tables(false, false)?;
+        let mut table = PredefinedStringTable::default();
+        gas.report_source_for_tabular_reports(&registry, &mut table, &900.0)?;
+        assert_eq!(table.num_table_entry, 5);
+        let entries = table.entries.as_ref().ok_or("actual Gas table entries")?;
+        for (entry, (column, text, value)) in entries[..5].iter().zip([
+            ("pdchEMgasannual", "3.60", Some(3.6)),
+            ("pdchEMgasminvalue", "1000.00", Some(1000.0)),
+            ("pdchEMgasminvaluetime", "02-JAN-09:15", None),
+            ("pdchEMgasmaxvalue", "2000.00", Some(2000.0)),
+            ("pdchEMgasmaxvaluetime", "03-FEB-11:30", None),
+        ]) {
+            assert_eq!(entry.object_name, "NaturalGas:Facility");
+            assert_eq!(entry.index_column, registry.named_indices[column]);
+            assert_eq!(std::str::from_utf8(&entry.char_entry)?.trim(), text);
+            assert_eq!(entry.original_entry_is_real, value.is_some());
+            if let Some(value) = value {
+                assert_eq!(entry.original_real_entry, value);
+                assert_eq!(entry.significant_digits, 2);
+            }
+        }
+        assert_ne!(
+            entries[0].index_column, registry.named_indices["pdchEMotherJannual"],
+            "NaturalGas must retain its Gas predefined columns"
+        );
+    }
     Ok(())
 }
 

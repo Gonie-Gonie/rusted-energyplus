@@ -1,4 +1,4 @@
-//! Ordered None/Propane IHG declarations on the existing OutputProcessor owner.
+//! Ordered real eFuel IHG declarations on the existing OutputProcessor owner.
 use super::getter::SourceGainInputOwners;
 use super::{E, SelectedInternalHeatGains, index, unavailable};
 use crate::heat_balance::source_output_registration::{
@@ -138,15 +138,11 @@ impl SelectedInternalHeatGains {
             for (row_index, row) in equipment.iter().enumerate() {
                 add_zone_outputs[index(row.zone_ptr)?] = true;
                 add_space_outputs[index(row.space_index)?] = true;
-                if row.fuel == super::SourceOtherFuel::Propane {
-                    self.declare_propane(owners, row_index, false)?;
-                    self.declare_propane(owners, row_index, true)?;
-                }
                 if row.fuel != super::SourceOtherFuel::None
                     && row.fuel != super::SourceOtherFuel::Invalid
-                    && row.fuel != super::SourceOtherFuel::Propane
                 {
-                    return Err(unavailable("positive IHG other fuel meter output"));
+                    self.declare_fuel(owners, row_index, false)?;
+                    self.declare_fuel(owners, row_index, true)?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     let value = if i.is_multiple_of(2) {
@@ -183,22 +179,27 @@ impl SelectedInternalHeatGains {
                     if fuel == -1 || fuel == 14 {
                         continue;
                     }
-                    if fuel != 5 {
-                        return Err(unavailable("actual other fuel total output name"));
-                    }
+                    let fuel_index =
+                        usize::try_from(fuel)
+                            .ok()
+                            .filter(|i| *i < 13)
+                            .ok_or_else(|| {
+                                unavailable("actual valid OtherEquipment fuel total index")
+                            })?;
+                    let fuel_name = super::SourceOtherFuel::source_name_at(fuel)?;
                     declare(
                         owners,
                         name,
-                        "Zone Other Equipment Propane Rate",
+                        &format!("Zone Other Equipment {fuel_name} Rate"),
                         1,
-                        &report.other_power[5],
+                        &report.other_power[fuel_index],
                     )?;
                     declare(
                         owners,
                         name,
-                        "Zone Other Equipment Propane Energy",
+                        &format!("Zone Other Equipment {fuel_name} Energy"),
                         0,
-                        &report.other_consumption[5],
+                        &report.other_consumption[fuel_index],
                     )?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
@@ -232,22 +233,27 @@ impl SelectedInternalHeatGains {
                     if fuel == -1 || fuel == 14 {
                         continue;
                     }
-                    if fuel != 5 {
-                        return Err(unavailable("actual other fuel total output name"));
-                    }
+                    let fuel_index =
+                        usize::try_from(fuel)
+                            .ok()
+                            .filter(|i| *i < 13)
+                            .ok_or_else(|| {
+                                unavailable("actual valid OtherEquipment fuel total index")
+                            })?;
+                    let fuel_name = super::SourceOtherFuel::source_name_at(fuel)?;
                     declare(
                         owners,
                         name,
-                        "Space Other Equipment Propane Rate",
+                        &format!("Space Other Equipment {fuel_name} Rate"),
                         1,
-                        &report.other_power[5],
+                        &report.other_power[fuel_index],
                     )?;
                     declare(
                         owners,
                         name,
-                        "Space Other Equipment Propane Energy",
+                        &format!("Space Other Equipment {fuel_name} Energy"),
                         0,
-                        &report.other_consumption[5],
+                        &report.other_consumption[fuel_index],
                     )?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
@@ -268,7 +274,7 @@ impl SelectedInternalHeatGains {
 }
 
 impl SelectedInternalHeatGains {
-    fn declare_propane(
+    fn declare_fuel(
         &self,
         owners: &mut SourceGainInputOwners<'_, '_>,
         row_index: usize,
@@ -277,7 +283,7 @@ impl SelectedInternalHeatGains {
         use crate::heat_balance::source_output_registration::{
             SourceGeneralMeterArguments, SourceGeneralRealRegistrationOptions,
             SourceInternalGainOutputField, SourceMeterEndUse, SourceMeterGroup,
-            SourceMeterResource, SourceRealOutputBinding, SourceRealOutputTarget,
+            SourceRealOutputBinding, SourceRealOutputTarget,
         };
         let row = self
             .allocations
@@ -308,7 +314,7 @@ impl SelectedInternalHeatGains {
             .and_then(|r| index(row.space_index).ok().and_then(|i| r.get(i)))
             .ok_or_else(|| unavailable("same output Space"))?;
         let meter = energy.then_some(SourceGeneralMeterArguments {
-            resource: SourceMeterResource::Propane,
+            resource: row.fuel.meter_resource()?,
             end_use: SourceMeterEndUse::InteriorEquipment,
             end_use_subcategory: &row.end_use_subcategory,
             group: SourceMeterGroup::Building,
@@ -328,11 +334,11 @@ impl SelectedInternalHeatGains {
                 &mut request,
                 owners.prescan,
                 SourceRealOutputDeclaration {
-                    name: if energy {
-                        "Other Equipment Propane Energy"
-                    } else {
-                        "Other Equipment Propane Rate"
-                    },
+                    name: &format!(
+                        "Other Equipment {} {}",
+                        row.fuel.source_name()?,
+                        if energy { "Energy" } else { "Rate" }
+                    ),
                     key: &row.name,
                     units: if energy { Units::J } else { Units::W },
                     store_type: if energy { Store::Sum } else { Store::Average },

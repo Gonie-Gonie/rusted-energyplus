@@ -25,9 +25,101 @@ pub(crate) use timestep::{
 pub(crate) enum SourceOtherFuel {
     #[default]
     Invalid = -1,
-    /// Native Constant::eFuel::Propane, distinct from eFuel::None14.
+    // Literal Constant::eFuel positions; Water is retained for its real error.
+    Electricity = 0,
+    NaturalGas = 1,
+    Gasoline = 2,
+    Diesel = 3,
+    Coal = 4,
     Propane = 5,
+    FuelOilNo1 = 6,
+    FuelOilNo2 = 7,
+    OtherFuel1 = 8,
+    OtherFuel2 = 9,
+    DistrictCooling = 10,
+    DistrictHeatingWater = 11,
+    DistrictHeatingSteam = 12,
+    Water = 13,
     None = 14,
+}
+
+impl SourceOtherFuel {
+    fn from_source_name(name: &str) -> Self {
+        match name {
+            "ELECTRICITY" => Self::Electricity,
+            "NATURALGAS" => Self::NaturalGas,
+            "GASOLINE" => Self::Gasoline,
+            "DIESEL" => Self::Diesel,
+            "COAL" => Self::Coal,
+            "PROPANE" => Self::Propane,
+            "FUELOILNO1" => Self::FuelOilNo1,
+            "FUELOILNO2" => Self::FuelOilNo2,
+            "OTHERFUEL1" => Self::OtherFuel1,
+            "OTHERFUEL2" => Self::OtherFuel2,
+            "DISTRICTCOOLING" => Self::DistrictCooling,
+            "DISTRICTHEATINGWATER" => Self::DistrictHeatingWater,
+            "DISTRICTHEATINGSTEAM" => Self::DistrictHeatingSteam,
+            "WATER" => Self::Water,
+            "NONE" => Self::None,
+            _ => Self::Invalid,
+        }
+    }
+
+    fn source_name(self) -> Result<&'static str, E> {
+        Self::source_name_at(self as i32)
+    }
+
+    fn source_name_at(index: i32) -> Result<&'static str, E> {
+        const NAMES: [&str; 15] = [
+            "Electricity",
+            "NaturalGas",
+            "Gasoline",
+            "Diesel",
+            "Coal",
+            "Propane",
+            "FuelOilNo1",
+            "FuelOilNo2",
+            "OtherFuel1",
+            "OtherFuel2",
+            "DistrictCooling",
+            "DistrictHeatingWater",
+            "DistrictHeatingSteam",
+            "Water",
+            "None",
+        ];
+        usize::try_from(index)
+            .ok()
+            .and_then(|i| NAMES.get(i))
+            .copied()
+            .ok_or_else(|| unavailable("actual invalid eFuel name index"))
+    }
+
+    fn meter_resource(
+        self,
+    ) -> Result<crate::heat_balance::source_output_registration::SourceMeterResource, E> {
+        use crate::heat_balance::source_output_registration::SourceMeterResource as R;
+        // Constant::eFuel2eResource: the thirteen real OtherEquipment fuels.
+        Ok(match self {
+            Self::Electricity => R::Electricity,
+            Self::NaturalGas => R::NaturalGas,
+            Self::Gasoline => R::Gasoline,
+            Self::Diesel => R::Diesel,
+            Self::Coal => R::Coal,
+            Self::Propane => R::Propane,
+            Self::FuelOilNo1 => R::FuelOilNo1,
+            Self::FuelOilNo2 => R::FuelOilNo2,
+            Self::OtherFuel1 => R::OtherFuel1,
+            Self::OtherFuel2 => R::OtherFuel2,
+            Self::DistrictCooling => R::DistrictCooling,
+            Self::DistrictHeatingWater => R::DistrictHeatingWater,
+            Self::DistrictHeatingSteam => R::DistrictHeatingSteam,
+            _ => {
+                return Err(unavailable(
+                    "actual non-metered or invalid OtherEquipment fuel",
+                ));
+            }
+        })
+    }
 }
 
 /// One genuine ZoneEquipData row; rates/energies retain their constructor zero.

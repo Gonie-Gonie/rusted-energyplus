@@ -39,9 +39,18 @@ pub(crate) enum SourceMeterGroup {
 pub(crate) enum SourceMeterResource {
     Invalid = -1,
     Electricity = 0,
+    NaturalGas = 1,
+    Gasoline = 2,
+    Diesel = 3,
+    Coal = 4,
     Propane = 5,
+    FuelOilNo1 = 6,
+    FuelOilNo2 = 7,
+    OtherFuel1 = 8,
+    OtherFuel2 = 9,
     DistrictCooling = 10,
     DistrictHeatingWater = 11,
+    DistrictHeatingSteam = 12,
     EnergyTransfer = 15,
     ElectricityPurchased = 17,
     ElectricitySurplusSold = 18,
@@ -59,6 +68,7 @@ pub(crate) enum SourceMeterType {
 pub(crate) enum SourceMeterIpUnits {
     OtherJ = 0,
     Electricity = 1,
+    Gas = 2,
     Cooling = 3,
     OtherKG = 5,
 }
@@ -515,8 +525,17 @@ impl SourceOutputRegistration {
                 | SourceMeterResource::ElectricityPurchased
                 | SourceMeterResource::ElectricitySurplusSold
                 | SourceMeterResource::ElectricityNet => SourceMeterIpUnits::Electricity,
+                SourceMeterResource::NaturalGas => SourceMeterIpUnits::Gas,
                 SourceMeterResource::DistrictCooling => SourceMeterIpUnits::Cooling,
                 SourceMeterResource::DistrictHeatingWater
+                | SourceMeterResource::DistrictHeatingSteam
+                | SourceMeterResource::Gasoline
+                | SourceMeterResource::Diesel
+                | SourceMeterResource::Coal
+                | SourceMeterResource::FuelOilNo1
+                | SourceMeterResource::FuelOilNo2
+                | SourceMeterResource::OtherFuel1
+                | SourceMeterResource::OtherFuel2
                 | SourceMeterResource::Propane
                 | SourceMeterResource::EnergyTransfer
                 | SourceMeterResource::CarbonEquivalent => {
@@ -563,9 +582,18 @@ impl SourceMeterResource {
     pub(super) fn source_name(self) -> Result<&'static str, OrdinaryRadiationError> {
         match self {
             Self::Electricity => Ok("Electricity"),
+            Self::NaturalGas => Ok("NaturalGas"),
+            Self::Gasoline => Ok("Gasoline"),
+            Self::Diesel => Ok("Diesel"),
+            Self::Coal => Ok("Coal"),
             Self::Propane => Ok("Propane"),
+            Self::FuelOilNo1 => Ok("FuelOilNo1"),
+            Self::FuelOilNo2 => Ok("FuelOilNo2"),
+            Self::OtherFuel1 => Ok("OtherFuel1"),
+            Self::OtherFuel2 => Ok("OtherFuel2"),
             Self::DistrictCooling => Ok("DistrictCooling"),
             Self::DistrictHeatingWater => Ok("DistrictHeatingWater"),
+            Self::DistrictHeatingSteam => Ok("DistrictHeatingSteam"),
             Self::EnergyTransfer => Ok("EnergyTransfer"),
             Self::ElectricityPurchased => Ok("ElectricityPurchased"),
             Self::ElectricitySurplusSold => Ok("ElectricitySurplusSold"),
