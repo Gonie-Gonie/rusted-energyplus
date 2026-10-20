@@ -165,8 +165,8 @@
     "Schedule:Compact": [
       "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use shared Source ProcessNumber, including D/E, successful signed underflow zero, empty/space-only and optional missing field as zero. Unknown item metadata is retained. Integral HH/MM includes genuine blank operands and exact byte0/immediate-colon grammar. Explicit0:0 and statefulMM60 retain every empty segment; MM60 preserves the prior decoded endpoint, with None distinct from Some0. Whole-hour empty warnings and Linear next-segment seeds remain genuine. Explicit null, missing entries, initialMM60 and nonIntegral formatting paths remain bounded.",
       "No/Average/Linear use retained minute/day/week/currentVal producers and actual type clocks. Optional blank/unknown types retain Invalid/None and original warning/continuation order. Missing For masks retain genuine MissingDay0 pointers and exact warnings. Detailed hasVal and uncached minmax follow actual366week/12day-type pointers and clocks; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects are preserved; Linear endpoint residues are never clamped.",
-      "Through invokes the real General child and leap OrdinalDay into the existing367week array for bounded fixed numeric/named/reversed/dash/space dates, including successful three-number year-first/year-last forms with Source ProcessNumber and truncation before integer selection. Two-field numeric fractions and numeric/month-prefix forms use exact whole-number-first dispatch, ordered separator/stopword normalization, integer truncation and canonical month/day validation; month names use the genuine first3characters in either position. Shared ProcessNumber now distinguishes genuine error-zero from non-finite suffix success before defined General integer conversion; only successful finite scalar/Until values are admitted, including underflow \u00b10. Empty/successful finite trunc-zero Through values retain real MonthDay0/0 empty owners. Coverage for admitted endpoints0..366 preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Broader date grammar and sibling families remain bounded.",
-      "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
+      "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow \u00b10, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
+      "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E and folded/zero dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
     ]
   },
   "verification": {
@@ -183,18 +183,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/process-number-outcomes-clippy-30.log",
-        "sha256": "3a9346100c291a6821de7a0fc3b15fc74ad4c01598f96915c2d58220cf16a7ff",
-        "bytes": 2492
+        "path": ".runtime/object-expansion/compact-through-folding-clippy-31.log",
+        "sha256": "69a7738d649f5778adac7919a28d53cb1ec1f694fc205e8c75273c52ca861959",
+        "bytes": 2288
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-through-underflow-docs-30.log",
+        "path": ".runtime/object-expansion/compact-through-folding-docs-31.log",
         "sha256": "f226614fe1cfb6afac4b38fa5b3acbe5344b3603467770c825476e8349834d8f",
         "bytes": 354
       },
-      "clippy_through_build": "compact-through-underflow-30",
+      "clippy_through_build": "compact-through-folding-31",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3292,11 +3292,62 @@
           "passed": true
         },
         "effective_state": "Exactly two original B102 full schedule-record edits: gain leading Through1e-9999/AllDays/Until24=2 and availability leading Through-1D-9999/AllDays/Until24=2 before unchanged original12/31 profiles. Pinned bundled fast_float predicts finite signed underflow zero with success ec; Utility D-to-e recursion and whole-operand GeneralProcessNumber/int0 reach MonthDay0/0 and empty1..0 topology. Those internal signed-zero/date states are primary-derived predictions, not instrumented observations. Real rooted Fraction0..1/Constant4/consumers/all102requests/weather/otherbytes/original96profiles retained. Actual102/9792 raw-token and binary64 identical, zero tolerance/RMSE failures, fullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/actualdeletedMTR agree. Original full numerical kernel recomputed read-only; actualBuild30 compiler, SourceCompact, realGeneral, rich shared SourceNumberOutcome module+export, lexical reader and ingress live/archive/snapshot identities authenticated. No Native values feed runtime; no general grammar/fullCompact-domain/internal parser-bit claim."
+      },
+      {
+        "id": "compact-through-folding",
+        "group": "schedule_compact_through_folding",
+        "source_build": "compact-through-folding-31",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-through-folding/calibration-01/input.idf",
+          "sha256": "8f1969c44ae434c434670aced319fca704a6a7927d863ca31868437581eb3613",
+          "bytes": 13192
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-through-folding/calibration-01/receipt.json",
+          "sha256": "43b65c9a4cdb64d0c4d16f38243e3a2fe4dda4f075a72bf4cef94d14545715f2",
+          "bytes": 12888
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-through-folding-31/through-folding/receipt.json",
+          "sha256": "00a9148f304357239c3e1eb64f637a48abbb790788bec070dd367aea414b166b",
+          "bytes": 3910
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-through-folding-31/run-summary.json",
+          "sha256": "88d5eef6e3932439cf252ae1ab3cb271439edb75e2908c2c6d1a9a32c0d61552",
+          "bytes": 60765
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-through-folding-comparisons-31/through-folding/comparison.json",
+          "sha256": "8d394e2d3129369767349cc8fb18455955135c9f9dab5eff64ea77f29ba4413b",
+          "bytes": 248673
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-through-folding-31-launch/through-folding/request.json",
+          "sha256": "7cd11605d5b7a923701415a18ac1c8ef128173fb05f1f2fbc0bdac8c68fb7bf1",
+          "bytes": 3233
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Exactly two original B102 full schedule-record edits: gain Through2013/2/30 then original12/31 with identical original0/1/0 profiles in both periods, and availability leading Through2013/13/31 AllDays/Until24=2 before original12/31 profile. Pinned General three-field arm converts all ProcessNumber/int fields before selecting year position, makes MonthDay2/30 or13/31 without ValidateMonthDay, and actual OrdinalDay(...,1) predicts61 or0. These internal month/day/ordinal states are primary-derived predictions, not instrumented observations. Actual retained roots/profiles/Fraction0..1/Constant4/consumers/all102requests/weather/otherbytes are validated through real physical consumers. Full102/9792 raw operands and binary64 values identical, zero tolerance/RMSE failures, fullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/actualdeletedMTR agree. Original full numerical kernel recomputed read-only; actualBuild31 compiler, SourceCompact, realGeneral, rich shared SourceNumberOutcome module+export, lexical reader and ingress live/archive/snapshot identities authenticated. No Native values feed runtime; no general civil-date/full schedule-domain or measured internal parser-bit claim."
       }
     ],
     "totals": {
-      "paired_cases": 56,
-      "reported_samples": 411294,
+      "paired_cases": 57,
+      "reported_samples": 421086,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3812,12 +3863,40 @@
           "sha256": "1c5c1ab1ae30ce76eb2f46fc5e0d5547faa2508db25a5a0f34ec6c657a55b823",
           "bytes": 75680677
         }
+      },
+      {
+        "id": "compact-through-folding-31",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-31/receipt.json",
+          "sha256": "e4a8827835cf55da3000ad727a69521e4137f730330bdcce65288ee6f56fd467",
+          "bytes": 4727
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/37/3781d9f0e7bd53f78bba72288fccc7ea8ed51f3dbcbd43acfeb44cd2162f1feb",
+          "sha256": "3781d9f0e7bd53f78bba72288fccc7ea8ed51f3dbcbd43acfeb44cd2162f1feb"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-31/eplus-rs.exe",
+          "sha256": "9bb295d780cca9f49571a530431a373ae31d564bb033dcc36455d01246a599a8",
+          "bytes": 75687314
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "No subsequent Rust changes or additional focused tests after full workspace milestone30."
+      "passed": 26,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/compact-through-folding-compiler-tests-31.log",
+          "sha256": "3b1fdcfd15f04b109033917681066e2004569343bf3cc77ad9ca90b75d315d73",
+          "bytes": 7450
+        },
+        {
+          "path": ".runtime/object-expansion/compact-through-folding-owner-tests-31.log",
+          "sha256": "94a9631000df90af5b91bea2f0b770702fb44ab841fbe507e20c8d3352de0be5",
+          "bytes": 2376
+        }
+      ],
+      "scope": "After full workspace milestone30, existing compiler Compact25 and actual ScheduleManager1 bodies verify plain-three-token General selection, ignored genuine error-zero flags, defined all-token casts, checked ordinal folds and bounds, inactive owners, reachable limits and resumed overlap. No new test cohort or dependency."
     }
   },
   "additional_native_type_calibrations": [

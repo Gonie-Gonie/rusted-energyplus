@@ -16969,6 +16969,88 @@ fn parse_compact_source_two_field_through(value: &str) -> Option<u16> {
     u16::try_from(ordinal).ok()
 }
 
+/// Exact completing plain-three-token General MonthDay branch. Unlike Loop2,
+/// it ignores numeric error flags and never calls ValidateMonthDay. Keep the
+/// actual checked OrdinalDay result, not a fabricated canonical civil date.
+fn parse_compact_source_three_field_through(value: &str) -> Option<u16> {
+    use ep_model::SourceNumberOutcome::{ErrorZero, Finite, NonFinite};
+    // Native's E-tail std::isdigit is not defined for negative high-bit chars.
+    // This newly projected branch is ASCII only; shared legacy parsing remains.
+    if !value.is_ascii() || !value.get(..7)?.eq_ignore_ascii_case("Through") {
+        return None;
+    }
+    let operand = value.get(7..)?;
+    let operand = operand
+        .strip_prefix(':')
+        .unwrap_or(operand)
+        .trim_matches(' ');
+    // ProcessDateString must take its real failed-WHOLE-number route first.
+    // Finite zero belongs to the earlier zero arm; finite nonzero Julian and
+    // non-finite success cannot be treated as date tokens by this helper.
+    if ep_model::process_source_number_outcome(operand) != ErrorZero {
+        return None;
+    }
+    let mut normalized = operand.to_ascii_uppercase().replace(['/', ':', '-'], " ");
+    let mut weekday_in_month = false;
+    for word in ["ST ", "ND ", "RD ", "TH ", "OF ", "IN "] {
+        while let Some(at) = normalized.find(word) {
+            normalized.replace_range(at..at + 2, "  ");
+            weekday_in_month = true;
+        }
+    }
+    if weekday_in_month {
+        return None;
+    } // Reached Nth/Last branch, not plain3.
+    let fields = normalized
+        .split(' ')
+        .filter(|field| !field.is_empty())
+        .collect::<Vec<_>>();
+    let [first, second, third] = fields.as_slice() else {
+        return None;
+    };
+    let source_int = |text: &str| {
+        let number = match ep_model::process_source_number_outcome(text) {
+            Finite(value) => value,
+            ErrorZero => 0.0, // Native actually returned0; this branch ignores errFlag.
+            NonFinite => return None,
+        };
+        let truncated = number.trunc();
+        if !truncated.is_finite()
+            || truncated < f64::from(i32::MIN)
+            || truncated > f64::from(i32::MAX)
+        {
+            return None;
+        }
+        Some(truncated as i32)
+    };
+    // Native converts ALL3 before selection, even an unused year or day that
+    // would later be ignored by an invalid-month OrdinalDay0 branch.
+    let first = source_int(first)?;
+    let second = source_int(second)?;
+    let third = source_int(third)?;
+    let (month, day) = if first > 100 {
+        (second, third)
+    } else if third > 100 {
+        (first, second)
+    } else {
+        (0, 0)
+    };
+    const END_MONTH: [i32; 12] = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
+    let ordinal = match month {
+        1 => day,
+        2 => day.checked_add(END_MONTH[0])?,
+        3..=12 => day
+            .checked_add(END_MONTH[(month - 2) as usize])?
+            .checked_add(1)?,
+        _ => 0,
+    };
+    // Bound before real schedule array access or StartPointer=end+1 arithmetic.
+    if !(0..=366).contains(&ordinal) {
+        return None;
+    }
+    u16::try_from(ordinal).ok()
+}
+
 fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
     let date = compact_directive_operand(value, "Through")?;
     // ScheduleManager1324 erases an immediate colon only, before ASCII strip.
@@ -17002,58 +17084,10 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
             day_of_month,
         }) => (month, day_of_month),
         Some(_) => return None,
-        None => {
-            // General635-654 selects numeric yyyy/mm/dd or mm/dd/yyyy by
-            // first>100, otherwise third>100. This actual caller omits PYear,
-            // so the authored year does not change the leap-shaped schedule.
-            // Each numeric token uses the same successful ProcessNumber and
-            // defined trunc-to-int boundary as the actual General child. Keep
-            // failed-number/unvalidated-date branches outside this projection;
-            // the selected fixed month/day and shared CalendarDateRule stay strict.
-            // Check the original authored directive before the operand helper
-            // can hide a Unicode/tab edge with trim. This new numeric arm
-            // admits only General's ASCII-space separators, no leading '+'.
-            // The pre-existing two-field/named-date parser above is unchanged.
-            if value
-                .chars()
-                .any(|character| character.is_whitespace() && character != ' ')
-            {
-                return None;
-            }
-            let normalized = date.replace(['/', ':', '-'], " ");
-            let fields = normalized
-                .split(' ')
-                .filter(|field| !field.is_empty())
-                .collect::<Vec<_>>();
-            let [first, second, third] = fields.as_slice() else {
-                return None;
-            };
-            let source_int = |text: &str| {
-                let number = ep_model::process_source_number(text).ok()?;
-                let truncated = number.trunc();
-                if !truncated.is_finite()
-                    || truncated < f64::from(i32::MIN)
-                    || truncated > f64::from(i32::MAX)
-                {
-                    return None;
-                }
-                Some(truncated as i32)
-            };
-            let first = source_int(first)?;
-            let second = source_int(second)?;
-            let third = source_int(third)?;
-            let (month, day) = if first > 100 {
-                (second, third)
-            } else if third > 100 {
-                (first, second)
-            } else {
-                return None;
-            };
-            (u32::try_from(month).ok()?, u32::try_from(day).ok()?)
-        }
+        None => return parse_compact_source_three_field_through(value),
     };
-    // The same fixed-date validity and leap ordinal are retained for old and
-    // new spellings. No year, expanded values or runtime answer is invented.
+    // Loop2/shared fixed dates retain canonical validity. Plain3 above returns
+    // its actual bounded OrdinalDay directly, without inventing a civil date.
     u16::try_from(leap_schedule_ordinal(month, day_of_month)?).ok()
 }
 
@@ -18705,6 +18739,26 @@ mod tests {
             ("Through -1e-9999", 0),
             ("Through 1D-9999", 0),
             ("Through -1D-9999", 0),
+            ("Through 2013/2/30", 61), // Plain3 intentionally skips ValidateMonthDay.
+            ("Through 2013/2/BAD", 31), // Genuine error-zero day, not a fake profile.
+            ("Through 2013/3/0", 60),
+            ("Through 2013/1/366", 366),
+            ("Through 2013/2/335", 366),
+            ("Through 2013/11/61", 366),
+            ("Through 2013/13/31", 0),
+            ("Through 13/31/2013", 0),
+            ("Through BAD/2/2013", 0),
+            ("Through BAD/BAD/BAD", 0),
+            ("Through 100.9/12/31", 0),
+            ("Through 12/31/100.9", 0),
+            ("Through 12/31/100", 0),
+            ("Through +2013/12/31", 0),
+            ("Through 12/31/+2013", 0),
+            ("Through 2013/+12/31", 0),
+            ("Through 1e9999/12/31", 0),
+            ("Through 2013/13/2147483647.9", 0),
+            ("Through 2013/13/1e9999", 0),
+            ("Through 2013/nan/31", 0), // Bare nan is NativeErrorZero, not nanE success.
         ] {
             let remainder = if ordinal == 366 {
                 String::new()
@@ -18746,7 +18800,6 @@ mod tests {
             }
         }
         for through in [
-            "Through 2013/2/30",
             "Through DEC31.9", // No separating space: one token, not month/day.
             "Through12E-1",    // Whole successful1.2 takes LastDayInMonth, never tokenized.
             "Through12D-1",
@@ -18764,12 +18817,19 @@ mod tests {
             "Through \u{00a0}12.9/31.9",
             "Through 12.9/31.9\u{00a0}",
             "Through 12.9\\t31.9",
-            "Through 100.9/12/31", // Raw first>100 is not the truncated test.
-            "Through 12/31/100.9",
             "Through 2147483648/12/31",
-            "Through 1e9999/12/31",
+            "Through 2013/2147483648/31", // Even a selected invalid-month cast must be defined.
+            "Through 2013/13/2147483648", // Day cast is checked before invalid-month0.
+            "Through nanE/12/2013",
+            "Through 2013/nanE/31",
+            "Through 2013/13/nanE",
+            "Through 2013/2/2147483647", // Checked OrdinalDay addition cannot overflow.
+            "Through 2013/2/336",        // End367 would write outside the real366day owner.
+            "Through 2013/1/367",
+            "Through 2013ST/12/31", // DoubleChars selects Nth/Last, never plain3.
+            " Through 2013/13/31",  // Newly projected syntax requires keyword byte0.
+            "Through 2013/nanE\u{00a0}/31", // No negative-char std::isdigit projection.
             "Through 2013D-1/12/31", // Four tokens after separator replacement.
-            "Through 12/31/100",
             "Through 1st Monday in January",
             "Through +0",
             "Through nanE", // Native retains non-finite with errorFlag false: no defined int.
@@ -18781,9 +18841,6 @@ mod tests {
             "Through :0",
             "Through :",
             "Through 366",
-            "Through +2013/12/31",
-            "Through 12/31/+2013",
-            "Through 2013/+12/31",
             "Through 2013\\t12\\t31",
             "Through 2013\u{00a0}12\u{00a0}31",
             "Through \u{00a0}2013/12/31",

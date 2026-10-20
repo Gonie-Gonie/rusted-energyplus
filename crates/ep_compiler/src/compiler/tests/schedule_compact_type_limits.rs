@@ -79,9 +79,28 @@ fn rejects_populated_compact_values_outside_active_limits() -> Result<(), Box<dy
             2.0
         );
     }
-    // Successful ProcessNumber zeros keep the leading authored2 owner while
-    // every reachable day belongs to the later Fraction-valid profile.
-    for zero in ["0", "0.0", "-0", ".5", "-5D-1", "0E", "0D", "", "   "] {
+    // Genuine zero endpoints retain leading authored2 owners. This includes
+    // ProcessNumber0 and real plain3 invalid-month/default0 results; reachable
+    // Fraction extrema and later resumed-overlap checks remain unchanged.
+    for zero in [
+        "0",
+        "0.0",
+        "-0",
+        ".5",
+        "-5D-1",
+        "0E",
+        "0D",
+        "",
+        "   ",
+        "1e-9999",
+        "-1D-9999",
+        "2013/13/31",
+        "BAD/BAD/BAD",
+        "12/31/100",
+        "+2013/12/31",
+        "2013/13/2147483647.9",
+        "2013/nan/31",
+    ] {
         let result = topology_result(&[(zero, 2.0), ("12/31", 0.75)], "AllDays", 0.0, 1.0)?;
         assert!(
             !result.has_errors(),

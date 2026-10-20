@@ -1018,8 +1018,8 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 .is_err()
         );
     }
-    // Compiler-accepted fixed MonthDay spellings reach the same actual General
-    // child and retain genuine Detailed -> Week -> Day pointers, not a preview.
+    // Compiler-accepted General MonthDay endpoints reach the actual child,
+    // including noncanonical plain3 folds. Genuine Day/Week owners are retained.
     for (through, ordinal) in [
         ("Through: DECEMBER 31", 366_i32),
         ("Through: 31 DEC", 366),
@@ -1050,6 +1050,12 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         ("Through -12.9/-31.9", 366),
         ("Through :12.9/31.9", 366),
         ("Through12+E-1", 336),
+        ("Through 2013/2/30", 61),
+        ("Through 2013/2/BAD", 31),
+        ("Through 2013/3/0", 60),
+        ("Through 2013/1/366", 366),
+        ("Through 2013/2/335", 366),
+        ("Through 2013/11/61", 366),
     ] {
         let mut raw = authored_raw(fixture, "Average", false);
         raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
@@ -1154,6 +1160,30 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
             );
         }
     }
+    // The real Through caller stops defined-int/checked-ordinal/array failures
+    // before any out-of-range schedule pointer. No Native diagnostic is invented.
+    for through in [
+        "2013/13/2147483648",
+        "2013/2147483648/31",
+        "2013/2/2147483647",
+        "2013/2/336",
+        "2013/13/NANE",
+        "2013ST/12/31",
+    ] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
+            serde_json::json!(format!("Through:{through}"));
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        assert!(
+            manager
+                .process_schedule_input(&mut input, &declarations, 4, &mut MemoryAudit::default())
+                .is_err(),
+            "{through}"
+        );
+    }
     // Source already parses every authored empty period into real Week/Day
     // owners. Only the actual annual pointer graph contributes to min/max.
     for (periods, inactive_number, expected_min, expected_max) in [
@@ -1168,8 +1198,29 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
     .into_iter()
     .chain(
         [
-            "0", "0.0", "-0", ".5", "-5D-1", "0E", "0D", "", "   ", "1e-9999", "-1e-9999",
-            "1D-9999", "-1D-9999",
+            "0",
+            "0.0",
+            "-0",
+            ".5",
+            "-5D-1",
+            "0E",
+            "0D",
+            "",
+            "   ",
+            "1e-9999",
+            "-1e-9999",
+            "1D-9999",
+            "-1D-9999",
+            "2013/13/31",
+            "13/31/2013",
+            "BAD/2/2013",
+            "BAD/BAD/BAD",
+            "12/31/100",
+            "+2013/12/31",
+            "2013/+12/31",
+            "1e9999/12/31",
+            "2013/13/2147483647.9",
+            "2013/nan/31",
         ]
         .into_iter()
         .map(|zero| (vec![(zero, 2.0), ("12/31", 0.75)], 1, 0.75, 0.75)),
