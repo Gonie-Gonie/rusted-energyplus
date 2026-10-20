@@ -100,7 +100,7 @@ fn compact_schedule_extrema(
     let mut full_year_set = false;
     for period in &schedule.periods {
         let end = period.through_schedule_day_of_year;
-        if !(1..=366).contains(&end) || (end == 366 && full_year_set) {
+        if end > 366 || (end == 366 && full_year_set) {
             return None;
         }
         full_year_set |= end == 366;

@@ -174,27 +174,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/compact-topology-workspace-tests-23b.log",
-        "sha256": "71fdd83a3927c669736df59b6bc39c87d8181e8d0e92a7c8fa8c9f3bb1c8c862",
-        "bytes": 1557812
+        "path": ".runtime/object-expansion/compact-finite-zero-workspace-tests-24.log",
+        "sha256": "4c2406d48bdaeaa3d422152a091244d19b8e7bb077ebf89530aab2f17eeefbe3",
+        "bytes": 1558342
       },
-      "scope": "Full workspace milestone through final compact-topology-23 bytes: actual ScheduleManager body covers live interpolation/type clocks/fixed dates/missing-day warning effects and retained empty Week/Day owners; compiler bodies cover optional-colon/integer fixed dates, scalar annual coverage and reachable-only limits. Three existing bodies extended for topology; no new test cohort."
+      "scope": "Full workspace milestone through compact-finite-zero-24: unchanged weather prefix/ProcessNumber bodies moved to shared ep_model utilities with original caller error/cursor/reference adapters; compiler and actual Source ScheduleManager bodies cover successful finite trunc-zero/empty Through owners, reachable-only limits and overlap rejection. Existing test bodies extended; no new test cohort."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/compact-topology-clippy-23.log",
-        "sha256": "a88a803b0d0654daf993686ece72cfc78b1fe1398ce89e1c544b9fa331df8c61",
-        "bytes": 2286
+        "path": ".runtime/object-expansion/compact-finite-zero-clippy-24.log",
+        "sha256": "591478a5e90f1b1003cb93cc8ccde99637be6545557e26c4523236729785ac86",
+        "bytes": 2492
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-topology-docs-23.log",
+        "path": ".runtime/object-expansion/compact-finite-zero-docs-24.log",
         "sha256": "ec57032a80a96e8c15955d284e92249fb0a4987568912610086b220dce954777",
         "bytes": 354
       },
-      "clippy_through_build": "compact-topology-23",
+      "clippy_through_build": "compact-finite-zero-24",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -2935,11 +2935,62 @@
           "passed": true
         },
         "effective_state": "Original B102 with exactly2 full schedule-record edits. Gain:6/30 original0-1-0profile,equal6/30AllDays2,12/31originalprofile,trailing3/31AllDays2. Availability:original12/31profile,trailing6/30AllDays2. Genuine raw/typed declarations retain inactive2 under original limitedFraction0..1; final Detailed/daygroup extrema use only reachable week pointers. Original ConstantControl4, gains/thermostat refs, all102requests/weather/otherbytes unchanged. Actual96control4/gain48zero48one/availability12zero84one match raw and binary64. Full102/9792 original policies and independent fullnumericalreread pass with0 raw/binary unequal/tolerance/RMSE failures; exact fullERR-END0warnings0severe, actualWarmup6, nominal+4daygroup0..1000W, wholeSHD and actualdeletedemptyMTR0 agree. No repeated366/trueoverlap/missingday/arbitrarytopology or internal allocation/cache/iteration counts claim."
+      },
+      {
+        "id": "compact-finite-zero",
+        "group": "schedule_compact_finite_zero",
+        "source_build": "compact-finite-zero-24",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-finite-zero/calibration-01/input.idf",
+          "sha256": "47aea79dad7fef9f2203df43b49cb7940128dcc38a851c5d4dd1487b3e9b5b88",
+          "bytes": 13133
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-finite-zero/calibration-01/receipt.json",
+          "sha256": "713c59ac126e81d113429485dd841ddfc674f28dae6103367ede52075600ff27",
+          "bytes": 12338
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-finite-zero-24/finite-zero/receipt.json",
+          "sha256": "72b503c8214afc91fbf4059efb614194ce45fe5f66d4762d27c85cc80970cbc0",
+          "bytes": 4282
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-finite-zero-24/run-summary.json",
+          "sha256": "d260187aa50560a8c070c34ed62b2aeca71db8532105d5acf8ec22ec552b8035",
+          "bytes": 60658
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-finite-zero-comparisons-24/finite-zero/comparison.json",
+          "sha256": "a8f983b2ff230e31f3286c3e072d6a2767d8e5e044cc4dfb27f71346d0f04567",
+          "bytes": 248023
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-finite-zero-24-launch/finite-zero/request.json",
+          "sha256": "3fcd70d4dd301f87606f99e2e32d92a85dacb06c47a78589fd09b67140e4073c",
+          "bytes": 3197
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Original B102 with exactly2 fullschedule-record edits: gainleadingThrough0.5/AllDays2 thenoriginal12/31profile; availabilityleadingThrough-5D-1/AllDays2 thenoriginal12/31profile. ActualsharedProcessNumber utility is included/authenticated inBuild24; finitelexemes follow primary int0/MonthDay0 emptyrange path without typed/raw deletion or invented calendar date. LimitedFraction0..1/Constant4/gains-thermostatrefs/all102requests/weather/otherbytes unchanged. Actual96control4/gain48zero48one/availability12zero84one raw+binary64 equal. Full102/9792 originalnamedpolicies andindependentfullnumericalreread pass with0 raw/binary unequal/tolerance/RMSE failures; exactfullERR-END0warnings0severe/actualWarmup6/nominal+4daygroups0..1000W/wholeSHD/realdeletedemptyMTR0 agree. No generalnumeric/nonfinite/out-of-range/positiveordinal/fullCompact-domain or internalparse/allocation/cache/iterationcounts claim."
       }
     ],
     "totals": {
-      "paired_cases": 49,
-      "reported_samples": 342750,
+      "paired_cases": 50,
+      "reported_samples": 352542,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3336,12 +3387,29 @@
           "sha256": "fd0cb570f6eadd10c3f293fefe715e608ddd1ab2902795432bf2cab62c85647e",
           "bytes": 75644535
         }
+      },
+      {
+        "id": "compact-finite-zero-24",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-24/receipt.json",
+          "sha256": "e5388f57406a9e88912934bbf37d7d5e6e0bb8e2507a640ea8ce13c38b2428c2",
+          "bytes": 5157
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/9e/9e6cd59f45124908a86953247f03db4e285485f673f1d00dd60776bc1eb38d66",
+          "sha256": "9e6cd59f45124908a86953247f03db4e285485f673f1d00dd60776bc1eb38d66"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-24/eplus-rs.exe",
+          "sha256": "55f97641be519dd08d2777a6b44900ddd8d9c97d7ac8e0a1e06f29a4296c66f7",
+          "bytes": 75642791
+        }
       }
     ],
     "focused_since_workspace": {
       "passed": 0,
       "logs": [],
-      "scope": "No subsequent focused runs; full workspace milestone is compact-topology-23."
+      "scope": "No subsequent focused runs; full workspace milestone is compact-finite-zero-24."
     }
   },
   "additional_native_type_calibrations": [

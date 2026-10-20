@@ -78,11 +78,14 @@ fn through_day(value: &str) -> Result<(usize, String), SelectedScheduleError> {
         .month
         .zip(date.day)
         .ok_or_else(|| unavailable("actual Compact defined General MonthDay outputs"))?;
+    // General's successful int-zero branch writes the real MonthDay(0,0).
+    // Its OrdinalDay0 retains a genuine empty period; arbitrary invalid dates
+    // that happen to yield ordinal0 are not opened by this bounded caller.
     let ordinal = source_ordinal_day(month, day, 1)
         .map_err(|_| unavailable("actual Compact ProcessDateString signed ordinal domain"))?;
     usize::try_from(ordinal)
         .ok()
-        .filter(|day| (1..=366).contains(day))
+        .filter(|ordinal| (1..=366).contains(ordinal) || (*ordinal == 0 && month == 0 && day == 0))
         .map(|day| (day, value.to_owned())) // Actual CurrentThrough after erase/strip.
         .ok_or_else(|| unavailable("actual Compact Through ordinal domain"))
 }

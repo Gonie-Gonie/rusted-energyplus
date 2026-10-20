@@ -16871,6 +16871,28 @@ fn schedule_day_type_name(day_type: ScheduleDayType) -> &'static str {
 
 fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
     let date = compact_directive_operand(value, "Through")?;
+    // ScheduleManager1324 erases an immediate colon only, before ASCII strip.
+    // Use that actual operand for the new numeric-zero branch: the older helper
+    // above intentionally retains its existing fixed-date projection behavior.
+    // Inspect authored whitespace before that helper can hide a Unicode edge.
+    if !value
+        .chars()
+        .any(|character| character.is_whitespace() && character != ' ')
+    {
+        let source_text = value.trim_start_matches(' ');
+        let operand = source_text.get("Through".len()..)?;
+        let operand = operand
+            .strip_prefix(':')
+            .unwrap_or(operand)
+            .trim_matches(' ');
+        if ep_model::process_source_number(operand)
+            .is_ok_and(|number| number.is_finite() && number.trunc() == 0.0)
+        {
+            // General414-427 truncates the successful value and writes 0/0.
+            // Retain the empty endpoint, not a synthetic date or day profile.
+            return Some(0);
+        }
+    }
     let (month, day_of_month) = match parse_calendar_date_rule(date) {
         Some(ep_model::CalendarDateRule::MonthDay {
             month,
@@ -18538,6 +18560,15 @@ mod tests {
             ("Through2013-12-31", 366),
             ("Through 2013:12:31", 366),
             ("Through: 2013/2/29", 60), // PYear is absent; no civil-year leap test.
+            ("Through 0", 0),
+            ("Through: 0.0", 0),
+            ("Through:-0", 0),
+            ("Through .5", 0),
+            ("Through -5D-1", 0),
+            ("Through 0E", 0), // Retain the source's empty-exponent suffix path.
+            ("Through 0D", 0),
+            ("Through:", 0), // ProcessNumber's ASCII-empty input succeeds as 0.
+            ("Through   ", 0),
         ] {
             let remainder = if ordinal == 366 {
                 String::new()
@@ -18583,7 +18614,13 @@ mod tests {
             "Through 2013.5/12/31",
             "Through 12/31/100",
             "Through 1st Monday in January",
-            "Through 0",
+            "Through +0",
+            "Through 1e-9999",
+            "Through \u{00a0}0",
+            "Through 0\u{00a0}",
+            "Through \\t0",
+            "Through :0",
+            "Through :",
             "Through 366",
             "Through +2013/12/31",
             "Through 12/31/+2013",

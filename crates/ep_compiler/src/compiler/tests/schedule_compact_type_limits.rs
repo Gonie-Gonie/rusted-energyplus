@@ -79,6 +79,36 @@ fn rejects_populated_compact_values_outside_active_limits() -> Result<(), Box<dy
             2.0
         );
     }
+    // Successful ProcessNumber zeros keep the leading authored2 owner while
+    // every reachable day belongs to the later Fraction-valid profile.
+    for zero in ["0", "0.0", "-0", ".5", "-5D-1", "0E", "0D", "", "   "] {
+        let result = topology_result(&[(zero, 2.0), ("12/31", 0.75)], "AllDays", 0.0, 1.0)?;
+        assert!(
+            !result.has_errors(),
+            "{zero}: {:?}",
+            result.report.diagnostics
+        );
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("zero-leading owners"))?;
+        let periods = &model.compact_schedules[0].periods;
+        assert_eq!(periods[0].through_schedule_day_of_year, 0);
+        assert_eq!(periods[0].day_profiles[0].segments[0].value, 2.0);
+        assert_eq!(periods[1].through_schedule_day_of_year, 366);
+        let active2 = topology_result(&[(zero, 2.0), ("12/31", 2.0)], "AllDays", 0.0, 1.0)?;
+        assert!(has_compact_range_error(&active2));
+        assert!(active2.model.is_none());
+        // A zero after coverage resets StartPointer to1. Resuming a nonempty
+        // range must still fail actual pointer coverage rather than overwrite.
+        let overlap = topology_result(
+            &[("6/30", 0.25), (zero, 2.0), ("12/31", 0.75)],
+            "AllDays",
+            0.0,
+            1.0,
+        )?;
+        assert!(overlap.has_errors());
+        assert!(overlap.model.is_none());
+    }
     // The empty row cannot disable validation of a later reachable period.
     let result = topology_result(
         &[("6/30", 0.25), ("6/30", 0.5), ("12/31", 2.0)],
