@@ -205,6 +205,9 @@ fn special_day_resolution_error(
     error: CalendarRuleResolutionError,
 ) -> TimeAxisError {
     match error {
+        CalendarRuleResolutionError::SourceOnlyIdfDstOrdinalInput { ordinal } => {
+            TimeAxisError::SourceOnlyIdfDstOrdinalInput { ordinal }
+        }
         CalendarRuleResolutionError::InvalidDate {
             month,
             day_of_month,

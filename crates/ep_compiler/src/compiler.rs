@@ -1194,8 +1194,9 @@ impl<'a> Compiler<'a> {
         };
 
         let start_date =
-            self.required_calendar_date_rule(OBJECT_TYPE, &name, &object, "start_date");
-        let end_date = self.required_calendar_date_rule(OBJECT_TYPE, &name, &object, "end_date");
+            self.required_idf_dst_calendar_date_rule(OBJECT_TYPE, &name, &object, "start_date");
+        let end_date =
+            self.required_idf_dst_calendar_date_rule(OBJECT_TYPE, &name, &object, "end_date");
         let (Some(start_date), Some(end_date)) = (start_date, end_date) else {
             return;
         };
@@ -15072,7 +15073,7 @@ impl<'a> Compiler<'a> {
         }
     }
 
-    fn required_calendar_date_rule(
+    fn required_idf_dst_calendar_date_rule(
         &mut self,
         object_type: &str,
         object_name: &str,
@@ -15080,7 +15081,16 @@ impl<'a> Compiler<'a> {
         field: &str,
     ) -> Option<ep_model::CalendarDateRule> {
         let value = self.required_string(object_type, object_name, object, field)?;
-        match parse_calendar_date_rule(&value) {
+        // This hook belongs only to the IDF DST family. Its actual getter
+        // receives the retained ctor-owned weekday reference; SpecialDays and
+        // EPW numeric dates instead have an unwritten local and stay closed.
+        let rule = parse_calendar_date_rule(&value).or_else(|| {
+            let ordinal = value.trim().parse::<u32>().ok()?;
+            (1..=365)
+                .contains(&ordinal)
+                .then_some(ep_model::CalendarDateRule::IdfDstOrdinalInput { ordinal })
+        });
+        match rule {
             Some(rule) => Some(rule),
             None => {
                 self.error(

@@ -13,6 +13,9 @@ pub(super) struct ResolvedCalendarRuleDate {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum CalendarRuleResolutionError {
+    SourceOnlyIdfDstOrdinalInput {
+        ordinal: u32,
+    },
     InvalidDate {
         month: u32,
         day_of_month: u32,
@@ -30,6 +33,11 @@ pub(super) fn resolve_calendar_date_rule(
     rule: CalendarDateRule,
 ) -> Result<ResolvedCalendarRuleDate, CalendarRuleResolutionError> {
     let (month, day_of_month) = match rule {
+        CalendarDateRule::IdfDstOrdinalInput { ordinal } => {
+            // The actual retained IDFDST weekday is not owned by this preview.
+            // Never manufacture MonthDay or a weekday to resolve its syntax.
+            return Err(CalendarRuleResolutionError::SourceOnlyIdfDstOrdinalInput { ordinal });
+        }
         CalendarDateRule::MonthDay {
             month,
             day_of_month,

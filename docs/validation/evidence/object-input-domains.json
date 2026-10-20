@@ -152,7 +152,8 @@
       "Actual EPW MonthDay unwritten weekday remains None and is never read by its unused branch; no synthetic0 or early false boundary.",
       "Real fixed/Nth/Last calendar resolution, wrap/inclusive366DST fill and exact pinned Original end-Nth right-shift predicate. All3 caller routes borrow actual clock/global/project diagnostic phase cells.",
       "Source-only preparation validates actual raw inputs then retains only civil-date/weather coverage; DST/holiday/schedule values are explicitly deferred to actual Source raw/header/calendar owners, never fed from previews. Legacy guards remain.",
-      "Same-input B102 completes102/9792 raw/binary64-exact values with actual DST1 and matching complete calendarEIO/ERR-END; ordinal-only and other numeric lexical forms remain bounded."
+      "Same-input B102 completes102/9792 raw/binary64-exact values with actual DST1 and matching complete calendarEIO/ERR-END; Source-only integer strings1..365 are now separately connected; other numeric lexical forms remain bounded.",
+      "Source-only integer1..365 syntactic descriptor never projects civil date or weekday. Actual raw getter retains constructor-owned weekday0 and Original LastDayInMonth semantics; same-input365-to-1 yields12/28-to-01/26 and102/9792 raw-exact values with actualDST1/Tuesday clock.0/366/fraction and numeric SpecialDays/EPW remain excluded; all-target legacy consumers explicitly retain or reject the input-only descriptor."
     ],
     "RunPeriodControl:SpecialDays": [
       "Real scoped no-optional3alpha/1number getter, Native local/shared scratch distinction, source order and actual header SpecialDays array allocation/count.",
@@ -176,18 +177,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/calendar-clippy-16.log",
-        "sha256": "b08a2740a025a35514e5ae7fda0cc3d797c8162315be092fe20a7d6cceda6192",
-        "bytes": 2508
+        "path": ".runtime/object-expansion/ordinal-clippy-17.log",
+        "sha256": "4bff51dcf4fab789c819be7301093048d6291b720af958077ef1c00558244e58",
+        "bytes": 2492
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/calendar-docs-16.log",
-        "sha256": "a4fe96be74011773397a478691f536a103a75362daf96a7b2fc3230ca937c125",
+        "path": ".runtime/object-expansion/ordinal-docs-17.log",
+        "sha256": "458728d835dc49082fd9e9bbcc899b1b1b2e9d373f798099128e96fdc9767e1e",
         "bytes": 354
       },
-      "clippy_through_build": "calendar-controls-16"
+      "clippy_through_build": "calendar-dst-ordinal-17"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -2203,11 +2204,62 @@
           "passed": true
         },
         "effective_state": "Exact original B102 plus IDF DST1/1-to-1/1 and one1/1 CustomDay1 with authored number Duration1.9. Actual raw getter truncates to1; original102/9792 values are raw/binary64 identical under unchanged named policies. Full96physical DST1/CustomDay1 clocks, inclusive InputFile DST/Special EIO, ZoneTARP/DOE2 and6warmup days, completeERR/END0/0, wholeSHD and actual deleted-emptyMTR0 match. Both existing Compact schedules vary by time but use AllDays, so the real DST+1hour/hour24 consumers are exercised without claiming distinct day-type coefficient variations. Fixed/Nth/Last, wrap, weekend, leap-inverse quirks and overlap/error prefixes have actual-owner unit tables; arbitrary date syntax/calendar/model combinations remain bounded."
+      },
+      {
+        "id": "calendar-dst-ordinal-B102",
+        "group": "calendar_controls",
+        "source_build": "calendar-dst-ordinal-17",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-dst-ordinal/calibration-01/input.idf",
+          "sha256": "32cbb7a091b5f66742d63515ebc1fe122308f7ea853e36072f63c7d68fa8cc35",
+          "bytes": 13069
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-dst-ordinal/calibration-01/receipt.json",
+          "sha256": "bcb4fa23ce48f40370b5d5b085f29bf23e3899eddf26e47e881c1efb2344115c",
+          "bytes": 12221
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-calendar-dst-ordinal-17/receipt.json",
+          "sha256": "f54048937cf18889b2c81653330e908347a7820fea2d8860f94de218e1209f17",
+          "bytes": 4096
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/calendar-dst-ordinal-17/run-summary.json",
+          "sha256": "574a991a89dea8a365f00a78a132587c092f096778dbd60b36d7d8328f5a5a2c",
+          "bytes": 60685
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-calendar-dst-ordinal-comparisons-01/main/comparison.json",
+          "sha256": "2b3bf0976fafdb98186ff428d2ba45c43b602fdd4a29db5d234117386fdda478",
+          "bytes": 210917
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-calendar-dst-ordinal-17-launch/request.json",
+          "sha256": "4a8c12c81d5c374efa2df9b9467bc5a10b52a33dc319a46f78b34db46acf06c5",
+          "bytes": 2852
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Exact original B102 plus sole IDF DST365-to-1. Native ProcessDateString classifies these as LastDayInMonth and leaves the actual retained IDFDST ctor weekday0 unchanged; the typed descriptor retains syntax only and legacy previews explicitly reject it. Actual getter/calendar yields InputFile12/28-to-01/26, not projected ordinary ordinal dates. All102/9792 original-policy outputs are raw/binary64 exact, with96actual DST1/Tuesday clocks, noSpecialEIO,6warmup days, wholeSHD, fullERR-END0/0 and genuine deleted-emptyMTR0. Shared/SpecialDays/EPW numeric grammar,0/366/fractional-string and full date-domain compatibility remain bounded."
       }
     ],
     "totals": {
-      "paired_cases": 35,
-      "reported_samples": 227862,
+      "paired_cases": 36,
+      "reported_samples": 237654,
       "raw_operand_unequal": 101278,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -2484,6 +2536,45 @@
           "path": ".runtime/porting/object-domain-20261020/build-16/eplus-rs.exe",
           "sha256": "d00da18c79820f92b6f198d3d8a353175aa0095dbb888b6886beed7ae181bdae",
           "bytes": 75372867
+        }
+      },
+      {
+        "id": "calendar-dst-ordinal-17",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-17/receipt.json",
+          "sha256": "4678f1f8bd43404cf71022d72365b1e5ee441eb6fffc2c66b9dcaf4c77948f87",
+          "bytes": 4976
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/c3/c3e4cbd8a1a4261335c4bf36fbd8be77dd6717cde11212a40c8b59705b253428",
+          "sha256": "c3e4cbd8a1a4261335c4bf36fbd8be77dd6717cde11212a40c8b59705b253428"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-17/eplus-rs.exe",
+          "sha256": "4bc731f8ef3286f29e09249288ec5de3502f142ec0d9fe19b1428111a8b907f8",
+          "bytes": 75375346
+        }
+      }
+    ],
+    "focused_tests_since_workspace": [
+      {
+        "scope": "calendar typed/raw/actual-owner paths",
+        "passed": 24,
+        "ignored": 0,
+        "log": {
+          "path": ".runtime/object-expansion/ordinal-focused-tests-17.log",
+          "sha256": "b58373c584bd05dfbb0c6fa4c108083c4045a2f9c7c4dddcd71881746a59fbbe",
+          "bytes": 11098
+        }
+      },
+      {
+        "scope": "RunPeriod/defaults/legacy calendar consumers",
+        "passed": 24,
+        "ignored": 0,
+        "log": {
+          "path": ".runtime/object-expansion/ordinal-run-period-tests-17.log",
+          "sha256": "9338a0fa74776d5ebbd191ef0fa9d48da7531cdcca07393afbc4a2d46b00b0ca",
+          "bytes": 9606
         }
       }
     ]

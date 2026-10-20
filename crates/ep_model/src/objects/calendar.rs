@@ -5,6 +5,15 @@ use crate::{DayOfWeek, NormalizedName, RunPeriodSpecialDayId};
 /// One EnergyPlus month/day or weekday-in-month date rule.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CalendarDateRule {
+    /// An integer-only IDF daylight-saving input, in the defined 1-365 subset.
+    /// This is syntax custody, not an ordinal-to-month/day projection. Native
+    /// ProcessDateString classifies it as LastDayInMonth without writing the
+    /// actual retained IDFDST weekday. Only the real Source getter may resolve
+    /// that constructor-owned reference; legacy previews reject this variant.
+    IdfDstOrdinalInput {
+        /// Authored positive integer, 1-365; original raw text is also retained.
+        ordinal: u32,
+    },
     /// A fixed month and day, such as `3/10` or `March 10`.
     MonthDay {
         /// Month number, 1-12.

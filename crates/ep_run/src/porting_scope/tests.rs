@@ -771,6 +771,7 @@ fn effective_calendar_branches_are_checked_after_weather_resolution() {
             ("1/1", "1/1"),
             ("2nd Sunday in March", "Last Sunday in October"),
             ("1/1", "5th Monday in February"),
+            ("365", "1"),
         ] {
             let mut value = input(scope);
             value["RunPeriodControl:SpecialDays"] = json!({"Holiday":{"start_date":"1/1","duration":1.9,"special_day_type":"CustomDay1"}});
@@ -783,6 +784,27 @@ fn effective_calendar_branches_are_checked_after_weather_resolution() {
                 .as_ref()
                 .expect("schema-number duration projects Native int");
             assert_eq!(model.run_period_special_days[0].duration_days, 1);
+            if start == "365" {
+                let dst = model.run_period_daylight_saving_time.unwrap();
+                assert_eq!(
+                    dst.start_date,
+                    ep_model::CalendarDateRule::IdfDstOrdinalInput { ordinal: 365 }
+                );
+                assert_eq!(
+                    dst.end_date,
+                    ep_model::CalendarDateRule::IdfDstOrdinalInput { ordinal: 1 }
+                );
+                assert!(ep_model::parse_calendar_date_rule(start).is_none());
+                assert!(
+                    super::environment::environment_from_weather(
+                        model,
+                        &weather,
+                        "legacy ordinal preview"
+                    )
+                    .unwrap_err()
+                    .contains("actual Source retained weekday")
+                );
+            }
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
             let proof =
                 super::environment::SourceCalendarInputAdmission::from_raw(&raw, scope).unwrap();
@@ -848,6 +870,17 @@ fn effective_calendar_branches_are_checked_after_weather_resolution() {
         let raw = parse_epjson_str(&value.to_string()).unwrap();
         assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
     }
+    for unsupported in ["0", "366", "1.9"] {
+        let mut value = input(PortingScope::A);
+        value["RunPeriodControl:DaylightSavingTime"] =
+            json!({" ":{"start_date":unsupported,"end_date":"1/1"}});
+        let raw = parse_epjson_str(&value.to_string()).unwrap();
+        assert!(compile_raw_model(&raw).has_errors());
+    }
+    let mut value = input(PortingScope::A);
+    value["RunPeriodControl:SpecialDays"] = json!({"Holiday":{"start_date":"365"}});
+    let raw = parse_epjson_str(&value.to_string()).unwrap();
+    assert!(compile_raw_model(&raw).has_errors()); // Unwritten local weekday is not the IDFDST ctor0.
 }
 
 #[test]

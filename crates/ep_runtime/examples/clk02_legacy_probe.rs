@@ -31,6 +31,12 @@ fn scalar(value: f64) -> Value {
 
 fn date_rule(rule: EpwCalendarDateRule) -> Value {
     match rule {
+        // The shared enum also retains input-only IDF DST syntax. The EPW
+        // parser cannot emit this arm; do not invent a civil date or weekday.
+        EpwCalendarDateRule::IdfDstOrdinalInput { ordinal } => json!({
+            "kind":"IdfDstOrdinalInput", "ordinal":ordinal,
+            "resolution":"requires_actual_Source_retained_weekday"
+        }),
         EpwCalendarDateRule::MonthDay {
             month,
             day_of_month,

@@ -151,6 +151,9 @@ fn resolve_daylight_saving_date_rule(
 ) -> Result<ResolvedDaylightSavingDate, TimeAxisError> {
     let resolved = resolve_calendar_date_rule(calendar, weather_effective_leap_year, rule)
         .map_err(|error| match error {
+            CalendarRuleResolutionError::SourceOnlyIdfDstOrdinalInput { ordinal } => {
+                TimeAxisError::SourceOnlyIdfDstOrdinalInput { ordinal }
+            }
             CalendarRuleResolutionError::InvalidDate {
                 month,
                 day_of_month,

@@ -4,6 +4,11 @@ use std::fmt::{Display, Formatter};
 /// Error returned while resolving a run period or building a time axis.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum TimeAxisError {
+    /// An IDF DST numeric expression needs its genuine Source retained weekday.
+    SourceOnlyIdfDstOrdinalInput {
+        /// The authored positive integer; not a resolved civil date.
+        ordinal: u32,
+    },
     /// An end year was supplied without the required start year.
     EndYearWithoutStartYear {
         /// Run period name.
@@ -65,6 +70,10 @@ pub enum TimeAxisError {
 impl Display for TimeAxisError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::SourceOnlyIdfDstOrdinalInput { ordinal } => write!(
+                formatter,
+                "IDF daylight-saving numeric input {ordinal} requires the actual Source retained weekday; legacy calendar preview cannot resolve it"
+            ),
             Self::EndYearWithoutStartYear { run_period_name } => write!(
                 formatter,
                 "run period {run_period_name} has an end year without a start year"
