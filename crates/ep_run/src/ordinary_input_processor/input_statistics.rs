@@ -110,6 +110,7 @@ pub(super) fn resolve_source_b(raw: &RawModel) -> Result<SourceInputStatisticsIn
 pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsInput, String> {
     let mut result = resolve(raw);
     for family in [
+        "Output:Schedules",
         "Schedule:Compact",
         "Schedule:Day:Hourly",
         "Schedule:Day:Interval",

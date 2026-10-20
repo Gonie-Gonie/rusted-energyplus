@@ -196,6 +196,11 @@
       "Actual Source A/B ordered mixed getters resolve and mark each real Day owner used before ProcessForDayTypes. Independent substring predicates mutate the real per-week assignment mask; successful selectors write only actual DayType slots1..12. The constructor retains nullptr/None at slot0 and genuine MissingDay pointers at unassigned slots1..12.",
       "WeekDaily precedes WeekCompact, then the existing Detailed Year/Compact/Constant and shared live calendar/currentVal/minmax consumers retain actual graph ownership. Invalid/duplicate selectors, missing Day references or required assignments remain explicit unavailable boundaries before unported severe effects; omitted assignments are not replaced by Compact's warning/zero-profile policy.",
       "The sole same-input B102 physical pair covers an AllDays mapping to a genuine No Interval gain Day with original consumer name and all102/9792 requests unchanged. Existing authored owner tests separately inspect Weekdays/Weekends/AllOtherDays, all twelve retained pointers, usage-before-selector failure prefixes and live Year clock values. Other calendars, arbitrary selector/reference combinations and full-family runtime parity remain unclaimed. Existing finite legacy first_evidence entries retain their separate conformance identities."
+    ],
+    "Output:Schedules": [
+      "Actual Source A/B raw/IP getter consumes the required Hourly or Timestep key in physical declaration order without an authored Name. Arbitrary unnamed epJSON map keys, including empty/whitespace keys and ignored additional metadata, retain actual raw custody; IDF generated per-family identities and exact field counts, including a final unterminated zero-count field, are preserved. Legacy admission remains blocked; whole-object compiler typing remains RawOnly.",
+      "After genuine schedule bounds and Fatal checks, the real open EIO stream receives retained ScheduleTypeLimits once before report getters. Distinct levels run in authored order; duplicate requests produce actual live Warning/Continue effects and are skipped. All actual Day owners including MissingDay0, twelve real Week pointers, and Detailed roots are written in retained vector order; constants are skipped. Hourly selects each hour final timestep, Timestep writes all values, and labels borrow the real Source clock. Existing .2R formatting and the unchanged General inverse ordinal with leap1 preserve numeric and date text, including February00; no canonical-date rewrite, average substitution or report-value seed.",
+      "The sole same-input B102 physical pair appends exactly two distinct report requests to the consumed Interval/List/WeekCompact/WeekDaily/Year input. The complete contiguous26-line6244-byte schedule EIO section agrees byte-for-byte with the independent primary/input-derived expectation and between engines, alongside all102/9792 original output operands, fullERR-END0, actualWarmup6, existing nominal/day-group EIO, wholeSHD and genuine deleted-emptyMTR. Existing owner checks separately cover all three interpolation modes, duplicate warmup warnings, equal-profile distinct Week pointer runs and actual partial-write prefixes. Full model combinations, external/EMS siblings, unsafe conversions and schema-invalid fallback diagnostics remain outside this bounded claim."
     ]
   },
   "verification": {
@@ -203,37 +208,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/schedule-regular-workspace-tests-32.log",
-        "sha256": "f682e5f1798c428a3a2fbf83f72bbe901944a226ef65ddd13178672a5ff08f41",
-        "bytes": 1558360
+        "path": ".runtime/object-expansion/output-schedules-workspace-tests-34b.log",
+        "sha256": "0f81218acf84421a85d6d5d82e0b4f78502ce10a4a2a6c2a8d1d075bdfcb3205",
+        "bytes": 1557606
       },
-      "scope": "Full workspace milestone32 verifies genuine Hourly/WeekDaily/Year producers, Source A/B raw custody and admission, IDF declaration order/counts, optional types, live warning order, all twelve day types, annual wrap and February29 fallback through existing owner bodies. No new test cohort or dependency."
+      "scope": "Full workspace milestone34 verifies real Output:Schedules raw unnamed order/count custody and Source A/B admission, actual Audit/EIO borrowing and live clock, retained Day/Week/Detailed EIO reports, both levels, duplicate live warnings, pointer-identity date compression, leap1 inverse dates and partial write prefixes through existing owner bodies. No new test cohort or dependency."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/schedule-interval-list-clippy-33.log",
-        "sha256": "4755288cace662d75f618196a7ead7d585d036c43c9088da12b406ac9feda66b",
-        "bytes": 2524
+        "path": ".runtime/object-expansion/output-schedules-clippy-34.log",
+        "sha256": "81d6d143cd9d384c5db990bc8d1cfc2d255a0a6bfce2d5e5d1dfff782e2f2151",
+        "bytes": 2520
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/schedule-interval-list-docs-33.log",
-        "sha256": "e4c381107af6b45b25894d45ab3c23d4211a327cacbffaac3d7676d2fa17dc7d",
+        "path": ".runtime/object-expansion/output-schedules-docs-34.log",
+        "sha256": "84484d8e9107bdfdf500aedad2fcecad10c8c97c7bfa0d7c8c0e9c2c6c5c610f",
         "bytes": 354
       },
-      "clippy_through_build": "interval-list-week-33",
+      "clippy_through_build": "output-schedules-34",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/schedule-regular-native-cohort-check-32.log",
-          "sha256": "9451c1da09015d58aa6a21908c4be64fbba757e469e96ab291f85ac89e6f8a83",
-          "bytes": 3001878
+          "path": ".runtime/object-expansion/output-schedules-native-cohort-check-34.log",
+          "sha256": "455445da8a59a23f21466aeea75314caccc3bee552a53b7130ccc6673f1a8a14",
+          "bytes": 3003188
         },
-        "scope": "Compile-only verification of the actual input-format field and shared schedule API, including existing optional cohort callers. Existing feature warnings remain; no feature tests or engines run.",
-        "through_build": "hourly-week-year-32"
+        "scope": "Compile-only verification of the actual disjoint file capability and live-clock schedule API, including existing optional cohort callers. Existing feature warnings remain; no feature tests or engines run.",
+        "through_build": "output-schedules-34"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -3474,11 +3479,62 @@
           "passed": true
         },
         "effective_state": "Exactly two original B102 Compact schedule-record spans13/35 each become three genuinely consumed objects. Gain uses DayIntervalNo bare06:00=0/18:00=1/24:00=0, WeekCompactAllDays and Year original gain name; availability uses DayListNo MinutesPerItem60 with0x3/1x21, WeekDailyall12 and Year original availability name, both full1..366. Constant4/Fraction0..1/all102requests/weather/realconsumerrefs/otherbytes and originalactiveprofiles remain unchanged. Actual raw/IP getters feed real minute producers/population, Day limits, Week selectors/pointers/usage and Detailed Year roots; no typed preview or Native output seeds producers. Full102/9792 raw operands and binary64 values are identical with zero tolerance/RMSE failures, exactfullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/realdeletedMTR agree. Original full numerical kernel independently recomputed from actual own streams. ActualBuild33 realminute/regular/manager/constructors/accessors, compiler/decoder, actualformat+IDF counts/order/rawtransfer/admission/support and sharedbaseline source owners are authenticated against actuallive/archive/snapshot bytes. No measured internal parser/allocation counts or full family/arbitrary-combination/domain claim; uint and unsupported error children remain bounded."
+      },
+      {
+        "id": "output-schedules",
+        "group": "schedule_output_reports",
+        "source_build": "output-schedules-34",
+        "input": {
+          "path": ".runtime/object-expansion/native-output-schedules/calibration-01/input.idf",
+          "sha256": "a391f524d1dab44a9352b87aa86e8132164abe5e3462c699b5f25925162917ce",
+          "bytes": 13838
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-output-schedules/calibration-01/receipt.json",
+          "sha256": "fcf31bca5e5aa2553e1991d416ac47b775c8b14d7a5f3f5ec17a37f517ed724d",
+          "bytes": 16587
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-output-schedules-34/output-schedules/receipt.json",
+          "sha256": "e2c8c6faadfc1739ddd121de85ec1f926cfbbb2ae9f6cd8e56de509e3ae1638d",
+          "bytes": 4974
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/output-schedules-34/run-summary.json",
+          "sha256": "1a3cc9c3c988472e6ebe961787f05cd09924624b0c02615c974005bd1030cb11",
+          "bytes": 60576
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-output-schedules-comparisons-34/output-schedules/comparison.json",
+          "sha256": "1f5fba991ed4a09e8cd2d56774f1e023a54c4880403458529efa697a34ba9187",
+          "bytes": 266026
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-output-schedules-34-launch/output-schedules/request.json",
+          "sha256": "53af08ed22a13b0b56baa82a9e9a870572b073d8ba9a121df511b424fa415ea1",
+          "bytes": 3178
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Frozen real33 consumed Interval/List/WeekCompact/WeekDaily/Year input is preserved byte-for-byte; exactly two distinct Output:Schedules Hourly and Timestep requests append. The original102requests/weather/Constant4/Fraction0..1/realconsumer references and all original schedule profiles are unchanged. Actual Source raw/IP report getters reach the live schedule manager report stage and genuine open EIO capability. All retained type/day/week/Detailed owners, MissingDay0, real4step/15minute clock, Hourly last-step values versus all Timestep values, twelve real day pointers, constant omission and actual leap1 inverse date compression are read rather than supplied from a preview. The complete actual26line6244byteCRLF schedule report section agrees byte-for-byte with the independent primary/input-derived expectation and between engines at actual line14. Full102/9792 original physical streams independently recomputed with the unchanged kernel show zero raw/binary64/tolerance/RMSE differences; all96profiles/fullERR-END0/warmup0/sizing0/actualWarmup6/nominal plus fourdaygroup0..1000W/wholeSHD/genuine deletedMTR agree. ActualBuild34 report, disjoint EIO/Audit capabilities, clock/General inverse owners plus existing real minute/regular/compiler/IDF/admission/sharednumber owners are authenticated against actual live/archive/snapshot bytes. Sole physical pair uses No-mode days; separate owner tests cover other interpolation and duplicate effects, with no all-combination or full schedule/report-domain claim."
       }
     ],
     "totals": {
-      "paired_cases": 59,
-      "reported_samples": 440670,
+      "paired_cases": 60,
+      "reported_samples": 450462,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -4045,24 +4101,29 @@
           "sha256": "60245702a749d0de3d281177c2d6aacecb7927d2bb152418bc6134a759f9ca89",
           "bytes": 75849875
         }
+      },
+      {
+        "id": "output-schedules-34",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-34/receipt.json",
+          "sha256": "ddf203d9be6d8e58d5f02d456cee31207d210079ad60c4f253db7394e7de6a60",
+          "bytes": 5816
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/ee/ee28a1f813bc31af99d6a2fbc66188c625143ced37326b8364c027b0055158ef",
+          "sha256": "ee28a1f813bc31af99d6a2fbc66188c625143ced37326b8364c027b0055158ef"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-34/eplus-rs.exe",
+          "sha256": "5b191c08b0fc25ed9449c486a8355fc2d0a6f6e1fc4d32d6ae3f02be82951629",
+          "bytes": 75933835
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 1315,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/schedule-interval-list-model-run-tests-33b.log",
-          "sha256": "93c0c6c9592c03b5e1231e291da58e9dc4ae8d3267e997eba99d3bc77bf4b1d5",
-          "bytes": 423948
-        },
-        {
-          "path": ".runtime/object-expansion/schedule-interval-list-owner-tests-33.log",
-          "sha256": "6a58b6129cb55157a9de4887d2f5db40a462324c8f24b3715112bd0762f1a318",
-          "bytes": 2388
-        }
-      ],
-      "scope": "After full workspace milestone32 (5049 passed/2 ignored), all compiler/raw-model/run library checks and the existing actual ScheduleManager owner body verify the bounded Interval/List/WeekCompact extension. Real getter defaults/blanks/order/counts, shared integral Until/empty/MM60 endpoints, three-mode authored 1440-minute-to-96-step population, List Linear endpoint sampling, actual Week usage/selection, live warnings and genuine incomplete-minute Severe-to-final-Fatal effects are checked. These are focused execution counts, not a repeated workspace run or an added test cohort.",
-      "through_build": "interval-list-week-33"
+      "passed": 0,
+      "logs": [],
+      "scope": "No subsequent Rust changes after full workspace milestone34."
     }
   },
   "additional_native_type_calibrations": [

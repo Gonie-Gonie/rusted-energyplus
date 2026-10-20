@@ -61,6 +61,7 @@ fn resolve_raw(
             && matches!(
                 family.0.as_str(),
                 "Schedule:Compact"
+                    | "Output:Schedules"
                     | "Schedule:Day:Hourly"
                     | "Schedule:Day:Interval"
                     | "Schedule:Day:List"
@@ -158,6 +159,7 @@ fn resolve_raw(
                         | "SurfaceConvectionAlgorithm:Inside"
                         | "SurfaceConvectionAlgorithm:Outside"
                         | "Output:Surfaces:List"
+                        | "Output:Schedules"
                         | "Output:Meter"
                         | "Output:Meter:MeterFileOnly"
                 )
@@ -1175,6 +1177,65 @@ mod source_a_compact_ingress {
             assert!(
                 resolve_source_a(&ep_raw_model::parse_epjson_str(&invalid.to_string())?).is_err(),
                 "invalid Source schedule scalar {family}.{field}"
+            );
+        }
+        // Output:Schedules has no Name field or nonblank outer-key rule.
+        // Scope-only Source admission retains its actual report operands;
+        // legacy resolution stays blocked and no typed object is invented.
+        let mut reports = input.clone();
+        reports["Output:Schedules"] = serde_json::json!({"":{"key_field":"Hourly","user_metadata":true},"   ":{"key_field":"Timestep"},"duplicate":{"key_field":"Hourly"}});
+        let raw = ep_raw_model::parse_epjson_str(&reports.to_string())?;
+        assert!(resolve(&raw).is_err());
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(
+            ip.source_raw_object_names("Output:Schedules")?,
+            ["", "   ", "duplicate"]
+        );
+        assert_eq!(
+            ip.source_raw_object_fields("Output:Schedules", "   ")?
+                .get("key_field"),
+            Some(&V::String("Timestep".into()))
+        );
+        assert_eq!(
+            ip.source_raw_object_fields("Output:Schedules", "")?
+                .get("user_metadata"),
+            Some(&V::Bool(true))
+        );
+        for value in [
+            serde_json::json!(null),
+            serde_json::json!(1),
+            serde_json::json!(""),
+            serde_json::json!("All"),
+            serde_json::json!(" Hourly "),
+        ] {
+            let mut invalid = reports.clone();
+            invalid["Output:Schedules"][""]["key_field"] = value;
+            let raw = ep_raw_model::parse_epjson_str(&invalid.to_string())?;
+            assert!(resolve_source_a(&raw).is_err());
+            assert!(resolve_source_b(&raw).is_err());
+        }
+        let mut missing = reports.clone();
+        missing["Output:Schedules"][""] = serde_json::json!({});
+        assert!(resolve_source_a(&ep_raw_model::parse_epjson_str(&missing.to_string())?).is_err());
+        // The actual admission requires its Zone even for this isolated
+        // format/count transfer check; no simulation or Native execution runs.
+        let json = r#"{"Zone":{"actual zone":{}},"Output:Schedules":{"Output:Schedules 1":{"key_field":"Hourly"},"Output:Schedules 2":{"key_field":"Timestep"}}}"#;
+        let raw = ep_raw_model::parse_epjson_str_with_idf_order(
+            json,
+            "Zone,actual zone;Output:Schedules,Hourly;Output:Schedules,Timestep",
+        )?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(
+            ip.source_raw_object_names("Output:Schedules")?,
+            ["Output:Schedules 1", "Output:Schedules 2"]
+        );
+        for (name, count) in [("Output:Schedules 1", "1"), ("Output:Schedules 2", "0")] {
+            assert_eq!(
+                ip.source_raw_object_fields("Output:Schedules", name)?
+                    .get("idf_max_fields"),
+                Some(&V::Number(count.into()))
             );
         }
         Ok(())

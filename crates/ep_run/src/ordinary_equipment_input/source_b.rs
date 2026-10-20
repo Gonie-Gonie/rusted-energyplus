@@ -6,6 +6,7 @@ pub(super) fn is_family(family: &str) -> bool {
     matches!(
         family,
         "NodeList"
+            | "Output:Schedules"
             | "Schedule:Compact"
             | "Schedule:Day:Hourly"
             | "Schedule:Day:Interval"
@@ -30,6 +31,10 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        ("Output:Schedules", "key_field") => text_is(value, &["Hourly", "Timestep"]),
+        // The unnamed report schema does not prohibit additional members.
+        // They remain raw metadata, never schedule values or field counts.
+        ("Output:Schedules", _) => true,
         (
             "Schedule:Day:Hourly" | "Schedule:Day:Interval" | "Schedule:Day:List" | "Schedule:Year",
             "schedule_type_limits_name",
@@ -400,6 +405,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
 }
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     match family {
+        "Output:Schedules" => &["key_field"],
         "Schedule:Week:Daily" => &REGULAR_DAY_FIELDS,
         "Schedule:Day:Interval" | "Schedule:Week:Compact" => &["data"],
         "Schedule:Day:List" => &["minutes_per_item", "extensions"],

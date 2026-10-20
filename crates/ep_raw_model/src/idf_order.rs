@@ -96,6 +96,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Output:Meter:Cumulative:MeterFileOnly",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "Output:Schedules",
+        name_field_index: 0,
+    },
     // IdfParser.cc277-301 generates these unnamed keys from the per-type count.
     IdfOrderTarget {
         object_type: "Output:Surfaces:List",
@@ -653,6 +657,18 @@ fn scan_target_objects(
             targets,
             &mut scanned,
         )?;
+        // IdfParser returns at END before advancing its final field or
+        // min-padding. Preserve the actual count for this newly connected
+        // unnamed report; Alphas(1) still contains the parsed key_field.
+        if fields
+            .first()
+            .is_some_and(|family| family.eq_ignore_ascii_case("Output:Schedules"))
+            && let Some(last) = scanned
+                .get_mut("Output:Schedules")
+                .and_then(|rows| rows.last_mut())
+        {
+            last.max_fields = last.max_fields.saturating_sub(1);
+        }
     }
 
     Ok(scanned)
@@ -679,6 +695,7 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
             | "Output:VariableDictionary"
             | "Output:Constructions"
             | "Output:EnergyManagementSystem"
+            | "Output:Schedules"
             | "Output:Variable"
             | "Output:Meter"
             | "Output:Meter:MeterFileOnly"
@@ -1317,6 +1334,64 @@ mod unnamed_report_order_tests {
             assert_eq!(
                 object.fields.get(&FieldName("idf_max_fields".to_string())),
                 Some(&RawValue::Number("1".to_string()))
+            );
+        }
+        // No authored Name exists: the converter creates per-family keys.
+        // Twelve records prove physical order instead of 1,10,11,12,2 lexical order.
+        let objects = (1..=12)
+            .map(|index| {
+                format!(
+                    "\"Output:Schedules {index}\":{{\"key_field\":\"{}\"}}",
+                    if index % 2 == 0 { "Timestep" } else { "Hourly" }
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let json = format!("{{\"Output:Schedules\":{{{objects}}}}}");
+        let idf = (1..=12)
+            .map(|index| {
+                format!(
+                    "Output:Schedules,{};",
+                    if index % 2 == 0 { "Timestep" } else { "Hourly" }
+                )
+            })
+            .collect::<String>();
+        let ordered = parse_epjson_str_with_idf_order(&json, &idf)?;
+        let direct = parse_epjson_str(&json)?;
+        let rows = ordered.ordered_instances("Output:Schedules")?;
+        assert_eq!(rows.len(), 12);
+        for (index, (name, object)) in rows.iter().enumerate() {
+            assert_eq!(name.0, format!("Output:Schedules {}", index + 1));
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number("1".into()))
+            );
+            assert_eq!(
+                object.fields.get(&FieldName("key_field".into())),
+                Some(&RawValue::String(
+                    if index % 2 == 0 { "Hourly" } else { "Timestep" }.into()
+                ))
+            );
+        }
+        assert!(!direct.has_idf_declaration_order("Output:Schedules"));
+        for (idf, count) in [
+            ("Output:Schedules,Hourly", "0"),
+            ("Output:Schedules,Hourly;", "1"),
+            ("Output:Schedules,Hourly,", "1"),
+        ] {
+            let raw = parse_epjson_str_with_idf_order(
+                r#"{"Output:Schedules":{"Output:Schedules 1":{"key_field":"Hourly"}}}"#,
+                idf,
+            )?;
+            let rows = raw.ordered_instances("Output:Schedules")?;
+            assert_eq!(rows[0].0.0, "Output:Schedules 1");
+            assert_eq!(
+                rows[0].1.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(count.into()))
+            );
+            assert_eq!(
+                rows[0].1.fields.get(&FieldName("key_field".into())),
+                Some(&RawValue::String("Hourly".into()))
             );
         }
         // The same unnamed Source parser counts blank positional fields too.

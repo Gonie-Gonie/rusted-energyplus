@@ -285,6 +285,7 @@ fn compact_primary_and_empty_hour_match_native_reported_timestep_bits() -> TestR
     verify_authored_compact_modes_and_diagnostic_prefix(&fixture)?;
     verify_authored_regular_schedule_graph(&fixture)?;
     verify_authored_interval_list_week_graph(&fixture)?;
+    verify_authored_schedule_input_reports(&fixture)?;
     Ok(())
 }
 
@@ -2647,5 +2648,376 @@ fn verify_authored_interval_list_week_graph(fixture: &Value) -> TestResult<()> {
     );
     assert_eq!(&manager.day_schedules[i].timestep_values[92..], &[0.0; 4]);
     assert!(manager.schedule_map.contains_key("INTERNAL GAIN SCHEDULE"));
+    Ok(())
+}
+
+// Authored raw/IP owners extend the same existing schedule cohort. These EIO
+// bytes are emitted by the real report stage, not a stored Native report seed.
+fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
+    use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
+    use crate::heat_balance::source_initialization::ScheduleInputFileWriters;
+
+    #[derive(Default)]
+    struct ReportStream {
+        bytes: Vec<u8>,
+        fail_at: Option<usize>,
+    }
+    impl io::Write for ReportStream {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            let count = self.fail_at.map_or(bytes.len(), |end| {
+                end.saturating_sub(self.bytes.len()).min(bytes.len())
+            });
+            if count == 0 && !bytes.is_empty() {
+                return Err(io::Error::other("authored actual EIO write failure"));
+            }
+            self.bytes.extend_from_slice(&bytes[..count]);
+            Ok(count)
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    #[derive(Default)]
+    struct ReportFiles {
+        audit: Vec<u8>,
+        eio: ReportStream,
+        opens: usize,
+    }
+    impl ScheduleAuditFileHost for ReportFiles {
+        fn audit_path(&self) -> &Path {
+            Path::new("authored-schedule-report.audit")
+        }
+        fn ensure_audit_open(&mut self) -> io::Result<&mut dyn io::Write> {
+            self.opens += 1;
+            Ok(&mut self.audit)
+        }
+        fn ensure_schedule_input_writers(&mut self) -> io::Result<ScheduleInputFileWriters<'_>> {
+            self.opens += 1;
+            Ok(ScheduleInputFileWriters {
+                audit: &mut self.audit,
+                eio: Some(&mut self.eio),
+            })
+        }
+    }
+    let clock = WeatherGlobalState {
+        time_steps_in_hour: 4,
+        minutes_in_time_step: 15,
+        warmup_flag: true,
+        ..Default::default()
+    };
+    let (kickoff, developer, sizing) = (false, false, false);
+    let flags = SourceDiagnosticFlags {
+        kickoff: &kickoff,
+        developer: &developer,
+        warmup: &clock.warmup_flag,
+        doing_sizing: &sizing,
+    };
+    let week_fields = [
+        "sunday_schedule_day_name",
+        "monday_schedule_day_name",
+        "tuesday_schedule_day_name",
+        "wednesday_schedule_day_name",
+        "thursday_schedule_day_name",
+        "friday_schedule_day_name",
+        "saturday_schedule_day_name",
+        "holiday_schedule_day_name",
+        "summerdesignday_schedule_day_name",
+        "winterdesignday_schedule_day_name",
+        "customday1_schedule_day_name",
+        "customday2_schedule_day_name",
+    ];
+    let make_raw = |mode: &str| {
+        let mut raw = authored_raw(fixture, mode, false);
+        raw["ScheduleTypeLimits"]["Discrete Report"] = serde_json::json!({
+            "lower_limit_value":2.9,"upper_limit_value":4.9,"numeric_type":"Discrete"
+        });
+        raw["ScheduleTypeLimits"]["Unlimited Report"] = serde_json::json!({});
+        let mut hourly = Value::Object(
+            (1..=24)
+                .map(|hour| (format!("hour_{hour}"), serde_json::json!(0.25)))
+                .collect(),
+        );
+        hourly["schedule_type_limits_name"] = serde_json::json!("Fraction");
+        // Equal scalar profiles still have distinct genuine Day/Week identities.
+        raw["Schedule:Day:Hourly"] = serde_json::json!({"H":hourly.clone(), "D":hourly});
+        let week = |day: &str| {
+            Value::Object(
+                week_fields
+                    .iter()
+                    .map(|name| ((*name).into(), serde_json::json!(day)))
+                    .collect(),
+            )
+        };
+        raw["Schedule:Week:Daily"] = serde_json::json!({"W":week("H"),"V":week("D")});
+        let period = |week: &str, sm: i32, sd: i32, em: i32, ed: i32| {
+            serde_json::json!({
+                "schedule_week_name":week,"start_month":sm,"start_day":sd,"end_month":em,"end_day":ed
+            })
+        };
+        raw["Schedule:Year"] = serde_json::json!({"Y":{"schedule_type_limits_name":"Fraction","schedule_weeks":[
+            period("W",1,1,1,31), period("V",2,1,2,1), period("W",2,2,12,31)
+        ]}});
+        raw["Output:Schedules"] = serde_json::json!({
+            " ":{"key_field":"Timestep"},
+            "":{"key_field":"Hourly","unrelated_valid_metadata":{"kept":true}},
+            "again":{"key_field":"Hourly"}
+        });
+        raw
+    };
+    let fixture_for = |raw: &Value| -> TestResult<Value> {
+        let mut f = fixture.clone();
+        let type_order = f["object_order"]["ScheduleTypeLimits"]
+            .as_array_mut()
+            .ok_or("actual type object order")?;
+        type_order.extend([
+            serde_json::json!("Discrete Report"),
+            serde_json::json!("Unlimited Report"),
+        ]);
+        for (family, order, definition) in [
+            (
+                "Schedule:Day:Hourly",
+                vec!["H", "D"],
+                serde_json::json!(["Schedule:Day:Hourly", 2, 24, 0, 0, null]),
+            ),
+            (
+                "Schedule:Week:Daily",
+                vec!["W", "V"],
+                serde_json::json!(["Schedule:Week:Daily", 13, 0, 0, 0, null]),
+            ),
+            (
+                "Schedule:Year",
+                vec!["Y"],
+                serde_json::json!(["Schedule:Year", 2, 0, 1, 4, "schedule_weeks"]),
+            ),
+            (
+                "Output:Schedules",
+                vec!["", " ", "again"],
+                serde_json::json!(["Output:Schedules", 1, 0, 0, 0, null]),
+            ),
+        ] {
+            assert_eq!(object(&raw[family])?.len(), order.len());
+            f["object_order"][family] = serde_json::json!(order);
+            let definitions = f["definitions"]
+                .as_array_mut()
+                .ok_or("actual report query definitions")?;
+            if !definitions.iter().any(|row| row[0] == family) {
+                definitions.push(definition);
+            }
+        }
+        Ok(f)
+    };
+    let mut completed = Vec::new();
+    for (mode, first_hour) in [("No", 175.0), ("Average", 175.0), ("Linear", 130.0)] {
+        let raw = make_raw(mode);
+        let f = fixture_for(&raw)?;
+        let mut input = processor(&f, &raw)?;
+        let mut declarations = schedule_declarations(&f, &raw)?;
+        declarations.source_is_epjson = Some(true);
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut files) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            ReportFiles::default(),
+        );
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend_and_clock(
+                &mut input,
+                &declarations,
+                4,
+                &mut files,
+                &mut backend,
+                &flags,
+                &clock,
+            )?;
+        }
+        assert_eq!(files.opens, 1);
+        assert_eq!(
+            std::str::from_utf8(&files.audit)?,
+            "  Processing Schedule Input -- Start\n  Processing Schedule Input -- Complete\n"
+        );
+        for name in ["", " ", "again"] {
+            assert!(!input.is_object_unused("Output:Schedules", name));
+        }
+        let text = std::str::from_utf8(&files.eio.bytes)?;
+        assert_eq!(text.matches("! <ScheduleTypeLimits>,").count(), 1);
+        assert!(text.contains("ScheduleTypeLimits,CONTROL TYPE,Yes,0,4,No\n"));
+        assert!(text.contains("ScheduleTypeLimits,FRACTION,Yes,0.00,200.00,Yes\n"));
+        assert!(text.contains("ScheduleTypeLimits,DISCRETE REPORT,Yes,2,4,No\n"));
+        assert!(text.contains("ScheduleTypeLimits,UNLIMITED REPORT,No,N/A,N/A,N/A\n"));
+        let hourly = text
+            .find("! Schedule Details Report=Hourly")
+            .ok_or("actual Hourly separator")?;
+        let timestep = text
+            .find("! Schedule Details Report=Timestep")
+            .ok_or("actual Timestep separator")?;
+        assert!(hourly < timestep);
+        assert_eq!(text.matches("! Schedule Details Report=").count(), 2);
+        assert!(text.contains("Time (HH:MM) =>,00:15,00:30,00:45,01:00,"));
+        assert!(text.contains("Time (HH:MM) =>,01:00,02:00,"));
+        let row_values = |level: &str, name: &str| -> TestResult<Vec<f64>> {
+            let prefix = format!("DaySchedule - {level},{name},");
+            let row = text
+                .lines()
+                .find(|line| line.starts_with(&prefix))
+                .ok_or("actual reported Day row")?;
+            let fields = row.split(',').collect::<Vec<_>>();
+            assert_eq!(fields[4], "Values:");
+            fields[5..].iter().map(|value| Ok(value.parse()?)).collect()
+        };
+        let gain_day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name.starts_with("INTERNAL GAIN SCHEDULE"))
+            .ok_or("actual generated gain Day")?;
+        let hours = row_values("Hourly", &gain_day.name)?;
+        let steps = row_values("Timestep", &gain_day.name)?;
+        assert_eq!((hours.len(), steps.len()), (24, 96));
+        assert_eq!(hours[0], first_hour);
+        for hour in 0..24 {
+            assert_eq!(hours[hour], steps[hour * 4 + 3]);
+        }
+        assert_eq!(
+            row_values("Timestep", "MissingDaySchedule-0.0")?,
+            vec![0.0; 96]
+        );
+        assert!(text.contains("DaySchedule - Hourly,MissingDaySchedule-0.0,,No,Values:"));
+        for (level, count) in [("Hourly", 24), ("Timestep", 96)] {
+            assert_eq!(
+                text.lines()
+                    .filter(|line| line.starts_with(&format!("DaySchedule - {level},")))
+                    .count(),
+                manager.day_schedules.len()
+            );
+            assert_eq!(
+                text.lines()
+                    .filter(|line| line.starts_with(&format!("WeekSchedule - {level},")))
+                    .count(),
+                manager.week_schedules.len()
+            );
+            for week in &manager.week_schedules {
+                let prefix = format!("WeekSchedule - {level},{},", week.name);
+                let row = text
+                    .lines()
+                    .find(|line| line.starts_with(&prefix))
+                    .ok_or("actual Week report row")?;
+                assert_eq!(row.split(',').count(), 14);
+            }
+            assert_eq!(row_values(level, "H")?, vec![0.25; count]);
+            assert!(text.contains(&format!(
+                "Schedule - {level},Y,FRACTION,Through Jan 31,W,Through Feb 00,V,Through Dec 31,W\n"
+            )));
+            for schedule in &manager.schedules {
+                if matches!(&schedule.data, super::SelectedScheduleData::Constant { .. }) {
+                    assert!(!text.lines().any(|line| {
+                        line.starts_with(&format!("Schedule - {level},{},", schedule.name))
+                    }));
+                }
+            }
+        }
+        let error_text = std::str::from_utf8(&errors)?;
+        assert_eq!(
+            error_text
+                .matches("ProcessScheduleInput: Output:Schedules = HOURLY")
+                .count(),
+            1
+        );
+        assert!(error_text.contains("Report level Hourly has already been processed. This report level will not be processed again."));
+        let expected = 1 + i32::from(mode == "No");
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_warning_errors_during_warmup
+            ),
+            (expected, expected)
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        assert!(!state.warmup_flag);
+        completed.push((mode, files.eio.bytes));
+    }
+    // A real partial EIO write retains exactly its completed prefix. Processing
+    // owners and usage before that failure remain; Audit Complete is not emitted.
+    let raw = make_raw("Average");
+    let f = fixture_for(&raw)?;
+    let mut input = processor(&f, &raw)?;
+    let mut declarations = schedule_declarations(&f, &raw)?;
+    declarations.source_is_epjson = Some(true);
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let expected = completed
+        .iter()
+        .find(|(mode, _)| *mode == "Average")
+        .ok_or("actual completed report")?;
+    let stop = std::str::from_utf8(&expected.1)?
+        .find("DaySchedule - Hourly,")
+        .ok_or("actual Day row prefix")?
+        + 30;
+    let mut files = ReportFiles {
+        eio: ReportStream {
+            fail_at: Some(stop),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let (mut state, mut errors, mut console) =
+        (interpolation_error_state(), Vec::new(), Vec::new());
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend_and_clock(
+            &mut input,
+            &declarations,
+            4,
+            &mut files,
+            &mut backend,
+            &flags,
+            &clock,
+        )
+    };
+    assert!(matches!(
+        result,
+        Err(super::SelectedScheduleError::Report(_))
+    ));
+    assert_eq!(files.eio.bytes, expected.1[..stop]);
+    assert_eq!(files.opens, 1);
+    assert_eq!(
+        std::str::from_utf8(&files.audit)?,
+        "  Processing Schedule Input -- Start\n"
+    );
+    assert!(!input.is_object_unused("Output:Schedules", ""));
+    assert!(input.is_object_unused("Output:Schedules", " "));
+    assert!(input.is_object_unused("Output:Schedules", "again"));
+    assert_eq!(state.tracking.total_warning_errors, 0);
+    assert!(manager.get_source_schedule("Y")?.is_some());
+    let mut input = processor(&f, &raw)?;
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    assert!(matches!(
+        manager.process_schedule_input(&mut input, &declarations, 4, &mut MemoryAudit::default()),
+        Err(super::SelectedScheduleError::Unavailable(
+            "actual schedule report EIO stream"
+        ))
+    ));
     Ok(())
 }

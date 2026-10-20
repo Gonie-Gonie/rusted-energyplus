@@ -1,7 +1,8 @@
 //! Genuine Constant/Compact ScheduleManager with retained native day/week owners.
 use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnavailable};
-use super::source_initialization::ScheduleAuditFileHost;
+use super::source_initialization::{ScheduleAuditFileHost, ScheduleInputFileWriters};
+use crate::weather::day::WeatherGlobalState;
 use ep_model::ScheduleUnitType;
 use std::collections::BTreeMap;
 mod accessors;
@@ -11,6 +12,7 @@ mod compact;
 mod compact_native_tests;
 mod day_group;
 mod detailed;
+mod input_reports;
 pub(crate) mod minute;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_gap_cohort;
@@ -174,6 +176,7 @@ pub(crate) enum SelectedScheduleError {
     HeatBalance(Box<super::selected_heat_balance_input::HeatBalanceInputError>),
     Unavailable(&'static str),
     Audit(std::io::Error),
+    Report(std::io::Error),
     AuditOpen {
         path: std::path::PathBuf,
         source: std::io::Error,
@@ -199,7 +202,7 @@ impl std::fmt::Display for SelectedScheduleError {
         match self {
             Self::Input(e) => std::fmt::Display::fmt(e, f),
             Self::HeatBalance(e) => std::fmt::Display::fmt(e, f),
-            Self::Audit(e) => std::fmt::Display::fmt(e, f),
+            Self::Audit(e) | Self::Report(e) => std::fmt::Display::fmt(e, f),
             Self::AuditOpen { path, .. } => write!(
                 f,
                 "ProcessScheduleInput: Could not open file {} for output (write).",
@@ -214,7 +217,7 @@ impl std::error::Error for SelectedScheduleError {
         match self {
             Self::Input(e) => Some(e),
             Self::HeatBalance(e) => Some(e.as_ref()),
-            Self::Audit(e) => Some(e),
+            Self::Audit(e) | Self::Report(e) => Some(e),
             Self::AuditOpen { source, .. } => Some(source),
             Self::Unavailable(_) => None,
         }
@@ -311,6 +314,7 @@ impl SelectedScheduleManager {
             audit_files,
             None,
             None,
+            None,
         )
     }
 
@@ -334,11 +338,16 @@ impl SelectedScheduleManager {
             audit_files,
             Some(backend),
             None,
+            None,
         )
     }
 
     /// Same actual producer with genuine Source phase cells, never copied
     /// into the legacy backend's constructor state. Numeric owners are shared.
+    #[allow(
+        dead_code,
+        reason = "Preserve the existing no-report-clock entry for explicit owner callers."
+    )]
     pub(crate) fn process_schedule_input_with_live_backend(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -355,9 +364,40 @@ impl SelectedScheduleManager {
             audit_files,
             Some(backend),
             Some(flags),
+            None,
         )
     }
 
+    /// Actual Source entry with the same live clock consumed by ReportScheduleDetails.
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Keep the actual file, diagnostic, phase and clock owners disjoint at the Source call."
+    )]
+    pub(crate) fn process_schedule_input_with_live_backend_and_clock(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: &SourceDiagnosticFlags<'_>,
+        clock: &WeatherGlobalState,
+    ) -> Result<(), SelectedScheduleError> {
+        self.process_schedule_input_with_optional_backend(
+            input,
+            declarations,
+            time_steps_in_hour,
+            audit_files,
+            Some(backend),
+            Some(flags),
+            Some(clock),
+        )
+    }
+
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve optional real report-clock and diagnostic capabilities for legacy entries."
+    )]
     fn process_schedule_input_with_optional_backend(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -366,6 +406,7 @@ impl SelectedScheduleManager {
         audit_files: &mut dyn ScheduleAuditFileHost,
         mut backend: Option<&mut super::error_backend::SourceErrorBackend<'_>>,
         flags: Option<&SourceDiagnosticFlags<'_>>,
+        report_clock: Option<&WeatherGlobalState>,
     ) -> Result<(), SelectedScheduleError> {
         if self.schedule_input_processed {
             return Ok(());
@@ -493,9 +534,9 @@ impl SelectedScheduleManager {
             }
         }
         let audit_path = audit_files.audit_path().to_path_buf();
-        let audit =
+        let ScheduleInputFileWriters { audit, eio } =
             audit_files
-                .ensure_audit_open()
+                .ensure_schedule_input_writers()
                 .map_err(|source| SelectedScheduleError::AuditOpen {
                     path: audit_path,
                     source,
@@ -654,7 +695,18 @@ impl SelectedScheduleManager {
             );
         }
         if input.get_num_objects_found("Output:Schedules") > 0 {
-            return Err(SelectedScheduleError::Unavailable("schedule report output"));
+            self.report_source_schedule_inputs(
+                input,
+                declarations.source_is_epjson,
+                time_steps_in_hour,
+                report_clock,
+                &mut locals,
+                eio.ok_or(SelectedScheduleError::Unavailable(
+                    "actual schedule report EIO stream",
+                ))?,
+                &mut backend,
+                flags,
+            )?;
         }
         drop(locals);
         writeln!(audit, "  Processing Schedule Input -- Complete")?;

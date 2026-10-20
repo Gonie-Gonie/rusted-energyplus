@@ -1,5 +1,6 @@
 //! Genuine ManageWeather131–155 and InitializeWeather1725–1992 on one session.
 pub(super) mod calendar;
+pub(crate) use calendar::inverse_ordinal as source_inverse_ordinal_day;
 mod hourly;
 mod interpolation;
 mod reader;

@@ -143,10 +143,22 @@ impl Write for SourceOutputStream {
     }
 }
 
+/// Disjoint actual schedule input streams. Legacy hosts have no EIO capability.
+pub(crate) struct ScheduleInputFileWriters<'a> {
+    pub audit: &'a mut dyn Write,
+    pub eio: Option<&'a mut dyn Write>,
+}
+
 /// Actual audit capability; a concrete real stream must outlive returned errors.
 pub(crate) trait ScheduleAuditFileHost {
     fn audit_path(&self) -> &Path;
     fn ensure_audit_open(&mut self) -> io::Result<&mut dyn Write>;
+    fn ensure_schedule_input_writers(&mut self) -> io::Result<ScheduleInputFileWriters<'_>> {
+        Ok(ScheduleInputFileWriters {
+            audit: self.ensure_audit_open()?,
+            eio: None,
+        })
+    }
 }
 
 /// Non-Clone retained source output files, independent of Runtime Result.
@@ -336,6 +348,17 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
     }
     fn ensure_audit_open(&mut self) -> io::Result<&mut dyn Write> {
         Ok(self.audit.ensure_open()?)
+    }
+    fn ensure_schedule_input_writers(&mut self) -> io::Result<ScheduleInputFileWriters<'_>> {
+        let audit = self.audit.ensure_open()?;
+        // OpenOutputFiles owns EIO opening and gating. Reporting borrows that
+        // same stream and never creates, reopens or substitutes an EIO here.
+        let eio = if self.outputs[1].file.is_some() {
+            Some(&mut self.outputs[1] as &mut dyn Write)
+        } else {
+            None
+        };
+        Ok(ScheduleInputFileWriters { audit, eio })
     }
 }
 

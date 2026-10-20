@@ -93,6 +93,9 @@ impl SourceSupportAdmission {
             "Output:Variable",
             "Output:Meter",
             "Output:Meter:MeterFileOnly",
+            // Actual Source schedule reporting consumes real key_field and EIO
+            // owners; this token never substitutes a TypedModel schedule.
+            "Output:Schedules",
             // Actual local getters populate the same retained Day/Week/Detailed
             // graph. Typed legacy schedules alone do not grant this token.
             "Schedule:Day:Hourly",

@@ -37,7 +37,8 @@ mod unopened_weather;
 // Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
 #[allow(unused_imports)]
 pub(crate) use files::{
-    ScheduleAuditFileHost, SourceRuntimeMeterStreams, SourceRuntimeReportStreams,
+    ScheduleAuditFileHost, ScheduleInputFileWriters, SourceRuntimeMeterStreams,
+    SourceRuntimeReportStreams,
 };
 pub use files::{SourceInitializationFilePaths, SourceInitializationFiles};
 
@@ -404,7 +405,7 @@ impl CtfInitializationReports {
             fluid.get_fluid_properties_data(input)?;
             let steps = usize::try_from(weather.global.time_steps_in_hour)
                 .map_err(|_| SourceInitializationError::Association("effective timestep"))?;
-            match schedules.process_schedule_input_with_live_backend(
+            match schedules.process_schedule_input_with_live_backend_and_clock(
                 input,
                 &raw.schedules,
                 steps,
@@ -416,6 +417,7 @@ impl CtfInitializationReports {
                     warmup: &weather.global.warmup_flag,
                     doing_sizing: &globals.doing_sizing,
                 },
+                &weather.global,
             ) {
                 Err(SelectedScheduleError::AuditOpen { path, source }) => {
                     let message = format!(

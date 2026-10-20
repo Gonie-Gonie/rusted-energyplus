@@ -141,7 +141,12 @@ fn fill_dst(values: &mut [i32; 366], first: i32, last: i32) -> Result<(), Error>
     }
     Ok(())
 }
-fn inverse_ordinal(number: i32, month: &mut i32, day: &mut i32, leap: i32) -> Result<(), Error> {
+pub(crate) fn inverse_ordinal(
+    number: i32,
+    month: &mut i32,
+    day: &mut i32,
+    leap: i32,
+) -> Result<(), Error> {
     const END: [i32; 13] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
     if !(0..=366).contains(&number) {
         return Ok(());
