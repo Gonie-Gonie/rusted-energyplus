@@ -171,8 +171,8 @@ fn resolve_raw(
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
                 {
-                    // Native's nine connected schedule instance schemas allow
-                    // additional members. Only an unconsumed top-level member
+                    // The connected schedule and OtherEquipment instance schemas
+                    // allow additional members. Only an unconsumed top-level member
                     // may pass here, after both existing operand validators.
                     // The three actual IDF metadata predicates stay unchanged.
                     let metadata = source_calendar_ingress
@@ -237,6 +237,21 @@ fn resolve_raw(
                                     | "customday2_schedule_day_name"
                             ),
                             "Schedule:Week:Compact" => field.0 != "data",
+                            "OtherEquipment" => !matches!(
+                                field.0.as_str(),
+                                "fuel_type"
+                                    | "zone_or_zonelist_or_space_or_spacelist_name"
+                                    | "schedule_name"
+                                    | "design_level_calculation_method"
+                                    | "design_level"
+                                    | "power_per_floor_area"
+                                    | "power_per_person"
+                                    | "fraction_latent"
+                                    | "fraction_radiant"
+                                    | "fraction_lost"
+                                    | "carbon_dioxide_generation_rate"
+                                    | "end_use_subcategory"
+                            ),
                             _ => false,
                         };
                     if !metadata {
@@ -1919,6 +1934,238 @@ mod source_a_compact_ingress {
                 assert!(resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err());
             }
         }
+        // Exact JSON lexemes reach every HB numeric operand through the same
+        // Native number-kind projection; existing A statistics remain scalar-only.
+        for (token, expected) in [
+            ("-0", 0.0_f64),
+            ("-0.0", -0.0),
+            ("-0e0", -0.0),
+            ("1e-9999", 0.0),
+            ("-1e-9999", -0.0),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}}}},
+                "OtherEquipment":{{"numbers":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on",
+                "design_level":{token},"power_per_floor_area":{token},"power_per_person":{token},
+                "fraction_latent":{token},"fraction_radiant":{token},"fraction_lost":{token},
+                "carbon_dioxide_generation_rate":{token}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            for (ip, full) in [
+                (
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    false,
+                ),
+                (
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    true,
+                ),
+            ] {
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                let fields = &hb.objects["OtherEquipment"][0].fields;
+                let original = ip.source_raw_object_fields("OtherEquipment", "numbers")?;
+                for name in [
+                    "design_level",
+                    "power_per_floor_area",
+                    "power_per_person",
+                    "fraction_latent",
+                    "fraction_radiant",
+                    "fraction_lost",
+                    "carbon_dioxide_generation_rate",
+                ] {
+                    let ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                        value,
+                    ) = &fields[name]
+                    else {
+                        return Err("actual HB numeric field lost".into());
+                    };
+                    assert_eq!(value.to_bits(), expected.to_bits(), "{name}/{token}");
+                    assert_eq!(
+                        original[name],
+                        if full {
+                            V::Number(token.into())
+                        } else {
+                            V::OtherScalar
+                        }
+                    );
+                }
+            }
+        }
+        // Six harmless metadata shapes remain in RawModel and genuine IP, but
+        // never become an HB getter operand. The unsigned selected loss is a
+        // literal JSON number in both baseline and tagged inputs.
+        let equipment_json = r#"{"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+            "OtherEquipment":{
+                "N":{"fuel_type":"None","zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level":18446744073709551615},
+                "P":{"fuel_type":"None","zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level":7}}}"#;
+        let baseline = ep_raw_model::parse_epjson_str(equipment_json)?;
+        let compiled = ep_compiler::compile_raw_model(&baseline);
+        let baseline_model = compiled
+            .model
+            .ok_or_else(|| format!("{:?}", compiled.report.diagnostics))?;
+        assert_eq!(baseline_model.other_equipment[0].design_level_w, -1.0);
+        let baseline_a = crate::ordinary_input_processor::resolve_source_a(&baseline)?;
+        let baseline_b = crate::ordinary_input_processor::resolve_source_b(&baseline)?;
+        let baseline_hb = crate::ordinary_heat_balance_input::resolve(&baseline, &baseline_a)?;
+        assert_eq!(
+            baseline_hb.objects["OtherEquipment"][0].fields["design_level"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
+        );
+        for (metadata, full, statistics, size) in [
+            ("null", V::Null, V::Null, 0_usize),
+            ("true", V::Bool(true), V::OtherScalar, 1),
+            (
+                "18446744073709551615",
+                V::Number("18446744073709551615".into()),
+                V::OtherScalar,
+                1,
+            ),
+            (
+                r#""literal -0""#,
+                V::String("literal -0".into()),
+                V::String("literal -0".into()),
+                1,
+            ),
+            (
+                "[null,true,1]",
+                V::Array(vec![V::Null, V::Bool(true), V::Number("1".into())]),
+                V::Array(vec![V::Null, V::OtherScalar, V::OtherScalar]),
+                3,
+            ),
+            (
+                r#"{"nested":null}"#,
+                V::Object(std::collections::BTreeMap::from([(
+                    "nested".into(),
+                    V::Null,
+                )])),
+                V::Object(std::collections::BTreeMap::from([(
+                    "nested".into(),
+                    V::Null,
+                )])),
+                1,
+            ),
+        ] {
+            let tagged = equipment_json.replace(
+                r#""fuel_type":"None""#,
+                &format!(r#""fuel_type":"None","user_metadata":{metadata},"name":{metadata}"#),
+            );
+            let raw = ep_raw_model::parse_epjson_str(&tagged)?;
+            assert!(resolve(&raw).is_err());
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert_eq!(
+                ep_compiler::compile_raw_model(&raw).model.as_ref(),
+                Some(&baseline_model)
+            );
+            for (mut ip, mut original, expected) in [
+                (
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    baseline_a.clone(),
+                    &statistics,
+                ),
+                (
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    baseline_b.clone(),
+                    &full,
+                ),
+            ] {
+                assert_eq!(
+                    crate::ordinary_heat_balance_input::resolve(&raw, &ip)?,
+                    baseline_hb
+                );
+                assert_eq!(ip.get_max_schema_args()?, original.get_max_schema_args()?);
+                assert_eq!(
+                    ip.get_object_def_max_args("OtherEquipment")?,
+                    original.get_object_def_max_args("OtherEquipment")?
+                );
+                let mut actual_stats =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                let mut original_stats =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                ip.report_source_idf_records_stats(&mut actual_stats)?;
+                original.report_source_idf_records_stats(&mut original_stats)?;
+                assert_eq!(actual_stats, original_stats);
+                for name in ["N", "P"] {
+                    let fields = ip.source_raw_object_fields("OtherEquipment", name)?;
+                    assert_eq!(fields.get("user_metadata"), Some(expected));
+                    assert_eq!(fields.get("name"), Some(expected));
+                    let Some(ep_runtime::heat_balance::selected_input_processor::SourceInputFamily::Objects(shapes)) = ip.family("OtherEquipment") else {
+                        return Err("actual OtherEquipment raw shape".into());
+                    };
+                    assert_eq!(
+                        shapes
+                            .iter()
+                            .find(|s| s.object_name == name)
+                            .ok_or("actual shape")?
+                            .field_sizes
+                            .get("user_metadata"),
+                        Some(&size)
+                    );
+                }
+            }
+        }
+        // A malformed real property or reserved IDF member cannot become metadata.
+        for name in [
+            "fuel_type",
+            "zone_or_zonelist_or_space_or_spacelist_name",
+            "schedule_name",
+            "design_level_calculation_method",
+            "design_level",
+            "power_per_floor_area",
+            "power_per_person",
+            "fraction_latent",
+            "fraction_radiant",
+            "fraction_lost",
+            "carbon_dioxide_generation_rate",
+            "end_use_subcategory",
+            "idf_order",
+            "idf_max_fields",
+            "idf_max_extensible_fields",
+        ] {
+            let mut raw = ep_raw_model::parse_epjson_str(equipment_json)?;
+            raw.objects
+                .get_mut(&ObjectType("OtherEquipment".into()))
+                .ok_or("known fields family")?
+                .get_mut(&ep_raw_model::ObjectName("N".into()))
+                .ok_or("known fields object")?
+                .fields
+                .insert(FieldName(name.into()), RawValue::Array(Vec::new()));
+            assert!(
+                resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err(),
+                "{name}"
+            );
+        }
+        // The IDF overflow fallback is a stored double in its actual converted
+        // JSON. Preserve its positive value, true order and padded max_fields.
+        let converted = r#"{"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1}},
+            "OtherEquipment":{
+                "N":{"fuel_type":"None","zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level":18446744073709551615.0},
+                "P":{"fuel_type":"None","zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level":7}}}"#;
+        let idf = "Zone,actual zone;Schedule:Constant,on,,1;OtherEquipment,P,None,actual zone,on,EquipmentLevel,7;OtherEquipment,N,None,actual zone,on,EquipmentLevel,18446744073709551615;";
+        let raw = ep_raw_model::parse_epjson_str_with_idf_order(converted, idf)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+        assert!(!hb.source_is_epjson);
+        assert_eq!(
+            hb.objects["OtherEquipment"]
+                .iter()
+                .map(|o| o.object_name.as_str())
+                .collect::<Vec<_>>(),
+            ["P", "N"]
+        );
+        assert!(
+            hb.objects["OtherEquipment"]
+                .iter()
+                .all(|o| o.idf_max_fields == Some(11))
+        );
+        assert_eq!(
+            hb.objects["OtherEquipment"][1].fields["design_level"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                18446744073709551616.0
+            )
+        );
         // The same selected raw gain getter consumes the real eFuel, while
         // legacy admission retains its original None-only boundary.
         for fuel in [

@@ -106,6 +106,71 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
         "design_level_calculation_method":"Power/Area","power_per_floor_area":-9}}}"#,
     )?;
     assert!(compile_raw_model(&selected_negative).has_errors());
+    // Literal JSON preserves Native stored integer versus double kind for all
+    // seven actual IHG numeric fields. No serde Value round trip precedes parse.
+    for (token, expected) in [
+        ("-0", 0.0_f64),
+        ("-0.0", -0.0),
+        ("-0e0", -0.0),
+        ("1e-9999", 0.0),
+        ("-1e-9999", -0.0),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"OtherEquipment":{{"Kinds":{{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone",
+            "design_level":{token},"power_per_floor_area":{token},"power_per_person":{token},
+            "fraction_latent":{token},"fraction_radiant":{token},"fraction_lost":{token},
+            "carbon_dioxide_generation_rate":{token}}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{token}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("typed JSON numeric kind")?;
+        let row = &typed.other_equipment[0];
+        for value in [
+            row.design_level_w,
+            row.power_per_floor_area_w_per_m2,
+            row.power_per_person_w,
+            row.fraction_latent,
+            row.fraction_radiant,
+            row.fraction_lost,
+            row.carbon_dioxide_generation_rate_m3_per_s_w,
+        ] {
+            assert_eq!(value.to_bits(), expected.to_bits(), "{token}");
+        }
+    }
+    for (token, expected) in [
+        ("9223372036854775808", i64::MIN as f64),
+        ("18446744073709551615", -1.0),
+        ("18446744073709551615.0", 18446744073709551616.0),
+        ("18446744073709551615e0", 18446744073709551616.0),
+        ("18446744073709551616", 18446744073709551616.0),
+        ("1E+00", 1.0),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"OtherEquipment":{{"Kinds":{{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","fuel_type":"None",
+            "design_level":{token},"power_per_floor_area":{token},"power_per_person":{token}}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{token}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("typed wide JSON numeric kind")?;
+        let row = &typed.other_equipment[0];
+        for value in [
+            row.design_level_w,
+            row.power_per_floor_area_w_per_m2,
+            row.power_per_person_w,
+        ] {
+            assert_eq!(value.to_bits(), expected.to_bits(), "{token}");
+        }
+    }
     Ok(())
 }
 

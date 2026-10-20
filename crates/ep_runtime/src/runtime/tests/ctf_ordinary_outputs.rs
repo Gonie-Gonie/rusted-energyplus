@@ -2971,6 +2971,104 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 valid
             );
         }
+        // Author genuine JSON-kind projected operands at the same getter
+        // boundary; the raw/typed/HB tests above its caller retain literal text.
+        // No Native observations or report values supply these unit inputs.
+        for (token, expected) in [
+            ("-0", 0.0_f64),
+            ("-0.0", -0.0),
+            ("-0e0", -0.0),
+            ("1e-9999", 0.0),
+            ("-1e-9999", -0.0),
+            ("18446744073709551615", -1.0),
+        ] {
+            let mut reports = failed_gains.clone();
+            let projected = ep_model::classify_source_json_number(token)
+                .map_err(|_| "authored valid JSON gain operand")?
+                .as_f64();
+            assert_eq!(projected.to_bits(), expected.to_bits());
+            let fields = &mut reports
+                .heat_balance_input
+                .as_mut()
+                .ok_or("kind raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("kind objects")?[0]
+                .fields;
+            for name in ["design_level", "power_per_floor_area", "power_per_person"] {
+                fields.insert(name.into(), ProjectInputValue::Number(projected));
+            }
+            let zero = if projected < 0.0 { 0.0 } else { projected };
+            for name in [
+                "fraction_latent",
+                "fraction_radiant",
+                "fraction_lost",
+                "carbon_dioxide_generation_rate",
+            ] {
+                fields.insert(name.into(), ProjectInputValue::Number(zero));
+            }
+            let clock = crate::weather::day::WeatherGlobalState::default();
+            let (mut state, mut errors, mut console, mut eio) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            CtfInitializationContext {
+                reports: &mut reports,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_clock(
+                &model.typed,
+                15,
+                &mut gain_host,
+                Some(&clock),
+            )?;
+            let gains = &reports.selected_internal_heat_gains;
+            let rows = gains
+                .allocations
+                .other_equipment
+                .as_ref()
+                .ok_or("kind gain rows")?;
+            assert_eq!(
+                rows[0].design_level.to_bits(),
+                expected.to_bits(),
+                "{token}"
+            );
+            assert_eq!(
+                rows[0].nominal_min_design_level.to_bits(),
+                expected.to_bits()
+            );
+            assert_eq!(
+                rows[0].nominal_max_design_level.to_bits(),
+                expected.to_bits()
+            );
+            for value in [
+                rows[0].fraction_latent,
+                rows[0].fraction_radiant,
+                rows[0].fraction_lost,
+                rows[0].co2_rate_factor,
+            ] {
+                assert_eq!(value.to_bits(), zero.to_bits());
+            }
+            assert_eq!(rows[0].fraction_convected, 1.0);
+            assert!(!gains.errors_found && !gains.get_input_flag);
+            assert_eq!(state.tracking.total_warning_errors, 0);
+            assert_eq!(state.tracking.total_severe_errors, 0);
+            assert!(errors.is_empty());
+            assert!(String::from_utf8(eio)?.contains("OtherEquipment Internal Gains Nominal"));
+        }
         // Genuine enum/resource registration and the existing timestep prefix
         // all retain the same real gain rows. The gain-only IP fixture lacks
         // refrigeration schema definitions, an explicit first child boundary.

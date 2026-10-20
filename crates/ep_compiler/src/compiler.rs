@@ -16079,19 +16079,33 @@ impl<'a> Compiler<'a> {
         value: &RawValue,
     ) -> Option<f64> {
         match value {
-            RawValue::Number(text) => match text.parse::<f64>() {
-                Ok(value) if value.is_finite() => Some(value),
-                Ok(_) | Err(_) => {
-                    self.error(
-                        "InvalidNumber",
-                        object_type,
-                        Some(object_name),
-                        Some(field),
-                        format!("{object_type}/{object_name} field {field} is not a finite number"),
-                    );
-                    None
+            RawValue::Number(text) => {
+                // These seven real IHG numeric operands use Native IP842's
+                // stored JSON number kind, not an unconditional double parse.
+                // Other families retain their existing numeric projection.
+                let parsed = if object_type == "OtherEquipment" {
+                    ep_model::classify_source_json_number(text)
+                        .ok()
+                        .map(ep_model::SourceJsonNumber::as_f64)
+                } else {
+                    text.parse::<f64>().ok()
+                };
+                match parsed {
+                    Some(value) if value.is_finite() => Some(value),
+                    Some(_) | None => {
+                        self.error(
+                            "InvalidNumber",
+                            object_type,
+                            Some(object_name),
+                            Some(field),
+                            format!(
+                                "{object_type}/{object_name} field {field} is not a finite number"
+                            ),
+                        );
+                        None
+                    }
                 }
-            },
+            }
             _value => {
                 self.invalid_field_type(object_type, object_name, field, "number");
                 None

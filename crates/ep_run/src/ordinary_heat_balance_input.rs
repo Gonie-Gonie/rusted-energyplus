@@ -74,12 +74,40 @@ pub(crate) fn resolve(
                 ) {
                     continue;
                 }
+                // Native IP walks only genuine OtherEquipment schema fields.
+                // Unknown instance metadata remains in the original raw/IP
+                // owners, rather than becoming a heat-balance operand.
+                if family == "OtherEquipment"
+                    && !matches!(
+                        field.0.as_str(),
+                        "fuel_type"
+                            | "zone_or_zonelist_or_space_or_spacelist_name"
+                            | "schedule_name"
+                            | "design_level_calculation_method"
+                            | "design_level"
+                            | "power_per_floor_area"
+                            | "power_per_person"
+                            | "fraction_latent"
+                            | "fraction_radiant"
+                            | "fraction_lost"
+                            | "carbon_dioxide_generation_rate"
+                            | "end_use_subcategory"
+                    )
+                {
+                    continue;
+                }
                 let scalar = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(value) => {
-                        let value = value
-                            .parse::<f64>()
-                            .map_err(|_| format!("HB numeric parse: {family}.{}", field.0))?;
+                        let value = if family == "OtherEquipment" {
+                            ep_model::classify_source_json_number(value)
+                                .map(ep_model::SourceJsonNumber::as_f64)
+                                .map_err(|_| format!("HB numeric parse: {family}.{}", field.0))?
+                        } else {
+                            value
+                                .parse::<f64>()
+                                .map_err(|_| format!("HB numeric parse: {family}.{}", field.0))?
+                        };
                         if !value.is_finite() {
                             return Err(format!("HB nonfinite JSON: {family}.{}", field.0));
                         }
