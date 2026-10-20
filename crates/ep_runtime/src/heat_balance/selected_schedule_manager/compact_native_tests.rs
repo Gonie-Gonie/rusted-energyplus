@@ -1082,12 +1082,103 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         assert!(date.month.is_none() && date.day.is_none(), "{text}");
         assert!(diagnostics.is_empty(), "{text}");
     }
-    for (mode, first) in [
-        ("No", [10.0, 175.0, 175.0, 175.0, 175.0]),
-        ("Average", [10.0, 120.0, 175.0, 175.0, 175.0]),
-        ("Linear", [10.0, 40.0, 85.0, 130.0, 175.0]),
+    for (selector, mode, first) in [
+        (
+            "Interpolate:No",
+            "No",
+            [10.0_f64, 175.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "Interpolate:Average",
+            "Average",
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "Interpolate:Linear",
+            "Linear",
+            [10.0, 40.0, 85.0, 130.0, 175.0],
+        ),
+        (
+            "Interpolate:NoAverageLinear",
+            "No",
+            [10.0, 175.0, 175.0, 175.0, 175.0],
+        ),
+        ("ThroughNo", "No", [10.0, 175.0, 175.0, 175.0, 175.0]),
+        (
+            "LinearAverage",
+            "Average",
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "Interpolate:LinearAverage",
+            "Average",
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        ("ForAverage", "Average", [10.0, 120.0, 175.0, 175.0, 175.0]),
+        (
+            "  Average suffix",
+            "Average",
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        ("LINEAR_SUFFIX", "Linear", [10.0, 40.0, 85.0, 130.0, 175.0]),
     ] {
-        let raw = authored_raw(fixture, mode, false);
+        let mut raw = authored_raw(fixture, mode, false);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][2]["field"] =
+            serde_json::json!(selector);
+        let source_mode = match mode {
+            "No" => super::minute::SourceScheduleInterpolation::No,
+            "Average" => super::minute::SourceScheduleInterpolation::Average,
+            _ => super::minute::SourceScheduleInterpolation::Linear,
+        };
+        let (mut minutes, mut assigned, mut found_errors) = ([0.0_f64; 1440], [false; 1440], false);
+        let mut minute_diagnostics = Vec::new();
+        super::minute::process_interval_fields_with(
+            &[
+                "UNTIL:00:20".into(),
+                "UNTIL:01:15".into(),
+                "UNTIL:24:00".into(),
+            ],
+            &[10.0, 175.0, 175.0],
+            3,
+            3,
+            &mut minutes,
+            &mut assigned,
+            &mut found_errors,
+            "ACTUAL SELECTOR",
+            "Schedule:Compact",
+            source_mode,
+            15,
+            &mut |kind, message| {
+                minute_diagnostics.push((kind, message.to_owned()));
+                Ok(())
+            },
+        )?;
+        assert!(!found_errors && assigned.iter().all(|assigned| *assigned));
+        assert_eq!(minute_diagnostics.len(), 2 * usize::from(mode == "No"));
+        if mode == "No" {
+            assert_eq!(
+                minute_diagnostics[0].0,
+                super::minute::SourceScheduleMinuteDiagnostic::Warning
+            );
+            assert_eq!(
+                minute_diagnostics[1].0,
+                super::minute::SourceScheduleMinuteDiagnostic::Continue
+            );
+        }
+        for (at, actual) in minutes.iter().enumerate() {
+            let expected: f64 = if at < 20 {
+                10.0
+            } else if mode == "Linear" && at < 75 {
+                10.0 + (at + 1 - 20) as f64 * 3.0
+            } else {
+                175.0
+            };
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "{selector} minute{at}"
+            );
+        }
         let mut input = processor(fixture, &raw)?;
         let declarations = schedule_declarations(fixture, &raw)?;
         let mut manager = SelectedScheduleManager::default();
@@ -1140,7 +1231,18 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
             assert_eq!(
                 actual.to_bits(),
                 expected.to_bits(),
-                "{mode} actual live lookup {ordinal}"
+                "{selector} actual live lookup {ordinal}"
+            );
+            let at = ordinal as usize;
+            let minute_expected = if mode == "Average" {
+                minutes[at * 15..(at + 1) * 15].iter().sum::<f64>() / 15.0
+            } else {
+                minutes[(at + 1) * 15 - 1]
+            };
+            assert_eq!(
+                actual.to_bits(),
+                minute_expected.to_bits(),
+                "{selector} real minute reduction{at}"
             );
         }
         // The last live currentVal is175, yet the same retained Detailed graph

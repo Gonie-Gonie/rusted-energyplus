@@ -16245,6 +16245,39 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             };
+            // Native1405-1418 examines exactly the immediate post-For alpha,
+            // before Through/For dispatch. A pending Until value was consumed
+            // above. Keep the whole uppercase field and substring precedence;
+            // this is not the regular Day interpolation enum grammar.
+            if let Some(profile) = current_profile.as_mut()
+                && !profile.interpolation_explicit
+                && profile.profile.segments.is_empty()
+                && let RawValue::String(text) = field_value
+            {
+                let selector = text.to_ascii_uppercase();
+                if selector.starts_with("INTERPOLATE") || !selector.starts_with("UNTIL") {
+                    profile.interpolation_explicit = true;
+                    let interpolation = if selector.contains("NO") {
+                        Some(ScheduleInterpolation::No)
+                    } else if selector.contains("AVERAGE") {
+                        Some(ScheduleInterpolation::Average)
+                    } else if selector.contains("LINEAR") {
+                        Some(ScheduleInterpolation::Linear)
+                    } else {
+                        None
+                    };
+                    if let Some(interpolation) = interpolation {
+                        profile.profile.interpolation = interpolation;
+                    } else {
+                        self.error(
+                            "InvalidScheduleCompactInterpolation", "Schedule:Compact",
+                            Some(object_name), Some("data"),
+                            format!("Schedule:Compact/{object_name} has invalid post-For interpolation selector '{text}'"),
+                        );
+                    }
+                    continue;
+                }
+            }
             match field_value {
                 RawValue::String(text) if compact_directive_operand(text, "Through").is_some() => {
                     self.finish_compact_schedule_profile(

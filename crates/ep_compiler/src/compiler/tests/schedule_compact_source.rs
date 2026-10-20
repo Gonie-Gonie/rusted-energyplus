@@ -102,6 +102,91 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
         assert!(scalar_result(entry, false)?.has_errors());
     }
 
+    // Compact consumes one immediate post-For alpha by whole-field substring
+    // precedence, including bare text and apparent For/Through prefixes.
+    for (selector, interpolation, first) in [
+        (
+            "Interpolate:NoAverageLinear",
+            ScheduleInterpolation::No,
+            [10.0_f64, 175.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "ThroughNo",
+            ScheduleInterpolation::No,
+            [10.0, 175.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "LinearAverage",
+            ScheduleInterpolation::Average,
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "Interpolate:LinearAverage",
+            ScheduleInterpolation::Average,
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "ForAverage",
+            ScheduleInterpolation::Average,
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "  Average suffix",
+            ScheduleInterpolation::Average,
+            [10.0, 120.0, 175.0, 175.0, 175.0],
+        ),
+        (
+            "LINEAR_SUFFIX",
+            ScheduleInterpolation::Linear,
+            [10.0, 40.0, 85.0, 130.0, 175.0],
+        ),
+    ] {
+        let source = format!(
+            r#"{{"Timestep":{{"T":{{"number_of_timesteps_per_hour":4}}}},
+            "ScheduleTypeLimits":{{"T":{{"lower_limit_value":0,"upper_limit_value":200,"numeric_type":"Continuous"}}}},
+            "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"T","data":[
+                {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{{"field":"{selector}"}},
+                {{"field":"Until:00:20"}},{{"field":10}},{{"field":"Until:01:15"}},{{"field":175}},
+                {{"field":"Until:24:00"}},{{"field":175}}]}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&source)?);
+        assert!(
+            !result.has_errors(),
+            "{selector}: {:?}",
+            result.report.diagnostics
+        );
+        let model = result.model.ok_or("actual Compact selector model")?;
+        let profile = &model.compact_schedules[0].periods[0].day_profiles[0];
+        assert_eq!(profile.interpolation, interpolation, "{selector}");
+        assert_eq!(profile.segments.len(), 3);
+        let (_, values) =
+            ep_model::populate_schedule_day_values(interpolation, &profile.segments, Some(15));
+        assert_eq!(values.len(), 96);
+        for (step, actual) in values.iter().enumerate() {
+            let expected: f64 = first.get(step).copied().unwrap_or(175.0);
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "{selector} step{step}"
+            );
+        }
+    }
+    for fields in [
+        r#"{"field":"Interpolate:Yes"},{"field":"Until:24:00"},{"field":1}"#,
+        r#"{"field":"LinearAverage"},{"field":"Interpolate:No"},{"field":"Until:24:00"},{"field":1}"#,
+        r#"{"field":"Until:00:20"},{"field":0},{"field":"Interpolate:Average"},{"field":"Until:24:00"},{"field":1}"#,
+        r#"{"field":"Until:24:00"},{"field":"LinearAverage"}"#,
+        r#"{"field":"UNTILAverage"},{"field":1}"#,
+    ] {
+        let source = format!(
+            r#"{{"Schedule:Compact":{{"S":{{"data":[
+            {{"field":"Through:12/31"}},{{"field":"For:AllDays"}},{fields}]}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&source)?);
+        assert!(result.has_errors() && result.model.is_none(), "{fields}");
+    }
+    assert!(super::super::parse_schedule_interpolation("LinearAverage").is_none());
+
     // Exercise the shared JSON-kind classifier in this existing connected body.
     // Integer overflow fallback is a stored float, never arbitrary-width wrap.
     use ep_model::{SourceJsonNumber, classify_source_json_number};
@@ -691,12 +776,19 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
     ] {
         let result = compile_until(directive, true)?;
         assert!(result.has_errors(), "{directive}");
+        // A leading space fails Native's byte-zero UNTIL prefix before the
+        // time decoder: the immediate post-For field is an invalid selector.
+        let diagnostic = if directive.starts_with(' ') {
+            "InvalidScheduleCompactInterpolation"
+        } else {
+            "InvalidScheduleCompactUntil"
+        };
         assert!(
             result
                 .report
                 .diagnostics
                 .iter()
-                .any(|row| row.code == "InvalidScheduleCompactUntil"),
+                .any(|row| row.code == diagnostic),
             "{directive}"
         );
         assert!(result.model.is_none());
