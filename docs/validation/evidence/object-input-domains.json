@@ -35,7 +35,8 @@
       "checked downstream calendar/Julian limits retained",
       "actual whole-environment nonactual-weather 48h December/January rollover and 24h February29 completion",
       "Source raw weather reads the real CurrentYearIsLeapYear separately from EPW leap permission; both must allow physical February29",
-      "leap proof uses explicitly derived synthetic Feb28-copy weather; nonleap skip/retry, actual-weather, DST and special-day children retain their guards"
+      "actual nonleap February29 skip consumes every physical record with real normalization/counter prefix, writes both live February tables and retries once per day; accepted-day physical/cache writes and conditional warning/continuation follow Original ordering",
+      "same-input 2013 Feb28-to-Mar1 lifecycle completes with all10704 reported samples and exact one skip warning; actual-weather year matching, DST and special-day children remain bounded"
     ],
     "Output:Variable": [
       "real live reporting schedule identity and immutable dictionary name",
@@ -120,14 +121,14 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/geometry-rules-clippy-10b.log",
-        "sha256": "92ec2b348a55347bfd312ae7857dc238bbabca4776bf6654ee1ec7e86d448bbb",
-        "bytes": 2170
+        "path": ".runtime/object-expansion/calendar-skip-clippy-11.log",
+        "sha256": "eb8605e3608b7dd93af05a141a7884dfd31828fd424bb9d94f4084d27aff8327",
+        "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/geometry-rules-docs-10b.log",
+        "path": ".runtime/object-expansion/calendar-skip-docs-11.log",
         "sha256": "d32de6266c72d4ab6d9555b499bf7f7fe64b811454642a50b6a3453269867e03",
         "bytes": 354
       }
@@ -1495,12 +1496,63 @@
           "passed": true
         },
         "geometry_state": "Only nine exact ancestral spans change: GGR LowerRightCorner/Clockwise/Relative, reordered authored quad vertices, Building north -22.5, Zone north 37.5 and origin 12/-7/2.25. Real two-stage transformation matches all six named ordered four-vertex DXF entities to Native five-decimal output and exact geometry EIO; zero diagnostics."
+      },
+      {
+        "id": "nonleap-Feb29-skip",
+        "group": "nonactual_weather_leap_skip",
+        "source_build": "calendar-skip-11",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-skip/calibration-01/input.idf",
+          "sha256": "55102729350a2d9c63b78bf260b42f1bbbda5e9d2a7dfc253e76ae29f78e82b0",
+          "bytes": 9277
+        },
+        "weather": {
+          "path": ".runtime/object-expansion/native-calendar-domains/calibration-01/leap-day/Golden-controlled-synthetic-leap-2016.epw",
+          "sha256": "70e5290902b0e62ae567001e1be9bc30d6b491e626af4a290d415ae0330777a5",
+          "bytes": 1627901
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-skip/calibration-01/receipt.json",
+          "sha256": "effcc27c64640008c3d6ef344d593b776239b3023d1a59199e2d61719af28562",
+          "bytes": 10917
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-calendar-skip/receipt/receipt.json",
+          "sha256": "1499e1730cff196310d942154c5c8eeeffbcb966b01891778287c81c701de1bf",
+          "bytes": 4113
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/nonleap-calendar-skip/run-summary.json",
+          "sha256": "f7b946dd6fbb8ea5e2b5fec7a771ba9103a20ab87e11a0ac29a9e1bdc00e4e5f",
+          "bytes": 32353
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-calendar-skip-comparisons-01/main/comparison.json",
+          "sha256": "71229287c7b9402a6f619793340306e584d3e447e909f1ae6c3b15a91561e356",
+          "bytes": 116978
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-calendar-skip-comparisons-01/nonleap-Feb29-skip-source-run-request.json",
+          "sha256": "ae99c08da566057ada45953d1104cf089df2c22524ba529645c608c06f1130ec",
+          "bytes": 4590
+        },
+        "totals": {
+          "series": 58,
+          "samples": 10704,
+          "raw_operand_unequal": 7254,
+          "parsed_binary64_unequal": 7254,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "calendar_state": "Nonactual2013 Feb28 Thursday to Mar1 Friday uses the existing explicitly synthetic leap EPW unchanged. Both physical owners report exactly48h and no Feb29; complete ERR/END retain the same one genuine skip warning, zero severe/fatal, elapsed normalized only."
       }
     ],
     "totals": {
-      "paired_cases": 23,
-      "reported_samples": 125112,
-      "raw_operand_unequal": 71641,
+      "paired_cases": 24,
+      "reported_samples": 135816,
+      "raw_operand_unequal": 78895,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1675,6 +1727,38 @@
           "sha256": "4fbf7ae704fa30601063b4a81c4beab73084c5f2ed31031f0e6db7832afd4281",
           "bytes": 75125490
         }
+      },
+      {
+        "id": "calendar-skip-11",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-11/receipt.json",
+          "sha256": "83a367ee4eaee964f011a8ccce7c8f8c98e7f3b56a43b3204b8f87d6b29a270a",
+          "bytes": 4854
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/15/15add14f7c5feff4b9c6d1825c55dc6c7beb79b74884fdff427a84ca30a71c06",
+          "sha256": "15add14f7c5feff4b9c6d1825c55dc6c7beb79b74884fdff427a84ca30a71c06"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-11/eplus-rs.exe",
+          "sha256": "c53e08a1eb802d0c179532cfe9b5527d5538a33fd11629cd3f5f23b4d5c922b2",
+          "bytes": 75130614
+        }
+      }
+    ],
+    "focused_tests": [
+      {
+        "through_build": "calendar-skip-11",
+        "passed": 126,
+        "ignored": 0,
+        "scope": "Weather filter across ep_runtime and ep_run, including all real leap-permission/current-year combinations, exact full24-row retry, skipped-prefix counters and live diagnostic phases. Earlier units are covered by the recorded workspace milestone.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/calendar-skip-tests-11.log",
+            "sha256": "f63d1ceef86bf1ee367f3521a8c66518b33cb41a853164828c1d0a6d576c8d7b",
+            "bytes": 1129
+          }
+        ]
       }
     ]
   },

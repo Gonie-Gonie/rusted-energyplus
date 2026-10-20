@@ -1,6 +1,6 @@
 //! Real raw-day sink: physical parsing mutates one cursor/header and one WeatherDayState.
 use super::{Error, Failure, ordinal};
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::psychrometrics::SourcePsychrometricAccess;
 use crate::weather::day::{WeatherDayError, WeatherDayState, WeatherSession, WeatherVars};
@@ -14,6 +14,7 @@ struct SourceDayReadSink<'a, 'backend> {
     state: &'a mut WeatherDayState,
     environ: usize,
     globals: &'a SelectedHeatBalanceGlobals,
+    developer_flag: &'a bool,
     psy: &'a mut SourcePsychrometricAccess,
     backend: &'a mut SourceErrorBackend<'backend>,
 }
@@ -43,6 +44,33 @@ impl SourceRawDayReadClock for SourceDayReadSink<'_, '_> {
 }
 impl SourceRawDayReadCallbacks for SourceDayReadSink<'_, '_> {
     type Error = Failure;
+    fn prepare_hour(&mut self, args: &mut RawEpwOutputs) -> Result<(), Failure> {
+        super::hourly::prepare_source_hour(self.state, args)?;
+        Ok(())
+    }
+    fn prepare_skipped_leap_day(&mut self, header: &mut RawEpwHeaderState) -> Result<(), Failure> {
+        header.month_ends[1] = 28;
+        self.state.weather.end_day_of_month_with_leap_day[1] = 28;
+        Ok(())
+    }
+    fn report_skipped_leap_day(&mut self, header: &RawEpwHeaderState) -> Result<(), Failure> {
+        let flags = SourceDiagnosticFlags {
+            kickoff: &self.globals.kickoff_simulation,
+            developer: self.developer_flag,
+            warmup: &self.state.global.warmup_flag,
+            doing_sizing: &self.globals.doing_sizing,
+        };
+        self.backend.show_source_warning_error(
+            "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed.",
+            &flags,
+        )?;
+        if !header.allows_leap_years {
+            self.backend.show_continue_error(
+                r#"...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate "Yes"."#,
+            )?;
+        }
+        Ok(())
+    }
     fn first_day_selected(
         &mut self,
         _slot: &RawWeatherSlot,
@@ -241,12 +269,14 @@ impl SourceDayReadSink<'_, '_> {
     }
 }
 impl WeatherSession {
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn read_source_weather_for_day(
         &mut self,
         day: i32,
         environ: i32,
         backspace: bool,
         globals: &SelectedHeatBalanceGlobals,
+        developer_flag: &bool,
         psy: &mut SourcePsychrometricAccess,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Failure> {
@@ -271,6 +301,7 @@ impl WeatherSession {
             state: &mut self.state,
             environ: index,
             globals,
+            developer_flag,
             psy,
             backend,
         };
@@ -290,5 +321,163 @@ impl WeatherSession {
                 SourceRawDayReadFailure::Callback(error) => error,
             })?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod skip_tests {
+    use super::*;
+    use crate::heat_balance::error_backend::{SourceErrorState, SourceErrorTracking};
+    use crate::weather::day::{WeatherDayValues, WeatherVars};
+    use crate::weather::raw::{HeaderCallerPreparation, RawDaySourceFatal};
+
+    // Explicit unit boundary construction, not a production activation/reset.
+    fn errors() -> SourceErrorState {
+        SourceErrorState {
+            output_error_header: false,
+            version_string: String::new(),
+            idd_version_string: String::new(),
+            doing_input_processing: false,
+            print_console_output: false,
+            kickoff_simulation: false,
+            developer_flag: false,
+            warmup_flag: false,
+            doing_sizing: false,
+            tracking: SourceErrorTracking {
+                ask_for_plant_check_on_abort: false,
+                exit_during_simulations: false,
+                match_counts: [0; 20],
+                abort_processing: false,
+                ask_for_connections_report: false,
+                ask_for_surfaces_report: false,
+                total_multiplied_windows: 0,
+                total_coincident_vertices: 0,
+                total_degenerate_surfaces: 0,
+                total_receiving_non_convex_surfaces: 0,
+                total_casting_non_convex_surfaces: 0,
+                total_severe_errors: 0,
+                total_severe_errors_during_warmup: 0,
+                total_severe_errors_during_sizing: 0,
+                last_severe_error: String::new(),
+                total_warning_errors: 0,
+                total_warning_errors_during_warmup: 0,
+                total_warning_errors_during_sizing: 0,
+            },
+        }
+    }
+
+    #[test]
+    fn skipped_hours_keep_real_prefix_effects_caches_slots_and_live_warning_phase() {
+        for allows in [true, false] {
+            let mut text = format!(
+                "LOCATION,Example,CO,USA,Test,000000,39.74,-105.18,-7,1600\nDESIGN CONDITIONS,0\nTYPICAL/EXTREME PERIODS,0\nGROUND TEMPERATURES,0\nHOLIDAYS/DAYLIGHT SAVINGS,{},0,0,0\nCOMMENTS 1,\nCOMMENTS 2,\nDATA PERIODS,1,1,Data,Sunday,1/1,12/31\n",
+                if allows { "Yes" } else { "No" }
+            );
+            for hour in 1..=24 {
+                text.push_str(&format!("2016,2,29,{hour},60,A,9999,9999,-1,-1,-1,-1,0,-1,9999,-1,-1,-1,-1,-1,361,-1,-1,-1,-1,-1,0,9,-1,-1,-1,-1,-1,-1\n"));
+            }
+            text.push_str("2016,3,1,2,60,A,20,10,50,101325,0,0,300,0,0,0,0,0,0,0,180,2.5,0,0,0,0,9,999999999,0,0,0,0,0,0\n");
+            let mut cursor = RawEpwCursorOwner::open_from_bytes(
+                text.into_bytes(),
+                RawEpwHeaderState::default(),
+                HeaderCallerPreparation::default(),
+            )
+            .unwrap();
+            cursor.source_header_mut().month_ends[1] = 29;
+            let mut state = WeatherDayState::default();
+            state.environment.current_year_is_leap_year = false;
+            state.environment.display_weather_missing_data_warnings = true;
+            state.global.warmup_flag = true;
+            state.weather.end_day_of_month_with_leap_day[1] = 29;
+            state.weather.cur_day_of_week = 5;
+            state.weather.read_e_plus_weather_cur_time = 3.25;
+            state.weather.last_hour_set = true;
+            state.last_hour.out_dry_bulb_temp = 42.0;
+            state.missing_values.base.out_dry_bulb_temp = 41.0;
+            state.tomorrow_values = WeatherDayValues::allocated(4).unwrap();
+            state.tomorrow_values.slots_mut().fill(WeatherVars {
+                out_dry_bulb_temp: 77.0,
+                ..Default::default()
+            });
+            let globals = SelectedHeatBalanceGlobals::default();
+            let developer = false;
+            let mut psy = SourcePsychrometricAccess;
+            let mut error_state = errors();
+            let mut error_text = Vec::new();
+            let mut console = Vec::new();
+            let result = {
+                let mut backend = SourceErrorBackend {
+                    state: &mut error_state,
+                    error_stream: Some(&mut error_text),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                let mut sink = SourceDayReadSink {
+                    state: &mut state,
+                    environ: 0,
+                    globals: &globals,
+                    developer_flag: &developer,
+                    psy: &mut psy,
+                    backend: &mut backend,
+                };
+                cursor.read_day_with_live_source_state(
+                    RawDayReadSelection {
+                        start_month: 2,
+                        start_day: 28,
+                        start_year: 2013,
+                        match_year: false,
+                        days_in_year: 365,
+                    },
+                    RawDayReadMode::NextDay,
+                    false,
+                    &mut sink,
+                )
+            };
+            assert!(matches!(
+                result,
+                Err(SourceRawDayReadFailure::Native(RawDayFailure::SourceFatal(
+                    RawDaySourceFatal::UnexpectedHour {
+                        expected: 1,
+                        actual: 2
+                    }
+                )))
+            ));
+            assert_eq!(cursor.interpret_count(), 25);
+            assert_eq!(state.missed_counts.weath_codes, 24);
+            assert_eq!(state.missed_counts.beam_solar_rad, 24);
+            assert_eq!(state.out_of_range_counts.dif_solar_rad, 24);
+            assert_eq!(state.missed_counts.out_dry_bulb_temp, 0);
+            assert_eq!(state.missing_values.base.out_dry_bulb_temp, 41.0);
+            assert_eq!(state.last_hour.out_dry_bulb_temp, 42.0);
+            assert!(state.weather.last_hour_set);
+            assert_eq!(state.weather.cur_day_of_week, 5);
+            assert_eq!(state.weather.read_e_plus_weather_cur_time, 3.25);
+            assert_eq!(cursor.header().month_ends[1], 28);
+            assert_eq!(state.weather.end_day_of_month_with_leap_day[1], 28);
+            assert_eq!(cursor.header().allows_leap_years, allows);
+            assert!(!state.environment.current_year_is_leap_year);
+            for hour in 1..=24 {
+                let slots = state.tomorrow_values.hour(hour).unwrap();
+                assert_eq!(slots[0], WeatherVars::default());
+                assert!(slots[1..].iter().all(|slot| slot.out_dry_bulb_temp == 77.0));
+            }
+            assert_eq!(error_state.tracking.total_warning_errors, 1);
+            assert_eq!(error_state.tracking.total_warning_errors_during_warmup, 1);
+            assert_eq!(error_state.tracking.total_warning_errors_during_sizing, 0);
+            let warning = "   ** Warning ** ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed.\n";
+            let expected = if allows {
+                warning.to_owned()
+            } else {
+                format!(
+                    "{warning}   **   ~~~   ** ...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\".\n"
+                )
+            };
+            assert_eq!(String::from_utf8(error_text).unwrap(), expected);
+        }
     }
 }

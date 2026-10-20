@@ -35,6 +35,15 @@ pub(crate) trait SourceRawDayReadCallbacks: SourceRawDayReadClock {
         arguments: &mut RawEpwOutputs,
     ) -> Result<(), Self::Error>;
     fn clear_source_interval(&mut self, hour: usize, interval: usize) -> Result<(), Self::Error>;
+    /// Genuine2738-2824 prefix, including reached counters, even on skipped rows.
+    fn prepare_hour(&mut self, arguments: &mut RawEpwOutputs) -> Result<(), Self::Error>;
+    /// Both real February tables are written before TryAgain/SkipThisDay flags.
+    fn prepare_skipped_leap_day(
+        &mut self,
+        header: &mut RawEpwHeaderState,
+    ) -> Result<(), Self::Error>;
+    /// Actual warning/optional continue after array writes and local retry flags.
+    fn report_skipped_leap_day(&mut self, header: &RawEpwHeaderState) -> Result<(), Self::Error>;
     /// `arguments` is the actual parser reference owner. Source hourly physical
     /// preprocessing must mutate it directly; detached slot is metadata only.
     fn parsed_hour(
@@ -100,6 +109,16 @@ impl<C> SourceRawDayReadClock for LegacyDayReadCallbacks<'_, C> {
 }
 impl<C: RawDayReadCallbacks> SourceRawDayReadCallbacks for LegacyDayReadCallbacks<'_, C> {
     type Error = String;
+    fn prepare_hour(&mut self, _: &mut RawEpwOutputs) -> Result<(), String> {
+        // Retained raw-only entry owns no processed weather prefix/counters.
+        Ok(())
+    }
+    fn prepare_skipped_leap_day(&mut self, _: &mut RawEpwHeaderState) -> Result<(), String> {
+        Err("legacy raw-only entry has no live leap retry owners".into())
+    }
+    fn report_skipped_leap_day(&mut self, _: &RawEpwHeaderState) -> Result<(), String> {
+        Err("legacy raw-only entry has no actual warning backend".into())
+    }
     fn first_day_selected(
         &mut self,
         slot: &RawWeatherSlot,
@@ -145,59 +164,85 @@ impl RawEpwCursorOwner {
                 .map_err(SourceRawDayReadFailure::Callback)?;
         }
         let mut hours = Vec::with_capacity(24);
-        for hour in 1..=24 {
-            callbacks
-                .clear_source_interval(hour, 1)
-                .map_err(SourceRawDayReadFailure::Callback)?;
-            let mut read = self.input.read_line()?;
-            if !read.read_good {
-                read.data.clear();
-            }
-            if read.data.is_empty() {
-                if hour == 1 {
-                    read.eof = true;
+        let mut try_again = true;
+        let mut skip_this_day = false;
+        while try_again {
+            try_again = false;
+            hours.clear();
+            for hour in 1..=24 {
+                callbacks
+                    .clear_source_interval(hour, 1)
+                    .map_err(SourceRawDayReadFailure::Callback)?;
+                let mut read = self.input.read_line()?;
+                if !read.read_good {
+                    read.data.clear();
                 }
-                read.read_good = false;
-            }
-            if read.read_good {
-                callbacks.interpret_record(self, &read)?;
-            } else if read.eof && self.header.number_data_periods == 1 {
-                if self.header.data_periods.values[0].number_days >= selection.days_in_year {
-                    self.rewind_and_skip_header()?;
-                    read.update(self.input.read_line()?);
-                    // Source calls Interpret before testing this replacement read.
+                if read.data.is_empty() {
+                    if hour == 1 {
+                        read.eof = true;
+                    }
+                    read.read_good = false;
+                }
+                if read.read_good {
                     callbacks.interpret_record(self, &read)?;
+                } else if read.eof && self.header.number_data_periods == 1 {
+                    if self.header.data_periods.values[0].number_days >= selection.days_in_year {
+                        self.rewind_and_skip_header()?;
+                        read.update(self.input.read_line()?);
+                        // Source calls Interpret before testing this replacement read.
+                        callbacks.interpret_record(self, &read)?;
+                    } else {
+                        return Err(RawDayFailure::SourceFatal(
+                            RawDaySourceFatal::PartialPeriodEof,
+                        )
+                        .into());
+                    }
                 } else {
                     return Err(
-                        RawDayFailure::SourceFatal(RawDaySourceFatal::PartialPeriodEof).into(),
+                        RawDayFailure::SourceFatal(RawDaySourceFatal::UnexpectedRead).into(),
                     );
                 }
-            } else {
-                return Err(RawDayFailure::SourceFatal(RawDaySourceFatal::UnexpectedRead).into());
+                if self.arguments.dates[3] != hour as i32 {
+                    return Err(
+                        RawDayFailure::SourceFatal(RawDaySourceFatal::UnexpectedHour {
+                            expected: hour as i32,
+                            actual: self.arguments.dates[3],
+                        })
+                        .into(),
+                    );
+                }
+                let slot = self.slot(&read);
+                // Same pre-decision reference writes happen on every physical row,
+                // including all24 rows of a day that will be skipped.
+                callbacks
+                    .prepare_hour(&mut self.arguments)
+                    .map_err(SourceRawDayReadFailure::Callback)?;
+                if hour == 1 {
+                    if slot.raw.dates[1..3] == [2, 29]
+                        && (!callbacks.current_year_is_leap_year()?
+                            || !self.header.allows_leap_years)
+                    {
+                        callbacks
+                            .prepare_skipped_leap_day(&mut self.header)
+                            .map_err(SourceRawDayReadFailure::Callback)?;
+                        skip_this_day = true;
+                        try_again = true;
+                        callbacks
+                            .report_skipped_leap_day(&self.header)
+                            .map_err(SourceRawDayReadFailure::Callback)?;
+                        continue;
+                    }
+                    try_again = false;
+                    skip_this_day = false;
+                }
+                if skip_this_day {
+                    continue;
+                }
+                callbacks
+                    .parsed_hour(hour, &slot, &mut self.header, &mut self.arguments)
+                    .map_err(SourceRawDayReadFailure::Callback)?;
+                hours.push(slot);
             }
-            if self.arguments.dates[3] != hour as i32 {
-                return Err(
-                    RawDayFailure::SourceFatal(RawDaySourceFatal::UnexpectedHour {
-                        expected: hour as i32,
-                        actual: self.arguments.dates[3],
-                    })
-                    .into(),
-                );
-            }
-            let slot = self.slot(&read);
-            // Original WeatherManager.cc2826: only a disallowed Feb29 takes
-            // the unported skip/retry branch. Read the live calendar owner;
-            // header leap permission and CurrentYearIsLeapYear are distinct.
-            if hour == 1
-                && slot.raw.dates[1..3] == [2, 29]
-                && (!callbacks.current_year_is_leap_year()? || !self.header.allows_leap_years)
-            {
-                return Err(RawDayFailure::OutsideBoundedDomain("February 29 daily retry").into());
-            }
-            callbacks
-                .parsed_hour(hour, &slot, &mut self.header, &mut self.arguments)
-                .map_err(SourceRawDayReadFailure::Callback)?;
-            hours.push(slot);
         }
         if backspace_after_read {
             self.backspace_record()?;

@@ -21,18 +21,15 @@ fn source_int(value: f64) -> Result<i32, Error> {
     }
     Ok(truncated as i32)
 }
-pub(super) fn process_source_hour(
+/// Actual2738-2824 reference normalization and optional radiation counters.
+/// Called once per physical record, before the leap retry decision.
+pub(super) fn prepare_source_hour(
     state: &mut WeatherDayState,
-    header: &RawEpwHeaderState,
-    environ: usize,
-    hour: usize,
     args: &mut RawEpwOutputs,
-    psychrometrics: &mut SourcePsychrometricAccess,
-    backend: &mut SourceErrorBackend<'_>,
-) -> Result<(), Failure> {
+) -> Result<(), Error> {
     let [
-        dry,
-        dew,
+        _dry,
+        _dew,
         rh,
         pressure,
         et_horizontal,
@@ -61,7 +58,6 @@ pub(super) fn process_source_hour(
         liquid,
     ] = &mut args.optional_reals;
     let observation = &mut args.observation_indicator;
-    let codes = &args.weather_codes;
     if *et_horizontal < 0.0 {
         *et_horizontal = 9999.0;
     }
@@ -153,6 +149,50 @@ pub(super) fn process_source_hour(
     if *liquid < 0.0 {
         *liquid = 999.0;
     }
+    Ok(())
+}
+
+pub(super) fn process_source_hour(
+    state: &mut WeatherDayState,
+    header: &RawEpwHeaderState,
+    environ: usize,
+    hour: usize,
+    args: &mut RawEpwOutputs,
+    psychrometrics: &mut SourcePsychrometricAccess,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), Failure> {
+    let [
+        dry,
+        dew,
+        rh,
+        pressure,
+        et_horizontal,
+        et_direct,
+        infrared,
+        global_horizontal,
+        beam,
+        diffuse,
+        global_illuminance,
+        direct_illuminance,
+        diffuse_illuminance,
+        zenith_luminance,
+        wind_direction,
+        wind_speed,
+        total_sky,
+        opaque_sky,
+        visibility,
+        ceiling,
+    ] = &mut args.mandatory_reals;
+    let [
+        precipitable_water,
+        aerosol,
+        snow_depth,
+        days_since_snow,
+        albedo,
+        liquid,
+    ] = &mut args.optional_reals;
+    let observation = &mut args.observation_indicator;
+    let codes = &args.weather_codes;
     if hour == 1 {
         let row = state
             .weather
