@@ -114,12 +114,16 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
         for (name, object) in objects {
-            // This numeric-only singleton has no authored Name. Its official
-            // epJSON pattern accepts arbitrary keys; keep the exact IP identity.
+            // These unnamed singletons have no authored Name. Their official
+            // epJSON patterns accept arbitrary keys; keep exact IP identity.
             if name.0.trim().is_empty()
                 && !matches!(
                     family.0.as_str(),
-                    "Version" | "Timestep" | "Site:GroundTemperature:BuildingSurface"
+                    "Version"
+                        | "Timestep"
+                        | "Site:GroundTemperature:BuildingSurface"
+                        | "SurfaceConvectionAlgorithm:Inside"
+                        | "SurfaceConvectionAlgorithm:Outside"
                 )
             {
                 return Err(format!("blank ordinary {} name", family.0));
@@ -174,8 +178,14 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                     // retains their live limits for CTF diagnostics and convection.
                     selected(object, "algorithm", &["ConductionTransferFunction"])
                 }
-                "SurfaceConvectionAlgorithm:Inside" => selected(object, "algorithm", &["TARP"]),
-                "SurfaceConvectionAlgorithm:Outside" => selected(object, "algorithm", &["DOE-2"]),
+                "SurfaceConvectionAlgorithm:Inside" => {
+                    selected(object, "algorithm", &["Simple", "TARP"])
+                }
+                "SurfaceConvectionAlgorithm:Outside" => selected(
+                    object,
+                    "algorithm",
+                    &["SimpleCombined", "TARP", "MoWiTT", "DOE-2"],
+                ),
                 "ZoneAirHeatBalanceAlgorithm" => {
                     selected(object, "algorithm", &["ThirdOrderBackwardDifference"])
                         && selected(object, "do_space_heat_balance_for_sizing", &["No"])

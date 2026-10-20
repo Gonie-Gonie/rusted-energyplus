@@ -6,6 +6,7 @@
 
 mod geometry;
 pub(crate) mod source;
+use super::convection::simple_inside;
 use super::convection::tarp_inside::{
     detailed_inside_coefficient_w_per_m2_k, natural_coefficient_w_per_m2_k,
 };
@@ -17,7 +18,9 @@ use super::report_scan::{
     ReportScanDiagnostic, ReportScanFailure, ReportScanState, ReportScanUnavailable,
     try_scan_for_reports,
 };
-use ep_model::{ReportInputs, SpaceId, SurfaceId, SurfaceType, ZoneId};
+use ep_model::{
+    InsideSurfaceConvectionAlgorithm, ReportInputs, SpaceId, SurfaceId, SurfaceType, ZoneId,
+};
 pub use geometry::ConvectionGeometrySummary;
 use std::collections::BTreeMap;
 
@@ -30,7 +33,7 @@ pub enum InsideConvectionUnavailable {
     Geometry,
     /// One of the six actual user-convection object counts is nonzero.
     UserConvectionInput,
-    /// Selected opaque TARP entry cannot represent this actual algorithm/branch.
+    /// Selected opaque Simple/TARP entry cannot represent this actual algorithm/branch.
     AlgorithmOrSurface,
     /// Genuine Details reporting was reached; its report writer is not ported here.
     SurfaceDetailsReport,
@@ -337,8 +340,8 @@ impl SpaceAirTemperatures {
 pub struct InsideConvectionZone {
     /// Actual zone identity.
     pub zone_id: ZoneId,
-    /// Actual IntConvAlgo; only TARP is admitted by this selected entry.
-    pub tarp: bool,
+    /// Actual lossless Zone.IntConvAlgo; selected Simple/TARP admission is checked at use.
+    pub inside_algorithm: InsideSurfaceConvectionAlgorithm,
     /// Actual CeilingHeight.
     pub ceiling_height: f64,
     /// Actual Volume.
@@ -362,6 +365,8 @@ pub struct InsideConvectionZone {
 pub enum InsideConvectionModel {
     /// Preserve actual surface default; resolve the owning zone at the call.
     SetByZone,
+    /// Explicit ASHRAESimple assignment.
+    Simple,
     /// Explicit ASHRAETARP assignment.
     Tarp,
 }
@@ -371,6 +376,7 @@ impl InsideConvectionModel {
     pub const fn source_id(self) -> i32 {
         match self {
             Self::SetByZone => 2,
+            Self::Simple => 3,
             Self::Tarp => 4,
         }
     }
@@ -422,7 +428,7 @@ pub struct InsideConvectionSurfaceState {
     pub surface_id: SurfaceId,
     /// Retained model, not overwritten by local SetByZone resolution.
     pub model: InsideConvectionModel,
-    /// SurfTAirRef and SurfTAirRefRpt, unchanged by selected TARP.
+    /// SurfTAirRef and SurfTAirRefRpt, unchanged by selected Simple/TARP.
     pub reference_air: [i32; 2],
     /// SurfIntConv zoneWallHeight/zonePerimLength/zoneHorizHydrDiam/windowWallRatio.
     pub interior_geometry: [f64; 4],
@@ -811,7 +817,10 @@ fn validate_static_geometry(
 ) -> Result<(), InsideConvectionUnavailable> {
     for zone in zones {
         let [xmin, xmax, ymin, ymax] = zone.xy_bounds;
-        if !zone.tarp {
+        if !matches!(
+            zone.inside_algorithm,
+            InsideSurfaceConvectionAlgorithm::Simple | InsideSurfaceConvectionAlgorithm::Tarp
+        ) {
             return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
         }
         if ![
@@ -1021,7 +1030,7 @@ fn initialize_user_convection_metadata<M: InsideConvectionSurfaceMetadata + ?Siz
 }
 
 /// Execute the genuine selected no-user first call, readiness transitions and
-/// opaque TARP traversal. Unsupported branches stop explicitly; success covers
+/// opaque Simple/TARP traversal. Unsupported branches stop explicitly; success covers
 /// this declared selected domain, never full adaptive/window/user setup.
 pub fn initialize_inside_convection<
     C: ZoneEquipmentActiveElements + ?Sized,
@@ -1180,11 +1189,11 @@ fn initialize_inside_convection_body<
         }
         state.active_surface_check = false;
     }
-    // Both actual surface model alternatives and every admitted zone are TARP;
+    // All admitted Simple/TARP surface and Zone alternatives are nonadaptive;
     // the BeginEnvrn adaptive search is genuinely false, so Node reset is not reached.
     if readiness.begin_environment && state.my_environment {
         for index in 0..metadata.metadata_count()? {
-            // The selected two real model alternatives are nonadaptive.
+            // The selected real model alternatives are nonadaptive.
             let _actual_model = metadata.model(index)?;
         }
         state.my_environment = false;
@@ -1202,9 +1211,43 @@ fn initialize_inside_convection_body<
                 .iter()
                 .position(|r| r.surface_id == *id)
                 .ok_or(InsideConvectionUnavailable::Association)?;
-            let _actual_model = metadata.model(index)?;
-            // SetByZone is a local resolution only: retain the actual model owner.
-            if entry == ConvectionEntry::Source {
+            let actual_model = metadata.model(index)?;
+            // Resolve SetByZone locally from the actual retained owning Zone;
+            // never overwrite surfIntConv.model or alias Simple to TARP.
+            let algorithm = match actual_model {
+                InsideConvectionModel::SetByZone => {
+                    zones
+                        .iter()
+                        .find(|zone| zone.zone_id == group.zone_id)
+                        .ok_or(InsideConvectionUnavailable::Association)?
+                        .inside_algorithm
+                }
+                InsideConvectionModel::Simple => InsideSurfaceConvectionAlgorithm::Simple,
+                InsideConvectionModel::Tarp => InsideSurfaceConvectionAlgorithm::Tarp,
+            };
+            if algorithm == InsideSurfaceConvectionAlgorithm::Simple {
+                // Actual non-Kiva1896 writes this same Source cell before the
+                // wrapper's unconditional Objexx max assignment1900.
+                coefficients.set_coefficient(
+                    index,
+                    simple_inside::coefficient_w_per_m2_k(
+                        *temperatures.borrow_temperature(index)?,
+                        mat,
+                        surfaces[index].outward_cos_tilt,
+                    ),
+                );
+                coefficients.set_coefficient(
+                    index,
+                    geometry::source_max(
+                        *coefficients.borrow_coefficient(index)?,
+                        actual_low_limit,
+                    ),
+                );
+                // Distinct caller325 reads the live cell again; no High limit.
+                if *coefficients.borrow_coefficient(index)? < actual_low_limit {
+                    coefficients.set_coefficient(index, actual_low_limit);
+                }
+            } else if entry == ConvectionEntry::Source {
                 // Actual CalcASHRAEDetailedIntConvCoeff1967 writes the raw
                 // value into the same Source cell BEFORE either clamp read.
                 coefficients.set_coefficient(

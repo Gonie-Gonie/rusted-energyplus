@@ -24,8 +24,8 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 | `Site:GroundTemperature:BuildingSurface` | 15 | 15 | 01 Project, time and site | typed |
 | `Site:Location` | 116 | 116 | 01 Project, time and site | typed |
 | `SizingPeriod:DesignDay` | 42 | 81 | 01 Project, time and site | unregistered / no reviewed entry |
-| `SurfaceConvectionAlgorithm:Inside` | 69 | 69 | 01 Project, time and site | unregistered / no reviewed entry |
-| `SurfaceConvectionAlgorithm:Outside` | 69 | 69 | 01 Project, time and site | unregistered / no reviewed entry |
+| `SurfaceConvectionAlgorithm:Inside` | 69 | 69 | 01 Project, time and site | typed |
+| `SurfaceConvectionAlgorithm:Outside` | 69 | 69 | 01 Project, time and site | typed |
 | `Timestep` | 174 | 174 | 01 Project, time and site | typed |
 | `Version` | 185 | 185 | 01 Project, time and site | typed |
 | `ZoneAirHeatBalanceAlgorithm` | 53 | 53 | 01 Project, time and site | unregistered / no reviewed entry |

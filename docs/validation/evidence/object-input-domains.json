@@ -67,6 +67,19 @@
       "numeric-only singleton keys/counts and converted IDF blank versus direct epJSON types",
       "real factory warning and current-month weather/reporting owner",
       "Source-only validated support classification; actual Ground thermal and sibling-family guards retained"
+    ],
+    "SurfaceConvectionAlgorithm:Inside": [
+      "real singleton IP getter, omitted/blank defaults, strict string types and exact unnamed keys",
+      "lossless actual Zone selection; SetByZone resolution preserves stored surface model identity",
+      "actual Simple threshold/sign correlation with per-Space MAT and outward cosine",
+      "sole live SurfHConvInt raw write, unconditional Source max and separate caller lower-limit read; no global high cap",
+      "Simple/TARP Source-only admission; adaptive/ASTMC1340/CeilingDiffuser, local/user/EMS/Kiva/window branches remain bounded"
+    ],
+    "SurfaceConvectionAlgorithm:Outside": [
+      "real singleton IP getter, omitted/blank DOE-2 default, strict string types and exact unnamed keys",
+      "SimpleCombined/TARP/MoWiTT/DOE-2 actual inherited Zone enums and existing physical correlations",
+      "three changed-algorithm cases retain all original five WindExposed faces and one NoWind face",
+      "validated Source-only admission; legacy arbitrary execution, adaptive and local/user/EMS/Kiva branches retain guards"
     ]
   },
   "verification": {
@@ -78,20 +91,20 @@
         "sha256": "9cdf1df65f77bc641a056fb81f148bb922b8c8ec5748c0afc08484b7a87da585",
         "bytes": 20646
       },
-      "scope": "Current runtime code through opaque-lifecycle-05; subsequent object registry/documentation changes are metadata only."
+      "scope": "Workspace milestone through opaque-lifecycle-05. Convection-06 subsequently passed the focused connected and unsupported-branch checks below; this is not a full-workspace rerun for that build."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/geometry-diagnostics-clippy-01.log",
-        "sha256": "5405dee0ea203310c5dd6aca4ab9290fc764c28504319a5ce740d117689030be",
-        "bytes": 2062
+        "path": ".runtime/object-expansion/convection-clippy-02.log",
+        "sha256": "7777137e7e5a6cb5481509b2433d755468bca0447d1653e80261365dbb5052e4",
+        "bytes": 2060
       },
       "format": "cargo fmt --all passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/geometry-diagnostics-docs-01.log",
-        "sha256": "8c6a4dcbe17a468400c73b4f7cb33c7d821534a0cd8b566f3a54d768ef72ab95",
+        "path": ".runtime/object-expansion/convection-docs-06.log",
+        "sha256": "31b13980e0eab0cee69cfc6c768d568b38267c0abf66f5f1f54813af528a40af",
         "bytes": 1408
       }
     },
@@ -940,12 +953,232 @@
           "sha256": "d226215b187c9895fa7c2628fd8e128feb1d6f84403dd5925bfbb9c27880b50b",
           "bytes": 34566
         }
+      },
+      {
+        "id": "inside-simple",
+        "group": "global_convection",
+        "source_build": "convection-06",
+        "input": {
+          "path": ".runtime/object-expansion/native-inside-simple/calibration-01/input.idf",
+          "sha256": "7e04a16f54bf29e35078ba33850a9fe08c8be90d722b08d300b6bd4980a2fe0f",
+          "bytes": 9277
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-inside-simple/calibration-01/receipt.json",
+          "sha256": "268acfb300efdd6e683750c6aee53b7660fea8269fe88ff0267c89aef177b36b",
+          "bytes": 5822
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-convection/inside-simple/receipt.json",
+          "sha256": "92a3b05c875e409aec1ceb3a7ea52925e18ae8c5ed5ab0cab0cc9dc05e7ca257",
+          "bytes": 5338
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/convection-inside-simple/run-summary.json",
+          "sha256": "eadd26a18b3b0d1cb95ade56b478a74efa1f6083f5ecff24e7388b0a7f9ecea7",
+          "bytes": 32324
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/inside-simple/comparison.json",
+          "sha256": "55599d32203e0f78a56c42850e0131db0f50dce6ce7c9263e46f33df451922b8",
+          "bytes": 111521
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/convection-inside-simple-source-launch-01.json",
+          "sha256": "6d638c6ebf87ed27c95d1c4d6583073772c6902d7e2d86c387dff2d7e8fc2157",
+          "bytes": 2701
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 1262,
+          "parsed_binary64_unequal": 1262,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_algorithms": {
+          "inside": "Simple",
+          "outside": "DOE-2"
+        },
+        "effective_state": "Exact global and inherited Zone EIO, successful END with zero warnings/severe and no diagnostic markers; full original wind flags and reported streams retained."
+      },
+      {
+        "id": "outside-mowitt",
+        "group": "global_convection",
+        "source_build": "convection-06",
+        "input": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/mowitt/input.idf",
+          "sha256": "94ee05052e30117a2e6a293b06a6d9c64bbacfcf54ece78ad3c8c2ac5352caa5",
+          "bytes": 9276
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/mowitt/command-receipt.json",
+          "sha256": "c3690d7e15ed719fe22fb7d7acd27b388c2d80b9135b9ba9302f253e6c63d094",
+          "bytes": 5248
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-convection/outside-mowitt/receipt.json",
+          "sha256": "ea32a09b2f0b807c5ad37c3133b3115f993e65af4a6744f82fdb9728da12466b",
+          "bytes": 5263
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/convection-outside-mowitt/run-summary.json",
+          "sha256": "53925b5554f7b6f9a73d6a6d32b1433cfc5d8a0be821ac56ab54a0e58f6c60ff",
+          "bytes": 32639
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-mowitt/comparison.json",
+          "sha256": "8aa0358169e0643ac3d619ff062805cc450fd49f1468354352e00962021b13ad",
+          "bytes": 111660
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-mowitt-prelaunch.json",
+          "sha256": "be8e29339ef66cc4cbba6bbeff3507de7c67ebbda22e2178547c2423908e7e86",
+          "bytes": 5357
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3769,
+          "parsed_binary64_unequal": 3769,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_algorithms": {
+          "inside": "TARP",
+          "outside": "MoWiTT"
+        },
+        "effective_state": "Exact global and inherited Zone EIO, successful END with zero warnings/severe and no diagnostic markers; full original wind flags and reported streams retained."
+      },
+      {
+        "id": "outside-simple-combined",
+        "group": "global_convection",
+        "source_build": "convection-06",
+        "input": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/simple-combined/input.idf",
+          "sha256": "d9fae7e0e0942a659f2c7528c5e204c9b563a3855a7de9b17441bcc1f6176a26",
+          "bytes": 9284
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/simple-combined/command-receipt.json",
+          "sha256": "4dc6f19dc502c3f1297140bd9888da65ebfb0e31e06fcbbe62808fdeded93c2d",
+          "bytes": 5302
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-convection/outside-simple-combined/receipt.json",
+          "sha256": "c44ed2b9d7c921412c57a42856215bc6473aa6e576c88778f816322702dbd485",
+          "bytes": 5299
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/convection-outside-simple-combined/run-summary.json",
+          "sha256": "14de07765219ff5c0c54be803a65a5865bce5be91da294906c03fd1ec745bcc7",
+          "bytes": 32873
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-simple-combined/comparison.json",
+          "sha256": "c3ffc90babff3e5398c0b78e911ebddad300fa3329c536239b6551f054e0c941",
+          "bytes": 112078
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-simple-combined-prelaunch.json",
+          "sha256": "34c72aa0751fd451a9755ff64ef2ea18563adc86b139ecf6c0736ea1b7228ee7",
+          "bytes": 5465
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3009,
+          "parsed_binary64_unequal": 3009,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_algorithms": {
+          "inside": "TARP",
+          "outside": "SimpleCombined"
+        },
+        "effective_state": "Exact global and inherited Zone EIO, successful END with zero warnings/severe and no diagnostic markers; full original wind flags and reported streams retained."
+      },
+      {
+        "id": "outside-tarp",
+        "group": "global_convection",
+        "source_build": "convection-06",
+        "input": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/tarp/input.idf",
+          "sha256": "4f341196cf1b0433ecc5b17b6b37bb8eec179e552ab9feb2bdfe627f554f3652",
+          "bytes": 9274
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-outside-algorithms/calibration-01/tarp/command-receipt.json",
+          "sha256": "b1705eaad29492c813c9be8480f2dc2fa5014f890a5a88825f215b7e390c7a69",
+          "bytes": 5236
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-convection/outside-tarp/receipt.json",
+          "sha256": "a06b0fee1a3cdb2b8507c65eb5498197788c624c2756ea4740533ae221a79f29",
+          "bytes": 5254
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/convection-outside-tarp/run-summary.json",
+          "sha256": "1520c22ed10f8e5240e842cd0be5ece7f10f5c8412c6a47828efcb161252b2fd",
+          "bytes": 32575
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-tarp/comparison.json",
+          "sha256": "cfee21da43b7605c652ca3547abbacf301e1c6b69bae0060b9af411434aaa94a",
+          "bytes": 111533
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-convection-comparisons-01/outside-tarp-prelaunch.json",
+          "sha256": "a4d97ee17eac892e7460f4e45f2beee425ddf167cb1dff6bb83f444be086bd99",
+          "bytes": 5333
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3693,
+          "parsed_binary64_unequal": 3693,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_algorithms": {
+          "inside": "TARP",
+          "outside": "TARP"
+        },
+        "effective_state": "Exact global and inherited Zone EIO, successful END with zero warnings/severe and no diagnostic markers; full original wind flags and reported streams retained."
       }
     ],
     "totals": {
-      "paired_cases": 14,
-      "reported_samples": 71592,
-      "raw_operand_unequal": 37752,
+      "paired_cases": 18,
+      "reported_samples": 93000,
+      "raw_operand_unequal": 49485,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1035,8 +1268,43 @@
           "sha256": "f24ad18bc17553f071bf7070a2aa4d50dc3d6dda1064d7ad279e483115796546",
           "bytes": 75077553
         }
+      },
+      {
+        "id": "convection-06",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-06/receipt.json",
+          "sha256": "4bd8d958d8ce4eb46ad0fe36271c927f659a9c0fe34357b2a46d785c36222fd1",
+          "bytes": 6093
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/be/beff3dfb2281dbdd8b373642bf502c1276433cf9ef07bb24802c17b1edd599ac",
+          "sha256": "beff3dfb2281dbdd8b373642bf502c1276433cf9ef07bb24802c17b1edd599ac"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-06/eplus-rs.exe",
+          "sha256": "24271a310d768c8d823354ad31bc92bd863c791c3b230b1b324fd981966aed2c",
+          "bytes": 75079423
+        }
       }
-    ]
+    ],
+    "focused_tests": {
+      "through_build": "convection-06",
+      "passed": 44,
+      "ignored": 1,
+      "scope": "Convection filter across ep_runtime and ep_run, plus the existing scientific-algorithm rejection test. The earlier broad ep_run run exposed an obsolete Simple rejection expectation; the corrected test still rejects genuinely unimplemented algorithms.",
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/convection-connected-tests-02.log",
+          "sha256": "470b219f849ec37c1ba9ca3259e21989700efcf37ab292caab1375cd08da0cca",
+          "bytes": 2778
+        },
+        {
+          "path": ".runtime/object-expansion/convection-rejection-tests-02.log",
+          "sha256": "203df2e0abc173e4b1fc43be1475432ac34f449d3c93a1d110fae6acf73df43f",
+          "bytes": 2272
+        }
+      ]
+    }
   },
   "additional_native_type_calibrations": [
     {

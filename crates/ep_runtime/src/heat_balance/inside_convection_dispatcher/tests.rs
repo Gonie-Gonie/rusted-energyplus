@@ -37,7 +37,7 @@ fn layout() -> Result<InsideConvectionLayout, InsideConvectionUnavailable> {
 fn zones() -> Vec<InsideConvectionZone> {
     vec![InsideConvectionZone {
         zone_id: ZoneId(7),
-        tarp: true,
+        inside_algorithm: InsideSurfaceConvectionAlgorithm::Tarp,
         ceiling_height: 3.0,
         volume: 90.0,
         floor_area: 30.0,
@@ -723,5 +723,110 @@ fn distinct_roof_edge_with_underflowed_length_stops_before_setup()
     assert_eq!(coefficients, coefficient_before);
     assert!(scan.get_report_input);
     assert!(stream.is_empty() && console.is_empty());
+    Ok(())
+}
+
+#[test]
+fn simple_resolves_zone_without_relabeling_and_writes_the_real_low_limit()
+-> Result<(), Box<dyn std::error::Error>> {
+    struct Cells {
+        rows: [(SurfaceId, f64); 2],
+        writes: Vec<(usize, f64)>,
+    }
+    impl InsideConvectionCoefficients for Cells {
+        fn surface_count(&self) -> usize {
+            self.rows.len()
+        }
+        fn surface_id(&self, index: usize) -> SurfaceId {
+            self.rows[index].0
+        }
+        fn set_coefficient(&mut self, index: usize, value: f64) {
+            self.rows[index].1 = value;
+            self.writes.push((index, value));
+        }
+        fn borrow_coefficient(&self, index: usize) -> Result<&f64, InsideConvectionUnavailable> {
+            Ok(&self.rows[index].1)
+        }
+    }
+    for low in [0.1, 2001.0] {
+        let layout = layout()?;
+        let (mut state, rows) = state(&layout)?;
+        let mut cells = Cells {
+            rows,
+            writes: Vec::new(),
+        };
+        let mut zones = zones();
+        zones[0].inside_algorithm = InsideSurfaceConvectionAlgorithm::Simple;
+        // The other surface's explicit TARP model remains independently TARP.
+        state.surfaces[1].model = InsideConvectionModel::Tarp;
+        let mut active = [(ZoneId(7), [true; 3])];
+        let air = SpaceAirTemperatures::allocate(&layout);
+        let temperatures = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
+        let mut error = error_state();
+        let (mut stream, mut console) = (Vec::new(), Vec::new());
+        let mut backend = SourceErrorBackend {
+            state: &mut error,
+            error_stream: Some(&mut stream),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        initialize_inside_convection(
+            &layout,
+            &zones,
+            &surfaces(),
+            NoUserConvectionInput::new([0; 6])?,
+            &mut state,
+            &mut active[..],
+            &mut cells,
+            &air,
+            InsideSurfaceTemperatures {
+                owner: InsideSurfaceTemperatureOwner::SurfTempIn,
+                rows: &temperatures,
+            },
+            readiness(),
+            low,
+            &ReportInputs::default(),
+            &mut ReportScanState::default(),
+            &mut backend,
+        )?;
+        let expected_simple = if low > 3.076 { low } else { 3.076 };
+        assert_eq!(cells.rows[0].1, expected_simple);
+        assert_eq!(cells.rows[1].1, low);
+        assert_eq!(
+            cells
+                .writes
+                .iter()
+                .filter(|(index, _)| *index == 0)
+                .map(|(_, value)| *value)
+                .collect::<Vec<_>>(),
+            [3.076, expected_simple]
+        );
+        assert_eq!(state.surfaces[0].model, InsideConvectionModel::SetByZone);
+        assert_eq!(state.surfaces[1].model, InsideConvectionModel::Tarp);
+        assert_eq!(InsideConvectionModel::Simple.source_id(), 3);
+        // Actual supplied LowLimit may exceed the separately supplied High;
+        // this Source wrapper/caller has no upper-limit operation.
+        if low == 2001.0 {
+            assert!(cells.rows.iter().all(|row| row.1 > 1000.0));
+        }
+    }
+    let mut zones = zones();
+    for unsupported in [
+        InsideSurfaceConvectionAlgorithm::CeilingDiffuser,
+        InsideSurfaceConvectionAlgorithm::TrombeWall,
+        InsideSurfaceConvectionAlgorithm::AdaptiveConvectionAlgorithm,
+        InsideSurfaceConvectionAlgorithm::AstmC1340,
+    ] {
+        zones[0].inside_algorithm = unsupported;
+        assert_eq!(
+            validate_static_geometry(&zones, &surfaces()),
+            Err(InsideConvectionUnavailable::AlgorithmOrSurface)
+        );
+    }
     Ok(())
 }

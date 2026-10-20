@@ -277,7 +277,7 @@ pub(super) fn snapshot(
         "ordered_layout":{"zones":layout.zones().iter().map(|v|v.0).collect::<Vec<_>>(),"spaces":layout.spaces().iter().map(|v|json!([v.0.0,v.1.0])).collect::<Vec<_>>(),
             "surface_associations":layout.surfaces().iter().map(|v|json!([v.surface_id.0,v.zone_id.0,v.space_id.0])).collect::<Vec<_>>(),
             "groups":layout.groups().iter().map(|v|json!({"zone":v.zone_id.0,"space":v.space_id.0,"surfaces":v.surfaces.iter().map(|s|s.0).collect::<Vec<_>>()})).collect::<Vec<_>>()},
-        "typed_zones":zones.iter().map(|z|json!({"zone_id":z.zone_id.0,"tarp":z.tarp,"CeilingHeight":scalar(z.ceiling_height),"Volume":scalar(z.volume),"FloorArea":scalar(z.floor_area),
+        "typed_zones":zones.iter().map(|z|json!({"zone_id":z.zone_id.0,"tarp":z.inside_algorithm == ep_model::InsideSurfaceConvectionAlgorithm::Tarp,"CeilingHeight":scalar(z.ceiling_height),"Volume":scalar(z.volume),"FloorArea":scalar(z.floor_area),
             "MinimumX":scalar(z.xy_bounds[0]),"MaximumX":scalar(z.xy_bounds[1]),"MinimumY":scalar(z.xy_bounds[2]),"MaximumY":scalar(z.xy_bounds[3]),
             "ExtGrossWallArea":scalar(z.exterior_gross_wall_area),"ExtWindowArea":scalar(z.exterior_window_area),"Multiplier":z.multiplier,"ListMultiplier":z.list_multiplier})).collect::<Vec<_>>(),
         "typed_surfaces":surfaces.iter().map(|s|json!({"surface_id":s.surface_id.0,"class":match s.class {ep_model::SurfaceType::Wall=>"Wall",ep_model::SurfaceType::Roof=>"Roof",ep_model::SurfaceType::Ceiling=>"Ceiling",ep_model::SurfaceType::Floor=>"Floor"},

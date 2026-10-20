@@ -8,6 +8,64 @@ use ep_model::{InsideSurfaceConvectionAlgorithm, OutsideSurfaceConvectionAlgorit
 use std::io::Write;
 
 impl SelectedHeatBalanceInputState {
+    // HeatBalanceManager724-803: genuine singleton queries, shared IP shortcut,
+    // enum owner writes and EIO in original order. Admission excludes all later
+    // unsupported adaptive, local override, user, EMS and Kiva consumers.
+    fn get_source_surface_convection_algorithms(
+        &mut self,
+        raw: &SelectedHeatBalanceInput,
+        input: &mut super::SelectedInputProcessor,
+        shortcut: &mut super::SourceInputProcessorShortCut,
+        current_module: &mut String,
+        eio: &mut dyn Write,
+    ) -> Result<(), HeatBalanceInputError> {
+        *current_module = "SurfaceConvectionAlgorithm:Inside".into();
+        let (inside, inside_label) = if input.get_num_objects_found(current_module) > 0 {
+            let values = raw.get_object_item::<4, 5>(current_module, 0, input, shortcut)?;
+            match values.alphas[0].as_str() {
+                "SIMPLE" => (InsideSurfaceConvectionAlgorithm::Simple, "Simple"),
+                "TARP" => (InsideSurfaceConvectionAlgorithm::Tarp, "TARP"),
+                _ => {
+                    return Err(HeatBalanceInputError::Unavailable(
+                        "unadmitted inside convection branch",
+                    ));
+                }
+            }
+        } else {
+            (InsideSurfaceConvectionAlgorithm::Tarp, "TARP")
+        };
+        self.inside_convection_algorithm = inside;
+        writeln!(
+            eio,
+            "! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{inside_label}"
+        )?;
+        *current_module = "SurfaceConvectionAlgorithm:Outside".into();
+        let (outside, outside_label) = if input.get_num_objects_found(current_module) > 0 {
+            let values = raw.get_object_item::<4, 5>(current_module, 0, input, shortcut)?;
+            match values.alphas[0].as_str() {
+                "SIMPLECOMBINED" => (
+                    OutsideSurfaceConvectionAlgorithm::SimpleCombined,
+                    "SimpleCombined",
+                ),
+                "TARP" => (OutsideSurfaceConvectionAlgorithm::Tarp, "TARP"),
+                "MOWITT" => (OutsideSurfaceConvectionAlgorithm::MoWitt, "MoWiTT"),
+                "DOE-2" => (OutsideSurfaceConvectionAlgorithm::Doe2, "DOE-2"),
+                _ => {
+                    return Err(HeatBalanceInputError::Unavailable(
+                        "unadmitted outside convection branch",
+                    ));
+                }
+            }
+        } else {
+            (OutsideSurfaceConvectionAlgorithm::Doe2, "DOE-2")
+        };
+        self.outside_convection_algorithm = outside;
+        writeln!(
+            eio,
+            "! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{outside_label}"
+        )?;
+        Ok(())
+    }
     pub(crate) fn get_project_control_data(
         &mut self,
         raw: &SelectedHeatBalanceInput,
@@ -17,51 +75,12 @@ impl SelectedHeatBalanceInputState {
         errors_found: &mut bool,
     ) -> Result<(), HeatBalanceInputError> {
         self.get_building(raw, owners, backend, eio, errors_found)?;
-        *owners.current_module_object = "SurfaceConvectionAlgorithm:Inside".into();
-        if owners
-            .input
-            .get_num_objects_found("SurfaceConvectionAlgorithm:Inside")
-            > 0
-        {
-            let values = raw.get_object_item::<4, 5>(
-                "SurfaceConvectionAlgorithm:Inside",
-                0,
-                owners.input,
-                owners.shortcut,
-            )?;
-            if values.alphas[0] != "TARP" {
-                return Err(HeatBalanceInputError::Unavailable(
-                    "unadmitted inside convection branch",
-                ));
-            }
-        }
-        self.inside_convection_algorithm = InsideSurfaceConvectionAlgorithm::Tarp;
-        write!(
+        self.get_source_surface_convection_algorithms(
+            raw,
+            owners.input,
+            owners.shortcut,
+            owners.current_module_object,
             eio,
-            "! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,TARP\n"
-        )?;
-        *owners.current_module_object = "SurfaceConvectionAlgorithm:Outside".into();
-        if owners
-            .input
-            .get_num_objects_found("SurfaceConvectionAlgorithm:Outside")
-            > 0
-        {
-            let values = raw.get_object_item::<4, 5>(
-                "SurfaceConvectionAlgorithm:Outside",
-                0,
-                owners.input,
-                owners.shortcut,
-            )?;
-            if values.alphas[0] != "DOE-2" {
-                return Err(HeatBalanceInputError::Unavailable(
-                    "unadmitted outside convection branch",
-                ));
-            }
-        }
-        self.outside_convection_algorithm = OutsideSurfaceConvectionAlgorithm::Doe2;
-        write!(
-            eio,
-            "! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,DOE-2\n"
         )?;
         *owners.current_module_object = "HeatBalanceAlgorithm".into();
         if owners.input.get_num_objects_found("HeatBalanceAlgorithm") > 0 {
@@ -226,3 +245,7 @@ impl SelectedHeatBalanceInputState {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "control/convection_tests.rs"]
+mod convection_tests;

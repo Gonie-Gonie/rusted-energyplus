@@ -212,6 +212,38 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
+    // Only the validated Source lane dispatches these real global alternatives.
+    // Legacy arbitrary-run convection and authored Zone override guards stay closed.
+    for (family, nondefault, code) in [
+        (
+            "SurfaceConvectionAlgorithm:Inside",
+            typed_model
+                .surface_convection_algorithms
+                .inside
+                .is_some_and(|value| value != ep_model::InsideSurfaceConvectionAlgorithm::Tarp),
+            "UnsupportedInsideConvectionAlgorithm",
+        ),
+        (
+            "SurfaceConvectionAlgorithm:Outside",
+            typed_model
+                .surface_convection_algorithms
+                .outside
+                .is_some_and(|value| value != ep_model::OutsideSurfaceConvectionAlgorithm::Doe2),
+            "UnsupportedOutsideConvectionAlgorithm",
+        ),
+    ] {
+        if nondefault && !source_admission.is_some_and(|admission| admission.consumes(family)) {
+            push_typed_boundary(
+                unsupported_objects,
+                diagnostics,
+                family,
+                1,
+                code,
+                "Nondefault global convection is outside the legacy arbitrary runtime boundary",
+            );
+        }
+    }
+
     let zone_convection_override_count = typed_model
         .zones
         .iter()

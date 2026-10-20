@@ -52,6 +52,18 @@ fn input(scope: PortingScope) -> Value {
     value
 }
 
+fn single_day_weather_fixture() -> ep_runtime::weather::EpwWeatherFile {
+    let mut weather_text = String::from(
+        "LOCATION,Example\nDESIGN CONDITIONS\nTYPICAL/EXTREME PERIODS\nGROUND TEMPERATURES\nHOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0\nCOMMENTS 1\nCOMMENTS 2\nDATA PERIODS,1,1,Data,Friday,1/1,1/1\n",
+    );
+    for hour in 1..=24 {
+        weather_text.push_str(&format!(
+            "1999,1,1,{hour},60,Source,1.0,0.0,50,101325,0,0,300,10,20,30,0,0,0,0,180,2.5\n"
+        ));
+    }
+    ep_runtime::weather::parse_epw_weather_file(&weather_text).expect("weather fixture")
+}
+
 fn trace(value: &Value, scope: PortingScope) -> PortingScopeTrace {
     let raw = parse_epjson_str(&value.to_string()).expect("valid epJSON");
     let compiled = compile_raw_model(&raw);
@@ -538,7 +550,13 @@ fn scientific_algorithms_are_rejected_before_bounded_execution() {
         (
             "SurfaceConvectionAlgorithm:Inside",
             "algorithm",
-            "Simple",
+            "CeilingDiffuser",
+            "convection",
+        ),
+        (
+            "SurfaceConvectionAlgorithm:Outside",
+            "algorithm",
+            "AdaptiveConvectionAlgorithm",
             "convection",
         ),
     ] {
@@ -671,16 +689,7 @@ fn effective_calendar_branches_are_checked_after_weather_resolution() {
     }});
     let raw = parse_epjson_str(&value.to_string()).expect("epJSON");
     let compiled = compile_raw_model(&raw);
-    let mut weather_text = String::from(
-        "LOCATION,Example\nDESIGN CONDITIONS\nTYPICAL/EXTREME PERIODS\nGROUND TEMPERATURES\nHOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0\nCOMMENTS 1\nCOMMENTS 2\nDATA PERIODS,1,1,Data,Friday,1/1,1/1\n",
-    );
-    for hour in 1..=24 {
-        weather_text.push_str(&format!(
-            "1999,1,1,{hour},60,Source,1.0,0.0,50,101325,0,0,300,10,20,30,0,0,0,0,180,2.5\n"
-        ));
-    }
-    let weather =
-        ep_runtime::weather::parse_epw_weather_file(&weather_text).expect("weather fixture");
+    let weather = single_day_weather_fixture();
     let actual = super::environment::environment_from_weather(
         compiled.model.as_ref().expect("compiled model"),
         &weather,
@@ -717,16 +726,7 @@ fn weather_trace_uses_real_calendar_selection_and_zone_schedule_values() {
     let value = input(PortingScope::B);
     let raw = parse_epjson_str(&value.to_string()).expect("epJSON");
     let compiled = compile_raw_model(&raw);
-    let mut weather_text = String::from(
-        "LOCATION,Example\nDESIGN CONDITIONS\nTYPICAL/EXTREME PERIODS\nGROUND TEMPERATURES\nHOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0\nCOMMENTS 1\nCOMMENTS 2\nDATA PERIODS,1,1,Data,Friday,1/1,1/1\n",
-    );
-    for hour in 1..=24 {
-        weather_text.push_str(&format!(
-            "1999,1,1,{hour},60,Source,1.0,0.0,50,101325,0,0,300,10,20,30,0,0,0,0,180,2.5\n"
-        ));
-    }
-    let weather =
-        ep_runtime::weather::parse_epw_weather_file(&weather_text).expect("weather fixture");
+    let weather = single_day_weather_fixture();
     let actual = super::environment::environment_from_weather(
         compiled.model.as_ref().expect("compiled model"),
         &weather,
@@ -825,16 +825,7 @@ fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() 
         "november",
         "december",
     ];
-    let mut weather_text = String::from(
-        "LOCATION,Example\nDESIGN CONDITIONS\nTYPICAL/EXTREME PERIODS\nGROUND TEMPERATURES\nHOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0\nCOMMENTS 1\nCOMMENTS 2\nDATA PERIODS,1,1,Data,Friday,1/1,1/1\n",
-    );
-    for hour in 1..=24 {
-        weather_text.push_str(&format!(
-            "1999,1,1,{hour},60,Source,1.0,0.0,50,101325,0,0,300,10,20,30,0,0,0,0,180,2.5\n"
-        ));
-    }
-    let weather = ep_runtime::weather::parse_epw_weather_file(&weather_text)
-        .expect("actual in-memory EPW parser");
+    let weather = single_day_weather_fixture();
     for scope in [PortingScope::A, PortingScope::B] {
         let mut value = input(scope);
         value[FAMILY] = json!({});
@@ -1025,4 +1016,171 @@ fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() 
         crate::ordinary_heat_balance_input::resolve(&raw, &ip).expect("IDF raw factory operands");
     assert_eq!(projected.objects[FAMILY][0].idf_max_fields, Some(12));
     assert!(projected.objects[FAMILY][0].fields.is_empty());
+}
+
+#[test]
+fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
+    use ep_model::{InsideSurfaceConvectionAlgorithm as I, OutsideSurfaceConvectionAlgorithm as O};
+    const INSIDE: &str = "SurfaceConvectionAlgorithm:Inside";
+    const OUTSIDE: &str = "SurfaceConvectionAlgorithm:Outside";
+    let weather = single_day_weather_fixture();
+    for scope in [PortingScope::A, PortingScope::B] {
+        for (inside, expected_inside) in [("TARP", I::Tarp), ("Simple", I::Simple)] {
+            for (outside, expected_outside) in [
+                ("DOE-2", O::Doe2),
+                ("SimpleCombined", O::SimpleCombined),
+                ("TARP", O::Tarp),
+                ("MoWiTT", O::MoWitt),
+            ] {
+                let mut value = input(scope);
+                value[INSIDE] = json!({" ":{"algorithm":inside}});
+                value[OUTSIDE] = json!({"":{"algorithm":outside}});
+                let raw = parse_epjson_str(&value.to_string()).expect("actual global selections");
+                let compiled = compile_raw_model(&raw);
+                let model = compiled.model.as_ref().expect("valid typed enum choices");
+                let zone = &model.zones[0];
+                assert_eq!(
+                    zone.inside_convection_algorithm.effective(),
+                    expected_inside
+                );
+                assert_eq!(
+                    zone.outside_convection_algorithm.effective(),
+                    expected_outside
+                );
+                assert!(
+                    !zone.inside_convection_algorithm.is_override()
+                        && !zone.outside_convection_algorithm.is_override()
+                );
+                let ip = match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .expect("actual IP admission");
+                assert!(ip.has_object(INSIDE, " ") && ip.has_object(OUTSIDE, ""));
+                let projected = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                    .expect("actual getter operands");
+                assert_eq!(projected.objects[INSIDE][0].object_name, " ");
+                assert_eq!(projected.objects[OUTSIDE][0].object_name, "");
+                let mut admitted =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(admitted.admissible, "{:?}", admitted.violations);
+                assert!(
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                        .is_none()
+                );
+                let environment = super::environment::environment_from_weather(
+                    model,
+                    &weather,
+                    "embedded convection weather",
+                )
+                .expect("real EPW/calendar preparation");
+                assert!(validate_porting_environment(&environment).is_empty());
+                admitted.environment = Some(environment);
+                let admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                        .expect("all real raw/IP/reporting guards");
+                let actual = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(actual.allows_rust_runtime(), "{:?}", actual.diagnostics);
+                let legacy = assess_support(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                );
+                for (code, nondefault) in [
+                    (
+                        "UnsupportedInsideConvectionAlgorithm",
+                        expected_inside != I::Tarp,
+                    ),
+                    (
+                        "UnsupportedOutsideConvectionAlgorithm",
+                        expected_outside != O::Doe2,
+                    ),
+                ] {
+                    assert_eq!(
+                        legacy
+                            .diagnostics
+                            .diagnostics
+                            .iter()
+                            .any(|d| d.code == code),
+                        nondefault
+                    );
+                }
+                value["Zone"]["Zone"]["zone_outside_convection_algorithm"] = json!(outside);
+                assert!(
+                    !trace(&value, scope).admissible,
+                    "authored Zone overrides stay excluded"
+                );
+            }
+        }
+        for family in [INSIDE, OUTSIDE] {
+            for contents in [json!({}), json!({"":{}}), json!({" ":{"algorithm":""}})] {
+                let mut value = input(scope);
+                value[family] = contents;
+                let raw =
+                    parse_epjson_str(&value.to_string()).expect("absent/empty/default singleton");
+                let compiled = compile_raw_model(&raw);
+                let model = compiled.model.as_ref().expect("default model");
+                assert!(trace(&value, scope).admissible);
+                assert_eq!(
+                    model.zones[0].inside_convection_algorithm.effective(),
+                    I::Tarp
+                );
+                assert_eq!(
+                    model.zones[0].outside_convection_algorithm.effective(),
+                    O::Doe2
+                );
+                assert!(
+                    match scope {
+                        PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                        PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                    }
+                    .is_ok()
+                );
+            }
+            for invalid in [
+                json!(null),
+                json!(1),
+                json!(false),
+                json!([]),
+                json!({}),
+                json!(" "),
+            ] {
+                let mut value = input(scope);
+                value[family] = json!({"":{"algorithm":invalid}});
+                let raw = parse_epjson_str(&value.to_string()).expect("wrong JSON enum type/value");
+                assert!(
+                    match scope {
+                        PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                        PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                    }
+                    .is_err()
+                );
+            }
+            let mut value = input(scope);
+            value[family] = json!({"a":{},"b":{}});
+            let raw = parse_epjson_str(&value.to_string()).expect("duplicate singleton");
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+            value[family] = json!({"":{"algorithm":"AdaptiveConvectionAlgorithm"}});
+            assert!(!trace(&value, scope).admissible);
+        }
+    }
 }

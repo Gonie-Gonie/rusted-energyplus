@@ -41,6 +41,8 @@ impl SourceSupportAdmission {
         let covered_objects = [
             "HeatBalanceAlgorithm",
             "SimulationControl",
+            "SurfaceConvectionAlgorithm:Inside",
+            "SurfaceConvectionAlgorithm:Outside",
             // This monthly weather input is consumed by the actual Source ground
             // model; admitted thermal boundary branches remain scope-validated.
             "Site:GroundTemperature:BuildingSurface",

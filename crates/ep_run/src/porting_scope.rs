@@ -341,12 +341,24 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                 "zone/group multipliers other than one are outside the selected inputs".into(),
             );
         }
-        if zone.inside_convection_algorithm.effective() != InsideSurfaceConvectionAlgorithm::Tarp
-            || zone.outside_convection_algorithm.effective()
-                != OutsideSurfaceConvectionAlgorithm::Doe2
+        if zone.inside_convection_algorithm.is_override()
+            || zone.outside_convection_algorithm.is_override()
         {
-            violations
-                .push("selected zone convection must be TARP inside and DOE-2 outside".into());
+            violations.push(
+                "authored Zone convection overrides are outside the selected Source scope".into(),
+            );
+        }
+        if !matches!(
+            zone.inside_convection_algorithm.effective(),
+            InsideSurfaceConvectionAlgorithm::Simple | InsideSurfaceConvectionAlgorithm::Tarp
+        ) || !matches!(
+            zone.outside_convection_algorithm.effective(),
+            OutsideSurfaceConvectionAlgorithm::SimpleCombined
+                | OutsideSurfaceConvectionAlgorithm::Tarp
+                | OutsideSurfaceConvectionAlgorithm::MoWitt
+                | OutsideSurfaceConvectionAlgorithm::Doe2
+        ) {
+            violations.push("selected global convection requires Simple/TARP inside and a nonadaptive outside algorithm".into());
         }
     }
     for surface in &model.surfaces {

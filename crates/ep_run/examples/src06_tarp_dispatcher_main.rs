@@ -533,7 +533,7 @@ impl Fixture {
         space_air.write_all(&layout, &air)?;
         let zones = vec![InsideConvectionZone {
             zone_id: ZoneId(1),
-            tarp: true,
+            inside_algorithm: ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
             ceiling_height: real(&zone["CeilingHeight"])?,
             volume: real(&zone["Volume"])?,
             floor_area: real(&zone["FloorArea"])?,

@@ -102,34 +102,28 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("HeatBalanceAlgorithm", "maximum_surface_convection_heat_transfer_coefficient_value") => {
             number(value).is_some_and(|n| n >= 1.0)
         }
-        ("SurfaceConvectionAlgorithm:Inside", "algorithm") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "ASTMC1340",
-                        "AdaptiveConvectionAlgorithm",
-                        "CeilingDiffuser",
-                        "Simple",
-                        "TARP",
-                    ],
-                )
-        }
-        ("SurfaceConvectionAlgorithm:Outside", "algorithm") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "AdaptiveConvectionAlgorithm",
-                        "DOE-2",
-                        "MoWiTT",
-                        "SimpleCombined",
-                        "TARP",
-                    ],
-                )
-        }
+        ("SurfaceConvectionAlgorithm:Inside", "algorithm") => text_is(
+            value,
+            &[
+                "",
+                "ASTMC1340",
+                "AdaptiveConvectionAlgorithm",
+                "CeilingDiffuser",
+                "Simple",
+                "TARP",
+            ],
+        ),
+        ("SurfaceConvectionAlgorithm:Outside", "algorithm") => text_is(
+            value,
+            &[
+                "",
+                "AdaptiveConvectionAlgorithm",
+                "DOE-2",
+                "MoWiTT",
+                "SimpleCombined",
+                "TARP",
+            ],
+        ),
         ("SimulationControl", "do_zone_sizing_calculation") => {
             blank(value) || text_is(value, &["", "No", "Yes"])
         }

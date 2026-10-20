@@ -28,7 +28,7 @@ use crate::heat_balance::selected_heat_balance_input::{
 };
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::weather::day::WeatherGlobalState;
-use ep_model::{InsideSurfaceConvectionAlgorithm, ReportInputs, SurfaceId, SurfaceType};
+use ep_model::{ReportInputs, SurfaceId, SurfaceType};
 
 fn index(number: i32) -> Result<usize, Error> {
     number
@@ -51,7 +51,7 @@ fn translate(error: InsideConvectionError) -> Error {
                 Error::Unavailable("positive actual user convection getter")
             }
             Unavailable::AlgorithmOrSurface => {
-                Error::Unavailable("positive non-TARP/window/EMS convection branch")
+                Error::Unavailable("unsupported inside/window/EMS convection branch")
             }
             Unavailable::SurfaceDetailsReport => {
                 Error::Unavailable("actual convection Details report writer")
@@ -96,6 +96,7 @@ impl InsideConvectionSurfaceMetadata for SurfaceGeometryInputState {
             .model
         {
             2 => Ok(InsideConvectionModel::SetByZone),
+            3 => Ok(InsideConvectionModel::Simple),
             4 => Ok(InsideConvectionModel::Tarp),
             _ => Err(Unavailable::AlgorithmOrSurface),
         }
@@ -278,7 +279,7 @@ fn static_zone_views(owners: &SelectedZoneInputOwners) -> Result<Vec<InsideConve
                 zone_id: zone
                     .typed_zone_id
                     .ok_or(Error::Unavailable("actual convection static ZoneId"))?,
-                tarp: zone.inside_algorithm == InsideSurfaceConvectionAlgorithm::Tarp,
+                inside_algorithm: zone.inside_algorithm,
                 ceiling_height: zone.ceiling_height,
                 volume: zone.volume,
                 floor_area: zone.floor_area,

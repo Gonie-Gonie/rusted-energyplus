@@ -1,6 +1,7 @@
 //! Heat-balance convection source-order ownership notes.
 
 mod geometry_operands;
+pub mod simple_inside;
 pub mod surface_environment;
 pub mod tarp_inside;
 use crate::geometry::production_trace::{self, GeometryConsumer, GeometryOperand};
