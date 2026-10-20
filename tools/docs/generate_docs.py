@@ -16,6 +16,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from example_object_union import markdown as example_object_union
 from script_inventory import collect_script_inventory, script_inventory_toml
 from validate_algorithm_ledger import ROUTINE_COMPLETION_RANK
 
@@ -509,6 +510,7 @@ GENERATED_DOC_OUTPUTS = [
     "docs/src/generated/current-status-classification.md",
     "docs/src/generated/capability-index.md",
     "docs/src/generated/object-coverage.md",
+    "docs/src/generated/example-object-union.md",
     "docs/src/generated/variable-coverage.md",
     "docs/src/generated/script-index.md",
     "docs/src/generated/docs-inventory.md",
@@ -827,9 +829,15 @@ def generated_manifest(repo_root: Path) -> str:
             "specs/variable_coverage.toml",
             "specs/capabilities.toml",
             "data/conformance_cases/*/case.toml",
+            "data/**/*.idf",
+            "data/**/*.epJSON",
+            "docs/validation/**/*.idf",
+            "docs/validation/**/*.epJSON",
+            "data/schema/energyplus-26.1-object-index.json",
             "scripts/**/*",
             "scripts/dev/commands.json",
             "tools/docs/generate_docs.py",
+            "tools/docs/example_object_union.py",
             "tools/docs/routine_completion_contract.py",
             "tools/docs/read_claim_boundaries.py",
             "tools/docs/script_inventory.py",
@@ -860,6 +868,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "current-status-classification.md": current_status_classification(repo_root),
         repo_root / "docs" / "src" / "generated" / "capability-index.md": capability_index(repo_root),
         repo_root / "docs" / "src" / "generated" / "object-coverage.md": object_coverage(repo_root),
+        repo_root / "docs" / "src" / "generated" / "example-object-union.md": example_object_union(repo_root),
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "script-index.md": script_inventory(repo_root),
         repo_root / "docs" / "src" / "generated" / "docs-inventory.md": docs_inventory(repo_root),

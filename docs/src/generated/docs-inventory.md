@@ -9,8 +9,8 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 49 |
-| SUMMARY links | 18 |
+| docs files | 50 |
+| SUMMARY links | 19 |
 | README h2 sections | 6 |
 | README h2 section limit | pass |
 | Current nav expected | 4 |
@@ -19,7 +19,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Current nav unexpected | 0 |
 | README current docs missing | 0 |
 | README current docs unexpected | 0 |
-| Generated docs missing notice | 0 |
+| Generated docs missing notice | 1 |
 | Removable docs in SUMMARY | 0 |
 | Obsolete docs in SUMMARY | 0 |
 | Non-core SUMMARY sections | 0 |
@@ -46,7 +46,7 @@ none
 
 **Generated docs missing notice**
 
-none
+- `docs/src/generated/example-object-union.md`
 
 **Removable docs in SUMMARY**
 
@@ -90,6 +90,7 @@ none
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/current-status-classification.md | generated | not in SUMMARY | present | none |  |  |  |
 | docs/src/generated/docs-inventory.md | generated | Generated References | present | none |  |  |  |
+| docs/src/generated/example-object-union.md | generated | Generated References | missing | none |  |  |  |
 | docs/src/generated/milestone-map.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
