@@ -16154,6 +16154,12 @@ impl<'a> Compiler<'a> {
         let mut periods = Vec::new();
         let mut current_period: Option<CompactSchedulePeriodBuilder> = None;
         let mut current_profile: Option<CompactScheduleProfileBuilder> = None;
+        // Original ScheduleManager1311/1343-1367: a Through row always
+        // advances StartPointer, even when its range owns no annual pointers.
+        // For fixed MonthDay1..366, valid nonempty ranges cover one prefix.
+        let mut start_pointer = 1_u16;
+        let mut covered_end = 0_u16;
+        let mut full_year_set = false;
         for (index, value) in values.iter().enumerate() {
             let Some(field_value) = compact_data_field(value) else {
                 self.error(
@@ -16189,19 +16195,31 @@ impl<'a> Compiler<'a> {
                         );
                         continue;
                     };
-                    if periods.last().is_some_and(|period| {
-                        through_schedule_day_of_year <= period.through_schedule_day_of_year
-                    }) {
-                        self.error(
-                            "InvalidScheduleCompactThroughOrder",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} Through dates must be strictly increasing; '{text}' is not later than the prior Through date"
-                            ),
-                        );
+                    if through_schedule_day_of_year == 366 {
+                        if full_year_set {
+                            self.error(
+                                "InvalidScheduleCompactThroughOrder",
+                                "Schedule:Compact",
+                                Some(object_name),
+                                Some("data"),
+                                format!("Schedule:Compact/{object_name} repeats Through: 12/31 after a full year was already set; '{text}'"),
+                            );
+                        }
+                        full_year_set = true;
                     }
+                    if start_pointer <= through_schedule_day_of_year {
+                        if start_pointer != covered_end + 1 {
+                            self.error(
+                                "InvalidScheduleCompactThroughOrder",
+                                "Schedule:Compact",
+                                Some(object_name),
+                                Some("data"),
+                                format!("Schedule:Compact/{object_name} Through range [{start_pointer}, {through_schedule_day_of_year}] overlaps existing annual pointers through {covered_end}; '{text}'"),
+                            );
+                        }
+                        covered_end = covered_end.max(through_schedule_day_of_year);
+                    }
+                    start_pointer = through_schedule_day_of_year + 1;
 
                     current_period = Some(CompactSchedulePeriodBuilder {
                         period: ScheduleCompactPeriod {
@@ -16437,16 +16455,13 @@ impl<'a> Compiler<'a> {
             );
             return None;
         }
-        if periods
-            .last()
-            .is_some_and(|period| period.through_schedule_day_of_year != 366)
-        {
+        if covered_end != 366 {
             self.error(
                 "MissingScheduleCompactFinalThrough",
                 "Schedule:Compact",
                 Some(object_name),
                 Some("data"),
-                format!("Schedule:Compact/{object_name} final Through date must be 12/31"),
+                format!("Schedule:Compact/{object_name} annual pointers cover only through day {covered_end}; full coverage through 12/31 is required"),
             );
         }
 
@@ -18810,55 +18825,100 @@ mod tests {
     }
 
     #[test]
-    fn rejects_schedule_compact_through_order_and_missing_final_date()
+    fn validates_compact_annual_pointer_coverage_and_retains_empty_periods()
     -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
-                "Schedule:Compact": {
-                    "Duplicate Through": {
-                        "data": [
-                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 1},
-                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 2},
-                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 3}
-                        ]
-                    },
-                    "Decreasing Through": {
-                        "data": [
-                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 1},
-                            {"field": "Through: 5/31"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 2},
-                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 3}
-                        ]
-                    },
-                    "Missing Final Through": {
-                        "data": [
-                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
-                            {"field": "Until: 24:00"}, {"field": 1}
-                        ]
-                    }
-                }
-            }"#,
+            "Schedule:Compact": {
+                "Equal Intermediate": {"data": [
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":0.25},
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2},
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":0.75}
+                ]},
+                "Trailing Empty": {"data": [
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":0.25},
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2},
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":3},
+                    {"field":"Through:3/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":4}
+                ]}
+            }
+        }"#,
         )?;
-
         let result = compile_raw_model(&raw_model);
-
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("actual retained Compact periods"))?;
+        for (name, expected) in [
+            ("EQUAL INTERMEDIATE", vec![182, 182, 366]),
+            ("TRAILING EMPTY", vec![366, 182, 182, 91]),
+        ] {
+            let schedule = model
+                .compact_schedules
+                .iter()
+                .find(|schedule| schedule.name.0 == name)
+                .ok_or_else(|| std::io::Error::other("actual Compact identity"))?;
+            assert_eq!(
+                schedule
+                    .periods
+                    .iter()
+                    .map(|period| period.through_schedule_day_of_year)
+                    .collect::<Vec<_>>(),
+                expected
+            );
+            assert!(
+                schedule
+                    .periods
+                    .iter()
+                    .all(|period| period.day_profiles.len() == 1)
+            );
+            // An unreferenced authored2 remains present; it is not discarded,
+            // merged, normalized or substituted by a preview calendar.
+            assert_eq!(schedule.periods[1].day_profiles[0].segments[0].value, 2.0);
+        }
+        let raw_model = parse_epjson_str(
+            r#"{
+            "Schedule:Compact": {
+                "Decreasing Through": {"data": [
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":1},
+                    {"field":"Through:5/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2},
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":3}
+                ]},
+                "Duplicate Full Year": {"data": [
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":1},
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2}
+                ]},
+                "Overlap After Full Year": {"data": [
+                    {"field":"Through:12/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":1},
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2},
+                    {"field":"Through:7/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":3}
+                ]},
+                "Missing Final Through": {"data": [
+                    {"field":"Through:6/30"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":1},
+                    {"field":"Through:5/31"},{"field":"For:AllDays"},{"field":"Until:24:00"},{"field":2}
+                ]}
+            }
+        }"#,
+        )?;
+        let result = compile_raw_model(&raw_model);
         assert!(result.has_errors());
-        for object_name in ["Duplicate Through", "Decreasing Through"] {
-            assert!(result.report.diagnostics.iter().any(|diagnostic| {
-                diagnostic.code == "InvalidScheduleCompactThroughOrder"
-                    && diagnostic.object_name.as_deref() == Some(object_name)
-            }));
+        for object_name in [
+            "Decreasing Through",
+            "Duplicate Full Year",
+            "Overlap After Full Year",
+        ] {
+            assert!(
+                result.report.diagnostics.iter().any(|diagnostic| {
+                    diagnostic.code == "InvalidScheduleCompactThroughOrder"
+                        && diagnostic.object_name.as_deref() == Some(object_name)
+                }),
+                "{object_name}"
+            );
         }
         assert!(result.report.diagnostics.iter().any(|diagnostic| {
             diagnostic.code == "MissingScheduleCompactFinalThrough"
                 && diagnostic.object_name.as_deref() == Some("Missing Final Through")
         }));
-
         Ok(())
     }
 

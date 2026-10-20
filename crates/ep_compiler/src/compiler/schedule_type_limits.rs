@@ -95,31 +95,43 @@ fn compact_schedule_extrema(
     minutes: Option<u32>,
 ) -> Option<(f64, f64)> {
     let mut annual = None;
-    let mut first_day = 1;
+    let mut first_day = 1_u16;
+    let mut covered_end = 0_u16;
+    let mut full_year_set = false;
     for period in &schedule.periods {
-        if period.through_schedule_day_of_year < first_day
-            || period.through_schedule_day_of_year > 366
-        {
+        let end = period.through_schedule_day_of_year;
+        if !(1..=366).contains(&end) || (end == 366 && full_year_set) {
             return None;
         }
-        let day_extrema = period
-            .day_profiles
-            .iter()
-            .map(|profile| populated_day_extrema(profile, minutes))
-            .collect::<Vec<_>>();
-        let mut week = None;
-        for day_type in ALL_SCHEDULE_DAY_TYPES {
-            let index = period
+        full_year_set |= end == 366;
+        // A genuine empty Through still advances StartPointer. Its Day/Week
+        // owners exist, but ScheduleDetailed::setMinMaxVals3307-3346 reaches
+        // only annual pointers; unused profile values must not enter extrema.
+        if first_day <= end {
+            if first_day != covered_end + 1 {
+                return None;
+            }
+            let day_extrema = period
                 .day_profiles
                 .iter()
-                .position(|profile| profile.day_types.contains(&day_type))?;
-            extend_extrema(&mut week, day_extrema[index]?);
+                .map(|profile| populated_day_extrema(profile, minutes))
+                .collect::<Vec<_>>();
+            let mut week = None;
+            for day_type in ALL_SCHEDULE_DAY_TYPES {
+                let index = period
+                    .day_profiles
+                    .iter()
+                    .position(|profile| profile.day_types.contains(&day_type))?;
+                extend_extrema(&mut week, day_extrema[index]?);
+            }
+            extend_extrema(&mut annual, week?);
+            covered_end = end;
         }
-        extend_extrema(&mut annual, week?);
-        first_day = period.through_schedule_day_of_year + 1;
+        first_day = end + 1;
     }
-    // Invalid/incomplete parser state cannot stand in for a complete owned annual graph.
-    if first_day != 367 {
+    // The parser retains every authored period, including trailing empty rows.
+    // Complete valid coverage is independent of the final authored endpoint.
+    if covered_end != 366 {
         return None;
     }
     annual

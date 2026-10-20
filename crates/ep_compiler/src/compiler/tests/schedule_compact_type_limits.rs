@@ -30,12 +30,64 @@ fn has_compact_range_error(result: &CompileResult) -> bool {
     })
 }
 
+// Authored raw periods only: no expanded day array or runtime answer is a
+// compiler input. The builder's existing MissingDay profile remains unchanged.
+fn topology_result(
+    periods: &[(&str, f64)],
+    selector: &str,
+    lower: f64,
+    upper: f64,
+) -> Result<CompileResult, Box<dyn std::error::Error>> {
+    let fields = periods
+        .iter()
+        .map(|(through, value)| {
+            format!(
+                r#"{{"field":"Through: {through}"}},{{"field":"For: {selector}"}},{{"field":"Until:24:00"}},{{"field":{value}}}"#
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    let input = format!(
+        r#"{{
+        "Timestep": {{"Context": {{"number_of_timesteps_per_hour": 4}}}},
+        "ScheduleTypeLimits": {{"T": {{"lower_limit_value": {lower},
+            "upper_limit_value": {upper}, "numeric_type": "Continuous"}}}},
+        "Schedule:Compact": {{"S": {{"schedule_type_limits_name": "T", "data": [{fields}]}}}}
+    }}"#
+    );
+    Ok(compile_raw_model(&parse_epjson_str(&input)?))
+}
+
 #[test]
 fn rejects_populated_compact_values_outside_active_limits() -> Result<(), Box<dyn std::error::Error>>
 {
     let result = compact_result("No", r#"{"field":"Until: 24:00"},{"field":2}"#, 0.0)?;
     assert!(result.model.is_none());
     assert!(has_compact_range_error(&result));
+    for periods in [
+        vec![("6/30", 0.25), ("6/30", 2.0), ("12/31", 0.75)],
+        vec![("12/31", 0.25), ("6/30", 2.0)],
+    ] {
+        let result = topology_result(&periods, "AllDays", 0.0, 1.0)?;
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("retained inactive2 Compact period"))?;
+        assert_eq!(model.compact_schedules[0].periods.len(), periods.len());
+        assert_eq!(
+            model.compact_schedules[0].periods[1].day_profiles[0].segments[0].value,
+            2.0
+        );
+    }
+    // The empty row cannot disable validation of a later reachable period.
+    let result = topology_result(
+        &[("6/30", 0.25), ("6/30", 0.5), ("12/31", 2.0)],
+        "AllDays",
+        0.0,
+        1.0,
+    )?;
+    assert!(has_compact_range_error(&result));
+    assert!(result.model.is_none());
     Ok(())
 }
 

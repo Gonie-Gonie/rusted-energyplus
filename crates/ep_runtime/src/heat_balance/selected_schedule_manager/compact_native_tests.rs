@@ -533,6 +533,88 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
             );
         }
     }
+    // Source already parses every authored empty period into real Week/Day
+    // owners. Only the actual annual pointer graph contributes to min/max.
+    for periods in [
+        vec![("6/30", 0.25_f64), ("6/30", 2.0), ("12/31", 0.75)],
+        vec![("12/31", 0.25_f64), ("6/30", 2.0)],
+    ] {
+        let expected_max = if periods.len() == 3 { 0.75 } else { 0.25 };
+        let mut raw = authored_raw(fixture, "No", false);
+        raw["ScheduleTypeLimits"]["Fraction"]["upper_limit_value"] = serde_json::json!(1);
+        let mut data = Vec::new();
+        for (through, value) in periods {
+            data.extend([
+                serde_json::json!({"field":format!("Through: {through}")}),
+                serde_json::json!({"field":"For: AllDays"}),
+                serde_json::json!({"field":"Until: 24:00"}),
+                serde_json::json!({"field":value}),
+            ]);
+        }
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = Value::Array(data);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual empty-period Detailed pointer")?;
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+            return Err("actual empty-period Detailed owner".into());
+        };
+        let inactive_week = manager
+            .week_schedules
+            .iter()
+            .find(|week| week.name == "INTERNAL GAIN SCHEDULE_wk_2")
+            .ok_or("actual inactive Week owner")?;
+        assert!(inactive_week.is_used);
+        assert!(!inactive_week.is_min_max_set);
+        assert!(
+            detail.week_schedules[1..]
+                .iter()
+                .all(|slot| slot.is_some() && *slot != Some(inactive_week.number))
+        );
+        let inactive_day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name == "INTERNAL GAIN SCHEDULE_dy_2")
+            .ok_or("actual inactive Day owner")?;
+        assert!(inactive_day.is_used);
+        assert!(!inactive_day.is_min_max_set);
+        assert_eq!(inactive_day.timestep_values.len(), 96);
+        assert!(
+            inactive_day
+                .timestep_values
+                .iter()
+                .all(|value| *value == 2.0)
+        );
+        assert_eq!(manager.source_min(index)?, 0.25);
+        assert_eq!(manager.source_max(index)?, expected_max);
+        let clock = WeatherGlobalState {
+            hour_of_day: 1,
+            time_step: 1,
+            time_steps_in_hour: 4,
+            ..Default::default()
+        };
+        for (day_of_year_schedule, expected) in [(1, 0.25_f64), (183, expected_max)] {
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                expected.to_bits()
+            );
+        }
+    }
     // Blank, unresolved and named-unlimited types leave this Detailed
     // schedule uncached. Its real downstream getter must use the live clock,
     // not currentVal, an inferred minutes clock, or an eager input reduction.
