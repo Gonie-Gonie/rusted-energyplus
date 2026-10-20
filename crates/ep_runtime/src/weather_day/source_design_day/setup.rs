@@ -3,7 +3,9 @@ mod profiles;
 mod properties;
 mod reports;
 use super::*;
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
 use crate::heat_balance::radiation::ordinary::source_children::SourceSolarReportFlags;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::psychrometrics::SourcePsychrometricAccess;
 use crate::weather::day::SourceWeatherInitializationError as Failure;
 use crate::weather::day::{WeatherDayValues, WeatherEnvironmentState};
@@ -20,6 +22,8 @@ pub(crate) struct SourceDesignDaySetupOwners<'a, 'backend> {
     pub(crate) current_environment_number: &'a i32,
     pub(crate) print_design_day_header: &'a mut bool,
     pub(crate) report_flags: &'a SourceSolarReportFlags,
+    pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) developer_flag: &'a bool,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
     pub(crate) eio: &'a mut dyn Write,
@@ -71,22 +75,13 @@ impl SourceDesignDayInputState {
             "{} - {}",
             o.environment.current_month_day, o.environment.current_month_day
         );
-        if input.pressure_entered {
-            if ((input.barometric_pressure - o.environment.std_baro_press)
-                / o.environment.std_baro_press)
-                .abs()
-                > 0.1
-            {
-                if o.backend.state.warmup_flag != o.clock.warmup_flag {
-                    return Err(Error::Unavailable("actual SetUp pressure-warning backend must borrow current DataGlobal WarmupFlag").into());
-                }
-                o.backend.show_warning_error(&format!("SetUpDesignDay: Entered DesignDay Barometric Pressure={} differs by more than 10% from Standard Barometric Pressure={}.", rounded(input.barometric_pressure, 0)?, rounded(o.environment.std_baro_press, 0)?))?;
-                o.backend.show_continue_error(&format!("...occurs in DesignDay={}, Standard Pressure (based on elevation) will be used.", o.environment.environment_name))?;
-                input.barometric_pressure = o.environment.std_baro_press;
-            }
-        } else {
-            input.barometric_pressure = o.environment.std_baro_press;
-        }
+        let flags = SourceDiagnosticFlags {
+            kickoff: &o.globals.kickoff_simulation,
+            developer: o.developer_flag,
+            warmup: &o.clock.warmup_flag,
+            doing_sizing: &o.globals.doing_sizing,
+        };
+        correct_source_design_day_pressure(input, o.environment, &flags, o.backend)?;
         if input.humidity_indicator_type == 1 && input.dew_point_needs_set {
             let humidity = properties::from_relative_humidity(
                 o.psychrometrics,
@@ -273,6 +268,185 @@ impl SourceDesignDayInputState {
         }
         o.clock.warmup_flag = saved_warmup;
         crate::psychrometrics::set_psychrometric_warmup(o.clock.warmup_flag);
+        Ok(())
+    }
+}
+
+// The genuine WeatherManager3564–3579 pressure child retains its mutable
+// DesDayInput cell. Diagnostic failures return before the Source assignment.
+fn correct_source_design_day_pressure(
+    input: &mut SourceDesignDayData,
+    environment: &WeatherEnvironmentState,
+    flags: &SourceDiagnosticFlags<'_>,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), Error> {
+    if input.pressure_entered {
+        if ((input.barometric_pressure - environment.std_baro_press) / environment.std_baro_press)
+            .abs()
+            > 0.1
+        {
+            backend.show_source_warning_error(&format!("SetUpDesignDay: Entered DesignDay Barometric Pressure={} differs by more than 10% from Standard Barometric Pressure={}.", rounded(input.barometric_pressure, 0)?, rounded(environment.std_baro_press, 0)?), flags)?;
+            backend.show_continue_error(&format!(
+                "...occurs in DesignDay={}, Standard Pressure (based on elevation) will be used.",
+                environment.environment_name
+            ))?;
+            input.barometric_pressure = environment.std_baro_press;
+        }
+    } else {
+        input.barometric_pressure = environment.std_baro_press;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod pressure_tests {
+    use super::*;
+    use crate::heat_balance::error_backend::{
+        SourceDiagnosticFlags, SourceErrorBackend, SourceErrorState, SourceErrorTracking,
+    };
+    use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+    use crate::heat_balance::selected_project_data::SelectedProjectData;
+    use std::io::{self, Write};
+
+    struct StopAtContinue {
+        bytes: Vec<u8>,
+        fail: bool,
+    }
+    impl Write for StopAtContinue {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            let mut candidate = self.bytes.clone();
+            candidate.extend_from_slice(bytes);
+            if self.fail
+                && candidate
+                    .windows(b" **   ~~~   ** ".len())
+                    .any(|part| part == b" **   ~~~   ** ")
+            {
+                return Err(io::Error::other("authored Continue sink stop"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    fn source_error_state() -> SourceErrorState {
+        SourceErrorState {
+            output_error_header: true,
+            version_string: "authored caller".into(),
+            idd_version_string: "authored input".into(),
+            doing_input_processing: false,
+            print_console_output: true,
+            kickoff_simulation: false,
+            developer_flag: false,
+            warmup_flag: false,
+            doing_sizing: false,
+            tracking: SourceErrorTracking {
+                ask_for_plant_check_on_abort: false,
+                exit_during_simulations: false,
+                ask_for_connections_report: false,
+                ask_for_surfaces_report: false,
+                total_multiplied_windows: 0,
+                total_coincident_vertices: 0,
+                total_degenerate_surfaces: 0,
+                total_receiving_non_convex_surfaces: 0,
+                total_casting_non_convex_surfaces: 0,
+                match_counts: [0; 20],
+                abort_processing: false,
+                total_severe_errors: 0,
+                total_severe_errors_during_warmup: 0,
+                total_severe_errors_during_sizing: 0,
+                last_severe_error: String::new(),
+                total_warning_errors: 0,
+                total_warning_errors_during_warmup: 0,
+                total_warning_errors_during_sizing: 0,
+            },
+        }
+    }
+
+    #[test]
+    fn source_design_day_pressure_uses_live_phase_and_assignment_follows_continue()
+    -> Result<(), Box<dyn std::error::Error>> {
+        for (kickoff, sizing, fail_continue, expected_warmup, expected_sizing) in [
+            (true, false, false, 0, 0),
+            (false, false, false, 1, 0),
+            (false, true, false, 0, 1),
+            (true, false, true, 0, 0),
+        ] {
+            let mut input = SourceDesignDayData {
+                pressure_entered: true,
+                barometric_pressure: 81198.0,
+                ..SourceDesignDayData::default()
+            };
+            let environment = WeatherEnvironmentState {
+                std_baro_press: 100129.0,
+                environment_name: "LIVE DD".into(),
+                ..WeatherEnvironmentState::default()
+            };
+            let clock = WeatherGlobalState {
+                warmup_flag: true,
+                ..WeatherGlobalState::default()
+            };
+            let globals = SelectedHeatBalanceGlobals {
+                kickoff_simulation: kickoff,
+                doing_sizing: sizing,
+                ..SelectedHeatBalanceGlobals::default()
+            };
+            let project = SelectedProjectData::default();
+            let flags = SourceDiagnosticFlags {
+                kickoff: &globals.kickoff_simulation,
+                developer: &project.system.developer_flag,
+                warmup: &clock.warmup_flag,
+                doing_sizing: &globals.doing_sizing,
+            };
+            let mut state = source_error_state();
+            let (mut sink, mut console) = (
+                StopAtContinue {
+                    bytes: Vec::new(),
+                    fail: fail_continue,
+                },
+                Vec::new(),
+            );
+            let result = {
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut sink),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                correct_source_design_day_pressure(&mut input, &environment, &flags, &mut backend)
+            };
+            let text = std::str::from_utf8(&sink.bytes)?;
+            assert!(text.contains("Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=100129."));
+            if fail_continue {
+                assert!(matches!(result, Err(Error::Backend(_))));
+                assert_eq!(input.barometric_pressure, 81198.0);
+            } else {
+                result?;
+                assert!(text.contains("...occurs in DesignDay=LIVE DD, Standard Pressure (based on elevation) will be used."));
+                assert_eq!(input.barometric_pressure, environment.std_baro_press);
+            }
+            assert_eq!(
+                (
+                    state.tracking.total_warning_errors,
+                    state.tracking.total_warning_errors_during_warmup,
+                    state.tracking.total_warning_errors_during_sizing
+                ),
+                (1, expected_warmup, expected_sizing)
+            );
+            assert!(
+                !state.warmup_flag
+                    && !state.doing_sizing
+                    && !state.kickoff_simulation
+                    && clock.warmup_flag
+            );
+        }
         Ok(())
     }
 }

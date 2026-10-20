@@ -139,6 +139,7 @@ fn maximum_day_diagnostics_once_flag_zone_order_and_reset_before_global_severe()
     assert!(!owner.warmup_flag && owner.maximum_day_forced_exit);
     assert_eq!(owner.zones[0].previous, [200.0, 0.0, 23.0, 23.0]);
     assert_eq!(owner.zones[1].current, [-9999.0, -9999.0, -9999.0, 1000.0]);
+    verify_source_maximum_day_live_flags()?;
     Ok(())
 }
 
@@ -213,6 +214,7 @@ fn reached_diagnostic_sink_failure_stops_before_zone_reset_and_preserves_cause()
     assert_eq!(owner.zones[1].pass_flags, [2; 4]);
     assert_eq!(owner.checked_day, 0);
     assert!(owner.warmup_flag);
+    verify_source_warmup_failure_prefix()?;
     Ok(())
 }
 
@@ -236,5 +238,231 @@ fn begin_environment_preserves_header_warning_and_scratch_owners()
             && !report.first_summary_write
             && report.warmup_convergence_warning
     );
+    Ok(())
+}
+
+// Exercise the actual Source checker beside the existing legacy regression.
+// Its backend intentionally retains constructor-false phase cells; only the
+// live borrowed globals/clock may decide Source diagnostic accounting.
+fn source_owner() -> Result<
+    (
+        crate::heat_balance::ordinary_heat_balance_initialization::SourceHeatBalanceManager,
+        crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners,
+    ),
+    Box<dyn std::error::Error>,
+> {
+    use crate::heat_balance::ordinary_heat_balance_initialization::{
+        SourceHeatBalanceManager, SourceWarmupConvergence,
+    };
+    use crate::heat_balance::selected_heat_balance_input::zone::{
+        SelectedZoneData, SelectedZoneInputOwners,
+    };
+    let report = WarmupReportState::new_source_unallocated(
+        vec!["A".into(), "B".into()],
+        WarmupReportConfiguration {
+            doing_sizing: false,
+            do_pure_load_calc: false,
+            run_period_environment: true,
+            environment_name: "ACTUAL INPUT ENV".into(),
+            detailed: false,
+        },
+    );
+    let mut manager = SourceHeatBalanceManager::new(report)?;
+    manager.convergence = Some(vec![SourceWarmupConvergence::default(); 2]);
+    manager.max_temp_prev_day = Some(vec![0.0; 2]);
+    manager.min_temp_prev_day = Some(vec![0.0; 2]);
+    manager.max_heat_load_prev_day = Some(vec![0.0; 2]);
+    manager.max_cool_load_prev_day = Some(vec![0.0; 2]);
+    manager.max_temp_zone = Some(vec![23.0, 10.0]);
+    manager.min_temp_zone = Some(vec![23.0, 10.0]);
+    manager.max_heat_load_zone = Some(vec![200.0, 0.0]);
+    manager.max_cool_load_zone = Some(vec![0.0; 2]);
+    Ok((
+        manager,
+        SelectedZoneInputOwners {
+            zones: Some(
+                ["A", "B"]
+                    .map(|name| SelectedZoneData {
+                        name: name.into(),
+                        ..SelectedZoneData::default()
+                    })
+                    .into(),
+            ),
+            ..SelectedZoneInputOwners::default()
+        },
+    ))
+}
+
+fn check_source_owner(
+    manager: &mut crate::heat_balance::ordinary_heat_balance_initialization::SourceHeatBalanceManager,
+    zones: &crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners,
+    clock: &mut crate::weather::day::WeatherGlobalState,
+    globals: &crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    use crate::heat_balance::ordinary_heat_balance_initialization::warmup::SourceWarmupCheckOwners;
+    use crate::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInputState;
+    use crate::heat_balance::selected_project_data::SelectedProjectData;
+    use crate::weather::day::WeatherEnvironmentState;
+    manager.check_source_warmup_convergence(&mut SourceWarmupCheckOwners {
+        zones,
+        control: &SelectedHeatBalanceInputState {
+            max_number_of_warmup_days: 1,
+            ..SelectedHeatBalanceInputState::default()
+        },
+        project: &SelectedProjectData::default(),
+        globals,
+        clock,
+        environment: &WeatherEnvironmentState {
+            run_period_environment: true,
+            environment_name: "ACTUAL INPUT ENV".into(),
+            ..WeatherEnvironmentState::default()
+        },
+        backend,
+    })
+}
+
+fn verify_source_maximum_day_live_flags() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+    use crate::weather::day::WeatherGlobalState;
+    for (sizing, kickoff, abort, expected_warmup, expected_sizing) in [
+        (false, false, false, 3, 0),
+        (true, false, false, 0, 3),
+        (false, true, false, 0, 0),
+        (false, false, true, 0, 0),
+    ] {
+        let (mut manager, zones) = source_owner()?;
+        let mut clock = WeatherGlobalState {
+            warmup_flag: true,
+            day_of_sim: 1,
+            ..WeatherGlobalState::default()
+        };
+        let globals = SelectedHeatBalanceGlobals {
+            num_of_zones: 2,
+            doing_sizing: sizing,
+            kickoff_simulation: kickoff,
+            ..SelectedHeatBalanceGlobals::default()
+        };
+        let mut state = state();
+        state.warmup_flag = false;
+        state.doing_sizing = false;
+        state.kickoff_simulation = false;
+        state.tracking.abort_processing = abort;
+        let (mut error, mut console) = (Vec::new(), Vec::new());
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut error),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            check_source_owner(&mut manager, &zones, &mut clock, &globals, &mut backend)?;
+        }
+        let text = std::str::from_utf8(&error)?;
+        let a = text.find("Zone=\"A\"").ok_or("Source A severe missing")?;
+        let b = text.find("Zone=\"B\"").ok_or("Source B severe missing")?;
+        let maximum = text
+            .find("User supplied maximum")
+            .ok_or("Source final severe missing")?;
+        assert!(a < b && b < maximum);
+        assert_eq!(
+            text.matches(if sizing {
+                "Warmup Convergence failing during sizing."
+            } else {
+                "See Warmup Convergence Information"
+            })
+            .count(),
+            1
+        );
+        assert_eq!(
+            (
+                state.tracking.total_severe_errors,
+                state.tracking.total_severe_errors_during_warmup,
+                state.tracking.total_severe_errors_during_sizing
+            ),
+            (3, expected_warmup, expected_sizing)
+        );
+        assert!(
+            !clock.warmup_flag
+                && !state.warmup_flag
+                && !state.doing_sizing
+                && !state.kickoff_simulation
+        );
+        assert_eq!(
+            manager.max_heat_load_prev_day.as_deref(),
+            Some([200.0, 0.0].as_slice())
+        );
+        assert_eq!(
+            manager.max_temp_zone.as_deref(),
+            Some([-9999.0; 2].as_slice())
+        );
+        assert_eq!(manager.report.sizing_warmup_convergence_warning, sizing);
+        assert_eq!(manager.report.warmup_convergence_warning, !sizing);
+    }
+    Ok(())
+}
+
+fn verify_source_warmup_failure_prefix() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+    use crate::weather::day::WeatherGlobalState;
+    let (mut manager, zones) = source_owner()?;
+    let before = manager.clone();
+    let mut clock = WeatherGlobalState {
+        warmup_flag: true,
+        day_of_sim: 1,
+        ..WeatherGlobalState::default()
+    };
+    let globals = SelectedHeatBalanceGlobals {
+        num_of_zones: 2,
+        ..SelectedHeatBalanceGlobals::default()
+    };
+    let mut state = state();
+    state.warmup_flag = false;
+    let (mut sink, mut console) = (
+        Stop {
+            bytes: Vec::new(),
+            remaining: 9,
+        },
+        Vec::new(),
+    );
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut sink),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        check_source_owner(&mut manager, &zones, &mut clock, &globals, &mut backend)
+    };
+    assert!(matches!(
+        result,
+        Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_))
+    ));
+    assert_eq!(sink.bytes.len(), 9);
+    assert_eq!(
+        (
+            state.tracking.total_severe_errors,
+            state.tracking.total_severe_errors_during_warmup
+        ),
+        (1, 1)
+    );
+    assert_eq!(manager.max_temp_zone, before.max_temp_zone);
+    // Original check_load clamps the previous load before the Severe call;
+    // the later current-to-previous transfer and daily reset remain unreached.
+    assert_eq!(
+        manager.max_heat_load_prev_day.as_deref(),
+        Some([100.0, 0.0].as_slice())
+    );
+    assert!(!manager.report.warmup_convergence_warning && clock.warmup_flag && !state.warmup_flag);
     Ok(())
 }

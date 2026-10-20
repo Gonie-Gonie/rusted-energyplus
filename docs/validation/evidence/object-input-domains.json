@@ -107,7 +107,9 @@
       "opaque FullInteriorAndExterior admission now follows real retained solar enum and existing consumers",
       "actual no-window/TDD/subsurface conditions keep the Original extra back-surface child inactive; no zero stand-ins",
       "existing test checks all five solar enums across A/B: three nonreflection selections admitted, both reflection selections retain bounds",
-      "same-input whole Source completion, actual Building EIO and byte-identical complete SHD; no arbitrary Building/window/reflection combination promotion"
+      "same-input whole Source completion, actual Building EIO and byte-identical complete SHD; no arbitrary Building/window/reflection combination promotion",
+      "Positive max/min warmup-day and convergence tolerance operands feed real convergence criteria; Severe effects use actual kickoff/developer/warmup/doingSizing flags rather than constructor legacy phase copies, retaining continuation/summary/reset order.",
+      "Same-input one-day strict1e-6 warmup case matches all5352 samples under unchanged limits, exact two Severe/seven Continue diagnostics, Loads Initialization category/warmup/END counts and one warmup day EIO; optional failure and phase permutations remain unit-scoped, active sizing stays bounded."
     ],
     "GlobalGeometryRules": [
       "all four starting corners, both vertex entry directions and World/Relative selection reach the real Source vertex consumer",
@@ -124,6 +126,12 @@
       "existing enum table checks all3x4 local selections with differing globals across A/B, actual raw/IP/projection/environment custody and legacy rejection",
       "same-input localSimple/MoWitt case matches original58/5352 and exact globalTARP/DOE-2 versus ZoneSimple/MoWitt EIO; the sole Native initial spelling-readback failure is retained with an independently complete corrected verifier",
       "one-Zone implicit-Space geometry and multiplier1 remain runtime boundaries; grouping, authored Space partitions and positive local-environment consumers are not promoted"
+    ],
+    "Site:Location": [
+      "Five finite numeric fields retain official latitude[-90,90], longitude[-180,180], timezone[-12,14], elevation[-300,8900) and omitted-zero defaults; nonblank named identity and raw keep-weather-file flag are retained.",
+      "Actual GetLocationInfo, EPW precedence and keepYes selection feed CheckLocationValidity, standard barometric pressure/density, solar coordinates and weather/reporting owners; separate WeatherStation/HeightVariation and moving-building families remain bounded.",
+      "Design-day pressure correction now borrows real kickoff/developer/current warmup/doingSizing flags after the actual warmup=true write. Warning then Continue then pressure assignment and optional failure prefix preserve Original order.",
+      "Same-input authored35/-120/-8/100 keepYes case matches all58/5352 physical operands exactly, Site EIO and two genuine pressure warnings with exact phase counts; independent corrected Native completeness retains the initial readback failure."
     ]
   },
   "verification": {
@@ -140,8 +148,8 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/convection-clippy-13.log",
-        "sha256": "4185d24c48594962f05ea875a2ee2e046cc8f329d60a9695d7ac9fe99436b8bd",
+        "path": ".runtime/object-expansion/live-diagnostics-clippy-14.log",
+        "sha256": "c083d8dd8bc21ceef90711678c144cd2423a19deab3ee8e52ba8a0f4e7460596",
         "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
@@ -151,7 +159,7 @@
         "sha256": "ec37863d23669715f5888203e9e62fbf186c928ce363c1617594b8e780a27105",
         "bytes": 354
       },
-      "clippy_through_build": "convection-13"
+      "clippy_through_build": "live-diagnostics-14"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -1827,12 +1835,114 @@
           "passed": true
         },
         "effective_state": "Thirteen exact base-B102 spans and two appended objects combine actual2016Feb29 synthetic weather, twelve zone steps per hour, rotated/translated Relative geometry, Groundfloor18C, used Regular/AirGap/Regular construction, FullInterior opaque control and localCeiling/MoWitt versus globalsSimple/DOE-2. Original102 requests unchanged. Both physical floor owners have288 exact18C samples; actual EIO/wholeSHD and zero-diagnostic/empty-MTR lifecycle match. Actual absence of requested DXF/detailedCTF output and allNoSun/NoWind retained; no positive wind/window/solartransport or exact earlier ACH-count claim."
+      },
+      {
+        "id": "site-location-keep-yes",
+        "group": "site_location",
+        "source_build": "live-diagnostics-14",
+        "input": {
+          "path": ".runtime/object-expansion/native-site-location/calibration-01/input.idf",
+          "sha256": "d8e4c12a12c7963e1ec00d87d8d8cf76dca7cf65564fd2dd5be499066e771675",
+          "bytes": 9236
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-site-location/calibration-01/receipt.json",
+          "sha256": "dead5dd530709bf09d859069cf1e92d30bd1a24ddf324cd2c5aabdb242f53e16",
+          "bytes": 13062
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-site-location-14/receipt/receipt.json",
+          "sha256": "08fc0548eee086e1a5b7c242eadb45ff1303eff247fe4cbc7a4f396e85378890",
+          "bytes": 4186
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/site-location-14/run-summary.json",
+          "sha256": "05436704eba0c9658ee5edcb5f230a1a9f8195c7ed6f1da20c6168931b563d9e",
+          "bytes": 32107
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-site-location-comparisons-14/main/comparison.json",
+          "sha256": "a667c57acb07ccdee436168dc1e88c32f4410ddbf6f2f19ca8eec3d97eda49bc",
+          "bytes": 110537
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-site-location-comparisons-14/site-location-keep-yes-source-run-request.json",
+          "sha256": "8528a62e2ccc34eb2c8951252d078b8a6f1a5be931986dcda68b261ff6ca947f",
+          "bytes": 4498
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Actual authored Site latitude35/longitude-120/timezone-8/elevation100 and keepYes feed standard pressure/density, design-day setup and weather consumers. All original58/5352 physical reported operands are identical. Full Site EIO matches; both genuine pressure-correction warnings and their continuations occur after actual warmup=true, with real kickoff/developer/sizing owners and exact zero warmup/sizing diagnostic counts. The initial Native zero-warning readback failure remains bound alongside the independently complete corrected verifier; no producer rerun."
+      },
+      {
+        "id": "warmup-max1-strict",
+        "group": "building_warmup",
+        "source_build": "live-diagnostics-14",
+        "input": {
+          "path": ".runtime/object-expansion/native-warmup-live/calibration-01/input.idf",
+          "sha256": "be4118f06b25dbcd4d5e94adcab01d42d84ecebe02ec58f673d093e510a3fda0",
+          "bytes": 9281
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-warmup-live/calibration-01/receipt.json",
+          "sha256": "0155c5e2ddaaaff76908f36d0a62b26b1e48247cd09354b95feab92352835a53",
+          "bytes": 13486
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-warmup-live-14/receipt/receipt.json",
+          "sha256": "867b5aa9c22f6b0c492a98ebc00a7a5f42a98225324ea2cc14de901a59bf7b6e",
+          "bytes": 4159
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/warmup-live-14/run-summary.json",
+          "sha256": "9c3c08a2b6b65e6de74e4e676e389221ffa88e13901122037fe2f00765ce83f8",
+          "bytes": 32062
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-warmup-live-14-comparisons-01/main/comparison.json",
+          "sha256": "bdcc4be96947761fff40a48f2ffc40230037051a9c339b9c6661e732b8d36b68",
+          "bytes": 117848
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-warmup-live-14-comparisons-01/warmup-max1-strict-source-run-request.json",
+          "sha256": "c8432f8d810c05490df6322aa770d5601478a18601f0edaf19af3cc5a1156f82",
+          "bytes": 4275
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 2076,
+          "parsed_binary64_unequal": 2076,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Building minimum/maximum warmup days1 and both convergence tolerances1e-6 drive real convergence/reset owners. All original58/5352 physical samples pass unchanged limits; exact two Severe and seven Continue diagnostics, full Loads Initialization category summary, warmupSevere2/sizing0/END0warnings2severe and EIOWarmupDays1 match. Source Severe calls borrow actual kickoff/developer/warmup/doingSizing flags, preserving first-failure effects and counter reset order. No arbitrary warmup/phase or active sizing promotion."
       }
     ],
     "totals": {
-      "paired_cases": 29,
-      "reported_samples": 191040,
-      "raw_operand_unequal": 88594,
+      "paired_cases": 31,
+      "reported_samples": 201744,
+      "raw_operand_unequal": 90670,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -2058,8 +2168,47 @@
           "sha256": "2564422dd71ecc20f0f221306efb665613ceb48e2f30241568f53e171ec335f5",
           "bytes": 75198057
         }
+      },
+      {
+        "id": "live-diagnostics-14",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-14/receipt.json",
+          "sha256": "95776599e687b21235df13e2325811ed6f9a5ce4be5bd50b0384dbb206b2a130",
+          "bytes": 4949
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc715851b6c14e80b96dcef5e5de4d7f5f71b3fe4df51d99dca40b0f15c00287",
+          "sha256": "cc715851b6c14e80b96dcef5e5de4d7f5f71b3fe4df51d99dca40b0f15c00287"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-14/eplus-rs.exe",
+          "sha256": "aa4c4edb6ce0424fe7aab53c6a7be8d68ab9f1c9144eb27c392c2b5b13ece87a",
+          "bytes": 75194367
+        }
       }
-    ]
+    ],
+    "focused_tests": {
+      "source_build": "live-diagnostics-14",
+      "command_filters": [
+        "warmup",
+        "source_design_day_pressure_"
+      ],
+      "passed": 34,
+      "ignored": 1,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/live-diagnostics-warmup-tests-14.log",
+          "sha256": "0d998646d5c4cdb8213ff18a53a1d991c7cf810b1fa13cc99f69353a3e47e740",
+          "bytes": 2433
+        },
+        {
+          "path": ".runtime/object-expansion/live-diagnostics-pressure-tests-14.log",
+          "sha256": "edbab6ebe4e1448a13c5421ed519cd7d91216ff4a8c5124bcd3d559d4e7f9d94",
+          "bytes": 2192
+        }
+      ],
+      "scope": "Focused workspace library checks for actual live warmup diagnostic flags/reset order and authored-pressure warning prefix; the full workspace milestone remains through convection-13."
+    }
   },
   "additional_native_type_calibrations": [
     {

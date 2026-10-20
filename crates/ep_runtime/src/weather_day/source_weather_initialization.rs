@@ -115,6 +115,8 @@ impl WeatherSession {
                     current_environment_number: &weather.envrn,
                     print_design_day_header: &mut weather.print_design_day_header,
                     report_flags: owners.report_flags,
+                    globals: owners.globals,
+                    developer_flag: &owners.system.developer_flag,
                     psychrometrics,
                     backend: owners.backend,
                     eio: owners.eio,

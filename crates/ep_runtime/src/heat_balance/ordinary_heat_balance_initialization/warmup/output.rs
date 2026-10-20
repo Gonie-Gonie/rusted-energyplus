@@ -5,7 +5,13 @@ pub(super) fn zone_failure(
     o: &mut SourceWarmupCheckOwners<'_, '_>,
     i: usize,
 ) -> Result<(), Error> {
-    o.backend.show_severe_error(&format!("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",zone_name(o.zones,i)?,o.control.max_number_of_warmup_days))?;
+    let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+        kickoff: &o.globals.kickoff_simulation,
+        developer: &o.project.system.developer_flag,
+        warmup: &o.clock.warmup_flag,
+        doing_sizing: &o.globals.doing_sizing,
+    };
+    o.backend.show_source_severe_error(&format!("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",zone_name(o.zones,i)?,o.control.max_number_of_warmup_days), &flags)?;
     if !manager.report.warmup_convergence_warning && !o.globals.doing_sizing {
         o.backend
             .show_continue_error("See Warmup Convergence Information in .eio file for details.")?;

@@ -82,10 +82,19 @@ impl SourceHeatBalanceManager {
             && failed
             && o.control.max_number_of_warmup_days < 25
         {
-            o.backend.show_severe_error(&format!(
-                "CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.",
-                o.control.max_number_of_warmup_days
-            ))?;
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &o.globals.kickoff_simulation,
+                developer: &o.project.system.developer_flag,
+                warmup: &o.clock.warmup_flag,
+                doing_sizing: &o.globals.doing_sizing,
+            };
+            o.backend.show_source_severe_error(
+                &format!(
+                    "CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.",
+                    o.control.max_number_of_warmup_days
+                ),
+                &flags,
+            )?;
             o.backend.show_continue_error(
                 "Suggest setting maximum number of warmup days to at least 25.",
             )?;
