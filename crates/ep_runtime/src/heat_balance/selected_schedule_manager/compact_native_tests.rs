@@ -709,15 +709,21 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
     }
     // Compiler-accepted fixed MonthDay spellings reach the same actual General
     // child and retain genuine Detailed -> Week -> Day pointers, not a preview.
-    for through in [
-        "Through: DECEMBER 31",
-        "Through: 31 DEC",
-        "Through: 12-31",
-        "Through: 12 31",
-        "Through 2013/12/31",
-        "Through: 12/31/2013",
-        "Through2013-12-31",
-        "Through 2013:12:31",
+    for (through, ordinal) in [
+        ("Through: DECEMBER 31", 366_i32),
+        ("Through: 31 DEC", 366),
+        ("Through: 12-31", 366),
+        ("Through: 12 31", 366),
+        ("Through 2013/12/31", 366),
+        ("Through: 12/31/2013", 366),
+        ("Through2013-12-31", 366),
+        ("Through 2013:12:31", 366),
+        ("Through 2013.5/12.9/31.9", 366),
+        ("Through 2.013D+3/1.2E+1/3.1D1", 366),
+        ("Through 12.9/31.9/2013.5", 366),
+        ("Through -2013.5/-12/-31", 366),
+        ("Through 2013.5/2.9/29.9", 60),
+        ("Through 2013D-1/12", 12),
     ] {
         let mut raw = authored_raw(fixture, "Average", false);
         raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
@@ -733,6 +739,17 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         ] {
             raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][at]["field"] =
                 serde_json::json!(text);
+        }
+        if ordinal < 366 {
+            let data = raw["Schedule:Compact"]["Internal Gain Schedule"]["data"]
+                .as_array_mut()
+                .ok_or("actual authored fixed-date fields")?;
+            data.extend([
+                serde_json::json!({"field":"Through:12/31"}),
+                serde_json::json!({"field":"For:AllDays"}),
+                serde_json::json!({"field":"Until:24:00"}),
+                serde_json::json!({"field":5}),
+            ]);
         }
         let mut input = processor(fixture, &raw)?;
         let declarations = schedule_declarations(fixture, &raw)?;
@@ -751,12 +768,23 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
             return Err("actual named-month Detailed owner".into());
         };
         let week = detail.week_schedules[1].ok_or("actual first-day Week owner")?;
+        let endpoint = usize::try_from(ordinal)?;
         assert!(
-            detail.week_schedules[1..]
+            detail.week_schedules[1..=endpoint]
                 .iter()
                 .all(|slot| *slot == Some(week)),
             "{through}"
         );
+        if endpoint < 366 {
+            let next_week =
+                detail.week_schedules[endpoint + 1].ok_or("actual next-period Week owner")?;
+            assert_ne!(next_week, week);
+            assert!(
+                detail.week_schedules[endpoint + 1..]
+                    .iter()
+                    .all(|slot| *slot == Some(next_week))
+            );
+        }
         assert!(
             manager.week_schedules[week].day_schedules[1..]
                 .iter()
@@ -770,7 +798,7 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 ..Default::default()
             };
             let environment = WeatherEnvironmentState {
-                day_of_year_schedule: 366,
+                day_of_year_schedule: ordinal,
                 day_of_week: 3,
                 ..Default::default()
             };
@@ -779,6 +807,24 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 manager.source_current_schedule_value(index)?.to_bits(),
                 expected.to_bits(),
                 "{through}"
+            );
+        }
+        if ordinal < 366 {
+            let clock = WeatherGlobalState {
+                hour_of_day: 1,
+                time_step: 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: ordinal + 1,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                5.0_f64.to_bits()
             );
         }
     }

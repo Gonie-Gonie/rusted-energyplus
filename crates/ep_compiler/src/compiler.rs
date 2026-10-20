@@ -16926,10 +16926,10 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
             // General635-654 selects numeric yyyy/mm/dd or mm/dd/yyyy by
             // first>100, otherwise third>100. This actual caller omits PYear,
             // so the authored year does not change the leap-shaped schedule.
-            // First bounded projection: three i32-range decimal tokens after
-            // the Original separators, with a valid fixed selected month/day.
-            // General's fractional-number/unvalidated-date extensions remain
-            // outside this projection; shared DST/CalendarDateRule is unchanged.
+            // Each numeric token uses the same successful ProcessNumber and
+            // defined trunc-to-int boundary as the actual General child. Keep
+            // failed-number/unvalidated-date branches outside this projection;
+            // the selected fixed month/day and shared CalendarDateRule stay strict.
             // Check the original authored directive before the operand helper
             // can hide a Unicode/tab edge with trim. This new numeric arm
             // admits only General's ASCII-space separators, no leading '+'.
@@ -16948,15 +16948,20 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
             let [first, second, third] = fields.as_slice() else {
                 return None;
             };
-            if fields
-                .iter()
-                .any(|field| !field.bytes().all(|byte| byte.is_ascii_digit()))
-            {
-                return None;
-            }
-            let first = first.parse::<i32>().ok()?;
-            let second = second.parse::<i32>().ok()?;
-            let third = third.parse::<i32>().ok()?;
+            let source_int = |text: &str| {
+                let number = ep_model::process_source_number(text).ok()?;
+                let truncated = number.trunc();
+                if !truncated.is_finite()
+                    || truncated < f64::from(i32::MIN)
+                    || truncated > f64::from(i32::MAX)
+                {
+                    return None;
+                }
+                Some(truncated as i32)
+            };
+            let first = source_int(first)?;
+            let second = source_int(second)?;
+            let third = source_int(third)?;
             let (month, day) = if first > 100 {
                 (second, third)
             } else if third > 100 {
@@ -18583,6 +18588,15 @@ mod tests {
             ("Through2013-12-31", 366),
             ("Through 2013:12:31", 366),
             ("Through: 2013/2/29", 60), // PYear is absent; no civil-year leap test.
+            ("Through 2013.5/12/31", 366),
+            ("Through 2013.5/12.9/31.9", 366),
+            ("Through 2.013D+3/1.2E+1/3.1D1", 366),
+            ("Through 12.9/31.9/2013.5", 366),
+            ("Through -2013.5/-12/-31", 366), // Every '-' is a separator.
+            ("Through 2013.5/2.9/29.9", 60),
+            ("Through 101.0/12/31", 366),
+            ("Through 2147483647.9/12/31", 366), // Truncated int remains defined.
+            ("Through 2013D-1/12", 12),          // Three normalized tokens: 2013D,1,12.
             ("Through 0", 0),
             ("Through: 0.0", 0),
             ("Through:-0", 0),
@@ -18634,7 +18648,11 @@ mod tests {
         }
         for through in [
             "Through 2013/2/30",
-            "Through 2013.5/12/31",
+            "Through 100.9/12/31", // Raw first>100 is not the truncated test.
+            "Through 12/31/100.9",
+            "Through 2147483648/12/31",
+            "Through 1e9999/12/31",
+            "Through 2013D-1/12/31", // Four tokens after separator replacement.
             "Through 12/31/100",
             "Through 1st Monday in January",
             "Through +0",
