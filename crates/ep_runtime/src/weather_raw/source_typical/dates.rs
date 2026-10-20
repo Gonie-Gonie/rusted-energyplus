@@ -1,6 +1,5 @@
 //! Genuine General ProcessDateString395-454/Determine456-668/Validate670-703.
 //! Native optional/unwritten out arguments remain explicit masks, never zero probes.
-use super::super::dates::number_with_error;
 use super::super::header_state::{strip_ascii_spaces, to_source_int};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::weather::day::SourceWeatherInitializationError as Error;
@@ -17,8 +16,17 @@ fn raw(e: RawEpwHeaderError) -> Error {
     RawDayFailure::Header(e).into()
 }
 fn number(text: &str) -> Result<(i32, bool), Error> {
-    let (value, error) = number_with_error(text);
-    Ok((to_source_int(value).map_err(raw)?, error))
+    match ep_model::process_source_number_outcome(text) {
+        ep_model::SourceNumberOutcome::Finite(value) => {
+            Ok((to_source_int(value).map_err(raw)?, false))
+        }
+        ep_model::SourceNumberOutcome::ErrorZero => Ok((0, true)),
+        ep_model::SourceNumberOutcome::NonFinite => {
+            Err(raw(RawEpwHeaderError::OutsideBoundedDomain(
+                "undefined original non-finite real-to-int conversion",
+            )))
+        }
+    }
 }
 fn checked(value: Option<i32>) -> Result<i32, Error> {
     value.ok_or_else(|| {

@@ -18701,6 +18701,10 @@ mod tests {
             ("Through 0D", 0),
             ("Through:", 0), // ProcessNumber's ASCII-empty input succeeds as 0.
             ("Through   ", 0),
+            ("Through 1e-9999", 0),
+            ("Through -1e-9999", 0),
+            ("Through 1D-9999", 0),
+            ("Through -1D-9999", 0),
         ] {
             let remainder = if ordinal == 366 {
                 String::new()
@@ -18768,7 +18772,9 @@ mod tests {
             "Through 12/31/100",
             "Through 1st Monday in January",
             "Through +0",
-            "Through 1e-9999",
+            "Through nanE", // Native retains non-finite with errorFlag false: no defined int.
+            "Through infE",
+            "Through 1e9999E",
             "Through \u{00a0}0",
             "Through 0\u{00a0}",
             "Through \\t0",

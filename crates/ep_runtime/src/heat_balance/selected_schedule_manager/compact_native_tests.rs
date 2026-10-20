@@ -367,6 +367,143 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         warmup: &warmup,
         doing_sizing: &sizing,
     };
+    // This existing owner cohort also exercises the common numeric child:
+    // preserve Native error-zero vs non-finite-success before any real cast.
+    use ep_model::{
+        SourceNumberOutcome, process_source_number, process_source_number_outcome,
+        source_finite_number_prefix,
+    };
+    for (text, expected) in [
+        ("1e-9999", 0.0_f64),
+        ("-1e-9999", -0.0),
+        ("1D-9999", 0.0),
+        ("-1D-9999", -0.0),
+        ("0e9999", 0.0),
+        ("-0D9999", -0.0),
+        ("15+E0", 15.0),
+    ] {
+        let SourceNumberOutcome::Finite(actual) = process_source_number_outcome(text) else {
+            return Err("actual finite ProcessNumber outcome".into());
+        };
+        assert_eq!(actual.to_bits(), expected.to_bits(), "{text}");
+        assert_eq!(
+            process_source_number(text).map(f64::to_bits),
+            Ok(expected.to_bits()),
+            "{text}"
+        );
+    }
+    for text in [
+        "nan",
+        "-nan",
+        "INF",
+        "-infinity",
+        "nan(payload)",
+        "nan()",
+        "nan(",
+        "nan(bad!)E",
+        "nan(payload)X",
+        "nanE+1",
+        "1e9999",
+        "-1e9999",
+        "1e9999X",
+        "1e9999E+1",
+        "+1",
+        "junk",
+    ] {
+        assert_eq!(
+            process_source_number_outcome(text),
+            SourceNumberOutcome::ErrorZero,
+            "{text}"
+        );
+        assert!(process_source_number(text).is_err(), "{text}");
+    }
+    for text in [
+        "nanE",
+        "nan+E",
+        "nan-E",
+        "nanE12",
+        "nan(payload)E",
+        "nan()D",
+        "infE",
+        "infinityE",
+        "-infE",
+        "nanD",
+        "infD",
+        "1e9999E",
+        "1e9999+E",
+        "1D9999E",
+    ] {
+        assert_eq!(
+            process_source_number_outcome(text),
+            SourceNumberOutcome::NonFinite,
+            "{text}"
+        );
+        assert!(process_source_number(text).is_err(), "{text}");
+    }
+    for text in ["1e-9999", "-1e-9999", "1e9999"] {
+        assert_eq!(
+            source_finite_number_prefix(text),
+            Err("decimal magnitude outside the finite list-read domain"),
+            "{text}"
+        );
+    }
+    assert_eq!(
+        source_finite_number_prefix("nan(payload)E"),
+        Err("non-finite mandatory number")
+    );
+    assert_eq!(source_finite_number_prefix("1D-9999"), Ok(Some((1.0, 1))));
+    // Real General must stop unsupported non-finite->int before writing any
+    // MonthDay or fabricated error flag/zero. Its actual diagnostic is unreached.
+    // A successful finite value is truncated BEFORE the defined-i32 test,
+    // even when its year token is unused by this actual General caller.
+    {
+        use crate::weather::raw::{SourceDateScratch, process_source_date_string_with_diagnostic};
+        let mut date = SourceDateScratch::default();
+        let mut failed = false;
+        let mut diagnostics = Vec::new();
+        process_source_date_string_with_diagnostic(
+            "2147483647.9/12/31",
+            &mut date,
+            false,
+            &mut failed,
+            &mut |message| {
+                diagnostics.push(message.to_owned());
+                Ok(())
+            },
+        )?;
+        assert_eq!((date.month, date.day), (Some(12), Some(31)));
+        assert!(!failed && diagnostics.is_empty());
+    }
+    for text in [
+        "NANE",
+        "INFE",
+        "1E9999E",
+        "2013/NANE/31",
+        "2147483648/13/31",
+        "2013/13/2147483648",
+    ] {
+        use crate::weather::raw::{SourceDateScratch, process_source_date_string_with_diagnostic};
+        let mut date = SourceDateScratch::default();
+        let mut failed = false;
+        let mut diagnostics = Vec::new();
+        assert!(
+            process_source_date_string_with_diagnostic(
+                text,
+                &mut date,
+                false,
+                &mut failed,
+                &mut |message| {
+                    diagnostics.push(message.to_owned());
+                    Ok(())
+                }
+            )
+            .is_err(),
+            "{text}"
+        );
+        assert!(!failed, "{text}");
+        assert!(date.month.is_none() && date.day.is_none(), "{text}");
+        assert!(diagnostics.is_empty(), "{text}");
+    }
     for (mode, first) in [
         ("No", [10.0, 175.0, 175.0, 175.0, 175.0]),
         ("Average", [10.0, 120.0, 175.0, 175.0, 175.0]),
@@ -464,6 +601,8 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         ["Until::20", "Until:1D0:15.0", "Until:24:"],
         ["Until :20", "Until1E:15+E0", "Until24.0:0D"],
         ["Until:-0:2E1", "Until:1.0:1.5D1", "Until:2.4E+1:0E"],
+        ["Until:1e-9999:20", "Until:1:15", "Until:24:-1D-9999"],
+        ["Until:-1D-9999:20", "Until:1:15", "Until:24:1e-9999"],
     ] {
         let mut raw = authored_raw(fixture, "Average", false);
         for (at, text) in [3, 5, 7].into_iter().zip(untils) {
@@ -760,6 +899,10 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         (serde_json::json!({"field":"1D0"}), "1D0", 1.0_f64),
         (serde_json::json!({"field":"-5D-1"}), "-5D-1", -0.5),
         (serde_json::json!({"field":"0E"}), "0E", 0.0),
+        (serde_json::json!({"field":"1e-9999"}), "1E-9999", 0.0),
+        (serde_json::json!({"field":"-1e-9999"}), "-1E-9999", -0.0),
+        (serde_json::json!({"field":"1D-9999"}), "1D-9999", 0.0),
+        (serde_json::json!({"field":"-1D-9999"}), "-1D-9999", -0.0),
         (serde_json::json!({"field":""}), "", 0.0),
         (serde_json::json!({"field":"   "}), "   ", 0.0),
         (serde_json::json!({}), "", 0.0),
@@ -848,7 +991,9 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         Some(serde_json::json!(null)),
         Some(serde_json::json!({"field":"junk"})),
         Some(serde_json::json!({"field":"+1"})),
-        Some(serde_json::json!({"field":"1e-9999"})),
+        Some(serde_json::json!({"field":"nan"})),
+        Some(serde_json::json!({"field":"nanE"})),
+        Some(serde_json::json!({"field":"1e9999E"})),
         Some(serde_json::json!({"field":"\u{00a0}1"})),
         Some(serde_json::json!({"field":"Through:12/31"})),
         None,
@@ -1022,9 +1167,12 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
     ]
     .into_iter()
     .chain(
-        ["0", "0.0", "-0", ".5", "-5D-1", "0E", "0D", "", "   "]
-            .into_iter()
-            .map(|zero| (vec![(zero, 2.0), ("12/31", 0.75)], 1, 0.75, 0.75)),
+        [
+            "0", "0.0", "-0", ".5", "-5D-1", "0E", "0D", "", "   ", "1e-9999", "-1e-9999",
+            "1D-9999", "-1D-9999",
+        ]
+        .into_iter()
+        .map(|zero| (vec![(zero, 2.0), ("12/31", 0.75)], 1, 0.75, 0.75)),
     ) {
         let mut raw = authored_raw(fixture, "No", false);
         raw["ScheduleTypeLimits"]["Fraction"]["upper_limit_value"] = serde_json::json!(1);

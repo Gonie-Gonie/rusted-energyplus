@@ -15,5 +15,8 @@ pub use names::*;
 pub use objects::*;
 pub use report_inputs::*;
 pub use schedule_day_values::populate_schedule_day_values;
-pub use source_numbers::{SourceNumberError, process_source_number, source_finite_number_prefix};
+pub use source_numbers::{
+    SourceNumberError, SourceNumberOutcome, process_source_number, process_source_number_outcome,
+    source_finite_number_prefix,
+};
 pub use units::*;
