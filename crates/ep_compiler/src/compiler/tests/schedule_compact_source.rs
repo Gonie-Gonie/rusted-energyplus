@@ -29,6 +29,82 @@ fn compact_registration_precedes_constants_with_distinct_actual_ids()
         model.schedule_names.resolve("Constant"),
         Some(ScheduleId(1))
     );
+
+    // Raw Number remains on number_value. Strings and real existing blank
+    // extensible objects use source ProcessNumber only while Until is pending.
+    let scalar_result = |entry: &str,
+                         with_until: bool|
+     -> Result<crate::CompileResult, Box<dyn std::error::Error>> {
+        let until = if with_until {
+            r#",{"field":"Until:24:00"}"#
+        } else {
+            ""
+        };
+        let entry = if entry.is_empty() {
+            String::new()
+        } else {
+            format!(",{entry}")
+        };
+        let source = format!(
+            r#"{{
+            "ScheduleTypeLimits":{{"T":{{"lower_limit_value":-1,"upper_limit_value":1,"numeric_type":"Continuous"}}}},
+            "Schedule:Compact":{{"S":{{"schedule_type_limits_name":"T","data":[
+                {{"field":"Through:12/31"}},{{"field":"For:AllDays"}}{until}{entry}
+            ]}}}}
+        }}"#
+        );
+        Ok(compile_raw_model(&parse_epjson_str(&source)?))
+    };
+    for (entry, expected) in [
+        (r#"{"field":"1D0"}"#, 1.0_f64),
+        (r#"{"field":"-5D-1"}"#, -0.5),
+        (r#"{"field":"0E"}"#, 0.0),
+        (r#"{"field":""}"#, 0.0),
+        (r#"{"field":"   "}"#, 0.0),
+        (r#"{}"#, 0.0),
+        (r#"{"ignored":{"field":null}}"#, 0.0),
+    ] {
+        let result = scalar_result(entry, true)?;
+        assert!(
+            !result.has_errors(),
+            "{entry}: {:?}",
+            result.report.diagnostics
+        );
+        let model = result
+            .model
+            .ok_or_else(|| std::io::Error::other("actual Compact scalar model"))?;
+        let profile = &model.compact_schedules[0].periods[0].day_profiles[0];
+        assert_eq!(profile.segments.len(), 1);
+        assert_eq!(profile.segments[0].value.to_bits(), expected.to_bits());
+    }
+    for entry in [
+        r#"{"field":null}"#,
+        r#"null"#,
+        r#"{"field":true}"#,
+        r#"{"field":"junk"}"#,
+        r#"{"field":"+1"}"#,
+        r#"{"field":"1e-9999"}"#,
+        r#"{"field":"\u00a01"}"#,
+        r#"{"field":"1\u00a0"}"#,
+        r#"{"field":"Through:12/31"}"#,
+        "", // No entry exists after Until; do not manufacture a blank item.
+    ] {
+        let result = scalar_result(entry, true)?;
+        assert!(result.has_errors(), "{entry}");
+        assert!(result.model.is_none());
+    }
+    for entry in [r#"{"field":"1D0"}"#, r#"{}"#] {
+        assert!(scalar_result(entry, false)?.has_errors());
+    }
+    let excessive = scalar_result(r#"{"field":"2D0"}"#, true)?;
+    assert!(
+        excessive
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "ScheduleValueOutsideTypeLimits")
+    );
+    assert!(excessive.model.is_none());
     Ok(())
 }
 

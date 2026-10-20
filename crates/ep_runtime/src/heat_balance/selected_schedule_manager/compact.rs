@@ -29,12 +29,8 @@ fn alpha(value: Option<&V>) -> Result<String, SelectedScheduleError> {
     }
 }
 fn parsed_number(value: &str) -> Result<f64, SelectedScheduleError> {
-    value
-        .trim()
-        .parse::<f64>()
-        .ok()
-        .filter(|x| x.is_finite())
-        .ok_or_else(|| unavailable("actual Compact Util::ProcessNumber branch"))
+    ep_model::process_source_number(value)
+        .map_err(|_| unavailable("actual Compact Util::ProcessNumber branch"))
 }
 fn through_day(value: &str) -> Result<(usize, String), SelectedScheduleError> {
     let value = value
@@ -200,6 +196,12 @@ impl SelectedScheduleManager {
             let V::Object(fields) = value else {
                 return Err(unavailable("actual Compact extensible object"));
             };
+            // The schema permits absent `field` (a real blank alpha) and
+            // arbitrary other item members, but explicitly supplied null is not
+            // number|string. Keep that invalid schema path unavailable.
+            if matches!(fields.get("field"), Some(V::Null)) {
+                return Err(unavailable("actual Compact null extensible field schema"));
+            }
             locals.0[index + 2] = alpha(fields.get("field"))?;
         }
         if full {
@@ -421,6 +423,11 @@ impl SelectedScheduleManager {
                             return Err(unavailable("actual Compact expecting Until diagnostic"));
                         }
                         field += 1;
+                        if field >= num_alphas {
+                            return Err(unavailable(
+                                "actual Compact value beyond getObjectItem NumAlphas",
+                            ));
+                        }
                         let value = parsed_number(&locals.0[field])?;
                         let target = locals
                             .3

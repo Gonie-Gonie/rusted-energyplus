@@ -163,10 +163,10 @@
       "Same-input1/1 CustomDay1 Duration1.9 becomes1 across96actual clocks and matches all102/9792 original outputs exactly. AllDays schedules do not prove distinct day-type coefficients; ordinal-only unwritten local weekday and broader grammar/models remain bounded."
     ],
     "Schedule:Compact": [
-      "Actual Source A/B preserves raw/IP numeric fields and complete original family/order custody, retained day/week/currentVal and genuine No/Average/Linear minute producers. Live child/parent/population/finalFatal diagnostic order and partial-owner/IO prefixes remain; Linear endpoint residues are never clamped.",
-      "Omitted/blank/unknown optional type retains actual Invalid/None and Warning plus two Continues before week/day population; referenced unlimited types retain their real identity. Actual weather.global is borrowed through first-input/HB to gains, while thermostat/exterior use existing real clocks. Uncached Detailed minmax/day-group reduction reads actual TimeStepsInHour only when needed; cached and Constant paths ignore it. Legacy callers without clock remain bounded; no eager typed-cache or derived60/minutes substitute.",
-      "Detailed hasVal follows all366week/12day-type pointers with actual thermostat clock, visited Week/Day Num arrays and exact equality independent of currentVal; Constant remains unchanged. Through now invokes the genuine General child and actual leap OrdinalDay into the existing367week array for fixed numeric/named/reversed/dash/space MonthDay spellings. Reached invalid-date diagnostics, ordinal/Nth/Last, broader compiler syntax, missing selectors and sibling schedule families remain bounded.",
-      "Consumed B102 Average/Linear, Constant4-to-Compact control4, composed unlimited Fraction plus blank-gain/unknown-control types, and two Through token spellings each match all102/9792 raw/binary64 values under original unchanged policies. All96 relevant schedule profiles, nominal/day-group EIO, exact ERR-END0/0 or actual2Warnings4Continues with warmup0/sizing0, wholeSHD and real deleted-emptyMTR are checked. The four fixed-date spellings and failure-prefix edge cases also use existing actual-owner test bodies; no arbitrary calendar/model/thermostat physics or full-object completion claim."
+      "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use the shared Source ProcessNumber, including D/E forms and genuine empty/space-only or optional missing field as zero. Unknown item metadata is retained. Explicit null, a wholly missing entry and malformed numbers remain bounded; no fabricated IP sentinel or schema diagnostics.",
+      "No/Average/Linear use retained minute/day/week/currentVal producers and actual type clocks. Optional blank/unknown types retain Invalid/None and original warning/continuation order. Missing For masks retain genuine MissingDay0 pointers and exact warnings. Detailed hasVal and uncached minmax follow actual366week/12day-type pointers and clocks; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects are preserved; Linear endpoint residues are never clamped.",
+      "Through invokes the real General child and leap OrdinalDay into the existing367week array for bounded fixed numeric/named/reversed/dash/space dates, including integer year-first/year-last forms and optional directive colons. Empty/successful finite trunc-zero Through values share the actual Source number grammar and real MonthDay0/0 empty owners. Coverage for admitted endpoints0..366 preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Broader date/Until grammar and sibling families remain bounded.",
+      "Same-input B102 cases cover interpolation, Compact control4, optional types, date spellings, missing selectors, empty topology, finite-zero dates and blank/D/E values. Each verifies all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. Cases name their actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
     ]
   },
   "verification": {
@@ -183,18 +183,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/compact-finite-zero-clippy-24.log",
-        "sha256": "591478a5e90f1b1003cb93cc8ccde99637be6545557e26c4523236729785ac86",
-        "bytes": 2492
+        "path": ".runtime/object-expansion/compact-value-scalars-clippy-25.log",
+        "sha256": "d492cc07321f92ab9da08b5e681f80c7a00ce5f8f6986b170ef0390abf365c41",
+        "bytes": 2288
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-finite-zero-docs-24.log",
+        "path": ".runtime/object-expansion/compact-value-scalars-docs-25.log",
         "sha256": "ec57032a80a96e8c15955d284e92249fb0a4987568912610086b220dce954777",
         "bytes": 354
       },
-      "clippy_through_build": "compact-finite-zero-24",
+      "clippy_through_build": "compact-value-scalars-25",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -2986,11 +2986,62 @@
           "passed": true
         },
         "effective_state": "Original B102 with exactly2 fullschedule-record edits: gainleadingThrough0.5/AllDays2 thenoriginal12/31profile; availabilityleadingThrough-5D-1/AllDays2 thenoriginal12/31profile. ActualsharedProcessNumber utility is included/authenticated inBuild24; finitelexemes follow primary int0/MonthDay0 emptyrange path without typed/raw deletion or invented calendar date. LimitedFraction0..1/Constant4/gains-thermostatrefs/all102requests/weather/otherbytes unchanged. Actual96control4/gain48zero48one/availability12zero84one raw+binary64 equal. Full102/9792 originalnamedpolicies andindependentfullnumericalreread pass with0 raw/binary unequal/tolerance/RMSE failures; exactfullERR-END0warnings0severe/actualWarmup6/nominal+4daygroups0..1000W/wholeSHD/realdeletedemptyMTR0 agree. No generalnumeric/nonfinite/out-of-range/positiveordinal/fullCompact-domain or internalparse/allocation/cache/iterationcounts claim."
+      },
+      {
+        "id": "compact-value-scalars",
+        "group": "schedule_compact_value_scalars",
+        "source_build": "compact-value-scalars-25",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-value-scalars/calibration-01/input.idf",
+          "sha256": "8150882fee408ac7bcd42d7978f55eae69ad5d1fd305562e38192ae6664ccb58",
+          "bytes": 13042
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-value-scalars/calibration-01/receipt.json",
+          "sha256": "8eaf55f21e8df9542d04f75ad4e3e69b7746a270486bdbbd7998476c9f2e8e03",
+          "bytes": 14312
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-value-scalars-25/value-scalars/receipt.json",
+          "sha256": "94176f43d01ff1b58fc1fd601356b8e52d30d21e56b266dcd0f68e46c1145b66",
+          "bytes": 4122
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-value-scalars-25/run-summary.json",
+          "sha256": "ae2e60d794a9714cccc34829672963ef282904c47fa33d72a25696a05b52abc8",
+          "bytes": 60712
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-value-scalars-comparisons-25/value-scalars/comparison.json",
+          "sha256": "b9b723aea2972f2994544e8fd90d6ccf725075a849a1ae52b805f3d1d636591e",
+          "bytes": 249380
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-value-scalars-25-launch/value-scalars/request.json",
+          "sha256": "964ca6effc20c4c76a8f69686744b2eb06bb152d139d6e0016889052370a2826",
+          "bytes": 3215
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "OriginalB102 exactly2fullCompactrecords: gainUntil06explicitmiddleblank,18=1D0,new21=0Ezero,24explicittrailingblankwithcomma-before-semicolon; availabilityUntil03explicitmiddleblank,24=1D0. Allrealvalueentries andoriginalendpoints retained; new21onlysplitsoriginal18..24zero. OriginalFraction0..1/Constant4/gains-thermostatrefs/102requests/weather/otherbytes unchanged. Actual96control4/gain48zero48one/availability12zero84one raw+binary64equal. Full102/9792originalpolicies andindependentfullnumericalreread pass0raw/binaryunequal/tolerance/RMSEfailures; exactfullERR-END0warnings0severe/actualWarmup6/nominal+4daygroups0..1000W/wholeSHD/realdeletedemptyMTR0 agree. Build25actualcompiler/raw-ingress/Sourcegetter/sharednumbermodule live+archivebyteidentitiesauthenticated. IntermediateepJSONshape remainsprimary-derived only; noNativeconversion/NumAlphas/internalparsecounts or arbitraryscalar/fullCompact-domain claim."
       }
     ],
     "totals": {
-      "paired_cases": 50,
-      "reported_samples": 352542,
+      "paired_cases": 51,
+      "reported_samples": 362334,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3404,12 +3455,45 @@
           "sha256": "55f97641be519dd08d2777a6b44900ddd8d9c97d7ac8e0a1e06f29a4296c66f7",
           "bytes": 75642791
         }
+      },
+      {
+        "id": "compact-value-scalars-25",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-25/receipt.json",
+          "sha256": "9fef421d224e3f410cf3c2f079f18c009224b94f89adc98ec51f83a83eb8b8a9",
+          "bytes": 4950
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/79/79c00b01ce22f7a23d32e8ce2053ad905f9b4a6225959a80080312568940b801",
+          "sha256": "79c00b01ce22f7a23d32e8ce2053ad905f9b4a6225959a80080312568940b801"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-25/eplus-rs.exe",
+          "sha256": "8d737e5ab5d18bb1ae6c32f0f341b665f21930bc8ac3946d1e379d69ee18ad8d",
+          "bytes": 75656322
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "No subsequent focused runs; full workspace milestone is compact-finite-zero-24."
+      "passed": 27,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/compact-value-scalars-compiler-tests-25.log",
+          "sha256": "2c2a57f990142da526f38ae9b97928d3ea03bb03a3772fc5c09017b6caed5106",
+          "bytes": 7448
+        },
+        {
+          "path": ".runtime/object-expansion/compact-value-scalars-owner-tests-25.log",
+          "sha256": "5fea99ccaae56910b13d40481ae80c3ae8900bffdfb28e321f1ae51700785231",
+          "bytes": 6098
+        },
+        {
+          "path": ".runtime/object-expansion/compact-value-scalars-ingress-tests-25.log",
+          "sha256": "d296008cad3ad8d1c7954ccd409a20fa418d08ac8d23146cefc0e2de83c8e1f2",
+          "bytes": 2130
+        }
+      ],
+      "scope": "After full workspace milestone compact-finite-zero-24: compiler Compact25, actual ScheduleManager1 and Source A ingress1. Existing bodies cover pending-value-first number/string/optional blank entries, exact real IP extent and raw metadata/null boundaries; no new test cohort or dependency."
     }
   },
   "additional_native_type_calibrations": [

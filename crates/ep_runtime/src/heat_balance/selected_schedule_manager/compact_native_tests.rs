@@ -458,6 +458,126 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
                 .ends_with("  Processing Schedule Input -- Complete\n")
         );
     }
+    // Actual IP distinguishes a present empty item from a missing whole entry.
+    // Read the real getter count/alpha/blank, then use the genuine minute graph
+    // and live clock for every reported timestep; no profile is seeded here.
+    for (entry, expected_alpha, expected) in [
+        (serde_json::json!({"field":"1D0"}), "1D0", 1.0_f64),
+        (serde_json::json!({"field":"-5D-1"}), "-5D-1", -0.5),
+        (serde_json::json!({"field":"0E"}), "0E", 0.0),
+        (serde_json::json!({"field":""}), "", 0.0),
+        (serde_json::json!({"field":"   "}), "   ", 0.0),
+        (serde_json::json!({}), "", 0.0),
+        (serde_json::json!({"ignored":{"field":null}}), "", 0.0),
+    ] {
+        let mut raw = authored_raw(fixture, "No", false);
+        raw["ScheduleTypeLimits"]["Fraction"]["lower_limit_value"] = serde_json::json!(-1);
+        raw["ScheduleTypeLimits"]["Fraction"]["upper_limit_value"] = serde_json::json!(1);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = serde_json::json!([
+            {"field":"Through:12/31"},{"field":"For:AllDays"},
+            {"field":"Until:24:00"},entry,
+        ]);
+        let mut input = processor(fixture, &raw)?;
+        let ordinal = input
+            .source_raw_object_names("Schedule:Compact")?
+            .iter()
+            .position(|name| name.eq_ignore_ascii_case("INTERNAL GAIN SCHEDULE"))
+            .ok_or("actual Compact object ordinal")?;
+        let args = input.get_object_def_max_args("Schedule:Compact")?;
+        let mut locals: super::SourceScheduleGetterLocals = (
+            vec![String::new(); args.alphas + 1],
+            vec![String::new(); args.alphas + 1],
+            vec![String::new(); args.numerics],
+            vec![0.0; args.numerics],
+            vec![true; args.alphas + 1],
+            vec![true; args.numerics],
+        );
+        let count = SelectedScheduleManager::get_source_compact_object_item(
+            &mut input,
+            ordinal,
+            &mut locals,
+            true,
+        )?;
+        assert_eq!(count, 6); // Name + Type + four real extensible items.
+        assert_eq!(locals.0[5], expected_alpha);
+        assert_eq!(locals.4[5], expected_alpha.is_empty());
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual scalar schedule")?;
+        let actual_day = manager
+            .day_schedules
+            .iter()
+            .find(|day| day.name == "INTERNAL GAIN SCHEDULE_dy_1")
+            .ok_or("actual scalar Day owner")?;
+        assert_eq!(actual_day.timestep_values.len(), 96);
+        assert!(
+            actual_day
+                .timestep_values
+                .iter()
+                .all(|value| value.to_bits() == expected.to_bits())
+        );
+        assert_eq!(manager.source_min(index)?.to_bits(), expected.to_bits());
+        assert_eq!(manager.source_max(index)?.to_bits(), expected.to_bits());
+        for step in 0..96 {
+            let clock = WeatherGlobalState {
+                hour_of_day: step / 4 + 1,
+                time_step: step % 4 + 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: 1,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            assert_eq!(
+                manager.source_current_schedule_value(index)?.to_bits(),
+                expected.to_bits()
+            );
+        }
+    }
+    // These stop at existing unavailable/schema boundaries; no Native severe
+    // text, callback or counter is fabricated by the backend-free caller.
+    for entry in [
+        Some(serde_json::json!({"field":null})),
+        Some(serde_json::json!(null)),
+        Some(serde_json::json!({"field":"junk"})),
+        Some(serde_json::json!({"field":"+1"})),
+        Some(serde_json::json!({"field":"1e-9999"})),
+        Some(serde_json::json!({"field":"\u{00a0}1"})),
+        Some(serde_json::json!({"field":"Through:12/31"})),
+        None,
+    ] {
+        let mut raw = authored_raw(fixture, "No", false);
+        let mut data = vec![
+            serde_json::json!({"field":"Through:12/31"}),
+            serde_json::json!({"field":"For:AllDays"}),
+            serde_json::json!({"field":"Until:24:00"}),
+        ];
+        if let Some(entry) = entry {
+            data.push(entry);
+        }
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = Value::Array(data);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        assert!(
+            manager
+                .process_schedule_input(&mut input, &declarations, 4, &mut MemoryAudit::default())
+                .is_err()
+        );
+    }
     // Compiler-accepted fixed MonthDay spellings reach the same actual General
     // child and retain genuine Detailed -> Week -> Day pointers, not a preview.
     for through in [

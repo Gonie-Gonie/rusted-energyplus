@@ -33,7 +33,10 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         }
         ("Schedule:Compact", "data") => {
             blank(value)
-                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "field" => blank(value) || (number(value).is_some() || matches!(value, RawValue::String(_))), _ => false, }))))
+                // Native items.field is optional number|string, with no
+                // additionalProperties restriction. Other item members remain
+                // raw metadata; only the actual field is read as an alpha.
+                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.get(&FieldName("field".into())).is_none_or(|value| number(value).is_some() || matches!(value, RawValue::String(_))))))
         }
         ("ThermostatSetpoint:DualSetpoint", "heating_setpoint_temperature_schedule_name") => {
             blank(value) || matches!(value, RawValue::String(_))

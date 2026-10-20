@@ -948,9 +948,37 @@ mod source_a_compact_ingress {
             crate::ordinary_schedule_input::resolve(&raw)?.types.len(),
             1
         );
+        // Native items permit optionalfield plus arbitrary other members. The
+        // raw IP keeps that exact present Object and still advances one alpha.
+        for entry in [
+            serde_json::json!({}),
+            serde_json::json!({"unknown":{"kept":null}}),
+            serde_json::json!({"field":"0E"}),
+        ] {
+            let mut value = input.clone();
+            value["Schedule:Compact"]["variable schedule"]["data"][4] = entry;
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            resolve_source_a(&raw)?;
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let fields = ip.source_raw_object_fields("Schedule:Compact", "variable schedule")?;
+            let ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(data) = &fields["data"] else {
+                return Err("actual Compact extensible count lost".into());
+            };
+            assert_eq!(data.len(), 7);
+            let ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Object(entry) = &data[4] else {
+                return Err("actual blank/string item custody lost".into());
+            };
+            assert_eq!(
+                entry.contains_key("field"),
+                value["Schedule:Compact"]["variable schedule"]["data"][4]
+                    .get("field")
+                    .is_some()
+            );
+        }
         for bad in [
             serde_json::json!({"field":true}),
-            serde_json::json!({"unknown":1}),
+            serde_json::json!({"field":null}),
+            serde_json::json!(null),
         ] {
             let mut value = input.clone();
             value["Schedule:Compact"]["variable schedule"]["data"][0] = bad;

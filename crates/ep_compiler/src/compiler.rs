@@ -16161,6 +16161,47 @@ impl<'a> Compiler<'a> {
         let mut covered_end = 0_u16;
         let mut full_year_set = false;
         for (index, value) in values.iter().enumerate() {
+            // Native1431-1443 consumes the actual next alpha as the value before
+            // looking for another directive. A present extensible Object with
+            // no `field` has a real IP blank alpha, unlike an absent array item.
+            if let Some(profile) = current_profile.as_mut()
+                && let Some(until_minute_of_day) = profile.pending_until_minute_of_day.take()
+            {
+                let parsed = match compact_data_field(value) {
+                    Some(field @ RawValue::Number(_)) => {
+                        self.number_value("Schedule:Compact", object_name, "data", field)
+                    }
+                    Some(RawValue::String(text)) => match ep_model::process_source_number(text) {
+                        Ok(number) => Some(number),
+                        Err(_) => {
+                            self.error(
+                                "InvalidNumber", "Schedule:Compact", Some(object_name), Some("data"),
+                                format!("Schedule:Compact/{object_name} Until value '{text}' fails source ProcessNumber"),
+                            );
+                            None
+                        }
+                    },
+                    None if matches!(value, RawValue::Object(_)) => {
+                        ep_model::process_source_number("").ok()
+                    }
+                    _ => {
+                        self.invalid_field_type(
+                            "Schedule:Compact",
+                            object_name,
+                            "data",
+                            "string or number value in an extensible object",
+                        );
+                        None
+                    }
+                };
+                if let Some(value) = parsed {
+                    profile.profile.segments.push(ScheduleCompactSegment {
+                        until_minute_of_day,
+                        value,
+                    });
+                }
+                continue;
+            }
             let Some(field_value) = compact_data_field(value) else {
                 self.error(
                     "InvalidFieldType",
@@ -16378,41 +16419,23 @@ impl<'a> Compiler<'a> {
                     }
                     profile.pending_until_minute_of_day = Some(until_minute_of_day);
                 }
-                RawValue::Number(_text) => {
-                    let Some(profile) = current_profile.as_mut() else {
-                        self.error(
-                            "InvalidScheduleCompactOrder",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} numeric value appears before a For directive"
-                            ),
-                        );
-                        continue;
+                RawValue::Number(_) => {
+                    let message = if current_profile.is_none() {
+                        "numeric value appears before a For directive"
+                    } else {
+                        "value appears before an Until directive"
                     };
-                    let Some(until_minute_of_day) = profile.pending_until_minute_of_day.take()
-                    else {
-                        self.error(
-                            "InvalidScheduleCompactValue",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} value appears before an Until directive"
-                            ),
-                        );
-                        continue;
-                    };
-                    let Some(value) =
-                        self.number_value("Schedule:Compact", object_name, "data", field_value)
-                    else {
-                        continue;
-                    };
-                    profile.profile.segments.push(ScheduleCompactSegment {
-                        until_minute_of_day,
-                        value,
-                    });
+                    self.error(
+                        if current_profile.is_none() {
+                            "InvalidScheduleCompactOrder"
+                        } else {
+                            "InvalidScheduleCompactValue"
+                        },
+                        "Schedule:Compact",
+                        Some(object_name),
+                        Some("data"),
+                        format!("Schedule:Compact/{object_name} {message}"),
+                    );
                 }
                 RawValue::String(text) => {
                     self.error(
