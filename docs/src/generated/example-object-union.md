@@ -16,11 +16,11 @@ Canonical names and official groups come from the compact [EnergyPlus 26.1 catal
 |---|---|---|---|---|
 | `Building` | 174 | 174 | 01 Project, time and site | typed |
 | `GlobalGeometryRules` | 164 | 164 | 01 Project, time and site | unregistered / no reviewed entry |
-| `HeatBalanceAlgorithm` | 69 | 69 | 01 Project, time and site | unregistered / no reviewed entry |
+| `HeatBalanceAlgorithm` | 69 | 69 | 01 Project, time and site | typed |
 | `RunPeriod` | 168 | 168 | 01 Project, time and site | typed |
 | `RunPeriodControl:DaylightSavingTime` | 1 | 1 | 01 Project, time and site | typed |
 | `RunPeriodControl:SpecialDays` | 18 | 24 | 01 Project, time and site | typed |
-| `SimulationControl` | 114 | 114 | 01 Project, time and site | unregistered / no reviewed entry |
+| `SimulationControl` | 114 | 114 | 01 Project, time and site | typed |
 | `Site:GroundTemperature:BuildingSurface` | 15 | 15 | 01 Project, time and site | unregistered / no reviewed entry |
 | `Site:Location` | 116 | 116 | 01 Project, time and site | typed |
 | `SizingPeriod:DesignDay` | 42 | 81 | 01 Project, time and site | unregistered / no reviewed entry |

@@ -33,7 +33,16 @@ fn text(
 }
 
 fn number(raw: &RawModel, kind: &str, field: &str, default: f64, errors: &mut Vec<String>) -> f64 {
-    match object(raw, kind).and_then(|value| value.fields.get(&FieldName(field.into()))) {
+    let authored = object(raw, kind).and_then(|value| value.fields.get(&FieldName(field.into())));
+    // Converted blank IDF numeric fields are omitted. These schema-number
+    // controls do not permit an explicit epJSON null or string as a default.
+    if kind == "HeatBalanceAlgorithm"
+        && authored.is_some_and(|value| !matches!(value, RawValue::Number(_)))
+    {
+        errors.push(format!("{kind}.{field} must be a number when present"));
+        return default;
+    }
+    match authored {
         None | Some(RawValue::Null) => default,
         Some(RawValue::String(value)) if value.trim().is_empty() => default,
         Some(RawValue::Number(value)) => match value.parse::<f64>() {

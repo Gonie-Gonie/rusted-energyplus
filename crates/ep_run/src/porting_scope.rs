@@ -218,13 +218,22 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
         "do_zone_sizing_calculation",
         "do_system_sizing_calculation",
         "do_plant_sizing_calculation",
-        "do_hvac_sizing_simulation_for_sizing_periods",
     ] {
         if control[field] == true {
             violations.push(format!(
                 "SimulationControl.{field}=Yes is outside the weather-run scope"
             ));
         }
+    }
+    // Original GetProjectData1146-1158 resets HVAC sizing to No when
+    // plant sizing is No. This changes only admission: preserve the authored
+    // request for the real getter and its warning/continue messages.
+    if control["do_hvac_sizing_simulation_for_sizing_periods"] == true
+        && control["do_plant_sizing_calculation"] == true
+    {
+        violations.push(
+            "SimulationControl.do_hvac_sizing_simulation_for_sizing_periods=Yes is outside the weather-run scope".into(),
+        );
     }
     let design_days = raw
         .objects
@@ -249,20 +258,32 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
             violations.push(format!("{field} must be {required} in the selected scope"));
         }
     }
-    for (field, default) in [
-        ("surface_temperature_upper_limit", 200.0),
+    for (field, minimum, exclusive) in [
+        ("surface_temperature_upper_limit", 200.0, false),
         (
             "minimum_surface_convection_heat_transfer_coefficient_value",
-            0.1,
+            0.0,
+            true,
         ),
         (
             "maximum_surface_convection_heat_transfer_coefficient_value",
-            1000.0,
+            1.0,
+            false,
         ),
     ] {
-        if settings["heat_balance_controls"][field] != default {
+        let valid = settings["heat_balance_controls"][field]
+            .as_f64()
+            .is_some_and(|value| {
+                value.is_finite()
+                    && if exclusive {
+                        value > minimum
+                    } else {
+                        value >= minimum
+                    }
+            });
+        if !valid {
             violations.push(format!(
-                "HeatBalanceAlgorithm.{field} override is outside the fixed source branch"
+                "HeatBalanceAlgorithm.{field} is outside its numeric schema domain"
             ));
         }
     }

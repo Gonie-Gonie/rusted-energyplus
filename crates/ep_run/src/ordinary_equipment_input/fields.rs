@@ -94,13 +94,13 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                 )
         }
         ("HeatBalanceAlgorithm", "surface_temperature_upper_limit") => {
-            blank(value) || number(value).is_some_and(|n| n >= 200.0)
+            number(value).is_some_and(|n| n >= 200.0)
         }
         ("HeatBalanceAlgorithm", "minimum_surface_convection_heat_transfer_coefficient_value") => {
-            blank(value) || number(value).is_some_and(|n| n > 0.0)
+            number(value).is_some_and(|n| n > 0.0)
         }
         ("HeatBalanceAlgorithm", "maximum_surface_convection_heat_transfer_coefficient_value") => {
-            blank(value) || number(value).is_some_and(|n| n >= 1.0)
+            number(value).is_some_and(|n| n >= 1.0)
         }
         ("SurfaceConvectionAlgorithm:Inside", "algorithm") => {
             blank(value)

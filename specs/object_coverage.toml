@@ -13,6 +13,20 @@ first_evidence = "heat_balance_nomass_001"
 support_boundary = "Typed for model metadata and simple building scope; no global building simulation claim."
 
 [[object]]
+name = "HeatBalanceAlgorithm"
+family = "project"
+status = "typed"
+first_evidence = "porting_scope::tests::heat_balance_numeric_controls_admit_schema_numbers_without_changing_algorithms"
+support_boundary = "The existing CTF Source route now admits all finite schema-number values for surface_temperature_upper_limit >= 200, minimum_surface_convection_heat_transfer_coefficient_value > 0 and maximum_surface_convection_heat_transfer_coefficient_value >= 1, with omitted-field defaults 200, 0.1 and 1000. Explicit JSON nulls and strings are not numeric defaults. The actual Source getter retains the values: the temperature limits and low convection clamp feed the live CTF owners. EnergyPlus imposes no minimum-versus-maximum ordering check here and does not globally clamp CTF convection at the authored maximum. A same-input 250/4/250 Oracle comparison checks all original reported streams, with passive Source capture proving the actual pre-solve low clamp. Other heat-balance algorithms, user-convection/FD/moisture consumers of the maximum and positive temperature-limit warning/fatal diagnostic children remain outside the connected runtime scope. This field-domain expansion does not establish arbitrary HeatBalanceAlgorithm combination completion."
+
+[[object]]
+name = "SimulationControl"
+family = "project"
+status = "typed"
+first_evidence = "porting_scope::tests::simulation_control_inactive_hvac_request_preserves_raw_getter_and_sizing_boundary"
+support_boundary = "The existing weather-run Source route preserves all authored control operands for the real GetProjectData getter. An HVAC-sizing Yes request with plant sizing No is now admitted because that getter warns and resets the effective HVAC-sizing flag to No; early admission and warmup-report controls use the same effective condition without suppressing the original warning and five continuation rows. Blank plant sizing retains the No default, and the authored maximum pass count reaches the getter unchanged. The paired Oracle case checks the effective EIO flags, exact diagnostics and all original reported streams. Active zone/system/plant sizing, effective HVAC-sizing execution, actual sizing/design-day runs, disabled weather execution and other unconnected control combinations retain their runtime boundaries."
+
+[[object]]
 name = "Zone"
 family = "building"
 status = "typed"

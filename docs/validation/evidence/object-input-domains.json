@@ -40,6 +40,18 @@
       "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
       "actual IO deletion/catalog/extraction; zero samples are not fabricated",
       "Constant and built-in Constant admission; other explicit physics/output guards retained"
+    ],
+    "HeatBalanceAlgorithm": [
+      "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
+      "live Source CTF temperature limits and low convection clamp",
+      "no invented cross-field ordering or global CTF maximum clamp",
+      "other algorithms and unavailable positive diagnostic children retain explicit boundaries"
+    ],
+    "SimulationControl": [
+      "authored HVAC-sizing Yes with plant sizing No follows the actual warning-and-reset getter",
+      "early admission/warmup uses the effective condition; raw request and pass count retained",
+      "exact EIO flags and one warning plus five continuations",
+      "active sizing/design-day and disabled-weather execution retain explicit boundaries"
     ]
   },
   "verification": {
@@ -79,21 +91,8 @@
         "bytes": 1684
       },
       "format": "cargo fmt --all passed",
-      "documentation": "docs generator check and full mdBook docs-check passed"
-    },
-    "source_build_receipt": {
-      "path": ".runtime/porting/object-domain-20261020/build-01/receipt.json",
-      "sha256": "d691c60d7ec50be1722f95837e83fd75ec937964b493cbfb9d7858f58d0cf774",
-      "bytes": 7821
-    },
-    "source_snapshot": {
-      "path": ".runtime/porting/source-objects/44/44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7",
-      "sha256": "44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7"
-    },
-    "retained_source_executable": {
-      "path": ".runtime/porting/object-domain-20261020/build-01/eplus-rs.exe",
-      "sha256": "b051cab0bde48ae201dc24c8b00e3ae74e167c762bc58309e0356c7a0d4a26d3",
-      "bytes": 75051726
+      "documentation": "docs generator check and full mdBook docs-check passed",
+      "scope": "Workspace check for input-domains-01; subsequent project controls checked below."
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -146,7 +145,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "timestep-absent",
@@ -190,7 +190,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "version-not-a-version",
@@ -234,7 +235,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "year-fraction",
@@ -278,7 +280,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "year-zero",
@@ -322,7 +325,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "negative",
@@ -366,7 +370,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "positive",
@@ -410,7 +415,8 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
-        }
+        },
+        "source_build": "input-domains-01"
       },
       {
         "id": "zero",
@@ -454,16 +460,290 @@
           "tolerance_failures": 0,
           "rmse_failures": 0,
           "passed": true
+        },
+        "source_build": "input-domains-01"
+      },
+      {
+        "id": "hba-limits-250-4-250",
+        "group": "project_controls",
+        "source_build": "project-controls-02",
+        "input": {
+          "path": ".runtime/object-expansion/native-heat-balance-limits/calibration-01/input.idf",
+          "sha256": "5ddbc7eb3332659891445485608886e099935a537b7250c7d4c0bdfbc4763f71",
+          "bytes": 9272
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_request": {
+          "path": ".runtime/object-expansion/native-heat-balance-limits/calibration-01/request.json",
+          "sha256": "767669465b1096c89791659cf7d7ab26570d2f3dfa3daf52efc5144484673bee",
+          "bytes": 5215
+        },
+        "native_result": {
+          "path": ".runtime/object-expansion/native-heat-balance-limits/calibration-01/result.json",
+          "sha256": "379bf69a66d570ecad1293d5b4a712040d82ba07d95181c40347d2f7db3b10c1",
+          "bytes": 24564
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-controls/hba/receipt.json",
+          "sha256": "7052abe9b2194c83a1d0b1b3e41154c2d4a993634cf300d763ec206358f1477e",
+          "bytes": 3955
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/hba-limits/run-summary.json",
+          "sha256": "60bda22bb9cc5de8b3344ce5add6707e1c9ca17ce02b05e9e8ab3094feb22c05",
+          "bytes": 31954
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-controls-comparisons-01/hba/comparison.json",
+          "sha256": "5c5dd2a575e5bf0346e0240124535b45f6dd9030d905a7c2e02700915a4d0ed4",
+          "bytes": 99475
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 5,
+          "parsed_binary64_unequal": 5,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "passive_actual_capture": {
+          "inspected": true,
+          "pre_launch_request": {
+            "path": ".runtime/object-expansion/source-controls-comparisons-01/hba-source-run-request.json",
+            "sha256": "2e964cedd52bee97d50349483966e5bdb0ccc4533bc75bfae3601e0cd1662b30",
+            "bytes": 2727
+          },
+          "environment_switch": "RUSTED_ENERGYPLUS_SOURCE_SURFACE_CADENCE",
+          "recorded_switch_value": "traces/hba-limits.json",
+          "actual_capture": {
+            "path": ".runtime/porting/object-domain-20261020/runs/hba-limits/traces/hba-limits.json",
+            "sha256": "aaf75ae99c472295facf8f473f270a461ef46f44b3c656542a20fb67582ac00b",
+            "bytes": 83473054
+          },
+          "complete": true,
+          "event_count": 118712,
+          "calls": [
+            2025,
+            2025,
+            4,
+            2025,
+            2025,
+            2025,
+            2025,
+            20
+          ],
+          "first_pre_solve_clock_row": [
+            "inside_ctf_before_temperature_assignment",
+            "CalcHeatBalanceInsideSurf2CTFOnly",
+            1,
+            "ManageSurfaceHeatBalance",
+            1,
+            1,
+            0,
+            12,
+            21,
+            1,
+            1,
+            1,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            0
+          ],
+          "first_pre_solve_coefficients": [
+            {
+              "sequence": 11,
+              "surface": 1,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            },
+            {
+              "sequence": 13,
+              "surface": 2,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            },
+            {
+              "sequence": 15,
+              "surface": 3,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            },
+            {
+              "sequence": 17,
+              "surface": 4,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            },
+            {
+              "sequence": 19,
+              "surface": 5,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            },
+            {
+              "sequence": 21,
+              "surface": 6,
+              "SurfHConvInt_bits": "4010000000000000",
+              "SurfHConvInt": 4.0,
+              "Source_owner": 336108388128
+            }
+          ],
+          "immediate_solve_convection_storage": 2275363895104,
+          "qualification": "Passive actual Source output readback only. The explicit switch value comes from the pre-launch request, not the shared recorder. These observations are never production operands or numeric comparison inputs.",
+          "weather_clamp_readback": {
+            "path": ".runtime/object-expansion/source-controls-comparisons-01/hba/weather-clamp-readback.json",
+            "sha256": "7b41099e905eecf72408f3c0d190360527b9de83616362f7025951c9f5efbc71",
+            "bytes": 8375
+          },
+          "all_pre_solve_observations": {
+            "count": 24300,
+            "finite": 24300,
+            "minimum": 4.0,
+            "maximum": 4.0,
+            "first_reported_weather_group_also_checked": true
+          }
+        }
+      },
+      {
+        "id": "simulation-control-inactive-hvac-request",
+        "group": "project_controls",
+        "source_build": "project-controls-02",
+        "input": {
+          "path": ".runtime/object-expansion/native-simulation-control/calibration-01/input.idf",
+          "sha256": "c46c0fb663a26891fee62d522e651aa32450d3df5bc324173e62b3ac317ad6e9",
+          "bytes": 9276
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_request": {
+          "path": ".runtime/object-expansion/native-simulation-control/calibration-01/request.json",
+          "sha256": "3a7de2835b595720bdcfc7aec3646ac9114c41600e6c1646f5e4950a37297b52",
+          "bytes": 4455
+        },
+        "native_result": {
+          "path": ".runtime/object-expansion/native-simulation-control/calibration-01/result.json",
+          "sha256": "da60a5ded7eb586fe577385ec7cb7abdaa6d87466c0eb46eb0eef9b92efaf219",
+          "bytes": 26336
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-controls/sim-control/receipt.json",
+          "sha256": "112e18a48d23a102be084ca24c2c71d7d144aab5818109e1d3c8a7020a197ac6",
+          "bytes": 3898
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/sim-control/run-summary.json",
+          "sha256": "51954241b03e8647c5039759f08c6e686c13c29d2088eabf3c71ced00822e447",
+          "bytes": 32253
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-controls-comparisons-01/sim-control/comparison.json",
+          "sha256": "c7704ba51d22a051974d047d7dd16e45f7ccb41025f83f5522b9d8e984f285eb",
+          "bytes": 100234
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_flags_and_diagnostics": "Exact effective EIO No/No/No/No/Yes/No; original warning plus five continuation rows; end file one warning and zero severe errors.",
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-simulation-control-launch-02.json",
+          "sha256": "40db70714841b31c7a41721f6922980b6056384c802cb820c697c54823e3f3dd",
+          "bytes": 2553
         }
       }
     ],
     "totals": {
-      "paired_cases": 8,
-      "reported_samples": 34944,
-      "raw_operand_unequal": 21752,
+      "paired_cases": 10,
+      "reported_samples": 45648,
+      "raw_operand_unequal": 25293,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
+    },
+    "source_builds": [
+      {
+        "id": "input-domains-01",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-01/receipt.json",
+          "sha256": "d691c60d7ec50be1722f95837e83fd75ec937964b493cbfb9d7858f58d0cf774",
+          "bytes": 7821
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/44/44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7",
+          "sha256": "44fe7f6e29f11234aa9f5c68a32b2ccc7e8fa2518770ff97c062030018888ab7"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-01/eplus-rs.exe",
+          "sha256": "b051cab0bde48ae201dc24c8b00e3ae74e167c762bc58309e0356c7a0d4a26d3",
+          "bytes": 75051726
+        }
+      },
+      {
+        "id": "project-controls-02",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-02/receipt.json",
+          "sha256": "39d9799d7fcd12f73ed6dbb44a230d2f63b77b7963a3f03294c256203da301c1",
+          "bytes": 4795
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/eb/eb9fc3b64831c81f587016e8257a34b22ebb9bd7f8c515e38de1d2e778533a1c",
+          "sha256": "eb9fc3b64831c81f587016e8257a34b22ebb9bd7f8c515e38de1d2e778533a1c"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-02/eplus-rs.exe",
+          "sha256": "5fa07deaabdccefe3b370afb559c728ace951e82fa8917fe684d3479615167a4",
+          "bytes": 75041140
+        }
+      }
+    ],
+    "project_control_tests": {
+      "ep_run_passed": 786,
+      "log": {
+        "path": ".runtime/object-expansion/project-controls-tests-02.log",
+        "sha256": "41133405b7caaaca5a837245d60c7695ca69615d19b40b585277c375541789b9",
+        "bytes": 3830
+      }
+    },
+    "project_control_quality": {
+      "clippy": "ep_run --all-targets -- -D warnings passed",
+      "log": {
+        "path": ".runtime/object-expansion/project-controls-clippy-01.log",
+        "sha256": "2490160c05dc0558be2a02a334e6451f4af279a15b3da132a508de1df3abd953",
+        "bytes": 1668
+      },
+      "format": "cargo fmt --all passed",
+      "documentation": "docs generator --check and full mdBook docs-check passed",
+      "documentation_log": {
+        "path": ".runtime/object-expansion/project-controls-docs-01.log",
+        "sha256": "86156767647ff80c1804cc5c81d82578983e6509dbd960fb35e3e5423585250f",
+        "bytes": 1406
+      }
     }
   },
   "additional_native_type_calibrations": [
@@ -483,5 +763,5 @@
       "bytes": 3138
     }
   ],
-  "retention": "This compact record retains current facts. Raw receipts, source objects, binaries and physical streams are local validation artifacts under .runtime; historical native command paths in detailed comparisons describe their original execution. The retained executable above preserves its verified bytes across later builds."
+  "retention": "This compact record retains current facts. Raw receipts, source objects, binaries and physical streams are local validation artifacts under .runtime; historical command paths in detailed comparisons describe their original execution. Each case names its tested build; retained executables preserve those verified bytes across later builds."
 }

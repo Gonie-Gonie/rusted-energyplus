@@ -145,16 +145,9 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
             }
             let allowed = match family.0.as_str() {
                 "HeatBalanceAlgorithm" => {
+                    // Numeric domains are checked above; the same Source getter
+                    // retains their live limits for CTF diagnostics and convection.
                     selected(object, "algorithm", &["ConductionTransferFunction"])
-                        // Explicit schema defaults have the same retained values as blanks.
-                        // Dynamic nondefault high limits still lack downstream consumers.
-                        && field(object, "surface_temperature_upper_limit")
-                            .is_none_or(|value| blank(value) || number(value) == Some(200.0))
-                        && field(
-                            object,
-                            "maximum_surface_convection_heat_transfer_coefficient_value",
-                        )
-                        .is_none_or(|value| blank(value) || number(value) == Some(1000.0))
                 }
                 "SurfaceConvectionAlgorithm:Inside" => selected(object, "algorithm", &["TARP"]),
                 "SurfaceConvectionAlgorithm:Outside" => selected(object, "algorithm", &["DOE-2"]),
@@ -548,10 +541,10 @@ mod tests {
                 r#""algorithm":"ConductionTransferFunction","surface_temperature_upper_limit":200,"minimum_surface_convection_heat_transfer_coefficient_value":0.1,"maximum_surface_convection_heat_transfer_coefficient_value":1000"#,
                 true,
             ),
-            (r#""surface_temperature_upper_limit":201"#, false),
+            (r#""surface_temperature_upper_limit":201"#, true),
             (
                 r#""maximum_surface_convection_heat_transfer_coefficient_value":1001"#,
-                false,
+                true,
             ),
             (r#""surface_temperature_upper_limit":"200""#, false),
             (
@@ -560,7 +553,7 @@ mod tests {
             ),
             (
                 r#""surface_temperature_upper_limit":null,"maximum_surface_convection_heat_transfer_coefficient_value":" ""#,
-                true,
+                false,
             ),
             (r#""algorithm":"ConductionFiniteDifference""#, false),
             (r#""unknown_high_limit":1000"#, false),

@@ -27,7 +27,10 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
     let do_plant_sizing = yes_no("do_plant_sizing_calculation", false)?;
     let do_des_day_sim = yes_no("run_simulation_for_sizing_periods", true)?;
     let do_weather_sim = yes_no("run_simulation_for_weather_file_run_periods", true)?;
-    let do_hvac_sizing = yes_no("do_hvac_sizing_simulation_for_sizing_periods", false)?;
+    let requested_hvac_sizing = yes_no("do_hvac_sizing_simulation_for_sizing_periods", false)?;
+    // Admission follows the actual GetProjectData1146-1158 reset. Raw Yes is
+    // retained for the real getter, which emits the mismatch warning itself.
+    let do_hvac_sizing = requested_hvac_sizing && do_plant_sizing;
     let do_pure_load_calc = !do_des_day_sim
         && !do_weather_sim
         && !do_hvac_sizing
@@ -221,6 +224,28 @@ mod tests {
                 r#"{{"ZoneAirHeatBalanceAlgorithm":{{"air":{{"{field}":null}}}}}}"#
             ))?;
             assert!(!resolve(&raw)?.do_space_heat_balance_for_simulation);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn simulation_control_inactive_hvac_request_keeps_effective_sizing_blocked()
+    -> Result<(), Box<dyn std::error::Error>> {
+        for (plant, hvac, accepted) in [
+            ("No", "Yes", true),
+            ("", "Yes", true),
+            ("No", "No", true),
+            ("Yes", "No", false),
+            ("Yes", "Yes", false),
+        ] {
+            let raw = parse_epjson_str(&format!(
+                r#"{{"SimulationControl":{{"control":{{"do_plant_sizing_calculation":"{plant}","do_hvac_sizing_simulation_for_sizing_periods":"{hvac}","run_simulation_for_sizing_periods":"No","run_simulation_for_weather_file_run_periods":"Yes"}}}}}}"#
+            ))?;
+            let actual = resolve(&raw);
+            assert_eq!(actual.is_ok(), accepted, "plant={plant}, HVAC={hvac}");
+            if let Ok(actual) = actual {
+                assert!(!actual.do_pure_load_calc);
+            }
         }
         Ok(())
     }

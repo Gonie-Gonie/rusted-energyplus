@@ -165,6 +165,92 @@ fn run_period_year_normalization_reaches_calendar_and_axis_before_source_weather
 }
 
 #[test]
+fn heat_balance_numeric_controls_admit_schema_numbers_without_changing_algorithms() {
+    for (field, valid, invalid) in [
+        (
+            "surface_temperature_upper_limit",
+            vec![200.0, 250.5],
+            vec![199.999, 0.0],
+        ),
+        (
+            "minimum_surface_convection_heat_transfer_coefficient_value",
+            vec![0.1, 4.25, 1e-9],
+            vec![0.0, -0.1],
+        ),
+        (
+            "maximum_surface_convection_heat_transfer_coefficient_value",
+            vec![1.0, 250.5],
+            vec![0.999, -1.0],
+        ),
+    ] {
+        let mut cases: Vec<_> = valid
+            .into_iter()
+            .map(|value| (json!(value), true))
+            .collect();
+        cases.extend(invalid.into_iter().map(|value| (json!(value), false)));
+        cases.extend(
+            [
+                Value::Null,
+                json!(""),
+                json!(" "),
+                json!("200"),
+                json!(true),
+            ]
+            .into_iter()
+            .map(|value| (value, false)),
+        );
+        for (value, accepted) in cases {
+            let mut authored = input(PortingScope::A);
+            authored["HeatBalanceAlgorithm"] =
+                json!({"h":{"algorithm":"ConductionTransferFunction"}});
+            authored["HeatBalanceAlgorithm"]["h"][field] = value.clone();
+            let raw = parse_epjson_str(&authored.to_string()).expect("raw numeric controls");
+            let compiled = compile_raw_model(&raw);
+            let model = compiled.model.as_ref().expect("unrelated typed input");
+            let scope = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+            assert_eq!(
+                scope.admissible, accepted,
+                "{field}={value}: {:?}",
+                scope.violations
+            );
+            assert_eq!(
+                crate::ordinary_equipment_input::resolve(&raw).is_ok(),
+                accepted,
+                "{field}={value}"
+            );
+            if accepted {
+                assert_eq!(
+                    scope.settings["heat_balance_controls"][field].as_f64(),
+                    value.as_f64()
+                );
+            }
+        }
+    }
+    let mut authored = input(PortingScope::A);
+    authored["HeatBalanceAlgorithm"] = json!({"h":{}});
+    let defaults = trace(&authored, PortingScope::A);
+    assert!(defaults.admissible, "{:?}", defaults.violations);
+    assert_eq!(
+        defaults.settings["heat_balance_controls"],
+        json!({
+            "surface_temperature_upper_limit":200.0,
+            "minimum_surface_convection_heat_transfer_coefficient_value":0.1,
+            "maximum_surface_convection_heat_transfer_coefficient_value":1000.0,
+        })
+    );
+    // Native has no global lower<=upper condition without user convection.
+    authored["HeatBalanceAlgorithm"]["h"] = json!({
+        "surface_temperature_upper_limit":250,
+        "minimum_surface_convection_heat_transfer_coefficient_value":4,
+        "maximum_surface_convection_heat_transfer_coefficient_value":1,
+    });
+    let crossed = trace(&authored, PortingScope::A);
+    assert!(crossed.admissible, "{:?}", crossed.violations);
+    let raw = parse_epjson_str(&authored.to_string()).expect("raw independent limits");
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_ok());
+}
+
+#[test]
 fn default_controls_and_source_adjustments_are_observable() {
     let mut value = input(PortingScope::A);
     value["Building"]["Building"]["north_axis"] = json!(-450);
@@ -480,4 +566,58 @@ fn weather_trace_uses_real_calendar_selection_and_zone_schedule_values() {
             .iter()
             .all(|value| value == &json!(4.0))
     );
+}
+
+#[test]
+fn simulation_control_inactive_hvac_request_preserves_raw_getter_and_sizing_boundary() {
+    for scope in [PortingScope::A, PortingScope::B] {
+        let mut value = input(scope);
+        value["SimulationControl"]["Control"]["do_plant_sizing_calculation"] = json!("No");
+        value["SimulationControl"]["Control"]["do_hvac_sizing_simulation_for_sizing_periods"] =
+            json!("Yes");
+        value["SimulationControl"]["Control"]["maximum_number_of_hvac_sizing_simulation_passes"] =
+            json!(3);
+        let raw = parse_epjson_str(&value.to_string()).expect("raw cross-flag input");
+        let compiled = compile_raw_model(&raw);
+        let actual = inspect_porting_scope(&raw, &compiled.report, compiled.model.as_ref(), scope);
+        assert!(actual.admissible, "{:?}", actual.violations);
+        // The admission trace must not silently rewrite the requested Yes.
+        assert_eq!(
+            actual.settings["simulation_control"]["do_hvac_sizing_simulation_for_sizing_periods"],
+            true
+        );
+        let input = match scope {
+            PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+            PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+        }
+        .expect("actual shared InputProcessor ingress");
+        let project = crate::ordinary_project_data::resolve(&raw, true, &input)
+            .expect("same raw operands for the real GetProjectData");
+        let control = &project.objects["SimulationControl"][0];
+        use ep_runtime::heat_balance::selected_project_data::ProjectInputValue;
+        assert_eq!(
+            control.fields["do_hvac_sizing_simulation_for_sizing_periods"],
+            ProjectInputValue::String("Yes".into())
+        );
+        assert_eq!(
+            control.fields["do_plant_sizing_calculation"],
+            ProjectInputValue::String("No".into())
+        );
+        assert_eq!(
+            control.fields["maximum_number_of_hvac_sizing_simulation_passes"],
+            ProjectInputValue::Number(3.0)
+        );
+        for field in [
+            "do_zone_sizing_calculation",
+            "do_system_sizing_calculation",
+            "do_plant_sizing_calculation",
+        ] {
+            let mut active = value.clone();
+            active["SimulationControl"]["Control"][field] = json!("Yes");
+            assert!(
+                !trace(&active, scope).admissible,
+                "active {field} must remain blocked"
+            );
+        }
+    }
 }
