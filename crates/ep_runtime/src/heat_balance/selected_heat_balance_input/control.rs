@@ -25,6 +25,10 @@ impl SelectedHeatBalanceInputState {
             match values.alphas[0].as_str() {
                 "SIMPLE" => (InsideSurfaceConvectionAlgorithm::Simple, "Simple"),
                 "TARP" => (InsideSurfaceConvectionAlgorithm::Tarp, "TARP"),
+                "CEILINGDIFFUSER" => (
+                    InsideSurfaceConvectionAlgorithm::CeilingDiffuser,
+                    "CeilingDiffuser",
+                ),
                 _ => {
                     return Err(HeatBalanceInputError::Unavailable(
                         "unadmitted inside convection branch",

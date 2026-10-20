@@ -808,6 +808,13 @@ fn validate<
     {
         return Err(InsideConvectionUnavailable::TemperatureOwner);
     }
+    if entry == ConvectionEntry::Legacy
+        && zones
+            .iter()
+            .any(|zone| zone.inside_algorithm == InsideSurfaceConvectionAlgorithm::CeilingDiffuser)
+    {
+        return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
+    }
     validate_static_geometry(zones, surfaces)
 }
 
@@ -819,7 +826,9 @@ fn validate_static_geometry(
         let [xmin, xmax, ymin, ymax] = zone.xy_bounds;
         if !matches!(
             zone.inside_algorithm,
-            InsideSurfaceConvectionAlgorithm::Simple | InsideSurfaceConvectionAlgorithm::Tarp
+            InsideSurfaceConvectionAlgorithm::Simple
+                | InsideSurfaceConvectionAlgorithm::Tarp
+                | InsideSurfaceConvectionAlgorithm::CeilingDiffuser
         ) {
             return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
         }
@@ -1099,6 +1108,59 @@ fn initialize_inside_convection_body<
     backend: &mut SourceErrorBackend<'_>,
     entry: ConvectionEntry,
 ) -> Result<(), InsideConvectionError> {
+    initialize_inside_convection_prefix(
+        layout,
+        zones,
+        surfaces,
+        no_user_input,
+        state,
+        metadata,
+        zone_equipment,
+        coefficients,
+        space_air,
+        temperatures,
+        readiness,
+        actual_reports,
+        scan,
+        backend,
+        entry,
+    )?;
+    initialize_inside_convection_surfaces(
+        layout,
+        zones,
+        surfaces,
+        metadata,
+        coefficients,
+        space_air,
+        temperatures,
+        actual_low_limit,
+        entry,
+    )
+}
+
+fn initialize_inside_convection_prefix<
+    C: ZoneEquipmentActiveElements + ?Sized,
+    H: InsideConvectionCoefficients + ?Sized,
+    S: SpaceAirTemperatureOwners + ?Sized,
+    M: InsideConvectionSurfaceMetadata + ?Sized,
+    T: InsideSurfaceTemperatureValues + ?Sized,
+>(
+    layout: &InsideConvectionLayout,
+    zones: &[InsideConvectionZone],
+    surfaces: &[InsideConvectionSurface],
+    no_user_input: NoUserConvectionInput,
+    state: &mut InsideConvectionState,
+    metadata: &mut M,
+    zone_equipment: &mut C,
+    coefficients: &mut H,
+    space_air: &S,
+    temperatures: &T,
+    readiness: InsideConvectionReadiness,
+    actual_reports: &ReportInputs,
+    scan: &mut ReportScanState,
+    backend: &mut SourceErrorBackend<'_>,
+    entry: ConvectionEntry,
+) -> Result<(), InsideConvectionError> {
     validate(
         layout,
         zones,
@@ -1142,8 +1204,8 @@ fn initialize_inside_convection_body<
         && readiness.equipment_inputs_filled
         && readiness.nodes_allocated
     {
-        // Every genuine admitted zone is TARP: the CeilingDiffuser warning
-        // loop makes no writes; do not infer readiness from that fact.
+        // Source performs the real mutable-Zone NodeCheck before building these
+        // static views. Legacy remains Simple/TARP-only and has no fallback rows.
         state.node_check = false;
     }
     if state.active_surface_check
@@ -1189,7 +1251,7 @@ fn initialize_inside_convection_body<
         }
         state.active_surface_check = false;
     }
-    // All admitted Simple/TARP surface and Zone alternatives are nonadaptive;
+    // All admitted Simple/TARP/CeilingDiffuser alternatives are nonadaptive;
     // the BeginEnvrn adaptive search is genuinely false, so Node reset is not reached.
     if readiness.begin_environment && state.my_environment {
         for index in 0..metadata.metadata_count()? {
@@ -1201,6 +1263,25 @@ fn initialize_inside_convection_body<
     if !readiness.begin_environment {
         state.my_environment = true;
     }
+    Ok(())
+}
+
+fn initialize_inside_convection_surfaces<
+    H: InsideConvectionCoefficients + ?Sized,
+    S: SpaceAirTemperatureOwners + ?Sized,
+    M: InsideConvectionSurfaceMetadata + ?Sized,
+    T: InsideSurfaceTemperatureValues + ?Sized,
+>(
+    layout: &InsideConvectionLayout,
+    zones: &[InsideConvectionZone],
+    surfaces: &[InsideConvectionSurface],
+    metadata: &M,
+    coefficients: &mut H,
+    space_air: &S,
+    temperatures: &T,
+    actual_low_limit: f64,
+    entry: ConvectionEntry,
+) -> Result<(), InsideConvectionError> {
     for group in layout.groups() {
         let mat = *space_air
             .borrow_space_for_ids(group.space_id, group.zone_id)?
@@ -1225,6 +1306,14 @@ fn initialize_inside_convection_body<
                 InsideConvectionModel::Simple => InsideSurfaceConvectionAlgorithm::Simple,
                 InsideConvectionModel::Tarp => InsideSurfaceConvectionAlgorithm::Tarp,
             };
+            if algorithm == InsideSurfaceConvectionAlgorithm::CeilingDiffuser {
+                // Genuine whole-Zone prepass275 already wrote this cell. Source
+                // switch347 is a no-op; it neither reads a temperature nor clamps.
+                if entry != ConvectionEntry::Source {
+                    return Err(InsideConvectionUnavailable::AlgorithmOrSurface.into());
+                }
+                continue;
+            }
             if algorithm == InsideSurfaceConvectionAlgorithm::Simple {
                 // Actual non-Kiva1896 writes this same Source cell before the
                 // wrapper's unconditional Objexx max assignment1900.

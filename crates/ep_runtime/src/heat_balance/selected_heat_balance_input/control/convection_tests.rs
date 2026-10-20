@@ -14,6 +14,13 @@ fn source_convection_getter_preserves_enums_defaults_ip_identity_and_eio()
     // None=absent family, Some(None)=present instance with omitted algorithm.
     for (inside, outside, expected_inside, expected_outside, labels) in [
         (None, None, I::Tarp, O::Doe2, ("TARP", "DOE-2")),
+        (
+            Some(Some("CeilingDiffuser")),
+            Some(Some("DOE-2")),
+            I::CeilingDiffuser,
+            O::Doe2,
+            ("CeilingDiffuser", "DOE-2"),
+        ),
         (Some(None), Some(None), I::Tarp, O::Doe2, ("TARP", "DOE-2")),
         (
             Some(Some("")),

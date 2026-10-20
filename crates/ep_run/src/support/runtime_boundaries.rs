@@ -213,7 +213,7 @@ pub(super) fn assess_typed_runtime_boundaries(
     }
 
     // Only the validated Source lane dispatches these real global alternatives.
-    // Legacy arbitrary-run convection and authored Zone override guards stay closed.
+    // Legacy arbitrary-run convection remains bounded independently below.
     for (family, nondefault, code) in [
         (
             "SurfaceConvectionAlgorithm:Inside",
@@ -252,7 +252,9 @@ pub(super) fn assess_typed_runtime_boundaries(
                 || zone.outside_convection_algorithm.is_override()
         })
         .count();
-    if zone_convection_override_count > 0 {
+    if zone_convection_override_count > 0
+        && !source_admission.is_some_and(|admission| admission.consumes_zone_convection_overrides())
+    {
         push_typed_boundary(
             unsupported_objects,
             diagnostics,

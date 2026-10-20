@@ -98,7 +98,7 @@ fn readiness() -> InsideConvectionReadiness {
         equipment_simulated_once: false,
     }
 }
-fn error_state() -> SourceErrorState {
+pub(super) fn error_state() -> SourceErrorState {
     SourceErrorState {
         output_error_header: true,
         version_string: "declared test version".into(),
@@ -817,7 +817,6 @@ fn simple_resolves_zone_without_relabeling_and_writes_the_real_low_limit()
     }
     let mut zones = zones();
     for unsupported in [
-        InsideSurfaceConvectionAlgorithm::CeilingDiffuser,
         InsideSurfaceConvectionAlgorithm::TrombeWall,
         InsideSurfaceConvectionAlgorithm::AdaptiveConvectionAlgorithm,
         InsideSurfaceConvectionAlgorithm::AstmC1340,

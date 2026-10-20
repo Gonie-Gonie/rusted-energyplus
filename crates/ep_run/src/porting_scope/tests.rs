@@ -594,7 +594,7 @@ fn scientific_algorithms_are_rejected_before_bounded_execution() {
         (
             "SurfaceConvectionAlgorithm:Inside",
             "algorithm",
-            "CeilingDiffuser",
+            "AdaptiveConvectionAlgorithm",
             "convection",
         ),
         (
@@ -1436,7 +1436,11 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
     const OUTSIDE: &str = "SurfaceConvectionAlgorithm:Outside";
     let weather = single_day_weather_fixture();
     for scope in [PortingScope::A, PortingScope::B] {
-        for (inside, expected_inside) in [("TARP", I::Tarp), ("Simple", I::Simple)] {
+        for (inside, expected_inside) in [
+            ("TARP", I::Tarp),
+            ("Simple", I::Simple),
+            ("CeilingDiffuser", I::CeilingDiffuser),
+        ] {
             for (outside, expected_outside) in [
                 ("DOE-2", O::Doe2),
                 ("SimpleCombined", O::SimpleCombined),
@@ -1529,17 +1533,161 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
                         nondefault
                     );
                 }
+                // The same enum table now reaches the genuine local fields.
+                // Give the globals different values so inherited substitution
+                // cannot satisfy the raw/typed/Source admission assertions.
+                value[INSIDE] = json!({" ":{"algorithm":if expected_inside == I::Tarp {"Simple"} else {"TARP"}}});
+                value[OUTSIDE] = json!({"":{"algorithm":if expected_outside == O::Doe2 {"MoWiTT"} else {"DOE-2"}}});
+                value["Zone"]["Zone"]["zone_inside_convection_algorithm"] = json!(inside);
                 value["Zone"]["Zone"]["zone_outside_convection_algorithm"] = json!(outside);
+                let local_raw =
+                    parse_epjson_str(&value.to_string()).expect("actual local enum strings");
+                let local_compiled = compile_raw_model(&local_raw);
+                let local_model = local_compiled
+                    .model
+                    .as_ref()
+                    .expect("typed authored local selections");
+                let local_zone = &local_model.zones[0];
+                assert_eq!(
+                    local_zone.inside_convection_algorithm,
+                    ep_model::ZoneConvectionAlgorithm::Override(expected_inside)
+                );
+                assert_eq!(
+                    local_zone.outside_convection_algorithm,
+                    ep_model::ZoneConvectionAlgorithm::Override(expected_outside)
+                );
+                assert_ne!(
+                    local_model.surface_convection_algorithms.inside,
+                    Some(expected_inside)
+                );
+                assert_ne!(
+                    local_model.surface_convection_algorithms.outside,
+                    Some(expected_outside)
+                );
+                let local_ip = match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&local_raw),
+                    PortingScope::B => {
+                        crate::ordinary_input_processor::resolve_source_b(&local_raw)
+                    }
+                }
+                .expect("actual local raw/IP admission");
+                let local_projection =
+                    crate::ordinary_heat_balance_input::resolve(&local_raw, &local_ip)
+                        .expect("same Source GetZoneData raw alpha operands");
+                let actual_zone = &local_projection.objects["Zone"][0];
+                for (field, expected) in [
+                    ("zone_inside_convection_algorithm", inside),
+                    ("zone_outside_convection_algorithm", outside),
+                ] {
+                    assert_eq!(
+                        actual_zone.fields[field],
+                        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            expected.into()
+                        )
+                    );
+                }
+                let mut local_trace = inspect_porting_scope(
+                    &local_raw,
+                    &local_compiled.report,
+                    Some(local_model),
+                    scope,
+                );
+                assert!(local_trace.admissible, "{:?}", local_trace.violations);
                 assert!(
-                    !trace(&value, scope).admissible,
-                    "authored Zone overrides stay excluded"
+                    crate::support::SourceSupportAdmission::from_validated_scope(
+                        &local_raw,
+                        &local_trace
+                    )
+                    .is_none()
+                );
+                local_trace.environment = Some(
+                    super::environment::environment_from_weather(
+                        local_model,
+                        &weather,
+                        "embedded Zone-local convection weather",
+                    )
+                    .expect("same real EPW/calendar preparation"),
+                );
+                assert!(
+                    validate_porting_environment(
+                        local_trace.environment.as_ref().expect("environment")
+                    )
+                    .is_empty()
+                );
+                let local_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &local_raw,
+                    &local_trace,
+                )
+                .expect("bounded actual Source local-alpha admission");
+                let support = crate::support::assess_support_with_source_admission(
+                    &local_raw,
+                    &local_compiled.report,
+                    Some(local_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&local_admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert!(
+                    local_model.zones[0]
+                        .inside_convection_algorithm
+                        .is_override()
+                        && local_model.zones[0]
+                            .outside_convection_algorithm
+                            .is_override()
+                );
+                let legacy = crate::support::assess_support(
+                    &local_raw,
+                    &local_compiled.report,
+                    Some(local_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                );
+                assert!(
+                    legacy
+                        .diagnostics
+                        .diagnostics
+                        .iter()
+                        .any(|d| d.code == "UnsupportedZoneConvectionOverride"),
+                    "Source local-alpha fact must never exempt Legacy"
                 );
             }
+        }
+        for (field, unsupported) in [
+            ("zone_inside_convection_algorithm", "TrombeWall"),
+            (
+                "zone_inside_convection_algorithm",
+                "AdaptiveConvectionAlgorithm",
+            ),
+            ("zone_inside_convection_algorithm", "ASTMC1340"),
+            (
+                "zone_outside_convection_algorithm",
+                "AdaptiveConvectionAlgorithm",
+            ),
+        ] {
+            let mut value = input(scope);
+            value["Zone"]["Zone"][field] = json!(unsupported);
+            let raw =
+                parse_epjson_str(&value.to_string()).expect("official unsupported local enum");
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+            assert!(!trace(&value, scope).admissible);
         }
         for family in [INSIDE, OUTSIDE] {
             for contents in [json!({}), json!({"":{}}), json!({" ":{"algorithm":""}})] {
                 let mut value = input(scope);
                 value[family] = contents;
+                value["Zone"]["Zone"]["zone_inside_convection_algorithm"] = json!("");
+                value["Zone"]["Zone"]["zone_outside_convection_algorithm"] = json!("");
                 let raw =
                     parse_epjson_str(&value.to_string()).expect("absent/empty/default singleton");
                 let compiled = compile_raw_model(&raw);
@@ -1570,6 +1718,24 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
                 json!(" "),
             ] {
                 let mut value = input(scope);
+                let local_field = if family == INSIDE {
+                    "zone_inside_convection_algorithm"
+                } else {
+                    "zone_outside_convection_algorithm"
+                };
+                let mut local = input(scope);
+                local["Zone"]["Zone"][local_field] = invalid.clone();
+                let local_raw =
+                    parse_epjson_str(&local.to_string()).expect("invalid local enum stays raw");
+                assert!(
+                    match scope {
+                        PortingScope::A => crate::ordinary_input_processor::resolve(&local_raw),
+                        PortingScope::B =>
+                            crate::ordinary_input_processor::resolve_source_b(&local_raw),
+                    }
+                    .is_err(),
+                    "local alpha must have actual schema string/enum shape"
+                );
                 value[family] = json!({"":{"algorithm":invalid}});
                 let raw = parse_epjson_str(&value.to_string()).expect("wrong JSON enum type/value");
                 assert!(

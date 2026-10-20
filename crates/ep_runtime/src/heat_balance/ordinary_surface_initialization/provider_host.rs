@@ -25,6 +25,10 @@ pub(crate) struct SourceOrdinaryInitSurfaceHost<'a> {
     pub(crate) daylighting: &'a mut SourceDaylighting,
     pub(crate) convection: &'a mut SourceInsideConvection,
     pub(crate) equipment: &'a mut OrdinaryEquipment,
+    pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
+    pub(crate) recurring:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
 }
 impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfaceProviders<H, D>
     for SourceOrdinaryInitSurfaceHost<'_>
@@ -223,6 +227,11 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
             owners.input,
             owners.report_inputs,
             owners.scan,
+            crate::heat_balance::inside_convection_dispatcher::source::SourceInsideConvectionPropertyOwners {
+                environment: owners.environment, hvac: self.hvac,
+                psychrometrics: self.psychrometrics, recurring: self.recurring,
+                developer: &owners.project.system.developer_flag,
+            },
             owners.backend,
         )
     }

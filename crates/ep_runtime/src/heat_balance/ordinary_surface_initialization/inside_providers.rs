@@ -30,6 +30,8 @@ pub(crate) struct SourceOrdinaryInsideCtfHost<'a> {
     pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
     pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
     pub(crate) afn_control_type: &'a i32,
+    pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
+    pub(crate) developer: &'a bool,
     pub(crate) recurring_errors:
         &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
 }
@@ -46,7 +48,7 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
         &mut self,
         geometry: &mut SurfaceGeometryInputState,
         arrays: &mut SourceSurfaceHeatBalanceArrays,
-        zones: &SelectedZoneInputOwners,
+        zones: &mut SelectedZoneInputOwners,
         air: &SourceAirHeatBalance,
         globals: &SelectedHeatBalanceGlobals,
         clock: &WeatherGlobalState,
@@ -65,6 +67,11 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
             self.input,
             self.reports,
             self.scan,
+            crate::heat_balance::inside_convection_dispatcher::source::SourceInsideConvectionPropertyOwners {
+                environment: self.environment, hvac: self.hvac,
+                psychrometrics: self.psychrometrics, recurring: self.recurring_errors,
+                developer: self.developer,
+            },
             backend,
         )
     }

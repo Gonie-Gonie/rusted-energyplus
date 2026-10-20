@@ -1,13 +1,15 @@
 //! Genuine Tmp / iteration SurfTempIn entry, borrowing the sole Source owners.
 //! Static scalar views are temporary; no mutable Surface convection metadata,
 //! temperature, Space air, equipment flag, or HConv mirror is retained here.
+mod ceiling;
 mod cold_external;
 use super::{
     ConvectionEntry, InsideConvectionCoefficients, InsideConvectionError, InsideConvectionLayout,
     InsideConvectionModel, InsideConvectionState, InsideConvectionSurface,
     InsideConvectionSurfaceMetadata, InsideConvectionUnavailable as Unavailable,
     InsideConvectionZone, InsideSurfaceTemperatureOwner, InsideSurfaceTemperatureValues,
-    NoUserConvectionInput, initialize_inside_convection_body, initialize_user_convection_metadata,
+    NoUserConvectionInput, initialize_inside_convection_prefix,
+    initialize_inside_convection_surfaces, initialize_user_convection_metadata,
     validate_static_geometry,
 };
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -29,6 +31,17 @@ use crate::heat_balance::selected_heat_balance_input::{
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::weather::day::WeatherGlobalState;
 use ep_model::{ReportInputs, SurfaceId, SurfaceType};
+
+/// Live property/diagnostic roots borrowed by both genuine convection callers.
+/// Every phase, Node, psychrometric cache and recurrence cell stays in its owner.
+pub(crate) struct SourceInsideConvectionPropertyOwners<'a> {
+    pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
+    pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+    pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
+    pub(crate) recurring:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    pub(crate) developer: &'a bool,
+}
 
 fn index(number: i32) -> Result<usize, Error> {
     number
@@ -503,6 +516,56 @@ impl SourceInsideConvection {
         .map_err(translate)
     }
 
+    /// The same reached GetUser and real mutable NodeCheck prefix is shared by
+    /// Tmp and iteration entries. Static Zone views are rebuilt after fallback.
+    #[allow(clippy::too_many_arguments)]
+    fn prepare_source_inside_prefix<M: InsideConvectionSurfaceMetadata + ?Sized>(
+        &mut self,
+        layout: &InsideConvectionLayout,
+        zone_views: &[InsideConvectionZone],
+        surface_views: &[InsideConvectionSurface],
+        metadata: &mut M,
+        zones: &mut SelectedZoneInputOwners,
+        readiness: super::InsideConvectionReadiness,
+        globals: &SelectedHeatBalanceGlobals,
+        clock: &WeatherGlobalState,
+        developer: &bool,
+        input: &SelectedInputProcessor,
+        reports: &ReportInputs,
+        scan: &mut ReportScanState,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<NoUserConvectionInput, Error> {
+        let actual = if self.state.get_user_input {
+            let actual = self.get_source_user_input(input)?;
+            self.actual_no_user_input = Some(actual);
+            initialize_user_convection_metadata(
+                layout,
+                zone_views,
+                surface_views,
+                &mut self.state,
+                metadata,
+                reports,
+                scan,
+                backend,
+            )
+            .map_err(translate)?;
+            actual
+        } else {
+            self.actual_no_user_input
+                .ok_or(Error::Unavailable("retained real convection getter facts"))?
+        };
+        ceiling::check_zone_nodes(
+            &mut self.state,
+            zones,
+            readiness,
+            globals,
+            clock,
+            developer,
+            backend,
+        )?;
+        Ok(actual)
+    }
+
     /// One actual Source call, with an explicit choice of the caller's array.
     /// The same object serves the initial Tmp and every-30 SurfTempIn positions.
     pub(crate) fn initialize(
@@ -510,7 +573,7 @@ impl SourceInsideConvection {
         temperature_owner: InsideSurfaceTemperatureOwner,
         geometry: &mut SurfaceGeometryInputState,
         arrays: &mut SourceSurfaceHeatBalanceArrays,
-        zones: &SelectedZoneInputOwners,
+        zones: &mut SelectedZoneInputOwners,
         air: &SourceAirHeatBalance,
         control: &SelectedHeatBalanceInputState,
         globals: &SelectedHeatBalanceGlobals,
@@ -519,6 +582,7 @@ impl SourceInsideConvection {
         input: &SelectedInputProcessor,
         reports: &ReportInputs,
         scan: &mut ReportScanState,
+        mut properties: SourceInsideConvectionPropertyOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
         let layout = source_layout(geometry, zones)?;
@@ -527,7 +591,32 @@ impl SourceInsideConvection {
                 "same sole Source convection controller identity",
             ));
         }
-        let (zone_views, surface_views) = static_views(geometry, zones, control)?;
+        let (before_node_zones, surface_views) = static_views(geometry, zones, control)?;
+        validate_static_geometry(&before_node_zones, &surface_views)
+            .map_err(|e| translate(e.into()))?;
+        let readiness = equipment.source_convection_readiness(
+            clock.begin_envrn_flag,
+            globals.system_sizing_calculation,
+            globals.zone_sizing_calculation,
+        );
+        let no_user_input = self.prepare_source_inside_prefix(
+            &layout,
+            &before_node_zones,
+            &surface_views,
+            geometry,
+            zones,
+            readiness,
+            globals,
+            clock,
+            properties.developer,
+            input,
+            reports,
+            scan,
+            backend,
+        )?;
+        // NodeCheck mutates the real Zone; no stale typed or temporary enum can
+        // replace this fresh owner read for either prepass or ordinary dispatch.
+        let zone_views = static_zone_views(zones)?;
         let values = match temperature_owner {
             InsideSurfaceTemperatureOwner::SurfTempInTmp => arrays.surf_temp_in_tmp.as_deref(),
             InsideSurfaceTemperatureOwner::SurfTempIn => arrays.surf_temp_in.as_deref(),
@@ -552,36 +641,52 @@ impl SourceInsideConvection {
             air,
             metadata: zones,
         };
-        let readiness = equipment.source_convection_readiness(
-            clock.begin_envrn_flag,
-            globals.system_sizing_calculation,
-            globals.zone_sizing_calculation,
-        );
-        let mut config = equipment.source_convection_equipment();
-        let no_user_input = if self.state.get_user_input {
-            let actual = self.get_source_user_input(input)?;
-            self.actual_no_user_input = Some(actual);
-            actual
-        } else {
-            self.actual_no_user_input
-                .ok_or(Error::Unavailable("retained real convection getter facts"))?
-        };
-        initialize_inside_convection_body(
+        {
+            // The active-element prefix temporarily borrows only real Config.
+            // Release that loan before the whole-Zone child reads physical Nodes.
+            let mut config = equipment.source_convection_equipment();
+            initialize_inside_convection_prefix(
+                &layout,
+                &zone_views,
+                &surface_views,
+                no_user_input,
+                &mut self.state,
+                geometry,
+                &mut config,
+                &mut coefficients,
+                &space_air,
+                &temperatures,
+                readiness,
+                reports,
+                scan,
+                backend,
+                ConvectionEntry::Source,
+            )
+            .map_err(translate)?;
+        }
+        ceiling::initialize(
+            geometry,
+            zones,
+            air,
+            &surface_views,
+            &temperatures,
+            &mut coefficients,
+            equipment,
+            globals,
+            clock,
+            &mut properties,
+            control.low_hconv_limit,
+            backend,
+        )?;
+        initialize_inside_convection_surfaces(
             &layout,
             &zone_views,
             &surface_views,
-            no_user_input,
-            &mut self.state,
             geometry,
-            &mut config,
             &mut coefficients,
             &space_air,
             &temperatures,
-            readiness,
             control.low_hconv_limit,
-            reports,
-            scan,
-            backend,
             ConvectionEntry::Source,
         )
         .map_err(translate)

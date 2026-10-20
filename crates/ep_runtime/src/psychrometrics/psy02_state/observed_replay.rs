@@ -124,6 +124,8 @@ pub(crate) fn with_observed_window<R>(
     let owner = EnergyPlusPsychrometricsState {
         state: before.scalars,
         slots: std::array::from_fn(|_| std::collections::BTreeMap::new()),
+        // This numerical replay does not observe diagnostic state.
+        ..EnergyPlusPsychrometricsState::default()
     };
     let predecessor_owner = PROPERTY_STATE.with_borrow_mut(|state| std::mem::replace(state, owner));
     let predecessor_capture = ACTIVE.with_borrow_mut(|active| {

@@ -24,7 +24,7 @@ pub(crate) trait SourceInsideCtfProviders {
         &mut self,
         geometry: &mut SurfaceGeometryInputState,
         arrays: &mut SourceSurfaceHeatBalanceArrays,
-        zones: &SelectedZoneInputOwners,
+        zones: &mut SelectedZoneInputOwners,
         air: &SourceAirHeatBalance,
         globals: &SelectedHeatBalanceGlobals,
         clock: &WeatherGlobalState,

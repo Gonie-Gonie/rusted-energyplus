@@ -180,6 +180,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 daylighting: o.daylighting,
                 convection: o.convection,
                 equipment: o.equipment,
+                psychrometrics: o.psychrometrics,
+                recurring: o.recurring_errors,
+                hvac: &o.startup.hvac_globals,
             };
             self.surface
                 .initialize_source_surface_heat_balance(

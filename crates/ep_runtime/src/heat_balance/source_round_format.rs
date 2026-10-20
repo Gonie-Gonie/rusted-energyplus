@@ -94,6 +94,27 @@ pub(crate) fn round(value: f64, precision: usize) -> Result<String, SourceRoundF
     Ok(text)
 }
 
+/// Literal no-width IOFiles.hh305-331 T formatting used by psychrometric errors.
+pub(crate) fn truncate(
+    value: f64,
+    precision: usize,
+) -> Result<String, SourceRoundFormatUnavailable> {
+    let threshold = f64::from_bits(0x3fb9_9999_9999_9999);
+    if value >= threshold || value <= -threshold || value == 0.0 || value == -0.0 {
+        let exponent =
+            i32::try_from(precision).map_err(|_| SourceRoundFormatUnavailable::ExponentFormat)?;
+        let magnitude = 10.0_f64.powi(exponent);
+        let adjusted = (value * magnitude) + 0.0001;
+        return Ok(fixed(adjusted.trunc() / magnitude, precision).to_ascii_uppercase());
+    }
+    let mut text = exponential(value, precision + 2)?;
+    zero_pad_exponent(&mut text);
+    if let Some(index) = text.find('E') {
+        text.drain(index - 2..index);
+    }
+    Ok(text)
+}
+
 #[cfg(test)]
 #[path = "source_round_format_tests.rs"]
 mod tests;

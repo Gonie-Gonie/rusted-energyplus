@@ -17,6 +17,43 @@ pub(crate) struct SourceDiagnosticFlags<'call> {
 }
 
 impl SourceErrorBackend<'_> {
+    /// Genuine ShowFatalError with live Source DisplayString phase operands.
+    /// Existing callback/host boundaries remain explicit if DisplayString stops.
+    pub(crate) fn show_source_fatal_error(
+        &mut self,
+        message: &str,
+        flags: &SourceDiagnosticFlags<'_>,
+    ) -> Result<std::convert::Infallible, HeatBalanceInputError> {
+        self.show_error_message(&format!(" **  Fatal  ** {message}"))?;
+        self.display_source_string(&format!("**FATAL:{message}"), flags)?;
+        self.show_error_message(" ...Summary of Errors that led to program termination:")?;
+        self.show_error_message(&format!(
+            " ..... Reference severe error count={}",
+            self.state.tracking.total_severe_errors
+        ))?;
+        self.show_error_message(&format!(
+            " ..... Last severe error={}",
+            self.state.tracking.last_severe_error
+        ))?;
+        if let Some(sqlite) = self.sqlite.as_deref_mut() {
+            super::effect(
+                "SQLite create fatal",
+                sqlite.create_error_record(1, 2, message, 1),
+            )?;
+            if super::effect("SQLite transaction state", sqlite.within_transaction())? {
+                super::effect("SQLite commit", sqlite.commit())?;
+            }
+        }
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, super::SourceErrorLevel::Fatal, message);
+        }
+        Err(HeatBalanceInputError::Fatal(super::SourceFatalStop::Fatal(
+            super::SourceFatalError {
+                message: message.to_owned(),
+            },
+        )))
+    }
+
     /// Source DisplayString63–92; callbacks precede every phase-flag read.
     pub(crate) fn display_source_string(
         &mut self,

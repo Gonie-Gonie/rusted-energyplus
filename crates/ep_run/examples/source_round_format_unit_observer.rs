@@ -2,6 +2,10 @@
 #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
 mod digest;
 #[path = "../../ep_runtime/src/heat_balance/source_round_format.rs"]
+#[allow(
+    dead_code,
+    reason = "This unit-2 observer exercises only the shared .R formatter"
+)]
 mod formatting;
 use serde_json::{Value, json};
 use std::collections::BTreeSet;

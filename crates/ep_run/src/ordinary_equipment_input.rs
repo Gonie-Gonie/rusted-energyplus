@@ -181,7 +181,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                     selected(object, "algorithm", &["ConductionTransferFunction"])
                 }
                 "SurfaceConvectionAlgorithm:Inside" => {
-                    selected(object, "algorithm", &["Simple", "TARP"])
+                    selected(object, "algorithm", &["Simple", "TARP", "CeilingDiffuser"])
                 }
                 "SurfaceConvectionAlgorithm:Outside" => selected(
                     object,
@@ -194,8 +194,17 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                         && selected(object, "do_space_heat_balance_for_simulation", &["No"])
                 }
                 "Zone" => {
-                    selected(object, "zone_inside_convection_algorithm", &["TARP"])
-                        && selected(object, "zone_outside_convection_algorithm", &["DOE-2"])
+                    // The real GetZoneData writes these same enums into the
+                    // owning Zone; both Source dispatchers resolve SetByZone.
+                    selected(
+                        object,
+                        "zone_inside_convection_algorithm",
+                        &["Simple", "TARP", "CeilingDiffuser"],
+                    ) && selected(
+                        object,
+                        "zone_outside_convection_algorithm",
+                        &["SimpleCombined", "TARP", "MoWiTT", "DOE-2"],
+                    )
                 }
                 "BuildingSurface:Detailed" => {
                     selected(object, "surface_type", &["Wall", "Floor", "Roof"])

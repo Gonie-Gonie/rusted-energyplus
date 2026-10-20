@@ -123,10 +123,8 @@ impl SourceErrorBackend<'_> {
                     sqlite.update_error_record(&text),
                 )?;
             }
-            if self.error_callback.is_some() {
-                return Err(Error::Unavailable(
-                    "actual timestamp live-owner errorCallback928",
-                ));
+            if let Some(callback) = self.error_callback.as_deref_mut() {
+                callback(self.state, super::SourceErrorLevel::Continue, &text);
             }
         } else {
             let postfix = format!(
@@ -144,10 +142,9 @@ impl SourceErrorBackend<'_> {
                     sqlite.update_error_record(message),
                 )?;
             }
-            if self.error_callback.is_some() {
-                return Err(Error::Unavailable(
-                    "actual long timestamp live-owner errorCallback946",
-                ));
+            if let Some(callback) = self.error_callback.as_deref_mut() {
+                callback(self.state, super::SourceErrorLevel::Continue, message);
+                callback(self.state, super::SourceErrorLevel::Continue, &postfix);
             }
         }
         Ok(())

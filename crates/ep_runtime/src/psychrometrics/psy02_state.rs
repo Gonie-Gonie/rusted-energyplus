@@ -1,7 +1,8 @@
 //! Instance-owned default-build EnergyPlus saturation caches and inverse paths.
 //!
 //! Sparse slots have the exact logical defaults of the original 2^20 arrays.
-//! Warning aggregation and ErrorManager output are outside this numerical owner.
+//! Source property diagnostics retain their original indices and work string
+//! here; recurring aggregation and ErrorManager effects use borrowed owners.
 
 use super::{
     ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE, ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS,
@@ -80,6 +81,7 @@ pub enum EnergyPlusPsychrometricFunction {
     TsatHPb,
     TsatHPbRaw,
     WFromRh,
+    WFromDewPoint,
     WFromH,
     WFromTwb,
     H,
@@ -98,6 +100,7 @@ impl EnergyPlusPsychrometricFunction {
             Self::TsatHPb => "PsyTsatFnHPb",
             Self::TsatHPbRaw => "PsyTsatFnHPb_raw",
             Self::WFromRh => "PsyWFnTdbRhPb",
+            Self::WFromDewPoint => "PsyWFnTdpPb",
             Self::WFromH => "PsyWFnTdbH",
             Self::WFromTwb => "PsyWFnTdbTwbPb",
             Self::H => "PsyHFnTdbW",
@@ -116,11 +119,20 @@ pub struct EnergyPlusPsychrometricOperation {
     pub cache_after: Option<EnergyPlusPsychrometricCacheSlot>,
 }
 
+pub(super) enum SourcePsatLookup {
+    Hit(f64),
+    Miss { index: usize, representative: f64 },
+}
+
 /// Equivalent of one fresh EnergyPlusData's selected numerical property state.
 #[derive(Clone, Debug)]
 pub struct EnergyPlusPsychrometricsState {
     state: EnergyPlusPsychrometricStateSnapshot,
     slots: [BTreeMap<usize, EnergyPlusPsychrometricCacheSlot>; 4],
+    // Same DataPsychrometrics members as the numeric scalar state above;
+    // real backend-aware calls own writes, never a second cache or counter seed.
+    pub(super) source_error_indices: [i32; 19],
+    pub(super) source_string: String,
 }
 
 impl Default for EnergyPlusPsychrometricsState {
@@ -136,6 +148,8 @@ impl Default for EnergyPlusPsychrometricsState {
                 use_interpolation: false,
             },
             slots: std::array::from_fn(|_| BTreeMap::new()),
+            source_error_indices: [0; 19],
+            source_string: String::new(),
         }
     }
 }
@@ -183,6 +197,7 @@ impl EnergyPlusPsychrometricsState {
     }
 
     /// Calls an original route in source argument order and observes actual state.
+    /// Backend-free numerical evaluation; this does not claim diagnostic effects.
     /// Argument count is a dispatch contract, not a physical-input clamp.
     #[track_caller]
     pub fn evaluate(
@@ -193,7 +208,7 @@ impl EnergyPlusPsychrometricsState {
         use EnergyPlusPsychrometricFunction as F;
         let count = match function {
             F::Psat | F::PsatRaw | F::TsatPb | F::TsatPbRaw => 1,
-            F::TsatHPb | F::TsatHPbRaw | F::WFromH | F::H => 2,
+            F::TsatHPb | F::TsatHPbRaw | F::WFromH | F::WFromDewPoint | F::H => 2,
             _ => 3,
         };
         if inputs.len() != count {
@@ -226,6 +241,7 @@ impl EnergyPlusPsychrometricsState {
             F::Twb => self.twb(inputs[0], inputs[1], inputs[2]),
             F::TwbRaw => self.twb_raw(inputs[0], inputs[1], inputs[2]),
             F::WFromRh => self.w_from_rh(inputs[0], inputs[1], inputs[2]),
+            F::WFromDewPoint => self.w_from_dew_point(inputs[0], inputs[1]),
             F::WFromH => energyplus_psy_w_fn_tdb_h(inputs[0], inputs[1]),
             F::WFromTwb => self.w_from_twb(inputs[0], inputs[1], inputs[2]),
             F::H => energyplus_psy_h_fn_tdb_w(inputs[0], inputs[1]),
@@ -273,6 +289,43 @@ impl EnergyPlusPsychrometricsState {
             .get(&index)
             .copied()
             .unwrap_or_else(|| default_slot(kind, index))
+    }
+
+    // Literal Source cache-cell boundary: release the RefCell loan before
+    // invoking a backend/callback; a miss retains its new tag on failure.
+    pub(super) fn begin_source_psat(&mut self, t: f64) -> SourcePsatLookup {
+        let tag = signed_tag(t, 28);
+        let index = tag as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        let EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. } = self.slot(1, index)
+        else {
+            unreachable!()
+        };
+        if i_tdb == tag {
+            return SourcePsatLookup::Hit(value);
+        }
+        self.slots[1].insert(
+            index,
+            EnergyPlusPsychrometricCacheSlot::Psat {
+                index,
+                i_tdb: tag,
+                value,
+            },
+        );
+        SourcePsatLookup::Miss {
+            index,
+            representative: representative(tag, 28),
+        }
+    }
+    pub(super) fn finish_source_psat(&mut self, index: usize, result: f64) {
+        let slot = self.slots[1]
+            .entry(index)
+            .or_insert_with(|| default_slot(1, index));
+        let EnergyPlusPsychrometricCacheSlot::Psat { value, .. } = slot else {
+            unreachable!()
+        };
+        // Native retains a reference to this cell across raw diagnostics.
+        // A nested callback may have changed its tag: overwrite ONLY Psat.
+        *value = result;
     }
 
     fn psat(&mut self, t: f64) -> f64 {
@@ -436,6 +489,23 @@ impl EnergyPlusPsychrometricsState {
         energyplus_psy_tsat_fn_h_pb_raw_with_properties(h, p, |t, pressure| {
             energyplus_psy_h_fn_tdb_w(t, self.w_from_twb(t, t, pressure))
         })
+    }
+
+    // Exact numerical PsyWFnTdpPb, including every whole-degree retry and
+    // nested use of this same Psat cache. Backend effects are a distinct API.
+    fn w_from_dew_point(&mut self, t: f64, p: f64) -> f64 {
+        let dew = self.psat(t);
+        let w = dew * 0.62198 / (p - dew);
+        if w < 0.0 {
+            let mut delta = 0.0;
+            let mut adjusted = dew;
+            while adjusted >= p {
+                delta += 1.0;
+                adjusted = self.psat(t - delta);
+            }
+            return adjusted * 0.62198 / (p - adjusted);
+        }
+        w
     }
 
     fn w_from_rh(&mut self, t: f64, rh: f64, p: f64) -> f64 {

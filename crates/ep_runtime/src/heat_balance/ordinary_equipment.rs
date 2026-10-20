@@ -1537,3 +1537,16 @@ impl OrdinaryEquipment {
         Ok(std::ptr::from_ref(&row.temperature) as usize)
     }
 }
+
+#[cfg(test)]
+impl OrdinaryEquipment {
+    pub(crate) fn declare_ceiling_test_node(&mut self, temperature: f64, mass_flow_rate: f64) {
+        self.nodes.physical = Some(vec![SourceNodeData {
+            temperature,
+            mass_flow_rate,
+            ..SourceNodeData::default()
+        }]);
+        self.nodes.number_of_nodes = 1;
+        self.nodes.node_ids = Some(vec![String::new(), "DECLARED CEILING UNIT NODE".into()]);
+    }
+}

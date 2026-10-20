@@ -445,35 +445,29 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("Zone", "floor_area") => {
             blank(value) || (number(value).is_some() || text_is(value, &["", "Autocalculate"]))
         }
-        ("Zone", "zone_inside_convection_algorithm") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "ASTMC1340",
-                        "AdaptiveConvectionAlgorithm",
-                        "CeilingDiffuser",
-                        "Simple",
-                        "TARP",
-                        "TrombeWall",
-                    ],
-                )
-        }
-        ("Zone", "zone_outside_convection_algorithm") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "AdaptiveConvectionAlgorithm",
-                        "DOE-2",
-                        "MoWiTT",
-                        "SimpleCombined",
-                        "TARP",
-                    ],
-                )
-        }
+        ("Zone", "zone_inside_convection_algorithm") => text_is(
+            value,
+            &[
+                "",
+                "ASTMC1340",
+                "AdaptiveConvectionAlgorithm",
+                "CeilingDiffuser",
+                "Simple",
+                "TARP",
+                "TrombeWall",
+            ],
+        ),
+        ("Zone", "zone_outside_convection_algorithm") => text_is(
+            value,
+            &[
+                "",
+                "AdaptiveConvectionAlgorithm",
+                "DOE-2",
+                "MoWiTT",
+                "SimpleCombined",
+                "TARP",
+            ],
+        ),
         ("Zone", "part_of_total_floor_area") => blank(value) || text_is(value, &["", "No", "Yes"]),
         ("ScheduleTypeLimits", "lower_limit_value") => blank(value) || number(value).is_some(),
         ("ScheduleTypeLimits", "upper_limit_value") => blank(value) || number(value).is_some(),

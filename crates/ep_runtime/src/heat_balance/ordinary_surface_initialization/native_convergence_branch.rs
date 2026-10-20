@@ -245,7 +245,7 @@ impl SourceInsideCtfProviders for DiagnosticOwners<'_> {
         &mut self,
         _geometry: &mut SurfaceGeometryInputState,
         _arrays: &mut SourceSurfaceHeatBalanceArrays,
-        _zones: &SelectedZoneInputOwners,
+        _zones: &mut SelectedZoneInputOwners,
         _air: &SourceAirHeatBalance,
         _globals: &SelectedHeatBalanceGlobals,
         _clock: &WeatherGlobalState,

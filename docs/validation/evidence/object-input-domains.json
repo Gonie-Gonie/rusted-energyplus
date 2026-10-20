@@ -83,13 +83,18 @@
       "lossless actual Zone selection; SetByZone resolution preserves stored surface model identity",
       "actual Simple threshold/sign correlation with per-Space MAT and outward cosine",
       "sole live SurfHConvInt raw write, unconditional Source max and separate caller lower-limit read; no global high cap",
-      "Simple/TARP Source-only admission; adaptive/ASTMC1340/CeilingDiffuser, local/user/EMS/Kiva/window branches remain bounded"
+      "Simple/TARP/CeilingDiffuser validated Source admission; genuine ASTMC1340/adaptive/surface-local/user/EMS/Kiva/window children and legacy arbitrary execution remain bounded",
+      "CeilingDiffuser executes genuine GetUser then mutable live-Zone NodeCheck/fallback, refreshed views, whole-Zone prepass and ordinary per-surface no-op; actual MAT/humidity, physical Node temperature/mass flow, weather pressure, volume and multipliers are borrowed",
+      "exact nested Psat/dew-point/density calls precede the minimum-flow gate, retaining one real cache/error-index/work-string owner, live recurring/timestamp/optional effects and negative-density Fatal order",
+      "floor/ceiling/wall forced correlations, low-ACH natural/blended branch and sole lower clamp preserve Original conditions; forced ACH>=3 returns before the natural window child",
+      "same-input B102 actual Source completes9792 samples and true deleted-empty MTR lifecycle; both reported Node owners show21zero/75positive averages, without claiming exact earlier ACH branch counts"
     ],
     "SurfaceConvectionAlgorithm:Outside": [
       "real singleton IP getter, omitted/blank DOE-2 default, strict string types and exact unnamed keys",
       "SimpleCombined/TARP/MoWiTT/DOE-2 actual inherited Zone enums and existing physical correlations",
       "three changed-algorithm cases retain all original five WindExposed faces and one NoWind face",
-      "validated Source-only admission; legacy arbitrary execution, adaptive and local/user/EMS/Kiva branches retain guards"
+      "validated Source-only admission; legacy arbitrary execution, adaptive and local/user/EMS/Kiva branches retain guards",
+      "authored nonadaptive Zone overrides now use the same existing live owning-Zone dispatch rather than global substitution; legacy source-free execution remains bounded"
     ],
     "Material:AirGap": [
       "required finite positive numeric resistance with no default, clipping or invented upper bound; named identity, IDF order/minimum fields and strict direct JSON scalar custody",
@@ -111,34 +116,42 @@
       "same-input combined LowerRightCorner/Clockwise/Relative with nonzero Zone origin/north and negative Building north completes all original58 streams and exact named ordered DXF coordinates",
       "exact unnamed singleton identity and strict five alpha scalar fields; required enums do not accept blanks",
       "one Zone, closed triangular/quadrilateral opaque volume, canonical output and other genuine geometry/physics boundaries remain"
+    ],
+    "Zone": [
+      "authored Simple/TARP/CeilingDiffuser inside and SimpleCombined/TARP/MoWiTT/DOE-2 outside retain strict optional alpha/default inheritance and immutable typed Override provenance",
+      "real Source GetZoneData resolves each supplied local selection versus retained global enums; same actual Zone owners feed both coefficient dispatchers",
+      "narrow validated Source-admission fact covers only these consumed local alphas; legacy, unsupported enums, other Zone features and surface overrides stay bounded",
+      "existing enum table checks all3x4 local selections with differing globals across A/B, actual raw/IP/projection/environment custody and legacy rejection",
+      "same-input localSimple/MoWitt case matches original58/5352 and exact globalTARP/DOE-2 versus ZoneSimple/MoWitt EIO; the sole Native initial spelling-readback failure is retained with an independently complete corrected verifier",
+      "one-Zone implicit-Space geometry and multiplier1 remain runtime boundaries; grouping, authored Space partitions and positive local-environment consumers are not promoted"
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5011,
+      "passed": 5029,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/geometry-rules-workspace-tests-10.log",
-        "sha256": "3460c1d74cd174502193df147834709b4da98f8a25b06e79b0b464c0051ec3af",
-        "bytes": 20680
+        "path": ".runtime/object-expansion/convection-workspace-tests-13b.log",
+        "sha256": "20db322db1ea98ee0ed38d723d7e30290c4baf6721d7d531610ab41971118407",
+        "bytes": 9729
       },
-      "scope": "Full workspace milestone through geometry-rules-10, including all preceding input-domain changes. Only a Source-index-loop lint attribute/comment followed this test run; Clippy and format checked those final bytes."
+      "scope": "Full workspace milestone through convection-13: actual-year/Ground, effectful property dependencies, whole-Zone Ceiling and local enum admission; all final production/test bytes included."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/calendar-skip-clippy-11.log",
-        "sha256": "eb8605e3608b7dd93af05a141a7884dfd31828fd424bb9d94f4084d27aff8327",
+        "path": ".runtime/object-expansion/convection-clippy-13.log",
+        "sha256": "4185d24c48594962f05ea875a2ee2e046cc8f329d60a9695d7ac9fe99436b8bd",
         "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/actual-ground-docs-12.log",
-        "sha256": "d32de6266c72d4ab6d9555b499bf7f7fe64b811454642a50b6a3453269867e03",
+        "path": ".runtime/object-expansion/convection-docs-13.log",
+        "sha256": "ec37863d23669715f5888203e9e62fbf186c928ce363c1617594b8e780a27105",
         "bytes": 354
       },
-      "clippy_through_build": "calendar-skip-11"
+      "clippy_through_build": "convection-13"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -1656,12 +1669,119 @@
           "passed": true
         },
         "effective_state": "Only original A24 floor Adiabatic changes to Ground, with explicit12monthly18C input. Both actual physical owners have96 named FLOOR outside temperatures exactly18C; all original58 streams, monthly EIO and zero diagnostic completion match. No FCfactor/Kiva/interzone promotion."
+      },
+      {
+        "id": "ceiling-diffuser-B102",
+        "group": "ceiling_diffuser_inside",
+        "source_build": "convection-13",
+        "input": {
+          "path": ".runtime/object-expansion/native-ceiling-diffuser/calibration-01/input.idf",
+          "sha256": "3ee9c571ebf614836e4de71fd52f8193bb4911d97c2315042cc8aa4193d52bd2",
+          "bytes": 13036
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-ceiling-diffuser/calibration-01/receipt.json",
+          "sha256": "5032058a91f0bc3122e9e76a296c905285fe4c8d71b088c4a52119fe680e9f88",
+          "bytes": 11341
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-ceiling-diffuser-13/receipt/receipt.json",
+          "sha256": "e8af0a75b57e2eb003dfcb4c23d114a6044a7c1d7fa903ca9806b7975d9b839b",
+          "bytes": 7594
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/ceiling-diffuser-13/run-summary.json",
+          "sha256": "515584f84d3ebf7caf74fab4e0326124c4eacc5f2f900abed00581d76c9ec9ff",
+          "bytes": 60855
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-ceiling-diffuser-comparisons-01/main/comparison.json",
+          "sha256": "46c34ff5ffbc9b6503b40d8e4e6ef1970427e05774cbdf6a0a29defa7faf1e80",
+          "bytes": 253845
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-ceiling-diffuser-comparisons-01/prelaunch.json",
+          "sha256": "71a78033907580dce766a465cff4319a801f08839b34090d7d3b4f24bd390150",
+          "bytes": 2866
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 3178,
+          "parsed_binary64_unequal": 3178,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Only original B102 global Inside TARP becomes CeilingDiffuser. True controlled Node/positive-flow owners are retained. Both reported ZoneNode averages show21zero/75positive and44averages>=.01; exact earlier convection ACH/branch/cap counts are unmeasured. All102 streams and deleted-empty MTR/EIO/zero diagnostics match."
+      },
+      {
+        "id": "zone-local-simple-mowitt",
+        "group": "zone_local_convection",
+        "source_build": "convection-13",
+        "input": {
+          "path": ".runtime/object-expansion/native-zone-local-convection/calibration-01/input.idf",
+          "sha256": "5335b9d86aa2e8ba870b24459a7ced8543ce017010cb1cbdd8f08ff3f1ee882f",
+          "bytes": 9299
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-zone-local-convection/calibration-01/receipt.json",
+          "sha256": "b703077e0e34f6f981c5ac1faffa1556631497b7665618c0b763351324c30a7b",
+          "bytes": 11766
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-zone-local/receipt/receipt.json",
+          "sha256": "1220ce45f52eb70f15c91367f676e457e4d6032d0919177a2c07fe0cd1903623",
+          "bytes": 7655
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/zone-local-convection/run-summary.json",
+          "sha256": "acae8a7fe795710f506769fb9cde2bd9d2693c8d53a45d5e5678732f6badac0b",
+          "bytes": 32252
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-zone-local-comparisons-01/main/comparison.json",
+          "sha256": "7d20fee68d963e5b33dce2f5e7ccb9d21acc73d12ad746c1ff1a0d6cc5e66fae",
+          "bytes": 107812
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-zone-local-comparisons-01/zone-local-simple-mowitt-source-run-request.json",
+          "sha256": "c9b5a9c2d95eca66fde48f7a0b3461104add216bff023662d283261e17d9d93c",
+          "bytes": 4282
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 11,
+          "parsed_binary64_unequal": 11,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Only original A24 Zone span adds blank FloorArea/localSimple/localMoWiTT; global TARP/DOE-2 and original58 requests remain unchanged. Actual global versus Zone EIO selection, complete reported streams and zero diagnostics match. The single Native execution succeeded; its initial case-sensitive MoWitt readback failure remains immutable and is independently fully reverified.",
+        "corrected_native_readback": {
+          "path": ".runtime/object-expansion/native-zone-local-convection/calibration-01/native-completeness-02.json",
+          "sha256": "ed7423c3d34dda504daa60d200fc326b6212f9cb07dedbb9aa06e5ec58563239",
+          "bytes": 24494
+        }
       }
     ],
     "totals": {
-      "paired_cases": 26,
-      "reported_samples": 146520,
-      "raw_operand_unequal": 85400,
+      "paired_cases": 28,
+      "reported_samples": 161664,
+      "raw_operand_unequal": 88589,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1870,49 +1990,23 @@
           "sha256": "3e45277e3b9d5840304844d8a806f2d672f0b66070d9410bcbcdfddef9c68c1d",
           "bytes": 75140700
         }
-      }
-    ],
-    "focused_tests": [
-      {
-        "through_build": "calendar-skip-11",
-        "passed": 126,
-        "ignored": 0,
-        "scope": "Weather filter across ep_runtime and ep_run, including all real leap-permission/current-year combinations, exact full24-row retry, skipped-prefix counters and live diagnostic phases. Earlier units are covered by the recorded workspace milestone.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/calendar-skip-tests-11.log",
-            "sha256": "f63d1ceef86bf1ee367f3521a8c66518b33cb41a853164828c1d0a6d576c8d7b",
-            "bytes": 1129
-          }
-        ]
       },
       {
-        "through_build": "actual-weather-ground-12",
-        "passed": 146,
-        "ignored": 0,
-        "scope": "Sum of focused check executions: weather131, actual-calendar1, Ground8 and actual CTF geometry reporting6. Existing weather/Ground checks may overlap. A stale unconditional Ground-rejection block was removed; connected Ground and remaining unsupported boundaries are checked in the dedicated existing scope table. Full static/workspace checks remain at the recorded prior milestones.",
-        "logs": [
-          {
-            "path": ".runtime/object-expansion/actual-ground-weather-tests-12.log",
-            "sha256": "5ee12bec663c712d43c0eb214d7fb4d7957a11ecd0447fd66693d3801522c320",
-            "bytes": 1188
-          },
-          {
-            "path": ".runtime/object-expansion/actual-ground-calendar-tests-12.log",
-            "sha256": "7efb0db9a50875249a6ec3de95addeb113bec531b7bdd664ac1fa13cd1810fd2",
-            "bytes": 693
-          },
-          {
-            "path": ".runtime/object-expansion/actual-ground-boundary-tests-12b.log",
-            "sha256": "bead7a73d7000c7c2f59376ef8526df4979c904aed1f38402f07c2ea6e612036",
-            "bytes": 890
-          },
-          {
-            "path": ".runtime/object-expansion/actual-ground-report-tests-12b.log",
-            "sha256": "f48df9ee1813befe1237ed20a0582992f0c5bd74c588eced51989be149529b03",
-            "bytes": 789
-          }
-        ]
+        "id": "convection-13",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-13/receipt.json",
+          "sha256": "c9b0f4d94b2d23b95b1c9e7703f115124e67244f8ae55b937c00d944ecca81e9",
+          "bytes": 8436
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/58/58a10e861fe7a421a8a55ce30f82d4ed45a7cde8482e3f21f3342652b1cbc156",
+          "sha256": "58a10e861fe7a421a8a55ce30f82d4ed45a7cde8482e3f21f3342652b1cbc156"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-13/eplus-rs.exe",
+          "sha256": "2564422dd71ecc20f0f221306efb665613ceb48e2f30241568f53e171ec335f5",
+          "bytes": 75198057
+        }
       }
     ]
   },

@@ -182,6 +182,8 @@ impl OrdinarySurfaceInitialization {
                 hvac: &o.startup.hvac_globals,
                 afn_control_type,
                 recurring_errors: o.recurring_errors,
+                psychrometrics: o.psychrometrics,
+                developer: &o.project.system.developer_flag,
             };
             let cadence_scope = crate::heat_balance::source_surface_cadence::enter(
                 crate::heat_balance::source_surface_cadence::Procedure::InsideCtf,

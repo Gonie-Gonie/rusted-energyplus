@@ -3,7 +3,9 @@
 mod cp_cache;
 mod psy02_state;
 mod source_access;
+mod source_diagnostics;
 pub(crate) use source_access::SourcePsychrometricAccess;
+pub(crate) use source_diagnostics::SourcePsychrometricOwners;
 
 pub use psy02_state::{
     ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,

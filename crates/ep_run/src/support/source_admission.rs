@@ -1,11 +1,14 @@
 //! Ancillary classification of raw inputs on the admitted ordinary Source lane.
 //! This token never bypasses an input getter or provides Native runtime state.
 use crate::porting_scope::{PortingScope, PortingScopeTrace};
-use ep_raw_model::{ObjectType, RawModel};
+use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 use std::collections::BTreeSet;
 
 pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
+    /// Exact local alpha fields consumed by genuine GetZoneData and the live
+    /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
+    zone_convection_overrides_consumed: bool,
 }
 
 impl SourceSupportAdmission {
@@ -55,7 +58,33 @@ impl SourceSupportAdmission {
                 .is_some_and(|objects| !objects.is_empty())
         })
         .collect();
-        Some(Self { covered_objects })
+        // Scope and the same raw resolver already check every effective enum
+        // and every supplied scalar. Keep authored Override provenance in the
+        // typed model; only a nonempty, actually present local alpha is covered.
+        let zone_convection_overrides_consumed = raw
+            .objects
+            .get(&ObjectType("Zone".into()))
+            .is_some_and(|objects| {
+                objects.values().any(|object| {
+                    [
+                        "zone_inside_convection_algorithm",
+                        "zone_outside_convection_algorithm",
+                    ]
+                    .iter()
+                    .any(|field| {
+                        matches!(object.fields.get(&FieldName((*field).into())),
+                        Some(RawValue::String(value)) if !value.is_empty())
+                    })
+                })
+            });
+        Some(Self {
+            covered_objects,
+            zone_convection_overrides_consumed,
+        })
+    }
+
+    pub(super) fn consumes_zone_convection_overrides(&self) -> bool {
+        self.zone_convection_overrides_consumed
     }
 
     pub(super) fn consumes(&self, family: &str) -> bool {
