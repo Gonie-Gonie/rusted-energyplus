@@ -35,7 +35,9 @@ pub(crate) struct SelectedZoneData {
     pub(crate) exterior_total_surface_area: f64,
     pub(crate) exterior_perimeter: f64,
     pub(crate) exterior_gross_wall_area_multiplied: f64,
-    // Actual ZoneData.hh600-601, sole ground writer remains behind Setup435 positive boundary.
+    /// Actual DataHeatBalance.hh599 constructorzero, written by Setup432.
+    pub(crate) exterior_total_ground_surface_area: f64,
+    // Actual DataHeatBalance.hh600-601, written by Setup435-436.
     pub(crate) exterior_gross_ground_wall_area: f64,
     pub(crate) exterior_gross_ground_wall_area_multiplied: f64,
     /// ZoneData explicitly constructs Centroid(0.0, 0.0, 0.0).
@@ -132,6 +134,7 @@ impl Default for SelectedZoneData {
             exterior_total_surface_area: 0.0,
             exterior_perimeter: 0.0,
             exterior_gross_wall_area_multiplied: 0.0,
+            exterior_total_ground_surface_area: 0.0,
             exterior_gross_ground_wall_area: 0.0,
             exterior_gross_ground_wall_area_multiplied: 0.0,
             centroid_m: Some([0.0; 3]),

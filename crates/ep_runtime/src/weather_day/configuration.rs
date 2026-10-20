@@ -88,9 +88,11 @@ impl WeatherEnvironmentConfiguration {
                 "live weather requires a complete weather-aware hourly axis",
             ));
         }
-        if run_period.treat_weather_as_actual {
+        if time_axis.weather_calendar.as_ref().is_some_and(|calendar| {
+            calendar.treat_weather_as_actual != run_period.treat_weather_as_actual
+        }) {
             return Err(WeatherDayError::admission(
-                "actual-year live weather is outside the current bounded port",
+                "live weather axis and RunPeriod actual-year flag differ",
             ));
         }
         if design_day_count < 0 || input_special_day_count < 0 {
@@ -197,5 +199,57 @@ mod tests {
         assert_eq!(owner.day_of_year, 123);
         assert_eq!(owner.std_baro_press.to_bits(), (-0.0_f64).to_bits());
         assert_eq!(owner.current_weather, prior_current);
+    }
+
+    #[test]
+    fn actual_year_configuration_preserves_calendar_and_rejects_mismatched_axis()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut period = crate::time_axis::default_run_period();
+        period.begin_month = 2;
+        period.begin_day_of_month = 29;
+        period.begin_year = Some(2016);
+        period.end_month = 2;
+        period.end_day_of_month = 29;
+        period.end_year = Some(2016);
+        period.treat_weather_as_actual = true;
+        let site = SiteLocation {
+            name: ep_model::NormalizedName::new("Caller Site"),
+            latitude_deg: 0.0,
+            longitude_deg: 0.0,
+            time_zone_hours: 0.0,
+            elevation_m: 0.0,
+        };
+        for leap_year_observed in [false, true] {
+            let axis =
+                crate::time_axis::build_hourly_time_axis_for_run_period_with_weather_metadata(
+                    &period,
+                    &crate::weather::EpwCalendarMetadata {
+                        leap_year_observed,
+                        ..Default::default()
+                    },
+                )?;
+            let config = WeatherEnvironmentConfiguration::new(&axis, &period, &site, 0, 0)?;
+            assert!(config.run_period.treat_weather_as_actual);
+            assert_eq!(config.total_days(), 1);
+            let legacy_error =
+                super::super::WeatherSession::new(Vec::new(), config.clone()).unwrap_err();
+            assert!(
+                legacy_error
+                    .to_string()
+                    .contains("requires real Source Environment and header owners")
+            );
+            assert_eq!(
+                (
+                    config.time_axis.points[0].year,
+                    config.time_axis.points[0].month,
+                    config.time_axis.points[0].day_of_month
+                ),
+                (2016, 2, 29)
+            );
+            let mut mismatched = period.clone();
+            mismatched.treat_weather_as_actual = false;
+            assert!(WeatherEnvironmentConfiguration::new(&axis, &mismatched, &site, 0, 0).is_err());
+        }
+        Ok(())
     }
 }

@@ -467,3 +467,133 @@ fn full_cycle_rewind_requires_one_complete_data_period() {
         Err(EpwEnvironmentWeatherError::SourceEndedBeforeEnvironment { .. })
     ));
 }
+
+fn actual_period(name: &str, begin: (u32, u32, u32), end: (u32, u32, u32)) -> RunPeriod {
+    let mut period = run_period(name, begin.1, begin.2, end.1, end.2);
+    period.begin_year = Some(begin.0);
+    period.end_year = Some(end.0);
+    period.day_of_week_for_start_day = None;
+    period.treat_weather_as_actual = true;
+    period
+}
+
+fn year_period(begin: (u32, u32, u32), end: (u32, u32, u32)) -> EpwDataPeriod {
+    let mut period = data_period(begin.1, begin.2, end.1, end.2);
+    period.start_date.year = Some(begin.0);
+    period.end_date.year = Some(end.0);
+    period
+}
+
+#[test]
+fn actual_preview_selects_exact_year_and_julian_period_not_same_month_day()
+-> Result<(), Box<dyn std::error::Error>> {
+    let mut records = source_day(2012, 2, 29, 10.0);
+    records.extend(source_day(2016, 2, 29, 20.0));
+    let weather = weather_file(
+        true,
+        vec![
+            year_period((2012, 1, 1), (2012, 12, 31)),
+            year_period((2016, 1, 1), (2016, 12, 31)),
+        ],
+        records,
+    );
+    let period = actual_period("Actual Leap", (2016, 2, 29), (2016, 2, 29));
+    let selected = select_epw_environment_weather(&weather, &axis_for(&period, true)?)?;
+    assert_eq!(
+        (
+            selected.data_period_index,
+            selected.source_start_record_index
+        ),
+        (1, 24)
+    );
+    assert!(
+        selected
+            .hourly_records()
+            .iter()
+            .all(|row| row.year == 2016 && row.day == 29)
+    );
+    assert!(selected.skipped_february_29_source_record_starts.is_empty());
+    // The established nonactual branch continues to ignore raw years.
+    let mut nonactual = period.clone();
+    nonactual.treat_weather_as_actual = false;
+    let selected = select_epw_environment_weather(&weather, &axis_for(&nonactual, true)?)?;
+    assert_eq!(
+        (
+            selected.data_period_index,
+            selected.source_start_record_index
+        ),
+        (0, 0)
+    );
+    assert_eq!(selected.hourly_records()[0].year, 2012);
+    for wrong in [
+        data_period(1, 1, 12, 31),
+        year_period((2015, 1, 1), (2015, 12, 31)),
+    ] {
+        let invalid = weather_file(true, vec![wrong], source_day(2016, 2, 29, 0.0));
+        assert!(matches!(
+            select_epw_environment_weather(&invalid, &axis_for(&period, true)?),
+            Err(EpwEnvironmentWeatherError::RunPeriodOutsideDataPeriods { .. })
+        ));
+    }
+    Ok(())
+}
+
+#[test]
+fn actual_preview_crosses_year_and_rejects_physical_year_misattribution()
+-> Result<(), Box<dyn std::error::Error>> {
+    let period = actual_period("Actual Rollover", (2013, 12, 31), (2014, 1, 1));
+    let axis = axis_for(&period, false)?;
+    let mut records = source_day(2013, 12, 31, 10.0);
+    records.extend(source_day(2014, 1, 1, 20.0));
+    let weather = weather_file(
+        false,
+        vec![year_period((2013, 12, 31), (2014, 1, 1))],
+        records,
+    );
+    let selected = select_epw_environment_weather(&weather, &axis)?;
+    assert_eq!(selected.hourly_records().len(), 48);
+    assert_eq!(
+        (
+            selected.hourly_records()[0].year,
+            selected.hourly_records()[24].year
+        ),
+        (2013, 2014)
+    );
+    let mut wrong = weather.clone();
+    wrong.records[31].year = 2013;
+    assert!(matches!(
+        select_epw_environment_weather(&wrong, &axis),
+        Err(EpwEnvironmentWeatherError::SourceYearDoesNotMatchAxis {
+            day_of_sim: 2,
+            source_record_index: 31,
+            expected_year: 2014,
+            actual_year: 2013,
+        })
+    ));
+    Ok(())
+}
+
+#[test]
+fn actual_preview_missing_feb29_never_uses_nonactual_skip_or_alias()
+-> Result<(), Box<dyn std::error::Error>> {
+    let period = actual_period("Missing Actual Leap Day", (2016, 2, 28), (2016, 3, 1));
+    let mut records = source_day(2016, 2, 28, 10.0);
+    records.extend(source_day(2016, 3, 1, 20.0));
+    let weather = weather_file(
+        true,
+        vec![year_period((2016, 1, 1), (2016, 12, 31))],
+        records,
+    );
+    assert!(matches!(
+        select_epw_environment_weather(&weather, &axis_for(&period, true)?),
+        Err(EpwEnvironmentWeatherError::SourceDayDoesNotMatchAxis {
+            day_of_sim: 2,
+            expected_month: 2,
+            expected_day: 29,
+            actual_month: 3,
+            actual_day: 1,
+            ..
+        })
+    ));
+    Ok(())
+}

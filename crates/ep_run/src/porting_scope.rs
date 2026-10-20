@@ -368,10 +368,12 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     for surface in &model.surfaces {
         if !matches!(
             surface.outside_boundary_condition,
-            OutsideBoundaryCondition::Outdoors | OutsideBoundaryCondition::Adiabatic
+            OutsideBoundaryCondition::Outdoors
+                | OutsideBoundaryCondition::Adiabatic
+                | OutsideBoundaryCondition::Ground
         ) {
             violations.push(format!(
-                "{} boundary must be Outdoors or Adiabatic",
+                "{} boundary must be Outdoors, Adiabatic or Ground",
                 surface.name.0
             ));
         }

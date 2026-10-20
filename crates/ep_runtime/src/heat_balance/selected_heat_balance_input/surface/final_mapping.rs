@@ -461,6 +461,8 @@ impl SurfaceGeometryInputState {
                 .ok_or(Error::Unavailable("actual final Construction association"))?;
             let boundary = if row.exterior_boundary == 0 {
                 OutsideBoundaryCondition::Outdoors
+            } else if row.exterior_boundary == -1 {
+                OutsideBoundaryCondition::Ground
             } else if row.exterior_boundary == row.base_surface {
                 OutsideBoundaryCondition::Adiabatic
             } else {

@@ -241,10 +241,7 @@ fn weather_file_nth_weekday_daylight_saving_preserves_run_period_month_weekdays(
         .expect("active non-leap-shaped DST period")
         .start;
     assert_eq!((leap_start.month, leap_start.day_of_month), (3, 2));
-    assert_eq!(
-        (non_leap_start.month, non_leap_start.day_of_month),
-        (3, 2)
-    );
+    assert_eq!((non_leap_start.month, non_leap_start.day_of_month), (3, 2));
     assert_eq!(leap_start.day_of_year, 62);
     assert_eq!(non_leap_start.day_of_year, 61);
     assert_hourly_day_dst(&leap_axis, 3, 1, false);
@@ -420,7 +417,10 @@ fn cross_year_daylight_saving_reuses_the_source_start_year_annual_table()
     assert_eq!(environment_axes.len(), 1);
     let environment_axis = &environment_axes[0];
     assert_eq!(environment_axis.sample_count(), 96);
-    assert_eq!(environment_axis.daylight_saving, hourly_axis.daylight_saving);
+    assert_eq!(
+        environment_axis.daylight_saving,
+        hourly_axis.daylight_saving
+    );
     assert_eq!(
         environment_axis
             .points
@@ -550,8 +550,7 @@ fn input_file_daylight_saving_overrides_weather_file_period_and_run_period_polic
     assert_hourly_day_dst(&hourly_axis, 2, 29, true);
     assert_hourly_day_dst(&hourly_axis, 3, 1, false);
 
-    let environment_axes =
-        build_environment_time_axes_with_weather_metadata(&model, &metadata)?;
+    let environment_axes = build_environment_time_axes_with_weather_metadata(&model, &metadata)?;
     assert_eq!(environment_axes.len(), 1);
     assert_eq!(
         environment_axes[0].daylight_saving,
@@ -876,25 +875,81 @@ fn weather_calendar_uses_non_leap_ordinals_for_february_29_endpoints()
 }
 
 #[test]
-fn metadata_aware_calendar_rejects_actual_weather_for_both_leap_policies() {
-    let mut run_period = test_run_period("Actual Leap Weather", 2, 28, 3, 1);
-    run_period.begin_year = Some(2016);
-    run_period.end_year = Some(2016);
-    run_period.treat_weather_as_actual = true;
-
-    for leap_year_observed in [false, true] {
-        assert!(matches!(
-            resolve_weather_environment_calendar(
-                &run_period,
-                &EpwCalendarMetadata {
-                    leap_year_observed,
-                    daylight_saving_period: None,
-                    holidays: Vec::new(),
-                }
-            ),
-            Err(TimeAxisError::ActualWeatherUnsupported { .. })
-        ));
+fn actual_calendar_retains_gregorian_days_and_nonactual_keeps_tmy_policy()
+-> Result<(), Box<dyn std::error::Error>> {
+    for (begin, end, leap, actual, expected_days, skipped) in [
+        ((2016, 2, 28), (2016, 3, 1), false, false, 2, 1),
+        ((2016, 2, 28), (2016, 3, 1), true, false, 3, 0),
+        ((2016, 2, 28), (2016, 3, 1), false, true, 3, 0),
+        ((2016, 2, 28), (2016, 3, 1), true, true, 3, 0),
+        ((2016, 2, 29), (2016, 2, 29), false, true, 1, 0),
+        ((2015, 12, 31), (2016, 3, 1), false, true, 62, 0),
+        ((2015, 12, 31), (2016, 3, 1), false, false, 61, 1),
+        ((2013, 12, 31), (2014, 1, 1), false, true, 2, 0),
+    ] {
+        let mut period =
+            test_run_period("Actual/Nonactual calendar", begin.1, begin.2, end.1, end.2);
+        period.begin_year = Some(begin.0);
+        period.end_year = Some(end.0);
+        period.treat_weather_as_actual = actual;
+        let metadata = EpwCalendarMetadata {
+            leap_year_observed: leap,
+            ..Default::default()
+        };
+        let calendar = resolve_weather_environment_calendar(&period, &metadata)?;
+        assert_eq!(calendar.treat_weather_as_actual, actual);
+        assert_eq!(calendar.weather_file_allows_leap_years, leap);
+        assert_eq!(
+            (calendar.total_days, calendar.leap_days_skipped),
+            (expected_days, skipped)
+        );
+        let axis = build_hourly_time_axis_for_run_period_with_weather_metadata(&period, &metadata)?;
+        assert_eq!(axis.points.len(), expected_days * 24);
+        if actual {
+            assert_eq!(
+                (
+                    axis.points[0].year,
+                    axis.points[0].month,
+                    axis.points[0].day_of_month
+                ),
+                begin
+            );
+            let last = axis.points.last().expect("nonempty actual axis");
+            assert_eq!((last.year, last.month, last.day_of_month), end);
+            assert!(
+                axis.points
+                    .iter()
+                    .all(|point| point.day_of_week == point.gregorian_day_of_week)
+            );
+            if begin == (2016, 2, 29) {
+                assert_eq!(
+                    (
+                        axis.points[0].day_of_year,
+                        axis.points[0].schedule_day_of_year
+                    ),
+                    (60, 60)
+                );
+                assert_eq!(axis.points[0].leap_year_add, 1);
+            }
+        }
     }
+    // Actual weather cannot turn invalid Gregorian input into a TMY alias.
+    let mut invalid = test_run_period("Invalid Actual", 2, 29, 3, 1);
+    invalid.begin_year = Some(2013);
+    invalid.end_year = Some(2013);
+    invalid.treat_weather_as_actual = true;
+    assert!(matches!(
+        resolve_weather_environment_calendar(&invalid, &EpwCalendarMetadata::default()),
+        Err(TimeAxisError::InvalidDate { .. })
+    ));
+    invalid.begin_month = 1;
+    invalid.begin_day_of_month = 1;
+    invalid.end_year = Some(2012);
+    assert!(matches!(
+        resolve_weather_environment_calendar(&invalid, &EpwCalendarMetadata::default()),
+        Err(TimeAxisError::InvalidRange { .. })
+    ));
+    Ok(())
 }
 
 #[test]

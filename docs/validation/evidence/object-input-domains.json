@@ -36,7 +36,10 @@
       "actual whole-environment nonactual-weather 48h December/January rollover and 24h February29 completion",
       "Source raw weather reads the real CurrentYearIsLeapYear separately from EPW leap permission; both must allow physical February29",
       "actual nonleap February29 skip consumes every physical record with real normalization/counter prefix, writes both live February tables and retries once per day; accepted-day physical/cache writes and conditional warning/continuation follow Original ordering",
-      "same-input 2013 Feb28-to-Mar1 lifecycle completes with all10704 reported samples and exact one skip warning; actual-weather year matching, DST and special-day children remain bounded"
+      "same-input 2013 Feb28-to-Mar1 lifecycle completes with all10704 reported samples and exact one skip warning; positive DST and special-day children remain bounded",
+      "actual mode retains Gregorian leap days and performs the literal raw month/day/year first-record match against the real Source Environment.MatchYear owner",
+      "year-qualified DATA PERIODS coverage and physical row years bind the ancillary preview; missing-leap Source errors remain genuine and the legacy adapter requires real Source owners",
+      "same-input actual2016Feb29Monday lifecycle matches all5352 original samples and exact zero-diagnostic EIO/ERR/END; only three year-bearing DATA PERIODS fields change in existing explicitly synthetic8784-row weather"
     ],
     "Output:Variable": [
       "real live reporting schedule identity and immutable dictionary name",
@@ -64,13 +67,16 @@
       "remove the stale exactly-six-surface fence; retain the real one-Zone ownership boundary",
       "closed six/ten-quad and seven-face two-triangle geometry, actual identities and dynamic shared view-factor matrices",
       "actual Source completion, exact Native geometry EIO and ordered physical triangle DXF vertices",
-      "larger polygons, geometry repair and other real physics guards retained; all GlobalGeometryRules corners/directions and actual relative Zone/Building transforms now feed canonical world geometry"
+      "larger polygons, geometry repair and other real physics guards retained; all GlobalGeometryRules corners/directions and actual relative Zone/Building transforms now feed canonical world geometry",
+      "Ground -1 identity reaches actual getter, final surface mapping, CTF initialization/current-month outside history and nominal-U reporting with zero exterior film",
+      "real once-only missing Ground-temperature diagnostics and distinct Zone ground-area totals retain constructor/effect order; Ground SunExposed warns and clears actual solar exposure while independent Wind selection remains",
+      "same-input Ground floor uses all original58 streams and additional exact96 outside-face temperature checks at18C, with all twelve monthly EIO values and zero diagnostics"
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
       "numeric-only singleton keys/counts and converted IDF blank versus direct epJSON types",
       "real factory warning and current-month weather/reporting owner",
-      "Source-only validated support classification; actual Ground thermal and sibling-family guards retained"
+      "Source-only validated monthly weather support now feeds the genuine Ground surface history and boundary consumers; FCfactor/Kiva and sibling ground families remain bounded"
     ],
     "SurfaceConvectionAlgorithm:Inside": [
       "real singleton IP getter, omitted/blank defaults, strict string types and exact unnamed keys",
@@ -128,10 +134,11 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/calendar-skip-docs-11.log",
+        "path": ".runtime/object-expansion/actual-ground-docs-12.log",
         "sha256": "d32de6266c72d4ab6d9555b499bf7f7fe64b811454642a50b6a3453269867e03",
         "bytes": 354
-      }
+      },
+      "clippy_through_build": "calendar-skip-11"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -1547,12 +1554,114 @@
           "passed": true
         },
         "calendar_state": "Nonactual2013 Feb28 Thursday to Mar1 Friday uses the existing explicitly synthetic leap EPW unchanged. Both physical owners report exactly48h and no Feb29; complete ERR/END retain the same one genuine skip warning, zero severe/fatal, elapsed normalized only."
+      },
+      {
+        "id": "actual-weather",
+        "group": "actual_year_weather",
+        "source_build": "actual-weather-ground-12",
+        "input": {
+          "path": ".runtime/object-expansion/native-actual-weather/calibration-01/input.idf",
+          "sha256": "a71e0c4892ccb7060a2da6dd868684ad3c4c566cb52841e0fcf5b65070ac87c6",
+          "bytes": 9283
+        },
+        "weather": {
+          "path": ".runtime/object-expansion/native-actual-weather/calibration-01/Golden-controlled-synthetic-actual-2016.epw",
+          "sha256": "134042fbd42aa79d0886d45d852d9a5a60d53b70ffa34b2485ac8f350bc92059",
+          "bytes": 1627909
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-actual-weather/calibration-01/receipt.json",
+          "sha256": "0c055761baac81b110e01d86a59418e4bd5718877550a0725b6626c2add1863f",
+          "bytes": 11958
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-actual-weather/receipt/receipt.json",
+          "sha256": "9d8b57677466d8501ce3b0edc2224b686889f38c893986880a7f04da51dc5e61",
+          "bytes": 6230
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/actual-weather-2016-leap/run-summary.json",
+          "sha256": "9e8e4e4c745c583301945e7a423b51b42467f6ba0b1d574c00780b2577e120c6",
+          "bytes": 32363
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-actual-weather-comparisons-01/main/comparison.json",
+          "sha256": "c0fbb08d1b89dcc86ed4bf0f0a8f697c9e5d2a24d44f637dc9a8eb53e72e193d",
+          "bytes": 117069
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-actual-weather-comparisons-01/actual-weather-source-run-request.json",
+          "sha256": "706baf0cd531bb7651788f93a549cd2ffc6951984c3ad59a8131c7c18a0a06cb",
+          "bytes": 4660
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3450,
+          "parsed_binary64_unequal": 3450,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Only original A24 RunPeriod changes to actual2016Feb29Monday. Existing explicitly synthetic8784-row EPW retains all physical data rows; only DATA PERIODS weekday and year-qualified endpoints change. All5352 original samples and exact actual calendar EIO/ERR/END match; no measured-weather claim."
+      },
+      {
+        "id": "ground-boundary",
+        "group": "ground_surface_boundary",
+        "source_build": "actual-weather-ground-12",
+        "input": {
+          "path": ".runtime/object-expansion/native-ground-boundary/calibration-01/input.idf",
+          "sha256": "ade92594dfc07d9f8eadce0c24d0c37fc586aaf0d7a4c613ed0e82d0d157314f",
+          "bytes": 9385
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-ground-boundary/calibration-01/receipt.json",
+          "sha256": "cbb1715506f1c30167be8b30b0a536661e59f0fd2ef5690ff4e2f8c2f8dac64f",
+          "bytes": 9708
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-ground-boundary-12/receipt/receipt.json",
+          "sha256": "d7e323329e3ea76a99f55750defb89a65f2e97947dd6aeee02844de40df1c94e",
+          "bytes": 6129
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/ground-boundary-12/run-summary.json",
+          "sha256": "dca19b0c98edcaf0a671956bddede7f007b40d1e7f0bfb33d51dade308333fe1",
+          "bytes": 32440
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-ground-boundary-comparisons-01/main/comparison.json",
+          "sha256": "54c613d80f34944d677b5a5173b5379e2d299b1c76c6b1e4a63acc4a6415b182",
+          "bytes": 116734
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-ground-boundary-comparisons-01/prelaunch.json",
+          "sha256": "847612cfab4ae92af3144f6b97f28b8c6774204197a83b12c2da8ff5e00f0266",
+          "bytes": 2852
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3055,
+          "parsed_binary64_unequal": 3055,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Only original A24 floor Adiabatic changes to Ground, with explicit12monthly18C input. Both actual physical owners have96 named FLOOR outside temperatures exactly18C; all original58 streams, monthly EIO and zero diagnostic completion match. No FCfactor/Kiva/interzone promotion."
       }
     ],
     "totals": {
-      "paired_cases": 24,
-      "reported_samples": 135816,
-      "raw_operand_unequal": 78895,
+      "paired_cases": 26,
+      "reported_samples": 146520,
+      "raw_operand_unequal": 85400,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1744,6 +1853,23 @@
           "sha256": "c53e08a1eb802d0c179532cfe9b5527d5538a33fd11629cd3f5f23b4d5c922b2",
           "bytes": 75130614
         }
+      },
+      {
+        "id": "actual-weather-ground-12",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-12/receipt.json",
+          "sha256": "04a627ab327622359aca3f8229821a6f7da0034e6cd76a9e561a2394492184a7",
+          "bytes": 6975
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b81164213a26b4683cdcde551d43c4b7d3233b2747a7dde49da8aae9350fc92",
+          "sha256": "1b81164213a26b4683cdcde551d43c4b7d3233b2747a7dde49da8aae9350fc92"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-12/eplus-rs.exe",
+          "sha256": "3e45277e3b9d5840304844d8a806f2d672f0b66070d9410bcbcdfddef9c68c1d",
+          "bytes": 75140700
+        }
       }
     ],
     "focused_tests": [
@@ -1757,6 +1883,34 @@
             "path": ".runtime/object-expansion/calendar-skip-tests-11.log",
             "sha256": "f63d1ceef86bf1ee367f3521a8c66518b33cb41a853164828c1d0a6d576c8d7b",
             "bytes": 1129
+          }
+        ]
+      },
+      {
+        "through_build": "actual-weather-ground-12",
+        "passed": 146,
+        "ignored": 0,
+        "scope": "Sum of focused check executions: weather131, actual-calendar1, Ground8 and actual CTF geometry reporting6. Existing weather/Ground checks may overlap. A stale unconditional Ground-rejection block was removed; connected Ground and remaining unsupported boundaries are checked in the dedicated existing scope table. Full static/workspace checks remain at the recorded prior milestones.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/actual-ground-weather-tests-12.log",
+            "sha256": "5ee12bec663c712d43c0eb214d7fb4d7957a11ecd0447fd66693d3801522c320",
+            "bytes": 1188
+          },
+          {
+            "path": ".runtime/object-expansion/actual-ground-calendar-tests-12.log",
+            "sha256": "7efb0db9a50875249a6ec3de95addeb113bec531b7bdd664ac1fa13cd1810fd2",
+            "bytes": 693
+          },
+          {
+            "path": ".runtime/object-expansion/actual-ground-boundary-tests-12b.log",
+            "sha256": "bead7a73d7000c7c2f59376ef8526df4979c904aed1f38402f07c2ea6e612036",
+            "bytes": 890
+          },
+          {
+            "path": ".runtime/object-expansion/actual-ground-report-tests-12b.log",
+            "sha256": "f48df9ee1813befe1237ed20a0582992f0c5bd74c588eced51989be149529b03",
+            "bytes": 789
           }
         ]
       }

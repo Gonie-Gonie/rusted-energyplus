@@ -84,10 +84,20 @@ impl SurfaceGeometryInputState {
                     zone.exterior_perimeter += row.vertex_progress.width;
                     space.exterior_perimeter += row.vertex_progress.width;
                 }
+            } else if row.exterior_boundary == -1 {
+                // Original431-436 Ground contact is a distinct Zone category;
+                // it writes no exterior/perimeter or Space ground-area totals.
+                zone.exterior_total_ground_surface_area += row.gross_area;
+                if row.class == SurfaceClass::Wall {
+                    zone.exterior_gross_ground_wall_area += row.gross_area;
+                    zone.exterior_gross_ground_wall_area_multiplied += row.gross_area
+                        * f64::from(zone.multiplier)
+                        * f64::from(zone.list_multiplier);
+                }
             } else {
                 let source_number = super::signed(surface_index + 1)?;
                 if row.exterior_boundary != source_number || row.base_surface != source_number {
-                    // Ground/OSCM/other positive getters remain excluded. This
+                    // OSCM/FCfactor/Kiva/other positive getters remain excluded. This
                     // reached boundary retains total/geometric writes above.
                     return Err(Error::Unavailable(
                         "non-Outdoors/self-Adiabatic area boundary",

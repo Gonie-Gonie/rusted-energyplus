@@ -83,6 +83,8 @@ impl ResolvedRunPeriodCalendar {
 /// Thus a February-29-only period has Gregorian/skipped/effective counts 1/1/1.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ResolvedWeatherEnvironmentCalendar {
+    /// Literal RunPeriod actual-weather flag; actual calendars retain every Gregorian day.
+    pub treat_weather_as_actual: bool,
     /// Gregorian run-period interpretation before EPW policy is applied.
     pub gregorian: ResolvedRunPeriodCalendar,
     /// Whether the EPW header says that leap years are observed.
@@ -962,9 +964,14 @@ fn resolved_calendar_days(
     daylight_saving: &DaylightSavingAxisState,
     special_days: &SpecialDayAxisState,
 ) -> Result<Vec<ResolvedCalendarDay>, TimeAxisError> {
-    let weather_file_allows_leap_years = weather_calendar
-        .map(|calendar| calendar.weather_file_allows_leap_years)
-        .unwrap_or(true);
+    // Actual weather never aliases or skips Gregorian February29. The real
+    // GetNextEnvironment owner retains the header permission and its genuine
+    // missing-leap diagnostics/Fatal before physical execution; this axis must
+    // not silently substitute TMY dates before that owner runs.
+    let weather_file_allows_leap_years = run_period.treat_weather_as_actual
+        || weather_calendar
+            .map(|calendar| calendar.weather_file_allows_leap_years)
+            .unwrap_or(true);
     let expected_days = weather_calendar
         .map(|calendar| calendar.total_days)
         .unwrap_or(calendar.total_days);

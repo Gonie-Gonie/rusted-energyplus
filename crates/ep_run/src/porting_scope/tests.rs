@@ -1038,15 +1038,6 @@ fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() 
         assert!(result.err().is_some_and(|error| {
             error.contains("requires unique Site:GroundTemperature:BuildingSurface")
         }));
-        // Admitting the weather object does not admit thermal Ground boundaries.
-        value[FAMILY] = json!({"Ground":{}});
-        value["BuildingSurface:Detailed"]["Floor"]["outside_boundary_condition"] = json!("Ground");
-        let blocked = trace(&value, scope);
-        assert!(!blocked.admissible);
-        let raw = parse_epjson_str(&value.to_string()).expect("actual thermal Ground surface");
-        assert!(
-            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &blocked).is_none()
-        );
     }
     let converted = r#"{"Zone":{"z":{}},"Site:GroundTemperature:BuildingSurface":{"Site:GroundTemperature:BuildingSurface 1":{}}}"#;
     let raw = ep_raw_model::parse_epjson_str_with_idf_order(
@@ -1325,6 +1316,116 @@ fn unnamed_geometry_rule_keys_preserve_raw_ip_identity_and_strict_alpha_scalars(
             }
             .is_err()
         );
+    }
+}
+
+#[test]
+fn ground_boundaries_reach_real_raw_ip_scope_and_source_support_without_sun_wind_aliases() {
+    let weather = single_day_weather_fixture();
+    for scope in [PortingScope::A, PortingScope::B] {
+        for target in ["West", "Floor", "Roof"] {
+            for (sun, wind) in [
+                ("NoSun", "NoWind"),
+                ("SunExposed", "NoWind"),
+                ("NoSun", "WindExposed"),
+                ("SunExposed", "WindExposed"),
+            ] {
+                let mut value = input(scope);
+                value["Site:GroundTemperature:BuildingSurface"] =
+                    json!({"Ground":{"january_ground_temperature":18.0}});
+                let surface = &mut value["BuildingSurface:Detailed"][target];
+                surface["outside_boundary_condition"] = json!("Ground");
+                surface["outside_boundary_condition_object"] = json!("unused Ground operand");
+                surface["sun_exposure"] = json!(sun);
+                surface["wind_exposure"] = json!(wind);
+                let raw = parse_epjson_str(&value.to_string()).expect("actual Ground scalar input");
+                let compiled = compile_raw_model(&raw);
+                let model = compiled.model.as_ref().expect("schema-valid Ground model");
+                let ip = match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .expect("same real raw/IP admission");
+                let projected = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                    .expect("same actual surface getter operands");
+                let row = projected
+                    .surface
+                    .building_surfaces
+                    .iter()
+                    .find(|row| row.object.object_name == target)
+                    .unwrap();
+                assert_eq!(
+                    row.object.fields["outside_boundary_condition_object"],
+                    ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                        "unused Ground operand".into()
+                    )
+                );
+                let typed = model
+                    .surfaces
+                    .iter()
+                    .find(|row| row.name.0.eq_ignore_ascii_case(target))
+                    .unwrap();
+                assert_eq!(
+                    typed.outside_boundary_condition,
+                    ep_model::OutsideBoundaryCondition::Ground
+                );
+                assert_eq!(
+                    typed.sun_exposure == ep_model::SunExposure::SunExposed,
+                    sun == "SunExposed"
+                );
+                assert_eq!(
+                    typed.wind_exposure == ep_model::WindExposure::WindExposed,
+                    wind == "WindExposed"
+                );
+                let mut admitted =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(admitted.admissible, "{:?}", admitted.violations);
+                assert!(
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                        .is_none()
+                );
+                let environment = super::environment::environment_from_weather(
+                    model,
+                    &weather,
+                    "embedded Ground boundary weather",
+                )
+                .unwrap();
+                assert!(validate_porting_environment(&environment).is_empty());
+                admitted.environment = Some(environment);
+                let admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                        .expect("actual validated Source scope/environment");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            }
+        }
+        for boundary in [
+            "GroundFCfactorMethod",
+            "Foundation",
+            "OtherSideCoefficients",
+            "Surface",
+        ] {
+            let mut value = input(scope);
+            value["BuildingSurface:Detailed"]["Floor"]["outside_boundary_condition"] =
+                json!(boundary);
+            let raw = parse_epjson_str(&value.to_string()).unwrap();
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+        }
     }
 }
 

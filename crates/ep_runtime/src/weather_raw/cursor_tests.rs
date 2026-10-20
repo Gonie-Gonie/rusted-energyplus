@@ -614,3 +614,87 @@ fn raw_only_reader_keeps_feb29_unavailable_without_a_live_calendar_owner() {
     assert_eq!(writes.events, [('s', 0), ('c', 1)]);
     assert_eq!(cursor.interpret_count(), 2);
 }
+
+#[test]
+fn actual_first_day_search_matches_raw_year_without_reprocessing_decoy_hours() {
+    // Raw boundary test only; GetNextEnvironment owns year-qualified header
+    // coverage. The first physical July1 is a decoy with the wrong WYear.
+    for actual in [false, true] {
+        let mut text = header("12/31");
+        let mut decoy = day(2012, 1, "9");
+        if actual {
+            let start = decoy.find('\n').unwrap() + 1;
+            let end = start + decoy[start..].find('\n').unwrap() + 1;
+            decoy.replace_range(start..end, "skipped nonfirst row must not be interpreted\n");
+        }
+        text.push_str(&decoy);
+        let actual_start = text.len();
+        text.push_str(&day(2013, 1, "9"));
+        let mut cursor = owner(text);
+        let mut state = RawDayReadState::default();
+        let mut writes = Writes::canaries();
+        let mut select = selection(1);
+        select.match_year = actual;
+        let selected = cursor
+            .read_day(
+                select,
+                &mut state,
+                RawDayReadMode::FirstDay,
+                false,
+                &mut writes,
+            )
+            .unwrap();
+        assert_eq!(
+            selected.hours[0].raw.dates[0],
+            if actual { 2013 } else { 2012 }
+        );
+        assert!(
+            selected
+                .hours
+                .iter()
+                .all(|row| row.raw.dates[0] == if actual { 2013 } else { 2012 })
+        );
+        assert_eq!(cursor.interpret_count(), if actual { 26 } else { 25 });
+        if actual {
+            assert_eq!(selected.hours[0].provenance.start_byte, actual_start);
+        }
+        assert_eq!(
+            writes.events.iter().filter(|event| event.0 == 's').count(),
+            1
+        );
+        assert_eq!(
+            writes.events.iter().filter(|event| event.0 == 'p').count(),
+            24
+        );
+        assert_eq!(writes.events.last(), Some(&('d', 24)));
+        assert_eq!(state.read_time, 1.0);
+        assert!(state.last_hour_set);
+    }
+}
+
+#[test]
+fn absent_actual_year_keeps_real_search_failure_and_no_accepted_callbacks() {
+    let mut text = header("12/31");
+    text.push_str(&day(2012, 1, "9"));
+    text.push_str(&day(2013, 1, "9"));
+    let mut cursor = owner(text);
+    let mut writes = Writes::default();
+    let mut select = selection(1);
+    select.match_year = true;
+    select.start_year = 2014;
+    let error = cursor
+        .read_day(
+            select,
+            &mut RawDayReadState::default(),
+            RawDayReadMode::FirstDay,
+            false,
+            &mut writes,
+        )
+        .unwrap_err();
+    assert_eq!(
+        error,
+        RawDayFailure::SourceFatal(RawDaySourceFatal::SearchRead)
+    );
+    assert_eq!(cursor.interpret_count(), 4);
+    assert!(writes.events.is_empty());
+}

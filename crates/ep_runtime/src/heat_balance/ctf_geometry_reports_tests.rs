@@ -172,6 +172,25 @@ fn source_class_and_adiabatic_films_use_real_columns() -> Result<(), CtfReportUn
         film_u(&model, &ceiling)?.1.to_bits(),
         film_u(&model, &roof)?.1.to_bits()
     );
+    model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
+    let (exterior, ground_u) = film_u(&model, &model.surfaces[0])?;
+    assert!(exterior);
+    assert_eq!(
+        ground_u.to_bits(),
+        nominal_u_with_films(0.5, 0.1197548, 0.0).to_bits()
+    );
+    let mut ground_table = PredefinedStringTable::default();
+    let ground_registry = registry()?;
+    report_ordinary_surface_nominal_u(&model, &ground_registry, &mut ground_table)?;
+    let entry = &ground_table
+        .entries
+        .as_ref()
+        .ok_or(CtfReportUnavailable::TableOwner)?[0];
+    assert_eq!(
+        entry.index_column,
+        ground_registry.named_indices["pdchOpUfactFilm"]
+    );
+    assert_eq!(entry.original_real_entry.to_bits(), ground_u.to_bits());
     model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
     let interior_u = film_u(&model, &model.surfaces[0])?.1;
     assert!(interior_u < wall_u);
@@ -295,7 +314,7 @@ fn unused_unsupported_definition_is_unread_but_used_one_stops_at_actual_prefix()
 fn unsupported_boundary_or_unregistered_surface_is_not_silently_dropped()
 -> Result<(), CtfReportUnavailable> {
     let mut model = model();
-    model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
+    model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Other;
     assert_eq!(
         report_ordinary_surface_nominal_u(
             &model,

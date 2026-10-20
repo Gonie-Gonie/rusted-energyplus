@@ -34,11 +34,6 @@ pub enum TimeAxisError {
         /// Run period name.
         run_period_name: String,
     },
-    /// Metadata-aware actual-weather traversal is not implemented yet.
-    ActualWeatherUnsupported {
-        /// Run period name.
-        run_period_name: String,
-    },
     /// An EPW nth-weekday daylight-saving rule has no date in the resolved month.
     DaylightSavingDateRuleDoesNotExist {
         /// Run period name.
@@ -97,10 +92,6 @@ impl Display for TimeAxisError {
                     "run period {run_period_name} ends before it begins"
                 )
             }
-            Self::ActualWeatherUnsupported { run_period_name } => write!(
-                formatter,
-                "run period {run_period_name} treats weather as actual, but metadata-aware EPW record traversal is not implemented"
-            ),
             Self::DaylightSavingDateRuleDoesNotExist {
                 run_period_name,
                 boundary,

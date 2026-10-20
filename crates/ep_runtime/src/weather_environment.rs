@@ -141,6 +141,17 @@ pub enum EpwEnvironmentWeatherError {
         /// Source day of month.
         actual_day: u32,
     },
+    /// Actual-year preview may not attribute another raw year to this axis.
+    SourceYearDoesNotMatchAxis {
+        /// One-based simulation day.
+        day_of_sim: usize,
+        /// Actual zero-based physical row that carries the wrong year.
+        source_record_index: usize,
+        /// Gregorian year requested by the actual-weather axis.
+        expected_year: u32,
+        /// Year parsed from this physical weather row.
+        actual_year: u32,
+    },
     /// Every reachable source day was filtered without finding an effective day.
     NoUsableSourceDay {
         /// One-based simulation day being materialized.
@@ -234,6 +245,15 @@ impl Display for EpwEnvironmentWeatherError {
                 formatter,
                 "simulation day {day_of_sim} expects {expected_month}/{expected_day}, but EPW record {source_record_start} begins {actual_month}/{actual_day}"
             ),
+            Self::SourceYearDoesNotMatchAxis {
+                day_of_sim,
+                source_record_index,
+                expected_year,
+                actual_year,
+            } => write!(
+                formatter,
+                "actual-weather simulation day {day_of_sim} expects year {expected_year}, but EPW physical row {source_record_index} has year {actual_year}"
+            ),
             Self::NoUsableSourceDay {
                 day_of_sim,
                 scanned_source_days,
@@ -302,6 +322,8 @@ pub fn select_epw_environment_weather(
             record.month == gregorian.start_month
                 && record.day == gregorian.start_day_of_month
                 && record.hour == 1
+                && (!weather_calendar.treat_weather_as_actual
+                    || record.year == gregorian.start_year)
         })
         .ok_or_else(|| EpwEnvironmentWeatherError::StartRecordNotFound {
             run_period_name: time_axis.run_period_name.clone(),
@@ -343,7 +365,11 @@ pub fn select_epw_environment_weather(
             validate_source_day(&weather_file.records, cursor)?;
             scanned_source_days += 1;
             let first_record = weather_file.records[cursor];
-            if first_record.month == 2 && first_record.day == 29 && !weather_effective_leap_year {
+            if !weather_calendar.treat_weather_as_actual
+                && first_record.month == 2
+                && first_record.day == 29
+                && !weather_effective_leap_year
+            {
                 skipped_february_29_source_record_starts.push(cursor);
                 cursor = advance_source_day(
                     cursor,
@@ -370,6 +396,25 @@ pub fn select_epw_environment_weather(
             });
         }
 
+        // This is preview evidence only. Never silently assign physical rows
+        // from a different year to an actual Gregorian axis after an EOF wrap
+        // or within an incomplete/inconsistent source day. The live Source
+        // cursor and its own Native effects remain the production input owner.
+        if weather_calendar.treat_weather_as_actual {
+            for (offset, record) in weather_file.records[cursor..cursor + HOURS_PER_DAY]
+                .iter()
+                .enumerate()
+            {
+                if record.year != expected.year {
+                    return Err(EpwEnvironmentWeatherError::SourceYearDoesNotMatchAxis {
+                        day_of_sim: day_index + 1,
+                        source_record_index: cursor + offset,
+                        expected_year: expected.year,
+                        actual_year: record.year,
+                    });
+                }
+            }
+        }
         selected_day_starts.push(cursor);
         for source_record_index in cursor..cursor + HOURS_PER_DAY {
             selected_source_record_indices.push(source_record_index);
@@ -477,6 +522,51 @@ fn data_period_covers_calendar(
     period: &EpwDataPeriod,
     calendar: &crate::time_axis::ResolvedWeatherEnvironmentCalendar,
 ) -> bool {
+    if calendar.treat_weather_as_actual {
+        // Same computeJulianDate and BetweenDates as real GetNextEnvironment.
+        // A yearless TMY header is never authority for actual-year coverage.
+        let (Some(start_year), Some(end_year)) = (period.start_date.year, period.end_date.year)
+        else {
+            return false;
+        };
+        let julian = |year, month, day| {
+            super::raw::source_julian_date(
+                i32::try_from(year).ok()?,
+                i32::try_from(month).ok()?,
+                i32::try_from(day).ok()?,
+            )
+            .ok()
+        };
+        let Some(period_start) = julian(start_year, period.start_date.month, period.start_date.day)
+        else {
+            return false;
+        };
+        let Some(period_end) = julian(end_year, period.end_date.month, period.end_date.day) else {
+            return false;
+        };
+        let Some(run_start) = julian(
+            calendar.gregorian.start_year,
+            calendar.gregorian.start_month,
+            calendar.gregorian.start_day_of_month,
+        ) else {
+            return false;
+        };
+        let Some(run_end) = julian(
+            calendar.gregorian.end_year,
+            calendar.gregorian.end_month,
+            calendar.gregorian.end_day_of_month,
+        ) else {
+            return false;
+        };
+        let between = |value| {
+            if period_start <= period_end {
+                value >= period_start && value <= period_end
+            } else {
+                value <= period_end || value >= period_start
+            }
+        };
+        return between(run_start) && between(run_end);
+    }
     let leap_year = calendar.start_year_is_weather_effective_leap_year;
     let Some(period_start) =
         weather_ordinal(period.start_date.month, period.start_date.day, leap_year)

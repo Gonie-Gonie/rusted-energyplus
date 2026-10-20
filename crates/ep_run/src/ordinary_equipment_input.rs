@@ -202,9 +202,18 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                         && selected(
                             object,
                             "outside_boundary_condition",
-                            &["Outdoors", "Adiabatic"],
+                            &["Outdoors", "Adiabatic", "Ground"],
                         )
-                        && field(object, "outside_boundary_condition_object").is_none_or(blank)
+                        && (if text(object, "outside_boundary_condition")
+                            .is_some_and(|value| value.eq_ignore_ascii_case("Ground"))
+                        {
+                            // Original assigns ExtBoundCondName but does not
+                            // resolve or consume this string for Ground.
+                            field(object, "outside_boundary_condition_object")
+                                .is_none_or(|value| matches!(value, RawValue::String(_)))
+                        } else {
+                            field(object, "outside_boundary_condition_object").is_none_or(blank)
+                        })
                         && field(object, "space_name").is_none_or(blank)
                 }
                 "SizingPeriod:DesignDay" => {

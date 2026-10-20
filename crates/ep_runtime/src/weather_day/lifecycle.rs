@@ -64,6 +64,14 @@ impl WeatherSession {
         state: &mut WeatherDayState,
         preserve_project: bool,
     ) -> Result<Self, WeatherDayError> {
+        // The legacy/preinitialized adapter has no real GetRunPeriodData,
+        // actual-year header-range or MissingLeap Fatal owners. Keep it closed;
+        // genuine Source attachment uses from_source_project_state instead.
+        if configuration.run_period.treat_weather_as_actual {
+            return Err(WeatherDayError::admission(
+                "actual-year weather requires real Source Environment and header owners",
+            ));
+        }
         if preserve_project && state.global.time_steps_in_hour != configuration.steps() as i32 {
             return Err(WeatherDayError::admission(
                 "Project/weather timestep association",

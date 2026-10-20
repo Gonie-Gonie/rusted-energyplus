@@ -24,6 +24,7 @@ mod final_zero_suffix;
 mod floor_areas;
 mod foundation;
 mod geometry_rules;
+mod ground;
 mod lists;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_gap_cohort;
@@ -188,6 +189,9 @@ impl Default for SurfaceTmpInput {
 pub(crate) struct SurfaceGeometryInputState {
     pub(crate) entered_once: bool,
     pub(crate) warning_displayed: bool,
+    /// Actual SurfaceGeometryData NoGroundTempObjWarning constructortrue;
+    /// first Ground getter clears it after any actual diagnostic effects.
+    pub(crate) no_ground_temp_warning: ground::GroundTemperatureWarning,
     /// SurfaceGeometryData ErrCount constructor0; Setup514 reads it without incrementing.
     pub(crate) err_count: i32,
     /// SurfaceGeometryData ErrCount5 constructor0; volume mismatches increment it.

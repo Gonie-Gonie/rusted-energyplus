@@ -158,6 +158,11 @@ impl SurfaceGeometryInputState {
         row.exterior_boundary_name = args[6].clone();
         match args[5].as_str() {
             "OUTDOORS" => row.exterior_boundary = 0,
+            "GROUND" => {
+                row.exterior_boundary = -1;
+                self.no_ground_temp_warning
+                    .read(owners.environment, &name, backend)?;
+            }
             "ADIABATIC" => {
                 row.exterior_boundary = -999;
                 row.exterior_boundary_name = name.clone();

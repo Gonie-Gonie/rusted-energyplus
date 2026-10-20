@@ -233,9 +233,9 @@ impl RawEpwCursorOwner {
                 "hourly single-period EPW day reader",
             ));
         }
-        if selection.match_year || selection.days_in_year <= 0 {
+        if selection.days_in_year <= 0 {
             return Err(RawDayFailure::OutsideBoundedDomain(
-                "non-actual RunPeriod with positive NumDaysInYear",
+                "RunPeriod with positive NumDaysInYear",
             ));
         }
         Ok(())
@@ -331,7 +331,11 @@ impl RawEpwCursorOwner {
                 state.set_current_day_of_week(state.current_day_of_week() % 7 + 1);
             }
             let date = self.arguments.dates;
-            if date[1] == selection.start_month && date[2] == selection.start_day {
+            // Original2473-2475: only the actual MatchYear owner selects WYear.
+            if date[1] == selection.start_month
+                && date[2] == selection.start_day
+                && (!selection.match_year || date[0] == selection.start_year)
+            {
                 let selected = self.slot(&read);
                 self.backspace_record()?;
                 if state.current_day_of_week() <= 7 {

@@ -7,25 +7,21 @@ use ep_model::RunPeriod;
 
 /// Applies EPW leap-year policy to a Gregorian run-period calendar.
 ///
-/// This resolves calendar-axis shape only. Actual-weather traversal remains an
-/// explicit error. Non-actual cross-year ranges retain Gregorian year changes
+/// This resolves calendar-axis shape only; the actual Source owner still validates
+/// year-qualified DATA PERIODS and leap availability. Non-actual cross-year ranges retain Gregorian year changes
 /// while applying the EPW leap-day policy to each year in the range.
 pub fn resolve_weather_environment_calendar(
     run_period: &RunPeriod,
     metadata: &EpwCalendarMetadata,
 ) -> Result<ResolvedWeatherEnvironmentCalendar, TimeAxisError> {
     let gregorian = resolve_run_period_calendar(run_period)?;
-    if run_period.treat_weather_as_actual {
-        return Err(TimeAxisError::ActualWeatherUnsupported {
-            run_period_name: run_period.name.0.clone(),
-        });
-    }
-    let leap_days_skipped = if metadata.leap_year_observed {
+    let actual = run_period.treat_weather_as_actual;
+    let leap_days_skipped = if actual || metadata.leap_year_observed {
         0
     } else {
         count_february_29_days(&gregorian)
     };
-    let total_days = if metadata.leap_year_observed {
+    let total_days = if actual || metadata.leap_year_observed {
         gregorian.total_days
     } else if gregorian.start_year != gregorian.end_year {
         gregorian
@@ -56,10 +52,11 @@ pub fn resolve_weather_environment_calendar(
     };
 
     Ok(ResolvedWeatherEnvironmentCalendar {
+        treat_weather_as_actual: actual,
         start_year_is_weather_effective_leap_year: gregorian.start_year_is_leap_year
-            && metadata.leap_year_observed,
+            && (actual || metadata.leap_year_observed),
         end_year_is_weather_effective_leap_year: gregorian.end_year_is_leap_year
-            && metadata.leap_year_observed,
+            && (actual || metadata.leap_year_observed),
         weather_file_allows_leap_years: metadata.leap_year_observed,
         total_days,
         leap_days_skipped,

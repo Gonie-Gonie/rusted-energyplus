@@ -63,6 +63,7 @@ fn film_u(model: &TypedModel, surface: &Surface) -> Result<(bool, f64), CtfRepor
     let inside = inside_film(surface.surface_type);
     let (exterior, outside) = match surface.outside_boundary_condition {
         OutsideBoundaryCondition::Outdoors => (true, 0.0299387),
+        OutsideBoundaryCondition::Ground => (true, 0.0),
         // Native resolves Adiabatic to this surface's own ID before reporting.
         OutsideBoundaryCondition::Adiabatic => (false, inside),
         _ => return Err(CtfReportUnavailable::SurfaceBoundary(surface.id)),

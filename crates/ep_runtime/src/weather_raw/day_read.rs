@@ -52,9 +52,9 @@ pub struct RawDayReadSelection {
     pub start_month: i32,
     /// Declared environment start day of month.
     pub start_day: i32,
-    /// Declared year, retained separately while the non-actual search ignores it.
+    /// Declared environment year, matched only when MatchYear is true.
     pub start_year: i32,
-    /// Actual-year matching is outside this bounded non-actual reader.
+    /// Actual Environment.MatchYear; the literal first-day search then requires WYear.
     pub match_year: bool,
     /// Original NumDaysInYear, used with declared DataPeriod.NumDays at EOF.
     pub days_in_year: i32,
