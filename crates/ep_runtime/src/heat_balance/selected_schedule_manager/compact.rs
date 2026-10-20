@@ -36,7 +36,7 @@ fn parsed_number(value: &str) -> Result<f64, SelectedScheduleError> {
         .filter(|x| x.is_finite())
         .ok_or_else(|| unavailable("actual Compact Util::ProcessNumber branch"))
 }
-fn through_day(value: &str) -> Result<usize, SelectedScheduleError> {
+fn through_day(value: &str) -> Result<(usize, String), SelectedScheduleError> {
     let value = value
         .strip_prefix("THROUGH")
         .ok_or_else(|| unavailable("actual Compact expecting Through diagnostic"))?;
@@ -83,6 +83,7 @@ fn through_day(value: &str) -> Result<usize, SelectedScheduleError> {
     usize::try_from(ordinal)
         .ok()
         .filter(|day| (1..=366).contains(day))
+        .map(|day| (day, value.to_owned())) // Actual CurrentThrough after erase/strip.
         .ok_or_else(|| unavailable("actual Compact Through ordinal domain"))
 }
 fn for_days(value: &str, already: &mut [bool; 13]) -> Result<[bool; 13], SelectedScheduleError> {
@@ -296,6 +297,7 @@ impl SelectedScheduleManager {
             return Err(unavailable("actual Compact timestep domain"));
         }
         let slots = 24 * steps;
+        let mut last_for = String::new(); // Genuine ProcessScheduleInput local constructor.
         for number in 0..input.get_num_objects_found("Schedule:Compact") {
             let num_alphas = Self::get_source_compact_object_item(input, number, locals, true)?;
             if self.schedule_map.contains_key(&locals.0[0]) {
@@ -338,7 +340,7 @@ impl SelectedScheduleManager {
             let mut day_count = 0usize;
             let mut full_year = false;
             while field + 1 < num_alphas {
-                let end = through_day(&locals.0[field])?;
+                let (end, current_through) = through_day(&locals.0[field])?;
                 if end == 366 {
                     if full_year {
                         return Err(unavailable(
@@ -377,6 +379,7 @@ impl SelectedScheduleManager {
                     self.day_schedules[day].schedule_type_number =
                         self.schedules[schedule.0].schedule_type_number;
                     self.day_schedules[day].is_used = true;
+                    last_for.clone_from(&locals.0[field]); // Original1390, before the child.
                     let these_days = for_days(&locals.0[field], &mut all_days)?;
                     // Preserve Original index order and same-row checked accesses across the retained work arrays.
                     #[allow(clippy::needless_range_loop)]
@@ -442,7 +445,59 @@ impl SelectedScheduleManager {
                     }
                 }
                 if all_days[1..].iter().any(|value| !value) {
-                    return Err(unavailable("actual Compact missing day-type warning"));
+                    use super::minute::SourceScheduleMinuteDiagnostic::{Continue, Warning};
+                    // Original1480-1499: ShowWarningCustom itself emits the
+                    // first Continue, followed by the three explicit rows.
+                    // AddWeekSchedule already points missing slots at the real
+                    // resized MissingDaySchedule0; diagnostics write no values.
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        Warning,
+                        &format!("ProcessScheduleInput: Schedule:Compact = {name}"),
+                    )?;
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        Continue,
+                        &format!("has missing day types in Through={current_through}"),
+                    )?;
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        Continue,
+                        &format!("Last \"For\" field={last_for}"),
+                    )?;
+                    const DAY_NAMES: [&str; 13] = [
+                        "Unused",
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Holiday",
+                        "SummerDesignDay",
+                        "WinterDesignDay",
+                        "CustomDay1",
+                        "CustomDay2",
+                    ];
+                    let mut message = String::from("Missing day types=,");
+                    for (assigned, day_name) in all_days[1..].iter().zip(&DAY_NAMES[1..]) {
+                        if !assigned {
+                            let _ = message.pop();
+                            message.push_str(&format!(" \"{day_name}\",-"));
+                        }
+                    }
+                    message.truncate(message.len() - 2);
+                    schedule_diagnostic(backend, flags, Continue, &message)?;
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        Continue,
+                        "Missing day types will have 0.0 as Schedule Values",
+                    )?;
                 }
             }
             let SelectedScheduleData::Detailed(detail) = &mut self.schedules[schedule.0].data

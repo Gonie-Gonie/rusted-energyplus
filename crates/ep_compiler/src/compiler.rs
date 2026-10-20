@@ -16166,7 +16166,7 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             match field_value {
-                RawValue::String(text) if compact_directive(text, "Through") => {
+                RawValue::String(text) if compact_directive_operand(text, "Through").is_some() => {
                     self.finish_compact_schedule_profile(
                         object_name,
                         current_period.as_mut(),
@@ -16211,7 +16211,7 @@ impl<'a> Compiler<'a> {
                         assigned_day_types: [false; 12],
                     });
                 }
-                RawValue::String(text) if compact_directive(text, "For") => {
+                RawValue::String(text) if compact_directive_operand(text, "For").is_some() => {
                     self.finish_compact_schedule_profile(
                         object_name,
                         current_period.as_mut(),
@@ -16244,7 +16244,9 @@ impl<'a> Compiler<'a> {
                         interpolation_explicit: false,
                     });
                 }
-                RawValue::String(text) if compact_directive(text, "Interpolate") => {
+                RawValue::String(text)
+                    if compact_directive_operand(text, "Interpolate").is_some() =>
+                {
                     let Some(profile) = current_profile.as_mut() else {
                         self.error(
                             "InvalidScheduleCompactInterpolationOrder",
@@ -16283,7 +16285,9 @@ impl<'a> Compiler<'a> {
                         );
                         continue;
                     }
-                    let Some(interpolation) = parse_schedule_interpolation(text) else {
+                    let Some(interpolation) = compact_directive_operand(text, "Interpolate")
+                        .and_then(parse_schedule_interpolation)
+                    else {
                         self.error(
                             "InvalidScheduleCompactInterpolation",
                             "Schedule:Compact",
@@ -16298,7 +16302,7 @@ impl<'a> Compiler<'a> {
                     profile.profile.interpolation = interpolation;
                     profile.interpolation_explicit = true;
                 }
-                RawValue::String(text) if compact_directive(text, "Until") => {
+                RawValue::String(text) if compact_directive_operand(text, "Until").is_some() => {
                     let Some(profile) = current_profile.as_mut() else {
                         self.error(
                             "InvalidScheduleCompactOrder",
@@ -16642,6 +16646,20 @@ fn compact_directive(value: &str, directive: &str) -> bool {
         && value[directive.len()..].trim_start().starts_with(':')
 }
 
+/// Compact's actual Source grammar accepts its keyword with or without a
+/// colon. Keep this operand projection separate from shared day/calendar rules.
+fn compact_directive_operand<'a>(value: &'a str, directive: &str) -> Option<&'a str> {
+    let value = value.trim_start();
+    if !value
+        .get(..directive.len())?
+        .eq_ignore_ascii_case(directive)
+    {
+        return None;
+    }
+    let remainder = value[directive.len()..].trim_start();
+    Some(remainder.strip_prefix(':').unwrap_or(remainder).trim())
+}
+
 fn parse_schedule_interpolation(value: &str) -> Option<ScheduleInterpolation> {
     let value = value.trim();
     let value = if let Some((directive, interpolation)) = value.split_once(':') {
@@ -16837,19 +16855,61 @@ fn schedule_day_type_name(day_type: ScheduleDayType) -> &'static str {
 }
 
 fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
-    let (_directive, date) = value.split_once(':')?;
-    let ep_model::CalendarDateRule::MonthDay {
-        month,
-        day_of_month,
-    } = parse_calendar_date_rule(date.trim())?
-    else {
-        return None;
+    let date = compact_directive_operand(value, "Through")?;
+    let (month, day_of_month) = match parse_calendar_date_rule(date) {
+        Some(ep_model::CalendarDateRule::MonthDay {
+            month,
+            day_of_month,
+        }) => (month, day_of_month),
+        Some(_) => return None,
+        None => {
+            // General635-654 selects numeric yyyy/mm/dd or mm/dd/yyyy by
+            // first>100, otherwise third>100. This actual caller omits PYear,
+            // so the authored year does not change the leap-shaped schedule.
+            // First bounded projection: three i32-range decimal tokens after
+            // the Original separators, with a valid fixed selected month/day.
+            // General's fractional-number/unvalidated-date extensions remain
+            // outside this projection; shared DST/CalendarDateRule is unchanged.
+            // Check the original authored directive before the operand helper
+            // can hide a Unicode/tab edge with trim. This new numeric arm
+            // admits only General's ASCII-space separators, no leading '+'.
+            // The pre-existing two-field/named-date parser above is unchanged.
+            if value
+                .chars()
+                .any(|character| character.is_whitespace() && character != ' ')
+            {
+                return None;
+            }
+            let normalized = date.replace(['/', ':', '-'], " ");
+            let fields = normalized
+                .split(' ')
+                .filter(|field| !field.is_empty())
+                .collect::<Vec<_>>();
+            let [first, second, third] = fields.as_slice() else {
+                return None;
+            };
+            if fields
+                .iter()
+                .any(|field| !field.bytes().all(|byte| byte.is_ascii_digit()))
+            {
+                return None;
+            }
+            let first = first.parse::<i32>().ok()?;
+            let second = second.parse::<i32>().ok()?;
+            let third = third.parse::<i32>().ok()?;
+            let (month, day) = if first > 100 {
+                (second, third)
+            } else if third > 100 {
+                (first, second)
+            } else {
+                return None;
+            };
+            (u32::try_from(month).ok()?, u32::try_from(day).ok()?)
+        }
     };
-    let days_before_month = [0_u16, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
-    let month_index = usize::try_from(month.checked_sub(1)?).ok()?;
-    days_before_month
-        .get(month_index)?
-        .checked_add(u16::try_from(day_of_month).ok()?)
+    // The same fixed-date validity and leap ordinal are retained for old and
+    // new spellings. No year, expanded values or runtime answer is invented.
+    u16::try_from(leap_schedule_ordinal(month, day_of_month)?).ok()
 }
 
 fn leap_schedule_ordinal(month: u32, day_of_month: u32) -> Option<usize> {
@@ -18454,6 +18514,85 @@ mod tests {
         assert_eq!(segments[0].until_minute_of_day, 8 * 60);
         assert_eq!(segments[1].value, 1.0);
 
+        // Compile actual raw Compact objects through all four optional-colon
+        // directives; this is the same yearless typed representation consumed
+        // by both the raw Source route and bounded older calendar adapters.
+        for (through, ordinal) in [
+            ("Through 2013/12/31", 366),
+            ("Through: 12/31/2013", 366),
+            ("Through2013-12-31", 366),
+            ("Through 2013:12:31", 366),
+            ("Through: 2013/2/29", 60), // PYear is absent; no civil-year leap test.
+        ] {
+            let remainder = if ordinal == 366 {
+                String::new()
+            } else {
+                String::from(
+                    r#",{"field":"Through 12/31"},{"field":"For AllDays"},
+                    {"field":"Interpolate Linear"},{"field":"Until 24:00"},{"field":0.5}"#,
+                )
+            };
+            let text = format!(
+                r#"{{"Schedule:Compact":{{"Typed Syntax":{{"data":[
+                {{"field":"{through}"}},{{"field":"For AllDays"}},
+                {{"field":"Interpolate Linear"}},{{"field":"Until 24:00"}},{{"field":0.5}}
+                {remainder}]}}}}}}"#
+            );
+            let raw = parse_epjson_str(&text)?;
+            let compiled = compile_raw_model(&raw);
+            assert!(
+                !compiled.has_errors(),
+                "{through}: {:?}",
+                compiled.report.diagnostics
+            );
+            let model = compiled
+                .model
+                .ok_or_else(|| std::io::Error::other("actual Compact syntax model"))?;
+            let schedule = &model.compact_schedules[0];
+            assert_eq!(schedule.periods[0].through_schedule_day_of_year, ordinal);
+            assert_eq!(schedule.periods.len(), if ordinal == 366 { 1 } else { 2 });
+            for period in &schedule.periods {
+                assert_eq!(period.day_profiles.len(), 1);
+                assert_eq!(period.day_profiles[0].day_types.len(), 12);
+                assert_eq!(
+                    period.day_profiles[0].interpolation,
+                    ScheduleInterpolation::Linear
+                );
+                assert_eq!(period.day_profiles[0].segments.len(), 1);
+                assert_eq!(period.day_profiles[0].segments[0].until_minute_of_day, 1440);
+                assert_eq!(period.day_profiles[0].segments[0].value, 0.5);
+            }
+        }
+        for through in [
+            "Through 2013/2/30",
+            "Through 2013.5/12/31",
+            "Through 12/31/100",
+            "Through 1st Monday in January",
+            "Through 0",
+            "Through 366",
+            "Through +2013/12/31",
+            "Through 12/31/+2013",
+            "Through 2013/+12/31",
+            "Through 2013\\t12\\t31",
+            "Through 2013\u{00a0}12\u{00a0}31",
+            "Through \u{00a0}2013/12/31",
+            "Through 2013/12/31\u{00a0}",
+        ] {
+            let text = format!(
+                r#"{{"Schedule:Compact":{{"Bounded Syntax":{{"data":[
+                {{"field":"{through}"}},{{"field":"For AllDays"}},
+                {{"field":"Until 24:00"}},{{"field":0.5}}]}}}}}}"#
+            );
+            let compiled = compile_raw_model(&parse_epjson_str(&text)?);
+            assert!(
+                compiled
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|row| row.code == "InvalidScheduleCompactThrough"),
+                "{through}"
+            );
+        }
         Ok(())
     }
 

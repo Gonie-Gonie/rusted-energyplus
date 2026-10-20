@@ -465,10 +465,26 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
         "Through: 31 DEC",
         "Through: 12-31",
         "Through: 12 31",
+        "Through 2013/12/31",
+        "Through: 12/31/2013",
+        "Through2013-12-31",
+        "Through 2013:12:31",
     ] {
         let mut raw = authored_raw(fixture, "Average", false);
         raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][0]["field"] =
             serde_json::json!(through);
+        // Actual Raw Source getters already accept these no-colon spellings;
+        // exercise the real minute producer, not a typed preview value.
+        for (at, text) in [
+            (1, "For AllDays"),
+            (2, "Interpolate Average"),
+            (3, "Until 00:20"),
+            (5, "Until 01:15"),
+            (7, "Until 24:00"),
+        ] {
+            raw["Schedule:Compact"]["Internal Gain Schedule"]["data"][at]["field"] =
+                serde_json::json!(text);
+        }
         let mut input = processor(fixture, &raw)?;
         let declarations = schedule_declarations(fixture, &raw)?;
         let mut manager = SelectedScheduleManager::default();
@@ -631,6 +647,181 @@ fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestR
             assert!(header < field && field < last);
         } else {
             assert!(text.is_empty());
+        }
+    }
+    // Incomplete but valid masks keep the genuine MissingDaySchedule0
+    // pointers. A failed final Continue retains the already populated first
+    // Through period and prevents creation of the later period.
+    struct MissingDaySink {
+        bytes: Vec<u8>,
+        fail_final_continue: bool,
+    }
+    impl io::Write for MissingDaySink {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            if self.fail_final_continue
+                && String::from_utf8_lossy(bytes)
+                    .contains("Missing day types will have 0.0 as Schedule Values")
+            {
+                return Err(io::Error::other("actual missing-day final Continue sink"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    for fail_final_continue in [false, true] {
+        let mut raw = authored_raw(fixture, "Average", false);
+        raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = serde_json::json!([
+            {"field":"Through: 6/30"}, {"field":"For: Tuesday"},
+            {"field":"Interpolate: Average"}, {"field":"Until: 24:00"}, {"field":2},
+            {"field":"Through: 12/31"}, {"field":"For: AllDays"},
+            {"field":"Interpolate: Average"}, {"field":"Until: 24:00"}, {"field":3}
+        ]);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            MissingDaySink {
+                bytes: Vec::new(),
+                fail_final_continue,
+            },
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut input,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )
+        };
+        if fail_final_continue {
+            assert!(result.is_err());
+        } else {
+            result?;
+        }
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_warning_errors_during_warmup,
+                state.tracking.total_severe_errors
+            ),
+            (1, 1, 0)
+        );
+        assert!(!state.warmup_flag); // Actual borrowed warmup=true was read.
+        let index = *manager
+            .schedule_map
+            .get("INTERNAL GAIN SCHEDULE")
+            .ok_or("actual incomplete-mask Detailed pointer")?;
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+            return Err("actual incomplete-mask Detailed owner".into());
+        };
+        let first_week = detail.week_schedules[1].ok_or("actual first Through Week")?;
+        assert!(
+            detail.week_schedules[1..=182]
+                .iter()
+                .all(|slot| *slot == Some(first_week))
+        );
+        let week = &manager.week_schedules[first_week];
+        let tuesday = week.day_schedules[3].ok_or("actual Tuesday Day")?;
+        assert_ne!(tuesday, 0);
+        for day_type in 1..13 {
+            assert_eq!(
+                week.day_schedules[day_type],
+                Some(if day_type == 3 { tuesday } else { 0 })
+            );
+        }
+        assert_eq!(manager.day_schedules[0].name, "MissingDaySchedule-0.0");
+        assert_eq!(manager.day_schedules[0].timestep_values.len(), 96);
+        assert!(
+            manager.day_schedules[0]
+                .timestep_values
+                .iter()
+                .all(|v| v.to_bits() == 0.0_f64.to_bits())
+        );
+        assert!(
+            manager.day_schedules[tuesday]
+                .timestep_values
+                .iter()
+                .all(|v| *v == 2.0)
+        );
+        let diagnostic_rows = std::str::from_utf8(&errors.bytes)?
+            .lines()
+            .filter(|line| line.contains("**"))
+            .collect::<Vec<_>>();
+        let expected = [
+            "   ** Warning ** ProcessScheduleInput: Schedule:Compact = INTERNAL GAIN SCHEDULE",
+            "   **   ~~~   ** has missing day types in Through=6/30",
+            "   **   ~~~   ** Last \"For\" field=FOR: TUESDAY",
+            "   **   ~~~   ** Missing day types= \"Sunday\", \"Monday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Holiday\", \"SummerDesignDay\", \"WinterDesignDay\", \"CustomDay1\", \"CustomDay2\"",
+            "   **   ~~~   ** Missing day types will have 0.0 as Schedule Values",
+        ];
+        assert_eq!(
+            diagnostic_rows,
+            expected[..if fail_final_continue { 4 } else { 5 }]
+        );
+        if fail_final_continue {
+            assert!(detail.week_schedules[183..].iter().all(Option::is_none));
+            assert!(
+                !std::str::from_utf8(&audit.bytes)?
+                    .contains("Processing Schedule Input -- Complete")
+            );
+        } else {
+            let second =
+                detail.week_schedules[183].ok_or("actual continued second Through Week")?;
+            assert_ne!(second, first_week);
+            assert!(
+                detail.week_schedules[183..]
+                    .iter()
+                    .all(|slot| *slot == Some(second))
+            );
+            let clock = WeatherGlobalState {
+                hour_of_day: 1,
+                time_step: 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            for (day_of_year_schedule, day_of_week, holiday_index, expected) in [
+                (1, 3, 0, 2.0_f64),
+                (1, 1, 0, 0.0),
+                (1, 3, 8, 0.0),
+                (1, 3, 12, 0.0),
+                (183, 1, 0, 3.0),
+            ] {
+                let environment = WeatherEnvironmentState {
+                    day_of_year_schedule,
+                    day_of_week,
+                    holiday_index,
+                    ..Default::default()
+                };
+                manager.update_source_schedule_values(&clock, &environment)?;
+                assert_eq!(
+                    manager.source_current_schedule_value(index)?.to_bits(),
+                    expected.to_bits()
+                );
+            }
+            assert!(
+                std::str::from_utf8(&audit.bytes)?
+                    .ends_with("  Processing Schedule Input -- Complete\n")
+            );
         }
     }
     // Retain AddDetailed/type and the successful Warning/first Continue when

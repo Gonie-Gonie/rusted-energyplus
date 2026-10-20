@@ -7,7 +7,7 @@ use ep_model::{
 use ep_raw_model::RawObject;
 
 use super::{
-    ALL_SCHEDULE_DAY_TYPES, CompactSchedulePeriodBuilder, Compiler, compact_directive,
+    ALL_SCHEDULE_DAY_TYPES, CompactSchedulePeriodBuilder, Compiler, compact_directive_operand,
     process_week_compact_day_types,
 };
 
@@ -170,10 +170,7 @@ impl Compiler<'_> {
 }
 
 fn decode_compact_until(value: &str) -> Option<(u32, u32, bool)> {
-    if !compact_directive(value, "Until") {
-        return None;
-    }
-    let (_, time) = value.split_once(':')?;
+    let time = compact_directive_operand(value, "Until")?;
     let (hour, minute) = time.trim().split_once(':')?;
     let hour = hour.trim().parse::<u32>().ok()?;
     let minute = minute.trim().parse::<u32>().ok()?;
