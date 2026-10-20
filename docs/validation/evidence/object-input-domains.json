@@ -137,7 +137,8 @@
       "Positive opaque Vertices/Details/DetailsWithVertices selections, arbitrary unnamed map identities and optional IDF specification retain real raw fields, typed ReportInputs and both actual two-alpha IP schemas.",
       "Actual ReportSurfaces cache/order selects the real RptType1/10/11 writer; borrowed Source Zone first/last counts, final report order, Surface vertices/properties, nominalU/construction name and convection owners feed one complete buffered EIO write.",
       "Original headers including Vertex4 typo, .2R/.3R formatting, class-only film resistances independent of Ground/Adiabatic and genuine Surface Reveal constructor0 are preserved. Unsupported children fail before the buffered stream write.",
-      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Lines/CostInfo/VRML and positive shading/window/frame/user/OSC exporters are not promoted."
+      "Same-input DetailsWithVertices matches complete12line/six39field report, wholeSHD, ERR/END and all58/5352 physical reports; Vertices/Details sibling paths and optional failure prefixes remain table/unit scoped. Lines/CostInfo/VRML and positive shading/window/frame/user/OSC exporters are not promoted.",
+      "CostInfo now writes actual explicit caller-owned SCI through real local IOFilePath/outputControl defaulttrue and false dev-null; Native uniqueness mask/report order/physical ordinals/names/classes/independentArea andGrossArea are used. Live reached Fatal reads actual weather/global/project flags; partial IO prefixes remain. Same-input A58/5352 plus exact wholeSCI508B/9CRLF lines/6rows and wholeSHD/ERR-END0/0 pass. No opening/interzone/Construction0 activation claimed by this case."
     ],
     "Output:Meter": [
       "Normal and MeterFileOnly raw families retain named meter keys including wildcard/unit-suffix semantics, strict official frequencies/defaults and arbitrary unnamed object identities; unknown/empty authored keys reach the genuine not-found warning.",
@@ -161,34 +162,42 @@
       "Actual fixed/Nth/Last, weekend observation, cyclic duration, live weekday/month tables and literal Original InvOrdinalDay leap subtraction; no preview values substitute. Overlap warnings/conditional continuations precede overwrite and deferred Nth Severe-to-Fatal preserves prior writes.",
       "All3 real calendar callers use actual Environment ApplyWeekendRule, weather flags and live diagnostic phase owners. Actual special-day EIO and tomorrow/day-type/DST schedule consumers are connected.",
       "Same-input1/1 CustomDay1 Duration1.9 becomes1 across96actual clocks and matches all102/9792 original outputs exactly. AllDays schedules do not prove distinct day-type coefficients; ordinal-only unwritten local weekday and broader grammar/models remain bounded."
+    ],
+    "Schedule:Compact": [
+      "Actual retained DaySchedule enum0/1/2 selects No/Average/Linear through the existing Original minute expansion/population; no preview cache or Native output is supplied to runtime. Real day/week graph, UpdateScheduleVals/currentVal and DST/hour24 consumers remain owned by Source.",
+      "Actual Source initialization borrows live kickoff/developer/weather warmup/doingSizing into minute Warning/Severe/Continue callbacks. Parent error Continue follows child; retained population precedes later ProcessScheduleInput Fatal. Callback/IO failures keep completed prefixes.",
+      "SourceA accepts the same Compact family/raw grammar and references. Only Compact transfers full numeric/order operands; otherA raw projections and previous lexical fallback order stay unchanged. A complete all-family identity/order map preserves the existing strict IP association guard. Legacy unscoped admission remains closed.",
+      "Existing No Native unit body now covers all3 interpolation modes/live currentVal and diagnostic/failure prefixes; a SourceA ingress check proves raw numbers/order/type negatives. Full workspace5046/2 and all-targetClippy pass.",
+      "Same-input B102 consumed nonaligned Average and Linear each complete102/9792 raw/binary64-exact outputs under unchanged named policies, exact96schedule strings/bits, fullEIO/WarmupDays6/ERR-END0/0/wholeSHD and genuine deleted-emptyMTR. Linear endpoint overshoot/residue is retained, never clamped.",
+      "Remaining non-MM/DD Through grammar, missing/unknown type diagnostics, malformed/duplicate selectors, schedule-limit failures, some Detailed min/max/control getters, sibling public schedule families and broader calendar/model combinations retain explicit boundaries. No full-object or arbitrary-combination completion."
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5042,
+      "passed": 5046,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/calendar-workspace-tests-16c.log",
-        "sha256": "db04a7401514312c7cb0a3cc69a4d4cc4901a5004c6c4a8aecfdeddc5c525a19",
-        "bytes": 1555820
+        "path": ".runtime/object-expansion/surface-compact-workspace-tests-18.log",
+        "sha256": "c9ad024a6889124bd7ab024bb5e221b53c8eca5dfa89d42e71614bd3ee4d5d54",
+        "bytes": 1556948
       },
-      "scope": "Full workspace milestone through calendar-controls-16: actual raw/IP calendar getters, fractional duration, retained DST weekday definedness, all3 live calendar callers, real diagnostics, EIO and coverage-only Source preparation. Legacy preview admission remains bounded."
+      "scope": "Full workspace milestone through surface-compact-18: real SCI file/report owner and live Fatal, actual Compact No/Average/Linear minute producer/currentVal, live minute diagnostic/failure prefixes and final Fatal order, SourceA Compact numeric/order custody with strict complete-family association. Legacy paths retain their boundaries."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/ordinal-clippy-17.log",
-        "sha256": "4bff51dcf4fab789c819be7301093048d6291b720af958077ef1c00558244e58",
-        "bytes": 2492
+        "path": ".runtime/object-expansion/surface-compact-clippy-18.log",
+        "sha256": "ff55f390352f9f4bc76ebc2736a41380951425fc9384f4c3826af8f24659bb9a",
+        "bytes": 2068
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/ordinal-docs-17.log",
+        "path": ".runtime/object-expansion/surface-compact-docs-18.log",
         "sha256": "458728d835dc49082fd9e9bbcc899b1b1b2e9d373f798099128e96fdc9767e1e",
         "bytes": 354
       },
-      "clippy_through_build": "calendar-dst-ordinal-17"
+      "clippy_through_build": "surface-compact-18"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -2255,12 +2264,165 @@
           "passed": true
         },
         "effective_state": "Exact original B102 plus sole IDF DST365-to-1. Native ProcessDateString classifies these as LastDayInMonth and leaves the actual retained IDFDST ctor weekday0 unchanged; the typed descriptor retains syntax only and legacy previews explicitly reject it. Actual getter/calendar yields InputFile12/28-to-01/26, not projected ordinary ordinal dates. All102/9792 original-policy outputs are raw/binary64 exact, with96actual DST1/Tuesday clocks, noSpecialEIO,6warmup days, wholeSHD, fullERR-END0/0 and genuine deleted-emptyMTR0. Shared/SpecialDays/EPW numeric grammar,0/366/fractional-string and full date-domain compatibility remain bounded."
+      },
+      {
+        "id": "opaque-cost-info",
+        "group": "surface_reporting",
+        "source_build": "surface-compact-18",
+        "input": {
+          "path": ".runtime/object-expansion/native-cost-info/calibration-01/input.idf",
+          "sha256": "3a5ae388fb4a931e31a8b6cd26bc1df76b5853bf5e73e4e2e2ad131f1cbc4249",
+          "bytes": 9310
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-cost-info/calibration-01/receipt.json",
+          "sha256": "f0c1c3aeceddce36eee94b00f4f474fe54e0777161e26b3161ddfe341227598a",
+          "bytes": 24751
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-cost-info-18/receipt/receipt.json",
+          "sha256": "d157a91d2c642b031d3fb17f9201d9df54d389d87341740d9b98cf7cc1aee0c2",
+          "bytes": 5977
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/cost-info-18/run-summary.json",
+          "sha256": "8e86bb048a782995a082995cf5ae1fe5fccc26659581cdbabe7ff62366c99185",
+          "bytes": 32000
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-cost-info-18-comparisons-01/main/comparison.json",
+          "sha256": "e696402de9b51c2caeb4f459332c836183e2703c5d26c5c34e0890d63a17a57d",
+          "bytes": 125658
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-cost-info-18-comparisons-01/opaque-cost-info-source-run-request.json",
+          "sha256": "0282de788cdcc7e4e256461fce4a7256c77d4e8f480badcf1114bd1b9568a434",
+          "bytes": 4394
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Exact original A24 plus sole CostInfo request. All original58/5352 pass unchanged policies; actual Source SCI equals all508Nativebytes/9CRLF lines/6ordered surfaces with real ordinal/name/construction/class/independentArea andGrossArea. WholeSHD/fullERR-END0/0 also match. Real SCI caller path/local IOFilePath, outputControl false dev-null, partial IO prefix and live phase Fatal are connected; pair exclusion/Construction0 and different net/gross areas are actual-owner unit checks, not activated by this no-opening physical fixture."
+      },
+      {
+        "id": "compact-average-B102-02",
+        "group": "compact_interpolation",
+        "source_build": "surface-compact-18",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-average/calibration-02/input.idf",
+          "sha256": "0a87d00b16fd742f8583c3ef81a58ea39b505f6a5e2a65844101d2afc378c35f",
+          "bytes": 13072
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-average/calibration-02/receipt.json",
+          "sha256": "abef9a0ccfb40e3c8c39fc2c07485ada68329e8a036341cab164bbc4181c1e42",
+          "bytes": 10248
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-interpolation-18/average/receipt.json",
+          "sha256": "6c174ed991bd2bbc3236b23c93ab92c1cfd9c561b1aad384c21d398065ba39e7",
+          "bytes": 5922
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-average-18/run-summary.json",
+          "sha256": "0cec047a9a4affe08bcf51880d42897ee1358041acacb3fc55cc124a7c35ab07",
+          "bytes": 60549
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-interpolation-comparisons-18/average/comparison.json",
+          "sha256": "617fda43ca97ee786f5b5f803a7ddc0303dd77b2f73306c9c163c73bd11ae805",
+          "bytes": 209828
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-interpolation-18-launch/average/request.json",
+          "sha256": "fb93f3dc79773635e9cec0e9a352ae67dce0658b627493bd1f50330828d40b1c",
+          "bytes": 2870
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "One original B102 Internal Gain Schedule span selects Average with Until06:20=0/07:15=1/18:00=1/24:00=0; all other bytes and original102 policies/weather stay unchanged. Actual1000WOtherEquipment consumption and all102/9792 outputs are raw/binary64 exact. Actual96schedule operands include06:30=.6666666666666666; fullEIO/WarmupDays6/ERR-END0/0/wholeSHD and genuine deleted-emptyMTR0 match. Initial independent Native readback JSON tuple/list projection error is preserved; only structural readback corrected, no producer retry or operand rewrite."
+      },
+      {
+        "id": "compact-linear-B102",
+        "group": "compact_interpolation",
+        "source_build": "surface-compact-18",
+        "input": {
+          "path": ".runtime/object-expansion/native-compact-linear/calibration-01/input.idf",
+          "sha256": "432551118f4156879df5910c986ad064a8ec7811d1750ed86842fd8d3788cbe5",
+          "bytes": 13071
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-compact-linear/calibration-01/receipt.json",
+          "sha256": "848f117f1c3b4c3d90e68a305ca96bba5799a8df2b865b74ad40e2fb2e7b26fe",
+          "bytes": 9740
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-compact-interpolation-18/linear/receipt.json",
+          "sha256": "94cce50c6d4752fe7d912c38fae2db1345ae20ddcdc293e1991ee0299146ad81",
+          "bytes": 5918
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/compact-linear-18/run-summary.json",
+          "sha256": "dcdd8e6df3d6f9ab041b72cf478cf4a933b8062fa29a08c2125915976ab28df8",
+          "bytes": 60523
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-compact-interpolation-comparisons-18/linear/comparison.json",
+          "sha256": "0c05becc98224fcac74d64913ecfb5ed4f9678b835d43f21744b140257a15659",
+          "bytes": 212224
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-compact-interpolation-18-launch/linear/request.json",
+          "sha256": "272e4e0e07baba1596a54381add80f2d98814fdd9eb578bf0112e3bf02e150fe",
+          "bytes": 2861
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "One original B102 Internal Gain Schedule span selects Linear with the same four Until endpoints, retaining actual03:00-to-24:00 HVACavailability and bothNoLimit. Actual minute rising/flat/falling repeated additions drive real1000WOtherEquipment, with all102/9792 original-policy outputs raw/binary64 exact. Actual96schedule strings/bits retain07:15=1.0000000000000002 and24:00=3.0470417855532617e-15; no clamp/normalization. FullEIO/WarmupDays6/ERR-END0/0/SHD and genuine deleted-emptyMTR0 match. These consumed profiles do not establish every Compact grammar/calendar/model combination."
       }
     ],
     "totals": {
-      "paired_cases": 36,
-      "reported_samples": 237654,
-      "raw_operand_unequal": 101278,
+      "paired_cases": 39,
+      "reported_samples": 262590,
+      "raw_operand_unequal": 104814,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -2554,27 +2716,22 @@
           "sha256": "4bc731f8ef3286f29e09249288ec5de3502f142ec0d9fe19b1428111a8b907f8",
           "bytes": 75375346
         }
-      }
-    ],
-    "focused_tests_since_workspace": [
-      {
-        "scope": "calendar typed/raw/actual-owner paths",
-        "passed": 24,
-        "ignored": 0,
-        "log": {
-          "path": ".runtime/object-expansion/ordinal-focused-tests-17.log",
-          "sha256": "b58373c584bd05dfbb0c6fa4c108083c4045a2f9c7c4dddcd71881746a59fbbe",
-          "bytes": 11098
-        }
       },
       {
-        "scope": "RunPeriod/defaults/legacy calendar consumers",
-        "passed": 24,
-        "ignored": 0,
-        "log": {
-          "path": ".runtime/object-expansion/ordinal-run-period-tests-17.log",
-          "sha256": "9338a0fa74776d5ebbd191ef0fa9d48da7531cdcca07393afbc4a2d46b00b0ca",
-          "bytes": 9606
+        "id": "surface-compact-18",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-18/receipt.json",
+          "sha256": "4c0eac5f3b7369c7b29ef3e681486bb30ad9ba889310aa0bb5333dbc9362c7e7",
+          "bytes": 6774
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/9f/9fc59a2ff31382f345a1c41dfa77f00201ac72faafa31f0823792b694c6b810d",
+          "sha256": "9fc59a2ff31382f345a1c41dfa77f00201ac72faafa31f0823792b694c6b810d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-18/eplus-rs.exe",
+          "sha256": "d5a593ccb987f87df245bfd1b2add8a3549f07c88108dba9896a2ac69a54ac46",
+          "bytes": 75525625
         }
       }
     ]

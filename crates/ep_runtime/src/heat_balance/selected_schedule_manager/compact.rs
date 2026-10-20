@@ -258,6 +258,9 @@ impl SelectedScheduleManager {
         input: &mut SelectedInputProcessor,
         steps: usize,
         locals: &mut SourceScheduleGetterLocals,
+        backend: &mut Option<&mut SourceErrorBackend<'_>>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
+        errors_found: &mut bool,
     ) -> Result<(), SelectedScheduleError> {
         if steps == 0 || steps > 60 || 60 % steps != 0 {
             return Err(unavailable("actual Compact timestep domain"));
@@ -342,13 +345,18 @@ impl SelectedScheduleManager {
                     if locals.0[field].starts_with("INTERPOLATE")
                         || !locals.0[field].starts_with("UNTIL")
                     {
-                        if locals.0[field].contains("NO") {
-                            self.day_schedules[day].interpolation = 0;
+                        // Original independent substring selection order.
+                        self.day_schedules[day].interpolation = if locals.0[field].contains("NO") {
+                            0
+                        } else if locals.0[field].contains("AVERAGE") {
+                            1
+                        } else if locals.0[field].contains("LINEAR") {
+                            2
                         } else {
                             return Err(unavailable(
-                                "actual Compact non-No interpolation/key branch",
+                                "actual Compact invalid interpolation key diagnostic",
                             ));
-                        }
+                        };
                         field += 1;
                     }
                     let until_field = field;
@@ -382,6 +390,10 @@ impl SelectedScheduleManager {
                             &locals.0[until_field..until_field + numbers],
                             &locals.3[..numbers],
                             steps,
+                            &name,
+                            backend,
+                            flags,
+                            errors_found,
                         )?;
                     }
                 }
@@ -410,12 +422,17 @@ impl SelectedScheduleManager {
         }
         Ok(())
     }
+    #[allow(clippy::too_many_arguments)]
     fn populate_source_compact_day(
         &mut self,
         day: usize,
         untils: &[String],
         values: &[f64],
         steps: usize,
+        schedule_name: &str,
+        backend: &mut Option<&mut SourceErrorBackend<'_>>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
+        schedule_errors_found: &mut bool,
     ) -> Result<(), SelectedScheduleError> {
         use super::minute::{
             SourceScheduleInterpolation, populate_source_day_from_minutes,
@@ -425,11 +442,12 @@ impl SelectedScheduleManager {
             .day_schedules
             .get(day)
             .ok_or_else(|| unavailable("actual populated Compact day owner"))?;
-        if row.interpolation != 0 {
-            return Err(unavailable(
-                "actual production Compact non-No interpolation admission",
-            ));
-        }
+        let mode = match row.interpolation {
+            0 => SourceScheduleInterpolation::No,
+            1 => SourceScheduleInterpolation::Average,
+            2 => SourceScheduleInterpolation::Linear,
+            _ => return Err(unavailable("actual Compact DaySchedule interpolation enum")),
+        };
         let name = row.name.clone();
         let mut minute_values = [0.0; 1440];
         let mut set_minutes = [false; 1440];
@@ -443,21 +461,25 @@ impl SelectedScheduleManager {
             &mut set_minutes,
             &mut errors_found,
             &name,
-            "Schedule:Compact",
-            SourceScheduleInterpolation::No,
+            "Schedule:Compact DaySchedule Fields",
+            mode,
             i32::try_from(60 / steps)
                 .map_err(|_| unavailable("actual Compact minute clock conversion"))?,
-            &mut |_, _| {
-                Err(unavailable(
-                    "actual Compact minute diagnostic backend boundary",
-                ))
-            },
+            &mut |kind, message| schedule_diagnostic(backend, flags, kind, message),
         )?;
         if errors_found {
-            return Err(unavailable(
-                "actual ProcessIntervalFields Compact input errors",
-            ));
+            schedule_diagnostic(
+                backend,
+                flags,
+                super::minute::SourceScheduleMinuteDiagnostic::Continue,
+                &format!("ref Schedule:Compact=\"{schedule_name}\""),
+            )?;
+            *schedule_errors_found = true;
         }
+        // Original1467-1476 populates the same DaySchedule even when the
+        // completed minute child reported input errors. Fatal is later, after
+        // the full producer and ordinary schedule-type validation.
+
         let row = self
             .day_schedules
             .get_mut(day)

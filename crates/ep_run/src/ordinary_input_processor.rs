@@ -24,10 +24,10 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedInputProcessor, String> 
     super::ordinary_equipment_input::resolve(raw)?;
     project(raw, input_statistics::resolve(raw))
 }
-/// Explicit Source A admits only the additional real calendar input children.
+/// Explicit Source A retains actual calendar and Compact getter operands.
 pub(crate) fn resolve_source_a(raw: &RawModel) -> Result<SelectedInputProcessor, String> {
     super::ordinary_equipment_input::resolve_source_a(raw)?;
-    project(raw, input_statistics::resolve(raw))
+    project(raw, input_statistics::resolve_source_a(raw)?)
 }
 /// Explicit SourceB keeps full raw operands on the same IP; no getter is bypassed.
 pub(crate) fn resolve_source_b(raw: &RawModel) -> Result<SelectedInputProcessor, String> {

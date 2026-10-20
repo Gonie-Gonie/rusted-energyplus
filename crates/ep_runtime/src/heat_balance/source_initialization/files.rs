@@ -18,6 +18,8 @@ pub struct SourceInitializationFilePaths {
     pub bnd: PathBuf,
     /// Actual DXF drawing path; opened freshly at each reached DXF call.
     pub dxf: PathBuf,
+    /// Actual cost-information path; a fresh local IOFilePath at CostInfoOut.
+    pub sci: PathBuf,
     /// Actual report-variable dictionary path.
     pub rdd: PathBuf,
     /// Actual meter dictionary path.
@@ -158,6 +160,8 @@ pub struct SourceInitializationFiles {
     dfs: SourceOutputStream,
     // Native IOFilePath owns only the path, not a permanently opened stream.
     dxf: PathBuf,
+    // Actual IOFiles.hh635 local report path, never inferred from another file.
+    sci: PathBuf,
     tabular_paths: [PathBuf; 5],
     // Native IOFiles.hh626-627 retained InputOutputFile objects.
     dictionaries: [dictionaries::SourceDictionaryStream; 2],
@@ -180,6 +184,7 @@ impl SourceInitializationFiles {
             error: paths.error,
             dfs: SourceOutputStream::new(paths.dfs),
             dxf: paths.dxf,
+            sci: paths.sci,
             tabular_paths: [
                 paths.tabular_csv,
                 paths.tabular_tab,
@@ -217,6 +222,15 @@ impl SourceInitializationFiles {
             .create(true)
             .truncate(true)
             .open(&self.dxf)
+    }
+    pub(super) fn source_cost_info_path(&self) -> &Path {
+        &self.sci
+    }
+    pub(super) fn open_source_cost_info(
+        &self,
+        output_to_file: bool,
+    ) -> io::Result<SourceLocalReportFile> {
+        open_local_report(&self.sci, output_to_file)
     }
     pub(super) fn output_path(&self, index: usize) -> &Path {
         &self.outputs[index].path
@@ -400,3 +414,53 @@ impl SourceInitializationFiles {
 }
 
 mod program_end;
+
+/// IOFilePath local stream with actual outputControl false dev-null semantics.
+pub(super) struct SourceLocalReportFile {
+    file: Option<File>,
+}
+fn open_local_report(path: &Path, output_to_file: bool) -> io::Result<SourceLocalReportFile> {
+    let file = if output_to_file {
+        Some(
+            OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(path)?,
+        )
+    } else {
+        None
+    };
+    Ok(SourceLocalReportFile { file })
+}
+impl Write for SourceLocalReportFile {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        if let Some(file) = &mut self.file {
+            file.write_all(native_text_bytes(bytes).as_ref())?;
+        }
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        match &mut self.file {
+            Some(file) => file.flush(),
+            None => Ok(()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod local_report_tests {
+    use super::*;
+    #[test]
+    fn source_cost_info_output_gate_discards_without_open_and_preserves_real_open_error() {
+        // Empty is an invalid real filename. Native false opens its dev-null
+        // stream without touching it; true reaches the real filesystem error.
+        let invalid = Path::new("");
+        let mut disabled = open_local_report(invalid, false).unwrap();
+        disabled.write_all(b"unchanged logical report\n").unwrap();
+        disabled.flush().unwrap();
+        assert!(disabled.file.is_none());
+        assert!(open_local_report(invalid, true).is_err());
+    }
+}

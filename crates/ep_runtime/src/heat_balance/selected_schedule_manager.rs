@@ -1,4 +1,5 @@
 //! Genuine Constant/Compact ScheduleManager with retained native day/week owners.
+use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnavailable};
 use super::source_initialization::ScheduleAuditFileHost;
 use ep_model::ScheduleUnitType;
@@ -305,10 +306,15 @@ impl SelectedScheduleManager {
             time_steps_in_hour,
             audit_files,
             None,
+            None,
         )
     }
 
-    /// Same ProcessScheduleInput owners, with the caller's live diagnostic backend.
+    /// Existing backend-only callers retain their explicit legacy phase contract.
+    #[allow(
+        dead_code,
+        reason = "Keep the backend-only entry for gated owner callers; actual Source uses borrowed live phase cells."
+    )]
     pub(crate) fn process_schedule_input_with_backend(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -323,6 +329,28 @@ impl SelectedScheduleManager {
             time_steps_in_hour,
             audit_files,
             Some(backend),
+            None,
+        )
+    }
+
+    /// Same actual producer with genuine Source phase cells, never copied
+    /// into the legacy backend's constructor state. Numeric owners are shared.
+    pub(crate) fn process_schedule_input_with_live_backend(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: &SourceDiagnosticFlags<'_>,
+    ) -> Result<(), SelectedScheduleError> {
+        self.process_schedule_input_with_optional_backend(
+            input,
+            declarations,
+            time_steps_in_hour,
+            audit_files,
+            Some(backend),
+            Some(flags),
         )
     }
 
@@ -333,6 +361,7 @@ impl SelectedScheduleManager {
         time_steps_in_hour: usize,
         audit_files: &mut dyn ScheduleAuditFileHost,
         mut backend: Option<&mut super::error_backend::SourceErrorBackend<'_>>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), SelectedScheduleError> {
         if self.schedule_input_processed {
             return Ok(());
@@ -514,7 +543,15 @@ impl SelectedScheduleManager {
                 "actual MissingDaySchedule0 before Compact",
             ))?
             .timestep_values = vec![0.0; slots];
-        self.process_source_compacts(input, time_steps_in_hour, &mut locals)?;
+        let mut errors_found = false; // Actual ProcessScheduleInput local.
+        self.process_source_compacts(
+            input,
+            time_steps_in_hour,
+            &mut locals,
+            &mut backend,
+            flags,
+            &mut errors_found,
+        )?;
         for row in &declarations.constants {
             // getObjectItem resets all six getter-local arrays before unused erase.
             locals.0.fill(String::new());
@@ -588,6 +625,13 @@ impl SelectedScheduleManager {
                 ));
             }
         }
+        if errors_found {
+            return schedule_fatal(
+                &mut backend,
+                flags,
+                "ProcessScheduleInput: Preceding Errors cause termination.",
+            );
+        }
         if input.get_num_objects_found("Output:Schedules") > 0 {
             return Err(SelectedScheduleError::Unavailable("schedule report output"));
         }
@@ -605,3 +649,60 @@ type SourceScheduleGetterLocals = (
     Vec<bool>,
     Vec<bool>,
 );
+
+// Existing numerical callers can remain backend-free and stop at the first
+// requested diagnostic. Actual Source calls borrow the real phase roots.
+fn schedule_diagnostic(
+    backend: &mut Option<&mut SourceErrorBackend<'_>>,
+    flags: Option<&SourceDiagnosticFlags<'_>>,
+    kind: minute::SourceScheduleMinuteDiagnostic,
+    message: &str,
+) -> Result<(), SelectedScheduleError> {
+    use super::selected_heat_balance_input::HeatBalanceInputError;
+    use minute::SourceScheduleMinuteDiagnostic::{Continue, Severe, Warning};
+    let backend = backend
+        .as_deref_mut()
+        .ok_or(SelectedScheduleError::Unavailable(
+            "actual Compact minute diagnostic backend",
+        ))?;
+    if let Some(flags) = flags {
+        match kind {
+            Warning => backend.show_source_warning_error(message, flags)?,
+            Severe => backend.show_source_severe_error(message, flags)?,
+            Continue => backend
+                .show_continue_error(message)
+                .map_err(HeatBalanceInputError::from)?,
+        }
+    } else {
+        match kind {
+            Warning => backend.show_warning_error(message),
+            Severe => backend.show_severe_error(message),
+            Continue => backend.show_continue_error(message),
+        }
+        .map_err(HeatBalanceInputError::from)?;
+    }
+    Ok(())
+}
+fn schedule_fatal(
+    backend: &mut Option<&mut SourceErrorBackend<'_>>,
+    flags: Option<&SourceDiagnosticFlags<'_>>,
+    message: &str,
+) -> Result<(), SelectedScheduleError> {
+    use super::selected_heat_balance_input::HeatBalanceInputError;
+    let backend = backend
+        .as_deref_mut()
+        .ok_or(SelectedScheduleError::Unavailable(
+            "actual Compact final fatal backend",
+        ))?;
+    if let Some(flags) = flags {
+        match backend.show_source_fatal_error(message, flags) {
+            Ok(never) => match never {},
+            Err(error) => Err(error.into()),
+        }
+    } else {
+        match backend.show_fatal_error(message) {
+            Ok(never) => match never {},
+            Err(error) => Err(HeatBalanceInputError::Fatal(error).into()),
+        }
+    }
+}

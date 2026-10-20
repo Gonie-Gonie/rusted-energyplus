@@ -410,6 +410,7 @@ fn catalog_files() -> crate::heat_balance::source_initialization::SourceInitiali
         mtr: path.clone(),
         bnd: path.clone(),
         dxf: path.clone(),
+        sci: path.clone(),
         rdd: path.clone(),
         mdd: path.clone(),
         audit: path.clone(),

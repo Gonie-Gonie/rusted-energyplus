@@ -603,9 +603,10 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("Output:VariableDictionary", "sort_option") => {
             blank(value) || text_is(value, &["Name", "Unsorted"])
         }
-        ("Output:Surfaces:List", "report_type") => {
-            text_is(value, &["Vertices", "Details", "DetailsWithVertices"])
-        }
+        ("Output:Surfaces:List", "report_type") => text_is(
+            value,
+            &["Vertices", "Details", "DetailsWithVertices", "CostInfo"],
+        ),
         ("Output:Surfaces:List", "report_specifications") => {
             blank(value) || text_is(value, &["IDF"])
         }

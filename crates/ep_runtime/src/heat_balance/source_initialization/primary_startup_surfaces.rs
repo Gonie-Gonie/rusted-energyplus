@@ -1,5 +1,6 @@
 //! Actual OutputReports::ReportSurfaces on the retained report cache and geometry.
 //! Optional unported exporters stop only at their reached native child call.
+pub(crate) mod cost_info;
 mod wireframe;
 use super::SourceInitializationFiles;
 use crate::RuntimeError;
@@ -102,6 +103,7 @@ impl CtfInitializationReports {
         input: &ReportInputs,
         files: &mut SourceInitializationFiles,
         daylighting: &SourceDaylighting,
+        warmup: &bool,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), RuntimeError> {
         backend.state.tracking.ask_for_surfaces_report = false;
@@ -191,9 +193,8 @@ impl CtfInitializationReports {
             ));
         }
         if self.scan_source_surface_report(input, "CostInfo", None, None, backend)? {
-            return Err(unavailable(
-                "actual ReportSurfaces175 CostInfoOut1432 child",
-            ));
+            cost_info::write_source_cost_info(self, files, warmup, backend)
+                .map_err(hb_input_error)?;
         }
         if surface_detail || surface_vertices {
             write_source_surface_details(self, surface_details, files.eio_stream())

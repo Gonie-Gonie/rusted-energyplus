@@ -137,7 +137,7 @@ fn processor(fixture: &Value, raw: &Value) -> TestResult<SelectedInputProcessor>
     input.retain_source_input_statistics(statistics)?;
     Ok(input)
 }
-fn declarations(fixture: &Value, raw: &Value) -> TestResult<SelectedScheduleInput> {
+fn schedule_declarations(fixture: &Value, raw: &Value) -> TestResult<SelectedScheduleInput> {
     let mut result = SelectedScheduleInput::default();
     for name in names(fixture, "ScheduleTypeLimits")? {
         let fields = member(member(raw, "ScheduleTypeLimits")?, &name)?;
@@ -191,7 +191,7 @@ fn compact_primary_and_empty_hour_match_native_reported_timestep_bits() -> TestR
         let cohort_name = string(member(cohort, "name")?)?;
         let raw = member(cohort, "raw")?;
         let mut input = processor(&fixture, raw)?;
-        let declarations = declarations(&fixture, raw)?;
+        let declarations = schedule_declarations(&fixture, raw)?;
         let mut manager = SelectedScheduleManager::default();
         manager.init_constant_state(0)?;
         manager.process_schedule_input(
@@ -282,5 +282,287 @@ fn compact_primary_and_empty_hour_match_native_reported_timestep_bits() -> TestR
             }
         }
     }
+    verify_authored_compact_modes_and_diagnostic_prefix(&fixture)?;
+    Ok(())
+}
+
+// Authored raw profile tables reuse the existing production-IP helper. They
+// contain no Native result seed, gated cohort call or synthetic runtime clock.
+fn authored_raw(fixture: &Value, mode: &str, overlap: bool) -> Value {
+    let mut raw = fixture["cohorts"][0]["raw"].clone();
+    raw["ScheduleTypeLimits"]["Fraction"]["upper_limit_value"] = serde_json::json!(200);
+    let fields = if overlap {
+        vec![
+            serde_json::json!("Through: 12/31"),
+            serde_json::json!("For: AllDays"),
+            serde_json::json!("Interpolate: No"),
+            serde_json::json!("Until: 24:00"),
+            serde_json::json!(10),
+            serde_json::json!("Until: 01:00"),
+            serde_json::json!(11),
+        ]
+    } else {
+        vec![
+            serde_json::json!("Through: 12/31"),
+            serde_json::json!("For: AllDays"),
+            serde_json::json!(format!("Interpolate: {mode}")),
+            serde_json::json!("Until: 00:20"),
+            serde_json::json!(10),
+            serde_json::json!("Until: 01:15"),
+            serde_json::json!(175),
+            serde_json::json!("Until: 24:00"),
+            serde_json::json!(175),
+        ]
+    };
+    raw["Schedule:Compact"]["Internal Gain Schedule"]["data"] = Value::Array(
+        fields
+            .into_iter()
+            .map(|v| serde_json::json!({"field":v}))
+            .collect(),
+    );
+    raw
+}
+
+use crate::heat_balance::error_backend::{SourceErrorState, SourceErrorTracking};
+fn interpolation_error_state() -> SourceErrorState {
+    SourceErrorState {
+        output_error_header: true,
+        version_string: "authored caller".into(),
+        idd_version_string: "authored input".into(),
+        doing_input_processing: false,
+        print_console_output: true,
+        kickoff_simulation: false,
+        developer_flag: false,
+        warmup_flag: false,
+        doing_sizing: false,
+        tracking: SourceErrorTracking {
+            ask_for_plant_check_on_abort: false,
+            exit_during_simulations: false,
+            ask_for_connections_report: false,
+            ask_for_surfaces_report: false,
+            total_multiplied_windows: 0,
+            total_coincident_vertices: 0,
+            total_degenerate_surfaces: 0,
+            total_receiving_non_convex_surfaces: 0,
+            total_casting_non_convex_surfaces: 0,
+            match_counts: [0; 20],
+            abort_processing: false,
+            total_severe_errors: 0,
+            total_severe_errors_during_warmup: 0,
+            total_severe_errors_during_sizing: 0,
+            last_severe_error: String::new(),
+            total_warning_errors: 0,
+            total_warning_errors_during_warmup: 0,
+            total_warning_errors_during_sizing: 0,
+        },
+    }
+}
+
+fn verify_authored_compact_modes_and_diagnostic_prefix(fixture: &Value) -> TestResult<()> {
+    use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
+    let (kickoff, developer, warmup, sizing) = (false, false, true, false);
+    let flags = SourceDiagnosticFlags {
+        kickoff: &kickoff,
+        developer: &developer,
+        warmup: &warmup,
+        doing_sizing: &sizing,
+    };
+    for (mode, first) in [
+        ("No", [10.0, 175.0, 175.0, 175.0, 175.0]),
+        ("Average", [10.0, 120.0, 175.0, 175.0, 175.0]),
+        ("Linear", [10.0, 40.0, 85.0, 130.0, 175.0]),
+    ] {
+        let raw = authored_raw(fixture, mode, false);
+        let mut input = processor(fixture, &raw)?;
+        let declarations = schedule_declarations(fixture, &raw)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut input,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )?;
+        }
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual authored Compact pointer")?;
+        for ordinal in 0..96 {
+            let clock = WeatherGlobalState {
+                hour_of_day: ordinal / 4 + 1,
+                time_step: ordinal % 4 + 1,
+                time_steps_in_hour: 4,
+                ..Default::default()
+            };
+            let environment = WeatherEnvironmentState {
+                day_of_year_schedule: 1,
+                day_of_week: 3,
+                ..Default::default()
+            };
+            manager.update_source_schedule_values(&clock, &environment)?;
+            let actual = manager.source_current_schedule_value(index)?;
+            let expected: f64 = first.get(ordinal as usize).copied().unwrap_or(175.0);
+            assert_eq!(
+                actual.to_bits(),
+                expected.to_bits(),
+                "{mode} actual live lookup {ordinal}"
+            );
+        }
+        assert_eq!(state.tracking.total_warning_errors, i32::from(mode == "No"));
+        assert_eq!(
+            state.tracking.total_warning_errors_during_warmup,
+            i32::from(mode == "No")
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        assert!(!state.warmup_flag); // Source cells, not backend ctor, were read.
+        assert!(
+            std::str::from_utf8(&audit.bytes)?
+                .ends_with("  Processing Schedule Input -- Complete\n")
+        );
+    }
+    // One real Warning succeeded, then its Continue fails before population.
+    struct FailContinue {
+        bytes: Vec<u8>,
+    }
+    impl io::Write for FailContinue {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            if String::from_utf8_lossy(bytes).contains("Other errors may result.") {
+                return Err(io::Error::other("authored Compact Continue sink"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let raw = authored_raw(fixture, "No", false);
+    let mut input = processor(fixture, &raw)?;
+    let declarations = schedule_declarations(fixture, &raw)?;
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let (mut state, mut errors, mut console, mut audit) = (
+        interpolation_error_state(),
+        FailContinue { bytes: Vec::new() },
+        Vec::new(),
+        MemoryAudit::default(),
+    );
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend(
+            &mut input,
+            &declarations,
+            4,
+            &mut audit,
+            &mut backend,
+            &flags,
+        )
+    };
+    assert!(result.is_err());
+    assert_eq!(
+        (
+            state.tracking.total_warning_errors,
+            state.tracking.total_warning_errors_during_warmup
+        ),
+        (1, 1)
+    );
+    let day = manager
+        .day_schedules
+        .iter()
+        .find(|d| d.name == "INTERNAL GAIN SCHEDULE_dy_1")
+        .ok_or("actual day constructor")?;
+    assert!(
+        day.timestep_values
+            .iter()
+            .all(|v| v.to_bits() == 0.0_f64.to_bits())
+    );
+    assert_eq!(day.sum_timestep_values.to_bits(), 0.0_f64.to_bits());
+    // A completed severe minute child emits its parent Continue, populates the
+    // retained values, then reaches the real final fatal after validation.
+    let raw = authored_raw(fixture, "No", true);
+    let mut input = processor(fixture, &raw)?;
+    let declarations = schedule_declarations(fixture, &raw)?;
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let (mut state, mut errors, mut console, mut audit) = (
+        interpolation_error_state(),
+        Vec::new(),
+        Vec::new(),
+        MemoryAudit::default(),
+    );
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend(
+            &mut input,
+            &declarations,
+            4,
+            &mut audit,
+            &mut backend,
+            &flags,
+        )
+    };
+    assert!(result.is_err());
+    assert_eq!(
+        (
+            state.tracking.total_severe_errors,
+            state.tracking.total_severe_errors_during_warmup
+        ),
+        (1, 1)
+    );
+    let day = manager
+        .day_schedules
+        .iter()
+        .find(|d| d.name == "INTERNAL GAIN SCHEDULE_dy_1")
+        .ok_or("actual populated day")?;
+    assert!(
+        day.timestep_values
+            .iter()
+            .all(|v| v.to_bits() == 10.0_f64.to_bits())
+    );
+    assert_eq!(day.sum_timestep_values.to_bits(), 960.0_f64.to_bits());
+    let error = std::str::from_utf8(&errors)?;
+    assert!(error.contains("ref Schedule:Compact=\"INTERNAL GAIN SCHEDULE\""));
+    assert!(error.contains("ProcessScheduleInput: Preceding Errors cause termination."));
+    assert!(!std::str::from_utf8(&audit.bytes)?.contains("Processing Schedule Input -- Complete"));
     Ok(())
 }

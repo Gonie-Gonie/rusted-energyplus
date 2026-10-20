@@ -1,5 +1,5 @@
 //! Native minute expansion and retained DaySchedule population.
-//! This shared helper does not admit new Compact input modes into production.
+//! The actual Compact producer supplies its retained interpolation enum.
 use super::{SelectedDaySchedule, SelectedScheduleError};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
@@ -7,10 +7,6 @@ use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceScheduleInterpolation {
     No,
-    #[allow(
-        dead_code,
-        reason = "Keep the genuine ScheduleManager minute/interpolation interface for paired No/Average/Linear units; production admission remains separately restricted to its selected input mode."
-    )]
     Average,
     Linear,
 }

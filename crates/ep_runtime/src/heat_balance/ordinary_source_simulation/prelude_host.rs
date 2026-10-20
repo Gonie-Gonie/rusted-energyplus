@@ -91,6 +91,7 @@ impl SourcePrimaryPreludeChildren for PreludeHost<'_, '_> {
             &self.model.report_inputs,
             &mut *self.files,
             &session.daylighting,
+            &self.weather.state.global.warmup_flag,
             self.backend,
         )
     }

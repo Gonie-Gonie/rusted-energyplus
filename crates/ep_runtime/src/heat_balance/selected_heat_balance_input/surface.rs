@@ -611,6 +611,75 @@ mod source_surface_report_tests {
         reports
     }
     #[test]
+    fn cost_info_uses_actual_ordinals_unique_boundaries_names_and_independent_areas_with_io_prefix()
+    {
+        use crate::heat_balance::source_initialization::primary_startup_surfaces::cost_info::{
+            unique_cost_surfaces, write_cost_info_body,
+        };
+        let mut reports = owners();
+        let header = "           3           3\n data for surfaces useful for cost information\n Number, Name, Construction, class, area, grossarea\n";
+        let unique = unique_cost_surfaces(&reports).unwrap().unwrap();
+        let mut bytes = Vec::new();
+        write_cost_info_body(&reports, &unique, &mut bytes).unwrap();
+        let text = String::from_utf8(bytes).unwrap();
+        assert!(text.starts_with(header));
+        assert_eq!(
+            text.lines().skip(3).collect::<Vec<_>>(),
+            [
+                "    1,WALL,LIVE CONSTRUCTION,Wall,       5.00000,       6.00000",
+                "    3,ROOF,LIVE CONSTRUCTION,Roof,       5.00000,       6.00000",
+                "    2,FLOOR,LIVE CONSTRUCTION,Floor,       5.00000,       6.00000",
+            ]
+        );
+        // A later physical ordinal paired to an earlier one is excluded;
+        // construction0 is independently excluded. Self-pair3 above stays.
+        let rows = reports
+            .surface_geometry_input
+            .final_surfaces
+            .as_mut()
+            .unwrap();
+        rows[2].row.exterior_boundary = 1;
+        rows[1].row.construction = 0;
+        let unique = unique_cost_surfaces(&reports).unwrap().unwrap();
+        assert_eq!(unique, [true, false, false]);
+        bytes = Vec::new();
+        write_cost_info_body(&reports, &unique, &mut bytes).unwrap();
+        assert_eq!(String::from_utf8(bytes).unwrap().lines().count(), 4);
+        struct HeaderOnly {
+            bytes: Vec<u8>,
+            limit: usize,
+        }
+        impl std::io::Write for HeaderOnly {
+            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+                let remaining = self.limit - self.bytes.len();
+                if remaining == 0 {
+                    return Err(std::io::Error::other("real unit writer failure"));
+                }
+                let count = remaining.min(bytes.len());
+                self.bytes.extend_from_slice(&bytes[..count]);
+                Ok(count)
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        let reports = owners();
+        let unique = unique_cost_surfaces(&reports).unwrap().unwrap();
+        let mut writer = HeaderOnly {
+            bytes: Vec::new(),
+            limit: header.len(),
+        };
+        assert!(matches!(
+            write_cost_info_body(&reports, &unique, &mut writer),
+            Err(Error::Io(_))
+        ));
+        assert_eq!(writer.bytes, header.as_bytes());
+        let mut reports = reports;
+        reports.surface_geometry_input.final_surfaces = None;
+        assert_eq!(unique_cost_surfaces(&reports).unwrap(), None);
+    }
+
+    #[test]
     fn details_report_types_preserve_real_order_owner_fields_class_films_and_headers() {
         for (kind, columns, vertices) in [(1, 18, true), (10, 27, false), (11, 39, true)] {
             let reports = owners();

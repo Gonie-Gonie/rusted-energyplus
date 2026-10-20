@@ -57,6 +57,7 @@ fn resolve_raw(
             continue;
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_compact_family = source_calendar_ingress && family.0 == "Schedule:Compact";
         let source_calendar_family = source_calendar_ingress
             && matches!(
                 family.0.as_str(),
@@ -102,6 +103,7 @@ fn resolve_raw(
                 | "Output:Variable"
         ) && !source_b_family
             && !source_calendar_family
+            && !source_compact_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -154,7 +156,8 @@ fn resolve_raw(
             }
             for (field, value) in &object.fields {
                 if !admitted_field(&family.0, &field.0, value)
-                    && !(source_b_family && source_b::admitted_field(&family.0, &field.0, value))
+                    && !((source_b_family || source_compact_family)
+                        && source_b::admitted_field(&family.0, &field.0, value))
                 {
                     return Err(format!(
                         "ordinary equipment field unavailable: {}.{}",
@@ -402,12 +405,12 @@ fn resolve_raw(
                     })
                     .map(|(_, object)| object);
                 if constant.is_none()
-                    && source_b_ingress
+                    && (source_b_ingress || source_calendar_ingress)
                     && source_b::has_compact_reference(raw, schedule)
                 {
-                    // Reference only: all ordered Compact fields remain raw on
-                    // the same IP. Native ProcessScheduleInput stops at its real
-                    // positive count before any cache/value can be consumed.
+                    // All ordered Compact fields remain raw on the same IP.
+                    // The actual Source producer populates retained day/week
+                    // owners, followed by live currentVal/consumer validation.
                     continue;
                 }
                 let schedule =
@@ -767,7 +770,7 @@ mod source_surface_list_ingress_tests {
     #[test]
     fn source_opaque_surface_list_keeps_raw_identity_and_requires_real_report_branches()
     -> Result<(), Box<dyn std::error::Error>> {
-        for report in ["Vertices", "Details", "DetailsWithVertices"] {
+        for report in ["Vertices", "Details", "DetailsWithVertices", "CostInfo"] {
             for specification in [None, Some("IDF")] {
                 let mut fields = serde_json::json!({"report_type": report});
                 if let Some(value) = specification {
@@ -799,7 +802,6 @@ mod source_surface_list_ingress_tests {
             serde_json::json!({}),
             serde_json::json!({"report_type": true}),
             serde_json::json!({"report_type": "Lines"}),
-            serde_json::json!({"report_type": "CostInfo"}),
             serde_json::json!({"report_type": "ViewFactorInfo"}),
             serde_json::json!({"report_type": "Details", "report_specifications": null}),
             serde_json::json!({"report_type": "Details", "report_specifications": ""}),
@@ -888,6 +890,66 @@ mod meter_domain_tests {
                     "wrong scalar/field admitted for {family}"
                 );
             }
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod source_a_compact_ingress {
+    use super::*;
+    #[test]
+    fn source_a_compact_keeps_real_ordered_ip_operands_and_legacy_boundary()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let input = serde_json::json!({"Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{}},
+            "Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}},
+            "ScheduleTypeLimits":{"Fraction":{"lower_limit_value":0,"upper_limit_value":1,"numeric_type":"Continuous"}},
+            "Schedule:Compact":{"variable schedule":{"schedule_type_limits_name":"Fraction","data":[
+                {"field":"Through: 12/31"},{"field":"For: AllDays"},{"field":"Interpolate: Average"},
+                {"field":"Until: 00:20"},{"field":0},{"field":"Until: 24:00"},{"field":1}]}},
+            "Output:Variable":{"v":{"key_value":"Environment","variable_name":"Site Outdoor Air Drybulb Temperature","reporting_frequency":"Timestep","schedule_name":"variable schedule"}}});
+        let raw = ep_raw_model::parse_epjson_str(&input.to_string())?;
+        assert!(resolve(&raw).is_err()); // No new unscoped legacy route.
+        resolve_source_a(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(ip.get_num_objects_found("Schedule:Compact"), 1);
+        assert!(ip.has_object("Schedule:Compact", "variable schedule"));
+        let fields = ip.source_raw_object_fields("Schedule:Compact", "variable schedule")?;
+        let ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(
+            data,
+        ) = &fields["data"]
+        else {
+            return Err("real raw Compact array lost".into());
+        };
+        assert_eq!(data.len(), 7);
+        assert_eq!(
+            ip.source_raw_object_names("Schedule:Compact")?,
+            ["variable schedule"]
+        );
+        let ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Object(
+            value,
+        ) = &data[4]
+        else {
+            return Err("actual Compact numeric member lost".into());
+        };
+        assert_eq!(
+            value["field"],
+            ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(
+                "0".into()
+            )
+        );
+        assert_eq!(
+            crate::ordinary_schedule_input::resolve(&raw)?.types.len(),
+            1
+        );
+        for bad in [
+            serde_json::json!({"field":true}),
+            serde_json::json!({"unknown":1}),
+        ] {
+            let mut value = input.clone();
+            value["Schedule:Compact"]["variable schedule"]["data"][0] = bad;
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            assert!(resolve_source_a(&raw).is_err());
         }
         Ok(())
     }

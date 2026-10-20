@@ -3,7 +3,7 @@
 //! These call guards are set before dispatch and are not readiness certificates.
 
 use super::ctf_initialization_context::CtfInitializationReports;
-use super::error_backend::{SourceErrorBackend, SourceFatalStop};
+use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend, SourceFatalStop};
 use super::selected_fluid_properties::{SelectedFluidError, SelectedFluidProperties};
 use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_project_data::{ProjectDataError, ProjectDataOwners, SelectedProjectData};
@@ -404,12 +404,18 @@ impl CtfInitializationReports {
             fluid.get_fluid_properties_data(input)?;
             let steps = usize::try_from(weather.global.time_steps_in_hour)
                 .map_err(|_| SourceInitializationError::Association("effective timestep"))?;
-            match schedules.process_schedule_input_with_backend(
+            match schedules.process_schedule_input_with_live_backend(
                 input,
                 &raw.schedules,
                 steps,
                 files,
                 backend,
+                &SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                },
             ) {
                 Err(SelectedScheduleError::AuditOpen { path, source }) => {
                     let message = format!(
