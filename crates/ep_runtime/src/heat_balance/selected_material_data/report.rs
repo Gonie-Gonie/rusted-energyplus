@@ -1,5 +1,5 @@
 //! Material.cc2767-2798 writes to the real EIO using existing Source R formatting.
-use super::{SelectedMaterialData, unavailable};
+use super::{SelectedMaterialData, SourceMaterialGroup, unavailable};
 use crate::error::{RuntimeError, WarmupOutputError};
 use ep_model::{MaterialDefinition, MaterialSurfaceRoughness, TypedModel};
 use std::io::Write;
@@ -51,6 +51,19 @@ impl SelectedMaterialData {
                 .1;
             if names.next().is_some() {
                 return Err(unavailable("reported material name duplicate"));
+            }
+            if self.material_groups.get(id) == Some(&SourceMaterialGroup::AirGap) {
+                let MaterialDefinition::AirGap(value) = material.definition else {
+                    return Err(unavailable("reported AirGap group/physical owner"));
+                };
+                writeln!(
+                    eio,
+                    " Material:Air,{},{}",
+                    name,
+                    rounded(value.thermal_resistance_m2_k_per_w, 4)?
+                )
+                .map_err(io)?;
+                continue;
             }
             let (resistance, rough, geometry, surface) = match material.definition {
                 MaterialDefinition::Regular(value) => (

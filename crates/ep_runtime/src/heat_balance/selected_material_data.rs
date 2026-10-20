@@ -8,12 +8,16 @@ use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};
 use super::selected_project_data::ProjectInputObject;
 use crate::error::{RuntimeError, WarmupOutputError};
-use ep_model::{MaterialDefinition, MaterialId, MaterialSurfaceRoughness, TypedModel};
+use ep_model::{
+    MaterialDefinition, MaterialId, MaterialKind, MaterialSurfaceRoughness, TypedModel,
+};
 use std::collections::BTreeMap;
 use std::io::Write;
 
 mod input;
 pub use input::SelectedMaterialInput;
+#[cfg(test)]
+mod air_gap_tests;
 mod report;
 mod type_group;
 pub(crate) use type_group::SourceMaterialGroup;
@@ -47,6 +51,8 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) material_map: BTreeMap<String, i32>,
     /// Same Material owner: group written by the actual input-family getter.
     pub(crate) material_groups: BTreeMap<MaterialId, SourceMaterialGroup>,
+    /// MaterialBase ROnly ctorfalse and actual NoMass/AirGap getter writes.
+    pub(crate) resistance_only: BTreeMap<MaterialId, bool>,
     /// MaterialBase NominalR ctor0 and getter writes, aligned with actual MaterialNum.
     pub(crate) nominal_r: Vec<f64>,
     pub(crate) num_no_masses: i32,
@@ -108,7 +114,11 @@ fn roughness(object: &ProjectInputObject) -> Result<MaterialSurfaceRoughness, Ru
         _ => Err(unavailable("literal non-trimmed Material roughness enum")),
     }
 }
-fn typed_id(model: &TypedModel, name: &str, no_mass: bool) -> Result<MaterialId, RuntimeError> {
+fn typed_id(
+    model: &TypedModel,
+    name: &str,
+    kind: MaterialKind,
+) -> Result<MaterialId, RuntimeError> {
     let mut matches = model
         .ctf_report_names
         .materials
@@ -125,10 +135,7 @@ fn typed_id(model: &TypedModel, name: &str, no_mass: bool) -> Result<MaterialId,
         .iter()
         .find(|value| value.id == *id)
         .ok_or_else(|| unavailable("material typed ID"))?;
-    if !matches!(
-        (no_mass, material.definition),
-        (false, MaterialDefinition::Regular(_)) | (true, MaterialDefinition::NoMass(_))
-    ) {
+    if material.kind() != kind {
         return Err(unavailable("material family/typed ID"));
     }
     Ok(*id)
@@ -152,6 +159,7 @@ impl SelectedMaterialData {
         self.material_groups.insert(id, group);
         self.materials.push(id);
         self.nominal_r.push(0.0); // Material.hh239 constructor, before property reads.
+        self.resistance_only.insert(id, false); // MaterialBase ctor, before getter assignments.
         let number = i32::try_from(self.materials.len())
             .map_err(|_| unavailable("Material.Num int capacity"))?;
         self.material_map.insert(key, number);
@@ -175,7 +183,7 @@ impl SelectedMaterialData {
             }
             // Direct JSON markObjectAsUsed; none of the six arrays is an argument.
             o.input.mark_object_as_used("Material", &object.object_name);
-            let id = typed_id(o.model, &object.object_name, false)?;
+            let id = typed_id(o.model, &object.object_name, MaterialKind::Mass)?;
             let material_index =
                 self.insert(&object.object_name, id, SourceMaterialGroup::Regular)?;
             let material = o
@@ -239,7 +247,7 @@ impl SelectedMaterialData {
         for object in &raw.no_mass {
             let (_num_alphas, num_numbers) = raw.get_no_mass_item(object, o)?;
             let name = &o.shortcut.alpha_args[0];
-            let id = typed_id(o.model, name, true)?;
+            let id = typed_id(o.model, name, MaterialKind::NoMass)?;
             let material_index = self.insert(name, id, SourceMaterialGroup::Regular)?;
             let material = o
                 .model
@@ -257,6 +265,7 @@ impl SelectedMaterialData {
                 o.shortcut.numeric_args[0],
                 value.thermal_resistance_m2_k_per_w,
             )?;
+            self.resistance_only.insert(id, true); // Actual285, before optional absorptance reads.
             for (index, default, typed) in [
                 (1, 0.9, value.surface.thermal_absorptance),
                 (2, 0.7, value.surface.solar_absorptance),
@@ -274,7 +283,35 @@ impl SelectedMaterialData {
             self.nominal_r[material_index] = o.shortcut.numeric_args[0]; // Actual308.
         }
         o.shortcut.current_module_object = "Material:AirGap".into();
-        require_zero(self.num_air_gaps, "positive Material:AirGap")?;
+        if usize::try_from(self.num_air_gaps).ok() != Some(raw.air_gaps.len()) {
+            return Err(unavailable("AirGap raw/IP count"));
+        }
+        for object in &raw.air_gaps {
+            let (_num_alphas, num_numbers) = raw.get_air_gap_item(object, o)?;
+            if num_numbers != 1 {
+                return Err(unavailable("required AirGap numeric argument count"));
+            }
+            let name = &o.shortcut.alpha_args[0];
+            let id = typed_id(o.model, name, MaterialKind::AirGap)?;
+            let material_index = self.insert(name, id, SourceMaterialGroup::AirGap)?;
+            let material = o
+                .model
+                .materials
+                .iter()
+                .find(|value| value.id == id)
+                .ok_or_else(|| unavailable("AirGap ID"))?;
+            let MaterialDefinition::AirGap(value) = material.definition else {
+                return Err(unavailable("AirGap definition"));
+            };
+            // Material.cc366 writes MediumRough; the sole typed AirGap owner
+            // supplies that fixed roughness and genuine ctorzero absorptances.
+            same(
+                o.shortcut.numeric_args[0],
+                value.thermal_resistance_m2_k_per_w,
+            )?;
+            self.nominal_r[material_index] = o.shortcut.numeric_args[0]; // Actual367.
+            self.resistance_only.insert(id, true); // Actual368; never a NoMass alias.
+        }
         o.shortcut.current_module_object = "Material:InfraredTransparent".into();
         require_zero(self.num_irts, "positive Material:InfraredTransparent")?;
         macro_rules! empty {

@@ -36,13 +36,17 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneAirHeatBalanceAlgorithm",
         name_field_index: 0,
     },
-    // Material.cc regular direct JSON and NoMass getter preserve IDF order.
+    // Material.cc regular direct JSON, NoMass and AirGap getters preserve IDF order.
     IdfOrderTarget {
         object_type: "Material",
         name_field_index: 0,
     },
     IdfOrderTarget {
         object_type: "Material:NoMass",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Material:AirGap",
         name_field_index: 0,
     },
     // SimulationManager::GetProjectData uses real IDF max-field counts.
@@ -387,6 +391,7 @@ pub fn apply_idf_declaration_order(
                 || matches!(
                     target.object_type,
                     "Material:NoMass"
+                        | "Material:AirGap"
                         | "Building"
                         | "Construction"
                         | "Zone"
@@ -405,6 +410,7 @@ pub fn apply_idf_declaration_order(
                     actual_name.clone(),
                     match target.object_type {
                         "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
+                        "Material:AirGap" => idf_object.max_fields.max(2),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
                         "Site:Location" => idf_object.max_fields.max(5),
@@ -1178,6 +1184,11 @@ mod unnamed_report_order_tests {
                 "Material:NoMass",
                 "Material:NoMass,Z,Rough,1;Material:NoMass,A,Smooth,2,,,;",
                 Some([3, 6]),
+            ),
+            (
+                "Material:AirGap",
+                "Material:AirGap,Z,0.15;Material:AirGap,A;",
+                Some([2, 2]),
             ),
             (
                 "Zone",

@@ -83,6 +83,13 @@
       "SimpleCombined/TARP/MoWiTT/DOE-2 actual inherited Zone enums and existing physical correlations",
       "three changed-algorithm cases retain all original five WindExposed faces and one NoWind face",
       "validated Source-only admission; legacy arbitrary execution, adaptive and local/user/EMS/Kiva branches retain guards"
+    ],
+    "Material:AirGap": [
+      "required finite positive numeric resistance with no default, clipping or invented upper bound; named identity, IDF order/minimum fields and strict direct JSON scalar custody",
+      "actual distinct AirGap group, MediumRough/constructor-zero properties, nominal resistance and retained constructor/getter resistance-only flag",
+      "real interior CTF layer preprocessing, ordered nominal-U/report bridges and actual Source postlude AirGap row selection",
+      "used Regular/AirGap/Regular three-layer nine-term same-input Source completion under original58 policies",
+      "existing endpoint validation and genuine used low-resistance CTF error boundary retained; dedicated Material:Air writer checked at unit boundary because physical case requests Constructions only"
     ]
   },
   "verification": {
@@ -99,15 +106,15 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/calendar-clippy-07.log",
-        "sha256": "2810fe386316b01bd431ccd58a9486cb7cc33d358d452069a3f9d8f25ab1b1ff",
-        "bytes": 2062
+        "path": ".runtime/object-expansion/air-gap-clippy-08b.log",
+        "sha256": "2ea9904459eb4fa888e13939e99304ea33a6b01d21d7862d58e197853d258892",
+        "bytes": 2060
       },
       "format": "cargo fmt --all passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/calendar-docs-07.log",
-        "sha256": "dff208d3e2bd93e68378a46592a0730c1e6feb4e7c195e6e48502480224c6728",
+        "path": ".runtime/object-expansion/air-gap-docs-08b.log",
+        "sha256": "e5dea36a78d3856165c9d61ad79c8aac093477558683d1e83f313f91546f4fd2",
         "bytes": 1408
       }
     },
@@ -1302,12 +1309,82 @@
           "zone_steps": 192
         },
         "effective_state": "Exact Native/Source requested calendar EIO and complete physical civil timestamps; natural whole-environment duration without a supplied --hours value; zero diagnostic markers and END warnings/severe."
+      },
+      {
+        "id": "interior-air-gap",
+        "group": "opaque_materials",
+        "source_build": "air-gap-08b",
+        "input": {
+          "path": ".runtime/object-expansion/native-air-gap/calibration-01/input.idf",
+          "sha256": "d9adc99aab48f0c0718a082b5e0d48f312077e9b60c2c32caf6e68fc1c7fc6a5",
+          "bytes": 9395
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "A",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-air-gap/calibration-01/receipt.json",
+          "sha256": "9f5202caedaa217cedf8d7915237e2c4d4f099e4edbff7cb946b02889494ddfc",
+          "bytes": 9534
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-air-gap-08b/receipt/receipt.json",
+          "sha256": "438e8d36acd5a1dae1256acea73a6dbf4e51ddc4ba6739ff582f9f186f1bd604",
+          "bytes": 6120
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/air-gap-08b/run-summary.json",
+          "sha256": "6791ce7841b588621ebb95cf34570fdfee49c9c0897067af43ebcc28228e2f1d",
+          "bytes": 32253
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-air-gap-comparisons-02/main/comparison.json",
+          "sha256": "26adbc726995d41e88b1e078e9a677278497a73d86e4b862a98b82b74ee56137",
+          "bytes": 113829
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-air-gap-comparisons-02/prelaunch.json",
+          "sha256": "466022a88598df4d87f6d31c48617d90ca9c7eb06c5e40801714b4a7ee8e5b30",
+          "bytes": 3272
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 4448,
+          "parsed_binary64_unequal": 4448,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "material_state": "True used Regular/AirGap/Regular three-layer nine-term construction; exact ordered Native/Source construction/material CTF EIO. Dedicated Material:Air is absent in both physical outputs because the unchanged request selects Constructions, not Materials.",
+        "corrected_prior_attempt": {
+          "source_receipt": {
+            "path": ".runtime/porting/object-domain-20261020/source-air-gap/receipt/receipt.json",
+            "sha256": "7483c69681641ef0f10b6049119840755eeb7d27cd0592811a7169367dacaa3c",
+            "bytes": 5638
+          },
+          "failure_manifest": {
+            "path": ".runtime/object-expansion/source-air-gap-comparisons-01/blocked-build08.json",
+            "sha256": "82fdc038ee95a7a031af922964a8cae690bee285549134548b912d4c50b7dc3a",
+            "bytes": 8295
+          },
+          "retained_executable": {
+            "path": ".runtime/porting/object-domain-20261020/build-08/eplus-rs.exe",
+            "sha256": "d48cdc7dafa56d2e9a90a5666bbc8433c7d06d7d59ba96ba4683ebff8f2d99ac",
+            "bytes": 75117549
+          },
+          "numerical_comparison_performed": false,
+          "reason": "Build08 stopped at stale nominal-U material report admission before Source completion. Two concrete report adapters were connected and the existing report test extended before fresh build08b; original failed files were rehashed unchanged."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 20,
-      "reported_samples": 109056,
-      "raw_operand_unequal": 60120,
+      "paired_cases": 21,
+      "reported_samples": 114408,
+      "raw_operand_unequal": 64568,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -1431,6 +1508,23 @@
           "sha256": "5c24c5666aff7534de2bddec20afbd348b36cd5627343f28f7bf9ad0797b73cc",
           "bytes": 75071342
         }
+      },
+      {
+        "id": "air-gap-08b",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-08b/receipt.json",
+          "sha256": "0492acf94436e8fc218836725ecbd8a94f6fa73bd42e8617cee30db35abae672",
+          "bytes": 6996
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/46/46189692ebefd3421b5c5415307b9a5e230275ff721f8170fd33b0b51582b2c5",
+          "sha256": "46189692ebefd3421b5c5415307b9a5e230275ff721f8170fd33b0b51582b2c5"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-08b/eplus-rs.exe",
+          "sha256": "24adb54aa429ccef84a456988e358cb12eba3745dca2f10853278f7cb323f398",
+          "bytes": 75119535
+        }
       }
     ],
     "focused_tests": [
@@ -1462,6 +1556,29 @@
             "path": ".runtime/object-expansion/calendar-weather-tests-07.log",
             "sha256": "c2c04473fe602cf4fc843ccd09abe6d55726cc256319a659c8fff56d988ff047",
             "bytes": 2966
+          }
+        ]
+      },
+      {
+        "through_build": "air-gap-08b",
+        "passed": 23,
+        "ignored": 0,
+        "scope": "AirGap connected input/getter/CTF checks (4), IDF ordering/count custody (13), and actual geometry/predefined U report checks including the used interior gap (6). Existing test bodies extended where possible.",
+        "logs": [
+          {
+            "path": ".runtime/object-expansion/air-gap-connected-tests-08.log",
+            "sha256": "ace60fc3c5d90a5b2f7a9dcf25c57ed0382a9561d0416b28a81057cf345e89a1",
+            "bytes": 3660
+          },
+          {
+            "path": ".runtime/object-expansion/air-gap-idf-tests-08.log",
+            "sha256": "160565700a6d9dddf6b80bdbf4bb908a9b4510ea5b1e59d93192113975444ba9",
+            "bytes": 2118
+          },
+          {
+            "path": ".runtime/object-expansion/air-gap-reports-tests-08b.log",
+            "sha256": "5e542affbd9b3fcacfae42678803f0099667a194056a6a7fa840b7395485a5b5",
+            "bytes": 2698
           }
         ]
       }

@@ -43,11 +43,12 @@ fn nominal_u(model: &TypedModel, surface: &Surface) -> Result<f64, CtfReportUnav
             return Err(CtfReportUnavailable::Association);
         }
         // GetMaterialData assigns Regular Resistance and NominalR together.
-        // NoMass's NominalR is the actual input resistance. No total-R shortcut
+        // NoMass/AirGap NominalR is the actual input resistance. No total-R shortcut
         // may reorder the GetConstructData additions or remove its reciprocal.
         nominal_r += match material.definition {
             MaterialDefinition::Regular(value) => value.thermal_resistance_m2_k_per_w,
             MaterialDefinition::NoMass(value) => value.thermal_resistance_m2_k_per_w,
+            MaterialDefinition::AirGap(value) => value.thermal_resistance_m2_k_per_w,
             _ => return Err(CtfReportUnavailable::Material(*id)),
         };
     }

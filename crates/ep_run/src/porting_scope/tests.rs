@@ -1019,6 +1019,192 @@ fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() 
 }
 
 #[test]
+fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
+    const FAMILY: &str = "Material:AirGap";
+    let weather = single_day_weather_fixture();
+    for scope in [PortingScope::A, PortingScope::B] {
+        let mut value = input(scope);
+        value["Material"] = json!({"Solid":{"roughness":"MediumRough","thickness":0.1,"conductivity":1.7,"density":2200,"specific_heat":840}});
+        value[FAMILY] =
+            json!({"MiXeD Gap":{"thermal_resistance":0.15},"Spare":{"thermal_resistance":2.0}});
+        value["Construction"]["Opaque"] =
+            json!({"outside_layer":"Solid","layer_2":"MiXeD Gap","layer_3":"Solid"});
+        let raw = parse_epjson_str(&value.to_string()).expect("named numeric-only AirGap");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("actual interior AirGap model");
+        let ip = match scope {
+            PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+            PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+        }
+        .expect("same actual raw/IP admission");
+        assert_eq!(ip.get_num_objects_found(FAMILY), 2);
+        assert!(ip.has_object(FAMILY, "MiXeD Gap"));
+        let material_input =
+            crate::ordinary_material_input::resolve(&raw, &ip).expect("same material raw custody");
+        assert!(material_input.source_is_epjson);
+        assert_eq!(material_input.air_gaps.len(), 2);
+        assert_eq!(material_input.air_gaps[0].object_name, "MiXeD Gap");
+        assert_eq!(material_input.air_gaps[0].idf_max_fields, None);
+        assert_eq!(
+            material_input.air_gaps[0].fields["thermal_resistance"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(0.15)
+        );
+        let construction = &model.constructions[0];
+        let gap_id = construction.effective_layers()[1];
+        let gap = model
+            .materials
+            .iter()
+            .find(|m| m.id == gap_id)
+            .expect("same actual middle layer");
+        assert!(
+            matches!(gap.definition, ep_model::MaterialDefinition::AirGap(v) if v.thermal_resistance_m2_k_per_w == 0.15)
+        );
+        let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+        assert!(admitted.admissible, "{:?}", admitted.violations);
+        assert!(
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted).is_none()
+        );
+        let environment = super::environment::environment_from_weather(
+            model,
+            &weather,
+            "embedded interior-AirGap weather",
+        )
+        .expect("actual calendar preparation");
+        assert!(validate_porting_environment(&environment).is_empty());
+        admitted.environment = Some(environment);
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                .expect("all actual raw/IP/scope/weather checks");
+        let assessment = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(
+            assessment.allows_rust_runtime(),
+            "{:?}",
+            assessment.diagnostics
+        );
+        assert!(
+            assessment
+                .typed_objects
+                .iter()
+                .any(|entry| entry.object_type == FAMILY && entry.count == 2)
+        );
+        assert!(
+            !assessment
+                .source_consumed_objects
+                .iter()
+                .any(|entry| entry.object_type == FAMILY),
+            "typed AirGap stays typed, never rebranded RawOnly"
+        );
+        for accepted in [0.0005, 0.001, 0.15, 1.0e100] {
+            let mut boundary = value.clone();
+            boundary[FAMILY]["MiXeD Gap"]["thermal_resistance"] = json!(accepted);
+            let raw =
+                parse_epjson_str(&boundary.to_string()).expect("finite positive schema number");
+            assert!(
+                crate::ordinary_material_input::resolve(
+                    &raw,
+                    &match scope {
+                        PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                        PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                    }
+                    .expect("R has no invented admission upper/min0.001 bound")
+                )
+                .is_ok()
+            );
+        }
+        for invalid in [
+            json!(null),
+            json!(""),
+            json!("0.15"),
+            json!(true),
+            json!([]),
+            json!({}),
+            json!(0),
+            json!(-0.15),
+        ] {
+            let mut boundary = value.clone();
+            boundary[FAMILY]["MiXeD Gap"]["thermal_resistance"] = invalid;
+            let raw =
+                parse_epjson_str(&boundary.to_string()).expect("invalid scalar preserved raw");
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+        }
+        for fields in [
+            json!({}),
+            json!({"thermal_resistance":0.15,"roughness":"Rough"}),
+        ] {
+            let mut boundary = value.clone();
+            boundary[FAMILY]["MiXeD Gap"] = fields;
+            let raw = parse_epjson_str(&boundary.to_string()).expect("missing/unknown field raw");
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+        }
+        for key in ["", " "] {
+            let mut boundary = value.clone();
+            boundary[FAMILY] = json!({(key):{"thermal_resistance":0.15}});
+            let raw = parse_epjson_str(&boundary.to_string()).expect("invalid named instance raw");
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+                }
+                .is_err()
+            );
+        }
+        for construction in [
+            json!({"outside_layer":"MiXeD Gap","layer_2":"Solid"}),
+            json!({"outside_layer":"Solid","layer_2":"MiXeD Gap"}),
+        ] {
+            let mut boundary = value.clone();
+            boundary["Construction"]["Opaque"] = construction;
+            let raw =
+                parse_epjson_str(&boundary.to_string()).expect("invalid endpoint retained raw");
+            let compiled = compile_raw_model(&raw);
+            assert!(compiled.model.is_none());
+            assert!(
+                compiled
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "InvalidAirGapLayerPosition")
+            );
+        }
+        let mut duplicate = value.clone();
+        duplicate[FAMILY] = json!({"Solid":{"thermal_resistance":0.15}});
+        let duplicate = compile_raw_model(&parse_epjson_str(&duplicate.to_string()).unwrap());
+        assert!(duplicate.model.is_none());
+        assert!(
+            duplicate
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "DuplicateName" && d.object_type == FAMILY)
+        );
+    }
+}
+
+#[test]
 fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
     use ep_model::{InsideSurfaceConvectionAlgorithm as I, OutsideSurfaceConvectionAlgorithm as O};
     const INSIDE: &str = "SurfaceConvectionAlgorithm:Inside";

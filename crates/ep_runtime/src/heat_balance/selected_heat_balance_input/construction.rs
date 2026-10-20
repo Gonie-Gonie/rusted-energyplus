@@ -168,7 +168,7 @@ impl SelectedHeatBalanceInputState {
                     HeatBalanceInputError::Unavailable("actual construction material"),
                 )?;
                 match material.kind() {
-                    MaterialKind::Mass | MaterialKind::NoMass => {}
+                    MaterialKind::Mass | MaterialKind::NoMass | MaterialKind::AirGap => {}
                     _ => {
                         return Err(HeatBalanceInputError::Unavailable(
                             "unadmitted construction material family",

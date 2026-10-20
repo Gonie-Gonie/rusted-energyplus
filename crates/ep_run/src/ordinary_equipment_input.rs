@@ -65,6 +65,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "Site:GroundTemperature:Deep"
                 | "SizingPeriod:DesignDay"
                 | "Material:NoMass"
+                | "Material:AirGap"
                 | "Material"
                 | "Construction"
                 | "Zone"

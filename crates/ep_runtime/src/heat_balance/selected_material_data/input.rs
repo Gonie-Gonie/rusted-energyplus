@@ -3,7 +3,7 @@ use super::super::selected_project_data::{ProjectInputObject, ProjectInputValue}
 use super::{MaterialDataOwners, unavailable};
 use crate::error::RuntimeError;
 
-/// Literal selected Material/Material:NoMass raw fields and effective input order.
+/// Literal selected Material/Material:NoMass/Material:AirGap fields and input order.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SelectedMaterialInput {
     /// Actual loader format; never inferred from one family's metadata.
@@ -12,6 +12,8 @@ pub struct SelectedMaterialInput {
     pub regular: Vec<ProjectInputObject>,
     /// Actual getObjectItem order for Material:NoMass.
     pub no_mass: Vec<ProjectInputObject>,
+    /// Actual getObjectItem order for Material:AirGap.
+    pub air_gaps: Vec<ProjectInputObject>,
 }
 
 pub(super) fn alpha<'a>(
@@ -43,6 +45,65 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_air_gap_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        let max_fields = if self.source_is_epjson {
+            2 // Name plus the schema-required thermal_resistance.
+        } else {
+            object
+                .idf_max_fields
+                .ok_or_else(|| unavailable("missing actual Material:AirGap IDF field count"))?
+        };
+        if !owners
+            .input
+            .has_object("Material:AirGap", &object.object_name)
+        {
+            return Err(unavailable("Material:AirGap raw/IP identity"));
+        }
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.numeric_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.numeric_field_blanks.is_empty()
+            || s.numeric_field_names.is_empty()
+        {
+            return Err(unavailable(
+                "actual complete Material:AirGap shared allocation",
+            ));
+        }
+        // This actual getObjectItem call receives, and resets, all six arrays.
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("Material:AirGap", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = if self.source_is_epjson {
+            "name"
+        } else {
+            "Name"
+        }
+        .into();
+        s.numeric_args[0] = numeric(object, "thermal_resistance", None)?;
+        s.numeric_field_blanks[0] = false; // Required successful schema numeric; no default.
+        s.numeric_field_names[0] = if self.source_is_epjson {
+            "thermal_resistance"
+        } else {
+            "Thermal Resistance"
+        }
+        .into();
+        Ok((1, usize::from(1 < max_fields)))
+    }
+
     pub(super) fn get_no_mass_item(
         &self,
         object: &ProjectInputObject,

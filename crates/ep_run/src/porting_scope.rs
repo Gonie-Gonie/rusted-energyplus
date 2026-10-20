@@ -178,6 +178,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "RoomAirModelType"
             | "Material"
             | "Material:NoMass"
+            | "Material:AirGap"
             | "Construction"
             | "Zone"
             | "BuildingSurface:Detailed"

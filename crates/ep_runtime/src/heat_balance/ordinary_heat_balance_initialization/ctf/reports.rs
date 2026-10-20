@@ -52,9 +52,12 @@ fn prepare<'a>(
             .iter()
             .find(|v| v.id == id)
             .ok_or(CtfReportUnavailable::Material(id))?;
-        if materials.material_groups.get(&id) != Some(&SourceMaterialGroup::Regular) {
-            return Err(CtfReportUnavailable::Material(id));
-        }
+        let air_gap = match (materials.material_groups.get(&id), material.definition) {
+            (Some(SourceMaterialGroup::Regular), MaterialDefinition::Regular(_))
+            | (Some(SourceMaterialGroup::Regular), MaterialDefinition::NoMass(_)) => false,
+            (Some(SourceMaterialGroup::AirGap), MaterialDefinition::AirGap(_)) => true,
+            _ => return Err(CtfReportUnavailable::Material(id)),
+        };
         let input =
             material_layer_inputs(&[material]).map_err(|_| CtfReportUnavailable::Material(id))?;
         let values = input.first().ok_or(CtfReportUnavailable::Material(id))?;
@@ -63,7 +66,7 @@ fn prepare<'a>(
             name: crate::heat_balance::ctf_initialization_context::original_material_name(
                 model, id,
             )?,
-            air_gap: false,
+            air_gap,
             values: [
                 values.thickness,
                 values.conductivity,

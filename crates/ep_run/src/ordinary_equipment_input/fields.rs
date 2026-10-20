@@ -18,6 +18,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             | "Zone"
             | "Material"
             | "Material:NoMass"
+            | "Material:AirGap"
             | "Version"
             | "HeatBalanceAlgorithm"
             | "Timestep"
@@ -372,6 +373,9 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                     ],
                 )
         }
+        // AirGap is a required actual number, with no blank/default or upper bound.
+        // The existing real CTF loader retains its separate low-R diagnostics.
+        ("Material:AirGap", "thermal_resistance") => number(value).is_some_and(|n| n > 0.0),
         ("Material:NoMass", "thermal_resistance") => {
             blank(value) || number(value).is_some_and(|n| n >= 0.001)
         }
@@ -807,6 +811,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
             "wind_direction",
         ],
         "Material:NoMass" => &["roughness", "thermal_resistance"],
+        "Material:AirGap" => &["thermal_resistance"],
         "Material" => &[
             "roughness",
             "thickness",

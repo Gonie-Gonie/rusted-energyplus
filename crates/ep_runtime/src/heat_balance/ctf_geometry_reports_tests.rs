@@ -217,6 +217,37 @@ fn genuine_loader_resistance_and_zero_nominal_u_are_not_replaced()
     // Stored loader NominalR is an independent owner; it is not recomputed here
     // from deliberately different direct-test thickness/conductivity operands.
     assert_eq!(nominal_u(&model, &model.surfaces[0])?, 0.5);
+    model.materials.push(Material {
+        id: MaterialId(8),
+        name: NormalizedName::new("INTERIOR GAP"),
+        definition: MaterialDefinition::AirGap(ep_model::AirGapMaterial {
+            thermal_resistance_m2_k_per_w: 0.15,
+        }),
+    });
+    model.constructions[0].layers = vec![MaterialId(5), MaterialId(8), MaterialId(5)];
+    // The real interior AirGap participates in the same ordered NominalR sum;
+    // it does not acquire either face's properties or become a NoMass layer.
+    let mut resistance = 0.0;
+    resistance += value.thermal_resistance_m2_k_per_w;
+    resistance += 0.15;
+    resistance += value.thermal_resistance_m2_k_per_w;
+    let nominal = 1.0 / resistance;
+    assert_eq!(
+        nominal_u(&model, &model.surfaces[0])?.to_bits(),
+        nominal.to_bits()
+    );
+    let mut table = PredefinedStringTable::default();
+    report_ordinary_surface_nominal_u(&model, &registry()?, &mut table)?;
+    assert_eq!(
+        table
+            .entries
+            .as_ref()
+            .ok_or(CtfReportUnavailable::TableOwner)?[0]
+            .original_real_entry
+            .to_bits(),
+        nominal_u_with_films(nominal, 0.1197548, 0.0299387).to_bits()
+    );
+    model.constructions[0].layers = vec![MaterialId(5)];
     value.thermal_resistance_m2_k_per_w = 0.0;
     model.materials[0].definition = MaterialDefinition::NoMass(value);
     let mut table = PredefinedStringTable::default();

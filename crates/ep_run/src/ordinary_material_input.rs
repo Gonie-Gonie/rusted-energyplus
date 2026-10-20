@@ -13,7 +13,7 @@ pub(crate) fn resolve(
         source_is_epjson: raw.is_epjson(),
         ..SelectedMaterialInput::default()
     };
-    for family in ["Material", "Material:NoMass"] {
+    for family in ["Material", "Material:NoMass", "Material:AirGap"] {
         let rows = raw
             .ordered_instances(family)
             .map_err(|error| error.to_string())?;
@@ -64,8 +64,11 @@ pub(crate) fn resolve(
                 };
                 fields.insert(field.0.clone(), value);
             }
-            if !raw.is_epjson() && family == "Material:NoMass" && idf_max_fields.is_none() {
-                return Err("actual Material:NoMass IDF physical field count absent".into());
+            if !raw.is_epjson()
+                && matches!(family, "Material:NoMass" | "Material:AirGap")
+                && idf_max_fields.is_none()
+            {
+                return Err(format!("actual {family} IDF physical field count absent"));
             }
             values.push(ProjectInputObject {
                 object_name: name.0.clone(),
@@ -73,10 +76,11 @@ pub(crate) fn resolve(
                 idf_max_fields,
             });
         }
-        if family == "Material" {
-            result.regular = values;
-        } else {
-            result.no_mass = values;
+        match family {
+            "Material" => result.regular = values,
+            "Material:NoMass" => result.no_mass = values,
+            "Material:AirGap" => result.air_gaps = values,
+            _ => unreachable!("literal selected material family"),
         }
     }
     Ok(result)

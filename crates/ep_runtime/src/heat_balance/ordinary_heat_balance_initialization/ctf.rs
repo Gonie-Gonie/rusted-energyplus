@@ -546,14 +546,25 @@ fn source_layer_inputs(
             .ok_or(Error::Unavailable("sole physical Material owner"))?;
         match (materials.material_groups.get(&id), material.definition) {
             (Some(SourceMaterialGroup::Regular), MaterialDefinition::Regular(_))
-            | (Some(SourceMaterialGroup::Regular), MaterialDefinition::NoMass(_)) => {}
+            | (Some(SourceMaterialGroup::Regular), MaterialDefinition::NoMass(_))
+            | (Some(SourceMaterialGroup::AirGap), MaterialDefinition::AirGap(_)) => {}
             _ => {
                 return Err(Error::Unavailable(
-                    "actual Regular Material group/physical property view",
+                    "actual opaque Material group/physical property view",
                 ));
             }
         }
         rows.push(material);
     }
-    material_layer_inputs(&rows).map_err(Error::Loading)
+    let mut inputs = material_layer_inputs(&rows).map_err(Error::Loading)?;
+    for input in &mut inputs {
+        // Construction.cc298 consumes the actual MaterialBase::ROnly written
+        // by GetMaterialData, independently of the later ResLayer predicate.
+        input.resistance_only = materials
+            .resistance_only
+            .get(&input.material_id)
+            .copied()
+            .ok_or(Error::Unavailable("actual Material ROnly owner"))?;
+    }
+    Ok(inputs)
 }

@@ -48,7 +48,7 @@ pub struct CtfLayerContext {
 /// Scope failure, kept separate from a genuine source input error.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CtfLayerScopeError {
-    /// The supplied family has no selected Regular/NoMass owner mapping.
+    /// The supplied family has no selected Regular/NoMass/AirGap owner mapping.
     UnsupportedMaterial(MaterialId),
     /// Source/sink checks and their state mutations are outside CTF-01's scope.
     InternalSource,
@@ -199,6 +199,16 @@ pub fn material_layer_inputs(
                     // MaterialBase defaults are genuine zero members for NoMass;
                     // its actual loader stores Resistance and sets ROnly=true.
                     MaterialDefinition::NoMass(value) => (
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        value.thermal_resistance_m2_k_per_w,
+                        true,
+                    ),
+                    // AirGap owns MaterialBase ctorzero physical members and
+                    // its own genuine resistance-only loader; it is not NoMass.
+                    MaterialDefinition::AirGap(value) => (
                         0.0,
                         0.0,
                         0.0,

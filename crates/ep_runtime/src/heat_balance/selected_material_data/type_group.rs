@@ -3,7 +3,7 @@ use super::super::selected_heat_balance_input::HeatBalanceInputError;
 use super::SelectedMaterialData;
 
 // Preserve the native enum membership/numbers for the actual predicates. The
-// selected getter writes only Regular; other producers remain unsupported.
+// selected getter writes Regular and AirGap; other producers remain unsupported.
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[repr(i32)]

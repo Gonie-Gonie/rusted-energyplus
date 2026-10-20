@@ -476,6 +476,9 @@ impl GainFactory {
             no_mass: project_objects(factory, &["Material:NoMass"])?
                 .remove("Material:NoMass")
                 .unwrap_or_default(),
+            air_gaps: project_objects(factory, &["Material:AirGap"])?
+                .remove("Material:AirGap")
+                .unwrap_or_default(),
         });
         {
             let mut backend = error_backend(&mut error_state, &mut errors, &mut console);
