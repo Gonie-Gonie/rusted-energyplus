@@ -29,6 +29,8 @@ pub(crate) fn resolve(
         "Exterior:Lights",
         "Site:Location",
         "RunPeriod",
+        "RunPeriodControl:SpecialDays",
+        "RunPeriodControl:DaylightSavingTime",
         "SizingPeriod:DesignDay",
         "Output:Meter",
         "Output:Meter:MeterFileOnly",

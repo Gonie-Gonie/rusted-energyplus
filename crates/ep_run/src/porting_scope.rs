@@ -18,7 +18,9 @@ use serde::Serialize;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
-pub(crate) use environment::porting_environment_trace;
+pub(crate) use environment::{
+    porting_source_environment_trace, source_coverage_axis, validate_source_environment,
+};
 
 /// Frozen input family selected for card-based porting work.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]

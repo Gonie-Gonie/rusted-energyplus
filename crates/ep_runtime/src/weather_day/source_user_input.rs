@@ -216,9 +216,15 @@ impl WeatherSession {
             || self.state.weather.tot_run_pers >= 1
             || owners.system.full_annual_run
         {
-            self.cursor
-                .get_source_special_day_period_data(owners.input, owners.shortcut)?;
+            self.cursor.get_source_special_day_period_data(
+                owners.raw,
+                owners.input,
+                owners.shortcut,
+                owners.backend,
+                &mut errors_found,
+            )?;
             self.cursor.get_source_dst_data(
+                owners.raw,
                 owners.input,
                 owners.shortcut,
                 owners.backend,

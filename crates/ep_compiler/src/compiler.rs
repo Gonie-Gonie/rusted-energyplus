@@ -1152,19 +1152,22 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             };
-            let duration_days = self.u32_default(OBJECT_TYPE, &name, &object, "duration", 1);
-            if !(1..=366).contains(&duration_days) {
+            // Native GetSpecialDayPeriodData casts a schema number to int.
+            // Raw authored operands still reach the genuine Source getter.
+            let duration = self.number_default(OBJECT_TYPE, &name, &object, "duration", 1.0);
+            if !(1.0..=366.0).contains(&duration) {
                 self.error(
                     "InvalidNumericRange",
                     OBJECT_TYPE,
                     Some(&name),
                     Some("duration"),
                     format!(
-                        "{OBJECT_TYPE}/{name} field duration must be between 1 and 366, got {duration_days}"
+                        "{OBJECT_TYPE}/{name} field duration must be between 1 and 366, got {duration}"
                     ),
                 );
                 continue;
             }
+            let duration_days = duration.trunc() as u32;
             let special_day_type = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -18306,7 +18309,7 @@ mod tests {
             model.run_period_special_days[0].special_day_type,
             SpecialDayType::Holiday
         );
-        for (field, value) in [("duration", "1"), ("special_day_type", "Holiday")] {
+        for (field, value) in [("duration", "1.0"), ("special_day_type", "Holiday")] {
             assert!(result.report.defaults_applied.iter().any(|application| {
                 application.object_type == "RunPeriodControl:SpecialDays"
                     && application.object_name == "Default Holiday"

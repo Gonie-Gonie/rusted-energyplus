@@ -499,6 +499,46 @@ const SHADOW_CALCULATION: &[Field] = &[
         retain_case: false,
     },
 ];
+const SPECIAL_DAYS: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "start_date",
+        legacy: "Start Date",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "duration",
+        legacy: "Duration",
+        default: DefaultValue::Numeric(1.0),
+        retain_case: false,
+    },
+    Field {
+        json: "special_day_type",
+        legacy: "Special Day Type",
+        default: DefaultValue::Alpha("Holiday"),
+        retain_case: false,
+    },
+];
+const DAYLIGHT_SAVING: &[Field] = &[
+    Field {
+        json: "start_date",
+        legacy: "Start Date",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "end_date",
+        legacy: "End Date",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+];
 pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
     match family {
         "Building" => Some((F0, 8, true)),
@@ -512,6 +552,8 @@ pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
         "Exterior:Lights" => Some((EXTERIOR_LIGHTS, 0, true)),
         "Site:Location" => Some((SITE_LOCATION, 5, true)),
         "RunPeriod" => Some((RUN_PERIOD, 7, true)),
+        "RunPeriodControl:SpecialDays" => Some((SPECIAL_DAYS, 4, true)),
+        "RunPeriodControl:DaylightSavingTime" => Some((DAYLIGHT_SAVING, 2, false)),
         "SizingPeriod:DesignDay" => Some((super::design_day_schema::DESIGN_DAY, 0, true)),
         "Output:Meter"
         | "Output:Meter:MeterFileOnly"

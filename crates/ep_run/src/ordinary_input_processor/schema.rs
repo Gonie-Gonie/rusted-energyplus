@@ -4,6 +4,8 @@ use ep_runtime::heat_balance::selected_input_processor::SourceObjectDefinition;
 
 pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
     [
+        ("RunPeriodControl:SpecialDays", 3, 1, 0, 0, None),
+        ("RunPeriodControl:DaylightSavingTime", 2, 0, 0, 0, None),
         ("AirLoopHVAC:OutdoorAirSystem", 3, 0, 0, 0, None),
         (
             "AirLoopHVAC:OutdoorAirSystem:EquipmentList",

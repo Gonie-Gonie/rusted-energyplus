@@ -247,6 +247,12 @@ impl SourceRawDayReadCallbacks for SourceDayReadSink<'_, '_> {
 }
 impl SourceDayReadSink<'_, '_> {
     fn reset_selected_dates(&mut self, header: &mut RawEpwHeaderState) -> Result<(), Failure> {
+        let flags = SourceDiagnosticFlags {
+            kickoff: &self.globals.kickoff_simulation,
+            developer: self.developer_flag,
+            warmup: &self.state.global.warmup_flag,
+            doing_sizing: &self.globals.doing_sizing,
+        };
         let current = ordinal(self.state.weather.envrn)?;
         // Exact month array is small Native borrowed input; the callee needs its
         // same live storage, split from the remaining WeatherManager fields.
@@ -257,14 +263,25 @@ impl SourceDayReadSink<'_, '_> {
             .and_then(|v| v.get(current))
             .ok_or(Error::Unavailable("actual global envCurr reference2567"))?;
         if weather.daylight_saving_is_active {
-            super::calendar::set_dst_dates(&row.month_week_day, &mut weather.dst_index, header)?;
+            super::calendar::set_dst_dates(
+                &row.month_week_day,
+                &weather.end_day_of_month_with_leap_day,
+                &mut weather.dst_index,
+                header,
+                self.backend,
+                &flags,
+            )?;
         }
         super::calendar::set_special_days(
             &row.month_week_day,
+            &weather.end_day_of_month_with_leap_day,
+            &weather.weekday_types,
             &mut weather.special_day_types,
             &weather.use_special_days,
+            &row.apply_weekend_rule,
             header,
             self.backend,
+            &flags,
         )
     }
 }

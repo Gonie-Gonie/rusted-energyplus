@@ -9506,6 +9506,52 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "RunPeriodControl:SpecialDays" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "start_date",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "duration",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "special_day_type",
+                    default: SchemaDefault::String("Holiday"),
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
+        "RunPeriodControl:DaylightSavingTime" => SchemaDefinition {
+            has_name: false,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "start_date",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "end_date",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         _ => return None,
     })
 }

@@ -144,36 +144,50 @@
       "Real getter sets actual period flags, frequency tracking, original MTR-then-ESO dictionaries and separate physical counters. Duplicate and frequency/not-found diagnostics borrow actual kickoff/developer/warmup/doingSizing and actual owned file basenames, retaining effect/failure order.",
       "Rust-only successful physical dictionary observations retain original Detailed/EachCall frequency while scientific storage stays the actual TimeStep slot; observations never feed physics/report values.",
       "Actual ResultsFramework Annual variables_scanned provenance follows the real year-end variable/meter child. Only an unreached Annual boundary permits genuine zero samples; present/deleted ESO/MTR require matching exact declarations, actual closed/deleted0 state and unchanged raw pair checks. Missing/reached/wrong-frequency/name/partner cases stay rejected.",
-      "Same-input appendedElectricity:Facility Hourly completes60/5400: original58 policies unchanged, added ESO24 and MTR24 exactraw/binary64 under explicit derived0/0/0. Actual initial Native duplicate-warning prediction was wrong and is preserved; no duplicate physical proof claimed yet. Custom/cumulative/SQLite ingress and broader models remain bounded.",
+      "Same-input appendedElectricity:Facility Hourly completes60/5400: original58 policies unchanged, added ESO24 and MTR24 exactraw/binary64 under explicit derived0/0/0. Actual initial Native duplicate-warning prediction was wrong and is preserved; that case alone does not exercise the duplicate branch; the separate all-frequency case does. Custom/cumulative/SQLite ingress and broader models remain bounded.",
       "same-input all8frequency requests verify69physical declarations/5574rows, actual duplicate warning, Detailed/RunPeriod aliases, full min/max operands with exact dates and two genuinely unreached Annual0 declarations; positive year-end Annual remains unproved"
+    ],
+    "RunPeriodControl:DaylightSavingTime": [
+      "Official required strings and unnamed singleton raw/IP/schema ownership; retained IDFDST references keep actual ctor weekdays and preserve child-unwritten fields.",
+      "Actual EPW MonthDay unwritten weekday remains None and is never read by its unused branch; no synthetic0 or early false boundary.",
+      "Real fixed/Nth/Last calendar resolution, wrap/inclusive366DST fill and exact pinned Original end-Nth right-shift predicate. All3 caller routes borrow actual clock/global/project diagnostic phase cells.",
+      "Source-only preparation validates actual raw inputs then retains only civil-date/weather coverage; DST/holiday/schedule values are explicitly deferred to actual Source raw/header/calendar owners, never fed from previews. Legacy guards remain.",
+      "Same-input B102 completes102/9792 raw/binary64-exact values with actual DST1 and matching complete calendarEIO/ERR-END; ordinal-only and other numeric lexical forms remain bounded."
+    ],
+    "RunPeriodControl:SpecialDays": [
+      "Real scoped no-optional3alpha/1number getter, Native local/shared scratch distinction, source order and actual header SpecialDays array allocation/count.",
+      "Official finite number Duration1..366 preserves raw fraction; typed projection and genuine Source getter truncate toward zero. Five actual special day types/defaultHoliday retained.",
+      "Actual fixed/Nth/Last, weekend observation, cyclic duration, live weekday/month tables and literal Original InvOrdinalDay leap subtraction; no preview values substitute. Overlap warnings/conditional continuations precede overwrite and deferred Nth Severe-to-Fatal preserves prior writes.",
+      "All3 real calendar callers use actual Environment ApplyWeekendRule, weather flags and live diagnostic phase owners. Actual special-day EIO and tomorrow/day-type/DST schedule consumers are connected.",
+      "Same-input1/1 CustomDay1 Duration1.9 becomes1 across96actual clocks and matches all102/9792 original outputs exactly. AllDays schedules do not prove distinct day-type coefficients; ordinal-only unwritten local weekday and broader grammar/models remain bounded."
     ]
   },
   "verification": {
     "workspace_tests": {
-      "passed": 5038,
+      "passed": 5042,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/reporting-workspace-tests-15b.log",
-        "sha256": "2f1a4cd567792bda4df22b916552ba30c26ace3b56bd892645536382a624d0b6",
-        "bytes": 1554280
+        "path": ".runtime/object-expansion/calendar-workspace-tests-16c.log",
+        "sha256": "db04a7401514312c7cb0a3cc69a4d4cc4901a5004c6c4a8aecfdeddc5c525a19",
+        "bytes": 1555820
       },
-      "scope": "Full workspace milestone through reporting-15: live weather/warmup phases, opaque surface report owners, normal/MFO meter ingress, genuine dictionary provenance and actual Annual-boundary empty/deleted output pairing. Subsequent Clippy-only range-pattern spelling is equivalent."
+      "scope": "Full workspace milestone through calendar-controls-16: actual raw/IP calendar getters, fractional duration, retained DST weekday definedness, all3 live calendar callers, real diagnostics, EIO and coverage-only Source preparation. Legacy preview admission remains bounded."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/reporting-clippy-15b.log",
-        "sha256": "fa8c041ec60f3ca89ce25d038ea31e90904e4f3ec79bcb130464716f6183f14e",
-        "bytes": 2080
+        "path": ".runtime/object-expansion/calendar-clippy-16.log",
+        "sha256": "b08a2740a025a35514e5ae7fda0cc3d797c8162315be092fe20a7d6cceda6192",
+        "bytes": 2508
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/all-frequency-docs-15.log",
+        "path": ".runtime/object-expansion/calendar-docs-16.log",
         "sha256": "a4fe96be74011773397a478691f536a103a75362daf96a7b2fc3230ca937c125",
         "bytes": 354
       },
-      "clippy_through_build": "reporting-15"
+      "clippy_through_build": "calendar-controls-16"
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
     "policy": {
@@ -2138,11 +2152,62 @@
           "passed": true
         },
         "effective_state": "Eight appended normal ExteriorLights:Electricity requests exercise Detailed/Timestep, Hourly, Daily, Monthly, RunPeriod/Environment and Annual ownership. All69 actual declarations/5574 physical rows and5586 numeric energy operands match; original58 policies remain unchanged, newly requested energy Value/Min/Max roles explicitly derive1J/0rtol/1J-RMSE from the same named Hourly meter, with exact integer extrema dates and physical ordering. Detailed-first retains actual Each Call dictionary text; aliases share their genuine period. Two Annual declarations have0rows because the actual year-end child was not reached; both exported live-owner flags are required and no numeric metrics or RMSE are invented. Full original58, same-producer ESO/MTR, wholeSHD and fullERR/END1/0 including the actual duplicate MFO warning pass. This proves the listed composed requests, not arbitrary meter/model combinations or positive Annual year-end execution."
+      },
+      {
+        "id": "calendar-controls-B102",
+        "group": "calendar_controls",
+        "source_build": "calendar-controls-16",
+        "input": {
+          "path": ".runtime/object-expansion/native-calendar-controls/calibration-01/input.idf",
+          "sha256": "15f58da81cc8ca2a964b2218b3f2b8654799f4b2b3bc08595e8686044b3e8ae7",
+          "bytes": 13147
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-calendar-controls/calibration-01/receipt.json",
+          "sha256": "7e707b80bf378cebd90e89e0a7b8cb9e0c2299080af6d0b60208893e095d4ade",
+          "bytes": 12172
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-calendar-controls-16/receipt.json",
+          "sha256": "7669916d7b5bc5c27ca2c90bad05adf969d066422eb7764b0ad8812c895f45e1",
+          "bytes": 6373
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/calendar-controls-16/run-summary.json",
+          "sha256": "fa2a7d0dd3b95a370b084b20d7c9db266fc563c5ab132abfb3eae897f3d25ebd",
+          "bytes": 60603
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-calendar-controls-comparisons-01/main/comparison.json",
+          "sha256": "8624fbc41a31f6a250a9d53d9cb10f838af9acbc2cf6a0b58f2da5a4cb3e94db",
+          "bytes": 211492
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-calendar-controls-16-launch/request.json",
+          "sha256": "ea2ad9a5678eab68ece0929047f58b87820acb6f50c79ef7aaadd8c1ffe3530d",
+          "bytes": 2827
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Exact original B102 plus IDF DST1/1-to-1/1 and one1/1 CustomDay1 with authored number Duration1.9. Actual raw getter truncates to1; original102/9792 values are raw/binary64 identical under unchanged named policies. Full96physical DST1/CustomDay1 clocks, inclusive InputFile DST/Special EIO, ZoneTARP/DOE2 and6warmup days, completeERR/END0/0, wholeSHD and actual deleted-emptyMTR0 match. Both existing Compact schedules vary by time but use AllDays, so the real DST+1hour/hour24 consumers are exercised without claiming distinct day-type coefficient variations. Fixed/Nth/Last, wrap, weekend, leap-inverse quirks and overlap/error prefixes have actual-owner unit tables; arbitrary date syntax/calendar/model combinations remain bounded."
       }
     ],
     "totals": {
-      "paired_cases": 34,
-      "reported_samples": 218070,
+      "paired_cases": 35,
+      "reported_samples": 227862,
       "raw_operand_unequal": 101278,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -2402,6 +2467,23 @@
           "path": ".runtime/porting/object-domain-20261020/build-15/eplus-rs.exe",
           "sha256": "e302468715330ba00f11215453b8daad4fb55c6003c7f04ce98de00548324df2",
           "bytes": 75295135
+        }
+      },
+      {
+        "id": "calendar-controls-16",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-16/receipt.json",
+          "sha256": "4b8ccf917569cfa4e7ae034ca99d440f2cb040956aa8b2ffa78af358639d6429",
+          "bytes": 7263
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4a/4ad54f5b9c91ea77b6055e531eb1dae7eff827f7edd8f54b74d58a99938fd476",
+          "sha256": "4ad54f5b9c91ea77b6055e531eb1dae7eff827f7edd8f54b74d58a99938fd476"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-16/eplus-rs.exe",
+          "sha256": "d00da18c79820f92b6f198d3d8a353175aa0095dbb888b6886beed7ae181bdae",
+          "bytes": 75372867
         }
       }
     ]

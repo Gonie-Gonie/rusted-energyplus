@@ -1,6 +1,8 @@
 //! Reuse the production EPW/calendar/schedule preparation for admission traces.
 
+use super::PortingScope;
 use ep_model::TypedModel;
+use ep_raw_model::RawModel;
 use ep_runtime::schedules::precompute_schedule_value_series_for_environment_time_axis;
 use ep_runtime::{
     build_environment_time_axes_with_weather_metadata,
@@ -10,12 +12,117 @@ use ep_runtime::{
 use serde_json::{Value, json};
 use std::path::Path;
 
-pub(crate) fn porting_environment_trace(
+/// Proof of exact raw calendar-family admission on the Source A/B route.
+/// It supplies no dates, schedules or mutable runtime state.
+pub(crate) struct SourceCalendarInputAdmission {
+    _private: (),
+}
+impl SourceCalendarInputAdmission {
+    pub(super) fn from_raw(raw: &RawModel, scope: PortingScope) -> Result<Self, String> {
+        match scope {
+            PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(raw),
+            PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(raw),
+        }?;
+        Ok(Self { _private: () })
+    }
+}
+
+pub(crate) fn porting_source_environment_trace(
+    raw: &RawModel,
     model: &TypedModel,
     weather_path: &Path,
-) -> Result<Value, String> {
+    scope: PortingScope,
+) -> Result<(Value, SourceCalendarInputAdmission), String> {
+    let admission = SourceCalendarInputAdmission::from_raw(raw, scope)?;
     let weather = load_epw_weather_file(weather_path).map_err(|error| error.to_string())?;
-    environment_from_weather(model, &weather, &weather_path.to_string_lossy())
+    let trace = source_environment_from_weather(
+        model,
+        &weather,
+        &weather_path.to_string_lossy(),
+        &admission,
+    )?;
+    Ok((trace, admission))
+}
+
+/// Civil dates, weather coverage and step counts only. The actual Source route
+/// consumes no DST/holiday/schedule values from this preparation-time axis.
+/// Native's surprising end-Nth predicate must reach the genuine calendar child,
+/// rather than being vetoed by the legacy preview date resolver.
+pub(crate) fn source_coverage_axis(
+    raw: &RawModel,
+    scope: PortingScope,
+    model: &TypedModel,
+    metadata: &ep_runtime::weather::EpwCalendarMetadata,
+) -> Result<ep_runtime::time_axis::TimeAxis, String> {
+    let _admission = SourceCalendarInputAdmission::from_raw(raw, scope)?;
+    let mut coverage = model.clone();
+    coverage.run_period_daylight_saving_time = None;
+    coverage.run_period_special_days.clear();
+    let mut calendar = metadata.clone();
+    calendar.daylight_saving_period = None;
+    calendar.holidays.clear();
+    build_hourly_time_axis_with_weather_metadata(&coverage, &calendar)
+        .map_err(|error| error.to_string())
+}
+
+pub(super) fn source_environment_from_weather(
+    model: &TypedModel,
+    weather: &ep_runtime::weather::EpwWeatherFile,
+    weather_path: &str,
+    _admission: &SourceCalendarInputAdmission,
+) -> Result<Value, String> {
+    let mut coverage = model.clone();
+    coverage.run_period_daylight_saving_time = None;
+    coverage.run_period_special_days.clear();
+    let mut weather_coverage = weather.clone();
+    weather_coverage.calendar_metadata.daylight_saving_period = None;
+    weather_coverage.calendar_metadata.holidays.clear();
+    let mut trace = environment_from_weather(&coverage, &weather_coverage, weather_path)?;
+    let object = trace
+        .as_object_mut()
+        .ok_or("Source input trace is not an object")?;
+    for key in [
+        "active_special_day_count",
+        "active_dst_step_count",
+        "daylight_saving",
+        "schedule_values",
+        "prepared_calendar",
+    ] {
+        object.remove(key);
+    }
+    if let Some(first) = object.get_mut("first").and_then(Value::as_object_mut) {
+        first.remove("dst");
+        first.remove("day_type");
+    }
+    object.insert(
+        "source".into(),
+        json!("Rust coverage-only EPW/civil-date preparation; Source calendar values deferred"),
+    );
+    object.insert("trace_semantics".into(), json!("coverage inputs only; actual Source calendar/schedule children execute from original raw input and live header owners"));
+    object.insert("source_calendar_controls".into(), json!({
+        "status": "deferred_to_execution",
+        "execution_owner": "actual Source raw header/getters and SetDSTDateRanges/SetSpecialDayDates",
+        "input_file_DST_declared": model.run_period_daylight_saving_time.is_some(),
+        "input_file_special_day_declarations": model.run_period_special_days.len(),
+        "weather_file_DST_declared": weather.calendar_metadata.daylight_saving_period.is_some(),
+        "weather_file_special_day_declarations": weather.calendar_metadata.holidays.len(),
+        "preview_values_used_by_Source": false,
+    }));
+    Ok(trace)
+}
+
+pub(crate) fn validate_source_environment(
+    environment: &Value,
+    _admission: &SourceCalendarInputAdmission,
+) -> Vec<String> {
+    let mut errors = super::validate_porting_environment(environment);
+    if environment["source_calendar_controls"]["status"] != "deferred_to_execution"
+        || environment["source_calendar_controls"]["execution_owner"]
+            != "actual Source raw header/getters and SetDSTDateRanges/SetSpecialDayDates"
+    {
+        errors.push("Source calendar preparation lacks its validated execution-owner fact".into());
+    }
+    errors
 }
 
 pub(super) fn environment_from_weather(

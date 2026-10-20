@@ -113,7 +113,7 @@ fn assign_start(state: &mut RawEpwHeaderState, date: DateScratch) -> Result<(), 
     state.epw_dst.start_date_type = date.date_type;
     state.epw_dst.start_month = defined(date.month, "unwritten DST start month")?;
     state.epw_dst.start_day = defined(date.day, "unwritten DST start day")?;
-    state.epw_dst.start_weekday = defined(date.weekday, "unwritten active DST start weekday")?;
+    state.epw_dst.start_weekday = date.weekday;
     Ok(())
 }
 
@@ -154,8 +154,7 @@ fn holidays(
                         state.epw_dst.end_date_type = date.date_type;
                         state.epw_dst.end_month = defined(date.month, "unwritten DST end month")?;
                         state.epw_dst.end_day = defined(date.day, "unwritten DST end day")?;
-                        state.epw_dst.end_weekday =
-                            defined(date.weekday, "unwritten active DST end weekday")?;
+                        state.epw_dst.end_weekday = date.weekday;
                     } else {
                         state.epw_daylight_saving = false;
                     }

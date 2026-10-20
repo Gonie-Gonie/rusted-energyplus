@@ -1,6 +1,6 @@
 //! Actual GetNextEnvironment864-1174 on the live Environment and raw header.
 use super::{Failure, fatal, ordinal};
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::radiation::ordinary::source_children::SourceSolarReportFlags;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
@@ -20,6 +20,7 @@ pub(super) struct SourceRunEnvironmentCalendarOwners<'a> {
     pub(super) end_day_of_month_with_leap_day: &'a mut [i32; 12],
     pub(super) weekday_types: &'a mut [i32; 366],
     pub(super) special_day_types: &'a mut [i32; 366],
+    pub(super) dst_index: &'a mut [i32; 366],
     pub(super) current_simulation_day_for_end_of_run_period: &'a mut i32,
     pub(super) start_dates_cycle_should_be_reset: &'a mut bool,
     pub(super) jan1_dates_should_be_reset: &'a mut bool,
@@ -75,15 +76,16 @@ pub(super) fn initialize_source_run_environment(
     header: &mut RawEpwHeaderState,
     clock: &WeatherGlobalState,
     globals: &SelectedHeatBalanceGlobals,
+    flags: &SourceDiagnosticFlags<'_>,
     control: &SelectedHeatBalanceInputState,
     reports: &SourceSolarReportFlags,
     eio: &mut dyn Write,
     backend: &mut SourceErrorBackend<'_>,
 ) -> Result<(), Failure> {
-    let dst_actual_start_month = 0;
-    let dst_actual_start_day = 0;
-    let dst_actual_end_month = 0;
-    let dst_actual_end_day = 0;
+    let mut dst_actual_start_month = 0;
+    let mut dst_actual_start_day = 0;
+    let mut dst_actual_end_month = 0;
+    let mut dst_actual_end_day = 0;
     let kind_of_run_period = row.kind_of_environment_character.clone();
     environment.run_period_environment = clock.kind_of_sim == 3;
     environment.current_year_is_leap_year = row.is_leap_year;
@@ -291,31 +293,31 @@ pub(super) fn initialize_source_run_environment(
         (*calendar.use_daylight_saving && header.epw_daylight_saving) || header.idf_daylight_saving;
     row.set_week_days = false;
     if *calendar.daylight_saving_is_active {
-        return Err(Error::Unavailable("actual positive SetDSTDateRanges1110").into());
-    }
-    // Actual SetSpecialDayDates1642-1651 prefix, including mandatory reset.
-    let special_errors = false;
-    calendar.special_day_types.fill(0);
-    for number in 1..=header.number_special_days {
-        let special = header
-            .special_days
-            .values
-            .get_mut(ordinal(number)?)
-            .ok_or(Error::Unavailable("actual SpecialDays reference1647"))?;
-        if special.weather_file && !*calendar.use_special_days {
-            continue;
-        }
-        return Err(
-            Error::Unavailable("actual positive SetSpecialDayDates date resolution1651").into(),
-        );
-    }
-    if special_errors {
-        return Err(fatal(
+        (
+            dst_actual_start_month,
+            dst_actual_start_day,
+            dst_actual_end_month,
+            dst_actual_end_day,
+        ) = super::super::source_weather_initialization::calendar::set_dst_dates(
+            month_weekdays,
+            calendar.end_day_of_month_with_leap_day,
+            calendar.dst_index,
+            header,
             backend,
-            "SetSpecialDayDates: Program terminates due to preceding condition(s).",
-        ));
+            flags,
+        )?;
     }
-    let _ = month_weekdays; // Borrowed real array for the genuine positive children.
+    super::super::source_weather_initialization::calendar::set_special_days(
+        month_weekdays,
+        calendar.end_day_of_month_with_leap_day,
+        calendar.weekday_types,
+        calendar.special_day_types,
+        calendar.use_special_days,
+        &row.apply_weekend_rule,
+        header,
+        backend,
+        flags,
+    )?;
     if row.start_month != 1 || row.start_day != 1 {
         *calendar.start_dates_cycle_should_be_reset = true;
         *calendar.jan1_dates_should_be_reset = true;
@@ -361,15 +363,34 @@ pub(super) fn initialize_source_run_environment(
                 && *calendar.use_special_days
                 && reports.do_weather_init_reporting
             {
-                return Err(Error::Unavailable(
-                    "actual positive weather SpecialDay date report1154",
+                let start = date(special.actual_start_month, special.actual_start_day);
+                let kind = DAY_NAMES
+                    .get(
+                        usize::try_from(special.day_type)
+                            .map_err(|_| Error::Unavailable("actual special day name1159"))?,
+                    )
+                    .ok_or(Error::Unavailable("actual special day name1159"))?;
+                writeln!(
+                    eio,
+                    "Environment:Special Days,{},{},WeatherFile,{},{:3}",
+                    special.name, kind, start, special.duration
                 )
-                .into());
+                .map_err(Error::Io)?;
             }
             if !special.weather_file && reports.do_weather_init_reporting {
-                return Err(
-                    Error::Unavailable("actual positive input SpecialDay date report1164").into(),
-                );
+                let start = date(special.actual_start_month, special.actual_start_day);
+                let kind = DAY_NAMES
+                    .get(
+                        usize::try_from(special.day_type)
+                            .map_err(|_| Error::Unavailable("actual special day name1169"))?,
+                    )
+                    .ok_or(Error::Unavailable("actual special day name1169"))?;
+                writeln!(
+                    eio,
+                    "Environment:Special Days,{},{},InputFile,{},{:3}",
+                    special.name, kind, start, special.duration
+                )
+                .map_err(Error::Io)?;
             }
         }
     }

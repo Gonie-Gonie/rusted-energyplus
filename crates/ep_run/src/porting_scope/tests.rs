@@ -763,6 +763,91 @@ fn effective_calendar_branches_are_checked_after_weather_resolution() {
             .iter()
             .any(|message| message.contains("daylight-saving"))
     );
+    // Same real input/weather path, but only the Source lane can defer actual
+    // calendar controls to its connected getters/owners. No preview schedule is
+    // supplied to Source, and legacy raw/admission guards stay in force.
+    for scope in [PortingScope::A, PortingScope::B] {
+        for (start, end) in [
+            ("1/1", "1/1"),
+            ("2nd Sunday in March", "Last Sunday in October"),
+            ("1/1", "5th Monday in February"),
+        ] {
+            let mut value = input(scope);
+            value["RunPeriodControl:SpecialDays"] = json!({"Holiday":{"start_date":"1/1","duration":1.9,"special_day_type":"CustomDay1"}});
+            value["RunPeriodControl:DaylightSavingTime"] =
+                json!({" ":{"start_date":start,"end_date":end}});
+            let raw = parse_epjson_str(&value.to_string()).unwrap();
+            let compiled = compile_raw_model(&raw);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("schema-number duration projects Native int");
+            assert_eq!(model.run_period_special_days[0].duration_days, 1);
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+            let proof =
+                super::environment::SourceCalendarInputAdmission::from_raw(&raw, scope).unwrap();
+            let source = super::environment::source_environment_from_weather(
+                model,
+                &weather,
+                "embedded calendar weather",
+                &proof,
+            )
+            .unwrap();
+            assert!(validate_source_environment(&source, &proof).is_empty());
+            assert!(source.get("daylight_saving").is_none());
+            assert!(source.get("schedule_values").is_none());
+            assert_eq!(
+                source["source_calendar_controls"]["status"],
+                "deferred_to_execution"
+            );
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .unwrap();
+            let operands = crate::ordinary_heat_balance_input::resolve(&raw, &ip).unwrap();
+            assert_eq!(operands.objects["RunPeriodControl:SpecialDays"].len(), 1);
+            assert_eq!(
+                operands.objects["RunPeriodControl:DaylightSavingTime"][0].object_name,
+                " "
+            );
+            let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+            assert!(admitted.admissible, "{:?}", admitted.violations);
+            admitted.environment = Some(source);
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                    .unwrap();
+            let support = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            for family in [
+                "RunPeriodControl:SpecialDays",
+                "RunPeriodControl:DaylightSavingTime",
+            ] {
+                assert!(
+                    support
+                        .typed_objects
+                        .iter()
+                        .any(|row| row.object_type == family)
+                );
+            }
+        }
+    }
+    for bad in [Value::Null, json!(0), json!(false), json!([]), json!({})] {
+        let mut value = input(PortingScope::A);
+        value["RunPeriodControl:DaylightSavingTime"] =
+            json!({" ":{"start_date":bad,"end_date":"1/1"}});
+        let raw = parse_epjson_str(&value.to_string()).unwrap();
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    }
 }
 
 #[test]

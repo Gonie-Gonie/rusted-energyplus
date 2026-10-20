@@ -33,12 +33,13 @@ impl<T: Default + Clone> AllocatedValues<T> {
 }
 
 /// A distinct DSTPeriod owner; EPWDST and DST are separate instances.
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DstPeriod {
     /// Start date classification.
     pub start_date_type: DateType,
-    /// Start weekday number.
-    pub start_weekday: i32,
+    /// Start weekday; None preserves an unwritten EPW local assignment.
+    /// MonthDay consumers do not read it; Nth/Last consumers require Some.
+    pub start_weekday: Option<i32>,
     /// Start month number.
     pub start_month: i32,
     /// Start day or weekday occurrence number.
@@ -49,8 +50,25 @@ pub struct DstPeriod {
     pub end_month: i32,
     /// End day or weekday occurrence number.
     pub end_day: i32,
-    /// End weekday number.
-    pub end_weekday: i32,
+    /// End weekday with the same actual definedness semantics as start.
+    pub end_weekday: Option<i32>,
+}
+
+// Native DSTPeriod starts both weekday cells at zero. A Source EPW parser may
+// subsequently assign an unwritten local; retain that definedness until read.
+impl Default for DstPeriod {
+    fn default() -> Self {
+        Self {
+            start_date_type: DateType::Invalid,
+            start_weekday: Some(0),
+            start_month: 0,
+            start_day: 0,
+            end_date_type: DateType::Invalid,
+            end_month: 0,
+            end_day: 0,
+            end_weekday: Some(0),
+        }
+    }
 }
 
 /// A literal SpecialDayData value, including fields this parser does not write.

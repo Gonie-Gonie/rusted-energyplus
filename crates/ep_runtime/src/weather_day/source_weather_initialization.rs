@@ -1,5 +1,5 @@
 //! Genuine ManageWeather131–155 and InitializeWeather1725–1992 on one session.
-mod calendar;
+pub(super) mod calendar;
 mod hourly;
 mod interpolation;
 mod reader;
@@ -7,7 +7,8 @@ mod reports;
 mod sky;
 use super::source_initialization::SourceWeatherInitializationOwners;
 use super::{SourceWeatherInitializationError as Failure, WeatherDayError, WeatherSession};
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::psychrometrics::SourcePsychrometricAccess;
 use crate::weather::raw::source_ordinal_day;
@@ -224,7 +225,13 @@ impl WeatherSession {
                         raw_days,
                     )?;
                     if self.state.weather.start_dates_cycle_should_be_reset {
-                        self.reset_source_calendar(current, false, owners.backend)?;
+                        self.reset_source_calendar(
+                            current,
+                            false,
+                            owners.globals,
+                            &owners.system.developer_flag,
+                            owners.backend,
+                        )?;
                     }
                     self.state.weather.year_of_sim = add(self.state.weather.year_of_sim, 1)?;
                     self.read_source_weather_for_day(
@@ -268,7 +275,12 @@ impl WeatherSession {
             self.state.environment.holiday_index_tomorrow =
                 self.state.tomorrow_variables.holiday_index;
             self.state.environment.year_tomorrow = self.state.tomorrow_variables.year;
-            self.reset_source_january_calendar(current, owners.backend)?;
+            self.reset_source_january_calendar(
+                current,
+                owners.globals,
+                &owners.system.developer_flag,
+                owners.backend,
+            )?;
             if owners.globals.air_loop_hvac_doas_used_in_sim {
                 let row = self
                     .state
@@ -366,8 +378,16 @@ impl WeatherSession {
         &mut self,
         current: usize,
         mid_sim: bool,
+        globals: &SelectedHeatBalanceGlobals,
+        developer_flag: &bool,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Failure> {
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: developer_flag,
+            warmup: &self.state.global.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
         let weather = &mut self.state.weather;
         let row = weather
             .source_environments
@@ -377,19 +397,32 @@ impl WeatherSession {
         let header = self.cursor.source_header_mut();
         calendar::reset_weekdays(row, header, mid_sim)?;
         if weather.daylight_saving_is_active {
-            calendar::set_dst_dates(&row.month_week_day, &mut weather.dst_index, header)?;
+            calendar::set_dst_dates(
+                &row.month_week_day,
+                &weather.end_day_of_month_with_leap_day,
+                &mut weather.dst_index,
+                header,
+                backend,
+                &flags,
+            )?;
         }
         calendar::set_special_days(
             &row.month_week_day,
+            &weather.end_day_of_month_with_leap_day,
+            &weather.weekday_types,
             &mut weather.special_day_types,
             &weather.use_special_days,
+            &row.apply_weekend_rule,
             header,
             backend,
+            &flags,
         )
     }
     fn reset_source_january_calendar(
         &mut self,
         current: usize,
+        globals: &SelectedHeatBalanceGlobals,
+        developer_flag: &bool,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Failure> {
         let row = self
@@ -444,7 +477,7 @@ impl WeatherSession {
                             break;
                         }
                     }
-                    self.reset_source_calendar(current, false, backend)?;
+                    self.reset_source_calendar(current, false, globals, developer_flag, backend)?;
                 }
             } else if self.state.environment.month == 1
                 && self.state.environment.day_of_month == 1
@@ -477,7 +510,7 @@ impl WeatherSession {
                 {
                     let mid_sim = row.roll_day_type_on_repeat
                         || self.state.environment.current_year_is_leap_year;
-                    self.reset_source_calendar(current, mid_sim, backend)?;
+                    self.reset_source_calendar(current, mid_sim, globals, developer_flag, backend)?;
                 }
             }
         }

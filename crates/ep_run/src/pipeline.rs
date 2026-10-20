@@ -1184,11 +1184,19 @@ fn run_with_optional_porting_scope_impl(
         );
         if trace.admissible {
             if let (Some(model), Some(weather_path)) = (typed_model, config.weather_path.as_ref()) {
-                match crate::porting_scope::porting_environment_trace(model, weather_path) {
-                    Ok(environment) => {
-                        trace.violations.extend(
-                            crate::porting_scope::validate_porting_environment(&environment),
-                        );
+                match crate::porting_scope::porting_source_environment_trace(
+                    &raw_model,
+                    model,
+                    weather_path,
+                    scope,
+                ) {
+                    Ok((environment, calendar_admission)) => {
+                        trace
+                            .violations
+                            .extend(crate::porting_scope::validate_source_environment(
+                                &environment,
+                                &calendar_admission,
+                            ));
                         trace.environment = Some(environment);
                     }
                     Err(error) => trace
@@ -3586,11 +3594,22 @@ fn prepare_runtime_inputs(
                 ep_runtime::weather::raw::load_parsed_epw_weather_file(weather_path)
                     .map_err(|error| format!("failed to load EPW weather: {error}"))?;
             let weather_file = &parsed_weather.physical_projection;
-            let time_axis = build_hourly_time_axis_with_weather_metadata(
-                &model.typed,
-                &weather_file.calendar_metadata,
-            )
-            .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
+            let time_axis = if let Some(source_scope) = scope {
+                // Coverage-only preparation, never DST/holiday/schedule input
+                // to the genuine Source owners attached from original bytes.
+                crate::porting_scope::source_coverage_axis(
+                    raw_model,
+                    source_scope,
+                    &model.typed,
+                    &weather_file.calendar_metadata,
+                )?
+            } else {
+                build_hourly_time_axis_with_weather_metadata(
+                    &model.typed,
+                    &weather_file.calendar_metadata,
+                )
+                .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?
+            };
             if ep_runtime::weather::raw::production_trace::is_active() {
                 // Preview evidence remains separate from the live owner below.
                 let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
@@ -3717,6 +3736,8 @@ fn prepare_runtime_inputs(
     let selected_input_processor = if source_initialization_required {
         Some(if scope == Some(crate::PortingScope::B) {
             crate::ordinary_input_processor::resolve_source_b(raw_model)?
+        } else if scope == Some(crate::PortingScope::A) {
+            crate::ordinary_input_processor::resolve_source_a(raw_model)?
         } else {
             crate::ordinary_input_processor::resolve(raw_model)?
         })
@@ -3791,6 +3812,11 @@ fn prepare_runtime_inputs(
             let mut input = crate::warmup_report_controls::resolve(raw_model)?;
             let (equipment, radiation) = if scope == Some(crate::PortingScope::B) {
                 crate::ordinary_equipment_input::resolve_with_radiation_source_b(
+                    raw_model,
+                    input.advanced_report_variables,
+                )?
+            } else if scope == Some(crate::PortingScope::A) {
+                crate::ordinary_equipment_input::resolve_with_radiation_source_a(
                     raw_model,
                     input.advanced_report_variables,
                 )?

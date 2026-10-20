@@ -21,7 +21,7 @@ impl SourceSupportAdmission {
             return None;
         }
         match trace.scope {
-            PortingScope::A => crate::ordinary_equipment_input::resolve(raw),
+            PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(raw),
             PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(raw),
         }
         .ok()?;
@@ -53,7 +53,7 @@ impl SourceSupportAdmission {
             })
         {
             let input = match trace.scope {
-                PortingScope::A => crate::ordinary_input_processor::resolve(raw),
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(raw),
                 PortingScope::B => crate::ordinary_input_processor::resolve_source_b(raw),
             }
             .ok()?;

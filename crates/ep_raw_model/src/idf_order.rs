@@ -118,6 +118,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         name_field_index: 0,
     },
     IdfOrderTarget {
+        object_type: "RunPeriodControl:DaylightSavingTime",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
         object_type: "RunPeriodControl:SpecialDays",
         name_field_index: 0,
     },
@@ -400,6 +404,7 @@ pub fn apply_idf_declaration_order(
                         | "Exterior:Lights"
                         | "Site:Location"
                         | "RunPeriod"
+                        | "RunPeriodControl:SpecialDays"
                         | "SizingPeriod:DesignDay"
                         | "ZoneControl:Thermostat"
                         | "ZoneHVAC:IdealLoadsAirSystem"
@@ -410,7 +415,10 @@ pub fn apply_idf_declaration_order(
                     actual_name.clone(),
                     match target.object_type {
                         "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
-                        "Material:AirGap" => idf_object.max_fields.max(2),
+                        "Material:AirGap" | "RunPeriodControl:DaylightSavingTime" => {
+                            idf_object.max_fields.max(2)
+                        }
+                        "RunPeriodControl:SpecialDays" => idf_object.max_fields.max(4),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
                         "Site:Location" => idf_object.max_fields.max(5),
@@ -617,6 +625,7 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
             | "HeatBalanceAlgorithm"
             | "Timestep"
             | "SimulationControl"
+            | "RunPeriodControl:DaylightSavingTime"
             | "SurfaceConvectionAlgorithm:Inside"
             | "SurfaceConvectionAlgorithm:Outside"
             | "ZoneAirHeatBalanceAlgorithm"
@@ -989,7 +998,16 @@ mod tests {
             ordered_names(&model)?,
             vec!["Zulu Earlier Holiday", "Alpha Later Custom"]
         );
-        assert_eq!(model.objects, native_model.objects);
+        let mut without_metadata = model.objects.clone();
+        for objects in without_metadata.values_mut() {
+            for object in objects.values_mut() {
+                assert_eq!(
+                    object.fields.remove(&FieldName("idf_max_fields".into())),
+                    Some(RawValue::Number("4".into()))
+                );
+            }
+        }
+        assert_eq!(without_metadata, native_model.objects);
         assert_ne!(model, native_model);
         assert_eq!(model, model.clone());
         Ok(())

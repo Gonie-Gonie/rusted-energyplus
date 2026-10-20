@@ -1,5 +1,5 @@
 //! Genuine GetNextEnvironment739-1215 continuation, preserving the real caller flag.
-//! DesignDay/adaptive/DST/positive special-day children remain explicit boundaries.
+//! DesignDay/adaptive children retain their existing explicit boundaries.
 use super::source_initialization::SourceWeatherInitializationOwners;
 use super::{SourceWeatherInitializationError as Failure, WeatherSession};
 use crate::heat_balance::error_backend::SourceErrorBackend;
@@ -205,6 +205,7 @@ impl WeatherSession {
                                     .end_day_of_month_with_leap_day,
                                 weekday_types: &mut weather.weekday_types,
                                 special_day_types: &mut weather.special_day_types,
+                                dst_index: &mut weather.dst_index,
                                 current_simulation_day_for_end_of_run_period: &mut weather
                                     .cur_sim_day_for_end_of_run_period,
                                 start_dates_cycle_should_be_reset: &mut weather
@@ -214,6 +215,12 @@ impl WeatherSession {
                             self.cursor.source_header_mut(),
                             clock,
                             owners.globals,
+                            &crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &owners.globals.kickoff_simulation,
+                                developer: &owners.system.developer_flag,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &owners.globals.doing_sizing,
+                            },
                             owners.control,
                             owners.report_flags,
                             owners.eio,

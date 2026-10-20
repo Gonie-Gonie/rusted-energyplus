@@ -88,8 +88,7 @@ fn holidays(
                         state.epw_dst.start_date_type = date.date_type;
                         state.epw_dst.start_month = month;
                         state.epw_dst.start_day = day;
-                        state.epw_dst.start_weekday =
-                            defined(date.weekday, "actual DST start PWeekDay").map_err(raw)?;
+                        state.epw_dst.start_weekday = date.weekday;
                     }
                 } else {
                     backend.show_continue_error(&format!("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)={token}"))?;
@@ -108,8 +107,7 @@ fn holidays(
                             defined(date.month, "actual DST end PMonth").map_err(raw)?;
                         state.epw_dst.end_day =
                             defined(date.day, "actual DST end PDay").map_err(raw)?;
-                        state.epw_dst.end_weekday =
-                            defined(date.weekday, "actual DST end PWeekDay").map_err(raw)?;
+                        state.epw_dst.end_weekday = date.weekday;
                     } else {
                         backend.show_warning_error(&format!("ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)={token}"))?;
                         backend.show_continue_error("...Setting Weather File DST to false.")?;

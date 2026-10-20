@@ -29,6 +29,8 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             | "Exterior:Lights"
             | "Site:Location"
             | "RunPeriod"
+            | "RunPeriodControl:DaylightSavingTime"
+            | "RunPeriodControl:SpecialDays"
             | "SizingPeriod:DesignDay"
             | "SurfaceConvectionAlgorithm:Inside"
             | "SurfaceConvectionAlgorithm:Outside"
@@ -48,6 +50,22 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ) => {
             matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())
         }
+        ("RunPeriodControl:DaylightSavingTime", "start_date" | "end_date")
+        | ("RunPeriodControl:SpecialDays", "start_date") => matches!(value, RawValue::String(_)),
+        ("RunPeriodControl:SpecialDays", "duration") => {
+            number(value).is_some_and(|n| (1.0..=366.0).contains(&n))
+        }
+        ("RunPeriodControl:SpecialDays", "special_day_type") => text_is(
+            value,
+            &[
+                "",
+                "Holiday",
+                "SummerDesignDay",
+                "WinterDesignDay",
+                "CustomDay1",
+                "CustomDay2",
+            ],
+        ),
         ("Version", "version_identifier") => matches!(value, RawValue::String(_)),
         ("Timestep", "number_of_timesteps_per_hour") => {
             matches!(value, RawValue::Number(text) if text.parse::<u32>().is_ok_and(|n| (1..=60).contains(&n)))
@@ -790,6 +808,8 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
 
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     match family {
+        "RunPeriodControl:DaylightSavingTime" => &["start_date", "end_date"],
+        "RunPeriodControl:SpecialDays" => &["start_date"],
         "RunPeriod" => &[
             "begin_month",
             "begin_day_of_month",

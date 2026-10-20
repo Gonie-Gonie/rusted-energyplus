@@ -34,20 +34,34 @@ mod source_b;
 use fields::{admitted_field, required_fields};
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
-    resolve_raw(raw, false)
+    resolve_raw(raw, false, false)
+}
+/// Source A calendar fields reach the same actual getters only on the explicit
+/// validated Source lane. Unscoped legacy raw admission is unchanged.
+pub(crate) fn resolve_source_a(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
+    resolve_raw(raw, false, true)
 }
 /// SourceB preserves positive family operands for the same actual IP/getters.
 pub(crate) fn resolve_source_b(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
-    resolve_raw(raw, true)
+    resolve_raw(raw, true, true)
 }
 // Preserve first general admission then Source-B fallback evaluation and rejection order.
 #[allow(clippy::nonminimal_bool)]
-fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipmentInput, String> {
+fn resolve_raw(
+    raw: &RawModel,
+    source_b_ingress: bool,
+    source_calendar_ingress: bool,
+) -> Result<OrdinaryEquipmentInput, String> {
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_calendar_family = source_calendar_ingress
+            && matches!(
+                family.0.as_str(),
+                "RunPeriodControl:DaylightSavingTime" | "RunPeriodControl:SpecialDays"
+            );
         if !matches!(
             family.0.as_str(),
             "Version"
@@ -87,6 +101,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
         ) && !source_b_family
+            && !source_calendar_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -103,6 +118,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                 | "SurfaceConvectionAlgorithm:Outside"
                 | "SimulationControl"
                 | "RunPeriod"
+                | "RunPeriodControl:DaylightSavingTime"
                 | "Site:Location"
                 | "Site:GroundTemperature:BuildingSurface"
                 | "Zone"
@@ -125,6 +141,7 @@ fn resolve_raw(raw: &RawModel, source_b_ingress: bool) -> Result<OrdinaryEquipme
                     "Version"
                         | "Timestep"
                         | "GlobalGeometryRules"
+                        | "RunPeriodControl:DaylightSavingTime"
                         | "Site:GroundTemperature:BuildingSurface"
                         | "SurfaceConvectionAlgorithm:Inside"
                         | "SurfaceConvectionAlgorithm:Outside"
@@ -435,6 +452,25 @@ pub(crate) fn resolve_with_radiation(
     String,
 > {
     let equipment = resolve(raw)?;
+    let radiation = ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
+        raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len())),
+        advanced_report_variables,
+    ).map_err(|error| error.to_string())?;
+    Ok((equipment, radiation))
+}
+
+/// Same genuine radiation counts after Source A calendar raw admission.
+pub(crate) fn resolve_with_radiation_source_a(
+    raw: &RawModel,
+    advanced_report_variables: bool,
+) -> Result<
+    (
+        OrdinaryEquipmentInput,
+        ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput,
+    ),
+    String,
+> {
+    let equipment = resolve_source_a(raw)?;
     let radiation = ep_runtime::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
         raw.objects.iter().map(|(family, objects)| (family.0.as_str(), objects.len())),
         advanced_report_variables,
