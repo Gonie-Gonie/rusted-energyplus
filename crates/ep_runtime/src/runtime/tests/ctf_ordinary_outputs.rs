@@ -2520,6 +2520,316 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 assert!(eio.is_empty(), "failed dictionary precedes nominal writer");
             }
         }
+        // Every reached OtherEquipment/aggregate pointer is requested through the real
+        // dictionary and then resolved after changes to the same retained report owner.
+        {
+            use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile;
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
+            };
+            use crate::heat_balance::source_output_registration::{
+                SourceInternalGainOutputField as GainField, SourceRealOutputOwners,
+                SourceRealOutputTarget,
+            };
+            let mut requested = failed_gains.clone();
+            requested.output_registration = Default::default();
+            requested
+                .heat_balance_input
+                .as_mut()
+                .ok_or("bound gain raw")?
+                .objects
+                .get_mut("OtherEquipment")
+                .ok_or("bound gains")?[0]
+                .fields
+                .insert(
+                    "fuel_type".into(),
+                    ProjectInputValue::String("Electricity".into()),
+                );
+            let zones = requested
+                .selected_zone_input
+                .as_ref()
+                .ok_or("bound actual Zones")?;
+            let zone_key = zones.zones.as_ref().ok_or("bound actual Zone row")?[0]
+                .name
+                .clone();
+            let space_key = zones.spaces.as_ref().ok_or("bound implicit Space row")?[0]
+                .name
+                .clone();
+            let mut expected = Vec::<(String, String, f64)>::new();
+            let total_names = [
+                "Radiant Heating",
+                "Visible Radiation Heating",
+                "Convective Heating",
+                "Latent Gain",
+                "Total Heating",
+            ];
+            let other_names = [
+                "Radiant Heating",
+                "Convective Heating",
+                "Latent Gain",
+                "Lost Heat",
+                "Total Heating",
+            ];
+            // Exact Native order: all Zone totals, all actual Spaces (including the
+            // implicit Space), object fields, flagged Zone fuels/thermal, then Space.
+            for (key, prefix, base) in [(&zone_key, "Zone", 500.0), (&space_key, "Space", 600.0)] {
+                for (at, suffix) in total_names.into_iter().enumerate() {
+                    expected.push((
+                        key.clone(),
+                        format!("{prefix} Total Internal {suffix} Energy"),
+                        base + (at * 2) as f64,
+                    ));
+                    expected.push((
+                        key.clone(),
+                        format!("{prefix} Total Internal {suffix} Rate"),
+                        base + (at * 2 + 1) as f64,
+                    ));
+                }
+            }
+            expected.push((
+                "AUTHORED GAIN 0".into(),
+                "Other Equipment Electricity Rate".into(),
+                100.0,
+            ));
+            expected.push((
+                "AUTHORED GAIN 0".into(),
+                "Other Equipment Electricity Energy".into(),
+                200.0,
+            ));
+            for (at, suffix) in other_names.into_iter().enumerate() {
+                expected.push((
+                    "AUTHORED GAIN 0".into(),
+                    format!("Other Equipment {suffix} Energy"),
+                    201.0 + at as f64,
+                ));
+                expected.push((
+                    "AUTHORED GAIN 0".into(),
+                    format!("Other Equipment {suffix} Rate"),
+                    101.0 + at as f64,
+                ));
+            }
+            for (key, prefix, base, fuel_rate, fuel_energy) in [
+                (&zone_key, "Zone", 300.0, 701.0, 702.0),
+                (&space_key, "Space", 400.0, 801.0, 802.0),
+            ] {
+                expected.push((
+                    key.clone(),
+                    format!("{prefix} Other Equipment Electricity Rate"),
+                    fuel_rate,
+                ));
+                expected.push((
+                    key.clone(),
+                    format!("{prefix} Other Equipment Electricity Energy"),
+                    fuel_energy,
+                ));
+                for (at, suffix) in other_names.into_iter().enumerate() {
+                    expected.push((
+                        key.clone(),
+                        format!("{prefix} Other Equipment {suffix} Energy"),
+                        base + (at * 2) as f64,
+                    ));
+                    expected.push((
+                        key.clone(),
+                        format!("{prefix} Other Equipment {suffix} Rate"),
+                        base + (at * 2 + 1) as f64,
+                    ));
+                }
+            }
+            assert_eq!(expected.len(), 56);
+            let mut requested_model = model.typed.clone();
+            requested_model.report_inputs.output_variables = expected
+                .iter()
+                .enumerate()
+                .map(|(at, (key, name, _))| ep_model::SourceOutputVariableInput {
+                    object_name: format!("Actual gain pointer {at}"),
+                    key: key.clone(),
+                    variable_name: name.clone(),
+                    reporting_frequency: "TIMESTEP".into(),
+                    schedule_name: String::new(),
+                    alpha_blank: [false, false, false, true],
+                    default_applied: [false; 4],
+                    num_alphas: 3,
+                    is_epjson: true,
+                })
+                .collect();
+            let mut original_ip = requested
+                .selected_input_processor
+                .take()
+                .ok_or("bound actual IP")?;
+            let mut definitions = Vec::new();
+            for family in [
+                "People",
+                "Lights",
+                "ElectricEquipment",
+                "GasEquipment",
+                "HotWaterEquipment",
+                "SteamEquipment",
+                "OtherEquipment",
+                "ElectricEquipment:ITE:AirCooled",
+                "ZoneBaseboard:OutdoorTemperatureControlled",
+                "ZoneContaminantSourceAndSink:CarbonDioxide",
+            ] {
+                let actual = original_ip.get_object_def_max_args(family)?;
+                definitions.push(SourceObjectDefinition {
+                    object_type: family.into(),
+                    alpha_fields: actual.alphas,
+                    numeric_fields: actual.numerics,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                });
+            }
+            definitions.push(SourceObjectDefinition {
+                object_type: "Output:Variable".into(),
+                alpha_fields: 4,
+                numeric_fields: 0,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            });
+            requested.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(
+                definitions,
+                std::collections::BTreeMap::from([
+                    (
+                        "OtherEquipment".into(),
+                        original_ip
+                            .family("OtherEquipment")
+                            .ok_or("same actual gain family")?
+                            .clone(),
+                    ),
+                    (
+                        "Output:Variable".into(),
+                        SourceInputFamily::Objects(
+                            requested_model
+                                .report_inputs
+                                .output_variables
+                                .iter()
+                                .map(|row| SourceObjectShape {
+                                    object_name: row.object_name.clone(),
+                                    field_sizes: Default::default(),
+                                })
+                                .collect(),
+                        ),
+                    ),
+                ]),
+            )?);
+            for (key, name, _) in &expected {
+                requested.output_prescan.add_record(key, name)?;
+            }
+            let (mut state, mut error, mut console, mut eio, mut eso) = (
+                ctf_ordinary_output_test_state(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            );
+            CtfInitializationContext {
+                reports: &mut requested,
+                eio: &mut eio,
+                backend: SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+            }
+            .manage_selected_internal_heat_gains_input_with_dictionary(
+                &requested_model,
+                15,
+                &mut gain_host,
+                None,
+                Some(SourceGainDictionaryFile {
+                    eso: Some(&mut eso),
+                }),
+            )?;
+            assert!(!requested.selected_internal_heat_gains.get_input_flag);
+            assert_eq!(requested.output_registration.out_vars.len(), expected.len());
+            assert_eq!(requested.output_registration.num_real_variables_setup, 66);
+            assert!(error.is_empty());
+            assert!(std::str::from_utf8(&eio)?.contains("OtherEquipment Internal Gains Nominal"));
+            let before = requested.output_registration.out_vars.iter().map(|row| {
+            requested.selected_internal_heat_gains.real_output(row.which.ok_or(crate::heat_balance::radiation::ordinary::OrdinaryRadiationUnavailable::StorageDomain)?)
+                .copied()
+        }).collect::<Result<Vec<_>, _>>()?;
+            // Authored mutations prove live identities only, not timestep arithmetic.
+            // They never stand in for a successful parent timestep or physical proof.
+            let gains = &mut requested.selected_internal_heat_gains;
+            let object = &mut gains
+                .allocations
+                .other_equipment
+                .as_mut()
+                .ok_or("actual bound object")?[0];
+            object.rates = [100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 0.0];
+            object.energies = [200.0, 201.0, 202.0, 203.0, 204.0, 205.0];
+            let zone = &mut gains
+                .allocations
+                .zone_report
+                .as_mut()
+                .ok_or("actual bound Zone report")?[0];
+            zone.other = std::array::from_fn(|i| 300.0 + i as f64);
+            zone.total = std::array::from_fn(|i| 500.0 + i as f64);
+            zone.other_power[0] = 701.0;
+            zone.other_consumption[0] = 702.0;
+            let space = &mut gains
+                .allocations
+                .space_report
+                .as_mut()
+                .ok_or("actual bound Space report")?[0];
+            space.other = std::array::from_fn(|i| 400.0 + i as f64);
+            space.total = std::array::from_fn(|i| 600.0 + i as f64);
+            space.other_power[0] = 801.0;
+            space.other_consumption[0] = 802.0;
+            let dictionary = std::str::from_utf8(&eso)?;
+            for (at, (actual, (key, name, expected_value))) in requested
+                .output_registration
+                .out_vars
+                .iter()
+                .zip(&expected)
+                .enumerate()
+            {
+                assert_eq!(
+                    (&actual.key, &actual.name),
+                    (key, name),
+                    "Native declaration order/key {at}"
+                );
+                assert_eq!(
+                    *gains.real_output(actual.which.ok_or("actual live Which")?)?,
+                    *expected_value
+                );
+                assert_ne!(before[at], *expected_value);
+                assert!(actual.report);
+                assert!(dictionary.contains(&format!(
+                    "{key},{name} [{}] !TimeStep",
+                    if name.ends_with("Energy") { "J" } else { "W" }
+                )));
+            }
+            for field in [
+                GainField::OtherThermal { field: 10 },
+                GainField::ZoneOtherThermal { field: 10 },
+                GainField::SpaceOtherThermal { field: 10 },
+                GainField::ZoneTotalInternal { field: 10 },
+                GainField::SpaceTotalInternal { field: 10 },
+                GainField::ZoneOtherFuel {
+                    fuel: 13,
+                    energy: false,
+                },
+                GainField::SpaceOtherFuel {
+                    fuel: 14,
+                    energy: true,
+                },
+            ] {
+                assert!(
+                    gains
+                        .real_output(SourceRealOutputTarget::InternalGain { field, index: 1 })
+                        .is_err()
+                );
+            }
+        }
         // Same actual getter, selected local Numeric2, retained geometry and
         // live diagnostic owners. No Native observations or typed gain values
         // supply this authored boundary table.

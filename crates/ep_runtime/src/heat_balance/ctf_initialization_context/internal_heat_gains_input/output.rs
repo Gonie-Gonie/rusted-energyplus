@@ -1,6 +1,7 @@
 //! Ordered real eFuel IHG declarations on the existing OutputProcessor owner.
 use super::getter::SourceGainInputOwners;
 use super::{E, SelectedInternalHeatGains, index, unavailable};
+use crate::heat_balance::source_output_registration::SourceInternalGainOutputField as Field;
 use crate::heat_balance::source_output_registration::{
     SourceOutputFileHost, SourceOutputStoreType as Store, SourceOutputUnits as Units,
     SourceRealOutputDeclaration, SourceReportVariableInput,
@@ -38,44 +39,43 @@ const OTHER: [&str; 10] = [
 ];
 
 fn declare(
+    gains: &SelectedInternalHeatGains,
     owners: &mut SourceGainInputOwners<'_, '_>,
     key: &str,
     name: &str,
-    index: usize,
-    _actual_rate_or_energy: &f64,
+    declaration_index: usize,
+    field: crate::heat_balance::source_output_registration::SourceInternalGainOutputField,
+    row_index: usize,
 ) -> Result<(), E> {
-    // Native's pointer argument is not stored in the no-request/no-meter
-    // return. A positive requested OutVar stops in the existing registration API.
+    use crate::heat_balance::source_output_registration::{
+        SourceGeneralRealRegistrationOptions, SourceRealOutputBinding, SourceRealOutputTarget,
+        TimeStepKind,
+    };
+    let binding = SourceRealOutputBinding::new(
+        SourceRealOutputTarget::InternalGain {
+            field,
+            index: i32::try_from(row_index + 1)
+                .map_err(|_| unavailable("actual internal gain report output index"))?,
+        },
+        gains,
+    )
+    .map_err(E::Output)?;
     let mut request = SourceReportVariableInput::new(
         owners.report_inputs,
         owners.input,
         owners.minimum_report_frequency,
     );
-    let mut host = GainOutputHost(&mut *owners.host);
-    owners
-        .registration
-        .setup_unmetered_zone_real(
-            &mut request,
-            owners.prescan,
-            SourceRealOutputDeclaration {
-                name,
-                key,
-                units: if index.is_multiple_of(2) {
-                    Units::J
-                } else {
-                    Units::W
-                },
-                store_type: if index.is_multiple_of(2) {
-                    Store::Sum
-                } else {
-                    Store::Average
-                },
-            },
-            owners.minutes,
-            &mut host,
-            owners.eio,
-        )
-        .map_err(E::Output)
+    owners.registration.setup_bound_general_real_optional_dictionary(
+        &mut request, owners.prescan,
+        SourceRealOutputDeclaration {
+            name, key,
+            units: if declaration_index.is_multiple_of(2) { Units::J } else { Units::W },
+            store_type: if declaration_index.is_multiple_of(2) { Store::Sum } else { Store::Average },
+        },
+        owners.minutes, &mut GainOutputHost(&mut *owners.host), owners.eio, binding,
+        owners.dictionary_host.as_deref_mut().map(|host| host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
+        SourceGeneralRealRegistrationOptions::unmetered(TimeStepKind::Zone), owners.backend,
+    ).map_err(E::Output)
 }
 
 impl SelectedInternalHeatGains {
@@ -98,36 +98,34 @@ impl SelectedInternalHeatGains {
         let zone_names: Vec<_> = zones.iter().map(|r| r.name.clone()).collect();
         let space_names: Vec<_> = spaces.iter().map(|r| r.name.clone()).collect();
         for (number, name) in zone_names.iter().enumerate() {
-            let report = self
-                .allocations
-                .zone_report
-                .as_ref()
-                .and_then(|v| v.get(number))
-                .ok_or_else(|| unavailable("actual ZoneRpt allocation"))?;
             for (i, suffix) in TOTAL.iter().enumerate() {
                 declare(
+                    self,
                     owners,
                     name,
                     &format!("Zone Total Internal {suffix}"),
                     i,
-                    &report.total[i],
+                    Field::ZoneTotalInternal {
+                        field: u8::try_from(i)
+                            .map_err(|_| unavailable("actual total report ordinal"))?,
+                    },
+                    number,
                 )?;
             }
         }
         for (number, name) in space_names.iter().enumerate() {
-            let report = self
-                .allocations
-                .space_report
-                .as_ref()
-                .and_then(|v| v.get(number))
-                .ok_or_else(|| unavailable("actual spaceRpt allocation"))?;
             for (i, suffix) in TOTAL.iter().enumerate() {
                 declare(
+                    self,
                     owners,
                     name,
                     &format!("Space Total Internal {suffix}"),
                     i,
-                    &report.total[i],
+                    Field::SpaceTotalInternal {
+                        field: u8::try_from(i)
+                            .map_err(|_| unavailable("actual total report ordinal"))?,
+                    },
+                    number,
                 )?;
             }
         }
@@ -145,29 +143,23 @@ impl SelectedInternalHeatGains {
                     self.declare_fuel(owners, row_index, true)?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
-                    let value = if i.is_multiple_of(2) {
-                        &row.energies[i / 2 + 1]
-                    } else {
-                        &row.rates[i / 2 + 1]
-                    };
                     declare(
+                        self,
                         owners,
                         &row.name,
                         &format!("Other Equipment {suffix}"),
                         i,
-                        value,
+                        Field::OtherThermal {
+                            field: u8::try_from(i)
+                                .map_err(|_| unavailable("actual OtherEquipment report ordinal"))?,
+                        },
+                        row_index,
                     )?;
                 }
             }
         }
         for (number, name) in zone_names.iter().enumerate() {
             if add_zone_outputs[number] {
-                let report = self
-                    .allocations
-                    .zone_report
-                    .as_ref()
-                    .and_then(|v| v.get(number))
-                    .ok_or_else(|| unavailable("same Other ZoneRpt"))?;
                 let fuels = owners
                     .zones
                     .zones
@@ -188,27 +180,44 @@ impl SelectedInternalHeatGains {
                             })?;
                     let fuel_name = super::SourceOtherFuel::source_name_at(fuel)?;
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Zone Other Equipment {fuel_name} Rate"),
                         1,
-                        &report.other_power[fuel_index],
+                        Field::ZoneOtherFuel {
+                            fuel: u8::try_from(fuel_index)
+                                .map_err(|_| unavailable("actual fuel report ordinal"))?,
+                            energy: false,
+                        },
+                        number,
                     )?;
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Zone Other Equipment {fuel_name} Energy"),
                         0,
-                        &report.other_consumption[fuel_index],
+                        Field::ZoneOtherFuel {
+                            fuel: u8::try_from(fuel_index)
+                                .map_err(|_| unavailable("actual fuel report ordinal"))?,
+                            energy: true,
+                        },
+                        number,
                     )?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Zone Other Equipment {suffix}"),
                         i,
-                        &report.other[i],
+                        Field::ZoneOtherThermal {
+                            field: u8::try_from(i)
+                                .map_err(|_| unavailable("actual OtherEquipment report ordinal"))?,
+                        },
+                        number,
                     )?;
                 }
             }
@@ -216,12 +225,6 @@ impl SelectedInternalHeatGains {
         }
         for (number, name) in space_names.iter().enumerate() {
             if add_space_outputs[number] {
-                let report = self
-                    .allocations
-                    .space_report
-                    .as_ref()
-                    .and_then(|v| v.get(number))
-                    .ok_or_else(|| unavailable("same Other spaceRpt"))?;
                 let fuels = owners
                     .zones
                     .spaces
@@ -242,27 +245,44 @@ impl SelectedInternalHeatGains {
                             })?;
                     let fuel_name = super::SourceOtherFuel::source_name_at(fuel)?;
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Space Other Equipment {fuel_name} Rate"),
                         1,
-                        &report.other_power[fuel_index],
+                        Field::SpaceOtherFuel {
+                            fuel: u8::try_from(fuel_index)
+                                .map_err(|_| unavailable("actual fuel report ordinal"))?,
+                            energy: false,
+                        },
+                        number,
                     )?;
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Space Other Equipment {fuel_name} Energy"),
                         0,
-                        &report.other_consumption[fuel_index],
+                        Field::SpaceOtherFuel {
+                            fuel: u8::try_from(fuel_index)
+                                .map_err(|_| unavailable("actual fuel report ordinal"))?,
+                            energy: true,
+                        },
+                        number,
                     )?;
                 }
                 for (i, suffix) in OTHER.iter().enumerate() {
                     declare(
+                        self,
                         owners,
                         name,
                         &format!("Space Other Equipment {suffix}"),
                         i,
-                        &report.other[i],
+                        Field::SpaceOtherThermal {
+                            field: u8::try_from(i)
+                                .map_err(|_| unavailable("actual OtherEquipment report ordinal"))?,
+                        },
+                        number,
                     )?;
                 }
             }
