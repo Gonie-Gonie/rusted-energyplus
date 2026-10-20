@@ -52,7 +52,10 @@ fn unit(object: &RawObject) -> Result<ScheduleUnitType, String> {
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedScheduleInput, String> {
     // Caller already passed the same raw model through the sole ordinary admission.
-    let mut result = SelectedScheduleInput::default();
+    let mut result = SelectedScheduleInput {
+        source_is_epjson: Some(raw.is_epjson()),
+        ..Default::default()
+    };
     for (name, object) in raw
         .ordered_instances("ScheduleTypeLimits")
         .map_err(|e| e.to_string())?

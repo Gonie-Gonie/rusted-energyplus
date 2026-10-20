@@ -15,6 +15,7 @@ pub(crate) mod minute;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 mod native_gap_cohort;
 mod predefined;
+mod regular;
 mod report;
 
 /// Actual source-ordered ScheduleTypeLimits getter values after raw admission.
@@ -50,6 +51,9 @@ pub struct SourceConstantScheduleInput {
 /// Sole admitted source projection; no precomputed schedule-result table.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SelectedScheduleInput {
+    /// Actual loader input format, required only by the new mixed local getters.
+    /// Legacy Constant/Compact callers do not manufacture this owner.
+    pub source_is_epjson: Option<bool>,
     /// Actual type declaration order.
     pub types: Vec<SourceScheduleTypeInput>,
     /// Actual constant declaration order.
@@ -402,7 +406,12 @@ impl SelectedScheduleManager {
                 );
                 if !matches!(
                     family,
-                    "ScheduleTypeLimits" | "Schedule:Constant" | "Schedule:Compact"
+                    "ScheduleTypeLimits"
+                        | "Schedule:Constant"
+                        | "Schedule:Compact"
+                        | "Schedule:Day:Hourly"
+                        | "Schedule:Week:Daily"
+                        | "Schedule:Year"
                 ) {
                     return Err(SelectedScheduleError::Unavailable(
                         "nonconstant schedule input",
@@ -536,6 +545,15 @@ impl SelectedScheduleManager {
         let slots = 24usize
             .checked_mul(time_steps_in_hour)
             .ok_or(SelectedScheduleError::Unavailable("timestep storage size"))?;
+        let mut errors_found = false; // Actual ProcessScheduleInput local.
+        self.process_source_regulars(
+            input,
+            declarations.source_is_epjson,
+            time_steps_in_hour,
+            &mut locals,
+            &mut backend,
+            flags,
+        )?;
         // Native1269 resizes the same MissingDaySchedule before Compact input.
         self.day_schedules
             .get_mut(0)
@@ -543,7 +561,6 @@ impl SelectedScheduleManager {
                 "actual MissingDaySchedule0 before Compact",
             ))?
             .timestep_values = vec![0.0; slots];
-        let mut errors_found = false; // Actual ProcessScheduleInput local.
         self.process_source_compacts(
             input,
             time_steps_in_hour,

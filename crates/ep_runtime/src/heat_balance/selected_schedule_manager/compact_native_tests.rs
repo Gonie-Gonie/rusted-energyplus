@@ -283,6 +283,369 @@ fn compact_primary_and_empty_hour_match_native_reported_timestep_bits() -> TestR
         }
     }
     verify_authored_compact_modes_and_diagnostic_prefix(&fixture)?;
+    verify_authored_regular_schedule_graph(&fixture)?;
+    Ok(())
+}
+
+// Additional actual raw/IP producers on the same existing owner test. There
+// are no Native values, precomputed day profiles or extra engine cohorts here.
+fn verify_authored_regular_schedule_graph(fixture: &Value) -> TestResult<()> {
+    use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
+    let week_fields = [
+        "sunday_schedule_day_name",
+        "monday_schedule_day_name",
+        "tuesday_schedule_day_name",
+        "wednesday_schedule_day_name",
+        "thursday_schedule_day_name",
+        "friday_schedule_day_name",
+        "saturday_schedule_day_name",
+        "holiday_schedule_day_name",
+        "summerdesignday_schedule_day_name",
+        "winterdesignday_schedule_day_name",
+        "customday1_schedule_day_name",
+        "customday2_schedule_day_name",
+    ];
+    let row = |week: &str, sm: i32, sd: i32, em: i32, ed: i32| serde_json::json!({"schedule_week_name":week,"start_month":sm,"start_day":sd,"end_month":em,"end_day":ed});
+    for (periods, split) in [
+        (vec![row("W", 1, 1, 12, 31)], false),
+        (vec![row("W", 7, 1, 6, 30)], false), // Genuine wrap, not Compact empty range.
+        (vec![row("W", 1, 1, 2, 28), row("V", 3, 1, 12, 31)], true),
+    ] {
+        let mut raw = fixture["cohorts"][0]["raw"].clone();
+        raw["Schedule:Compact"]
+            .as_object_mut()
+            .ok_or("actual Compact map")?
+            .remove("Internal Gain Schedule");
+        let mut hourly = serde_json::Map::new();
+        hourly.insert(
+            "schedule_type_limits_name".into(),
+            serde_json::json!("Fraction"),
+        );
+        for hour in 2..=24 {
+            hourly.insert(
+                format!("hour_{hour}"),
+                serde_json::json!(if (7..=18).contains(&hour) { 1 } else { 0 }),
+            );
+        }
+        raw["Schedule:Day:Hourly"] = serde_json::json!({"H":Value::Object(hourly),"D":{"schedule_type_limits_name":"Fraction","hour_1":0.25,"hour_2":0.25,"hour_3":0.25,"hour_4":0.25,"hour_5":0.25,"hour_6":0.25,"hour_7":0.25,"hour_8":0.25,"hour_9":0.25,"hour_10":0.25,"hour_11":0.25,"hour_12":0.25,"hour_13":0.25,"hour_14":0.25,"hour_15":0.25,"hour_16":0.25,"hour_17":0.25,"hour_18":0.25,"hour_19":0.25,"hour_20":0.25,"hour_21":0.25,"hour_22":0.25,"hour_23":0.25,"hour_24":0.25}});
+        let make_week = |day: &str| {
+            Value::Object(
+                week_fields
+                    .iter()
+                    .map(|f| ((*f).into(), serde_json::json!(day)))
+                    .collect(),
+            )
+        };
+        raw["Schedule:Week:Daily"] = serde_json::json!({"W":make_week("H"),"V":make_week("D")});
+        raw["Schedule:Year"] = serde_json::json!({"Internal Gain Schedule":{"schedule_type_limits_name":"Fraction","schedule_weeks":periods}});
+        let mut f = fixture.clone();
+        for (family, order, definition) in [
+            (
+                "Schedule:Compact",
+                vec!["CON-01 System Availability"],
+                serde_json::json!(["Schedule:Compact", 2, 0, 1, 0, "data"]),
+            ),
+            (
+                "Schedule:Day:Hourly",
+                vec!["H", "D"],
+                serde_json::json!(["Schedule:Day:Hourly", 2, 24, 0, 0, null]),
+            ),
+            (
+                "Schedule:Week:Daily",
+                vec!["W", "V"],
+                serde_json::json!(["Schedule:Week:Daily", 13, 0, 0, 0, null]),
+            ),
+            (
+                "Schedule:Year",
+                vec!["Internal Gain Schedule"],
+                serde_json::json!(["Schedule:Year", 2, 0, 1, 4, "schedule_weeks"]),
+            ),
+        ] {
+            f["object_order"][family] = serde_json::json!(order);
+            let definitions = f["definitions"]
+                .as_array_mut()
+                .ok_or("actual query definitions")?;
+            if !definitions.iter().any(|r| r[0] == family) {
+                definitions.push(definition);
+            }
+        }
+        let mut input = processor(&f, &raw)?;
+        let mut locals: super::SourceScheduleGetterLocals = (
+            vec![String::new(); 16],
+            vec![String::new(); 16],
+            vec![String::new(); 24],
+            vec![0.0; 24],
+            vec![true; 16],
+            vec![true; 24],
+        );
+        assert_eq!(
+            SelectedScheduleManager::get_source_regular_object_item(
+                &mut input,
+                "Schedule:Day:Hourly",
+                0,
+                true,
+                &mut locals
+            )?,
+            (2, 24)
+        );
+        assert_eq!(locals.3[0].to_bits(), 0.0_f64.to_bits());
+        assert!(locals.5[0]);
+        assert!(!locals.5[1]);
+        assert_eq!(locals.1[1], "schedule_type_limits_name");
+        assert_eq!(locals.2[0], "hour_1");
+        let mut declarations = schedule_declarations(&f, &raw)?;
+        declarations.source_is_epjson = Some(true);
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        manager.process_schedule_input(
+            &mut input,
+            &declarations,
+            4,
+            &mut MemoryAudit::default(),
+        )?;
+        let h = *manager
+            .day_schedule_map
+            .get("H")
+            .ok_or("actual Hourly H owner")?;
+        let d = *manager
+            .day_schedule_map
+            .get("D")
+            .ok_or("actual Hourly D owner")?;
+        assert_eq!((h, d), (1, 2)); // Both precede remaining Compact-generated Day.
+        assert_eq!(manager.day_schedules[h].sum_timestep_values, 48.0);
+        assert!(
+            manager.day_schedules[d]
+                .timestep_values
+                .iter()
+                .all(|v| *v == 0.25)
+        );
+        let w = *manager
+            .week_schedule_map
+            .get("W")
+            .ok_or("actual Week W owner")?;
+        let v = *manager
+            .week_schedule_map
+            .get("V")
+            .ok_or("actual Week V owner")?;
+        assert_eq!((w, v), (0, 1));
+        assert!(
+            manager.week_schedules[w].day_schedules[1..]
+                .iter()
+                .all(|p| *p == Some(h))
+        );
+        assert!(
+            manager.week_schedules[v].day_schedules[1..]
+                .iter()
+                .all(|p| *p == Some(d))
+        );
+        let index = manager
+            .get_source_schedule("INTERNAL GAIN SCHEDULE")?
+            .ok_or("actual Year schedule")?;
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+            return Err("actual Year Detailed owner".into());
+        };
+        assert_eq!(index.0, 2);
+        assert_eq!(detail.schedule_kind, 0);
+        assert!(detail.use_daylight_saving);
+        assert!(detail.week_schedules[1..=60].iter().all(|p| *p == Some(w)));
+        assert!(
+            detail.week_schedules[61..]
+                .iter()
+                .all(|p| *p == Some(if split { v } else { w }))
+        );
+        for ordinal in [1, 59, 60, 61, 366] {
+            for day_type in 1..13 {
+                for step in 0..96 {
+                    let clock = WeatherGlobalState {
+                        hour_of_day: step / 4 + 1,
+                        time_step: step % 4 + 1,
+                        time_steps_in_hour: 4,
+                        ..Default::default()
+                    };
+                    let environment = WeatherEnvironmentState {
+                        day_of_year_schedule: ordinal,
+                        day_of_week: if day_type <= 7 { day_type } else { 3 },
+                        holiday_index: if day_type > 7 { day_type } else { 0 },
+                        ..Default::default()
+                    };
+                    manager.update_source_schedule_values(&clock, &environment)?;
+                    let expected = if split && ordinal >= 61 {
+                        0.25_f64
+                    } else if (7..=18).contains(&clock.hour_of_day) {
+                        1.0
+                    } else {
+                        0.0
+                    };
+                    assert_eq!(
+                        manager.source_current_schedule_value(index)?.to_bits(),
+                        expected.to_bits()
+                    );
+                }
+            }
+        }
+        // The same raw constructor chain supplies optional-type live warnings.
+        // Stop on a backend-free warning without manufacturing any callback.
+        for type_name in [Some("absent type"), None] {
+            let mut unknown = raw.clone();
+            if let Some(type_name) = type_name {
+                unknown["Schedule:Day:Hourly"]["H"]["schedule_type_limits_name"] =
+                    serde_json::json!(type_name);
+            } else {
+                unknown["Schedule:Day:Hourly"]["H"]
+                    .as_object_mut()
+                    .ok_or("actual Hourly fields")?
+                    .remove("schedule_type_limits_name");
+            }
+            let mut ip = processor(&f, &unknown)?;
+            let mut retained = SelectedScheduleManager::default();
+            retained.init_constant_state(0)?;
+            assert!(
+                retained
+                    .process_schedule_input(&mut ip, &declarations, 4, &mut MemoryAudit::default())
+                    .is_err()
+            );
+            assert_eq!(retained.day_schedules.len(), 2);
+            assert!(retained.week_schedules.is_empty());
+            assert!(
+                retained.day_schedules[1]
+                    .timestep_values
+                    .iter()
+                    .all(|v| v.to_bits() == 0.0_f64.to_bits())
+            );
+            assert!(!retained.day_schedules[1].is_min_max_set);
+            let mut ip = processor(&f, &unknown)?;
+            let mut retained = SelectedScheduleManager::default();
+            retained.init_constant_state(0)?;
+            let (mut state, mut errors, mut console, mut audit) = (
+                interpolation_error_state(),
+                Vec::new(),
+                Vec::new(),
+                MemoryAudit::default(),
+            );
+            let (kickoff, developer, warmup, sizing) = (false, false, true, false);
+            let flags = SourceDiagnosticFlags {
+                kickoff: &kickoff,
+                developer: &developer,
+                warmup: &warmup,
+                doing_sizing: &sizing,
+            };
+            {
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                retained.process_schedule_input_with_live_backend(
+                    &mut ip,
+                    &declarations,
+                    4,
+                    &mut audit,
+                    &mut backend,
+                    &flags,
+                )?;
+            }
+            assert_eq!(
+                (
+                    state.tracking.total_warning_errors,
+                    state.tracking.total_warning_errors_during_warmup
+                ),
+                (1, 1)
+            );
+            let text = std::str::from_utf8(&errors)?;
+            assert!(text.contains("ProcessScheduleInput: Schedule:Day:Hourly = H"));
+            assert!(text.contains(if type_name.is_some() {
+                "schedule_type_limits_name = ABSENT TYPE, item not found."
+            } else {
+                "schedule_type_limits_name is empty."
+            }));
+            assert!(text.contains("Schedule will not be validated."));
+        }
+        // Real const Day checks: strict range first, then integer cast warning;
+        // neither changes ErrorsFound or populates a min/max cache itself.
+        let mut warned = raw.clone();
+        warned["Schedule:Day:Hourly"]["H"]["hour_7"] = serde_json::json!(1.5);
+        warned["ScheduleTypeLimits"]["Fraction"]["numeric_type"] = serde_json::json!("Discrete");
+        warned["Schedule:Day:Hourly"]["D"]["schedule_type_limits_name"] =
+            serde_json::json!("Temperature");
+        warned["Schedule:Year"]["Internal Gain Schedule"]["schedule_type_limits_name"] =
+            serde_json::json!("Control Type");
+        let mut ip = processor(&f, &warned)?;
+        let declarations = {
+            let mut x = schedule_declarations(&f, &warned)?;
+            x.source_is_epjson = Some(true);
+            x
+        };
+        let mut prefix = SelectedScheduleManager::default();
+        prefix.init_constant_state(0)?;
+        assert!(
+            prefix
+                .process_schedule_input(&mut ip, &declarations, 4, &mut MemoryAudit::default())
+                .is_err()
+        );
+        assert_eq!(prefix.day_schedules[1].sum_timestep_values, 50.0);
+        assert!(!prefix.day_schedules[1].is_min_max_set);
+        assert!(prefix.week_schedules.is_empty());
+        let mut ip = processor(&f, &warned)?;
+        let mut manager = SelectedScheduleManager::default();
+        manager.init_constant_state(0)?;
+        let (mut state, mut errors, mut console, mut audit) = (
+            interpolation_error_state(),
+            Vec::new(),
+            Vec::new(),
+            MemoryAudit::default(),
+        );
+        let (kickoff, developer, warmup, sizing) = (false, false, true, false);
+        let flags = SourceDiagnosticFlags {
+            kickoff: &kickoff,
+            developer: &developer,
+            warmup: &warmup,
+            doing_sizing: &sizing,
+        };
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            manager.process_schedule_input_with_live_backend(
+                &mut ip,
+                &declarations,
+                4,
+                &mut audit,
+                &mut backend,
+                &flags,
+            )?;
+        }
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_warning_errors_during_warmup
+            ),
+            (2, 2)
+        );
+        assert_eq!(state.tracking.total_severe_errors, 0);
+        let text = std::str::from_utf8(&errors)?;
+        let range = text
+            .find("Values are outside of range for schedule_type_limits_name=FRACTION")
+            .ok_or("actual Day strict range warning")?;
+        let integer = text
+            .find("One or more values are not integer in schedule_type_limits_name=FRACTION")
+            .ok_or("actual Day discrete warning")?;
+        assert!(range < integer);
+        assert_eq!(manager.day_schedules[1].sum_timestep_values, 50.0);
+    }
     Ok(())
 }
 

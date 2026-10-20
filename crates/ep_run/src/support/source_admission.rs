@@ -93,6 +93,11 @@ impl SourceSupportAdmission {
             "Output:Variable",
             "Output:Meter",
             "Output:Meter:MeterFileOnly",
+            // Actual local getters populate the same retained Day/Week/Detailed
+            // graph. Typed legacy schedules alone do not grant this token.
+            "Schedule:Day:Hourly",
+            "Schedule:Week:Daily",
+            "Schedule:Year",
         ]
         .into_iter()
         .filter(|family| {

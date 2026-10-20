@@ -10784,22 +10784,8 @@ impl<'a> Compiler<'a> {
 
     fn parse_day_hourly_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:Day:Hourly") {
-            let schedule_type_limits = match self.optional_string(
-                "Schedule:Day:Hourly",
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    "Schedule:Day:Hourly",
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, "Schedule:Day:Hourly", &name, &object);
             let Some(id_value) =
                 self.checked_id("Schedule:Day:Hourly", &name, model.day_schedules.len())
             else {
@@ -11380,22 +11366,8 @@ impl<'a> Compiler<'a> {
 
     fn parse_year_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:Year") {
-            let schedule_type_limits = match self.optional_string(
-                "Schedule:Year",
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    "Schedule:Year",
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, "Schedule:Year", &name, &object);
             let Some(week_schedules) = self.schedule_year_week_pointers(model, &name, &object)
             else {
                 continue;

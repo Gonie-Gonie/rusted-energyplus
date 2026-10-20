@@ -211,7 +211,7 @@ impl SelectedScheduleManager {
         }
         Ok(count)
     }
-    fn add_source_detailed(&mut self, name: &str) -> SourceScheduleIndex {
+    pub(super) fn add_source_detailed(&mut self, name: &str) -> SourceScheduleIndex {
         let number = SourceScheduleIndex(self.schedules.len());
         self.schedules.push(SelectedSchedule {
             name: name.into(),
@@ -236,7 +236,7 @@ impl SelectedScheduleManager {
         self.schedule_map.insert(name.to_ascii_uppercase(), number);
         number
     }
-    fn add_source_week(&mut self, name: String) -> usize {
+    pub(super) fn add_source_week(&mut self, name: String) -> usize {
         let number = self.week_schedules.len();
         let mut days = [None; 13];
         for day in &mut days[1..] {
@@ -255,7 +255,7 @@ impl SelectedScheduleManager {
             .insert(name.to_ascii_uppercase(), number);
         number
     }
-    fn add_source_day(&mut self, name: String, slots: usize) -> usize {
+    pub(super) fn add_source_day(&mut self, name: String, slots: usize) -> usize {
         let number = self.day_schedules.len();
         self.day_schedules.push(SelectedDaySchedule {
             name: name.clone(),

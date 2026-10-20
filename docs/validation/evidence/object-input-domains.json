@@ -167,6 +167,20 @@
       "No/Average/Linear use retained minute/day/week/currentVal producers and actual type clocks. Optional blank/unknown types retain Invalid/None and original warning/continuation order. Missing For masks retain genuine MissingDay0 pointers and exact warnings. Detailed hasVal and uncached minmax follow actual366week/12day-type pointers and clocks; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects are preserved; Linear endpoint residues are never clamped.",
       "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow \u00b10, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
       "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E and folded/zero dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim."
+    ],
+    "Schedule:Day:Hourly": [
+      "Actual Source A/B getter retains original declaration order, input format, local arrays, numeric/alpha field names, blanks, defaults and usage. Twenty-four admitted finite JSON numbers or omitted-zero values populate real Day timestep values and sums in hour-major order; larger unsigned storage remains bounded.",
+      "Optional blank/unknown types retain Invalid and emit genuine warnings/continuations using live phase flags. Strict Day range and defined discrete-integer warnings preserve order without eager min/max caching. Year and shared live calendar/minmax consumers use these Day owners; unsupported error effects remain bounded.",
+      "The connected Hourly to WeekDaily to Year B102 case preserves the original gain name and all102/9792 requested operands. Existing owner checks cover defaults, all96 values across twelve day types, annual wrap, leap fallback and warning prefixes; no full-object or arbitrary-model claim."
+    ],
+    "Schedule:Week:Daily": [
+      "Actual ordered raw/IP getter resolves all twelve named Day references in Native day-type order after Hourly and before Year/Compact. Real Week pointers and Day usage flags feed existing live calendar, DST, currentVal and min/max consumers.",
+      "Connected B102 physical evidence covers all102/9792 original operands; existing owner checks inspect every Week pointer and all twelve day-type lookups. Missing reference and duplicate object-name diagnostics and unported Day siblings remain bounded."
+    ],
+    "Schedule:Year": [
+      "Actual ordered raw/IP getter creates the real Detailed kind0 owner before Compact/Constant. It resolves and marks each Week before consuming four raw dates, fills canonical inclusive or wrapped leap-shaped ranges, copies day59 to missing day60 and checks annual coverage in Native order.",
+      "Optional type warnings use real field names and live phase flags; existing uncached min/max, currentVal, DST, thermostat/gains and report owners consume actual pointers. Noncanonical date projection, incomplete/overlapping/reference error effects, EMS and broader environment/model physics remain bounded.",
+      "The same-input B102 Hourly/WeekDaily/Year replacement checks all102/9792 values, original96 gain/control/availability profiles, genuine nominal/day-group EIO, actualWarmup6, wholeSHD, fullERR-END0 and real deleted-emptyMTR. Existing owner checks additionally exercise wrapped ranges and February29 fallback."
     ]
   },
   "verification": {
@@ -174,37 +188,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/process-number-outcomes-workspace-tests-30.log",
-        "sha256": "7bc183a0802d2ae196b39f77f736b076c2ab52f1247978b0c3c3657a6a6dfd60",
-        "bytes": 1558234
+        "path": ".runtime/object-expansion/schedule-regular-workspace-tests-32.log",
+        "sha256": "f682e5f1798c428a3a2fbf83f72bbe901944a226ef65ddd13178672a5ff08f41",
+        "bytes": 1558360
       },
-      "scope": "Full workspace milestone30 verifies shared ProcessNumber finite signed underflow success, genuine error-zero and non-finite suffix outcome separation, unchanged mandatory list-read admission/errors, actual General defined-int ordering and all existing Source/compiler consumers. Existing test bodies extended; no new cohort or dependency."
+      "scope": "Full workspace milestone32 verifies genuine Hourly/WeekDaily/Year producers, Source A/B raw custody and admission, IDF declaration order/counts, optional types, live warning order, all twelve day types, annual wrap and February29 fallback through existing owner bodies. No new test cohort or dependency."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/compact-through-folding-clippy-31.log",
-        "sha256": "69a7738d649f5778adac7919a28d53cb1ec1f694fc205e8c75273c52ca861959",
-        "bytes": 2288
+        "path": ".runtime/object-expansion/schedule-regular-clippy-32.log",
+        "sha256": "9e2fb742ff2bfd86b0a276e055eae2f4e9586012050f7bc68d3e6f1cafe6943c",
+        "bytes": 2510
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/compact-through-folding-docs-31.log",
-        "sha256": "f226614fe1cfb6afac4b38fa5b3acbe5344b3603467770c825476e8349834d8f",
+        "path": ".runtime/object-expansion/schedule-regular-docs-32.log",
+        "sha256": "fd7462cdbf46d17f73b5167cf0c11dfb8e7fb94713bb663e5e3bf92776550269",
         "bytes": 354
       },
-      "clippy_through_build": "compact-through-folding-31",
+      "clippy_through_build": "hourly-week-year-32",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/compact-clock-through-native-cohort-check-21.log",
-          "sha256": "c00a36d50685826399735404f27b9bf67ee1e97ce6507c34a2eec470c1c189be",
-          "bytes": 3001242
+          "path": ".runtime/object-expansion/schedule-regular-native-cohort-check-32.log",
+          "sha256": "9451c1da09015d58aa6a21908c4be64fbba757e469e96ab291f85ac89e6f8a83",
+          "bytes": 3001878
         },
-        "scope": "Compile-only verification of changed live clock/debug owner calls and preserved legacy optional-clock wrapper; existing cohort warnings remain, no feature tests or engines run.",
-        "through_build": "compact-clock-through-21"
+        "scope": "Compile-only verification of the actual input-format field and shared schedule API, including existing optional cohort callers. Existing feature warnings remain; no feature tests or engines run.",
+        "through_build": "hourly-week-year-32"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -3343,11 +3357,62 @@
           "passed": true
         },
         "effective_state": "Exactly two original B102 full schedule-record edits: gain Through2013/2/30 then original12/31 with identical original0/1/0 profiles in both periods, and availability leading Through2013/13/31 AllDays/Until24=2 before original12/31 profile. Pinned General three-field arm converts all ProcessNumber/int fields before selecting year position, makes MonthDay2/30 or13/31 without ValidateMonthDay, and actual OrdinalDay(...,1) predicts61 or0. These internal month/day/ordinal states are primary-derived predictions, not instrumented observations. Actual retained roots/profiles/Fraction0..1/Constant4/consumers/all102requests/weather/otherbytes are validated through real physical consumers. Full102/9792 raw operands and binary64 values identical, zero tolerance/RMSE failures, fullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/actualdeletedMTR agree. Original full numerical kernel recomputed read-only; actualBuild31 compiler, SourceCompact, realGeneral, rich shared SourceNumberOutcome module+export, lexical reader and ingress live/archive/snapshot identities authenticated. No Native values feed runtime; no general civil-date/full schedule-domain or measured internal parser-bit claim."
+      },
+      {
+        "id": "hourly-week-year",
+        "group": "schedule_hourly_week_year",
+        "source_build": "hourly-week-year-32",
+        "input": {
+          "path": ".runtime/object-expansion/native-hourly-week-year/calibration-01/input.idf",
+          "sha256": "a20a35c673b2a4e99f505f59c046a58a0e41f03da4c16c0d6fdfa909ded621c6",
+          "bytes": 13495
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-hourly-week-year/calibration-01/receipt.json",
+          "sha256": "63a8d5058830e7aed0803c9cb4888701a4e41dff9d62dbc820f73cbdd63d17d8",
+          "bytes": 14698
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-hourly-week-year-32/hourly-week-year/receipt.json",
+          "sha256": "27effbbfe5bcf396604e11f7f3f55760cfbeb0518ec9b54726a6bc9cd71003f6",
+          "bytes": 5022
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/hourly-week-year-32/run-summary.json",
+          "sha256": "47c25276d7d9d03d78846fd8a39bc6eba66aa5c4496bd64037759fe11190755b",
+          "bytes": 60576
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-hourly-week-year-comparisons-32/hourly-week-year/comparison.json",
+          "sha256": "58bb6d2756ffa51d4d6c62a2843c9384160effa6aacaa6e3854405aa64007c79",
+          "bytes": 249289
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-hourly-week-year-32-launch/hourly-week-year/request.json",
+          "sha256": "7482fca8784e414669ff45ecdf459201dc1b57594d69bc35b95733a5b903948f",
+          "bytes": 3178
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Only ancestral B102 gain Compact record13 is replaced by three genuinely consumed records: Hourly Ported Hourly Gain Day/Fraction/24values0x6,1x12,0x6, WeekDaily Ported Gain Week with all12 actualday references, and Year original Internal Gain Schedule/Fraction/week/1,1,12,31. Original gain consumer name, availability Compact, Constant4, Fraction0..1, all102requests, weather and every byte outside that one span remain unchanged. Genuine raw/IP getters retain actual IDF format/order/counts and populate the real Hourly day, Week pointers/usage and Detailed Year roots; no typed preview or Native output seeds producers. Actual102/9792 raw operands and binary64 values are identical, zero tolerance/RMSE failures, fullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/actualdeletedMTR agree. Original full numerical kernel recomputed read-only; actualBuild32 regular.rs, manager/constructors/accessors/clock, compiler, actualformat+IDF input/count metadata, RawA/SourceB transfer, admission/support and shared baseline source owners are authenticated against live/archive/snapshot bytes. No measured internal allocation counts or full object/arbitrary-combination/domain claim; uint and unsupported error children remain bounded."
       }
     ],
     "totals": {
-      "paired_cases": 57,
-      "reported_samples": 421086,
+      "paired_cases": 58,
+      "reported_samples": 430878,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3880,23 +3945,29 @@
           "sha256": "9bb295d780cca9f49571a530431a373ae31d564bb033dcc36455d01246a599a8",
           "bytes": 75687314
         }
+      },
+      {
+        "id": "hourly-week-year-32",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-32/receipt.json",
+          "sha256": "66c8c969cda9d11acfd4d7625c899f2930289caa2c88db96a1c156caa317df31",
+          "bytes": 5864
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/dd/ddfffc0d16df82ac3b6e0325583babe04dbd29346945ec99d32b15e363bcb7c6",
+          "sha256": "ddfffc0d16df82ac3b6e0325583babe04dbd29346945ec99d32b15e363bcb7c6"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-32/eplus-rs.exe",
+          "sha256": "8ad54b4c137fddbc012ee882b712070e2400f87b84be95e69c56f755e620635a",
+          "bytes": 75780071
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 26,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/compact-through-folding-compiler-tests-31.log",
-          "sha256": "3b1fdcfd15f04b109033917681066e2004569343bf3cc77ad9ca90b75d315d73",
-          "bytes": 7450
-        },
-        {
-          "path": ".runtime/object-expansion/compact-through-folding-owner-tests-31.log",
-          "sha256": "94a9631000df90af5b91bea2f0b770702fb44ab841fbe507e20c8d3352de0be5",
-          "bytes": 2376
-        }
-      ],
-      "scope": "After full workspace milestone30, existing compiler Compact25 and actual ScheduleManager1 bodies verify plain-three-token General selection, ignored genuine error-zero flags, defined all-token casts, checked ordinal folds and bounds, inactive owners, reachable limits and resumed overlap. No new test cohort or dependency."
+      "passed": 0,
+      "logs": [],
+      "scope": "No subsequent Rust changes after full workspace milestone32."
     }
   },
   "additional_native_type_calibrations": [

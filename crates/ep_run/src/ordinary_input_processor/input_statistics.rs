@@ -109,20 +109,27 @@ pub(super) fn resolve_source_b(raw: &RawModel) -> Result<SourceInputStatisticsIn
 // or getter-owned state are calculated by this custody transfer.
 pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsInput, String> {
     let mut result = resolve(raw);
-    if let Some(objects) = raw
-        .objects
-        .get(&ep_raw_model::ObjectType("Schedule:Compact".into()))
-    {
+    for family in [
+        "Schedule:Compact",
+        "Schedule:Day:Hourly",
+        "Schedule:Week:Daily",
+        "Schedule:Year",
+    ] {
+        let Some(objects) = raw.objects.get(&ep_raw_model::ObjectType(family.into())) else {
+            continue;
+        };
         // A retained order map must cover every family. Other A families keep
-        // their previous lexical fallback order; Compact alone transfers its
+        // their lexical fallback order; these schedule families transfer their
         // actual declaration order together with complete numeric operands.
-        result.object_order = result
-            .objects
-            .iter()
-            .map(|(family, objects)| (family.clone(), objects.keys().cloned().collect()))
-            .collect();
+        if result.object_order.is_empty() {
+            result.object_order = result
+                .objects
+                .iter()
+                .map(|(family, objects)| (family.clone(), objects.keys().cloned().collect()))
+                .collect();
+        }
         result.objects.insert(
-            "Schedule:Compact".into(),
+            family.into(),
             objects
                 .iter()
                 .map(|(name, object)| {
@@ -138,8 +145,8 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
                 .collect(),
         );
         result.object_order.insert(
-            "Schedule:Compact".into(),
-            raw.ordered_instances("Schedule:Compact")
+            family.into(),
+            raw.ordered_instances(family)
                 .map_err(|error| error.to_string())?
                 .into_iter()
                 .map(|(name, _)| name.0.clone())

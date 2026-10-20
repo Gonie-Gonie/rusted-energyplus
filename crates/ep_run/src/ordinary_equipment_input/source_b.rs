@@ -1,5 +1,5 @@
-//! Finite raw field grammar from the pinned Native seven-family schema.
-//! Retains operands only; positive Native getters and owners remain unavailable.
+//! Finite raw field grammar for the pinned Source A/B families.
+//! Retains input operands for their actual Source getters and owners.
 use super::{blank, number, text_is};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 pub(super) fn is_family(family: &str) -> bool {
@@ -7,6 +7,9 @@ pub(super) fn is_family(family: &str) -> bool {
         family,
         "NodeList"
             | "Schedule:Compact"
+            | "Schedule:Day:Hourly"
+            | "Schedule:Week:Daily"
+            | "Schedule:Year"
             | "ThermostatSetpoint:DualSetpoint"
             | "ZoneControl:Thermostat"
             | "ZoneHVAC:EquipmentConnections"
@@ -24,6 +27,28 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        ("Schedule:Day:Hourly" | "Schedule:Year", "schedule_type_limits_name") => {
+            matches!(value, RawValue::String(_))
+        }
+        ("Schedule:Day:Hourly", name)
+            if name
+                .strip_prefix("hour_")
+                .and_then(|s| s.parse::<u32>().ok())
+                .is_some_and(|n| (1..=24).contains(&n) && name == format!("hour_{n}")) =>
+        {
+            number(value).is_some()
+        }
+        ("Schedule:Week:Daily", name) if REGULAR_DAY_FIELDS.contains(&name) => {
+            matches!(value, RawValue::String(_))
+        }
+        ("Schedule:Year", "schedule_weeks") => {
+            matches!(value, RawValue::Array(items) if !items.is_empty() && items.len() <= 53 && items.iter().all(|item| {
+                let RawValue::Object(fields) = item else {return false;};
+                matches!(fields.get(&FieldName("schedule_week_name".into())), Some(RawValue::String(_))) && ["start_month", "start_day", "end_month", "end_day"].iter().all(|name| {
+                    fields.get(&FieldName((*name).into())).and_then(number).is_some_and(|n| n.fract() == 0.0 && n >= 1.0 && n <= if name.ends_with("month") {12.0} else {31.0})
+                })
+            }))
+        }
         ("NodeList", "nodes") => {
             blank(value)
                 || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "node_name" => blank(value) || matches!(value, RawValue::String(_)), _ => false, }) && fields.get(&FieldName("node_name".into())).is_some_and(|value| !blank(value)))))
@@ -339,6 +364,8 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
 }
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     match family {
+        "Schedule:Week:Daily" => &REGULAR_DAY_FIELDS,
+        "Schedule:Year" => &["schedule_weeks"],
         "NodeList" => &[],
         "Schedule:Compact" => &[],
         "ThermostatSetpoint:DualSetpoint" => &[],
@@ -358,12 +385,29 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         _ => &[],
     }
 }
-pub(super) fn has_compact_reference(raw: &RawModel, reference: &str) -> bool {
-    raw.objects
-        .get(&ObjectType("Schedule:Compact".into()))
-        .is_some_and(|objects| {
-            objects
-                .keys()
-                .any(|name| name.0.eq_ignore_ascii_case(reference))
-        })
+pub(super) fn has_source_detailed_reference(raw: &RawModel, reference: &str) -> bool {
+    ["Schedule:Compact", "Schedule:Year"].iter().any(|family| {
+        raw.objects
+            .get(&ObjectType((*family).into()))
+            .is_some_and(|objects| {
+                objects
+                    .keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(reference))
+            })
+    })
 }
+
+const REGULAR_DAY_FIELDS: [&str; 12] = [
+    "sunday_schedule_day_name",
+    "monday_schedule_day_name",
+    "tuesday_schedule_day_name",
+    "wednesday_schedule_day_name",
+    "thursday_schedule_day_name",
+    "friday_schedule_day_name",
+    "saturday_schedule_day_name",
+    "holiday_schedule_day_name",
+    "summerdesignday_schedule_day_name",
+    "winterdesignday_schedule_day_name",
+    "customday1_schedule_day_name",
+    "customday2_schedule_day_name",
+];

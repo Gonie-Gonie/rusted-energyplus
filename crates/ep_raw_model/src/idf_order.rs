@@ -244,6 +244,18 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Schedule:Compact",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "Schedule:Day:Hourly",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Week:Daily",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Year",
+        name_field_index: 0,
+    },
 ];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.
@@ -408,6 +420,9 @@ pub fn apply_idf_declaration_order(
                         | "SizingPeriod:DesignDay"
                         | "ZoneControl:Thermostat"
                         | "ZoneHVAC:IdealLoadsAirSystem"
+                        | "Schedule:Day:Hourly"
+                        | "Schedule:Week:Daily"
+                        | "Schedule:Year"
                 )
             {
                 report_field_counts.push((
@@ -423,6 +438,9 @@ pub fn apply_idf_declaration_order(
                         "OtherEquipment" => idf_object.max_fields.max(11),
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
+                        "Schedule:Day:Hourly" => idf_object.max_fields.max(26),
+                        "Schedule:Week:Daily" => idf_object.max_fields.max(13),
+                        "Schedule:Year" => idf_object.max_fields.max(7),
                         // Pinned IdealLoads IDD/schema min_fields is 27; only semicolon records reach this padding.
                         "ZoneHVAC:IdealLoadsAirSystem" => idf_object.max_fields.max(27),
                         "Site:GroundTemperature:BuildingSurface"
@@ -436,6 +454,7 @@ pub fn apply_idf_declaration_order(
                             Some(idf_object.max_fields.saturating_sub(11))
                         }
                         "Output:Table:SummaryReports" => Some(idf_object.max_fields),
+                        "Schedule:Year" => Some(idf_object.max_fields.saturating_sub(2)),
                         _ => None,
                     },
                 ));
@@ -897,6 +916,42 @@ mod tests {
             );
         }
         assert_eq!(staged.objects, expected);
+        // Actual staged declaration order/counts for the regular chain, with
+        // reverse lexical Day names. Parser min-fields and extensible counts
+        // remain distinct; direct epJSON acquires no IDF metadata.
+        let json = r#"{"Schedule:Day:Hourly":{"Z Day":{},"A Day":{}},"Schedule:Week:Daily":{"W":{}},"Schedule:Year":{"Y":{"schedule_weeks":[{"schedule_week_name":"W","start_month":1,"start_day":1,"end_month":12,"end_day":31}]}}}"#;
+        let idf = "Schedule:Day:Hourly,Z Day;\nSchedule:Day:Hourly,A Day;\nSchedule:Week:Daily,W,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day,Z Day;\nSchedule:Year,Y,,W,1,1,12,31;";
+        let ordered = parse_epjson_str_with_idf_order(json, idf)?;
+        assert_eq!(
+            ordered
+                .ordered_instances("Schedule:Day:Hourly")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Z Day", "A Day"]
+        );
+        let direct = parse_epjson_str(json)?;
+        for (family, count, ext) in [
+            ("Schedule:Day:Hourly", "26", None),
+            ("Schedule:Week:Daily", "13", None),
+            ("Schedule:Year", "7", Some("5")),
+        ] {
+            for (_, object) in ordered.ordered_instances(family)? {
+                assert_eq!(
+                    object.fields.get(&FieldName("idf_max_fields".into())),
+                    Some(&RawValue::Number(count.into()))
+                );
+                if let Some(ext) = ext {
+                    assert_eq!(
+                        object
+                            .fields
+                            .get(&FieldName("idf_max_extensible_fields".into())),
+                        Some(&RawValue::Number(ext.into()))
+                    );
+                }
+            }
+            assert!(!direct.has_idf_declaration_order(family));
+        }
         Ok(())
     }
 

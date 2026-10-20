@@ -188,6 +188,9 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "ScheduleTypeLimits"
             | "Schedule:Constant"
             | "Schedule:Compact"
+            | "Schedule:Day:Hourly"
+            | "Schedule:Week:Daily"
+            | "Schedule:Year"
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
     ) || (scope == PortingScope::B

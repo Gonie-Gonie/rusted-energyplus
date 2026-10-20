@@ -127,6 +127,7 @@ fn live_schedules()
         BTreeMap::from(families),
     )?;
     let declarations = SelectedScheduleInput {
+        source_is_epjson: None,
         types: vec![SourceScheduleTypeInput {
             object_name: "Filter Type".into(),
             name: "FILTER TYPE".into(),

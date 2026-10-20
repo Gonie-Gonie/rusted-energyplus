@@ -57,7 +57,14 @@ fn resolve_raw(
             continue;
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
-        let source_compact_family = source_calendar_ingress && family.0 == "Schedule:Compact";
+        let source_compact_family = source_calendar_ingress
+            && matches!(
+                family.0.as_str(),
+                "Schedule:Compact"
+                    | "Schedule:Day:Hourly"
+                    | "Schedule:Week:Daily"
+                    | "Schedule:Year"
+            );
         let source_calendar_family = source_calendar_ingress
             && matches!(
                 family.0.as_str(),
@@ -212,7 +219,7 @@ fn resolve_raw(
                     "present Version requires its actual raw version_identifier string".into(),
                 );
             }
-            if source_b_family {
+            if source_b_family || source_compact_family {
                 for &required in source_b::required_fields(&family.0) {
                     if field(object, required).is_none_or(blank) {
                         return Err(format!("missing {}.{}", family.0, required));
@@ -406,7 +413,7 @@ fn resolve_raw(
                     .map(|(_, object)| object);
                 if constant.is_none()
                     && (source_b_ingress || source_calendar_ingress)
-                    && source_b::has_compact_reference(raw, schedule)
+                    && source_b::has_source_detailed_reference(raw, schedule)
                 {
                     // All ordered Compact fields remain raw on the same IP.
                     // The actual Source producer populates retained day/week
@@ -984,6 +991,64 @@ mod source_a_compact_ingress {
             value["Schedule:Compact"]["variable schedule"]["data"][0] = bad;
             let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
             assert!(resolve_source_a(&raw).is_err());
+        }
+        // The Source-only regular family chain transfers raw numbers/order on
+        // A as well as B; the unscoped legacy resolver remains unchanged.
+        let mut regular = input.clone();
+        regular
+            .as_object_mut()
+            .ok_or("actual raw model")?
+            .remove("Schedule:Compact");
+        regular["Schedule:Day:Hourly"] =
+            serde_json::json!({"H":{"schedule_type_limits_name":"Fraction","hour_7":1}});
+        let week = [
+            "sunday_schedule_day_name",
+            "monday_schedule_day_name",
+            "tuesday_schedule_day_name",
+            "wednesday_schedule_day_name",
+            "thursday_schedule_day_name",
+            "friday_schedule_day_name",
+            "saturday_schedule_day_name",
+            "holiday_schedule_day_name",
+            "summerdesignday_schedule_day_name",
+            "winterdesignday_schedule_day_name",
+            "customday1_schedule_day_name",
+            "customday2_schedule_day_name",
+        ]
+        .into_iter()
+        .map(|field| (field.to_owned(), serde_json::json!("H")))
+        .collect::<serde_json::Map<_, _>>();
+        regular["Schedule:Week:Daily"] = serde_json::json!({"W":week});
+        regular["Schedule:Year"] = serde_json::json!({"variable schedule":{"schedule_type_limits_name":"Fraction","schedule_weeks":[{"schedule_week_name":"W","start_month":1,"start_day":1,"end_month":12,"end_day":31}]}});
+        let raw = ep_raw_model::parse_epjson_str(&regular.to_string())?;
+        assert!(resolve(&raw).is_err());
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert!(
+            matches!(ip.source_raw_object_fields("Schedule:Day:Hourly","H")?.get("hour_7"),Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(text)) if text=="1")
+        );
+        assert_eq!(
+            ip.source_raw_object_names("Schedule:Year")?,
+            ["variable schedule"]
+        );
+        let mut optional = regular.clone();
+        optional["Schedule:Day:Hourly"]["H"]["schedule_type_limits_name"] =
+            serde_json::json!("unknown type");
+        optional["Schedule:Year"]["variable schedule"]["schedule_type_limits_name"] =
+            serde_json::json!("unknown type");
+        let compiled =
+            ep_compiler::compile_raw_model(&ep_raw_model::parse_epjson_str(&optional.to_string())?);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let typed = compiled.model.ok_or("actual optional-type regular model")?;
+        assert!(typed.day_schedules[0].schedule_type_limits.is_none());
+        assert!(typed.year_schedules[0].schedule_type_limits.is_none());
+        for value in [serde_json::json!(null), serde_json::json!("1")] {
+            let mut invalid = regular.clone();
+            invalid["Schedule:Day:Hourly"]["H"]["hour_7"] = value;
+            assert!(
+                resolve_source_a(&ep_raw_model::parse_epjson_str(&invalid.to_string())?).is_err()
+            );
         }
         Ok(())
     }
