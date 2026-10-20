@@ -171,7 +171,10 @@ impl Compiler<'_> {
     }
 }
 
-fn decode_compact_until(value: &str, previous_endpoint: Option<u32>) -> Option<(u32, u32, bool)> {
+pub(super) fn decode_compact_until(
+    value: &str,
+    previous_endpoint: Option<u32>,
+) -> Option<(u32, u32, bool)> {
     // Native ProcessIntervalFields2787-2795 requires the keyword at byte0
     // and erases a colon only at byte5. A space before ':' can instead be a
     // genuine blank HH (`Until :30`), not an optional keyword separator.

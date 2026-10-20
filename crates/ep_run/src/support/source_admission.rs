@@ -96,6 +96,9 @@ impl SourceSupportAdmission {
             // Actual local getters populate the same retained Day/Week/Detailed
             // graph. Typed legacy schedules alone do not grant this token.
             "Schedule:Day:Hourly",
+            "Schedule:Day:Interval",
+            "Schedule:Day:List",
+            "Schedule:Week:Compact",
             "Schedule:Week:Daily",
             "Schedule:Year",
         ]

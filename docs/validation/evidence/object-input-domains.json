@@ -181,6 +181,21 @@
       "Actual ordered raw/IP getter creates the real Detailed kind0 owner before Compact/Constant. It resolves and marks each Week before consuming four raw dates, fills canonical inclusive or wrapped leap-shaped ranges, copies day59 to missing day60 and checks annual coverage in Native order.",
       "Optional type warnings use real field names and live phase flags; existing uncached min/max, currentVal, DST, thermostat/gains and report owners consume actual pointers. Noncanonical date projection, incomplete/overlapping/reference error effects, EMS and broader environment/model physics remain bounded.",
       "The same-input B102 Hourly/WeekDaily/Year replacement checks all102/9792 values, original96 gain/control/availability profiles, genuine nominal/day-group EIO, actualWarmup6, wholeSHD, fullERR-END0 and real deleted-emptyMTR. Existing owner checks additionally exercise wrapped ranges and February29 fallback."
+    ],
+    "Schedule:Day:Interval": [
+      "Actual Source A/B raw/IP getters retain input format, declaration order, original counts, field names, blanks/defaults and usage. Existing numeric extension items with omitted values provide real zero blanks; explicit null/string numerics and missing whole rows are not promoted.",
+      "The retained Day owner calls the real ProcessIntervalFields minute producer and its No/Average/Linear population. The compiler reuses the bounded shared integral HH/MM decoder: finite D/E and underflow-zero forms, genuine blank HH/MM, explicit0:0, equal endpoints and MM60 retaining a previous endpoint; original-minute alignment warnings precede24:mm clamping. Nonintegral formatting-Fatal, unsafe conversions and unsupported severe children remain bounded. Real minute errors carry the actual parent ErrorsFound through population/checks to its existing final Fatal.",
+      "The sole same-input B102 physical pair consumes a No Interval06:00=0/18:00=1/24:00=0 through AllDays WeekCompact and Year, plus the newly consumed List availability chain. All original102/9792 reported operands, unchanged tolerance/RMSE policies, actual96 gain/control/availability profiles, fullERR-END0, actualWarmup6, nominal/day-group EIO, wholeSHD and genuine deleted-emptyMTR are checked. Existing authored owner tests separately cover three modes,1440 minutes to96 values, default blanks, empty/MM60 warnings and failure prefixes; these are not additional paired mode proofs. No full-object or arbitrary-combination claim."
+    ],
+    "Schedule:Day:List": [
+      "Actual Source A/B raw/IP getters preserve ordered numeric values, real omitted-value zero defaults and blank flags. The real producer checks positive minutes and item count before defined truncation/division, then expected count and divisibility into60, fills actual1440-minute storage and populates the retained Day values/sum. Source admission keeps schema-valid integer minutes1..60 and finite numbers.",
+      "Average alone accumulates minute windows; Linear uses the same constant-minute endpoint sampling as No and does not manufacture a ramp. Independent strict range and defined integer warnings use live phase flags in original order, including this family's \"not integer for\" wording. Missing/invalid count, unsupported severe paths, unsafe division/conversion and broader numeric storage remain bounded.",
+      "The sole same-input B102 physical pair consumes List No/60 with24 values0x3,1x21 through WeekDaily and Year, while its gain consumes Interval/WeekCompact. All original102/9792 operands and original policies are retained. Existing authored owner tests separately exercise No/Average/Linear with10-minute items, real blank defaults,1440-to96 population, sums, warning order and live Year/current-value consumers. Physical pairing does not establish all minute/timestep/mode combinations or full ScheduleManager parity."
+    ],
+    "Schedule:Week:Compact": [
+      "Actual Source A/B ordered mixed getters resolve and mark each real Day owner used before ProcessForDayTypes. Independent substring predicates mutate the real per-week assignment mask; successful selectors write only actual DayType slots1..12. The constructor retains nullptr/None at slot0 and genuine MissingDay pointers at unassigned slots1..12.",
+      "WeekDaily precedes WeekCompact, then the existing Detailed Year/Compact/Constant and shared live calendar/currentVal/minmax consumers retain actual graph ownership. Invalid/duplicate selectors, missing Day references or required assignments remain explicit unavailable boundaries before unported severe effects; omitted assignments are not replaced by Compact's warning/zero-profile policy.",
+      "The sole same-input B102 physical pair covers an AllDays mapping to a genuine No Interval gain Day with original consumer name and all102/9792 requests unchanged. Existing authored owner tests separately inspect Weekdays/Weekends/AllOtherDays, all twelve retained pointers, usage-before-selector failure prefixes and live Year clock values. Other calendars, arbitrary selector/reference combinations and full-family runtime parity remain unclaimed. Existing finite legacy first_evidence entries retain their separate conformance identities."
     ]
   },
   "verification": {
@@ -197,18 +212,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/schedule-regular-clippy-32.log",
-        "sha256": "9e2fb742ff2bfd86b0a276e055eae2f4e9586012050f7bc68d3e6f1cafe6943c",
-        "bytes": 2510
+        "path": ".runtime/object-expansion/schedule-interval-list-clippy-33.log",
+        "sha256": "4755288cace662d75f618196a7ead7d585d036c43c9088da12b406ac9feda66b",
+        "bytes": 2524
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/schedule-regular-docs-32.log",
-        "sha256": "fd7462cdbf46d17f73b5167cf0c11dfb8e7fb94713bb663e5e3bf92776550269",
+        "path": ".runtime/object-expansion/schedule-interval-list-docs-33.log",
+        "sha256": "e4c381107af6b45b25894d45ab3c23d4211a327cacbffaac3d7676d2fa17dc7d",
         "bytes": 354
       },
-      "clippy_through_build": "hourly-week-year-32",
+      "clippy_through_build": "interval-list-week-33",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -3408,11 +3423,62 @@
           "passed": true
         },
         "effective_state": "Only ancestral B102 gain Compact record13 is replaced by three genuinely consumed records: Hourly Ported Hourly Gain Day/Fraction/24values0x6,1x12,0x6, WeekDaily Ported Gain Week with all12 actualday references, and Year original Internal Gain Schedule/Fraction/week/1,1,12,31. Original gain consumer name, availability Compact, Constant4, Fraction0..1, all102requests, weather and every byte outside that one span remain unchanged. Genuine raw/IP getters retain actual IDF format/order/counts and populate the real Hourly day, Week pointers/usage and Detailed Year roots; no typed preview or Native output seeds producers. Actual102/9792 raw operands and binary64 values are identical, zero tolerance/RMSE failures, fullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/actualdeletedMTR agree. Original full numerical kernel recomputed read-only; actualBuild32 regular.rs, manager/constructors/accessors/clock, compiler, actualformat+IDF input/count metadata, RawA/SourceB transfer, admission/support and shared baseline source owners are authenticated against live/archive/snapshot bytes. No measured internal allocation counts or full object/arbitrary-combination/domain claim; uint and unsupported error children remain bounded."
+      },
+      {
+        "id": "interval-list-week",
+        "group": "schedule_interval_list_week",
+        "source_build": "interval-list-week-33",
+        "input": {
+          "path": ".runtime/object-expansion/native-interval-list-week/calibration-01/input.idf",
+          "sha256": "4c671f89b3d9ffe8c508b054dc427d7cd2fb6efeefe437b4146d487cfe4dc828",
+          "bytes": 13785
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "scope": "B",
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-interval-list-week/calibration-01/receipt.json",
+          "sha256": "60a7b76de9f36097fc74c158f6fac86b3b8dec1b40217899885943be6601551d",
+          "bytes": 14738
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-interval-list-week-33/interval-list-week/receipt.json",
+          "sha256": "b48b975fab264252766d3cbba537b35ac95bbf67c6f2eacd61fbe97b8671855e",
+          "bytes": 5125
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/interval-list-week-33/run-summary.json",
+          "sha256": "e78d8a8cc75ce6f2597c642ec6a7c1910c3d58fb89411a30518b40856a838272",
+          "bytes": 60630
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-interval-list-week-comparisons-33/interval-list-week/comparison.json",
+          "sha256": "faf4222c378a0824e1cfe314b459ac0c97bf03a413fbbb9cb927565185ea845d",
+          "bytes": 249913
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-interval-list-week-33-launch/interval-list-week/request.json",
+          "sha256": "465e3046013732dad7d93dbd85d2e7e73dee481f3f4d9caeae8bb4923d89086b",
+          "bytes": 3196
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Exactly two original B102 Compact schedule-record spans13/35 each become three genuinely consumed objects. Gain uses DayIntervalNo bare06:00=0/18:00=1/24:00=0, WeekCompactAllDays and Year original gain name; availability uses DayListNo MinutesPerItem60 with0x3/1x21, WeekDailyall12 and Year original availability name, both full1..366. Constant4/Fraction0..1/all102requests/weather/realconsumerrefs/otherbytes and originalactiveprofiles remain unchanged. Actual raw/IP getters feed real minute producers/population, Day limits, Week selectors/pointers/usage and Detailed Year roots; no typed preview or Native output seeds producers. Full102/9792 raw operands and binary64 values are identical with zero tolerance/RMSE failures, exactfullERR-END0/warmup0/sizing0/actualWarmup6/genuine nominal+fourdaygroup0..1000W/wholeSHD/realdeletedMTR agree. Original full numerical kernel independently recomputed from actual own streams. ActualBuild33 realminute/regular/manager/constructors/accessors, compiler/decoder, actualformat+IDF counts/order/rawtransfer/admission/support and sharedbaseline source owners are authenticated against actuallive/archive/snapshot bytes. No measured internal parser/allocation counts or full family/arbitrary-combination/domain claim; uint and unsupported error children remain bounded."
       }
     ],
     "totals": {
-      "paired_cases": 58,
-      "reported_samples": 430878,
+      "paired_cases": 59,
+      "reported_samples": 440670,
       "raw_operand_unequal": 118958,
       "tolerance_failures": 0,
       "rmse_failures": 0,
@@ -3962,12 +4028,41 @@
           "sha256": "8ad54b4c137fddbc012ee882b712070e2400f87b84be95e69c56f755e620635a",
           "bytes": 75780071
         }
+      },
+      {
+        "id": "interval-list-week-33",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-33/receipt.json",
+          "sha256": "601880a7f3347aa89d2579d2add4c5a5fe591caba1d32aac1a4fae1d2424d1d3",
+          "bytes": 5957
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/21/215d8e9b86b63fa53c77ac62b83b7822579006608861b4f3fdd47c3ed9949e04",
+          "sha256": "215d8e9b86b63fa53c77ac62b83b7822579006608861b4f3fdd47c3ed9949e04"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-33/eplus-rs.exe",
+          "sha256": "60245702a749d0de3d281177c2d6aacecb7927d2bb152418bc6134a759f9ca89",
+          "bytes": 75849875
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "No subsequent Rust changes after full workspace milestone32."
+      "passed": 1315,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/schedule-interval-list-model-run-tests-33b.log",
+          "sha256": "93c0c6c9592c03b5e1231e291da58e9dc4ae8d3267e997eba99d3bc77bf4b1d5",
+          "bytes": 423948
+        },
+        {
+          "path": ".runtime/object-expansion/schedule-interval-list-owner-tests-33.log",
+          "sha256": "6a58b6129cb55157a9de4887d2f5db40a462324c8f24b3715112bd0762f1a318",
+          "bytes": 2388
+        }
+      ],
+      "scope": "After full workspace milestone32 (5049 passed/2 ignored), all compiler/raw-model/run library checks and the existing actual ScheduleManager owner body verify the bounded Interval/List/WeekCompact extension. Real getter defaults/blanks/order/counts, shared integral Until/empty/MM60 endpoints, three-mode authored 1440-minute-to-96-step population, List Linear endpoint sampling, actual Week usage/selection, live warnings and genuine incomplete-minute Severe-to-final-Fatal effects are checked. These are focused execution counts, not a repeated workspace run or an added test cohort.",
+      "through_build": "interval-list-week-33"
     }
   },
   "additional_native_type_calibrations": [

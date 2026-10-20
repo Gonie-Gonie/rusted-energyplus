@@ -10818,22 +10818,8 @@ impl<'a> Compiler<'a> {
         let minutes_per_timestep =
             schedule_minutes_per_timestep(model.timestep.number_of_timesteps_per_hour);
         for (name, object) in self.objects(OBJECT_TYPE) {
-            let schedule_type_limits = match self.optional_string(
-                OBJECT_TYPE,
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    OBJECT_TYPE,
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, OBJECT_TYPE, &name, &object);
             let interpolation = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -10924,54 +10910,77 @@ impl<'a> Compiler<'a> {
             };
             let entry_name = format!("{object_name}[{index}]");
             let time = self.required_string(OBJECT_TYPE, &entry_name, &entry, "time");
-            let interval_value =
-                self.required_number(OBJECT_TYPE, &entry_name, &entry, "value_until_time");
+            // Existing schema-valid extension with absent numeric field is
+            // a real getter blank/default0; no missing row is manufactured.
+            let interval_value = match field_value(&entry, "value_until_time") {
+                Some(value) => {
+                    self.number_value(OBJECT_TYPE, &entry_name, "value_until_time", value)
+                }
+                None => {
+                    self.record_default(OBJECT_TYPE, &entry_name, "value_until_time", "0.0");
+                    Some(0.0)
+                }
+            };
             let (Some(time), Some(interval_value)) = (time, interval_value) else {
                 entries_valid = false;
                 continue;
             };
-            let Some(until_minute_of_day) = parse_schedule_time_minute(&time) else {
+            let uppercase = time.to_ascii_uppercase();
+            let directive = match uppercase.find("UNTIL") {
+                Some(0) => uppercase,
+                None => format!("Until:{uppercase}"),
+                Some(_) => String::new(),
+            };
+            let previous = segments
+                .last()
+                .map(|s: &ScheduleCompactSegment| s.until_minute_of_day);
+            let Some((until_minute_of_day, raw_minute, clamped)) =
+                schedule_compact_source::decode_compact_until(&directive, previous)
+            else {
                 self.error(
                     "InvalidScheduleDayIntervalTime",
                     OBJECT_TYPE,
                     Some(&entry_name),
                     Some("time"),
-                    format!(
-                        "{OBJECT_TYPE}/{entry_name} has invalid time '{time}'; expected 00:01 through 24:00"
-                    ),
+                    format!("{OBJECT_TYPE}/{entry_name} has invalid time '{time}'"),
                 );
                 entries_valid = false;
                 continue;
             };
-            if segments
-                .last()
-                .is_some_and(|segment: &ScheduleCompactSegment| {
-                    until_minute_of_day <= segment.until_minute_of_day
-                })
-            {
+            if previous.is_some_and(|prior| until_minute_of_day < prior) {
                 self.error(
-                    "InvalidScheduleDayIntervalTimeOrder",
-                    OBJECT_TYPE,
-                    Some(&entry_name),
-                    Some("time"),
-                    format!(
-                        "{OBJECT_TYPE}/{object_name} times must be strictly increasing; '{time}' is not later than the prior time"
-                    ),
+                    "InvalidScheduleDayIntervalTimeOrder", OBJECT_TYPE, Some(&entry_name), Some("time"),
+                    format!("{OBJECT_TYPE}/{object_name} times must not descend; '{time}' is earlier than the prior time"),
                 );
                 entries_valid = false;
                 continue;
             }
+            // Decode warning precedes the separate ProcessIntervalFields
+            // clamp, then its whole-hour zero-duration warning.
             if interpolation == ScheduleInterpolation::No
-                && minutes_per_timestep.is_some_and(|minutes| until_minute_of_day % minutes != 0)
+                && minutes_per_timestep.is_some_and(|minutes| raw_minute % minutes != 0)
             {
                 self.warning(
-                    "ScheduleDayIntervalTimeNotAlignedToTimestep",
+                    "ScheduleDayIntervalTimeNotAlignedToTimestep", OBJECT_TYPE, Some(&entry_name), Some("time"),
+                    format!("{OBJECT_TYPE}/{object_name} time minute {raw_minute} is not a multiple of the minutes per zone timestep"),
+                );
+            }
+            if clamped {
+                self.warning(
+                    "ScheduleDayIntervalTimeClampedToEndOfDay",
                     OBJECT_TYPE,
                     Some(&entry_name),
                     Some("time"),
-                    format!(
-                        "{OBJECT_TYPE}/{object_name} time {until_minute_of_day} minutes is not a multiple of the minutes per zone timestep"
-                    ),
+                    format!("{OBJECT_TYPE}/{object_name} terminates '{time}' at 24:00"),
+                );
+            }
+            if until_minute_of_day == previous.unwrap_or(0) && until_minute_of_day % 60 == 0 {
+                self.warning(
+                    "ScheduleDayIntervalZeroTimeInterval",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("time"),
+                    format!("{OBJECT_TYPE}/{object_name} has a zero time interval at '{time}'"),
                 );
             }
             segments.push(ScheduleCompactSegment {
@@ -10999,22 +11008,8 @@ impl<'a> Compiler<'a> {
     fn parse_day_list_schedules(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "Schedule:Day:List";
         for (name, object) in self.objects(OBJECT_TYPE) {
-            let schedule_type_limits = match self.optional_string(
-                OBJECT_TYPE,
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    OBJECT_TYPE,
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, OBJECT_TYPE, &name, &object);
             let interpolation = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -16656,14 +16651,6 @@ fn compact_data_field(value: &RawValue) -> Option<&RawValue> {
     fields.get(&FieldName("field".to_string()))
 }
 
-fn compact_directive(value: &str, directive: &str) -> bool {
-    let value = value.trim_start();
-    value
-        .get(..directive.len())
-        .is_some_and(|prefix| prefix.eq_ignore_ascii_case(directive))
-        && value[directive.len()..].trim_start().starts_with(':')
-}
-
 /// Compact's actual Source grammar accepts its keyword with or without a
 /// colon. Keep this operand projection separate from shared day/calendar rules.
 fn compact_directive_operand<'a>(value: &'a str, directive: &str) -> Option<&'a str> {
@@ -17074,28 +17061,6 @@ fn leap_schedule_ordinal(month: u32, day_of_month: u32) -> Option<usize> {
         .iter()
         .try_fold(0_u32, |total, days| total.checked_add(*days))?;
     usize::try_from(days_before_month.checked_add(day_of_month)?).ok()
-}
-
-fn parse_schedule_time_minute(value: &str) -> Option<u32> {
-    let value = value.trim();
-    let time = if compact_directive(value, "Until") {
-        let (_directive, time) = value.split_once(':')?;
-        time.trim()
-    } else {
-        value
-    };
-    let (hour, minute) = time.split_once(':')?;
-    let hour = hour.trim().parse::<u32>().ok()?;
-    let minute = minute.trim().parse::<u32>().ok()?;
-    if hour > 24 || minute >= 60 || (hour == 24 && minute != 0) {
-        return None;
-    }
-    let minute_of_day = hour * 60 + minute;
-    if minute_of_day == 0 {
-        None
-    } else {
-        Some(minute_of_day)
-    }
 }
 
 fn parse_terrain(value: &str) -> Option<Terrain> {

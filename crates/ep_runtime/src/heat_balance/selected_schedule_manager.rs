@@ -410,7 +410,10 @@ impl SelectedScheduleManager {
                         | "Schedule:Constant"
                         | "Schedule:Compact"
                         | "Schedule:Day:Hourly"
+                        | "Schedule:Day:Interval"
+                        | "Schedule:Day:List"
                         | "Schedule:Week:Daily"
+                        | "Schedule:Week:Compact"
                         | "Schedule:Year"
                 ) {
                     return Err(SelectedScheduleError::Unavailable(
@@ -553,6 +556,7 @@ impl SelectedScheduleManager {
             &mut locals,
             &mut backend,
             flags,
+            &mut errors_found,
         )?;
         // Native1269 resizes the same MissingDaySchedule before Compact input.
         self.day_schedules

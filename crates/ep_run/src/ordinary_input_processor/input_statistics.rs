@@ -112,6 +112,9 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
     for family in [
         "Schedule:Compact",
         "Schedule:Day:Hourly",
+        "Schedule:Day:Interval",
+        "Schedule:Day:List",
+        "Schedule:Week:Compact",
         "Schedule:Week:Daily",
         "Schedule:Year",
     ] {

@@ -62,6 +62,9 @@ fn resolve_raw(
                 family.0.as_str(),
                 "Schedule:Compact"
                     | "Schedule:Day:Hourly"
+                    | "Schedule:Day:Interval"
+                    | "Schedule:Day:List"
+                    | "Schedule:Week:Compact"
                     | "Schedule:Week:Daily"
                     | "Schedule:Year"
             );
@@ -1048,6 +1051,130 @@ mod source_a_compact_ingress {
             invalid["Schedule:Day:Hourly"]["H"]["hour_7"] = value;
             assert!(
                 resolve_source_a(&ep_raw_model::parse_epjson_str(&invalid.to_string())?).is_err()
+            );
+        }
+        // Both further Day/Week families retain genuine raw values/default
+        // omissions on A/B; the legacy lane remains unchanged. Item metadata
+        // does not manufacture a value when the declared numeric field is absent.
+        let mut further = regular.clone();
+        further
+            .as_object_mut()
+            .ok_or("actual schedule map")?
+            .remove("Schedule:Day:Hourly");
+        further
+            .as_object_mut()
+            .ok_or("actual schedule map")?
+            .remove("Schedule:Week:Daily");
+        further["Schedule:Day:Interval"] = serde_json::json!({"I":{"schedule_type_limits_name":"Fraction","data":[{"time":"06:00","metadata":true},{"time":"18:00","value_until_time":1},{"time":"24:00","value_until_time":0}]}});
+        let list = (0..24)
+            .map(|hour| {
+                if hour == 0 {
+                    serde_json::json!({"metadata":true})
+                } else {
+                    serde_json::json!({"value":if hour < 3 {0} else {1}})
+                }
+            })
+            .collect::<Vec<_>>();
+        further["Schedule:Day:List"] = serde_json::json!({"L":{"schedule_type_limits_name":"Fraction","minutes_per_item":60,"extensions":list}});
+        further["Schedule:Week:Compact"] = serde_json::json!({"WI":{"data":[{"daytype_list":"AllDays","schedule_day_name":"I"}]},"WL":{"data":[{"daytype_list":"AllDays","schedule_day_name":"L"}]}});
+        further["Schedule:Year"]["variable schedule"]["schedule_weeks"][0]["schedule_week_name"] =
+            serde_json::json!("WI");
+        further["Schedule:Year"]["list schedule"] = serde_json::json!({"schedule_type_limits_name":"Fraction","schedule_weeks":[{"schedule_week_name":"WL","start_month":1,"start_day":1,"end_month":12,"end_day":31}]});
+        let raw = ep_raw_model::parse_epjson_str(&further.to_string())?;
+        assert!(resolve(&raw).is_err());
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
+        let Some(V::Array(interval)) = ip
+            .source_raw_object_fields("Schedule:Day:Interval", "I")?
+            .get("data")
+        else {
+            return Err("actual Interval raw data".into());
+        };
+        assert!(
+            matches!(&interval[1], V::Object(fields) if matches!(fields.get("value_until_time"),Some(V::Number(text)) if text=="1"))
+        );
+        assert!(
+            matches!(&interval[0], V::Object(fields) if !fields.contains_key("value_until_time") && fields.get("metadata")==Some(&V::Bool(true)))
+        );
+        let Some(V::Array(list)) = ip
+            .source_raw_object_fields("Schedule:Day:List", "L")?
+            .get("extensions")
+        else {
+            return Err("actual List raw values".into());
+        };
+        assert_eq!(list.len(), 24);
+        assert!(
+            matches!(&list[0], V::Object(fields) if !fields.contains_key("value") && fields.get("metadata")==Some(&V::Bool(true)))
+        );
+        assert_eq!(
+            ip.source_raw_object_names("Schedule:Week:Compact")?,
+            ["WI", "WL"]
+        );
+        for mode in ["", "No", "Average", "Linear"] {
+            let mut modes = further.clone();
+            modes["Schedule:Day:Interval"]["I"]["interpolate_to_timestep"] = mode.into();
+            modes["Schedule:Day:List"]["L"]["interpolate_to_timestep"] = mode.into();
+            let raw = ep_raw_model::parse_epjson_str(&modes.to_string())?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+        }
+        for (family, name, field, value) in [
+            (
+                "Schedule:Day:Interval",
+                "I",
+                "interpolate_to_timestep",
+                serde_json::json!(null),
+            ),
+            (
+                "Schedule:Day:Interval",
+                "I",
+                "data",
+                serde_json::json!([null]),
+            ),
+            (
+                "Schedule:Day:Interval",
+                "I",
+                "data",
+                serde_json::json!([{"time":null,"value_until_time":0}]),
+            ),
+            (
+                "Schedule:Day:Interval",
+                "I",
+                "data",
+                serde_json::json!([{"time":"24:00","value_until_time":"1"}]),
+            ),
+            (
+                "Schedule:Day:List",
+                "L",
+                "minutes_per_item",
+                serde_json::json!(1.5),
+            ),
+            (
+                "Schedule:Day:List",
+                "L",
+                "minutes_per_item",
+                serde_json::json!("60"),
+            ),
+            (
+                "Schedule:Day:List",
+                "L",
+                "extensions",
+                serde_json::json!([{"value":null}]),
+            ),
+            (
+                "Schedule:Week:Compact",
+                "WI",
+                "data",
+                serde_json::json!([{"daytype_list":"AllDays","schedule_day_name":null}]),
+            ),
+        ] {
+            let mut invalid = further.clone();
+            invalid[family][name][field] = value;
+            assert!(
+                resolve_source_a(&ep_raw_model::parse_epjson_str(&invalid.to_string())?).is_err(),
+                "invalid Source schedule scalar {family}.{field}"
             );
         }
         Ok(())

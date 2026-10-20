@@ -85,7 +85,10 @@ fn through_day(value: &str) -> Result<(usize, String), SelectedScheduleError> {
         .map(|day| (day, value.to_owned())) // Actual CurrentThrough after erase/strip.
         .ok_or_else(|| unavailable("actual Compact Through ordinal domain"))
 }
-fn for_days(value: &str, already: &mut [bool; 13]) -> Result<[bool; 13], SelectedScheduleError> {
+pub(super) fn for_days(
+    value: &str,
+    already: &mut [bool; 13],
+) -> Result<[bool; 13], SelectedScheduleError> {
     // Native3075 independent substring predicates and exact duplicate writes.
     let mut these = [false; 13];
     let mut one_valid = false;

@@ -249,6 +249,18 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         name_field_index: 0,
     },
     IdfOrderTarget {
+        object_type: "Schedule:Day:Interval",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Day:List",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Week:Compact",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
         object_type: "Schedule:Week:Daily",
         name_field_index: 0,
     },
@@ -421,6 +433,9 @@ pub fn apply_idf_declaration_order(
                         | "ZoneControl:Thermostat"
                         | "ZoneHVAC:IdealLoadsAirSystem"
                         | "Schedule:Day:Hourly"
+                        | "Schedule:Day:Interval"
+                        | "Schedule:Day:List"
+                        | "Schedule:Week:Compact"
                         | "Schedule:Week:Daily"
                         | "Schedule:Year"
                 )
@@ -439,6 +454,10 @@ pub fn apply_idf_declaration_order(
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
                         "Schedule:Day:Hourly" => idf_object.max_fields.max(26),
+                        "Schedule:Day:Interval" | "Schedule:Day:List" => {
+                            idf_object.max_fields.max(5)
+                        }
+                        "Schedule:Week:Compact" => idf_object.max_fields.max(3),
                         "Schedule:Week:Daily" => idf_object.max_fields.max(13),
                         "Schedule:Year" => idf_object.max_fields.max(7),
                         // Pinned IdealLoads IDD/schema min_fields is 27; only semicolon records reach this padding.
@@ -455,6 +474,9 @@ pub fn apply_idf_declaration_order(
                         }
                         "Output:Table:SummaryReports" => Some(idf_object.max_fields),
                         "Schedule:Year" => Some(idf_object.max_fields.saturating_sub(2)),
+                        "Schedule:Day:Interval" => Some(idf_object.max_fields.saturating_sub(3)),
+                        "Schedule:Day:List" => Some(idf_object.max_fields.saturating_sub(4)),
+                        "Schedule:Week:Compact" => Some(idf_object.max_fields.saturating_sub(1)),
                         _ => None,
                     },
                 ));
@@ -951,6 +973,58 @@ mod tests {
                 }
             }
             assert!(!direct.has_idf_declaration_order(family));
+        }
+        // Semicolon padding changes only max_fields. Genuine physical
+        // extension counts remain partial or zero, including blank fields.
+        let json = r#"{"Schedule:Day:Interval":{"Z Interval":{"data":[{"time":"24:00"}]},"A Interval":{}},"Schedule:Day:List":{"Z List":{"minutes_per_item":60,"extensions":[{"value":0}]},"A List":{}},"Schedule:Week:Compact":{"Z Week":{"data":[{"daytype_list":"AllDays","schedule_day_name":"Z Interval"}]},"A Week":{}}}"#;
+        let idf = "Schedule:Day:Interval,Z Interval,Fraction,No,24:00;\nSchedule:Day:Interval,A Interval;\nSchedule:Day:List,Z List,Fraction,No,60,0;\nSchedule:Day:List,A List;\nSchedule:Week:Compact,Z Week,AllDays,Z Interval;\nSchedule:Week:Compact,A Week;";
+        let ordered = parse_epjson_str_with_idf_order(json, idf)?;
+        let direct = parse_epjson_str(json)?;
+        for (family, names, count, extension) in [
+            (
+                "Schedule:Day:Interval",
+                ["Z Interval", "A Interval"],
+                "5",
+                "1",
+            ),
+            ("Schedule:Day:List", ["Z List", "A List"], "5", "1"),
+            ("Schedule:Week:Compact", ["Z Week", "A Week"], "3", "2"),
+        ] {
+            let objects = ordered.ordered_instances(family)?;
+            assert_eq!(
+                objects
+                    .iter()
+                    .map(|(name, _)| name.0.as_str())
+                    .collect::<Vec<_>>(),
+                names
+            );
+            for (index, (_, object)) in objects.iter().enumerate() {
+                assert_eq!(
+                    object.fields.get(&FieldName("idf_max_fields".into())),
+                    Some(&RawValue::Number(count.into()))
+                );
+                assert_eq!(
+                    object
+                        .fields
+                        .get(&FieldName("idf_max_extensible_fields".into())),
+                    Some(&RawValue::Number(
+                        if index == 0 { extension } else { "0" }.into()
+                    ))
+                );
+            }
+            assert!(!direct.has_idf_declaration_order(family));
+            for (_, object) in direct.ordered_instances(family)? {
+                assert!(
+                    !object
+                        .fields
+                        .contains_key(&FieldName("idf_max_fields".into()))
+                );
+                assert!(
+                    !object
+                        .fields
+                        .contains_key(&FieldName("idf_max_extensible_fields".into()))
+                );
+            }
         }
         Ok(())
     }

@@ -146,6 +146,67 @@ fn compiles_modes_with_shared_hourly_offset_and_week_references()
             DayScheduleId(0),
         ]
     );
+    // Native retains explicit empty intervals and MM60's prior end state;
+    // an existing row's absent numeric member is getter default0.
+    let raw = parse_epjson_str(
+        r#"{
+        "Timestep":{"Timestep 1":{"number_of_timesteps_per_hour":4}},
+        "Schedule:Day:Interval":{"Stateful":{
+            "schedule_type_limits_name":"UNKNOWN",
+            "data":[{"time":"00:00","value_until_time":2},
+                    {"time":"03D0:"},{"time":"12:60","value_until_time":2},
+                    {"time":"2.4D1:0E","value_until_time":1}]
+        }}
+    }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let stateful = &result
+        .model
+        .as_ref()
+        .ok_or("stateful Interval model")?
+        .day_interval_schedules[0];
+    assert!(stateful.schedule_type_limits.is_none());
+    assert_eq!(
+        stateful
+            .segments
+            .iter()
+            .map(|s| s.until_minute_of_day)
+            .collect::<Vec<_>>(),
+        [0, 180, 180, 1440]
+    );
+    assert_eq!(
+        stateful
+            .segments
+            .iter()
+            .map(|s| s.value)
+            .collect::<Vec<_>>(),
+        [2.0, 0.0, 2.0, 1.0]
+    );
+    assert_eq!(
+        result
+            .report
+            .diagnostics
+            .iter()
+            .filter(|d| d.code == "ScheduleDayIntervalZeroTimeInterval")
+            .count(),
+        2
+    );
+    assert!(
+        result
+            .report
+            .defaults_applied
+            .iter()
+            .any(|d| d.object_name == "Stateful[1]"
+                && d.field == "value_until_time"
+                && d.value == "0.0")
+    );
+    for time in ["24:60", "6.5:0", "+6:0", "\u{00a0}6:0"] {
+        let raw = parse_epjson_str(&format!(
+            r#"{{"Schedule:Day:Interval":{{"Bad":{{"data":[{{"time":"{time}","value_until_time":0}},{{"time":"24:00","value_until_time":1}}]}}}}}}"#
+        ))?;
+        assert!(compile_raw_model(&raw).has_errors(), "{time}");
+    }
     Ok(())
 }
 
@@ -244,7 +305,7 @@ fn rejects_invalid_missing_mistyped_unordered_and_incomplete_data()
                     "data": [{"time": "24:00", "value_until_time": "one"}]
                 },
                 "Invalid Time": {
-                    "data": [{"time": "24:15", "value_until_time": 1}]
+                    "data": [{"time": "25:00", "value_until_time": 1}]
                 },
                 "Unordered Time": {
                     "data": [
@@ -277,11 +338,6 @@ fn rejects_invalid_missing_mistyped_unordered_and_incomplete_data()
             "interpolate_to_timestep",
         ),
         ("MissingRequiredField", "Missing Time[0]", "time"),
-        (
-            "MissingRequiredField",
-            "Missing Value[0]",
-            "value_until_time",
-        ),
         ("InvalidFieldType", "Mistyped Entry", "data"),
         ("InvalidFieldType", "Mistyped Time[0]", "time"),
         ("InvalidFieldType", "Mistyped Value[0]", "value_until_time"),

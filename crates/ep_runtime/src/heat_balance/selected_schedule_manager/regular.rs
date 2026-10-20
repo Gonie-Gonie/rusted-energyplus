@@ -1,4 +1,4 @@
-//! Native ScheduleManager803-855/1046-1077/1149-1245 on the real IP and graph.
+//! Native ScheduleManager803-1245 on the real IP and retained schedule graph.
 use super::*;
 use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
 
@@ -115,6 +115,26 @@ impl SelectedScheduleManager {
                 )))
                 .chain((1..=24).map(|n| (format!("hour_{n}"), format!("Hour {n}"), false)))
                 .collect(),
+            "Schedule:Day:Interval" | "Schedule:Day:List" => {
+                let mut fields = vec![
+                    ("name".into(), "Name".into(), true),
+                    (
+                        "schedule_type_limits_name".into(),
+                        "Schedule Type Limits Name".into(),
+                        true,
+                    ),
+                    (
+                        "interpolate_to_timestep".into(),
+                        "Interpolate to Timestep".into(),
+                        true,
+                    ),
+                ];
+                if family == "Schedule:Day:List" {
+                    fields.push(("minutes_per_item".into(), "Minutes per Item".into(), false));
+                }
+                fields
+            }
+            "Schedule:Week:Compact" => vec![("name".into(), "Name".into(), true)],
             "Schedule:Week:Daily" => std::iter::once(("name".into(), "Name".into(), true))
                 .chain(
                     WEEK_FIELDS
@@ -136,6 +156,8 @@ impl SelectedScheduleManager {
         let min_fields = match family {
             "Schedule:Day:Hourly" => 26,
             "Schedule:Week:Daily" => 13,
+            "Schedule:Week:Compact" => 3,
+            "Schedule:Day:Interval" | "Schedule:Day:List" => 5,
             _ => 7,
         };
         let max_fields = if source_is_epjson {
@@ -161,7 +183,12 @@ impl SelectedScheduleManager {
                 let (value, blank) = if field == "name" {
                     (name.to_ascii_uppercase(), name.is_empty())
                 } else {
-                    alpha(fields.get(field))?
+                    let (value, blank) = alpha(fields.get(field))?;
+                    if field == "interpolate_to_timestep" && blank {
+                        ("NO".into(), true) // Actual schema default, with the real blank retained.
+                    } else {
+                        (value, blank)
+                    }
                 };
                 *locals
                     .0
@@ -195,35 +222,58 @@ impl SelectedScheduleManager {
                 n += 1;
             }
         }
-        if family == "Schedule:Year" {
-            let Some(V::Array(rows)) = fields.get("schedule_weeks") else {
-                return Err(unavailable("actual Year schedule_weeks array"));
+        let (extension, extension_fields): (&str, &[(&str, &str, bool)]) = match family {
+            "Schedule:Year" => (
+                "schedule_weeks",
+                &[
+                    ("schedule_week_name", "Schedule:Week Name", true),
+                    ("start_month", "Start Month", false),
+                    ("start_day", "Start Day", false),
+                    ("end_month", "End Month", false),
+                    ("end_day", "End Day", false),
+                ],
+            ),
+            "Schedule:Day:Interval" => (
+                "data",
+                &[
+                    ("time", "Time", true),
+                    ("value_until_time", "Value Until Time", false),
+                ],
+            ),
+            "Schedule:Day:List" => ("extensions", &[("value", "Value", false)]),
+            "Schedule:Week:Compact" => (
+                "data",
+                &[
+                    ("daytype_list", "DayType List", true),
+                    ("schedule_day_name", "Schedule:Day Name", true),
+                ],
+            ),
+            _ => return Ok((num_a, num_n)),
+        };
+        // Native only visits genuine existing extensible objects. A min_fields
+        // declaration does not manufacture an item or a missing alpha/value.
+        if let Some(value) = fields.get(extension) {
+            let V::Array(rows) = value else {
+                return Err(unavailable("actual regular schedule extension array"));
             };
             let max_ext = if source_is_epjson {
                 rows.len()
-                    .checked_mul(5)
-                    .ok_or_else(|| unavailable("actual Year extension extent"))?
+                    .checked_mul(extension_fields.len())
+                    .ok_or_else(|| unavailable("actual regular extension extent"))?
             } else {
                 metadata(fields, "idf_max_extensible_fields")?
             };
             let mut ext = 0;
             for row in rows {
                 let V::Object(row) = row else {
-                    return Err(unavailable("actual Year extension object"));
+                    return Err(unavailable("actual regular extension object"));
                 };
-                for (field, title, is_alpha) in [
-                    ("schedule_week_name", "Schedule:Week Name", true),
-                    ("start_month", "Start Month", false),
-                    ("start_day", "Start Day", false),
-                    ("end_month", "End Month", false),
-                    ("end_day", "End Day", false),
-                ] {
+                for &(field, title, is_alpha) in extension_fields {
                     if is_alpha {
                         let (value, blank) = alpha(row.get(field))?;
-                        *locals
-                            .0
-                            .get_mut(a)
-                            .ok_or_else(|| unavailable("actual Year alpha extent"))? = value;
+                        *locals.0.get_mut(a).ok_or_else(|| {
+                            unavailable("actual regular extension alpha extent")
+                        })? = value;
                         locals.1[a] = if source_is_epjson {
                             field.into()
                         } else {
@@ -236,10 +286,9 @@ impl SelectedScheduleManager {
                         a += 1;
                     } else {
                         let (value, blank) = numeric(row.get(field), None)?;
-                        *locals
-                            .3
-                            .get_mut(n)
-                            .ok_or_else(|| unavailable("actual Year numeric extent"))? = value;
+                        *locals.3.get_mut(n).ok_or_else(|| {
+                            unavailable("actual regular extension numeric extent")
+                        })? = value;
                         locals.2[n] = if source_is_epjson {
                             field.into()
                         } else {
@@ -290,6 +339,88 @@ impl SelectedScheduleManager {
         Ok(found)
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Borrow actual independent Day, getter-local and diagnostic owners without replacing Native state."
+    )]
+    fn check_source_regular_day(
+        &self,
+        index: usize,
+        family: &str,
+        name: &str,
+        locals: &SourceScheduleGetterLocals,
+        integer_preposition: &str,
+        backend: &mut Option<&mut SourceErrorBackend<'_>>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
+    ) -> Result<(), SelectedScheduleError> {
+        let kind = self.day_schedules[index].schedule_type_number;
+        // Native const Day checks do not populate any min/max cache and
+        // use strict bounds, independently of final Schedule EPS validation.
+        if let Some(kind) = kind {
+            let limits = &self.schedule_types[kind];
+            let range = limits.is_limited
+                && self.day_schedules[index]
+                    .timestep_values
+                    .iter()
+                    .any(|v| *v < limits.min_value || *v > limits.max_value);
+            let real = limits.is_real;
+            if range {
+                schedule_diagnostic(
+                    backend,
+                    flags,
+                    minute::SourceScheduleMinuteDiagnostic::Warning,
+                    &format!("ProcessScheduleInput: {family} = {name}"),
+                )?;
+                schedule_diagnostic(
+                    backend,
+                    flags,
+                    minute::SourceScheduleMinuteDiagnostic::Continue,
+                    &format!(
+                        "Values are outside of range for {}={}",
+                        locals.1[1], locals.0[1]
+                    ),
+                )?;
+            }
+            if !real {
+                let mut bad = false;
+                for value in &self.day_schedules[index].timestep_values {
+                    let truncated = value.trunc();
+                    if truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX) {
+                        return Err(unavailable(
+                            "actual DaySchedule undefined discrete real-to-int conversion",
+                        ));
+                    }
+                    if *value != f64::from(truncated as i32) {
+                        bad = true;
+                        break;
+                    }
+                }
+                if bad {
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        minute::SourceScheduleMinuteDiagnostic::Warning,
+                        &format!("ProcessScheduleInput: {family} = {name}"),
+                    )?;
+                    schedule_diagnostic(
+                        backend,
+                        flags,
+                        minute::SourceScheduleMinuteDiagnostic::Continue,
+                        &format!(
+                            "One or more values are not integer {} {}={}",
+                            integer_preposition, locals.1[1], locals.0[1]
+                        ),
+                    )?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Carry the actual parent ErrorsFound alongside existing raw, local and live diagnostic owners."
+    )]
     pub(super) fn process_source_regulars(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -298,10 +429,14 @@ impl SelectedScheduleManager {
         locals: &mut SourceScheduleGetterLocals,
         backend: &mut Option<&mut SourceErrorBackend<'_>>,
         flags: Option<&SourceDiagnosticFlags<'_>>,
+        errors_found: &mut bool,
     ) -> Result<(), SelectedScheduleError> {
         if [
             "Schedule:Day:Hourly",
+            "Schedule:Day:Interval",
+            "Schedule:Day:List",
             "Schedule:Week:Daily",
+            "Schedule:Week:Compact",
             "Schedule:Year",
         ]
         .iter()
@@ -345,66 +480,154 @@ impl SelectedScheduleManager {
                     day.sum_timestep_values += day.timestep_values[at];
                 }
             }
-            // Native const Day checks do not populate any min/max cache and
-            // use strict bounds, independently of final Schedule EPS validation.
-            if let Some(kind) = kind {
-                let limits = &self.schedule_types[kind];
-                let range = limits.is_limited
-                    && self.day_schedules[index]
-                        .timestep_values
-                        .iter()
-                        .any(|v| *v < limits.min_value || *v > limits.max_value);
-                let real = limits.is_real;
-                if range {
-                    schedule_diagnostic(
-                        backend,
-                        flags,
-                        minute::SourceScheduleMinuteDiagnostic::Warning,
-                        &format!("ProcessScheduleInput: {family} = {name}"),
-                    )?;
-                    schedule_diagnostic(
-                        backend,
-                        flags,
-                        minute::SourceScheduleMinuteDiagnostic::Continue,
-                        &format!(
-                            "Values are outside of range for {}={}",
-                            locals.1[1], locals.0[1]
-                        ),
-                    )?;
+            self.check_source_regular_day(index, family, &name, locals, "in", backend, flags)?;
+        }
+        for ordinal in 0..input.get_num_objects_found("Schedule:Day:Interval") {
+            let family = "Schedule:Day:Interval";
+            let (na, nn) = Self::get_source_regular_object_item(
+                input,
+                family,
+                ordinal,
+                source_is_epjson,
+                locals,
+            )?;
+            let name = locals.0[0].clone();
+            if self.day_schedule_map.contains_key(&name) {
+                return Err(unavailable(
+                    "actual Interval duplicate-name severe diagnostic",
+                ));
+            }
+            let index = self.add_source_day(name.clone(), slots);
+            self.day_schedules[index].schedule_type_number =
+                self.regular_type(family, &name, locals, backend, flags)?;
+            let num_fields = na
+                .checked_sub(3)
+                .filter(|count| *count > 0)
+                .ok_or_else(|| {
+                    unavailable("actual Interval insufficient-data severe diagnostic")
+                })?;
+            let mode = match locals.0[2].as_str() {
+                "NO" => minute::SourceScheduleInterpolation::No,
+                "AVERAGE" => minute::SourceScheduleInterpolation::Average,
+                "LINEAR" => minute::SourceScheduleInterpolation::Linear,
+                _ => {
+                    return Err(unavailable(
+                        "actual Interval invalid interpolation severe diagnostic",
+                    ));
                 }
-                if !real {
-                    let mut bad = false;
-                    for value in &self.day_schedules[index].timestep_values {
-                        let truncated = value.trunc();
-                        if truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX) {
-                            return Err(unavailable(
-                                "actual DaySchedule undefined discrete real-to-int conversion",
-                            ));
-                        }
-                        if *value != f64::from(truncated as i32) {
-                            bad = true;
-                            break;
-                        }
-                    }
-                    if bad {
-                        schedule_diagnostic(
-                            backend,
-                            flags,
-                            minute::SourceScheduleMinuteDiagnostic::Warning,
-                            &format!("ProcessScheduleInput: {family} = {name}"),
-                        )?;
-                        schedule_diagnostic(
-                            backend,
-                            flags,
-                            minute::SourceScheduleMinuteDiagnostic::Continue,
-                            &format!(
-                                "One or more values are not integer in {}={}",
-                                locals.1[1], locals.0[1]
-                            ),
-                        )?;
-                    }
+            };
+            self.day_schedules[index].interpolation = match mode {
+                minute::SourceScheduleInterpolation::No => 0,
+                minute::SourceScheduleInterpolation::Average => 1,
+                minute::SourceScheduleInterpolation::Linear => 2,
+            };
+            let mut minutes = [0.0; 1440];
+            let mut set_minutes = [false; 1440];
+            minute::process_interval_fields_with(
+                &locals.0[3..],
+                &locals.3,
+                num_fields,
+                nn,
+                &mut minutes,
+                &mut set_minutes,
+                errors_found,
+                &name,
+                family,
+                mode,
+                i32::try_from(60 / steps)
+                    .map_err(|_| unavailable("actual Interval minute clock"))?,
+                &mut |kind, message| schedule_diagnostic(backend, flags, kind, message),
+            )?;
+            // Native populates even when the completed minute child set the
+            // real parent ErrorsFound. Its final Fatal belongs to the caller.
+            minute::populate_source_day_from_minutes(
+                &mut self.day_schedules[index],
+                &minutes,
+                steps,
+            )?;
+            self.check_source_regular_day(index, family, &name, locals, "in", backend, flags)?;
+        }
+        for ordinal in 0..input.get_num_objects_found("Schedule:Day:List") {
+            let family = "Schedule:Day:List";
+            let (_na, nn) = Self::get_source_regular_object_item(
+                input,
+                family,
+                ordinal,
+                source_is_epjson,
+                locals,
+            )?;
+            let name = locals.0[0].clone();
+            if self.day_schedule_map.contains_key(&name) {
+                return Err(unavailable("actual List duplicate-name severe diagnostic"));
+            }
+            let index = self.add_source_day(name.clone(), slots);
+            self.day_schedules[index].schedule_type_number =
+                self.regular_type(family, &name, locals, backend, flags)?;
+            self.day_schedules[index].interpolation = match locals.0[2].as_str() {
+                "NO" => 0,
+                "AVERAGE" => 1,
+                "LINEAR" => 2,
+                _ => return Err(unavailable("actual List interpolation enum")),
+            };
+            // Preserve the actual Native predicate order, including its count
+            // test before the truncation/division. No invalid division is made.
+            let raw_minutes = locals.3[0];
+            if raw_minutes <= 0.0 {
+                return Err(unavailable(
+                    "actual List nonpositive minutes severe diagnostic",
+                ));
+            }
+            if nn < 25 {
+                return Err(unavailable(
+                    "actual List insufficient count severe diagnostic",
+                ));
+            }
+            let truncated = raw_minutes.trunc();
+            if truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX) {
+                return Err(unavailable("actual List defined minutes-to-int conversion"));
+            }
+            let minutes_per_item = truncated as i32;
+            if minutes_per_item == 0 {
+                return Err(unavailable("actual List undefined zero divisor"));
+            }
+            let expected = 1440 / minutes_per_item;
+            if i32::try_from(nn - 1).ok() != Some(expected) {
+                return Err(unavailable(
+                    "actual List expected item count severe diagnostic",
+                ));
+            }
+            if 60 % minutes_per_item != 0 {
+                return Err(unavailable(
+                    "actual List minutes divisibility severe diagnostic",
+                ));
+            }
+            let minutes_per_item = usize::try_from(minutes_per_item)
+                .map_err(|_| unavailable("actual List positive minute extent"))?;
+            let mut minutes = [0.0; 1440];
+            let (mut hour, mut begin, mut end) = (0, 0, minutes_per_item - 1);
+            for field in 1..nn {
+                for minute in begin..=end {
+                    *minutes
+                        .get_mut(hour * 60 + minute)
+                        .ok_or_else(|| unavailable("actual List minute storage extent"))? =
+                        locals.3[field];
+                }
+                begin = end + 1;
+                end += minutes_per_item;
+                if end >= 60 {
+                    end = minutes_per_item - 1;
+                    begin = 0;
+                    hour += 1;
                 }
             }
+            // Linear has no ramp producer for List; it samples the exact same
+            // filled minute owner as No. Average alone accumulates every minute.
+            minute::populate_source_day_from_minutes(
+                &mut self.day_schedules[index],
+                &minutes,
+                steps,
+            )?;
+            self.check_source_regular_day(index, family, &name, locals, "for", backend, flags)?;
         }
         for ordinal in 0..input.get_num_objects_found("Schedule:Week:Daily") {
             let family = "Schedule:Week:Daily";
@@ -435,6 +658,52 @@ impl SelectedScheduleManager {
                     })?;
                 self.day_schedules[day].is_used = true; // Actual GetDaySchedule.
                 self.week_schedules[week].day_schedules[day_type] = Some(day);
+            }
+        }
+        for ordinal in 0..input.get_num_objects_found("Schedule:Week:Compact") {
+            let family = "Schedule:Week:Compact";
+            let (na, _) = Self::get_source_regular_object_item(
+                input,
+                family,
+                ordinal,
+                source_is_epjson,
+                locals,
+            )?;
+            let name = locals.0[0].clone();
+            if self.week_schedule_map.contains_key(&name) {
+                return Err(unavailable(
+                    "actual WeekCompact duplicate-name severe diagnostic",
+                ));
+            }
+            let week = self.add_source_week(name);
+            if na < 3 || na.is_multiple_of(2) {
+                return Err(unavailable(
+                    "actual WeekCompact paired reference alpha extent",
+                ));
+            }
+            let mut all_days = [false; 13];
+            for field in (1..na).step_by(2) {
+                // GetDaySchedule marks the actual owner before any selector
+                // side effect. Invalid selectors cannot backfill Week pointers.
+                let day = self
+                    .day_schedule_map
+                    .get(&locals.0[field + 1])
+                    .copied()
+                    .ok_or_else(|| {
+                        unavailable("actual WeekCompact missing Day severe diagnostic")
+                    })?;
+                self.day_schedules[day].is_used = true;
+                let these = compact::for_days(&locals.0[field], &mut all_days)?;
+                for day_type in 1..13 {
+                    if these[day_type] {
+                        self.week_schedules[week].day_schedules[day_type] = Some(day);
+                    }
+                }
+            }
+            if all_days[1..].iter().any(|assigned| !assigned) {
+                return Err(unavailable(
+                    "actual WeekCompact missing assignments severe diagnostic",
+                ));
             }
         }
         for ordinal in 0..input.get_num_objects_found("Schedule:Year") {

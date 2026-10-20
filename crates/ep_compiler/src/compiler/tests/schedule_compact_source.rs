@@ -1,7 +1,5 @@
-use super::super::{
-    ALL_SCHEDULE_DAY_TYPES, Compiler, DiagnosticSeverity, compile_raw_model,
-    parse_schedule_time_minute,
-};
+use super::super::schedule_compact_source::decode_compact_until;
+use super::super::{ALL_SCHEDULE_DAY_TYPES, Compiler, DiagnosticSeverity, compile_raw_model};
 use ep_model::{ScheduleDayType, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId};
 use ep_raw_model::parse_epjson_str;
 
@@ -434,7 +432,7 @@ fn equal_until_retains_the_zero_duration_segment_and_warning()
 #[test]
 fn compact_24mm_clamps_after_original_minute_alignment_warning()
 -> Result<(), Box<dyn std::error::Error>> {
-    for time in ["24:01", "24:59"] {
+    for (time, raw_minute) in [("24:01", 1), ("24:59", 59)] {
         let source = format!(
             r#"{{
             "Timestep":{{"T":{{"number_of_timesteps_per_hour":4}}}},
@@ -475,9 +473,8 @@ fn compact_24mm_clamps_after_original_minute_alignment_warning()
             1440
         );
         assert_eq!(
-            parse_schedule_time_minute(time),
-            None,
-            "other day-family parser stays strict"
+            decode_compact_until(&format!("Until:{time}"), None),
+            Some((1440, raw_minute, true))
         );
     }
     let compile_until = |directive: &str,

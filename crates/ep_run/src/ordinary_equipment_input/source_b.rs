@@ -8,6 +8,9 @@ pub(super) fn is_family(family: &str) -> bool {
         "NodeList"
             | "Schedule:Compact"
             | "Schedule:Day:Hourly"
+            | "Schedule:Day:Interval"
+            | "Schedule:Day:List"
+            | "Schedule:Week:Compact"
             | "Schedule:Week:Daily"
             | "Schedule:Year"
             | "ThermostatSetpoint:DualSetpoint"
@@ -27,7 +30,10 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
-        ("Schedule:Day:Hourly" | "Schedule:Year", "schedule_type_limits_name") => {
+        (
+            "Schedule:Day:Hourly" | "Schedule:Day:Interval" | "Schedule:Day:List" | "Schedule:Year",
+            "schedule_type_limits_name",
+        ) => {
             matches!(value, RawValue::String(_))
         }
         ("Schedule:Day:Hourly", name)
@@ -37,6 +43,36 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                 .is_some_and(|n| (1..=24).contains(&n) && name == format!("hour_{n}")) =>
         {
             number(value).is_some()
+        }
+        ("Schedule:Day:Interval" | "Schedule:Day:List", "interpolate_to_timestep") => {
+            text_is(value, &["", "No", "Average", "Linear"])
+        }
+        ("Schedule:Day:Interval", "data") => {
+            // Schema items have no required fields or additionalProperties
+            // restriction. The actual IP supplies missing numeric fields as
+            // blank0 and ignores unrelated retained item metadata.
+            matches!(value, RawValue::Array(items) if items.iter().all(|item| {
+                let RawValue::Object(fields) = item else {return false;};
+                fields.get(&FieldName("time".into())).is_none_or(|value| matches!(value, RawValue::String(_)))
+                    && fields.get(&FieldName("value_until_time".into())).is_none_or(|value| number(value).is_some())
+            }))
+        }
+        ("Schedule:Day:List", "minutes_per_item") => {
+            number(value).is_some_and(|n| n.fract() == 0.0 && n >= 1.0 && n <= 60.0)
+        }
+        ("Schedule:Day:List", "extensions") => {
+            matches!(value, RawValue::Array(items) if items.iter().all(|item| {
+                let RawValue::Object(fields) = item else {return false;};
+                fields.get(&FieldName("value".into())).is_none_or(|value| number(value).is_some())
+            }))
+        }
+        ("Schedule:Week:Compact", "data") => {
+            matches!(value, RawValue::Array(items) if items.iter().all(|item| {
+                let RawValue::Object(fields) = item else {return false;};
+                ["daytype_list", "schedule_day_name"].iter().all(|field| {
+                    matches!(fields.get(&FieldName((*field).into())), Some(RawValue::String(_)))
+                })
+            }))
         }
         ("Schedule:Week:Daily", name) if REGULAR_DAY_FIELDS.contains(&name) => {
             matches!(value, RawValue::String(_))
@@ -365,6 +401,8 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     match family {
         "Schedule:Week:Daily" => &REGULAR_DAY_FIELDS,
+        "Schedule:Day:Interval" | "Schedule:Week:Compact" => &["data"],
+        "Schedule:Day:List" => &["minutes_per_item", "extensions"],
         "Schedule:Year" => &["schedule_weeks"],
         "NodeList" => &[],
         "Schedule:Compact" => &[],
