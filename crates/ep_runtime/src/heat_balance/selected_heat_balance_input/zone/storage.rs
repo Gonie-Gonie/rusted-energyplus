@@ -53,6 +53,8 @@ pub(crate) struct SelectedZoneData {
     pub(crate) outside_algorithm: Outside,
     /// ZoneSpaceData constructor-zero total design occupants.
     pub(crate) total_occupants: f64,
+    pub(crate) min_occupants: f64,
+    pub(crate) max_occupants: f64,
     /// ZoneData constructor-zero nominal load, written by IHG input EIO.
     pub(crate) internal_heat_gains: f64,
     /// Actual ZoneData ctor-zero nominal flow totals, written by Air input4157/4158.
@@ -145,6 +147,8 @@ impl Default for SelectedZoneData {
             inside_algorithm: Inside::Simple,
             outside_algorithm: Outside::SimpleCombined,
             total_occupants: 0.0,
+            min_occupants: 0.0,
+            max_occupants: 0.0,
             internal_heat_gains: 0.0,
             nominal_infiltration_ventilation: 0.0,
             nominal_mixing: 0.0,
@@ -205,6 +209,9 @@ pub(crate) struct SelectedSpaceData {
     pub(crate) fraction_zone_volume: f64,
     pub(crate) user_entered_floor_area: f64,
     pub(crate) floor_area: f64,
+    pub(crate) total_occupants: f64,
+    pub(crate) min_occupants: f64,
+    pub(crate) max_occupants: f64,
     pub(crate) has_floor: bool,
     pub(crate) fraction_zone_floor_area: f64,
     /// Native SpaceData.hh468 ctorfalse; positive remainder-Space creation
@@ -251,6 +258,9 @@ impl Default for SelectedSpaceData {
             fraction_zone_volume: 0.0,
             user_entered_floor_area: -99999.0,
             floor_area: 0.0,
+            total_occupants: 0.0,
+            min_occupants: 0.0,
+            max_occupants: 0.0,
             has_floor: false,
             fraction_zone_floor_area: 0.0,
             is_remainder_space: false,

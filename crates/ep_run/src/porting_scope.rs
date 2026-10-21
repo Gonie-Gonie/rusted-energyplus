@@ -185,6 +185,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Zone"
             | "BuildingSurface:Detailed"
             | "OtherEquipment"
+            | "People"
             | "ScheduleTypeLimits"
             | "Schedule:Constant"
             | "Schedule:Compact"

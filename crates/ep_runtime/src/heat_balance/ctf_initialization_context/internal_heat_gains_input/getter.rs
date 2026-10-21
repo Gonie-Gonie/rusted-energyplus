@@ -112,22 +112,37 @@ impl SelectedInternalHeatGains {
             };
             let objects = self.preprocess(family, kind, owners)?;
             if self.totals[kind] > 0 {
-                if kind != 6 {
+                if kind == 0 {
+                    self.allocations.people.allocated = true;
+                    self.allocations.people.rows = vec![
+                            super::comfort_people::SourcePeopleComfortData::default();
+                            usize::try_from(self.totals[0])
+                                .map_err(|_| unavailable("TotPeople capacity"))?
+                        ];
+                    self.read_people(
+                        objects
+                            .as_deref()
+                            .ok_or_else(|| unavailable("actual People misc allocation"))?,
+                        &mut local,
+                        owners,
+                    )?;
+                } else if kind == 6 {
+                    self.allocations.other_equipment =
+                        Some(vec![
+                            SourceOtherEquipment::default();
+                            usize::try_from(self.totals[kind])
+                                .map_err(|_| unavailable("TotOthEquip capacity"))?
+                        ]);
+                    self.read_other(
+                        objects
+                            .as_deref()
+                            .ok_or_else(|| unavailable("actual other misc allocation"))?,
+                        &mut local,
+                        owners,
+                    )?;
+                } else {
                     return Err(unavailable("positive unported IHG family getter"));
                 }
-                self.allocations.other_equipment =
-                    Some(vec![
-                        SourceOtherEquipment::default();
-                        usize::try_from(self.totals[kind])
-                            .map_err(|_| unavailable("TotOthEquip capacity"))?
-                    ]);
-                self.read_other(
-                    objects
-                        .as_deref()
-                        .ok_or_else(|| unavailable("actual other misc allocation"))?,
-                    &mut local,
-                    owners,
-                )?;
             }
             if let Some((sum_area, sum_power)) = lighting_totals {
                 // Native1254-1261 is OUTSIDE the TotLights>0 block and
@@ -238,7 +253,7 @@ impl SelectedInternalHeatGains {
             }
             return Ok(Some(misc));
         }
-        if family != "OtherEquipment" {
+        if !matches!(family, "OtherEquipment" | "People") {
             if kind == 1 {
                 self.lights_objects = Some(misc);
             } else if kind == 2 {

@@ -42,7 +42,7 @@
       "same-input actual2016Feb29Monday lifecycle matches all5352 original samples and exact zero-diagnostic EIO/ERR/END; only three year-bearing DATA PERIODS fields change in existing explicitly synthetic8784-row weather"
     ],
     "Output:Variable": [
-      "real live reporting schedule identity and immutable dictionary name; bound Total Internal and OtherEquipment object/Zone/implicit-Space gain requests reach actual ESO dictionaries and Source A Timestep reporting",
+      "real live reporting schedule identity and immutable dictionary name; bound Total Internal and OtherEquipment object/Zone/implicit-Space gain requests reach actual ESO dictionaries and Source A Timestep reporting; People object/Zone/implicit-Space gains bind real Which owners; same-input A/B evidence directly checks People Total Heating Rate/Energy Timestep streams.",
       "zero OFF; positive/negative ON; EMS current value at both native boundaries",
       "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
       "actual IO deletion/catalog/extraction; zero samples are not fabricated",
@@ -239,6 +239,10 @@
     "OtherEquipment": [
       "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
       "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions, its separate Hourly meter and bound object, Zone and implicit-Space thermal/fuel Timestep outputs through the actual ESO dictionary. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
+    ],
+    "People": [
+      "Direct-Zone People uses the real single implicit Space, retained raw/IP defaults and field counts, and genuine built-in or user occupancy schedules. Direct counts preserve the original JSON-number conversion before the actual getter, design totals, devices, rate/energy updates, Which bindings and nominal reporting. This milestone uses an explicit numeric sensible fraction and no optional comfort models; mandatory SimpleASH55 and the reached comfort/report lifecycle are connected. Unused auxiliary comfort operands retain the original count-sensitive warnings without extra schedule lookups.",
+      "Same-input A/B execution compares People Total Heating Rate/Energy Timestep outputs with every retained output policy. Other object/Zone/Space declarations and signed/zero count branches have connected-owner checks. Built-in Constant-0.0/Constant-1.0 identities remain distinct from user schedule IDs and absence. Per-area/per-person sizing, automatic sensible calculation, optional comfort models, EMS, explicit/multiple Spaces and group expansion, and positive non-Mixing RoomAir remain unsupported by this milestone. This is bounded runtime support, not full People input-domain completion."
     ]
   },
   "verification": {
@@ -246,37 +250,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/internal-gain-dictionary-workspace-tests-46b.log",
-        "sha256": "1c422dfa5b73273e2f88f852dd32815caca364de127a78d27d83563e0d76cbae",
-        "bytes": 773376
+        "path": ".runtime/object-expansion/people-builtin-workspace-tests-49b.log",
+        "sha256": "66b8236ba0a7e1c1b0fe07224a0723549ec1072bf11eccf1a5378bcba74a7b1e",
+        "bytes": 773484
       },
-      "scope": "Full workspace regression after the real internal-gain output dictionary capability and its caller borrows changed. Existing owner bodies check the bound dictionary paths; the actual same-input engine pair records physical requested-output closure separately. Earlier focused checks are contained in this milestone. The original failed compile log remains preserved; only the corrected successful full run is counted."
+      "scope": "Full workspace regression after People runtime connection and explicit typed occupancy schedule identities. Existing owner bodies were extended; no new tests or cohorts. The failed test-only unqualified type reference in the first49 log is preserved separately."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-output-bindings-clippy-47.log",
-        "sha256": "9f771a4e16d2f0ecbe019e6c33f532cfee1c8d943bd5889f75a3e01979ad5327",
-        "bytes": 686
+        "path": ".runtime/object-expansion/people-builtin-clippy-49.log",
+        "sha256": "6dfac0f078a34dde000f72c8416396d7bdefd70c80f3d84144e616daebb72dc3",
+        "bytes": 896
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-output-bindings-docs-47.log",
+        "path": ".runtime/object-expansion/people-direct-docs-49.log",
         "sha256": "7506d5a968fd6ce480e34947b23d348120eae34ddff24414972dc9f5ee5191a8",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-output-bindings-47",
+      "clippy_through_build": "people-builtin-reference-49",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/internal-gain-dictionary-native-cohort-check-46.log",
-          "sha256": "1b78de90e237727d3a31703ae2f46eafb280756943a3974657f581d03d98f794",
-          "bytes": 1468006
+          "path": ".runtime/object-expansion/people-builtin-native-cohort-check-49.log",
+          "sha256": "4b74a2567eff3e371dea3f11f4306196c5f5cf017d6c1b16a8cce2801e467624",
+          "bytes": 1468108
         },
-        "scope": "Compile-only verification of the existing optional callers after the real dictionary capability borrow API changed. Existing feature warnings remain; no optional tests or engines were run.",
-        "through_build": "internal-gain-dictionary-46"
+        "scope": "Compile-only verification of existing optional callers after typed People schedule identities changed. Existing feature warnings remain; no optional tests or engines were run.",
+        "through_build": "people-builtin-reference-49"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -4231,12 +4235,230 @@
           "passed": true
         },
         "effective_state": "Actual Native47 and Source47 consume the same direct-JSON input, adding only54 object/Zone/implicit-Space gain output requests to actual Native46. All original62 requests/policies, physical fields/weather and otherbytes remain exact. Current Native47 own initial validationTrue and sole execution are independently required; Native46 originalFalse and separate accepted read-only metadata correction remain explicit ancestry only. Full116/10848 ownstream kernel recomputation retains every prior policy and54 separately derived Zone96 W.001/J1 rules copied by identity only. Both complete54 RDD metadata sets and finite signed96 arrays are retained without additional raw-equality/sign constraints. Genuine Zone/Space Total Internal20, object thermal10, Zone/Space Other thermal20 and Electricity4 outputs bind actual live Which targets. The implicit Space is ZONE ONE from the real Zone constructor, not an invented object. Whole32/8762 schedule and3/1143 nominal EIO, actualWarmup19/fullERR-END/fourinfo/SHD/bidirectional MTD match. All92 actual source owners plus shared numeric utility/full compiled Rust snapshot are authenticated live/archive; the changed Which getter, output registrar and existing owner body are included. No output value seeds production or proves arbitrary models, per-person sizing, multiple Spaces, EMS or all gain families."
+      },
+      {
+        "id": "people-direct-a",
+        "group": "people_direct",
+        "source_build": "people-direct-48",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/input.epJSON",
+          "sha256": "034ab84ea10b1009691a7b539a9618018ec2af3da35b0ce1c6abfc74e6d47630",
+          "bytes": 52987
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/receipt.json",
+          "sha256": "3dbee97d24db78b4c972899c77b916a13caef4bdc24c9c8f7335f9dea4994368",
+          "bytes": 20044
+        },
+        "native_initial_validation_passed": false,
+        "native_read_only_correction": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/native-readback-correction-01.json",
+          "sha256": "2956ec27f223771106e73c1681d482f6486bbcb12ce1e536836e42584460035a",
+          "bytes": 170927
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-a-48/people-direct-a/receipt.json",
+          "sha256": "affe8832a47b371e0e8b72865a41a8081964cded8db2ad8eaf2b42f2c98582f8",
+          "bytes": 9213
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-a-48/run-summary.json",
+          "sha256": "54794f9e03b4085078d879eafc4e4686282b12300b0c4b3140706d46eb5e6870",
+          "bytes": 50328
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-a-comparisons-48/people-direct-a/comparison.json",
+          "sha256": "7eb6fe8580638575694ffeaa52578a2a9ceb3a2b8d53e76c5b1cf36e71bbb691",
+          "bytes": 521292
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-a-48-launch/people-direct-a/request.json",
+          "sha256": "84af9df3d13d25f72fcf6377ddd5932ace679c493013b4b36f69cfe7d95567ed",
+          "bytes": 3237
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-48/eplus-rs.exe",
+          "sha256": "949ff2529641dca35cab90ba834e0fa01eea96c4aeeff3adf4e32745c71c063a",
+          "bytes": 76109404
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3e/3e991fb64ea6ef4b54cc6390e528de5ca8ddb71ac3332fd4a8ebb8160c28e7eb",
+          "sha256": "3e991fb64ea6ef4b54cc6390e528de5ca8ddb71ac3332fd4a8ebb8160c28e7eb"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-48/receipt.json",
+          "sha256": "d6b4dcb015adbbad499c7180bb3db4e6882f8d4848ed1e416b19e623dba7f6de",
+          "bytes": 9976
+        },
+        "totals": {
+          "series": 118,
+          "samples": 11040,
+          "raw_operand_unequal": 3318,
+          "parsed_binary64_unequal": 3318,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "The current same-input Native/Source A48 pair completes full118/11040 under all116 retained policies plus two identity-only People Zone96 W/J rules. The original sole Native initialFalse and exact mixed-table UTF8 checker failure remain immutable beside the separately accepted zero-process ASCII-report correction. All physical streams, whole Schedule/Zone/People/Other nominal reports, no-optional Adaptive table, complete diagnostics/warmup, SHD and MTD are actual observations. Every Build48 snapshot file and109 selected owners plus the shared numeric module is authenticated live/archive. Only ScopeA succeeds here; the separate SourceB48 compiler failure is retained and no B pair is claimed. No engine retry, numeric/report seed, optional comfort model, per-area/person People sizing, arbitrary model or full People-domain promotion is inferred."
+      },
+      {
+        "id": "people-direct-a-source49-regression",
+        "group": "people_direct",
+        "source_build": "people-builtin-reference-49",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/input.epJSON",
+          "sha256": "034ab84ea10b1009691a7b539a9618018ec2af3da35b0ce1c6abfc74e6d47630",
+          "bytes": 52987
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/receipt.json",
+          "sha256": "3dbee97d24db78b4c972899c77b916a13caef4bdc24c9c8f7335f9dea4994368",
+          "bytes": 20044
+        },
+        "retained_Native_build": 48,
+        "new_Native49_executions": 0,
+        "native_initial_validation_passed": false,
+        "native_read_only_correction": {
+          "path": ".runtime/object-expansion/native-people-a/calibration-01/native-readback-correction-01.json",
+          "sha256": "2956ec27f223771106e73c1681d482f6486bbcb12ce1e536836e42584460035a",
+          "bytes": 170927
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-a-49/people-direct-a/receipt.json",
+          "sha256": "77af1bde3da62cb033e3df4dc8b828cfb3a80a0c5d0a3fa2c80955541bb13812",
+          "bytes": 9509
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-a-49/run-summary.json",
+          "sha256": "8ea5a919ef78c91f0898a8d6028d239ddeda70e46db7b7a316c6cde7f77c2639",
+          "bytes": 50328
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/eplus-rs.exe",
+          "sha256": "b692fd8dc4f8ec28f60952a993e12068403dbd2f95953b5c0aaae1466f236f90",
+          "bytes": 76116977
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/76/76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8",
+          "sha256": "76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/receipt.json",
+          "sha256": "7906ce7d720d1027c0c957d0c23bafa43c43850c596e02cee50f6af57a82c3e5",
+          "bytes": 10292
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-a-comparisons-49/people-direct-a/comparison.json",
+          "sha256": "20c4e42e3085b8aa6f60935f60739ddf07bdef86d92f1f9c98a5fa073a8d7ec8",
+          "bytes": 521293
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-a-49-launch/people-direct-a/request.json",
+          "sha256": "84636d18ed336cff640fe9c03175dc1cbf2e110fa0a63e391edb7c211d73fc65",
+          "bytes": 3238
+        },
+        "totals": {
+          "series": 118,
+          "samples": 11040,
+          "raw_operand_unequal": 3318,
+          "parsed_binary64_unequal": 3318,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Fresh Source49 same-input regression against retained sole Native48 proof, unchanged policies and authentic current physical streams. Original A48 False/correction or B48 True remains explicit. No new Native or separate readback/proof-helper conversion, output seed or full People-domain promotion; normal SourceB IDF staging remains part of the actual producer."
+      },
+      {
+        "id": "people-direct-b-source49-builtins",
+        "group": "people_direct",
+        "source_build": "people-builtin-reference-49",
+        "scope": "B",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-b/calibration-01/input.idf",
+          "sha256": "2ce592ea3c8ffedcbc3aec3dc43bc5e7b42f4358d6a19f9279f3f3b491470792",
+          "bytes": 14982
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-b/calibration-01/receipt.json",
+          "sha256": "3d26715ca4b73b7def8c577895de4df69e0e379c3ec0fd3d1a9caa6279705d4a",
+          "bytes": 21257
+        },
+        "retained_Native_build": 48,
+        "new_Native49_executions": 0,
+        "native_initial_validation_passed": true,
+        "native_read_only_correction": null,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-b-49/people-direct-b/receipt.json",
+          "sha256": "5ee0c64f803f3e687236f53dfacdb4cf45fc89361b4f756c174744e1642ab38d",
+          "bytes": 9397
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-b-49/run-summary.json",
+          "sha256": "a332608d9204b04d6a9970e90db0cd7a9ed48440e02c045177915376fb9317f6",
+          "bytes": 60962
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/eplus-rs.exe",
+          "sha256": "b692fd8dc4f8ec28f60952a993e12068403dbd2f95953b5c0aaae1466f236f90",
+          "bytes": 76116977
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/76/76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8",
+          "sha256": "76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/receipt.json",
+          "sha256": "7906ce7d720d1027c0c957d0c23bafa43c43850c596e02cee50f6af57a82c3e5",
+          "bytes": 10292
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-b-comparisons-49/people-direct-b/comparison.json",
+          "sha256": "051c934810af721a91f8515e2b72f531fefc1cccb2674b6b5befd4392005b21d",
+          "bytes": 357024
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-b-49-launch/people-direct-b/request.json",
+          "sha256": "32990e39aedfd9785b0cfb014de393cc037112e4d7a90c7da8f51d4d67d28463",
+          "bytes": 3115
+        },
+        "totals": {
+          "series": 104,
+          "samples": 9984,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Fresh Source49 same-input regression against retained sole Native48 proof, unchanged policies and authentic current physical streams. Original A48 False/correction or B48 True remains explicit. No new Native or separate readback/proof-helper conversion, output seed or full People-domain promotion; normal SourceB IDF staging remains part of the actual producer.",
+        "prior_failed_source_attempt": {
+          "path": ".runtime/object-expansion/source-people-b-48-failure/failed-attempt.json",
+          "sha256": "7b88f4e574c32762c1f7e445d27993c34e0ef038c68d76e10a0fdee1ebebd4d1",
+          "bytes": 9251
+        }
       }
     ],
     "totals": {
-      "paired_cases": 73,
-      "reported_samples": 535686,
-      "raw_operand_unequal": 157747,
+      "paired_cases": 76,
+      "reported_samples": 567750,
+      "raw_operand_unequal": 164383,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -5040,18 +5262,46 @@
           "sha256": "239c3060ad9790f1e82f6d974001e84e05ac3fdd32afa3ab574f788a872f7044",
           "bytes": 75933276
         }
+      },
+      {
+        "id": "people-direct-48",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-48/receipt.json",
+          "sha256": "d6b4dcb015adbbad499c7180bb3db4e6882f8d4848ed1e416b19e623dba7f6de",
+          "bytes": 9976
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3e/3e991fb64ea6ef4b54cc6390e528de5ca8ddb71ac3332fd4a8ebb8160c28e7eb",
+          "sha256": "3e991fb64ea6ef4b54cc6390e528de5ca8ddb71ac3332fd4a8ebb8160c28e7eb"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-48/eplus-rs.exe",
+          "sha256": "949ff2529641dca35cab90ba834e0fa01eea96c4aeeff3adf4e32745c71c063a",
+          "bytes": 76109404
+        }
+      },
+      {
+        "id": "people-builtin-reference-49",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/receipt.json",
+          "sha256": "7906ce7d720d1027c0c957d0c23bafa43c43850c596e02cee50f6af57a82c3e5",
+          "bytes": 10292
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/76/76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8",
+          "sha256": "76d1a662b5bebd05d5c79867a446fae7b0b6c01dd34accea9e8f1109989acaf8"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-49/eplus-rs.exe",
+          "sha256": "b692fd8dc4f8ec28f60952a993e12068403dbd2f95953b5c0aaae1466f236f90",
+          "bytes": 76116977
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 1,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/other-equipment-output-bindings-focused-47.log",
-          "sha256": "d8b9ea00be9e69a8369e75ba4dc376a7ec76ad3594f57ae554e804dbe3fd0efe",
-          "bytes": 792
-        }
-      ],
-      "scope": "The existing connected owner body checks actual output declaration order/dictionaries and live Which references after same-owner field mutations. The separate actual same-input engine pair records physical output closure. No new cohort or public borrow API change."
+      "passed": 0,
+      "logs": [],
+      "scope": "All existing owner-body checks are contained in the current full workspace milestone."
     }
   },
   "additional_native_type_calibrations": [

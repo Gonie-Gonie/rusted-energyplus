@@ -21,6 +21,14 @@ pub(crate) struct SourceSurfaceShadowingReportOwners<'a, 'backend> {
     pub(crate) writer: SourceTabularWriterOwners<'a, 'backend>,
 }
 
+/// Same actual no-optional-model adaptive summary files, flags and sink capabilities.
+pub(crate) struct SourceAdaptiveComfortReportOwners<'a, 'backend> {
+    pub(crate) gains: &'a SelectedInternalHeatGains,
+    pub(crate) sqlite: &'a SourceSqliteState,
+    pub(crate) results: &'a SourceResultsFrameworkOptions,
+    pub(crate) writer: SourceTabularWriterOwners<'a, 'backend>,
+}
+
 fn extent(value: i32) -> Result<usize, Error> {
     usize::try_from(value).map_err(|_| Error::Unavailable("actual report negative array extent"))
 }
@@ -311,17 +319,87 @@ impl SourceTabularReports {
 
     pub(crate) fn write_source_adaptive_comfort_table(
         &mut self,
-        gains: &SelectedInternalHeatGains,
+        o: &mut SourceAdaptiveComfortReportOwners<'_, '_>,
     ) -> Result<(), Error> {
-        if !self.display_adaptive_comfort || gains.totals[0] <= 0 {
+        if !self.display_adaptive_comfort || o.gains.totals[0] <= 0 {
             return Ok(());
         }
-        let _people_indices = vec![None::<i32>; extent(gains.totals[0])?];
-        // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
+        let mut people_indices = vec![None::<i32>; extent(o.gains.totals[0])?];
+        for number in 1..=o.gains.totals[0] {
+            let people =
+                o.gains
+                    .allocations
+                    .people
+                    .get(ordinal(number)?)
+                    .ok_or(Error::Unavailable(
+                        "actual adaptive comfort People flag scan12380",
+                    ))?;
+            if people.adaptive_ash55 || people.adaptive_cen15251 {
+                self.num_people_adaptive = self
+                    .num_people_adaptive
+                    .checked_add(1)
+                    .ok_or(Error::Unavailable("actual numPeopleAdaptive signed count"))?;
+                *people_indices
+                    .get_mut(ordinal(self.num_people_adaptive)?)
+                    .ok_or(Error::Unavailable("actual adaptive peopleInd allocation"))? =
+                    Some(number);
+            }
+        }
+        let count = extent(self.num_people_adaptive)?;
+        let mut row_head = vec![Vec::<u8>::new(); count];
+        let mut body = SourceTabularBody::allocate(5, count)?;
+        self.write_source_report_headers(
+            b"Adaptive Comfort Summary",
+            b"Entire Facility",
+            SourceOutputStoreType::Average,
+        )?;
+        self.write_source_subtitle(
+            b"Time Not Meeting the Adaptive Comfort Models during Occupied Hours",
+        )?;
+        let mut widths = [10; 5];
+        let columns = [
+            b"ASHRAE55 90% Acceptability Limits [Hours]".to_vec(),
+            b"ASHRAE55 80% Acceptability Limits  [Hours]".to_vec(),
+            b"CEN15251 Category I Acceptability Limits [Hours]".to_vec(),
+            b"CEN15251 Category II Acceptability Limits [Hours]".to_vec(),
+            b"CEN15251 Category III Acceptability Limits [Hours]".to_vec(),
+        ];
+        body.fill(b"");
         #[allow(clippy::never_loop)]
-        for _person in 1..=gains.totals[0] {
+        for number in 1..=self.num_people_adaptive {
+            row_head[ordinal(number)?] = o
+                .gains
+                .allocations
+                .people
+                .get(ordinal(number)?)
+                .ok_or(Error::Unavailable(
+                    "actual adaptive comfort row People.Name12408",
+                ))?
+                .name
+                .as_bytes()
+                .to_vec();
+            // Optional adaptive model producers remain explicitly unavailable.
             return Err(Error::Unavailable(
-                "actual WriteAdaptiveComfortTable12380 People AdaptiveASH55/AdaptiveCEN15251 read",
+                "actual positive adaptive comfort model table body12409",
+            ));
+        }
+        self.write_source_table(
+            &body,
+            &row_head,
+            &columns,
+            &mut widths,
+            false,
+            b"",
+            &mut o.writer,
+        )?;
+        if o.sqlite.present() {
+            return Err(Error::Unavailable(
+                "actual AdaptiveComfortSummary SQLite table12423",
+            ));
+        }
+        if o.results.time_series_and_tabular_enabled {
+            return Err(Error::Unavailable(
+                "actual AdaptiveComfortSummary ResultsFramework table12432",
             ));
         }
         Ok(())

@@ -36,8 +36,8 @@ use ep_model::{
     AutoOrNumber, AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, NormalizedName,
-    OutdoorAirEconomizerType, OutputHandle, PeopleNumberCalculationMethod, ScheduleId,
-    SimulationModel, SurfaceType, TypedModel, Zone,
+    OutdoorAirEconomizerType, OutputHandle, PeopleNumberCalculationMethod, PeopleScheduleReference,
+    ScheduleId, SimulationModel, SurfaceType, TypedModel, Zone,
 };
 use ep_runtime::schedules::hour_only_single_period_compact_schedule_segments;
 use ep_runtime::{
@@ -2259,13 +2259,21 @@ fn ideal_loads_zone_current_people_counts(
         if !design_count.is_finite() || design_count <= 0.0 {
             continue;
         }
-        let schedule_values = ideal_loads_optional_schedule_values(
-            model,
-            people.number_of_people_schedule,
-            &format!("People/{} number-of-people", people.name.0),
-            sample_count,
-            timestamps,
-        )?;
+        let label = format!("People/{} number-of-people", people.name.0);
+        let schedule_values = match people.number_of_people_schedule {
+            Some(PeopleScheduleReference::ConstantZero) => vec![0.0; sample_count],
+            Some(PeopleScheduleReference::ConstantOne) => vec![1.0; sample_count],
+            Some(PeopleScheduleReference::User(id)) => ideal_loads_optional_schedule_values(
+                model,
+                Some(id),
+                &label,
+                sample_count,
+                timestamps,
+            )?,
+            None => {
+                ideal_loads_optional_schedule_values(model, None, &label, sample_count, timestamps)?
+            }
+        };
         for (value, schedule_value) in values.iter_mut().zip(schedule_values.iter()) {
             if !schedule_value.is_finite() || *schedule_value < 0.0 {
                 return Err(format!(
@@ -8159,6 +8167,47 @@ mod schedule_boundary_tests {
     #[test]
     fn ideal_loads_hour_only_paths_reject_calendar_varying_compact_schedules()
     -> Result<(), Box<dyn std::error::Error>> {
+        // Exercise the actual People occupancy consumer after typed resolution.
+        // Built-in constants are semantic identities, not authored profile rows.
+        for (schedule_field, expected_reference, expected_count) in [
+            ("", None, 2.0_f64),
+            (
+                r#", "number_of_people_schedule_name":"Constant-0.0""#,
+                Some(PeopleScheduleReference::ConstantZero),
+                0.0,
+            ),
+            (
+                r#", "number_of_people_schedule_name":"cOnStAnT-1.0""#,
+                Some(PeopleScheduleReference::ConstantOne),
+                2.0,
+            ),
+            (
+                r#", "number_of_people_schedule_name":"User""#,
+                Some(PeopleScheduleReference::User(ScheduleId(0))),
+                0.5,
+            ),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"Zone":{{}}}},"Schedule:Constant":{{"User":{{"hourly_value":0.25}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Zone","number_of_people":2{schedule_field}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            let result = compile_raw_model(&raw);
+            assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+            let typed = result.model.ok_or("typed People occupancy consumer")?;
+            assert_eq!(
+                typed.people[0].number_of_people_schedule,
+                expected_reference
+            );
+            assert_eq!(typed.schedules.len(), 1);
+            let model = SimulationModel::from_typed(typed);
+            let values = ideal_loads_zone_current_people_counts(
+                &model,
+                &model.typed.zones[0],
+                2,
+                &[None, None],
+            )?;
+            assert_eq!(values, vec![expected_count; 2]);
+        }
         let schedule_id = ScheduleId(41);
         let model = SimulationModel::from_typed(TypedModel {
             compact_schedules: vec![calendar_varying_schedule(schedule_id)],

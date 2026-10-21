@@ -703,6 +703,54 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             .iter()
             .any(|entry| entry.object_type == "ZoneAirHeatBalanceAlgorithm")
     );
+    // Both Source scopes use the genuine direct People/comfort chain. Other
+    // sizing methods and positive optional comfort models retain their bounds.
+    for scope in [PortingScope::A, PortingScope::B] {
+        let mut people = input(scope);
+        people["Schedule:Constant"]["Activity"] = json!({"hourly_value":120});
+        people["People"] = json!({"Occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Zone","number_of_people_schedule_name":"On","number_of_people":1.5,"activity_level_schedule_name":"Activity","sensible_heat_fraction":0.6}});
+        let mut actual = trace(&people, scope);
+        assert!(actual.admissible, "{:?}", actual.violations);
+        let raw = parse_epjson_str(&people.to_string()).expect("authored People scope");
+        match scope {
+            PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(&raw),
+            PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
+        }
+        .expect("actual People Source admission");
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("actual compiled People model");
+        actual.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &single_day_weather_fixture(),
+                "authored People admission weather",
+            )
+            .expect("real People environment preparation"),
+        );
+        let admission = crate::support::SourceSupportAdmission::from_validated_scope(&raw, &actual)
+            .expect("same validated People raw/IP scope");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert!(
+            support
+                .typed_objects
+                .iter()
+                .any(|row| row.object_type == "People")
+        );
+    }
 }
 
 #[test]

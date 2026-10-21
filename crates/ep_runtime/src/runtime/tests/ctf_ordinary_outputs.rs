@@ -2830,6 +2830,1417 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 );
             }
         }
+        // Positive direct People uses the real schedule producer and IHG getter.
+        // Later explicit child checks do not turn the genuine Refrig stop into
+        // a successful parent. All operands here are authored unit inputs.
+        {
+            use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::{
+                SourceGainDictionaryFile, SourceGainStepOwners, SourceZoneGenericGainAllocation,
+            };
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
+            };
+            use crate::heat_balance::selected_schedule_manager::{
+                SelectedScheduleInput, SelectedScheduleManager, SourceConstantScheduleInput,
+                SourceScheduleTypeInput,
+            };
+            use crate::heat_balance::source_output_registration::SourceRealOutputOwners;
+            struct PeopleAudit(Vec<u8>);
+            impl crate::heat_balance::source_initialization::ScheduleAuditFileHost for PeopleAudit {
+                fn audit_path(&self) -> &std::path::Path {
+                    std::path::Path::new("authored People audit")
+                }
+                fn ensure_audit_open(&mut self) -> std::io::Result<&mut dyn std::io::Write> {
+                    Ok(&mut self.0)
+                }
+            }
+            // The earlier geometry fixture deliberately renamed its Zone for
+            // nominal-output checks. This fresh raw getter uses the same typed
+            // Zone identity instead of inheriting that authored display name.
+            let zone_name = model.typed.zones[0].name.0.clone();
+            for (count_token, expected_count) in
+                [("1.5", 1.5_f64), ("0", 0.0), ("18446744073709551615", -1.0)]
+            {
+                let mut people_reports = failed_gains.clone();
+                people_reports.output_registration = Default::default();
+                let projected = ep_model::classify_source_json_number(count_token)
+                    .map_err(|_| "authored valid People JSON number")?
+                    .as_f64();
+                assert_eq!(projected.to_bits(), expected_count.to_bits());
+                let people_objects = [1.5, projected]
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, count)| ProjectInputObject {
+                        object_name: format!("People {i}"),
+                        idf_max_fields: None,
+                        fields: std::collections::BTreeMap::from([
+                            (
+                                "zone_or_zonelist_or_space_or_spacelist_name".into(),
+                                ProjectInputValue::String(zone_name.clone()),
+                            ),
+                            (
+                                "number_of_people_schedule_name".into(),
+                                ProjectInputValue::String("Constant-1.0".into()),
+                            ),
+                            ("number_of_people".into(), ProjectInputValue::Number(count)),
+                            ("fraction_radiant".into(), ProjectInputValue::Number(0.3)),
+                            (
+                                "sensible_heat_fraction".into(),
+                                ProjectInputValue::Number(0.6),
+                            ),
+                            (
+                                "activity_level_schedule_name".into(),
+                                ProjectInputValue::String("Activity".into()),
+                            ),
+                            (
+                                "enable_ashrae_55_comfort_warnings".into(),
+                                ProjectInputValue::String("Yes".into()),
+                            ),
+                        ]),
+                    })
+                    .collect::<Vec<_>>();
+                let mut definitions = Vec::new();
+                let mut old_ip = people_reports
+                    .selected_input_processor
+                    .take()
+                    .ok_or("People real schema")?;
+                for family in [
+                    "People",
+                    "Lights",
+                    "ElectricEquipment",
+                    "GasEquipment",
+                    "HotWaterEquipment",
+                    "SteamEquipment",
+                    "OtherEquipment",
+                    "ElectricEquipment:ITE:AirCooled",
+                    "ZoneBaseboard:OutdoorTemperatureControlled",
+                    "ZoneContaminantSourceAndSink:CarbonDioxide",
+                ] {
+                    let actual = old_ip.get_object_def_max_args(family)?;
+                    definitions.push(SourceObjectDefinition {
+                        object_type: family.into(),
+                        alpha_fields: actual.alphas,
+                        numeric_fields: actual.numerics,
+                        alpha_extensions: 0,
+                        numeric_extensions: 0,
+                        extension: None,
+                    });
+                }
+                for (name, a, n) in [
+                    ("ScheduleTypeLimits", 3, 2),
+                    ("Schedule:Constant", 2, 1),
+                    ("Output:Schedules", 1, 0),
+                    ("Output:Variable", 4, 0),
+                ] {
+                    definitions.push(SourceObjectDefinition {
+                        object_type: name.into(),
+                        alpha_fields: a,
+                        numeric_fields: n,
+                        alpha_extensions: 0,
+                        numeric_extensions: 0,
+                        extension: None,
+                    });
+                }
+                // Exact official schema definitions for the genuine Zone and
+                // tabular getter prefixes, including absent report families.
+                for (name, a, n, ae, ne, extension) in [
+                    ("Zone", 4, 9, 0, 0, None),
+                    ("ZoneList", 1, 0, 1, 0, Some("zones")),
+                    ("ZoneGroup", 2, 1, 0, 0, None),
+                    ("ZoneProperty:LocalEnvironment", 3, 0, 0, 0, None),
+                    ("ZoneHVAC:EquipmentConnections", 8, 0, 0, 0, None),
+                    ("Space", 3, 3, 1, 0, Some("tags")),
+                    ("SpaceList", 1, 0, 1, 0, Some("spaces")),
+                    ("Output:Table:SummaryReports", 0, 0, 1, 0, Some("reports")),
+                    ("Output:Table:Monthly", 1, 1, 2, 0, Some("variable_details")),
+                    ("Output:Table:Annual", 3, 0, 2, 1, Some("variable_details")),
+                    ("Output:Table:TimeBins", 4, 3, 0, 0, None),
+                    ("OutputControl:Table:Style", 3, 0, 0, 0, None),
+                ] {
+                    definitions.push(SourceObjectDefinition {
+                        object_type: name.into(),
+                        alpha_fields: a,
+                        numeric_fields: n,
+                        alpha_extensions: ae,
+                        numeric_extensions: ne,
+                        extension: extension.map(str::to_owned),
+                    });
+                }
+                let shape = |name: &str| SourceObjectShape {
+                    object_name: name.into(),
+                    field_sizes: Default::default(),
+                };
+                let mut people_ip = SelectedInputProcessor::from_admitted_input(
+                    definitions,
+                    std::collections::BTreeMap::from([
+                        (
+                            "People".into(),
+                            SourceInputFamily::Objects(
+                                people_objects
+                                    .iter()
+                                    .map(|p| shape(&p.object_name))
+                                    .collect(),
+                            ),
+                        ),
+                        (
+                            "Zone".into(),
+                            SourceInputFamily::Objects(vec![shape(&zone_name)]),
+                        ),
+                        ("Space".into(), SourceInputFamily::Objects(Vec::new())),
+                        (
+                            "Output:Table:SummaryReports".into(),
+                            SourceInputFamily::Objects(vec![SourceObjectShape {
+                                object_name: "People comfort summary".into(),
+                                field_sizes: std::collections::BTreeMap::from([(
+                                    "reports".into(),
+                                    1,
+                                )]),
+                            }]),
+                        ),
+                        (
+                            "ScheduleTypeLimits".into(),
+                            SourceInputFamily::Objects(vec![shape("Activity Type")]),
+                        ),
+                        (
+                            "Schedule:Constant".into(),
+                            SourceInputFamily::Objects(vec![
+                                shape("Activity"),
+                                shape("Unused People Auxiliary"),
+                            ]),
+                        ),
+                        (
+                            "Output:Variable".into(),
+                            SourceInputFamily::Objects(vec![shape("People rate request")]),
+                        ),
+                    ]),
+                )?;
+                let mut people_schedules = SelectedScheduleManager::default();
+                people_schedules.init_constant_state(4)?;
+                people_schedules.process_schedule_input(
+                    &mut people_ip,
+                    &SelectedScheduleInput {
+                        source_is_epjson: Some(true),
+                        types: vec![SourceScheduleTypeInput {
+                            object_name: "Activity Type".into(),
+                            name: "ACTIVITY TYPE".into(),
+                            lower: None,
+                            upper: None,
+                            numeric_type: None,
+                            unit: ep_model::ScheduleUnitType::ActivityLevel,
+                        }],
+                        constants: vec![
+                            SourceConstantScheduleInput {
+                                object_name: "Activity".into(),
+                                name: "ACTIVITY".into(),
+                                type_name: Some("ACTIVITY TYPE".into()),
+                                value: 120.0,
+                            },
+                            SourceConstantScheduleInput {
+                                object_name: "Unused People Auxiliary".into(),
+                                name: "UNUSED PEOPLE AUXILIARY".into(),
+                                type_name: Some("ACTIVITY TYPE".into()),
+                                value: 0.125,
+                            },
+                        ],
+                    },
+                    4,
+                    &mut PeopleAudit(Vec::new()),
+                )?;
+                people_reports.selected_input_processor = Some(people_ip);
+                people_reports.selected_schedule_manager = Some(people_schedules);
+                let raw = people_reports
+                    .heat_balance_input
+                    .as_mut()
+                    .ok_or("People raw")?;
+                raw.objects.remove("OtherEquipment");
+                raw.objects.insert("People".into(), people_objects);
+                let mut people_model = model.typed.clone();
+                people_model.report_inputs.output_variables =
+                    vec![ep_model::SourceOutputVariableInput {
+                        object_name: "People rate request".into(),
+                        key: "PEOPLE 0".into(),
+                        variable_name: "People Total Heating Rate".into(),
+                        reporting_frequency: "TIMESTEP".into(),
+                        schedule_name: String::new(),
+                        alpha_blank: [false, false, false, true],
+                        default_applied: [false; 4],
+                        num_alphas: 3,
+                        is_epjson: true,
+                    }];
+                people_reports
+                    .output_prescan
+                    .add_record("PEOPLE 0", "People Total Heating Rate")?;
+                let people_clock = crate::weather::day::WeatherGlobalState {
+                    time_steps_in_hour: 4,
+                    time_step_zone: 0.25,
+                    time_step_zone_sec: 900.0,
+                    ..Default::default()
+                };
+                let (
+                    mut people_state,
+                    mut people_errors,
+                    mut people_console,
+                    mut people_eio,
+                    mut people_eso,
+                ) = (
+                    ctf_ordinary_output_test_state(),
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                );
+                // Invoke the real GetZoneData child on fresh constructor owners.
+                // Its resilience/predefined allocations are not hand-set flags;
+                // this explicit child fixture does not certify a full geometry run.
+                let zone = &people_model.zones[0];
+                let auto = |value| match value {
+                    ep_model::AutoOrNumber::AutoCalculate => {
+                        ProjectInputValue::String("Autocalculate".into())
+                    }
+                    ep_model::AutoOrNumber::Value(value) => ProjectInputValue::Number(value),
+                };
+                let outside = zone.outside_convection_algorithm.effective();
+                let outside = if outside == ep_model::OutsideSurfaceConvectionAlgorithm::Doe2 {
+                    "DOE-2".into()
+                } else {
+                    format!("{outside:?}")
+                };
+                people_reports
+                    .heat_balance_input
+                    .as_mut()
+                    .ok_or("People Zone raw owner")?
+                    .objects
+                    .insert(
+                        "Zone".into(),
+                        vec![ProjectInputObject {
+                            object_name: zone_name.clone(),
+                            idf_max_fields: None,
+                            fields: std::collections::BTreeMap::from([
+                                (
+                                    "direction_of_relative_north".into(),
+                                    ProjectInputValue::Number(zone.direction_of_relative_north_deg),
+                                ),
+                                (
+                                    "x_origin".into(),
+                                    ProjectInputValue::Number(zone.origin.x_m),
+                                ),
+                                (
+                                    "y_origin".into(),
+                                    ProjectInputValue::Number(zone.origin.y_m),
+                                ),
+                                (
+                                    "z_origin".into(),
+                                    ProjectInputValue::Number(zone.origin.z_m),
+                                ),
+                                (
+                                    "multiplier".into(),
+                                    ProjectInputValue::Number(f64::from(zone.multiplier)),
+                                ),
+                                ("ceiling_height".into(), auto(zone.ceiling_height)),
+                                ("volume".into(), auto(zone.volume)),
+                                ("floor_area".into(), auto(zone.floor_area)),
+                                (
+                                    "zone_inside_convection_algorithm".into(),
+                                    ProjectInputValue::String(format!(
+                                        "{:?}",
+                                        zone.inside_convection_algorithm.effective()
+                                    )),
+                                ),
+                                (
+                                    "zone_outside_convection_algorithm".into(),
+                                    ProjectInputValue::String(outside),
+                                ),
+                                (
+                                    "part_of_total_floor_area".into(),
+                                    ProjectInputValue::String(
+                                        if zone.is_part_of_total_floor_area {
+                                            "Yes"
+                                        } else {
+                                            "No"
+                                        }
+                                        .into(),
+                                    ),
+                                ),
+                            ]),
+                        }],
+                    );
+                let mut people_zones = crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners::default();
+                let mut people_zone_globals = crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
+                let input = people_reports
+                    .selected_input_processor
+                    .as_mut()
+                    .ok_or("People Zone IP")?;
+                people_reports
+                    .input_processor_shortcut
+                    .allocate_from_input(input)?;
+                people_zones.get_zone_data(
+                    people_reports
+                        .heat_balance_input
+                        .as_ref()
+                        .ok_or("People Zone raw")?,
+                    &people_reports.heat_balance_input_state,
+                    &people_model,
+                    &mut crate::heat_balance::selected_heat_balance_input::zone::ZoneGetterOwners {
+                        input,
+                        shortcut: &mut people_reports.input_processor_shortcut,
+                        globals: &mut people_zone_globals,
+                        output: &mut people_reports.output_registration,
+                        prescan: &people_reports.output_prescan,
+                        report_input: &people_model.report_inputs,
+                        minimum_report_frequency: "",
+                        minutes_in_time_step: 15,
+                        host: &mut gain_host,
+                        eio: &mut people_eio,
+                    },
+                )?;
+                assert_eq!(people_zone_globals.num_of_zones, 1);
+                assert_eq!(people_zone_globals.num_spaces, 1);
+                assert_eq!(
+                    people_zones
+                        .resilience
+                        .as_ref()
+                        .ok_or("real GetZoneData resilience allocation")?
+                        .len(),
+                    1
+                );
+                assert_eq!(
+                    people_zones
+                        .zone_predefined
+                        .as_ref()
+                        .ok_or("real GetZoneData predefined allocation")?
+                        .len(),
+                    1
+                );
+                people_reports.selected_zone_input = Some(people_zones);
+                people_reports.selected_heat_balance_globals = Some(people_zone_globals);
+                // Directly exercise the same shared getter's genuine EOF count:
+                // Activity is filled even though its field is outside NumAlphas.
+                if expected_count == 1.5 {
+                    for (max_fields, expected_alphas) in [(9, 4), (10, 5)] {
+                        let mut raw = people_reports
+                            .heat_balance_input
+                            .clone()
+                            .ok_or("People EOF raw")?;
+                        raw.source_is_epjson = false;
+                        for row in raw.objects.get_mut("People").ok_or("People EOF rows")? {
+                            row.idf_max_fields = Some(max_fields);
+                            row.fields.remove("enable_ashrae_55_comfort_warnings");
+                        }
+                        let mut input = people_reports
+                            .selected_input_processor
+                            .clone()
+                            .ok_or("People EOF IP")?;
+                        let mut shortcut = SourceInputProcessorShortCut::default();
+                        shortcut.allocate_from_input(&input)?;
+                        let values =
+                            raw.get_object_item::<21, 8>("People", 0, &mut input, &mut shortcut)?;
+                        assert_eq!(values.num_alphas, expected_alphas);
+                        assert_eq!(values.num_numbers, 5);
+                        assert_eq!(values.alphas[4], "ACTIVITY");
+                        assert!(!shortcut.alpha_field_blanks[4]);
+                    }
+                }
+                let people_getter_base = people_reports.clone();
+                CtfInitializationContext {
+                    reports: &mut people_reports,
+                    eio: &mut people_eio,
+                    backend: SourceErrorBackend {
+                        state: &mut people_state,
+                        error_stream: Some(&mut people_errors),
+                        console: &mut people_console,
+                        out_unit1: None,
+                        out_unit2: None,
+                        f_message: None,
+                        message_callback: None,
+                        error_callback: None,
+                        sqlite: None,
+                    },
+                }
+                .manage_selected_internal_heat_gains_input_with_dictionary(
+                    &people_model,
+                    15,
+                    &mut gain_host,
+                    Some(&people_clock),
+                    Some(SourceGainDictionaryFile {
+                        eso: Some(&mut people_eso),
+                    }),
+                )?;
+                if expected_count == 1.5 {
+                    let mut blank = people_getter_base.clone();
+                    blank
+                        .heat_balance_input
+                        .as_mut()
+                        .ok_or("blank People raw")?
+                        .objects
+                        .get_mut("People")
+                        .ok_or("blank People rows")?[0]
+                        .fields
+                        .remove("number_of_people");
+                    let mut blank_clock = people_clock.clone();
+                    blank_clock.warmup_flag = true;
+                    let (
+                        mut blank_state,
+                        mut blank_error,
+                        mut blank_console,
+                        mut blank_eio,
+                        mut blank_eso,
+                    ) = (
+                        ctf_ordinary_output_test_state(),
+                        Vec::new(),
+                        Vec::new(),
+                        Vec::new(),
+                        Vec::new(),
+                    );
+                    assert!(!blank_state.warmup_flag);
+                    CtfInitializationContext {
+                        reports: &mut blank,
+                        eio: &mut blank_eio,
+                        backend: SourceErrorBackend {
+                            state: &mut blank_state,
+                            error_stream: Some(&mut blank_error),
+                            console: &mut blank_console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        },
+                    }
+                    .manage_selected_internal_heat_gains_input_with_dictionary(
+                        &people_model,
+                        15,
+                        &mut gain_host,
+                        Some(&blank_clock),
+                        Some(SourceGainDictionaryFile {
+                            eso: Some(&mut blank_eso),
+                        }),
+                    )?;
+                    assert!(!blank.selected_internal_heat_gains.get_input_flag);
+                    assert_eq!(
+                        blank.selected_internal_heat_gains.allocations.people.rows[0]
+                            .number_of_people,
+                        0.0
+                    );
+                    assert_eq!(blank_state.tracking.total_warning_errors, 1);
+                    assert_eq!(blank_state.tracking.total_warning_errors_during_warmup, 1);
+                    assert_eq!(blank_state.tracking.total_severe_errors, 0);
+                    assert!(std::str::from_utf8(&blank_error)?.contains("specifies number_of_people, but that field is blank.  0 People will result."));
+                }
+                // Native's unselected auxiliary fields never resolve their
+                // names or assign the constructor's MRT/clothing/schedule fields.
+                if expected_count == 1.5 {
+                    for (auxiliary, mrt, clothing, expected_alphas) in [
+                        ("work_efficiency_schedule_name", None, None, 9),
+                        ("clothing_insulation_schedule_name", None, None, 12),
+                        ("air_velocity_schedule_name", None, None, 13),
+                        (
+                            "work_efficiency_schedule_name",
+                            Some("SurfaceWeighted"),
+                            Some("CalculationMethodSchedule"),
+                            21,
+                        ),
+                        (
+                            "work_efficiency_schedule_name",
+                            Some("AngleFactor"),
+                            Some("DynamicClothingModelASHRAE55"),
+                            21,
+                        ),
+                    ] {
+                        let mut auxiliary_reports = people_getter_base.clone();
+                        let raw = auxiliary_reports
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("actual auxiliary People raw")?;
+                        let first = &mut raw
+                            .objects
+                            .get_mut("People")
+                            .ok_or("actual auxiliary People rows")?[0];
+                        first.fields.insert(
+                            auxiliary.into(),
+                            ProjectInputValue::String("Unused People Auxiliary".into()),
+                        );
+                        if let (Some(mrt), Some(clothing)) = (mrt, clothing) {
+                            for (field, value) in [
+                                ("mean_radiant_temperature_calculation_type", mrt),
+                                ("clothing_insulation_calculation_method", clothing),
+                                (
+                                    "surface_name_angle_factor_list_name",
+                                    "missing unused surface or angle list",
+                                ),
+                                (
+                                    "clothing_insulation_calculation_method_schedule_name",
+                                    "missing unused method",
+                                ),
+                                (
+                                    "clothing_insulation_schedule_name",
+                                    "missing unused clothing",
+                                ),
+                                ("air_velocity_schedule_name", "missing unused velocity"),
+                                (
+                                    "ankle_level_air_velocity_schedule_name",
+                                    "missing unused ankle",
+                                ),
+                            ] {
+                                first
+                                    .fields
+                                    .insert(field.into(), ProjectInputValue::String(value.into()));
+                            }
+                        }
+                        let mut input = auxiliary_reports
+                            .selected_input_processor
+                            .clone()
+                            .ok_or("actual auxiliary People IP")?;
+                        let mut shortcut = SourceInputProcessorShortCut::default();
+                        shortcut.allocate_from_input(&input)?;
+                        let values =
+                            raw.get_object_item::<21, 8>("People", 0, &mut input, &mut shortcut)?;
+                        assert_eq!(values.num_alphas, expected_alphas);
+                        let mut auxiliary_clock = people_clock.clone();
+                        auxiliary_clock.warmup_flag = true;
+                        let (
+                            mut auxiliary_state,
+                            mut auxiliary_error,
+                            mut auxiliary_console,
+                            mut auxiliary_eio,
+                            mut auxiliary_eso,
+                        ) = (
+                            ctf_ordinary_output_test_state(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                        );
+                        assert!(!auxiliary_state.warmup_flag);
+                        CtfInitializationContext {
+                            reports: &mut auxiliary_reports,
+                            eio: &mut auxiliary_eio,
+                            backend: SourceErrorBackend {
+                                state: &mut auxiliary_state,
+                                error_stream: Some(&mut auxiliary_error),
+                                console: &mut auxiliary_console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            },
+                        }
+                        .manage_selected_internal_heat_gains_input_with_dictionary(
+                            &people_model,
+                            15,
+                            &mut gain_host,
+                            Some(&auxiliary_clock),
+                            Some(SourceGainDictionaryFile {
+                                eso: Some(&mut auxiliary_eso),
+                            }),
+                        )?;
+                        assert!(
+                            !auxiliary_reports
+                                .selected_internal_heat_gains
+                                .get_input_flag
+                        );
+                        assert!(!auxiliary_reports.selected_internal_heat_gains.errors_found);
+                        assert_eq!(
+                            auxiliary_reports
+                                .selected_internal_heat_gains
+                                .allocations
+                                .people,
+                            people_reports
+                                .selected_internal_heat_gains
+                                .allocations
+                                .people,
+                            "unconsumed auxiliary fields retain every genuine People field"
+                        );
+                        let untouched = auxiliary_reports
+                            .selected_schedule_manager
+                            .as_ref()
+                            .ok_or("actual auxiliary schedule owner")?
+                            .schedules
+                            .iter()
+                            .find(|row| row.name == "UNUSED PEOPLE AUXILIARY")
+                            .ok_or("actual produced unused auxiliary schedule")?;
+                        assert!(!untouched.is_used, "no auxiliary schedule lookup occurred");
+                        let expected_warning = if expected_alphas < 14 { 1 } else { 0 };
+                        assert_eq!(
+                            auxiliary_state.tracking.total_warning_errors,
+                            expected_warning
+                        );
+                        assert_eq!(
+                            auxiliary_state.tracking.total_warning_errors_during_warmup,
+                            expected_warning
+                        );
+                        assert_eq!(auxiliary_state.tracking.total_severe_errors, 0);
+                        let text = std::str::from_utf8(&auxiliary_error)?;
+                        if expected_warning == 1 {
+                            let messages = [
+                                "GetInternalHeatGains: People=\"PEOPLE 0\" has comfort related schedules but no thermal comfort model selected.",
+                                "If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort",
+                                "thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.",
+                                "To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.",
+                            ];
+                            let mut start = 0;
+                            for message in messages {
+                                start += text[start..]
+                                    .find(message)
+                                    .ok_or("actual ordered People auxiliary diagnostic")?
+                                    + message.len();
+                            }
+                            assert_eq!(text.matches("** Warning **").count(), 1);
+                            assert_eq!(text.matches("**   ~~~   **").count(), 3);
+                        } else {
+                            assert!(
+                                auxiliary_error.is_empty(),
+                                "A21 suppresses the low-count warning"
+                            );
+                        }
+                    }
+                }
+                let people_gains = &people_reports.selected_internal_heat_gains;
+                assert_eq!(people_gains.totals[0], 2);
+                assert!(people_gains.allocations.people.allocated);
+                assert_eq!(
+                    people_gains.allocations.people.rows[1]
+                        .number_of_people
+                        .to_bits(),
+                    expected_count.to_bits()
+                );
+                for person in &people_gains.allocations.people.rows {
+                    assert_eq!(
+                        (
+                            person.mrt_calc_type,
+                            person.clothing_type,
+                            person.surface_ptr
+                        ),
+                        (-1, -1, -1)
+                    );
+                    assert!(
+                        !person.fanger
+                            && !person.pierce
+                            && !person.ksu
+                            && !person.adaptive_ash55
+                            && !person.adaptive_cen15251
+                            && !person.cooling_effect_ash55
+                            && !person.ankle_draft_ash55
+                    );
+                    assert!(person.show55_warning);
+                    assert_eq!(person.user_spec_sens_frac, 0.6);
+                }
+                let people_zones = people_reports
+                    .selected_zone_input
+                    .as_ref()
+                    .ok_or("People Zone totals")?;
+                for value in [
+                    people_zones.zones.as_ref().ok_or("Zone totals")?[0].total_occupants,
+                    people_zones.zones.as_ref().ok_or("Zone totals")?[0].min_occupants,
+                    people_zones.zones.as_ref().ok_or("Zone totals")?[0].max_occupants,
+                    people_zones.spaces.as_ref().ok_or("Space totals")?[0].total_occupants,
+                ] {
+                    assert_eq!(value, 1.5 + expected_count);
+                }
+                assert_eq!(
+                    people_gains
+                        .allocations
+                        .space_devices
+                        .as_ref()
+                        .ok_or("People devices")?[0]
+                        .number_of_devices,
+                    2
+                );
+                assert!(
+                    std::str::from_utf8(&people_eio)?.contains("People Internal Gains Nominal")
+                );
+                assert!(
+                    std::str::from_utf8(&people_eso)?
+                        .contains("PEOPLE 0,People Total Heating Rate [W] !TimeStep")
+                );
+                assert_eq!(people_state.tracking.total_warning_errors, 0);
+                assert!(people_errors.is_empty());
+                let people_globals = people_reports
+                    .selected_heat_balance_globals
+                    .as_ref()
+                    .ok_or("People globals")?;
+                let mut people_air =
+                    crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+                people_air.allocate_source_arrays(people_globals)?;
+                let people_air_before = people_air.clone();
+                let mut people_modules =
+                    crate::heat_balance::selected_gain_modules::SourceGainModules::default();
+                let mut people_facility =
+                    crate::heat_balance::facility_electric_service::FacilityElectricService::new();
+                let mut people_provider =
+                    crate::heat_balance::selected_gain_modules::SourceModuleGainProvider {
+                        modules: &mut people_modules,
+                        input: people_reports
+                            .selected_input_processor
+                            .as_mut()
+                            .ok_or("People module IP")?,
+                        facility: Some(&mut people_facility),
+                    };
+                let mut people_backend = SourceErrorBackend {
+                    state: &mut people_state,
+                    error_stream: Some(&mut people_errors),
+                    console: &mut people_console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                let mut people_step = SourceGainStepOwners {
+                    clock: &people_clock,
+                    globals: people_globals,
+                    control: &people_reports.heat_balance_input_state,
+                    zones: people_reports
+                        .selected_zone_input
+                        .as_mut()
+                        .ok_or("People live Zones")?,
+                    schedules: people_reports
+                        .selected_schedule_manager
+                        .as_ref()
+                        .ok_or("People live schedules")?,
+                    backend: &mut people_backend,
+                    modules: &mut people_provider,
+                    latent: Some(&mut people_air),
+                    radiation: None,
+                    zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
+                };
+                let reached = people_reports
+                    .selected_internal_heat_gains
+                    .manage_timestep(&mut people_step);
+                assert!(matches!(&reached,Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))),"actual People timestep prefix: {reached:?}");
+                let rows = &people_reports
+                    .selected_internal_heat_gains
+                    .allocations
+                    .people
+                    .rows;
+                assert_eq!(rows[0].num_occ, 1.5);
+                assert_eq!(rows[0].tot_gain_rate, 180.0);
+                assert_eq!(rows[0].sen_gain_rate, 108.0);
+                assert_eq!(rows[1].num_occ.to_bits(), expected_count.to_bits());
+                assert_eq!(
+                    rows[1].tot_gain_rate,
+                    if expected_count > 0.0 {
+                        expected_count * 120.0
+                    } else {
+                        0.0
+                    }
+                );
+                assert_eq!(rows[1].tot_gain_energy, 0.0);
+                assert_eq!(people_air, people_air_before);
+                assert!(
+                    people_reports
+                        .selected_internal_heat_gains
+                        .allocations
+                        .space_devices
+                        .as_ref()
+                        .ok_or("People cache")?[0]
+                        .devices
+                        .as_ref()
+                        .ok_or("People slots")?
+                        .iter()
+                        .all(|d| d.cached_rates == [0.0; 7])
+                );
+                let predefined = &people_reports
+                    .selected_zone_input
+                    .as_ref()
+                    .ok_or("People occupied Zone")?
+                    .zone_predefined
+                    .as_ref()
+                    .ok_or("People occupied report")?[0];
+                assert_eq!(predefined.is_occupied, expected_count > 0.0);
+                assert_eq!(predefined.num_occ, 1.5 + expected_count.max(0.0));
+                assert_eq!(
+                    predefined.num_occ_accum_time,
+                    if expected_count > 0.0 { 0.5 } else { 0.25 }
+                );
+                // Explicit real children following the failed parent above.
+                let mut people_child = SourceGainStepOwners {
+                    clock: &people_clock,
+                    globals: people_globals,
+                    control: &people_reports.heat_balance_input_state,
+                    zones: people_reports
+                        .selected_zone_input
+                        .as_mut()
+                        .ok_or("People child Zones")?,
+                    schedules: people_reports
+                        .selected_schedule_manager
+                        .as_ref()
+                        .ok_or("People child schedules")?,
+                    backend: &mut people_backend,
+                    modules: &mut people_provider,
+                    latent: Some(&mut people_air),
+                    radiation: None,
+                    zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
+                };
+                people_reports
+                    .selected_internal_heat_gains
+                    .update_source_internal_gain_values(&mut people_child, false, true)?;
+                people_reports
+                    .selected_internal_heat_gains
+                    .report_timestep(&people_child)?;
+                let total = 180.0
+                    + if expected_count > 0.0 {
+                        expected_count * 120.0
+                    } else {
+                        0.0
+                    };
+                let report = &people_reports
+                    .selected_internal_heat_gains
+                    .allocations
+                    .zone_report
+                    .as_ref()
+                    .ok_or("People Zone report")?[0];
+                assert_eq!(report.people_num_occ, 1.5 + expected_count);
+                assert_eq!(report.people_tot_gain_rate, total);
+                assert_eq!(report.people_tot_gain, total * 900.0);
+                let requested = people_reports
+                    .output_registration
+                    .out_vars
+                    .iter()
+                    .find(|v| v.name == "People Total Heating Rate")
+                    .ok_or("People bound Which")?;
+                assert_eq!(
+                    *people_reports
+                        .selected_internal_heat_gains
+                        .real_output(requested.which.ok_or("People real binding")?)?,
+                    180.0
+                );
+                assert_eq!(
+                    people_air.zones.as_ref().ok_or("People latent Zone")?[0]
+                        .air
+                        .latent_gain,
+                    total - total * 0.6
+                );
+                // People comfort/report child anchor: these are the same genuine
+                // getter-populated People/schedules/Air/clock owners.
+                // Connected comfort/report children use the genuine People getter checkpoint.
+                // Keep the failed parent timestep and its unchanged-cache assertions above.
+                if expected_count < 0.0 {
+                    use crate::heat_balance::ordinary_thermal_comfort::{
+                        SourceComfortPredefinedSummary, SourceThermalComfort,
+                        SourceThermalComfortOwners,
+                    };
+                    use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as ComfortError;
+                    use crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams;
+                    for all_unoccupied in [false, true] {
+                        let mut comfort_reports = if all_unoccupied {
+                            people_getter_base.clone()
+                        } else {
+                            people_reports.clone()
+                        };
+                        let (
+                            mut comfort_state,
+                            mut comfort_errors,
+                            mut comfort_console,
+                            mut comfort_eio,
+                            mut comfort_eso,
+                        ) = (
+                            ctf_ordinary_output_test_state(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                        );
+                        let mut comfort_clock = people_clock.clone();
+                        comfort_clock.minutes_in_time_step = 15;
+                        comfort_clock.kind_of_sim = 3;
+                        comfort_clock.day_of_sim = 1;
+                        comfort_clock.hour_of_day = 1;
+                        comfort_clock.time_step = 1;
+                        comfort_clock.num_of_day_in_envrn = 1;
+                        if all_unoccupied {
+                            // An authored raw schedule change and actual getter reread, never
+                            // edited People pointers/currentVal/occupancy or report answers.
+                            for row in comfort_reports
+                                .heat_balance_input
+                                .as_mut()
+                                .ok_or("comfort raw People")?
+                                .objects
+                                .get_mut("People")
+                                .ok_or("comfort raw People rows")?
+                            {
+                                row.fields.insert(
+                                    "number_of_people_schedule_name".into(),
+                                    ProjectInputValue::String("Constant-0.0".into()),
+                                );
+                            }
+                            CtfInitializationContext {
+                                reports: &mut comfort_reports,
+                                eio: &mut comfort_eio,
+                                backend: SourceErrorBackend {
+                                    state: &mut comfort_state,
+                                    error_stream: Some(&mut comfort_errors),
+                                    console: &mut comfort_console,
+                                    out_unit1: None,
+                                    out_unit2: None,
+                                    f_message: None,
+                                    message_callback: None,
+                                    error_callback: None,
+                                    sqlite: None,
+                                },
+                            }
+                            .manage_selected_internal_heat_gains_input_with_dictionary(
+                                &people_model,
+                                15,
+                                &mut gain_host,
+                                Some(&comfort_clock),
+                                Some(SourceGainDictionaryFile {
+                                    eso: Some(&mut comfort_eso),
+                                }),
+                            )?;
+                        }
+                        let comfort_globals = comfort_reports
+                            .selected_heat_balance_globals
+                            .as_ref()
+                            .ok_or("comfort genuine globals")?;
+                        let mut comfort_air = people_air.clone();
+                        let comfort_environment = crate::weather::day::WeatherEnvironmentState {
+                            month: 1,
+                            day_of_month: 1,
+                            run_period_environment: true,
+                            ..Default::default()
+                        };
+                        let comfort_hvac =
+                            crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
+                        let comfort_controller = crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::default();
+                        let comfort_fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                        let mut comfort = SourceThermalComfort::default();
+                        let mut comfort_summary = SourceComfortPredefinedSummary::default();
+                        {
+                            let mut comfort_backend = SourceErrorBackend {
+                                state: &mut comfort_state,
+                                error_stream: Some(&mut comfort_errors),
+                                console: &mut comfort_console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            };
+                            let mut run_comfort = |initialize_only, current: &mut SourceThermalComfort,
+                                               clock: &crate::weather::day::WeatherGlobalState,
+                                               air: &crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance| {
+                            let mut dictionary = SourceOutputDictionaryStreams {
+                                eso: Some(&mut comfort_eso), sqlite_present: comfort_reports.source_sqlite.present(),
+                                results_framework_output_variables: &mut comfort_reports.source_results_output_variables,
+                            };
+                            current.manage_source_thermal_comfort(initialize_only, &mut SourceThermalComfortOwners {
+                                gains: &comfort_reports.selected_internal_heat_gains,
+                                schedules: comfort_reports.selected_schedule_manager.as_ref().ok_or(ComfortError::Unavailable("comfort genuine schedules"))?,
+                                zones: comfort_reports.selected_zone_input.as_ref().ok_or(ComfortError::Unavailable("comfort genuine Zones"))?,
+                                control: &comfort_reports.heat_balance_input_state, globals: comfort_globals,
+                                clock, environment: &comfort_environment, hvac: &comfort_hvac, air,
+                                developer: &comfort_reports.selected_project_data.as_ref().ok_or(ComfortError::Unavailable("comfort actual project"))?.system.developer_flag,
+                                controller: &comfort_controller, fan: &comfort_fan,
+                                input: comfort_reports.selected_input_processor.as_mut().ok_or(ComfortError::Unavailable("comfort genuine IP"))?,
+                                shortcut: &mut comfort_reports.input_processor_shortcut,
+                                registration: &mut comfort_reports.output_registration,
+                                prescan: &comfort_reports.output_prescan, report_inputs: &people_model.report_inputs,
+                                minimum_report_frequency: "", host: &mut gain_host, dictionary_host: &mut dictionary,
+                                eio: &mut comfort_eio, backend: &mut comfort_backend,
+                                registry: &mut comfort_reports.registry, table: &mut comfort_reports.table,
+                                predefined_summary: &mut comfort_summary,
+                            })
+                        };
+                            run_comfort(true, &mut comfort, &comfort_clock, &comfort_air)?;
+                            assert!(!comfort.first_time_flag);
+                            assert_eq!(
+                                comfort
+                                    .thermal_comfort_data
+                                    .as_ref()
+                                    .ok_or("real comfort rows")?
+                                    .len(),
+                                2
+                            );
+                            // Authored averaged air points cover both polygons independently,
+                            // neither polygon, and the Native fBC==0 extended-edge quirk.
+                            for (temperature, humidity, not_summer, not_winter, not_either) in [
+                                (22.0, 0.006, true, false, false),
+                                (27.0, 0.006, false, true, false),
+                                (25.0, 0.006, false, false, false),
+                                (18.0, 0.006, true, true, true),
+                                (100.0, 0.012, false, false, false),
+                            ] {
+                                let air =
+                                    &mut comfort_air.zones.as_mut().ok_or("comfort real AirHB")?[0]
+                                        .air;
+                                air.ztav_comf = temperature;
+                                air.mrt = temperature;
+                                air.air_hum_rat_avg_comf = humidity;
+                                let reached =
+                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same Zone thermostat setpoint"))),
+                                "the real SimpleASH child precedes the fixture's absent thermostat owner: {reached:?}");
+                                let row = &comfort
+                                    .thermal_comfort_in_ash55
+                                    .as_ref()
+                                    .ok_or("real SimpleASH row")?[0];
+                                assert_eq!(row.zone_is_occupied, !all_unoccupied);
+                                for (actual, fails) in [
+                                    (row.time_not_summer, not_summer),
+                                    (row.time_not_winter, not_winter),
+                                    (row.time_not_either, not_either),
+                                ] {
+                                    assert_eq!(
+                                        actual,
+                                        if !all_unoccupied && fails { 0.25 } else { 0.0 }
+                                    );
+                                }
+                                assert_eq!(
+                                    comfort.any_zone_time_not_simple_ash55_either,
+                                    row.time_not_either
+                                );
+                            }
+                            let row = &comfort
+                                .thermal_comfort_in_ash55
+                                .as_ref()
+                                .ok_or("real SimpleASH totals")?[0];
+                            assert_eq!(
+                                row.total_time_not_summer,
+                                if all_unoccupied { 0.0 } else { 0.5 }
+                            );
+                            assert_eq!(
+                                row.total_time_not_winter,
+                                if all_unoccupied { 0.0 } else { 0.5 }
+                            );
+                            assert_eq!(
+                                row.total_time_not_either,
+                                if all_unoccupied { 0.0 } else { 0.25 }
+                            );
+                            for step in 0..4 {
+                                let air = &mut comfort_air
+                                    .zones
+                                    .as_mut()
+                                    .ok_or("comfort end-period AirHB")?[0]
+                                    .air;
+                                air.ztav_comf = 18.0;
+                                air.mrt = 18.0;
+                                air.air_hum_rat_avg_comf = 0.006;
+                                comfort_clock.end_design_day_envrns_flag = step == 3;
+                                let reached =
+                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same Zone thermostat setpoint"))), "comfort report prefix: {reached:?}");
+                            }
+                        }
+                        assert_eq!(
+                            comfort.zone_occ_hrs.as_ref().ok_or("real occupied hours")?[0],
+                            if all_unoccupied { 0.0 } else { 2.25 }
+                        );
+                        assert_eq!(
+                            comfort_summary.total_time_not_simple_ash55_either_for_abups,
+                            if all_unoccupied { 0.0 } else { 1.25 }
+                        );
+                        assert_eq!(comfort.total_any_zone_time_not_simple_ash55_either, 0.0);
+                        let row = &comfort
+                            .thermal_comfort_in_ash55
+                            .as_ref()
+                            .ok_or("real period reset")?[0];
+                        assert_eq!(
+                            (
+                                row.total_time_not_summer,
+                                row.total_time_not_winter,
+                                row.total_time_not_either
+                            ),
+                            (0.0, 0.0, 0.0)
+                        );
+                        let column = *comfort_reports
+                            .registry
+                            .named_indices
+                            .get("pdchSCeitherClothes")
+                            .ok_or("actual comfort column")?;
+                        assert!(
+                            comfort_reports
+                                .table
+                                .entries
+                                .as_ref()
+                                .ok_or("actual comfort table")?
+                                .iter()
+                                .take(usize::try_from(comfort_reports.table.num_table_entry)?)
+                                .any(|entry| entry.index_column == column
+                                    && entry.object_name == "Facility"
+                                    && entry.original_entry_is_real
+                                    && entry.original_real_entry
+                                        == if all_unoccupied { 0.0 } else { 1.25 })
+                        );
+                        assert_eq!(
+                            comfort_state.tracking.total_warning_errors,
+                            i32::from(!all_unoccupied)
+                        );
+                        for person in comfort_reports
+                            .selected_internal_heat_gains
+                            .allocations
+                            .people
+                            .iter()
+                        {
+                            assert_eq!(
+                                (person.temperature_in_zone, person.relative_humidity_in_zone),
+                                (0.0, 0.0)
+                            );
+                        }
+                        for row in comfort
+                            .thermal_comfort_data
+                            .as_ref()
+                            .ok_or("actual false-Fanger rows")?
+                        {
+                            assert_eq!((row.fanger_pmv, row.pierce_set), (0.0, 0.0));
+                        }
+
+                        // The same actual schedules/Air/comfort rows reach the independent
+                        // weather-report child. No report-state answers are seeded here.
+                        let mut resilience =
+                            crate::heat_balance::ordinary_surface_management::SourceSurfaceManagement::default(
+                            );
+                        let weather = crate::weather::day::WeatherOwnerState::default();
+                        let report = crate::heat_balance::warmup::report::WarmupReportState::new_source_unallocated(
+                            people_model.zones.iter().map(|zone| zone.name.0.clone()).collect(),
+                            crate::heat_balance::warmup::report::WarmupReportConfiguration {
+                                doing_sizing: comfort_globals.doing_sizing,
+                                do_pure_load_calc: comfort_globals.do_pure_load_calc,
+                                run_period_environment: comfort_environment.run_period_environment,
+                                environment_name: comfort_environment.environment_name.clone(),
+                                detailed: comfort_reports.selected_project_data.as_ref()
+                                    .ok_or("actual comfort report project")?
+                                    .system.report_detailed_warmup_convergence,
+                            },
+                        );
+                        let mut heat_balance = crate::heat_balance::ordinary_heat_balance_initialization::SourceHeatBalanceManager::new(report)?;
+                        let daylighting =
+                            crate::heat_balance::ordinary_daylighting::SourceDaylighting::default();
+                        let mut tabular =
+                            crate::heat_balance::ordinary_tabular_reports::SourceTabularReports::default();
+                        for (temperature, hour, step) in [(15.56, 1, 1), (30.0, 2, 3)] {
+                            comfort_air
+                                .zones
+                                .as_mut()
+                                .ok_or("weather-report genuine AirHB")?[0]
+                                .air
+                                .ztav = temperature;
+                            comfort_clock.hour_of_day = hour;
+                            comfort_clock.time_step = step;
+                            comfort_clock.end_design_day_envrns_flag = false;
+                            let mut report_backend = SourceErrorBackend {
+                                state: &mut comfort_state,
+                                error_stream: Some(&mut comfort_errors),
+                                console: &mut comfort_console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            };
+                            let mut weather_owners = crate::heat_balance::ordinary_surface_management::SourceResilienceReportOwners {
+                            globals: comfort_globals,
+                            zones: comfort_reports.selected_zone_input.as_mut().ok_or("real weather-report Zones")?,
+                            air: &comfort_air, fan: &comfort_fan, clock: &comfort_clock,
+                            weather: &weather, environment: &comfort_environment,
+                            control: &comfort_reports.heat_balance_input_state,
+                            gains: &comfort_reports.selected_internal_heat_gains,
+                            schedules: comfort_reports.selected_schedule_manager.as_ref().ok_or("real weather-report schedules")?,
+                            comfort: &comfort, heat_balance: &mut heat_balance, daylighting: &daylighting,
+                            tabular: &mut tabular, backend: &mut report_backend,
+                        };
+                            if hour == 1 {
+                                let reached = resilience
+                                    .report_source_thermal_resilience(&mut weather_owners);
+                                assert!(
+                                    matches!(
+                                        &reached,
+                                        Err(ComfortError::Unavailable(
+                                            "actual allocated low_s_e_t_longest_hours_rep_period"
+                                        ))
+                                    ),
+                                    "the genuine outer first-call prefix requires the full InitHeatBalance report matrices: {reached:?}"
+                                );
+                                assert!(resilience.report_thermal_resilience_first_time);
+                                assert!(!resilience.has_pierce_set);
+                            }
+                            // An explicitly invoked real child after the failed parent above;
+                            // no matrix allocation, latch or successful-parent claim is added.
+                            let reached =
+                                resilience.report_source_thermal_weather(&mut weather_owners);
+                            assert!(
+                                matches!(
+                                    &reached,
+                                    Err(ComfortError::Unavailable("actual zoneTstatSetpts6146"))
+                                ),
+                                "real People safety/PMV bins precede this fixture's absent thermostat: {reached:?}"
+                            );
+                        }
+                        assert!(resilience.report_thermal_resilience_first_time);
+                        assert!(!resilience.has_pierce_set);
+                        let row = &comfort_reports
+                            .selected_zone_input
+                            .as_ref()
+                            .ok_or("actual weather-report owner")?
+                            .resilience
+                            .as_ref()
+                            .ok_or("genuine GetZoneData resilience allocation")?[0];
+                        let last_occupants = if all_unoccupied { -0.0_f64 } else { -1.0 };
+                        assert_eq!(
+                            row.zone_num_occ.to_bits(),
+                            last_occupants.to_bits(),
+                            "Native overwrites ZoneNumOcc per People instead of summing or consuming EMS NumOcc"
+                        );
+                        assert_eq!(
+                            (row.pmv, row.zone_pierce_set, row.zone_pierce_set_last_step),
+                            (0.0, -1.0, -1.0)
+                        );
+                        assert!(row.crossed_cold_thresh && row.crossed_heat_thresh);
+                        for (bins, first_time) in [
+                            (&row.zone_cold_hour_of_safety_bins, 1010100.0),
+                            (&row.zone_heat_hour_of_safety_bins, 1010230.0),
+                        ] {
+                            assert_eq!(bins[1], first_time);
+                            assert_eq!(bins[2], 0.5);
+                            assert_eq!(bins[3], if all_unoccupied { 0.0 } else { 0.125 });
+                            assert_eq!(bins[4], if all_unoccupied { 0.0 } else { 0.25 });
+                        }
+                        assert_eq!(row.zone_discomfort_wt_exceed_occu_hour_bins, [0.0; 4]);
+                        assert_eq!(row.zone_discomfort_wt_exceed_occupied_hour_bins, [0.0; 4]);
+
+                        // Consume an authored real SummaryReports object before the adaptive
+                        // writer. No display/input-complete flag is assigned by this test.
+                        let sizing = crate::heat_balance::selected_sizing::SelectedSizingInput {
+                            summary_report_objects: vec![
+                                crate::heat_balance::selected_sizing::SelectedSummaryReportInput {
+                                    object_name: "People comfort summary".into(),
+                                    reports: vec!["AdaptiveComfortSummary".into()],
+                                    idf_max_fields: None,
+                                    idf_max_extensible_fields: None,
+                                },
+                            ],
+                        };
+                        let raw =
+                            crate::heat_balance::ordinary_tabular_reports::SelectedTabularInput {
+                                source_is_epjson: true,
+                                table_style_objects: Vec::new(),
+                            };
+                        let inventory = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::FAMILIES
+                        .into_iter().filter_map(|family| match comfort_reports.selected_input_processor.as_ref()?.family(family) {
+                            Some(crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(rows)) => Some((family, rows.len())),
+                            _ => None,
+                        });
+                        let equipment_clock = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_source_family_inventory(
+                        inventory, usize::try_from(people_model.timestep.number_of_timesteps_per_hour)?,
+                    )?;
+                        let equipment =
+                            crate::heat_balance::ordinary_equipment::OrdinaryEquipment::new_for_source(
+                                &people_model,
+                                equipment_clock,
+                            )?;
+                        let solar_input = crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput::from_admitted_inventory(
+                        ["ZoneProperty:UserViewFactors:BySurfaceName", "PerformancePrecisionTradeoffs", "DaylightingDevice:Shelf"]
+                            .into_iter().map(|family| (family, comfort_reports.selected_input_processor.as_ref()
+                                .map_or(0, |input| input.get_num_objects_found(family)))), false,
+                    )?;
+                        let radiation =
+                            crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(
+                                solar_input,
+                            );
+                        let surface = crate::heat_balance::ordinary_surface_initialization::OrdinarySurfaceInitialization::default();
+                        let surface_averages = crate::heat_balance::ordinary_surface_source_averages::SourceFinalSurfaceHeatBalance::default();
+                        let emissions = crate::heat_balance::ordinary_hvac_manager::heat_emission::state::SourceHeatEmissionDeviceModules::default();
+                        let modules =
+                            crate::heat_balance::selected_gain_modules::SourceGainModules::default(
+                            );
+                        let mut pollution =
+                            crate::heat_balance::ordinary_pollution::SourcePollutionModule::default(
+                            );
+                        {
+                            let mut report_backend = SourceErrorBackend {
+                                state: &mut comfort_state,
+                                error_stream: Some(&mut comfort_errors),
+                                console: &mut comfort_console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            };
+                            tabular.update_source_tabular_reports(
+                                crate::heat_balance::source_output_registration::TimeStepKind::Zone,
+                                &mut crate::heat_balance::ordinary_tabular_reports::SourceTabularInputOwners {
+                                    files: &comfort_reports.source_output_control,
+                                    results: &comfort_reports.source_results_framework,
+                                    input: comfort_reports
+                                        .selected_input_processor
+                                        .as_mut()
+                                        .ok_or("real summary IP")?,
+                                    shortcut: &mut comfort_reports.input_processor_shortcut,
+                                    raw: &raw,
+                                    sizing_raw: &sizing,
+                                    globals: comfort_globals,
+                                    clock: &comfort_clock,
+                                    schedules: comfort_reports
+                                        .selected_schedule_manager
+                                        .as_ref()
+                                        .ok_or("real summary schedules")?,
+                                    environment: &comfort_environment,
+                                    zones: comfort_reports
+                                        .selected_zone_input
+                                        .as_mut()
+                                        .ok_or("real summary Zones")?,
+                                    gains: &comfort_reports.selected_internal_heat_gains,
+                                    registry: &mut comfort_reports.registry,
+                                    registration: &comfort_reports.output_registration,
+                                    backend: &mut report_backend,
+                                    eio: &mut comfort_eio,
+                                    pollution: &mut pollution,
+                                    equipment: &equipment,
+                                    space_controls: &comfort_reports.heat_balance_space_controls,
+                                    hvac: &comfort_hvac,
+                                    control: &mut comfort_reports.heat_balance_input_state,
+                                    gain_modules: &modules,
+                                    heat_emission: &emissions,
+                                    surface_heat_emission: &surface.sum_surface_heat_emission,
+                                    controller: &comfort_controller,
+                                    radiation: &radiation,
+                                    surface_averages: &surface_averages,
+                                },
+                            )?;
+                            assert!(tabular.display_adaptive_comfort);
+                            assert!(!tabular.update_tabular_reports_get_input);
+                            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &comfort_globals.kickoff_simulation,
+                                developer: &comfort_reports
+                                    .selected_project_data
+                                    .as_ref()
+                                    .ok_or("actual summary project")?
+                                    .system
+                                    .developer_flag,
+                                warmup: &comfort_clock.warmup_flag,
+                                doing_sizing: &comfort_globals.doing_sizing,
+                            };
+                            let reached = tabular.write_source_adaptive_comfort_table(
+                            &mut crate::heat_balance::ordinary_tabular_reports::SourceAdaptiveComfortReportOwners {
+                                gains: &comfort_reports.selected_internal_heat_gains,
+                                sqlite: &comfort_reports.source_sqlite, results: &comfort_reports.source_results_framework,
+                                writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                                    monetary: &comfort_reports.cost_estimate_monetary,
+                                    flags, backend: &mut report_backend,
+                                },
+                            });
+                            assert!(
+                                matches!(
+                                    &reached,
+                                    Err(ComfortError::Unavailable(
+                                        "actual unopened TabularOutputFile insertion"
+                                    ))
+                                ),
+                                "the actual zero-row adaptive branch reaches this fixture's genuine unopened report stream: {reached:?}"
+                            );
+                            assert_eq!(tabular.num_people_adaptive, 0);
+                        }
+                    }
+                }
+            }
+        }
         // Same actual getter, selected local Numeric2, retained geometry and
         // live diagnostic owners. No Native observations or typed gain values
         // supply this authored boundary table.

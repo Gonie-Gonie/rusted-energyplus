@@ -108,7 +108,7 @@ pub(crate) use node_target::{SourceNodeOutputField, SourceNodeReportingOutputCon
 mod system_target;
 pub(crate) use system_target::{SourceAllIntegerOutputOwners, SourceHvacRealOutputField};
 mod internal_gain_target;
-pub(crate) use internal_gain_target::SourceInternalGainOutputField;
+pub(crate) use internal_gain_target::{SourceInternalGainOutputField, SourcePeopleOutputField};
 mod bound_real;
 mod exterior_light_target;
 mod facility_target;

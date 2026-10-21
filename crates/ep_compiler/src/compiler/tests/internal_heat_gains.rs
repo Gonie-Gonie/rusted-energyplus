@@ -42,6 +42,102 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     );
     assert_eq!(model.other_equipment[0].zone, model.zones[0].id);
     assert_eq!(result.report.typed_object_count, model.object_count());
+    assert_eq!(model.people[0].number_of_people_schedule, None);
+    for (reference, expected) in [
+        (
+            "cOnStAnT-0.0",
+            ep_model::PeopleScheduleReference::ConstantZero,
+        ),
+        (
+            "CONSTANT-1.0",
+            ep_model::PeopleScheduleReference::ConstantOne,
+        ),
+        (
+            "User",
+            ep_model::PeopleScheduleReference::User(ep_model::ScheduleId(0)),
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"User":{{"hourly_value":0.25}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"{reference}","number_of_people":2}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{reference}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("typed People schedule identity")?;
+        assert_eq!(typed.people[0].number_of_people_schedule, Some(expected));
+        assert_eq!(typed.schedules.len(), 1);
+        assert_eq!(typed.schedules[0].id, ep_model::ScheduleId(0));
+        assert_eq!(
+            typed.schedule_names.resolve("User"),
+            Some(ep_model::ScheduleId(0))
+        );
+        assert_eq!(typed.schedule_names.resolve("Constant-0.0"), None);
+        assert_eq!(typed.schedule_names.resolve("Constant-1.0"), None);
+    }
+    // Distinct raw names do not collide merely because typed user-name
+    // normalization trims them. Native preserves both name boundaries.
+    for (authored, reference, expected) in [
+        (
+            " Constant-1.0",
+            "Constant-1.0",
+            ep_model::PeopleScheduleReference::ConstantOne,
+        ),
+        (
+            "Constant-0.0 ",
+            "Constant-0.0",
+            ep_model::PeopleScheduleReference::ConstantZero,
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"{authored}":{{"hourly_value":0.25}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"{reference}","number_of_people":2}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        let result = compile_raw_model(&raw);
+        assert!(
+            !result.has_errors(),
+            "{authored:?}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("distinct raw schedule name")?;
+        assert_eq!(typed.people[0].number_of_people_schedule, Some(expected));
+        assert_eq!(typed.schedules.len(), 1);
+        assert_eq!(typed.schedules[0].hourly_value, 0.25);
+    }
+    for (reference, schedules, expected_code) in [
+        ("Missing", "", "MissingReference"),
+        (" Constant-1.0", "", "MissingReference"),
+        ("Constant-2.0", "", "MissingReference"),
+        (
+            "CONSTANT-1.0",
+            r#", "Schedule:Constant":{"constant-1.0":{"hourly_value":0.25}}"#,
+            "AmbiguousPeopleSchedule",
+        ),
+        (
+            "Constant-0.0",
+            r#", "Schedule:Constant":{"CONSTANT-0.0":{"hourly_value":0.25}}"#,
+            "AmbiguousPeopleSchedule",
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}}{schedules},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"{reference}","number_of_people":2}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(result.has_errors(), "{reference}");
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == expected_code
+                    && d.object_type == "People"
+                    && d.field.as_deref() == Some("number_of_people_schedule_name")),
+            "{reference}: {:?}",
+            result.report.diagnostics
+        );
+    }
     // Preserve Native's grouped subtraction at the representable clamp edge.
     // The next lost-fraction float crosses the threshold even though decimal
     // 0.401 itself is just inside after the actual rounded addition.
@@ -170,6 +266,50 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
         ] {
             assert_eq!(value.to_bits(), expected.to_bits(), "{token}");
         }
+    }
+    // Raw schema nonnegative checks precede Native JSON-kind conversion.
+    // Successful unsigned?signed projection is retained, including unused fields.
+    for (token, expected) in [
+        ("-0", 0.0_f64),
+        ("-0.0", -0.0),
+        ("18446744073709551615", -1.0),
+        ("18446744073709551615.0", 18446744073709551616.0),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"People":{{"Kinds":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people":{token},"people_per_floor_area":{token},"floor_area_per_person":{token}}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{token}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("typed People number origin")?;
+        for value in [
+            typed.people[0].number_of_people,
+            typed.people[0].people_per_floor_area,
+            typed.people[0].floor_area_per_person,
+        ] {
+            assert_eq!(value.to_bits(), expected.to_bits());
+        }
+    }
+    for field in [
+        "number_of_people",
+        "people_per_floor_area",
+        "floor_area_per_person",
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"People":{{"Bad":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","{field}":-1}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(result.has_errors());
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "InvalidNumericRange")
+        );
     }
     Ok(())
 }

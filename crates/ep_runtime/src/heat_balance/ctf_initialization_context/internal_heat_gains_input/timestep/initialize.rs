@@ -51,8 +51,82 @@ impl SelectedInternalHeatGains {
         {
             row.num_occ = 0.0;
         }
-        // People, Lights, ElectricEquipment and GasEquipment precede OtherEq.
-        for family in [0, 1, 2, 3] {
+        // Native6631-6696: nonpositive occupancy retains NumOcc/NOFOCC but
+        // skips activity and occupied accumulators, with genuine +0 heat rates.
+        for person in 0..self.positive_count(0)? {
+            let row = self
+                .allocations
+                .people
+                .rows
+                .get_mut(person)
+                .ok_or_else(|| unavailable("actual People timestep row"))?;
+            let mut occupants = row.number_of_people
+                * owners.schedules.source_current_schedule_value(
+                    row.sched
+                        .ok_or_else(|| unavailable("same People occupancy schedule"))?,
+                )?;
+            if row.ems_people_on {
+                occupants = row.ems_number_of_people;
+            }
+            let mut total = 0.0;
+            let mut sensible = 0.0;
+            let zone = owners
+                .zones
+                .zone_predefined
+                .as_mut()
+                .and_then(|v| v.get_mut(index(row.zone_ptr).ok()?))
+                .ok_or_else(|| unavailable("same People ZonePreDefRep"))?;
+            if occupants > 0.0 {
+                let activity = owners.schedules.source_current_schedule_value(
+                    row.activity_level_sched
+                        .ok_or_else(|| unavailable("same People activity schedule"))?,
+                )?;
+                total = occupants * activity;
+                if row.user_spec_sens_frac == -99999.0 {
+                    return Err(unavailable(
+                        "actual automatic People sensible temperature branch",
+                    ));
+                }
+                sensible = total * row.user_spec_sens_frac;
+                if sensible > total {
+                    sensible = total;
+                }
+                if sensible < 0.0 {
+                    sensible = 0.0;
+                }
+                zone.is_occupied = true;
+                zone.num_occ += occupants;
+                zone.num_occ_accum += occupants * owners.clock.time_step_zone;
+                zone.num_occ_accum_time += owners.clock.time_step_zone;
+            } else {
+                zone.is_occupied = false;
+            }
+            row.num_occ = occupants;
+            row.rad_gain_rate = sensible * row.fraction_radiant;
+            row.con_gain_rate = sensible * row.fraction_convected;
+            row.sen_gain_rate = sensible;
+            row.lat_gain_rate = total - sensible;
+            row.tot_gain_rate = total;
+            row.co2_gain_rate = total * row.co2_rate_factor;
+            self.allocations
+                .space_int_gain
+                .as_mut()
+                .and_then(|v| v.get_mut(index(row.space_index).ok()?))
+                .ok_or_else(|| unavailable("same People SpaceIntGain"))?[0] += row.num_occ;
+            let report = self
+                .allocations
+                .space_report
+                .as_mut()
+                .and_then(|v| v.get_mut(index(row.space_index).ok()?))
+                .ok_or_else(|| unavailable("same People SpaceRpt"))?;
+            report.people_rad_gain_rate += row.rad_gain_rate;
+            report.people_con_gain_rate += row.con_gain_rate;
+            report.people_sen_gain_rate += row.sen_gain_rate;
+            report.people_lat_gain_rate += row.lat_gain_rate;
+            report.people_tot_gain_rate += row.tot_gain_rate;
+        }
+        // Lights, ElectricEquipment and GasEquipment precede OtherEq.
+        for family in [1, 2, 3] {
             self.require_empty_family(family)?;
         }
         for equipment in 0..self.positive_count(6)? {

@@ -104,12 +104,13 @@ pub(super) fn resolve_source_b(raw: &RawModel) -> Result<SourceInputStatisticsIn
     })
 }
 
-// Source A's Compact producer needs full numeric operands and genuine original
+// Source A's connected People and schedule getters need full operands and genuine original
 // order. Other A statistics retain their existing projection; no schedule values
 // or getter-owned state are calculated by this custody transfer.
 pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsInput, String> {
     let mut result = resolve(raw);
     for family in [
+        "People",
         "Output:Schedules",
         "Schedule:Compact",
         "Schedule:Day:Hourly",

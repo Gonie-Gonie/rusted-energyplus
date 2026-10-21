@@ -1,4 +1,4 @@
-//! Ordered real eFuel IHG declarations on the existing OutputProcessor owner.
+//! Ordered real People/eFuel IHG declarations on the existing OutputProcessor owner.
 use super::getter::SourceGainInputOwners;
 use super::{E, SelectedInternalHeatGains, index, unavailable};
 use crate::heat_balance::source_output_registration::SourceInternalGainOutputField as Field;
@@ -13,6 +13,87 @@ impl SourceOutputFileHost for GainOutputHost<'_> {
         self.0.ensure_mtd_open()
     }
 }
+use crate::heat_balance::source_output_registration::SourcePeopleOutputField as PeopleField;
+const PEOPLE: [(&str, PeopleField, Units, Store); 13] = [
+    (
+        "Occupant Count",
+        PeopleField::Count,
+        Units::Dimensionless,
+        Store::Average,
+    ),
+    (
+        "Radiant Heating Energy",
+        PeopleField::RadiantEnergy,
+        Units::J,
+        Store::Sum,
+    ),
+    (
+        "Radiant Heating Rate",
+        PeopleField::RadiantRate,
+        Units::W,
+        Store::Average,
+    ),
+    (
+        "Convective Heating Energy",
+        PeopleField::ConvectiveEnergy,
+        Units::J,
+        Store::Sum,
+    ),
+    (
+        "Convective Heating Rate",
+        PeopleField::ConvectiveRate,
+        Units::W,
+        Store::Average,
+    ),
+    (
+        "Sensible Heating Energy",
+        PeopleField::SensibleEnergy,
+        Units::J,
+        Store::Sum,
+    ),
+    (
+        "Sensible Heating Rate",
+        PeopleField::SensibleRate,
+        Units::W,
+        Store::Average,
+    ),
+    (
+        "Latent Gain Energy",
+        PeopleField::LatentEnergy,
+        Units::J,
+        Store::Sum,
+    ),
+    (
+        "Latent Gain Rate",
+        PeopleField::LatentRate,
+        Units::W,
+        Store::Average,
+    ),
+    (
+        "Total Heating Energy",
+        PeopleField::TotalEnergy,
+        Units::J,
+        Store::Sum,
+    ),
+    (
+        "Total Heating Rate",
+        PeopleField::TotalRate,
+        Units::W,
+        Store::Average,
+    ),
+    (
+        "Air Temperature",
+        PeopleField::AirTemperature,
+        Units::C,
+        Store::Average,
+    ),
+    (
+        "Air Relative Humidity",
+        PeopleField::AirRelativeHumidity,
+        Units::Percentage,
+        Store::Average,
+    ),
+];
 const TOTAL: [&str; 10] = [
     "Radiant Heating Energy",
     "Radiant Heating Rate",
@@ -131,7 +212,42 @@ impl SelectedInternalHeatGains {
         }
         let mut add_zone_outputs = vec![false; zone_names.len()];
         let mut add_space_outputs = vec![false; space_names.len()];
-        // All preceding equipment loops are genuinely empty in this admission.
+        for people_number in 1..=self.totals[0] {
+            let number = index(people_number)?;
+            let people = self
+                .allocations
+                .people
+                .get(number)
+                .ok_or_else(|| unavailable("actual People output row3728"))?;
+            add_zone_outputs[index(people.zone_ptr)?] = true;
+            add_space_outputs[index(people.space_index)?] = true;
+            for &(suffix, field, units, store) in &PEOPLE {
+                self.declare_people(owners, &people.name, &format!("People {suffix}"),
+                    number, crate::heat_balance::source_output_registration::SourceInternalGainOutputField::PeopleObject(field),
+                    units, store)?;
+            }
+        }
+        for (number, name) in zone_names.iter().enumerate() {
+            if add_zone_outputs[number] {
+                for &(suffix, field, units, store) in &PEOPLE[..11] {
+                    self.declare_people(owners, name, &format!("Zone People {suffix}"),
+                        number, crate::heat_balance::source_output_registration::SourceInternalGainOutputField::PeopleZone(field),
+                        units, store)?;
+                }
+            }
+            add_zone_outputs[number] = false;
+        }
+        for (number, name) in space_names.iter().enumerate() {
+            if add_space_outputs[number] {
+                for &(suffix, field, units, store) in &PEOPLE[..11] {
+                    self.declare_people(owners, name, &format!("Space People {suffix}"),
+                        number, crate::heat_balance::source_output_registration::SourceInternalGainOutputField::PeopleSpace(field),
+                        units, store)?;
+                }
+            }
+            add_space_outputs[number] = false;
+        }
+        // Lights/electric/gas/hot-water/steam loops remain genuinely empty here.
         if let Some(equipment) = &self.allocations.other_equipment {
             for (row_index, row) in equipment.iter().enumerate() {
                 add_zone_outputs[index(row.zone_ptr)?] = true;
@@ -294,6 +410,52 @@ impl SelectedInternalHeatGains {
 }
 
 impl SelectedInternalHeatGains {
+    fn declare_people(
+        &self,
+        owners: &mut SourceGainInputOwners<'_, '_>,
+        key: &str,
+        name: &str,
+        row_index: usize,
+        field: crate::heat_balance::source_output_registration::SourceInternalGainOutputField,
+        units: Units,
+        store_type: Store,
+    ) -> Result<(), E> {
+        use crate::heat_balance::source_output_registration::{
+            SourceGeneralRealRegistrationOptions, SourceRealOutputBinding, SourceRealOutputTarget,
+            TimeStepKind,
+        };
+        let target = SourceRealOutputTarget::InternalGain {
+            field,
+            index: i32::try_from(row_index + 1)
+                .map_err(|_| unavailable("actual People output index"))?,
+        };
+        let binding = SourceRealOutputBinding::new(target, self).map_err(E::Output)?;
+        let mut request = SourceReportVariableInput::new(
+            owners.report_inputs,
+            owners.input,
+            owners.minimum_report_frequency,
+        );
+        owners
+            .registration
+            .setup_bound_general_real_optional_dictionary(
+                &mut request,
+                owners.prescan,
+                SourceRealOutputDeclaration {
+                    name,
+                    key,
+                    units,
+                    store_type,
+                },
+                owners.minutes,
+                &mut GainOutputHost(&mut *owners.host),
+                owners.eio,
+                binding,
+                owners.dictionary_host.as_mut().map(|host| &mut **host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
+                SourceGeneralRealRegistrationOptions::unmetered(TimeStepKind::Zone),
+                owners.backend,
+            )
+            .map_err(E::Output)
+    }
     fn declare_fuel(
         &self,
         owners: &mut SourceGainInputOwners<'_, '_>,

@@ -1,5 +1,5 @@
-//! Genuine first-call reports and selected actual zero-People weather accumulation.
-//! Positive report-period, People and PierceSET branches remain explicit boundaries.
+//! Genuine first-call reports and actual no-optional-model People weather accumulation.
+//! Positive report-period, PierceSET and recurring mismatch children remain boundaries.
 mod thermal_weather;
 use super::*;
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
@@ -9,8 +9,10 @@ use crate::heat_balance::ordinary_air_heat_balance::{
 };
 use crate::heat_balance::ordinary_daylighting::SourceDaylighting;
 use crate::heat_balance::ordinary_heat_balance_initialization::SourceHeatBalanceManager;
+use crate::heat_balance::ordinary_thermal_comfort::SourceThermalComfort;
 use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
-use crate::weather::day::{WeatherGlobalState, WeatherOwnerState};
+use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
+use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState, WeatherOwnerState};
 
 pub(crate) struct SourceResilienceReportOwners<'a, 'backend> {
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
@@ -19,8 +21,11 @@ pub(crate) struct SourceResilienceReportOwners<'a, 'backend> {
     pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) weather: &'a WeatherOwnerState,
+    pub(crate) environment: &'a WeatherEnvironmentState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) gains: &'a SelectedInternalHeatGains,
+    pub(crate) schedules: &'a SelectedScheduleManager,
+    pub(crate) comfort: &'a SourceThermalComfort,
     pub(crate) heat_balance: &'a mut SourceHeatBalanceManager,
     pub(crate) daylighting: &'a SourceDaylighting,
     pub(crate) tabular: &'a mut SourceTabularReports,

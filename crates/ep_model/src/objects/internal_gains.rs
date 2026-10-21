@@ -53,6 +53,18 @@ pub enum PeopleNumberCalculationMethod {
     AreaPerPerson,
 }
 
+/// Resolved occupancy-schedule identity for a People object.
+/// Built-ins remain separate from the user-authored schedule namespace and IDs.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PeopleScheduleReference {
+    /// User-authored schedule in the shared typed schedule namespace.
+    User(ScheduleId),
+    /// EnergyPlus's genuine built-in `Constant-0.0` schedule.
+    ConstantZero,
+    /// EnergyPlus's genuine built-in `Constant-1.0` schedule.
+    ConstantOne,
+}
+
 /// Occupant internal gain represented as a design people count.
 #[derive(Clone, Debug, PartialEq)]
 pub struct People {
@@ -62,8 +74,8 @@ pub struct People {
     pub name: NormalizedName,
     /// Target zone.
     pub zone: ZoneId,
-    /// Number-of-people schedule.
-    pub number_of_people_schedule: Option<ScheduleId>,
+    /// Number-of-people schedule; absence remains distinct from either built-in.
+    pub number_of_people_schedule: Option<PeopleScheduleReference>,
     /// Design people calculation method.
     pub number_of_people_calculation_method: PeopleNumberCalculationMethod,
     /// Direct design people count.

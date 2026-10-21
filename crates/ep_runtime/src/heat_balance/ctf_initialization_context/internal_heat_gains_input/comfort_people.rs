@@ -1,4 +1,4 @@
-//! Sole DataHeatBalance.People row constructor750-821; positive People input is unported.
+//! Sole DataHeatBalance.People row constructor750-821 and live gain/comfort owners.
 use crate::heat_balance::selected_schedule_manager::SourceScheduleIndex;
 /// Native EPVector default std::vector empty and m_allocated=false, retained separately.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -9,9 +9,6 @@ pub(crate) struct SourcePeopleArray {
 impl SourcePeopleArray {
     pub(crate) fn get(&self, at: usize) -> Option<&SourcePeopleComfortData> {
         self.rows.get(at)
-    }
-    pub(crate) fn first(&self) -> Option<&SourcePeopleComfortData> {
-        self.rows.first()
     }
     pub(crate) fn iter(&self) -> std::slice::Iter<'_, SourcePeopleComfortData> {
         self.rows.iter()

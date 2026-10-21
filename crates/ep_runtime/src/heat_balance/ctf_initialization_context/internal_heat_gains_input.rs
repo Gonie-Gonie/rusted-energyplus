@@ -14,6 +14,7 @@ mod getter;
 mod nominal;
 pub(super) mod observation;
 mod output;
+mod people;
 mod timestep;
 pub(crate) use timestep::{
     SourceGainLatentOwners, SourceGainModule, SourceGainModuleProvider, SourceGainRadiationOwners,
@@ -257,7 +258,7 @@ pub(crate) struct SourceMiscGainObject {
 /// Actual reached collection allocations; None differs from allocated length0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceGainAllocations {
-    /// Native DataHeatBalance.People EPVector constructor empty; positive allocation is guarded IHG361.
+    /// Native DataHeatBalance.People EPVector constructor empty; allocated at IHG361.
     pub(crate) people: SourcePeopleArray,
     // SpaceZoneSimData ctor NOFOCC/QLTSW.
     pub(crate) zone_int_gain: Option<Vec<[f64; 2]>>,

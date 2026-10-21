@@ -94,6 +94,7 @@ pub(crate) struct SourceTabularReports {
     pub(crate) display_surface_shadowing: bool,
     pub(crate) display_demand_end_use: bool,
     pub(crate) display_adaptive_comfort: bool,
+    pub(crate) num_people_adaptive: i32, // Native OutputReportTabular numPeopleAdaptive ctor0
     pub(crate) display_source_energy_end_use_summary: bool,
     pub(crate) display_zone_component_load_summary: bool,
     pub(crate) display_air_loop_component_load_summary: bool,
@@ -124,6 +125,7 @@ impl Default for SourceTabularReports {
             display_surface_shadowing: false,
             display_demand_end_use: false,
             display_adaptive_comfort: false,
+            num_people_adaptive: 0,
             display_source_energy_end_use_summary: false,
             display_zone_component_load_summary: false,
             display_air_loop_component_load_summary: false,
@@ -284,7 +286,9 @@ pub(crate) use demand_summary::SourceDemandReportOwners;
 mod source_energy_summary;
 
 mod post_summary;
-pub(crate) use post_summary::SourceSurfaceShadowingReportOwners;
+pub(crate) use post_summary::{
+    SourceAdaptiveComfortReportOwners, SourceSurfaceShadowingReportOwners,
+};
 
 mod post_summary_next;
 pub(crate) use post_summary_next::SourcePostSummaryReportOwners;

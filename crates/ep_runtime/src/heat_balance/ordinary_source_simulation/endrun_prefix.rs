@@ -554,10 +554,23 @@ impl SourceInitializationFiles {
                 .tabular
                 .write_source_component_cost_table(&reports.cost_estimate_monetary)
                 .map_err(hb_input_error)?;
-            session
-                .tabular
-                .write_source_adaptive_comfort_table(&reports.selected_internal_heat_gains)
-                .map_err(hb_input_error)?;
+            session.tabular.write_source_adaptive_comfort_table(
+                &mut crate::heat_balance::ordinary_tabular_reports::SourceAdaptiveComfortReportOwners {
+                    gains: &reports.selected_internal_heat_gains,
+                    sqlite: &reports.source_sqlite,
+                    results: &reports.source_results_framework,
+                    writer: crate::heat_balance::ordinary_tabular_reports::SourceTabularWriterOwners {
+                        monetary: &reports.cost_estimate_monetary,
+                        flags: SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &project.system.developer_flag,
+                            warmup: &weather.state.global.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                        backend: &mut *backend,
+                    },
+                },
+            ).map_err(hb_input_error)?;
             {
                 let mut next_owners = crate::heat_balance::ordinary_tabular_reports::SourcePostSummaryReportOwners {
                     globals,

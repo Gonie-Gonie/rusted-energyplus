@@ -1,7 +1,7 @@
-//! Actual ManageThermalComfort105-164 and zero-People child route on retained owners.
+//! Actual ManageThermalComfort105-164 and SimpleASH55 on retained People/Air owners.
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::ctf_reports::PredefinedStringTable;
-use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance;
 use crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays;
 use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector;
@@ -13,6 +13,7 @@ use crate::heat_balance::selected_heat_balance_input::{
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputProcessorShortCut,
 };
+use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
 use crate::heat_balance::source_output_prescan::SourceOutputPreScan;
 use crate::heat_balance::source_output_registration::{
@@ -30,6 +31,8 @@ pub(crate) use state::{SourceComfortPredefinedSummary, SourceThermalComfort};
 
 pub(crate) struct SourceThermalComfortOwners<'a, 'backend, H, D> {
     pub(crate) gains: &'a SelectedInternalHeatGains,
+    pub(crate) schedules: &'a SelectedScheduleManager,
+    pub(crate) developer: &'a bool,
     pub(crate) zones: &'a SelectedZoneInputOwners,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,

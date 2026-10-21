@@ -87,6 +87,7 @@ pub(super) fn sum_by_types(
 fn dereference_rate(
     target: Option<SourceRateTarget>,
     equipment: Option<&[SourceOtherEquipment]>,
+    people: &[super::super::comfort_people::SourcePeopleComfortData],
     zero_pointer_value: f64,
 ) -> Result<f64, E> {
     match target {
@@ -99,7 +100,19 @@ fn dereference_rate(
                 SourceRateField::Convective => 2,
                 SourceRateField::Radiant => 1,
                 SourceRateField::Latent => 3,
+                SourceRateField::CarbonDioxide => 6,
             }])
+        }
+        Some(SourceRateTarget::People { row, field }) => {
+            let row = people
+                .get(row)
+                .ok_or_else(|| unavailable("same live People pointer owner"))?;
+            Ok(match field {
+                SourceRateField::Convective => row.con_gain_rate,
+                SourceRateField::Radiant => row.rad_gain_rate,
+                SourceRateField::Latent => row.lat_gain_rate,
+                SourceRateField::CarbonDioxide => row.co2_gain_rate,
+            })
         }
         None => Err(unavailable(
             "actual initialized internal-gain pointer target",
@@ -158,6 +171,7 @@ impl SelectedInternalHeatGains {
     ) -> Result<(), E> {
         let do_radiation_update = !suppress_radiation_update;
         let equipment = self.allocations.other_equipment.as_deref();
+        let people = &self.allocations.people.rows;
         let spaces = self
             .allocations
             .space_devices
@@ -182,6 +196,7 @@ impl SelectedInternalHeatGains {
                     device.cached_rates[field] = dereference_rate(
                         device.targets[field],
                         equipment,
+                        people,
                         self.zero_pointer_value,
                     )? * device.space_gain_fraction;
                 }

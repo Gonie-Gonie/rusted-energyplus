@@ -26,6 +26,7 @@ pub(crate) fn resolve(
         "Construction",
         "Zone",
         "OtherEquipment",
+        "People",
         "Exterior:Lights",
         "Site:Location",
         "RunPeriod",
@@ -77,6 +78,41 @@ pub(crate) fn resolve(
                 // Native IP walks only genuine OtherEquipment schema fields.
                 // Unknown instance metadata remains in the original raw/IP
                 // owners, rather than becoming a heat-balance operand.
+                if family == "People"
+                    && !matches!(
+                        field.0.as_str(),
+                        "zone_or_zonelist_or_space_or_spacelist_name"
+                            | "number_of_people_schedule_name"
+                            | "number_of_people_calculation_method"
+                            | "number_of_people"
+                            | "people_per_floor_area"
+                            | "floor_area_per_person"
+                            | "fraction_radiant"
+                            | "sensible_heat_fraction"
+                            | "activity_level_schedule_name"
+                            | "carbon_dioxide_generation_rate"
+                            | "enable_ashrae_55_comfort_warnings"
+                            | "mean_radiant_temperature_calculation_type"
+                            | "surface_name_angle_factor_list_name"
+                            | "work_efficiency_schedule_name"
+                            | "clothing_insulation_calculation_method"
+                            | "clothing_insulation_calculation_method_schedule_name"
+                            | "clothing_insulation_schedule_name"
+                            | "air_velocity_schedule_name"
+                            | "thermal_comfort_model_1_type"
+                            | "thermal_comfort_model_2_type"
+                            | "thermal_comfort_model_3_type"
+                            | "thermal_comfort_model_4_type"
+                            | "thermal_comfort_model_5_type"
+                            | "thermal_comfort_model_6_type"
+                            | "thermal_comfort_model_7_type"
+                            | "ankle_level_air_velocity_schedule_name"
+                            | "cold_stress_temperature_threshold"
+                            | "heat_stress_temperature_threshold"
+                    )
+                {
+                    continue;
+                }
                 if family == "OtherEquipment"
                     && !matches!(
                         field.0.as_str(),
@@ -99,7 +135,7 @@ pub(crate) fn resolve(
                 let scalar = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(value) => {
-                        let value = if family == "OtherEquipment" {
+                        let value = if matches!(family, "OtherEquipment" | "People") {
                             ep_model::classify_source_json_number(value)
                                 .map(ep_model::SourceJsonNumber::as_f64)
                                 .map_err(|_| format!("HB numeric parse: {family}.{}", field.0))?

@@ -217,6 +217,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Exterior:Lights",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "People",
+        name_field_index: 0,
+    },
     // InternalHeatGains::GetInternalHeatGainsInput reads named OtherEquipment
     // in the same Source getObjectItem order and with real IDF field counts.
     IdfOrderTarget {
@@ -300,6 +304,7 @@ impl std::error::Error for IdfOrderError {}
 struct ScannedObject {
     idf_order: u32,
     max_fields: usize,
+    semicolon_terminated: bool,
     name: String,
     line: usize,
     column: usize,
@@ -429,6 +434,7 @@ pub fn apply_idf_declaration_order(
                         | "Zone"
                         | "BuildingSurface:Detailed"
                         | "OtherEquipment"
+                        | "People"
                         | "Exterior:Lights"
                         | "Site:Location"
                         | "RunPeriod"
@@ -455,6 +461,11 @@ pub fn apply_idf_declaration_order(
                         "RunPeriodControl:SpecialDays" => idf_object.max_fields.max(4),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
+                        "People" if idf_object.semicolon_terminated => {
+                            idf_object.max_fields.max(10)
+                        }
+                        // Native END neither advances the last field nor min-pads.
+                        "People" => idf_object.max_fields.saturating_sub(1),
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
                         "Schedule:Day:Hourly" => idf_object.max_fields.max(26),
@@ -608,6 +619,7 @@ fn scan_target_objects(
                         &fields,
                         object_start.unwrap_or((character_line, character_column)),
                         idf_order,
+                        true,
                         targets,
                         &mut scanned,
                     )?;
@@ -654,6 +666,7 @@ fn scan_target_objects(
             &fields,
             (start_line, start_column),
             idf_order,
+            false,
             targets,
             &mut scanned,
         )?;
@@ -710,6 +723,7 @@ fn record_object(
     fields: &[String],
     (line, column): (usize, usize),
     idf_order: u32,
+    semicolon_terminated: bool,
     targets: &[IdfOrderTarget],
     scanned: &mut BTreeMap<&'static str, Vec<ScannedObject>>,
 ) -> Result<(), IdfOrderError> {
@@ -740,6 +754,7 @@ fn record_object(
         bucket.push(ScannedObject {
             idf_order,
             max_fields: fields.len() - 1,
+            semicolon_terminated,
             name: format!("{} {}", target.object_type, bucket.len() + 1),
             line,
             column,
@@ -774,6 +789,7 @@ fn record_object(
     bucket.push(ScannedObject {
         idf_order,
         max_fields: fields.len() - 1,
+        semicolon_terminated,
         name: name.clone(),
         line,
         column,
@@ -1540,6 +1556,42 @@ mod unnamed_report_order_tests {
                 .ok_or("unterminated IdealLoads must remain unavailable")?;
             assert!(error.to_string().contains("terminating semicolon"));
             assert_eq!(eof_ideal_loads, before_eof);
+        }
+        // People is named, with its genuine legacy min_fields10 and independent
+        // supplied count beyond that minimum; declaration order is not key sort.
+        let people_json = r#"{"People":{"A":{"zone_or_zonelist_or_space_or_spacelist_name":"zone","number_of_people_schedule_name":"on","number_of_people":1,"fraction_radiant":0.3,"sensible_heat_fraction":0.6,"activity_level_schedule_name":"activity"},"Z":{"zone_or_zonelist_or_space_or_spacelist_name":"zone","number_of_people_schedule_name":"on","number_of_people":2,"fraction_radiant":0.3,"sensible_heat_fraction":0.6,"activity_level_schedule_name":"activity","enable_ashrae_55_comfort_warnings":"Yes"}}}"#;
+        let ordered = parse_epjson_str_with_idf_order(
+            people_json,
+            "People,Z,zone,on,People,2,,,0.3,0.6,activity,,Yes;People,A,zone,on,People,1,,,0.3,0.6,activity;",
+        )?;
+        let rows = ordered.ordered_instances("People")?;
+        assert_eq!(
+            rows.iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Z", "A"]
+        );
+        for ((_, object), count) in rows.into_iter().zip([12, 10]) {
+            assert_eq!(
+                object.fields[&FieldName("idf_max_fields".into())],
+                RawValue::Number(count.to_string())
+            );
+        }
+        // Actual EOF retains the parsed Activity alpha while its final field
+        // is outside NumAlphas; only a semicolon performs min_fields padding.
+        let people_eof = r#"{"People":{"A":{"zone_or_zonelist_or_space_or_spacelist_name":"zone","number_of_people_schedule_name":"on","number_of_people":1,"fraction_radiant":0.3,"sensible_heat_fraction":0.6,"activity_level_schedule_name":"activity"}}}"#;
+        for (ending, count) in [("", 9), (",", 10), (";", 10)] {
+            let idf = format!("People,A,zone,on,People,1,,,0.3,0.6,activity{ending}");
+            let actual = parse_epjson_str_with_idf_order(people_eof, &idf)?;
+            let rows = actual.ordered_instances("People")?;
+            assert_eq!(
+                rows[0].1.fields[&FieldName("idf_max_fields".into())],
+                RawValue::Number(count.to_string())
+            );
+            assert_eq!(
+                rows[0].1.fields[&FieldName("activity_level_schedule_name".into())],
+                RawValue::String("activity".into())
+            );
         }
         Ok(())
     }

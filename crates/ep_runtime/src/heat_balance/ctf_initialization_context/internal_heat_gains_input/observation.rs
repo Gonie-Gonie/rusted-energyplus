@@ -12,6 +12,13 @@ use crate::heat_balance::source_output_registration::SourceOutputStoreType;
 pub enum OrdinaryGainRateTarget {
     /// The genuine shared zeroPointerVal target.
     ZeroPointerValue,
+    /// A genuine retained People row and rate-field target.
+    People {
+        /// Actual zero-based People owner position.
+        row_index: usize,
+        /// Literal Source rate member name.
+        field: &'static str,
+    },
     /// A genuine retained OtherEquipment row and rate-field target.
     OtherEquipment {
         /// Actual zero-based OtherEquipment owner position.
@@ -277,12 +284,22 @@ fn misc(row: &SourceMiscGainObject) -> OrdinaryGainMiscObject<'_> {
 fn target(value: SourceRateTarget) -> OrdinaryGainRateTarget {
     match value {
         SourceRateTarget::ZeroPointerValue => OrdinaryGainRateTarget::ZeroPointerValue,
+        SourceRateTarget::People { row, field } => OrdinaryGainRateTarget::People {
+            row_index: row,
+            field: match field {
+                SourceRateField::Convective => "ConGainRate",
+                SourceRateField::Radiant => "RadGainRate",
+                SourceRateField::Latent => "LatGainRate",
+                SourceRateField::CarbonDioxide => "CO2GainRate",
+            },
+        },
         SourceRateTarget::OtherEquipment { row, field } => OrdinaryGainRateTarget::OtherEquipment {
             row_index: row,
             field: match field {
                 SourceRateField::Convective => "ConGainRate",
                 SourceRateField::Radiant => "RadGainRate",
                 SourceRateField::Latent => "LatGainRate",
+                SourceRateField::CarbonDioxide => "CO2GainRate",
             },
         },
     }

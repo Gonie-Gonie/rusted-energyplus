@@ -13830,6 +13830,21 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Native schema validates the authored JSON number before IP converts its
+    // stored integer kind to signed i64. A valid u64 may therefore project <0.
+    fn people_number_default(&mut self, name: &str, object: &RawObject, field: &str) -> f64 {
+        if let Some(RawValue::Number(text)) = field_value(object, field)
+            && text
+                .parse::<f64>()
+                .is_ok_and(|value| value.is_finite() && value < 0.0)
+        {
+            self.error("InvalidNumericRange", "People", Some(name), Some(field),
+                format!("People/{name} field {field} must be nonnegative before input numeric projection"));
+            return 0.0;
+        }
+        self.number_default("People", name, object, field, 0.0)
+    }
+
     fn parse_people(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("People") {
             let Some(zone_name) = self.required_string(
@@ -13850,13 +13865,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let number_of_people_schedule = self.optional_schedule_reference(
-                model,
-                "People",
-                &name,
-                &object,
-                "number_of_people_schedule_name",
-            );
+            let number_of_people_schedule = self.people_schedule_reference(model, &name, &object);
             let Some(id_value) = self.checked_id("People", &name, model.people.len()) else {
                 continue;
             };
@@ -13879,29 +13888,16 @@ impl<'a> Compiler<'a> {
                     "People",
                     parse_people_number_calculation_method,
                 ),
-                number_of_people: self.number_range_default(
-                    "People",
-                    &name,
-                    &object,
-                    "number_of_people",
-                    0.0,
-                    0.0..=f64::INFINITY,
-                ),
-                people_per_floor_area: self.number_range_default(
-                    "People",
+                number_of_people: self.people_number_default(&name, &object, "number_of_people"),
+                people_per_floor_area: self.people_number_default(
                     &name,
                     &object,
                     "people_per_floor_area",
-                    0.0,
-                    0.0..=f64::INFINITY,
                 ),
-                floor_area_per_person: self.number_range_default(
-                    "People",
+                floor_area_per_person: self.people_number_default(
                     &name,
                     &object,
                     "floor_area_per_person",
-                    0.0,
-                    0.0..=f64::INFINITY,
                 ),
             });
         }
@@ -16080,10 +16076,10 @@ impl<'a> Compiler<'a> {
     ) -> Option<f64> {
         match value {
             RawValue::Number(text) => {
-                // These seven real IHG numeric operands use Native IP842's
+                // The connected IHG numeric operands use Native IP842's
                 // stored JSON number kind, not an unconditional double parse.
                 // Other families retain their existing numeric projection.
-                let parsed = if object_type == "OtherEquipment" {
+                let parsed = if matches!(object_type, "OtherEquipment" | "People") {
                     ep_model::classify_source_json_number(text)
                         .ok()
                         .map(ep_model::SourceJsonNumber::as_f64)
@@ -18150,8 +18146,10 @@ mod tests {
         assert_eq!(model.people.len(), 1);
         assert_eq!(model.people[0].zone.0, 0);
         assert_eq!(
-            model.people[0].number_of_people_schedule.map(|id| id.0),
-            Some(0)
+            model.people[0].number_of_people_schedule,
+            Some(ep_model::PeopleScheduleReference::User(
+                ep_model::ScheduleId(0)
+            ))
         );
         assert_eq!(
             model.people[0].number_of_people_calculation_method,

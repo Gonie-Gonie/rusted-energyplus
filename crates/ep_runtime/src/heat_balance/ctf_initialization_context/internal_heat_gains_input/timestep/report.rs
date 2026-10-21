@@ -133,13 +133,26 @@ pub(super) fn reset_report(row: &mut SourceGainReport, clear_co2: bool) {
 }
 
 impl SelectedInternalHeatGains {
-    pub(super) fn report_timestep(
+    pub(crate) fn report_timestep(
         &mut self,
         owners: &SourceGainStepOwners<'_, '_>,
     ) -> Result<(), E> {
         let seconds = owners.clock.time_step_zone_sec;
         // Source individual-object loops, before the Zone reset.
-        for family in [0, 1, 2, 3] {
+        for person in 0..self.positive_count(0)? {
+            let row = self
+                .allocations
+                .people
+                .rows
+                .get_mut(person)
+                .ok_or_else(|| unavailable("actual People report row"))?;
+            row.rad_gain_energy = row.rad_gain_rate * seconds;
+            row.con_gain_energy = row.con_gain_rate * seconds;
+            row.sen_gain_energy = row.sen_gain_rate * seconds;
+            row.lat_gain_energy = row.lat_gain_rate * seconds;
+            row.tot_gain_energy = row.tot_gain_rate * seconds;
+        }
+        for family in [1, 2, 3] {
             self.require_empty_family(family)?;
         }
         for equipment in 0..self.positive_count(6)? {

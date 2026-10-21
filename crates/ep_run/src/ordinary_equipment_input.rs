@@ -30,6 +30,7 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
 }
 
 mod fields;
+mod people;
 mod source_b;
 use fields::{admitted_field, required_fields};
 
@@ -57,6 +58,7 @@ fn resolve_raw(
             continue;
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_compact_family = source_calendar_ingress
             && matches!(
                 family.0.as_str(),
@@ -115,6 +117,7 @@ fn resolve_raw(
         ) && !source_b_family
             && !source_calendar_family
             && !source_compact_family
+            && !source_people_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -170,6 +173,7 @@ fn resolve_raw(
                 if !admitted_field(&family.0, &field.0, value)
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
+                    && !(source_people_family && people::admitted_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -181,6 +185,7 @@ fn resolve_raw(
                             "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
                         )
                         && match family.0.as_str() {
+                            "People" if source_people_family => !people::known_field(&field.0),
                             "ScheduleTypeLimits" => !matches!(
                                 field.0.as_str(),
                                 "lower_limit_value"
@@ -406,6 +411,7 @@ fn resolve_raw(
                         .and_then(number)
                         .is_some_and(|value| value >= 0.0)
                 }
+                "People" => source_people_family && people::admitted_object(raw, object),
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
                         || source_calendar_ingress
@@ -2232,6 +2238,122 @@ mod source_a_compact_ingress {
                     .get("idf_max_fields"),
                 Some(&V::Number(count.into()))
             );
+        }
+        // Genuine built-in occupancy stays raw and typed without an authored
+        // replacement schedule. Both Source frontends preserve the same name.
+        for (reference, expected) in [
+            (
+                "Constant-0.0",
+                ep_model::PeopleScheduleReference::ConstantZero,
+            ),
+            (
+                "cOnStAnT-1.0",
+                ep_model::PeopleScheduleReference::ConstantOne,
+            ),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"activity":{{"hourly_value":120}}}},"People":{{"P":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"{reference}","activity_level_schedule_name":"activity","number_of_people":2,"sensible_heat_fraction":0.6}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                assert_eq!(
+                    ip.source_raw_object_fields("People", "P")?
+                        .get("number_of_people_schedule_name"),
+                    Some(&V::String(reference.into()))
+                );
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                assert_eq!(
+                    hb.objects["People"][0]
+                        .fields
+                        .get("number_of_people_schedule_name"),
+                    Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            reference.into()
+                        )
+                    )
+                );
+            }
+            let result = ep_compiler::compile_raw_model(&raw);
+            assert!(
+                !result.has_errors(),
+                "{reference}: {:?}",
+                result.report.diagnostics
+            );
+            let model = result.model.ok_or("typed real builtin occupancy")?;
+            assert_eq!(model.people[0].number_of_people_schedule, Some(expected));
+            assert_eq!(model.schedules.len(), 1);
+            assert_eq!(model.schedule_names.resolve(reference), None);
+        }
+        // Direct People shares the genuine Source A/B getter. Literal JSON kinds pass
+        // raw schema checks before the same actual numeric getter conversion.
+        for (token, expected) in [
+            ("-0", 0.0_f64),
+            ("-0.0", -0.0),
+            ("18446744073709551615", -1.0),
+            ("18446744073709551615.0", 18446744073709551616.0),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"P":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":{token},"people_per_floor_area":{token},"floor_area_per_person":{token},"sensible_heat_fraction":0.6,"mean_radiant_temperature_calculation_type":"SurfaceWeighted","surface_name_angle_factor_list_name":"missing unused surface","work_efficiency_schedule_name":"missing unused work","clothing_insulation_calculation_method":"CalculationMethodSchedule","clothing_insulation_calculation_method_schedule_name":"missing unused method","clothing_insulation_schedule_name":"missing unused clothing","air_velocity_schedule_name":"missing unused velocity","ankle_level_air_velocity_schedule_name":"missing unused ankle","metadata":{{"kept":[null,true,7,"text",[]]}}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                let original = ip.source_raw_object_fields("People", "P")?;
+                assert_eq!(original["number_of_people"], V::Number(token.into()));
+                assert!(matches!(original["metadata"], V::Object(_)));
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                for name in [
+                    "number_of_people",
+                    "people_per_floor_area",
+                    "floor_area_per_person",
+                ] {
+                    let ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                        value,
+                    ) = hb.objects["People"][0].fields[name]
+                    else {
+                        return Err("actual People numeric getter".into());
+                    };
+                    assert_eq!(value.to_bits(), expected.to_bits());
+                }
+                assert!(!hb.objects["People"][0].fields.contains_key("metadata"));
+            }
+            let typed = ep_compiler::compile_raw_model(&raw);
+            assert!(!typed.has_errors(), "{:?}", typed.report.diagnostics);
+        }
+        for (field, value) in [
+            ("number_of_people", serde_json::json!(-1)),
+            ("sensible_heat_fraction", serde_json::json!("Autocalculate")),
+            (
+                "number_of_people_calculation_method",
+                serde_json::json!("People/Area"),
+            ),
+            ("thermal_comfort_model_1_type", serde_json::json!("Fanger")),
+            (
+                "mean_radiant_temperature_calculation_type",
+                serde_json::json!("invalid MRT enum"),
+            ),
+            (
+                "clothing_insulation_calculation_method",
+                serde_json::json!("invalid clothing enum"),
+            ),
+            ("work_efficiency_schedule_name", serde_json::json!(1)),
+            ("idf_max_fields", serde_json::json!(-1)),
+        ] {
+            let mut value_model = serde_json::json!({"Zone":{"actual zone":{}},"Schedule:Constant":{"on":{"hourly_value":1},"activity":{"hourly_value":120}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":1,"sensible_heat_fraction":0.6}}});
+            value_model["People"]["P"][field] = value;
+            let raw = ep_raw_model::parse_epjson_str(&value_model.to_string())?;
+            assert!(resolve_source_a(&raw).is_err());
+            assert!(resolve_source_b(&raw).is_err());
         }
         Ok(())
     }
