@@ -201,7 +201,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         && (!selected(
             object,
             "mean_radiant_temperature_calculation_type",
-            &["EnclosureAveraged", "SurfaceWeighted"],
+            &["EnclosureAveraged", "SurfaceWeighted", "AngleFactor"],
         ) || !selected(
             object,
             "clothing_insulation_calculation_method",
@@ -224,6 +224,25 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         })
     {
         return false;
+    }
+    if fanger
+        && field(object, "mean_radiant_temperature_calculation_type")
+            .is_some_and(|value| text_is(value, &["AngleFactor"]))
+    {
+        // A missing A8 defaults to empty. Empty/whitespace can name a genuine
+        // list; only the shared getter applies Native uppercase, without trim.
+        let name = match field(object, "surface_name_angle_factor_list_name") {
+            None => "",
+            Some(RawValue::String(name)) => name,
+            _ => return false,
+        };
+        if !raw
+            .objects
+            .get(&ObjectType("ComfortViewFactorAngles".into()))
+            .is_some_and(|lists| lists.keys().any(|key| key.0.eq_ignore_ascii_case(name)))
+        {
+            return false;
+        }
     }
     let Some(zones) = raw.objects.get(&ObjectType("Zone".into())) else {
         return false;
@@ -281,4 +300,23 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         }
     }
     true
+}
+
+// Exact optional extensible schema; counts/defaults belong to the real getter.
+pub(super) fn admitted_angle_field(name: &str, value: &RawValue) -> bool {
+    match name {
+        "idf_order" | "idf_max_fields" | "idf_max_extensible_fields" => {
+            matches!(value, RawValue::Number(s) if s.parse::<usize>().is_ok())
+        }
+        "angles" => matches!(value, RawValue::Array(rows) if rows.iter().all(|row| {
+            let RawValue::Object(fields) = row else { return false; };
+            fields.get(&ep_raw_model::FieldName("surface_name".into()))
+                .is_none_or(|value| matches!(value, RawValue::String(_)))
+                && fields.get(&ep_raw_model::FieldName("angle_factor".into()))
+                    .is_none_or(|value| number(value).is_some_and(|n| (0.0..=1.0).contains(&n)))
+        })),
+        // Unknown instance/row members are retained raw metadata. Reserved
+        // top-level IDF names above never reach this fallback.
+        _ => true,
+    }
 }

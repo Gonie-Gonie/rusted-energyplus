@@ -59,6 +59,7 @@ fn resolve_raw(
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         let source_people_family = source_calendar_ingress && family.0 == "People";
+        let source_angle_family = source_calendar_ingress && family.0 == "ComfortViewFactorAngles";
         let source_compact_family = source_calendar_ingress
             && matches!(
                 family.0.as_str(),
@@ -118,6 +119,7 @@ fn resolve_raw(
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
+            && !source_angle_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -166,6 +168,7 @@ fn resolve_raw(
                         | "Output:Meter"
                         | "Output:Meter:MeterFileOnly"
                 )
+                && !source_angle_family
             {
                 return Err(format!("blank ordinary {} name", family.0));
             }
@@ -174,6 +177,7 @@ fn resolve_raw(
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
                     && !(source_people_family && people::admitted_field(&field.0, value))
+                    && !(source_angle_family && people::admitted_angle_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -2751,6 +2755,168 @@ mod source_a_compact_ingress {
             let raw = ep_raw_model::parse_epjson_str(&changed)?;
             assert!(resolve_source_a(&raw).is_err());
             assert!(resolve_source_b(&raw).is_err());
+        }
+        // The genuine extensible IP owner retains lexical numbers and all
+        // metadata kinds; no angle becomes a scalar HB getter or typed list.
+        let angle_zone_only = ep_raw_model::parse_epjson_str(r#"{"Zone":{"actual zone":{}}}"#)?;
+        let angle_zone_ip = crate::ordinary_input_processor::resolve_source_a(&angle_zone_only)?;
+        let mut angle_zone_stats =
+            ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+        angle_zone_ip.report_source_idf_records_stats(&mut angle_zone_stats)?;
+        for (token, metadata, expected) in [
+            ("0", "null", V::Null),
+            ("1", "true", V::Bool(true)),
+            ("-0", "0.25", V::Number("0.25".into())),
+            ("-0.0", r#""text""#, V::String("text".into())),
+            ("-0e0", "[]", V::Array(Vec::new())),
+            ("1E-9999", "{}", V::Object(Default::default())),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"ComfortViewFactorAngles":{{"list":{{"metadata":{metadata},"angles":[{{"surface_name":"Wall One","angle_factor":{token},"metadata":{metadata}}}]}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            assert_eq!(
+                ep_compiler::typed_coverage_status("ComfortViewFactorAngles"),
+                ep_compiler::ObjectCoverageStatus::RawOnly
+            );
+            for mut ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                assert_eq!(
+                    ip.source_raw_object_names("ComfortViewFactorAngles")?,
+                    ["list"]
+                );
+                let fields = ip.source_raw_object_fields("ComfortViewFactorAngles", "list")?;
+                assert_eq!(fields.get("metadata"), Some(&expected));
+                let Some(V::Array(rows)) = fields.get("angles") else {
+                    return Err("actual raw angles".into());
+                };
+                let V::Object(row) = &rows[0] else {
+                    return Err("actual raw angle row".into());
+                };
+                assert_eq!(row.get("angle_factor"), Some(&V::Number(token.into())));
+                assert_eq!(row.get("surface_name"), Some(&V::String("Wall One".into())));
+                assert_eq!(row.get("metadata"), Some(&expected));
+                let counts = ip.get_object_def_max_args("ComfortViewFactorAngles")?;
+                assert_eq!((counts.alphas, counts.numerics), (2, 1));
+                let mut stats =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                ip.report_source_idf_records_stats(&mut stats)?;
+                assert_eq!(
+                    stats.number_input_records,
+                    angle_zone_stats.number_input_records + 1
+                );
+                assert_eq!(
+                    (
+                        stats.total_fields_with_defaults,
+                        stats.number_defaulted_fields,
+                        stats.total_autosizable_fields,
+                        stats.total_autocalculatable_fields
+                    ),
+                    (
+                        angle_zone_stats.total_fields_with_defaults,
+                        angle_zone_stats.number_defaulted_fields,
+                        angle_zone_stats.total_autosizable_fields,
+                        angle_zone_stats.total_autocalculatable_fields
+                    )
+                );
+            }
+        }
+        // Omitted members and empty arrays stay raw, so the real NumNumbers-
+        // driven consumer owns any later sum/surface diagnostics.
+        for fields in [
+            "{}",
+            r#"{"angles":[]}"#,
+            r#"{"angles":[{}]}"#,
+            r#"{"angles":[{"surface_name":""},{"angle_factor":-0.0}]}"#,
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"ComfortViewFactorAngles":{{"":{fields}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+        }
+        let many = vec![r#"{"surface_name":"Wall One","angle_factor":0.01}"#; 100].join(",");
+        let text = format!(
+            r#"{{"Zone":{{"actual zone":{{}}}},"ComfortViewFactorAngles":{{"many":{{"angles":[{many}]}}}}}}"#
+        );
+        let raw = ep_raw_model::parse_epjson_str(&text)?;
+        for mut ip in [
+            crate::ordinary_input_processor::resolve_source_a(&raw)?,
+            crate::ordinary_input_processor::resolve_source_b(&raw)?,
+        ] {
+            let counts = ip.get_object_def_max_args("ComfortViewFactorAngles")?;
+            assert_eq!((counts.alphas, counts.numerics), (101, 100));
+        }
+        for angles in [
+            "null",
+            "{}",
+            "[null]",
+            r#"[{"surface_name":7}]"#,
+            r#"[{"angle_factor":null}]"#,
+            r#"[{"angle_factor":"0.5"}]"#,
+            r#"[{"angle_factor":-0.1}]"#,
+            r#"[{"angle_factor":1.1}]"#,
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"ComfortViewFactorAngles":{{"bad":{{"angles":{angles}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            assert!(resolve_source_a(&raw).is_err());
+            assert!(resolve_source_b(&raw).is_err());
+        }
+        // Original list identities are not normalized. Blank/space A8 and
+        // case-variant lists reach the actual later association in list order.
+        for (name, reference) in [
+            ("", Some("")),
+            ("", None),
+            (" ", Some(" ")),
+            ("List", Some("lIST")),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(surface_weighted)?;
+            value["People"]["Surface person"]["mean_radiant_temperature_calculation_type"] =
+                "AngleFactor".into();
+            let person = value["People"]["Surface person"]
+                .as_object_mut()
+                .ok_or("authored AngleFactor person")?;
+            if let Some(reference) = reference {
+                person.insert(
+                    "surface_name_angle_factor_list_name".into(),
+                    reference.into(),
+                );
+            } else {
+                person.remove("surface_name_angle_factor_list_name");
+            }
+            value["ComfortViewFactorAngles"] = serde_json::json!({(name):{"angles":[{"surface_name":"Wall One","angle_factor":1}]}});
+            let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                assert_eq!(
+                    ip.source_raw_object_names("ComfortViewFactorAngles")?,
+                    [name]
+                );
+            }
+        }
+        let names = ep_raw_model::parse_epjson_str(
+            r#"{"Zone":{"actual zone":{}},"ComfortViewFactorAngles":{"a":{},"A":{},"":{}," ":{}}}"#,
+        )?;
+        for ip in [
+            crate::ordinary_input_processor::resolve_source_a(&names)?,
+            crate::ordinary_input_processor::resolve_source_b(&names)?,
+        ] {
+            assert_eq!(
+                ip.source_raw_object_names("ComfortViewFactorAngles")?,
+                ["", " ", "A", "a"]
+            );
         }
         for (field, value) in [
             ("number_of_people", serde_json::json!(-1)),

@@ -54,6 +54,7 @@ pub(crate) struct SourceThermalComfortOwners<'a, 'backend, H, D> {
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) recurring_errors: &'a mut SourceRecurringErrorState,
     pub(crate) input: &'a mut SelectedInputProcessor,
+    pub(crate) source_is_epjson: &'a bool,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) registration: &'a mut SourceOutputRegistration,
     pub(crate) prescan: &'a SourceOutputPreScan,

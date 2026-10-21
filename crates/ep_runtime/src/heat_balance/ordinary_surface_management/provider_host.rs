@@ -450,6 +450,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 psychrometrics: o.psychrometrics,
                 recurring_errors: o.recurring_errors,
                 input: o.input,
+                source_is_epjson: o.source_is_epjson,
                 shortcut: o.shortcut,
                 registration: o.registration,
                 prescan: o.prescan,

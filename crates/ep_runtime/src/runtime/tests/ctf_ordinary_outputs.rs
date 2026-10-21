@@ -4549,6 +4549,322 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         .latent_gain,
                     total - total * 0.6
                 );
+                // Actual shared IP extensible getter: raw arrays, source format,
+                // schema-dependent global max args, exact names and usage owner.
+                {
+                    use crate::heat_balance::ordinary_thermal_comfort::SourceThermalComfort;
+                    use crate::heat_balance::selected_input_processor::{
+                        SelectedInputProcessor, SourceInputFamily, SourceInputProcessorShortCut,
+                        SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+                        SourceObjectDefinition, SourceObjectShape,
+                    };
+                    let mut objects = std::collections::BTreeMap::<
+                        String,
+                        std::collections::BTreeMap<String, V>,
+                    >::new();
+                    for (name, e, r) in [
+                        ("", 199, 100),
+                        ("z list", 200, 100),
+                        ("Z LIST", 1, 1),
+                        (" ", 0, 0),
+                    ] {
+                        let rows = (0..r)
+                            .map(|at| {
+                                let mut row = std::collections::BTreeMap::from([(
+                                    "surface_name".into(),
+                                    V::String(format!("surface {at}")),
+                                )]);
+                                if !(name == "Z LIST" || (name.is_empty() && at == 99)) {
+                                    row.insert(
+                                        "angle_factor".into(),
+                                        V::Number(
+                                            match at {
+                                                0 => "-0",
+                                                1 => "-0.0",
+                                                2 => "-0e0",
+                                                _ => "0.01",
+                                            }
+                                            .into(),
+                                        ),
+                                    );
+                                }
+                                V::Object(row)
+                            })
+                            .collect();
+                        objects.insert(
+                            name.into(),
+                            std::collections::BTreeMap::from([
+                                ("angles".into(), V::Array(rows)),
+                                ("idf_max_fields".into(), V::Number((1 + e).to_string())),
+                                ("idf_max_extensible_fields".into(), V::Number(e.to_string())),
+                            ]),
+                        );
+                    }
+                    objects.insert(
+                        "short list".into(),
+                        std::collections::BTreeMap::from([
+                            (
+                                "angles".into(),
+                                V::Array(vec![V::Object(Default::default())]),
+                            ),
+                            ("idf_max_fields".into(), V::Number("2".into())),
+                            ("idf_max_extensible_fields".into(), V::Number("1".into())),
+                        ]),
+                    );
+                    // Genuine Native EOF: independent F2/E2, no attached array.
+                    objects.insert(
+                        "EOF list".into(),
+                        std::collections::BTreeMap::from([
+                            ("idf_max_fields".into(), V::Number("2".into())),
+                            ("idf_max_extensible_fields".into(), V::Number("2".into())),
+                        ]),
+                    );
+                    let order = vec![
+                        "z list".into(),
+                        "".into(),
+                        " ".into(),
+                        "Z LIST".into(),
+                        "short list".into(),
+                        "EOF list".into(),
+                    ];
+                    let make_input = |source_is_epjson: bool| -> Result<
+                        SelectedInputProcessor,
+                        Box<dyn std::error::Error>,
+                    > {
+                        let shapes = objects
+                            .iter()
+                            .map(|(name, fields)| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: fields
+                                    .iter()
+                                    .map(|(name, value)| {
+                                        (
+                                            name.clone(),
+                                            match value {
+                                                V::Array(rows) => rows.len(),
+                                                _ => 1,
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            })
+                            .collect();
+                        let mut input = SelectedInputProcessor::from_admitted_input(
+                            vec![SourceObjectDefinition {
+                                object_type: "ComfortViewFactorAngles".into(),
+                                alpha_fields: 1,
+                                numeric_fields: 0,
+                                alpha_extensions: 1,
+                                numeric_extensions: 1,
+                                extension: Some("angles".into()),
+                            }],
+                            std::collections::BTreeMap::from([(
+                                "ComfortViewFactorAngles".into(),
+                                SourceInputFamily::Objects(shapes),
+                            )]),
+                        )?;
+                        input.retain_source_input_statistics(SourceInputStatisticsInput {
+                            objects: std::collections::BTreeMap::from([(
+                                "ComfortViewFactorAngles".into(),
+                                objects.clone(),
+                            )]),
+                            object_order: std::collections::BTreeMap::from([(
+                                "ComfortViewFactorAngles".into(),
+                                if source_is_epjson {
+                                    objects.keys().cloned().collect()
+                                } else {
+                                    order.clone()
+                                },
+                            )]),
+                        })?;
+                        Ok(input)
+                    };
+                    for source_is_epjson in [false, true] {
+                        let mut input = make_input(source_is_epjson)?;
+                        let mut shortcut = SourceInputProcessorShortCut::default();
+                        shortcut.allocate_from_input(&input)?;
+                        assert_eq!(
+                            (shortcut.alpha_args.len(), shortcut.numeric_args.len()),
+                            (101, 100)
+                        );
+                        shortcut.current_module_object = "ComfortViewFactorAngles".into();
+                        assert_eq!(
+                            input.source_raw_object_names("ComfortViewFactorAngles")?[0],
+                            if source_is_epjson { "" } else { "z list" }
+                        );
+                        let mut used = std::collections::BTreeSet::new();
+                        // JSON lexical order or retained IDF declaration order.
+                        // Every retained row still stores beyond the counted E.
+                        for (name, json_counts, idf_counts, r) in [
+                            ("z list", (101, 100, 1), (101, 100, 1), 100),
+                            ("", (101, 100, 1), (101, 99, 1), 100),
+                            (" ", (1, 0, 1), (1, 0, 1), 0),
+                            ("Z LIST", (2, 1, 1), (2, 0, 1), 1),
+                            ("z list", (101, 100, 1), (101, 100, 1), 100),
+                        ] {
+                            let ordinal = input
+                                .source_raw_object_names("ComfortViewFactorAngles")?
+                                .iter()
+                                .position(|candidate| candidate == name)
+                                .ok_or("actual angle raw key")?;
+                            let got = SourceThermalComfort::get_source_angle_factor_object_item(
+                                &mut input,
+                                &mut shortcut,
+                                ordinal,
+                                source_is_epjson,
+                            )?;
+                            assert_eq!(
+                                got,
+                                if source_is_epjson {
+                                    json_counts
+                                } else {
+                                    idf_counts
+                                }
+                            );
+                            used.insert(name.to_string());
+                            for original in
+                                input.source_raw_object_names("ComfortViewFactorAngles")?
+                            {
+                                assert_eq!(
+                                    input.is_object_unused("ComfortViewFactorAngles", original),
+                                    !used.contains(original)
+                                );
+                            }
+                            assert_eq!(shortcut.alpha_args[0], name.to_ascii_uppercase());
+                            assert_eq!(shortcut.alpha_field_blanks[0], name.is_empty());
+                            assert_eq!(
+                                shortcut.alpha_field_names[0],
+                                if source_is_epjson { "name" } else { "Name" }
+                            );
+                            if r == 100 {
+                                assert_eq!(shortcut.alpha_args[100], "SURFACE 99");
+                                assert_eq!(shortcut.numeric_args[0].to_bits(), 0); // JSON integer -0 -> i64 zero.
+                                assert_eq!(
+                                    shortcut.numeric_args[1].to_bits(),
+                                    (-0.0_f64).to_bits()
+                                );
+                                assert_eq!(
+                                    shortcut.numeric_args[2].to_bits(),
+                                    (-0.0_f64).to_bits()
+                                );
+                                assert!(
+                                    shortcut.numeric_field_blanks[..99]
+                                        .iter()
+                                        .all(|blank| !*blank)
+                                );
+                                assert_eq!(shortcut.numeric_field_blanks[99], name.is_empty());
+                                assert_eq!(
+                                    shortcut.numeric_field_names[99],
+                                    if source_is_epjson {
+                                        "angle_factor"
+                                    } else {
+                                        "Angle Factor"
+                                    }
+                                );
+                            } else {
+                                assert!(shortcut.alpha_args[r + 1..].iter().all(String::is_empty));
+                                assert!(
+                                    shortcut
+                                        .numeric_args
+                                        .iter()
+                                        .all(|value| value.to_bits() == 0)
+                                );
+                                assert!(shortcut.numeric_field_blanks.iter().all(|blank| *blank));
+                                assert!(
+                                    shortcut.alpha_field_names[r + 1..]
+                                        .iter()
+                                        .all(String::is_empty)
+                                );
+                                assert!(
+                                    shortcut.numeric_field_names[r..]
+                                        .iter()
+                                        .all(String::is_empty)
+                                );
+                            }
+                        }
+                        // Fill100, reset with partial row, reset again with EOF,
+                        // fill100 again, and reset every tail once more.
+                        for name in ["short list", "EOF list", "z list", "short list", "EOF list"] {
+                            let ordinal = input
+                                .source_raw_object_names("ComfortViewFactorAngles")?
+                                .iter()
+                                .position(|candidate| candidate == name)
+                                .ok_or("actual short/EOF raw key")?;
+                            let expected = if name == "z list" {
+                                (101, 100, 1)
+                            } else if name == "short list" {
+                                if source_is_epjson {
+                                    (2, 1, 1)
+                                } else {
+                                    (2, 0, 1)
+                                }
+                            } else {
+                                (1, 0, 1)
+                            };
+                            assert_eq!(
+                                SourceThermalComfort::get_source_angle_factor_object_item(
+                                    &mut input,
+                                    &mut shortcut,
+                                    ordinal,
+                                    source_is_epjson,
+                                )?,
+                                expected
+                            );
+                            used.insert(name.to_string());
+                            for original in
+                                input.source_raw_object_names("ComfortViewFactorAngles")?
+                            {
+                                assert_eq!(
+                                    input.is_object_unused("ComfortViewFactorAngles", original),
+                                    !used.contains(original)
+                                );
+                            }
+                            if name == "z list" {
+                                assert_eq!(shortcut.alpha_args[100], "SURFACE 99");
+                                assert!(shortcut.numeric_field_blanks.iter().all(|blank| !*blank));
+                                continue;
+                            }
+                            assert_eq!(shortcut.alpha_args[0], name.to_ascii_uppercase());
+                            assert!(!shortcut.alpha_field_blanks[0]);
+                            assert!(shortcut.alpha_args[1..].iter().all(String::is_empty));
+                            assert!(
+                                shortcut
+                                    .numeric_args
+                                    .iter()
+                                    .all(|value| value.to_bits() == 0)
+                            );
+                            assert!(shortcut.alpha_field_blanks[1..].iter().all(|blank| *blank));
+                            assert!(shortcut.numeric_field_blanks.iter().all(|blank| *blank));
+                            assert!(shortcut.alpha_field_names[2..].iter().all(String::is_empty));
+                            assert!(
+                                shortcut.numeric_field_names[1..]
+                                    .iter()
+                                    .all(String::is_empty)
+                            );
+                            if name == "EOF list" {
+                                assert_eq!(shortcut.alpha_field_names[1], "");
+                                assert_eq!(shortcut.numeric_field_names[0], "");
+                            } else {
+                                assert_eq!(
+                                    shortcut.alpha_field_names[1],
+                                    if source_is_epjson {
+                                        "surface_name"
+                                    } else {
+                                        "Surface Name"
+                                    }
+                                );
+                                assert_eq!(
+                                    shortcut.numeric_field_names[0],
+                                    if source_is_epjson {
+                                        "angle_factor"
+                                    } else {
+                                        "Angle Factor"
+                                    }
+                                );
+                            }
+                        }
+                    }
+                }
                 // People comfort/report child anchor: these are the same genuine
                 // getter-populated People/schedules/Air/clock owners.
                 // Connected comfort/report children use the genuine People getter checkpoint.
@@ -4776,6 +5092,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 psychrometrics: &mut comfort_psychrometrics,
                                 recurring_errors: &mut comfort_reports.source_recurring_errors,
                                 input: comfort_reports.selected_input_processor.as_mut().ok_or(ComfortError::Unavailable("comfort genuine IP"))?,
+                                source_is_epjson: &comfort_reports.heat_balance_input.as_ref().ok_or(ComfortError::Unavailable("comfort actual input format"))?.source_is_epjson,
                                 shortcut: &mut comfort_reports.input_processor_shortcut,
                                 registration: &mut comfort_reports.output_registration,
                                 prescan: &comfort_reports.output_prescan, report_inputs: &people_model.report_inputs,

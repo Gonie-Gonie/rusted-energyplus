@@ -217,6 +217,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Exterior:Lights",
         name_field_index: 0,
     },
+    // Native Comfort list names may be blank or distinct only by case.
+    IdfOrderTarget {
+        object_type: "ComfortViewFactorAngles",
+        name_field_index: 0,
+    },
     IdfOrderTarget {
         object_type: "People",
         name_field_index: 0,
@@ -305,6 +310,7 @@ struct ScannedObject {
     idf_order: u32,
     max_fields: usize,
     semicolon_terminated: bool,
+    comfort_max_extensible_fields: Option<usize>,
     name: String,
     line: usize,
     column: usize,
@@ -325,6 +331,7 @@ pub fn apply_idf_declaration_order(
     let mut report_field_counts = Vec::new();
 
     for target in targets {
+        let exact_names = target.object_type == "ComfortViewFactorAngles";
         let idf_objects = scanned.get(target.object_type).ok_or_else(|| {
             IdfOrderError::new(format!(
                 "internal IDF order recovery error: missing scan bucket for {}",
@@ -332,10 +339,13 @@ pub fn apply_idf_declaration_order(
             ))
         })?;
         for (index, idf_object) in idf_objects.iter().enumerate() {
-            if idf_objects[..index]
-                .iter()
-                .any(|earlier| earlier.name.eq_ignore_ascii_case(&idf_object.name))
-            {
+            if idf_objects[..index].iter().any(|earlier| {
+                if exact_names {
+                    earlier.name == idf_object.name
+                } else {
+                    earlier.name.eq_ignore_ascii_case(&idf_object.name)
+                }
+            }) {
                 return Err(IdfOrderError::new(format!(
                     "duplicate staged IDF {} name '{}' at line {}, column {}",
                     target.object_type, idf_object.name, idf_object.line, idf_object.column
@@ -374,10 +384,13 @@ pub fn apply_idf_declaration_order(
 
         let actual_names = instances.keys().collect::<Vec<_>>();
         for (index, actual_name) in actual_names.iter().enumerate() {
-            if actual_names[..index]
-                .iter()
-                .any(|earlier| earlier.0.eq_ignore_ascii_case(&actual_name.0))
-            {
+            if actual_names[..index].iter().any(|earlier| {
+                if exact_names {
+                    earlier.0 == actual_name.0
+                } else {
+                    earlier.0.eq_ignore_ascii_case(&actual_name.0)
+                }
+            }) {
                 return Err(IdfOrderError::new(format!(
                     "converted epJSON contains duplicate case-insensitive {} name '{}'",
                     actual_type.0, actual_name.0
@@ -402,7 +415,13 @@ pub fn apply_idf_declaration_order(
         for idf_object in idf_objects {
             let matching_names = instances
                 .keys()
-                .filter(|name| name.0.eq_ignore_ascii_case(&idf_object.name))
+                .filter(|name| {
+                    if exact_names {
+                        name.0 == idf_object.name
+                    } else {
+                        name.0.eq_ignore_ascii_case(&idf_object.name)
+                    }
+                })
                 .collect::<Vec<_>>();
             if matching_names.is_empty() {
                 return Err(IdfOrderError::new(format!(
@@ -424,6 +443,18 @@ pub fn apply_idf_declaration_order(
                     actual_type.0, actual_name.0
                 )));
             }
+            // Native END returns before attaching its temporary extensible
+            // array. Reject a staged counterpart that invents those rows.
+            if exact_names
+                && !idf_object.semicolon_terminated
+                && instances[&actual_name]
+                    .fields
+                    .contains_key(&FieldName("angles".into()))
+            {
+                return Err(IdfOrderError::new(
+                    "staged ComfortViewFactorAngles EOF must retain absent angles",
+                ));
+            }
             if unnamed_legacy_type(target.object_type)
                 || matches!(
                     target.object_type,
@@ -435,6 +466,7 @@ pub fn apply_idf_declaration_order(
                         | "BuildingSurface:Detailed"
                         | "OtherEquipment"
                         | "People"
+                        | "ComfortViewFactorAngles"
                         | "Exterior:Lights"
                         | "Site:Location"
                         | "RunPeriod"
@@ -461,6 +493,9 @@ pub fn apply_idf_declaration_order(
                         "RunPeriodControl:SpecialDays" => idf_object.max_fields.max(4),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
+                        "ComfortViewFactorAngles" if !idf_object.semicolon_terminated => {
+                            idf_object.max_fields.saturating_sub(1)
+                        }
                         "People" if idf_object.semicolon_terminated => {
                             idf_object.max_fields.max(10)
                         }
@@ -484,6 +519,7 @@ pub fn apply_idf_declaration_order(
                         _ => idf_object.max_fields,
                     },
                     match target.object_type {
+                        "ComfortViewFactorAngles" => idf_object.comfort_max_extensible_fields,
                         "BuildingSurface:Detailed" => {
                             Some(idf_object.max_fields.saturating_sub(11))
                         }
@@ -569,12 +605,13 @@ fn scan_target_objects(
     let mut field = String::new();
     let mut parsed_field_segment = None::<String>;
     let mut object_start = None::<(usize, usize)>;
+    let mut object_byte_start = 0;
     let mut in_comment = false;
     let mut idf_order = 0_u32;
     let mut line = 1_usize;
     let mut column = 1_usize;
 
-    for character in idf.chars() {
+    for (byte_index, character) in idf.char_indices() {
         let character_line = line;
         let character_column = column;
 
@@ -620,6 +657,7 @@ fn scan_target_objects(
                         object_start.unwrap_or((character_line, character_column)),
                         idf_order,
                         true,
+                        &idf[object_byte_start..byte_index + 1],
                         targets,
                         &mut scanned,
                     )?;
@@ -631,6 +669,7 @@ fn scan_target_objects(
             _ => {
                 if object_start.is_none() && !is_idf_leading_whitespace(character) {
                     object_start = Some((character_line, character_column));
+                    object_byte_start = byte_index;
                 }
                 field.push(character);
             }
@@ -667,6 +706,7 @@ fn scan_target_objects(
             (start_line, start_column),
             idf_order,
             false,
+            &idf[object_byte_start..],
             targets,
             &mut scanned,
         )?;
@@ -719,11 +759,69 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
     )
 }
 
+// Comfort has one regular Name and alternating string/number extension
+// operands. IdfParser advances E for each parsed value or blank extension,
+// while F advances only at delimiters. String tokens include newlines;
+// numeric tokens stop at CR/LF as well as comments and delimiters.
+fn comfort_extensible_fields(raw_object: &str) -> usize {
+    let bytes = raw_object.as_bytes();
+    let Some(comma) = bytes.iter().position(|byte| *byte == b',') else {
+        return 0;
+    };
+    let mut cursor = comma + 1;
+    let mut legacy_index = 0;
+    let mut extensible_index = 0;
+    let mut was_value_parsed = false;
+    loop {
+        while bytes
+            .get(cursor)
+            .is_some_and(|byte| matches!(byte, b' ' | b'\t' | b'\r' | b'\n'))
+        {
+            cursor += 1;
+        }
+        let Some(byte) = bytes.get(cursor) else {
+            return extensible_index;
+        };
+        match byte {
+            b',' | b';' => {
+                if !was_value_parsed && legacy_index >= 1 {
+                    extensible_index += 1;
+                }
+                legacy_index += 1;
+                was_value_parsed = false;
+                cursor += 1;
+                if *byte == b';' {
+                    return extensible_index;
+                }
+            }
+            b'!' => {
+                while bytes.get(cursor).is_some_and(|byte| *byte != b'\n') {
+                    cursor += 1;
+                }
+            }
+            _ => {
+                let numeric = legacy_index >= 1 && extensible_index % 2 == 1;
+                while bytes.get(cursor).is_some_and(|byte| {
+                    !(matches!(byte, b'!' | b',' | b';')
+                        || numeric && matches!(byte, b'\r' | b'\n'))
+                }) {
+                    cursor += 1;
+                }
+                if legacy_index >= 1 {
+                    extensible_index += 1;
+                }
+                was_value_parsed = true;
+            }
+        }
+    }
+}
+
 fn record_object(
     fields: &[String],
     (line, column): (usize, usize),
     idf_order: u32,
     semicolon_terminated: bool,
+    raw_object: &str,
     targets: &[IdfOrderTarget],
     scanned: &mut BTreeMap<&'static str, Vec<ScannedObject>>,
 ) -> Result<(), IdfOrderError> {
@@ -755,6 +853,7 @@ fn record_object(
             idf_order,
             max_fields: fields.len() - 1,
             semicolon_terminated,
+            comfort_max_extensible_fields: None,
             name: format!("{} {}", target.object_type, bucket.len() + 1),
             line,
             column,
@@ -767,13 +866,18 @@ fn record_object(
             target.object_type
         ))
     })?;
-    let Some(name) = fields.get(field_index) else {
-        return Err(IdfOrderError::new(format!(
-            "malformed staged IDF {} object at line {line}, column {column}: missing required name field {}",
-            target.object_type, target.name_field_index
-        )));
+    let comfort = target.object_type == "ComfortViewFactorAngles";
+    let name = match fields.get(field_index) {
+        Some(name) => name.as_str(),
+        None if comfort => "",
+        None => {
+            return Err(IdfOrderError::new(format!(
+                "malformed staged IDF {} object at line {line}, column {column}: missing required name field {}",
+                target.object_type, target.name_field_index
+            )));
+        }
     };
-    if name.is_empty() {
+    if name.is_empty() && !comfort {
         return Err(IdfOrderError::new(format!(
             "malformed staged IDF {} object at line {line}, column {column}: required name is blank",
             target.object_type
@@ -790,7 +894,10 @@ fn record_object(
         idf_order,
         max_fields: fields.len() - 1,
         semicolon_terminated,
-        name: name.clone(),
+        // Values can advance across comments/numeric newlines without a
+        // delimiter. Keep that Native event count independent of legacy F.
+        comfort_max_extensible_fields: comfort.then(|| comfort_extensible_fields(raw_object)),
+        name: name.to_owned(),
         line,
         column,
     });
@@ -1058,6 +1165,141 @@ mod tests {
                         .contains_key(&FieldName("idf_max_extensible_fields".into()))
                 );
             }
+        }
+        // Comfort lists preserve exact original identities, including blank
+        // and case variants, before the shared Alpha Name becomes uppercase.
+        let json = r#"{"ComfortViewFactorAngles":{"a":{},"":{},"A":{"angles":[{"surface_name":"Wall One","angle_factor":1}]}}}"#;
+        let idf = "ComfortViewFactorAngles,a;\nComfortViewFactorAngles,;\nComfortViewFactorAngles,A,Wall One,1;";
+        let ordered = parse_epjson_str_with_idf_order(json, idf)?;
+        assert_eq!(
+            ordered
+                .ordered_instances("ComfortViewFactorAngles")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["a", "", "A"]
+        );
+        for (name, fields, extensible) in [("a", "1", "0"), ("", "1", "0"), ("A", "3", "2")] {
+            let object = &ordered.objects[&crate::ObjectType("ComfortViewFactorAngles".into())]
+                [&crate::ObjectName(name.into())];
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(fields.into()))
+            );
+            assert_eq!(
+                object
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(&RawValue::Number(extensible.into()))
+            );
+        }
+        let blank = parse_epjson_str_with_idf_order(
+            r#"{"ComfortViewFactorAngles":{"":{}}}"#,
+            "ComfortViewFactorAngles,   ;",
+        )?;
+        assert_eq!(
+            blank.ordered_instances("ComfortViewFactorAngles")?[0].0.0,
+            ""
+        );
+        assert!(
+            parse_epjson_str_with_idf_order(
+                json,
+                "ComfortViewFactorAngles,a;ComfortViewFactorAngles,a;ComfortViewFactorAngles,A;"
+            )
+            .is_err()
+        );
+        for (idf, fields, extensible) in [
+            ("ComfortViewFactorAngles,L,S,1", "2", "2"),
+            ("ComfortViewFactorAngles,L,S,", "2", "1"),
+            ("ComfortViewFactorAngles,L,S", "1", "1"),
+        ] {
+            // Genuine IdfParser END returns before attaching temporary angles.
+            let raw =
+                parse_epjson_str_with_idf_order(r#"{"ComfortViewFactorAngles":{"L":{}}}"#, idf)?;
+            let object = raw.ordered_instances("ComfortViewFactorAngles")?[0].1;
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(fields.into()))
+            );
+            assert_eq!(
+                object
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(&RawValue::Number(extensible.into()))
+            );
+            assert!(!object.fields.contains_key(&FieldName("angles".into())));
+            assert!(parse_epjson_str_with_idf_order(r#"{"ComfortViewFactorAngles":{"L":{"angles":[{"surface_name":"S","angle_factor":1}]}}}"#, idf).is_err());
+        }
+        // A comment can end a string value without advancing legacy F;
+        // a numeric CR/LF also ends a value and selects the next E operand.
+        for (idf, angles, fields, extensible) in [
+            (
+                "ComfortViewFactorAngles,L,Wall One !comment\n 1;",
+                r#"[{"surface_name":"Wall One","angle_factor":1}]"#,
+                "2",
+                "2",
+            ),
+            (
+                "ComfortViewFactorAngles,L,Wall One,0.5\nWall Two,0.5;",
+                r#"[{"surface_name":"Wall One","angle_factor":0.5},{"surface_name":"Wall Two","angle_factor":0.5}]"#,
+                "4",
+                "4",
+            ),
+            (
+                "ComfortViewFactorAngles,L,Wall One !one\n0.5 !two\nWall Two !three\n0.5;",
+                r#"[{"surface_name":"Wall One","angle_factor":0.5},{"surface_name":"Wall Two","angle_factor":0.5}]"#,
+                "2",
+                "4",
+            ),
+            (
+                "ComfortViewFactorAngles,L,Wall\n One,1;",
+                r#"[{"surface_name":"Wall\n One","angle_factor":1}]"#,
+                "3",
+                "2",
+            ),
+            (
+                "ComfortViewFactorAngles,L,Wall One,!comment\n;",
+                r#"[{"surface_name":"Wall One"}]"#,
+                "3",
+                "2",
+            ),
+        ] {
+            let json = format!(r#"{{"ComfortViewFactorAngles":{{"L":{{"angles":{angles}}}}}}}"#);
+            let raw = parse_epjson_str_with_idf_order(&json, idf)?;
+            let object = raw.ordered_instances("ComfortViewFactorAngles")?[0].1;
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(fields.into()))
+            );
+            assert_eq!(
+                object
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(&RawValue::Number(extensible.into()))
+            );
+        }
+        for (idf, fields, extensible) in [
+            ("ComfortViewFactorAngles,L,Wall One !comment\n 1", "1", "2"),
+            (
+                "ComfortViewFactorAngles,L,Wall One,0.5\nWall Two,0.5",
+                "3",
+                "4",
+            ),
+        ] {
+            let raw =
+                parse_epjson_str_with_idf_order(r#"{"ComfortViewFactorAngles":{"L":{}}}"#, idf)?;
+            let object = raw.ordered_instances("ComfortViewFactorAngles")?[0].1;
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(fields.into()))
+            );
+            assert_eq!(
+                object
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(&RawValue::Number(extensible.into()))
+            );
+            assert!(!object.fields.contains_key(&FieldName("angles".into())));
         }
         Ok(())
     }

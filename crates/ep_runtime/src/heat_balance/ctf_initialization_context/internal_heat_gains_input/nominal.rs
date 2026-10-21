@@ -211,6 +211,7 @@ impl SelectedInternalHeatGains {
                 let mrt_type = match people.mrt_calc_type {
                     0 => "Zone Averaged",
                     1 => "Surface Weighted",
+                    2 => "Angle Factor",
                     _ => {
                         return Err(unavailable(
                             "actual unsupported People nominal MRT branch2795",

@@ -210,6 +210,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("OutputControl:Sizing:Style", 1, 0, 0, 0, None),
         ("OutputControl:Table:Style", 3, 0, 0, 0, None),
         ("People", 21, 8, 0, 0, None),
+        ("ComfortViewFactorAngles", 1, 0, 1, 1, Some("angles")),
         ("Refrigeration:AirChiller", 12, 16, 0, 0, None),
         ("Refrigeration:Case", 15, 21, 0, 0, None),
         (

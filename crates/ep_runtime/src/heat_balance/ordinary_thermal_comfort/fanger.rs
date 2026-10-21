@@ -272,7 +272,15 @@ impl SourceThermalComfort {
                     o.backend,
                 )?;
             }
-            _ => return Err(Error::Unavailable("positive Fanger AngleFactor MRT2279")),
+            2 => {
+                self.rad_temp = self.calc_source_angle_factor_mrt(
+                    people.angle_factor_list_ptr,
+                    o.geometry,
+                    o.control,
+                    o.history,
+                )?;
+            }
+            _ => return Err(Error::Unavailable("actual invalid Fanger MRT selection")),
         }
         let zone = index(self.zone_num)?;
         let radiation_to_person = fan_value(&o.fan.zone_q_ht_rad_sys_to_person, zone)?
@@ -292,6 +300,70 @@ impl SourceThermalComfort {
             self.rad_temp -= 273.15;
         }
         Ok(self.rad_temp)
+    }
+
+    /// Literal CalcAngleFactorMRT2075-2102, in retained list row order.
+    /// Final Source Surface ordinals map through typed IDs to real term1 history.
+    fn calc_source_angle_factor_mrt(
+        &self,
+        number: i32,
+        geometry: &SurfaceGeometryInputState,
+        control: &SelectedHeatBalanceInputState,
+        history: &CtfThermalHistoryState,
+    ) -> Result<f64, Error> {
+        let list = self
+            .angle_factor_list
+            .as_ref()
+            .and_then(|lists| lists.get(index(number).ok()?))
+            .ok_or(Error::Unavailable(
+                "actual CalcAngleFactorMRT retained list",
+            ))?;
+        let surfaces = geometry
+            .final_surfaces
+            .as_deref()
+            .ok_or(Error::Unavailable(
+                "actual CalcAngleFactorMRT final Surfaces",
+            ))?;
+        let mut surface_temp_emiss_angle_fac_summed = 0.0;
+        let mut sum_surface_emiss_angle_factor = 0.0;
+        for at in 0..count(list.total_angle_factor_surfaces)? {
+            let number = *list
+                .surface_ptr
+                .get(at)
+                .ok_or(Error::Unavailable("actual CalcAngleFactorMRT SurfacePtr"))?;
+            let surface = surfaces
+                .get(index(number)?)
+                .ok_or(Error::Unavailable("actual CalcAngleFactorMRT Surface"))?;
+            let id = surface.typed_id.ok_or(Error::Unavailable(
+                "actual CalcAngleFactorMRT typed Surface ID",
+            ))?;
+            let history_at = history
+                .surface_ids
+                .iter()
+                .position(|candidate| *candidate == id)
+                .ok_or(Error::Unavailable(
+                    "actual CalcAngleFactorMRT same history mapping",
+                ))?;
+            let surface_temp =
+                *history.normal.inside_temperature[0]
+                    .get(history_at)
+                    .ok_or(Error::Unavailable(
+                        "actual CalcAngleFactorMRT SurfInsideTempHist term1",
+                    ))?
+                    + 273.15;
+            let emissivity = control
+                .construction_usage
+                .get(index(surface.row.construction)?)
+                .ok_or(Error::Unavailable("actual CalcAngleFactorMRT construction"))?
+                .inside_absorp_thermal;
+            let surface_eaf = emissivity
+                * *list.angle_factor.get(at).ok_or(Error::Unavailable(
+                    "actual CalcAngleFactorMRT angle operand",
+                ))?;
+            surface_temp_emiss_angle_fac_summed += surface_eaf * pow4(surface_temp);
+            sum_surface_emiss_angle_factor += surface_eaf;
+        }
+        Ok(root4(surface_temp_emiss_angle_fac_summed / sum_surface_emiss_angle_factor) - 273.15)
     }
 
     /// Literal CalcSurfaceWeightedMRT2105-2198 over the same Surface fields,

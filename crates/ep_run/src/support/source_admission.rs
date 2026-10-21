@@ -96,6 +96,9 @@ impl SourceSupportAdmission {
             // Actual Source schedule reporting consumes real key_field and EIO
             // owners; this token never substitutes a TypedModel schedule.
             "Output:Schedules",
+            // Actual comfort initialization consumes all declared lists through
+            // its shared IP getter; this remains compiler RawOnly.
+            "ComfortViewFactorAngles",
             // Actual local getters populate the same retained Day/Week/Detailed
             // graph. Typed legacy schedules alone do not grant this token.
             "Schedule:Day:Hourly",

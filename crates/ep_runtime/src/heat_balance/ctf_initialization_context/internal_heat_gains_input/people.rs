@@ -499,6 +499,7 @@ impl SelectedInternalHeatGains {
                     }
                 }
             }
+            2 => row.angle_factor_list_name = alphas[7].clone(),
             _ => return Err(unavailable("positive Fanger unsupported MRT inputs")),
         }
         let row = self

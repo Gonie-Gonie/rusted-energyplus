@@ -3,6 +3,28 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        "ComfortViewFactorAngles" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[SchemaField {
+                name: "name",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+            extension: Some("angles"),
+            extensible: &[
+                SchemaField {
+                    name: "surface_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "angle_factor",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+        },
         "AirLoopHVAC:OutdoorAirSystem" => SchemaDefinition {
             has_name: true,
             name_has_default: false,
