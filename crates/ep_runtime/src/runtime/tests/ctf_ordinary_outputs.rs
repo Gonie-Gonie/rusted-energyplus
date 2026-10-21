@@ -7005,6 +7005,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     availability: &availability,
                     psychrometrics: &mut psychrometrics,
                     backend: &mut backend,
+                    recurring_errors: &mut reports.source_recurring_errors,
                 };
                 let zone = &owners.zones.zones.as_ref().ok_or("unconditioned Zone")?[0];
                 assert!(!zone.is_controlled && zone.system_zone_node_number == 0);
@@ -7113,6 +7114,300 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 );
                 assert_eq!(backend.state.tracking.total_warning_errors, 0);
                 assert_eq!(backend.state.tracking.total_severe_errors, 0);
+                // The failed parent and the three humidity/clamp cases above
+                // remain intact. This explicit child enables diagnostics through
+                // the full real project getter, then reuses the same live gains,
+                // Zone/Space AirHB, controller and persistent report owners.
+                use crate::heat_balance::selected_input_processor::{
+                    SelectedInputProcessor, SourceInputFamily, SourceObjectDefinition,
+                    SourceObjectShape,
+                };
+                use crate::heat_balance::selected_project_data::{
+                    ProjectDataOwners, ProjectDiagnosticsObject, ProjectInputObject,
+                    SelectedProjectData, SelectedProjectDataInput,
+                };
+                let raw = SelectedProjectDataInput {
+                    source_is_epjson: true,
+                    objects: [
+                        (
+                            "Version",
+                            "version_identifier",
+                            ProjectInputValue::String("26.1".into()),
+                        ),
+                        (
+                            "Timestep",
+                            "number_of_timesteps_per_hour",
+                            ProjectInputValue::Number(4.0),
+                        ),
+                    ]
+                    .into_iter()
+                    .map(|(family, field, value)| {
+                        (
+                            family.into(),
+                            vec![ProjectInputObject {
+                                object_name: family.into(),
+                                fields: std::collections::BTreeMap::from([(field.into(), value)]),
+                                idf_max_fields: None,
+                            }],
+                        )
+                    })
+                    .collect(),
+                    diagnostics: vec![ProjectDiagnosticsObject {
+                        object_name: "Air balance diagnostics".into(),
+                        keys: vec![
+                            Some("DisplayWeatherMissingDataWarnings".into()),
+                            Some("DisplayZoneAirHeatBalanceOffBalance".into()),
+                        ],
+                    }],
+                };
+                let definitions = [
+                    ("Version", 1, 0, 0),
+                    ("Timestep", 0, 1, 0),
+                    ("Output:Diagnostics", 0, 0, 1),
+                ]
+                .into_iter()
+                .map(
+                    |(family, alphas, numerics, extensions)| SourceObjectDefinition {
+                        object_type: family.into(),
+                        alpha_fields: alphas,
+                        numeric_fields: numerics,
+                        alpha_extensions: extensions,
+                        numeric_extensions: 0,
+                        extension: (extensions != 0).then(|| "diagnostics".into()),
+                    },
+                )
+                .collect();
+                let mut families: std::collections::BTreeMap<String, SourceInputFamily> = raw
+                    .objects
+                    .iter()
+                    .map(|(family, objects)| {
+                        (
+                            family.clone(),
+                            SourceInputFamily::Objects(
+                                objects
+                                    .iter()
+                                    .map(|object| SourceObjectShape {
+                                        object_name: object.object_name.clone(),
+                                        field_sizes: object
+                                            .fields
+                                            .keys()
+                                            .map(|field| (field.clone(), 1))
+                                            .collect(),
+                                    })
+                                    .collect(),
+                            ),
+                        )
+                    })
+                    .collect();
+                families.insert(
+                    "Output:Diagnostics".into(),
+                    SourceInputFamily::Objects(vec![SourceObjectShape {
+                        object_name: raw.diagnostics[0].object_name.clone(),
+                        field_sizes: std::collections::BTreeMap::from([(
+                            "diagnostics".into(),
+                            raw.diagnostics[0].keys.len(),
+                        )]),
+                    }]),
+                );
+                let mut project_input =
+                    SelectedInputProcessor::from_admitted_input(definitions, families)?;
+                let mut project_shortcut = crate::heat_balance::selected_input_processor::SourceInputProcessorShortCut::default();
+                project_shortcut.allocate_from_input(&project_input)?;
+                let mut project = SelectedProjectData::default();
+                let mut project_weather = crate::weather::day::WeatherDayState {
+                    environment: weather,
+                    ..Default::default()
+                };
+                let mut current_module = String::new();
+                let globals = reports
+                    .selected_heat_balance_globals
+                    .as_mut()
+                    .ok_or("same diagnostic globals")?;
+                assert!(!globals.display_zone_air_heat_balance_off_balance);
+                assert!(
+                    !project_weather
+                        .environment
+                        .display_weather_missing_data_warnings
+                );
+                assert!(
+                    project_input.is_object_unused("Output:Diagnostics", "Air balance diagnostics")
+                );
+                project.get_project_data(
+                    &raw,
+                    &mut ProjectDataOwners {
+                        input: &mut project_input,
+                        shortcut: &mut project_shortcut,
+                        globals,
+                        weather: &mut project_weather,
+                        hvac: &mut hvac,
+                        heat_balance_current_module_object: &mut current_module,
+                    },
+                    &mut backend,
+                    &mut child_eio,
+                )?;
+                assert!(globals.display_zone_air_heat_balance_off_balance);
+                assert!(
+                    project_weather
+                        .environment
+                        .display_weather_missing_data_warnings
+                );
+                assert!(
+                    !project_input
+                        .is_object_unused("Output:Diagnostics", "Air balance diagnostics")
+                );
+                assert_eq!(project_weather.global.time_step_zone_sec, 900.0);
+                assert_eq!(backend.state.tracking.total_warning_errors, 0);
+                assert_eq!(reports.source_recurring_errors.number, 0);
+                let mut owners = SourceZoneAirOwners {
+                    zones: reports
+                        .selected_zone_input
+                        .as_mut()
+                        .ok_or("same diagnostic Zones")?,
+                    equipment: &mut latent_equipment,
+                    geometry,
+                    surface_arrays: &surfaces,
+                    fan: &mut fan,
+                    gains: &reports.selected_internal_heat_gains,
+                    control: &mut reports.heat_balance_input_state,
+                    space_controls: controls,
+                    globals,
+                    clock: &project_weather.global,
+                    environment: &project_weather.environment,
+                    hvac: &mut hvac,
+                    input: reports
+                        .selected_input_processor
+                        .as_mut()
+                        .ok_or("same corrector IP")?,
+                    shortcut: &mut shortcut,
+                    source_is_epjson: &reports
+                        .heat_balance_input
+                        .as_ref()
+                        .ok_or("same raw format")?
+                        .source_is_epjson,
+                    faults: &reports.source_faults_manager,
+                    schedules: reports
+                        .selected_schedule_manager
+                        .as_mut()
+                        .ok_or("same schedules")?,
+                    availability: &availability,
+                    psychrometrics: &mut psychrometrics,
+                    backend: &mut backend,
+                    recurring_errors: &mut reports.source_recurring_errors,
+                };
+                assert_eq!(
+                    owners.zones.zones.as_ref().ok_or("diagnostic Zone")?[0]
+                        .air_heat_balance_imbalance_error_index,
+                    0
+                );
+                assert!(!owners.hvac.turn_fans_on);
+                let mut excesses = Vec::new();
+                let mut same_index = None;
+                crate::psychrometrics::with_fresh_psychrometric_state(
+                    || -> Result<(), Box<dyn std::error::Error>> {
+                        crate::psychrometrics::initialize_source_psychrometric_caches();
+                        for occurrence in 1..=2 {
+                            // Authored current/history operands go through the real
+                            // ThirdOrder solve, humidity and component-report caller.
+                            let current =
+                                &mut air.zones.as_mut().ok_or("diagnostic AirHB input")?[0].air;
+                            current.mat = 23.0;
+                            current.zt = 23.0;
+                            current.xmat = [23.0; 4];
+                            current.air_hum_rat = 0.008;
+                            current.w_prev_zone_ts = [0.008; 4];
+                            air.correct_source_zone_air_temperatures(
+                                true,
+                                &mut controller,
+                                &mut owners,
+                            )?;
+                            let report = &controller
+                                .reports
+                                .zones
+                                .as_ref()
+                                .ok_or("real component result")?[0];
+                            assert!(report.sum_int_gains > 0.0 && report.czd_tdt > 0.0);
+                            for value in [
+                                report.sum_had_tsurfs,
+                                report.sum_m_cp_d_tzones,
+                                report.sum_m_cp_dt_infil,
+                                report.sum_m_cp_d_tsystem,
+                                report.sum_non_air_system,
+                            ] {
+                                assert_eq!(
+                                    value, 0.0,
+                                    "real zero-convection/no-flow child operands"
+                                );
+                            }
+                            let threshold = 0.2
+                                * (report.sum_int_gains * report.sum_int_gains
+                                    + report.czd_tdt * report.czd_tdt)
+                                    .sqrt();
+                            let excess = report.im_balance.abs() - threshold;
+                            assert!(
+                                excess > 0.0,
+                                "actual solved report reaches Native strict warning predicate"
+                            );
+                            excesses.push(excess);
+                            let index = owners
+                                .zones
+                                .zones
+                                .as_ref()
+                                .ok_or("persistent diagnostic Zone")?[0]
+                                .air_heat_balance_imbalance_error_index;
+                            assert_eq!(index, 1);
+                            assert_eq!(*same_index.get_or_insert(index), index);
+                            assert_eq!(owners.recurring_errors.number, 1);
+                            let row = &owners
+                                .recurring_errors
+                                .rows
+                                .as_ref()
+                                .ok_or("actual recurring row")?[0];
+                            assert_eq!(row.count, occurrence);
+                            assert_eq!((row.warmup_count, row.sizing_count), (0, 0));
+                            assert!(row.report_max && row.report_min && !row.report_sum);
+                            assert_eq!(
+                                (&*row.max_units, &*row.min_units, &*row.sum_units),
+                                ("{W}", "{W}", "")
+                            );
+                            assert_eq!(
+                                row.max_value.to_bits(),
+                                excesses
+                                    .iter()
+                                    .copied()
+                                    .fold(f64::NEG_INFINITY, f64::max)
+                                    .to_bits()
+                            );
+                            assert_eq!(
+                                row.min_value.to_bits(),
+                                excesses
+                                    .iter()
+                                    .copied()
+                                    .fold(f64::INFINITY, f64::min)
+                                    .to_bits()
+                            );
+                            assert_eq!(
+                                owners.backend.state.tracking.total_warning_errors,
+                                occurrence
+                            );
+                            assert_eq!(owners.backend.state.tracking.total_severe_errors, 0);
+                        }
+                        Ok(())
+                    },
+                )?;
+                let text = std::str::from_utf8(&error)?;
+                assert_eq!(
+                    text.matches("Zone Air Heat Balance is out of balance for zone named ")
+                        .count(),
+                    1
+                );
+                assert_eq!(
+                    text.matches("Zone Air Heat Balance Deviation Rate is more than ")
+                        .count(),
+                    1
+                );
+                assert!(text.contains(" {W}\n"));
+                assert_eq!(text.matches(" Occurrence info: Environment=").count(), 1);
+                assert!(!text.contains("Night cycle fan operation"));
             }
         }
         // Real invalid/Water and negative-fuel diagnostics run before final

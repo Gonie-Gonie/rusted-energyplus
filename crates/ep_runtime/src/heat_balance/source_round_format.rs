@@ -61,7 +61,7 @@ fn zero_pad_exponent(text: &mut String) {
     }
 }
 
-/// Exact selected R branch structure for the no-width .0/.2/.3/.4/.10R callers.
+/// Exact selected R branch structure for the no-width .0/.1/.2/.3/.4/.10R callers.
 /// Values are formatted after the original nudges, with no decimal rescaling.
 pub(crate) fn round(value: f64, precision: usize) -> Result<String, SourceRoundFormatUnavailable> {
     let threshold = f64::from_bits(0x3fb9_9999_9999_9999);

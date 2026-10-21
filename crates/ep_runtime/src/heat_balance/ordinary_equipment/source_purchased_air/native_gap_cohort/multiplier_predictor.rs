@@ -494,6 +494,7 @@ fn call(f: &mut Factory, operation: FullCall) -> Result<Option<f64>> {
         availability: &f.hvac_manager.ancillary.availability,
         psychrometrics: &mut f.psych,
         backend: &mut backend,
+        recurring_errors: &mut f.ancillary.source_recurring_errors,
     };
     match operation {
         FullCall::Setpoints { prior } => {

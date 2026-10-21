@@ -52,6 +52,7 @@ pub(crate) struct SourceHvacOwners<'a, 'backend> {
     pub(crate) faults: &'a crate::heat_balance::source_initialization::SourceFaultsManager,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
+    pub(crate) recurring_errors: &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
     /// Same actual DataPlant.PlantLoop allocated empty by SimulationManager; no second array.
     pub(crate) plant_loops: &'a mut Option<Vec<()>>,
     pub(crate) project: &'a mut SelectedProjectData,
@@ -111,6 +112,7 @@ impl SourceHvacOwners<'_, '_> {
             schedules: self.schedules,
             psychrometrics: self.psychrometrics,
             backend: self.backend,
+            recurring_errors: self.recurring_errors,
         };
         self.controller.manage_source_zone_air_updates(
             update,

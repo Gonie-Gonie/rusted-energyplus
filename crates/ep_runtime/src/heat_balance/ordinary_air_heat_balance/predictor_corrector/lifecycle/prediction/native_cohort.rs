@@ -638,6 +638,8 @@ fn all_native_b_prediction_entries_match_source_rollback_and_sensible_bits() -> 
         sqlite: None,
     };
     let source_is_epjson = false;
+    let mut recurring_errors =
+        crate::heat_balance::source_initialization::SourceRecurringErrorState::default();
     let mut shortened = 0;
     let mut groups = BTreeMap::new();
     let mut first_physical_address = None;
@@ -675,6 +677,7 @@ fn all_native_b_prediction_entries_match_source_rollback_and_sensible_bits() -> 
             availability: &availability,
             psychrometrics: &mut psychrometrics,
             backend: &mut backend,
+            recurring_errors: &mut recurring_errors,
         };
         seed_state(&mut air, &mut controller, &mut owners, &entry)?;
         let ordinal = integer(member(&entry, "node_ordinal")?)?;
@@ -776,6 +779,7 @@ fn all_native_b_prediction_entries_match_source_rollback_and_sensible_bits() -> 
         &mut gains,
         &globals,
         &mut backend,
+        &mut recurring_errors,
     )?;
     assert!(
         console.is_empty(),
@@ -1086,6 +1090,7 @@ fn run_corrector_cohort(
     gains: &mut SelectedInternalHeatGains,
     globals: &SelectedHeatBalanceGlobals,
     backend: &mut SourceErrorBackend<'_>,
+    recurring_errors: &mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
 ) -> Result {
     let cases = array(member(fixture, "corrector_cases")?)?;
     assert_eq!(cases.len(), 1168);
@@ -1176,6 +1181,7 @@ fn run_corrector_cohort(
                 availability: &availability,
                 psychrometrics: &mut psychrometrics,
                 backend,
+                recurring_errors,
             };
             seed_state(&mut air, controller, &mut owners, &entry)?;
             seed_corrector_air(&mut air, member(&entry, "air")?)?;

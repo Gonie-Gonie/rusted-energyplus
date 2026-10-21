@@ -63,6 +63,8 @@ pub(crate) struct SourceZoneAirOwners<'a, 'b> {
         &'a crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) backend: &'a mut SourceErrorBackend<'b>,
+    pub(crate) recurring_errors:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
 }
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SourceZoneAirPredictorCorrector {

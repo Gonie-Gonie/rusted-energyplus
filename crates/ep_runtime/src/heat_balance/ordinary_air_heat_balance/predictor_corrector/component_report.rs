@@ -186,11 +186,57 @@ impl SourceZoneSpaceHeatBalanceData {
                 && !owners.globals.doing_sizing
             {
                 if zone(owners, number)?.air_heat_balance_imbalance_error_index == 0 {
-                    return Err(Error::Unavailable(
-                        "positive air imbalance ShowWarningMessage5659",
-                    ));
+                    let message = format!(
+                        "Zone Air Heat Balance is out of balance for zone named {}",
+                        zone(owners, number)?.name
+                    );
+                    owners.backend.show_warning_message(&message)?;
+                    let threshold_text = crate::heat_balance::source_round_format::round(
+                        threshold, 1,
+                    )
+                    .map_err(|error| {
+                        Error::Format(format!("actual air imbalance .1R unavailable: {error:?}"))
+                    })?;
+                    owners.backend.show_continue_error(&format!(
+                        "Zone Air Heat Balance Deviation Rate is more than {threshold_text} {{W}}"
+                    ))?;
+                    if owners.hvac.turn_fans_on {
+                        owners.backend.show_continue_error(
+                            "Night cycle fan operation may be causing above error",
+                        )?;
+                    }
+                    owners.backend.show_source_continue_error_time_stamp(
+                        " Occurrence info:",
+                        owners.clock,
+                        owners.globals,
+                        owners.environment,
+                        owners.hvac,
+                    )?;
                 }
-                return Err(Error::Unavailable("positive air imbalance recurring5667"));
+                // The persistent index belongs to the same real Zone. Reborrow
+                // it only here, after all original reads and first-warning effects.
+                let zone = owners
+                    .zones
+                    .zones
+                    .as_mut()
+                    .and_then(|rows| rows.get_mut(index(number).ok()?))
+                    .ok_or(Error::Unavailable("same actual air imbalance Zone index"))?;
+                owners.backend.show_source_recurring_warning_at_end(
+                    &format!(
+                        "Zone Air Heat Balance is out of balance ... zone named {}",
+                        zone.name
+                    ),
+                    &mut zone.air_heat_balance_imbalance_error_index,
+                    owners.recurring_errors,
+                    owners.clock,
+                    owners.globals,
+                    Some(report.im_balance.abs() - threshold),
+                    Some(report.im_balance.abs() - threshold),
+                    None,
+                    "{W}",
+                    "{W}",
+                    "",
+                )?;
             }
         }
         Ok(())

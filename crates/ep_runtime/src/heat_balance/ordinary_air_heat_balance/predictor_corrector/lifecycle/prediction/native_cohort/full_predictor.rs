@@ -262,6 +262,8 @@ pub(super) fn run() -> Result<usize> {
         &mut backend,
     )?;
     let source_is_epjson = false;
+    let mut recurring_errors =
+        crate::heat_balance::source_initialization::SourceRecurringErrorState::default();
     let mut stable_addresses = None;
     let mut shortened = 0;
     // No property-state reset between calls. Native cache state was unobserved;
@@ -352,6 +354,7 @@ pub(super) fn run() -> Result<usize> {
             availability: &availability,
             psychrometrics: &mut psychrometrics,
             backend: &mut backend,
+            recurring_errors: &mut recurring_errors,
         };
         seed_state(air, &mut controller, &mut owners, &entry)?;
         seed_corrector_air(air, member(&entry, "air")?)?;

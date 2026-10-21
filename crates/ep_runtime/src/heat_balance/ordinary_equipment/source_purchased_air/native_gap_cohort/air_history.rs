@@ -241,6 +241,7 @@ fn call(factory: &mut Factory, operation: &str) -> Result {
         availability: &factory.hvac_manager.ancillary.availability,
         psychrometrics: &mut factory.psych,
         backend: &mut backend,
+        recurring_errors: &mut factory.ancillary.source_recurring_errors,
     };
     match operation {
         "push_zone" => factory

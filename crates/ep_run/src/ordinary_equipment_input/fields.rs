@@ -620,6 +620,8 @@ pub(super) fn admitted_field(
                                             "DisplayAllWarnings",
                                             "DisplayUnusedObjects",
                                             "DisplayUnusedSchedules",
+                                            "DisplayWeatherMissingDataWarnings",
+                                            "DisplayZoneAirHeatBalanceOffBalance",
                                         ],
                                     ))
                             }

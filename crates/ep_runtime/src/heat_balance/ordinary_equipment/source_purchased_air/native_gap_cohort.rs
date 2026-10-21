@@ -851,6 +851,7 @@ impl Factory {
             faults: &self.ancillary.source_faults_manager,
             psychrometrics: &mut self.psych,
             backend: &mut backend,
+            recurring_errors: &mut self.ancillary.source_recurring_errors,
             plant_loops: &mut self.startup.plant_loops,
             project: &mut self.project,
             contaminants: &mut self.contaminants,

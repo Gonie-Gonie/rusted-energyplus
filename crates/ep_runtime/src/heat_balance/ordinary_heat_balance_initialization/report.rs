@@ -118,6 +118,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             faults: o.faults,
             psychrometrics: o.psychrometrics,
             backend: o.backend,
+            recurring_errors: o.recurring_errors,
             plant_loops: &mut o.startup.plant_loops,
             project: o.project,
             contaminants: &mut o.heat_balance.contaminants,

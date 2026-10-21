@@ -872,6 +872,16 @@ mod tests {
                     ],
                     false,
                 ),
+                (
+                    Some(r#"[{"key":"DisplayWeatherMissingDataWarnings"}]"#),
+                    vec![Some("DisplayWeatherMissingDataWarnings")],
+                    false,
+                ),
+                (
+                    Some(r#"[{"key":"DisplayZoneAirHeatBalanceOffBalance"}]"#),
+                    vec![Some("DisplayZoneAirHeatBalanceOffBalance")],
+                    false,
+                ),
                 (Some(r#"[{}]"#), vec![None], false),
                 (
                     Some(r#"[{}, {"key":"DisplayUnusedObjects"}, {}]"#),
@@ -1131,7 +1141,7 @@ mod tests {
                 }
             }
             for entries in [
-                r#"[{"key":"DisplayWeatherMissingDataWarnings"}]"#,
+                r#"[{"key":"ReportDuringHVACSizingSimulation"}]"#,
                 r#"[{"key":"ReportDuringWarmup","ignored":1}]"#,
                 r#"[{"key":""}]"#,
                 r#"[{"key":" "}]"#,

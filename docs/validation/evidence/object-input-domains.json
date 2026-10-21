@@ -253,37 +253,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/people-ankle-draft-workspace-tests-56.log",
-        "sha256": "cc197cfbb5d377d89c0fe1553b8893faabf1bfad3dd44f67d278560a2ae9fe92",
-        "bytes": 773594
+        "path": ".runtime/object-expansion/diagnostics-weather-offbalance-workspace-tests-60.log",
+        "sha256": "b47e2b25fceaccbbd4f5a5c8cbeab7a9f2aabd5fc8a7338277e19f8568ff36ca",
+        "bytes": 773376
       },
-      "scope": "Full workspace regression includes genuine ankle-only getter/registration and scalar owner checks; the connected CTF fixture preserves its actual fresh-Space boundary. Full both-model flow is closed by the separately recorded same-input A/B pairs."
+      "scope": "Full workspace regression includes the same genuine Raw/IP/project getter and positive offbalance corrector child with persistent recurring ownership. All original failed-parent assertions remain; separately recorded same-input A/B pairs govern complete physical flow."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-unused-diagnostics-clippy-59.log",
-        "sha256": "83bd670a57319d0c84bfc6047e3a5c1588a159532bf3a93eeb774773c7df29f4",
-        "bytes": 580
+        "path": ".runtime/object-expansion/diagnostics-weather-offbalance-clippy-60.log",
+        "sha256": "73fd69f1d6bea1a24a6087c1b713b466c57d932c23e16f1cbcb89f4df82666ae",
+        "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/diagnostics-unused-docs-59.log",
-        "sha256": "a366baa1c46fb026f3fc9b2b2ce0b09d4967798e67b7799d9ed2dfd39be29a3f",
+        "path": ".runtime/object-expansion/diagnostics-weather-offbalance-docs-60.log",
+        "sha256": "1d2d9f24b47745b5254f3cc25e212d95753249901bf960b5293efd4eac312c6e",
         "bytes": 354
       },
-      "clippy_through_build": "diagnostics-unused-59",
+      "clippy_through_build": "diagnostics-weather-offbalance-60",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/people-ankle-draft-native-cohort-check-56.log",
-          "sha256": "c1b15b785b19d7992314f16d5c87ed0db83160be9107584229fa6de9274ffc77",
+          "path": ".runtime/object-expansion/diagnostics-weather-offbalance-native-cohort-check-60.log",
+          "sha256": "bde2e8526459238daf4a2363d542286a4d379e4d7e8fc1a5d2913d92166baef2",
           "bytes": 1468006
         },
-        "scope": "Compile-only verification of existing optional callers after the AnkleDraft owner/storage change; existing feature warnings remain, with no optional tests or engines.",
-        "through_build": "people-ankle-draft-56"
+        "scope": "Compile-only verification of existing optional callers after shared recurring-state borrow threading; no optional tests or engines are claimed.",
+        "through_build": "diagnostics-weather-offbalance-60"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -5834,12 +5834,156 @@
           "passed": true
         },
         "effective_state": "Current own-initial-True Native59 and same-input Source59 require actual new Build59. Source diagnostics use six known keys, actual missing key/None, ignored row/instance metadata and exact singleton name through the same IP/project/global owners. Legacy and all reserved/other-family fences remain. All selected57 policies/origins remain A119/B105 with People2/Ankle1 raw96/binary and real six Fanger/common ESO/RDD absences. Actual orphan/extra diagnostics, names/counts/order/phases/extrema and whole reports are freshly observed without prescribed inventories, warnings, valid segments, values or parent answers. Immediate Native58 identity ancestry stays separate from Native56 policy proof; Source58 history is archive-only. NoSizing/NoLimit/empty monthly/Mixing/EMS/other-model/spatial/user-fluid bounds and normal SourceB staging remain."
+      },
+      {
+        "id": "diagnostics-weather-offbalance-a",
+        "group": "diagnostics_weather_offbalance",
+        "source_build": "diagnostics-weather-offbalance-60",
+        "scope": "A",
+        "actual_Source_build_reused": false,
+        "current60_changed_source_path_count": 14,
+        "current60_functional_production_source_path_count": 6,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-diagnostics-weather-offbalance-a/calibration-01/input.epJSON",
+          "sha256": "8e03db1d8bf7bd1a57e61a15e01c76089fd8040c0cec463cffaebb0ce915139f",
+          "bytes": 58443
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-diagnostics-weather-offbalance-a/calibration-01/receipt.json",
+          "sha256": "ead0214b353993a8519ce89421a5a8fa088607ebb5c6f62dc2878b59ae4f5290",
+          "bytes": 41226
+        },
+        "Native_calibration_unit": 60,
+        "Native60_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-diagnostics-weather-offbalance-a-60/diagnostics-weather-offbalance-a/receipt.json",
+          "sha256": "58116ab8862ce15634eb89b6cb1070f1e68146b606dce6ce10f35ea886c17662",
+          "bytes": 6115
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/diagnostics-weather-offbalance-a-60/run-summary.json",
+          "sha256": "bbc6243fcc7074c9f8cd9b9c4d03c1ebc601979cde45c625429c9e8c2d487366",
+          "bytes": 51294
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/eplus-rs.exe",
+          "sha256": "8f7631689f2caaad26b910b5798c0047491a374c9d335afa31a2b6f65f98d8f6",
+          "bytes": 76313359
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/61/61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29",
+          "sha256": "61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/receipt.json",
+          "sha256": "f302e4e709cdbb020aabd25d650a9b68e53dd1c7e02a8ff680d7bc04f20066fc",
+          "bytes": 6768
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-diagnostics-weather-offbalance-a-comparisons-60/diagnostics-weather-offbalance-a/comparison.json",
+          "sha256": "ab13e5b78ee41be0aacba0d07beeb0eb380f443a0128eb2c885b862f57ff5811",
+          "bytes": 748504
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-diagnostics-weather-offbalance-a-60-launch/diagnostics-weather-offbalance-a/request.json",
+          "sha256": "d829a1975d1a21635a9e322b85f600d2580a8b56c4a1675f1cf2052dd5368432",
+          "bytes": 3439
+        },
+        "totals": {
+          "series": 119,
+          "samples": 11136,
+          "raw_operand_unequal": 3449,
+          "parsed_binary64_unequal": 3449,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native60 and same-input Source60 require actual new Build60. The genuine project getter writes the weather environment and Zone offbalance flags from the two additional official keys; legacy, six retained Source keys/None/ignored metadata and all reserved/other-family fences remain. Unchanged GoldenNREL feeds real hourly counters and the end-environment weather diagnostic report. The strict original Zone component threshold reads the same live AirHB/Zone/HVAC/shared recurring owners, excludes warmup/sizing and preserves first-prefix/continue/timestamp/recurrence order. Actual physical weather/offbalance warnings, counts, extrema, crossings and complete reports are newly observed, never prescribed. Observer60 preserves full raw ERR/END and actual counters, adjusting only the row-count inequality for physically observed exact noncounting first offbalance prefixes. All224 selected57 rules/origins remain A119/B105 with People2/Ankle1 raw96/binary and actual six Fanger/common ESO/RDD absences. Immediate Native59 identity ancestry stays separate from Native56 policy proof; Source59 history is immutable archive-only. NoSizing/NoLimit/empty monthly/Mixing/EMS/other-model/spatial/user-fluid bounds and normal SourceB staging remain. Fourteen changed source roles are six functional production, two existing-test, five optional-compile and one formatter-documentation path; this is not fourteen production paths or a branch execution claim."
+      },
+      {
+        "id": "diagnostics-weather-offbalance-b",
+        "group": "diagnostics_weather_offbalance",
+        "source_build": "diagnostics-weather-offbalance-60",
+        "scope": "B",
+        "actual_Source_build_reused": false,
+        "current60_changed_source_path_count": 14,
+        "current60_functional_production_source_path_count": 6,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-diagnostics-weather-offbalance-b/calibration-01/input.idf",
+          "sha256": "54e9b2a3d7ad7d319dfed84b64bd9bd33c8b17af693b70bdb690a2cd639ae88e",
+          "bytes": 17183
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-diagnostics-weather-offbalance-b/calibration-01/receipt.json",
+          "sha256": "7005400f0ec6f6af9c6cc02a3ae25e5c601ee46fa4e4ee71f06ea704a5c6f6f9",
+          "bytes": 41718
+        },
+        "Native_calibration_unit": 60,
+        "Native60_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-diagnostics-weather-offbalance-b-60/diagnostics-weather-offbalance-b/receipt.json",
+          "sha256": "c0519c7b679f0b50cb12fd9c7ab6c46758d0f8e6f3057a107f96d8e2a5ac7719",
+          "bytes": 6003
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/diagnostics-weather-offbalance-b-60/run-summary.json",
+          "sha256": "32ac1d2412583d67f1f1d722fe45983b107942f9a67f488794599563eaf9be7c",
+          "bytes": 61921
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/eplus-rs.exe",
+          "sha256": "8f7631689f2caaad26b910b5798c0047491a374c9d335afa31a2b6f65f98d8f6",
+          "bytes": 76313359
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/61/61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29",
+          "sha256": "61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/receipt.json",
+          "sha256": "f302e4e709cdbb020aabd25d650a9b68e53dd1c7e02a8ff680d7bc04f20066fc",
+          "bytes": 6768
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-diagnostics-weather-offbalance-b-comparisons-60/diagnostics-weather-offbalance-b/comparison.json",
+          "sha256": "aa6183fae0bc542bc098fbc8274f224b35471339adc05cd0e4a1d0db1098e0f1",
+          "bytes": 429039
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-diagnostics-weather-offbalance-b-60-launch/diagnostics-weather-offbalance-b/request.json",
+          "sha256": "df2fcf2f58ed19c1a703d87602081ade8d65df45f5ae439ecc4c5f6140ebcfdf",
+          "bytes": 3323
+        },
+        "totals": {
+          "series": 105,
+          "samples": 10080,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native60 and same-input Source60 require actual new Build60. The genuine project getter writes the weather environment and Zone offbalance flags from the two additional official keys; legacy, six retained Source keys/None/ignored metadata and all reserved/other-family fences remain. Unchanged GoldenNREL feeds real hourly counters and the end-environment weather diagnostic report. The strict original Zone component threshold reads the same live AirHB/Zone/HVAC/shared recurring owners, excludes warmup/sizing and preserves first-prefix/continue/timestamp/recurrence order. Actual physical weather/offbalance warnings, counts, extrema, crossings and complete reports are newly observed, never prescribed. Observer60 preserves full raw ERR/END and actual counters, adjusting only the row-count inequality for physically observed exact noncounting first offbalance prefixes. All224 selected57 rules/origins remain A119/B105 with People2/Ankle1 raw96/binary and actual six Fanger/common ESO/RDD absences. Immediate Native59 identity ancestry stays separate from Native56 policy proof; Source59 history is immutable archive-only. NoSizing/NoLimit/empty monthly/Mixing/EMS/other-model/spatial/user-fluid bounds and normal SourceB staging remain. Fourteen changed source roles are six functional production, two existing-test, five optional-compile and one formatter-documentation path; this is not fourteen production paths or a branch execution claim."
       }
     ],
     "totals": {
-      "paired_cases": 96,
-      "reported_samples": 784518,
-      "raw_operand_unequal": 175197,
+      "paired_cases": 98,
+      "reported_samples": 805734,
+      "raw_operand_unequal": 178646,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -6830,23 +6974,29 @@
           "sha256": "ae92f739d09a0a80cf1a2bdcc41f165336b8600a18d9fc6e9feb9d8f7510f05e",
           "bytes": 76317088
         }
+      },
+      {
+        "id": "diagnostics-weather-offbalance-60",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/receipt.json",
+          "sha256": "f302e4e709cdbb020aabd25d650a9b68e53dd1c7e02a8ff680d7bc04f20066fc",
+          "bytes": 6768
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/61/61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29",
+          "sha256": "61042fa1a0c4b1fc34265cdca994813d0dd81ddf219d0365adf7faedfeb05e29"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-60/eplus-rs.exe",
+          "sha256": "8f7631689f2caaad26b910b5798c0047491a374c9d335afa31a2b6f65f98d8f6",
+          "bytes": 76313359
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 2,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/people-ankle-extra-warnings-focused-58.log",
-          "sha256": "2f3982e3aff68603cb9b73d9d30183f3b71f4bad6b6624d3974168dd84570f66",
-          "bytes": 812
-        },
-        {
-          "path": ".runtime/object-expansion/people-unused-diagnostics-focused-59.log",
-          "sha256": "8a703c5079d6d995b3086a4fb1f0bd2181e2e38e8e51f1e0729c779170e93b18",
-          "bytes": 812
-        }
-      ],
-      "scope": "Two successful existing Raw admission/IP/project-data body runs after the retained full workspace milestone; actual global flags, completion warnings and physical flow are covered by the separate same-input pairs."
+      "passed": 0,
+      "logs": [],
+      "scope": "Reset at the actual full workspace milestone; all prior successful focused bodies are included in that regression."
     }
   },
   "additional_native_type_calibrations": [
