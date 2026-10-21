@@ -154,7 +154,32 @@ fn resolve_raw(
         for (name, object) in objects {
             // These unnamed singletons have no authored Name. Their official
             // epJSON patterns accept arbitrary keys; keep exact IP identity.
-            if name.0.trim().is_empty()
+            // Exact official schedule pattern ^.*\S.*$ under default RE2:
+            // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
+            // or Unicode whitespace. Other families keep their old boundary.
+            let blank_name = if source_calendar_ingress
+                && matches!(
+                    family.0.as_str(),
+                    "ScheduleTypeLimits"
+                        | "Schedule:Constant"
+                        | "Schedule:Compact"
+                        | "Schedule:File"
+                        | "Schedule:Day:Hourly"
+                        | "Schedule:Day:Interval"
+                        | "Schedule:Day:List"
+                        | "Schedule:Week:Daily"
+                        | "Schedule:Week:Compact"
+                        | "Schedule:Year"
+                ) {
+                name.0.contains('\n')
+                    || name
+                        .0
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.0.trim().is_empty()
+            };
+            if blank_name
                 && !matches!(
                     family.0.as_str(),
                     "Version"
@@ -321,6 +346,13 @@ fn resolve_raw(
                 ) && required == "key_name"
                 {
                     !matches!(field(object, required), Some(RawValue::String(_)))
+                } else if source_calendar_ingress
+                    && matches!(
+                        (family.0.as_str(), required),
+                        ("Exterior:Lights" | "OtherEquipment", "schedule_name")
+                    )
+                {
+                    !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
                 } else {
                     field(object, required).is_none_or(blank)
                 };
@@ -335,7 +367,16 @@ fn resolve_raw(
             }
             if source_b_family || source_compact_family {
                 for &required in source_b::required_fields(&family.0) {
-                    if field(object, required).is_none_or(blank) {
+                    let missing = if source_calendar_ingress
+                        && (family.0 == "Schedule:Week:Daily"
+                            || (family.0 == "ZoneControl:Thermostat"
+                                && required == "control_type_schedule_name"))
+                    {
+                        !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
+                    } else {
+                        field(object, required).is_none_or(blank)
+                    };
+                    if missing {
                         return Err(format!("missing {}.{}", family.0, required));
                     }
                 }
@@ -575,7 +616,15 @@ fn resolve_raw(
                 {
                     return Err("ordinary OtherEquipment requires the direct actual Zone".into());
                 }
-                let Some(schedule) = text(object, "schedule_name") else {
+                let schedule = if source_calendar_ingress {
+                    match field(object, "schedule_name") {
+                        Some(RawValue::String(value)) if !value.is_empty() => Some(value.as_str()),
+                        _ => None,
+                    }
+                } else {
+                    text(object, "schedule_name")
+                };
+                let Some(schedule) = schedule else {
                     if family == "Output:Variable" {
                         continue;
                     }
@@ -1984,6 +2033,137 @@ mod source_a_compact_ingress {
             ("Schedule:Week:Compact", "WI"),
             ("Schedule:Year", "Y"),
         ];
+        // RE2 schema-name whitespace is distinct from IP alpha blankness.
+        let mut name_input = metadata_input.clone();
+        name_input
+            .as_object_mut()
+            .ok_or("name model")?
+            .remove("Output:Variable");
+        name_input["Schedule:File"] = files["Schedule:File"].clone();
+        for (exact, valid) in [
+            ("", false),
+            (" \t\r\u{c}", false),
+            ("\n", false),
+            ("X\nY", false),
+            ("\u{b}", true),
+            ("\u{a0}", true),
+            ("\u{85}", true),
+            ("\u{2003}", true),
+            ("\u{2028}", true),
+            (" X\r", true),
+        ] {
+            for (family, old_name) in schedule_objects
+                .into_iter()
+                .chain([("Schedule:File", "File schedule")])
+            {
+                let mut value = name_input.clone();
+                let objects = value[family].as_object_mut().ok_or("schedule family")?;
+                let object = objects.remove(old_name).ok_or("schedule name")?;
+                objects.insert(exact.into(), object);
+                let raw = ep_raw_model::parse_epjson_str(&value.to_string())?;
+                assert_eq!(
+                    resolve_source_a(&raw).is_ok(),
+                    valid,
+                    "A {family} name {exact:?}"
+                );
+                assert_eq!(
+                    resolve_source_b(&raw).is_ok(),
+                    valid,
+                    "B {family} name {exact:?}"
+                );
+                if valid {
+                    for ip in [
+                        crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                        crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    ] {
+                        assert!(
+                            ip.source_raw_object_names(family)?
+                                .contains(&exact.to_owned())
+                        );
+                    }
+                }
+            }
+        }
+        // Actual Source People/OtherEquipment/output-filter refs reach the same
+        // nonempty NBSP File identity; generic legacy text rules stay unchanged.
+        let mut non_ascii = files.clone();
+        let object = non_ascii["Schedule:File"]
+            .as_object_mut()
+            .ok_or("File objects")?
+            .remove("File schedule")
+            .ok_or("original File")?;
+        non_ascii["Schedule:File"]
+            .as_object_mut()
+            .ok_or("File map")?
+            .insert("\u{a0}".into(), object);
+        non_ascii["Schedule:Constant"] = serde_json::json!({"activity":{"hourly_value":120}});
+        non_ascii["People"] = serde_json::json!({"P":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone",
+            "number_of_people":1,"number_of_people_schedule_name":"\u{a0}","activity_level_schedule_name":"activity"}});
+        non_ascii["OtherEquipment"] = serde_json::json!({"E":{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone",
+            "schedule_name":"\u{a0}","design_level":1}});
+        non_ascii["Output:Variable"]["v"]["schedule_name"] = "\u{a0}".into();
+        let raw = ep_raw_model::parse_epjson_str(&non_ascii.to_string())?;
+        for ip in [
+            crate::ordinary_input_processor::resolve_source_a(&raw)?,
+            crate::ordinary_input_processor::resolve_source_b(&raw)?,
+        ] {
+            assert_eq!(
+                ip.source_raw_object_fields("People", "P")?["number_of_people_schedule_name"],
+                V::String("\u{a0}".into())
+            );
+            assert_eq!(
+                ip.source_raw_object_fields("OtherEquipment", "E")?["schedule_name"],
+                V::String("\u{a0}".into())
+            );
+        }
+        let mut calendar_names = name_input.clone();
+        let day = calendar_names["Schedule:Day:Hourly"]
+            .as_object_mut()
+            .ok_or("Day map")?
+            .remove("H")
+            .ok_or("original Day")?;
+        calendar_names["Schedule:Day:Hourly"]
+            .as_object_mut()
+            .ok_or("Day map")?
+            .insert("\u{a0}".into(), day);
+        let week = calendar_names["Schedule:Week:Daily"]["W"]
+            .as_object_mut()
+            .ok_or("Week map")?;
+        for value in week.values_mut() {
+            *value = "\u{a0}".into();
+        }
+        let raw = ep_raw_model::parse_epjson_str(&calendar_names.to_string())?;
+        for ip in [
+            crate::ordinary_input_processor::resolve_source_a(&raw)?,
+            crate::ordinary_input_processor::resolve_source_b(&raw)?,
+        ] {
+            assert_eq!(
+                ip.source_raw_object_fields("Schedule:Week:Daily", "W")?["sunday_schedule_day_name"],
+                V::String("\u{a0}".into())
+            );
+        }
+        calendar_names["Schedule:Constant"]["\u{a0}\u{a0}"] = serde_json::json!({"hourly_value":4});
+        calendar_names["ThermostatSetpoint:DualSetpoint"] = serde_json::json!({"D":{
+            "heating_setpoint_temperature_schedule_name":"C","cooling_setpoint_temperature_schedule_name":"C"}});
+        calendar_names["ZoneControl:Thermostat"] = serde_json::json!({"T":{"zone_or_zonelist_name":"actual zone",
+            "control_type_schedule_name":"\u{a0}\u{a0}","control_1_object_type":"ThermostatSetpoint:DualSetpoint","control_1_name":"D"}});
+        let raw = ep_raw_model::parse_epjson_str(&calendar_names.to_string())?;
+        assert!(resolve_source_a(&raw).is_err()); // Preserve the conditioned-B family gate.
+        let ip = crate::ordinary_input_processor::resolve_source_b(&raw)?;
+        assert_eq!(
+            ip.source_raw_object_fields("ZoneControl:Thermostat", "T")?["control_type_schedule_name"],
+            V::String("\u{a0}\u{a0}".into())
+        );
+        non_ascii["Exterior:Lights"] =
+            serde_json::json!({"L":{"schedule_name":"\u{a0}","design_level":1}});
+        let raw = ep_raw_model::parse_epjson_str(&non_ascii.to_string())?;
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        for exact in ["\u{b}", "\u{a0}", "\u{85}", "\u{2003}", "\u{2028}"] {
+            let legacy =
+                serde_json::json!({"Zone":{"Z":{}},"Schedule:Constant":{exact:{"hourly_value":1}}});
+            assert!(resolve(&ep_raw_model::parse_epjson_str(&legacy.to_string())?).is_err());
+        }
         let baseline = ep_raw_model::parse_epjson_str(&metadata_input.to_string())?;
         let baseline_a = crate::ordinary_input_processor::resolve_source_a(&baseline)?;
         let baseline_b = crate::ordinary_input_processor::resolve_source_b(&baseline)?;

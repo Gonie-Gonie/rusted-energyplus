@@ -292,13 +292,15 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         // Dynamic clothing consumes neither the method nor clothing schedule.
         // Native validates any nonempty A21 even when AnkleDraft is false.
         if ankle
-            || text(object, "ankle_level_air_velocity_schedule_name").is_some_and(|s| !s.is_empty())
+            || matches!(field(object, "ankle_level_air_velocity_schedule_name"), Some(RawValue::String(s)) if !s.is_empty())
         {
             required_schedules.push("ankle_level_air_velocity_schedule_name");
         }
     }
     for name in required_schedules {
-        let Some(schedule) = text(object, name) else {
+        let Some(RawValue::String(schedule)) = field(object, name)
+            .filter(|value| matches!(value, RawValue::String(text) if !text.is_empty()))
+        else {
             return false;
         };
         if !source_schedule(schedule) {

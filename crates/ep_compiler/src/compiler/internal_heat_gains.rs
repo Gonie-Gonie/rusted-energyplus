@@ -15,7 +15,7 @@ impl Compiler<'_> {
         object: &RawObject,
     ) -> Option<PeopleScheduleReference> {
         const FIELD: &str = "number_of_people_schedule_name";
-        let reference = self.optional_string("People", name, object, FIELD)?;
+        let reference = self.optional_schedule_name("People", name, object, FIELD)?;
         let built_in = if reference.eq_ignore_ascii_case("Constant-0.0") {
             Some(PeopleScheduleReference::ConstantZero)
         } else if reference.eq_ignore_ascii_case("Constant-1.0") {

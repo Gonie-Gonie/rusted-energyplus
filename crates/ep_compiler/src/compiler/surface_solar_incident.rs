@@ -30,7 +30,8 @@ impl Compiler<'_> {
             let surface_name = self.required_string(OBJECT_TYPE, &name, &object, SURFACE_FIELD);
             let construction_name =
                 self.required_string(OBJECT_TYPE, &name, &object, CONSTRUCTION_FIELD);
-            let schedule_name = self.required_string(OBJECT_TYPE, &name, &object, SCHEDULE_FIELD);
+            let schedule_name =
+                self.required_schedule_name(OBJECT_TYPE, &name, &object, SCHEDULE_FIELD);
 
             let surface = surface_name.as_deref().and_then(|target_name| {
                 self.resolve_name(

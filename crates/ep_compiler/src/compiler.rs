@@ -1927,7 +1927,7 @@ impl<'a> Compiler<'a> {
                 &object,
                 "thermal_absorptance_function_name",
             );
-            let thermal_schedule_name = self.optional_reference_name_checked(
+            let thermal_schedule_name = self.optional_schedule_name_checked(
                 OBJECT_TYPE,
                 &name,
                 &object,
@@ -1939,7 +1939,7 @@ impl<'a> Compiler<'a> {
                 &object,
                 "solar_absorptance_function_name",
             );
-            let solar_schedule_name = self.optional_reference_name_checked(
+            let solar_schedule_name = self.optional_schedule_name_checked(
                 OBJECT_TYPE,
                 &name,
                 &object,
@@ -9192,7 +9192,7 @@ impl<'a> Compiler<'a> {
                     }
                 }
             };
-            let schedule_name = self.optional_reference_name_checked(
+            let schedule_name = self.optional_schedule_name_checked(
                 AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
                 &name,
                 &object,
@@ -10683,7 +10683,7 @@ impl<'a> Compiler<'a> {
 
     fn parse_file_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:File") {
-            let schedule_type_limits = match self.optional_string(
+            let schedule_type_limits = match self.optional_schedule_name(
                 "Schedule:File",
                 &name,
                 &object,
@@ -11245,7 +11245,7 @@ impl<'a> Compiler<'a> {
             let mut references_complete = true;
             for (day_schedule, field) in day_schedules.iter_mut().zip(DAY_FIELDS) {
                 let Some(day_schedule_name) =
-                    self.required_string("Schedule:Week:Daily", &name, &object, field)
+                    self.required_schedule_name("Schedule:Week:Daily", &name, &object, field)
                 else {
                     references_complete = false;
                     continue;
@@ -11362,7 +11362,7 @@ impl<'a> Compiler<'a> {
             let entry_name = format!("{object_name}[{index}]");
             let (Some(day_type_list), Some(day_schedule_name)) = (
                 self.required_string(OBJECT_TYPE, &entry_name, &entry, "daytype_list"),
-                self.required_string(OBJECT_TYPE, &entry_name, &entry, "schedule_day_name"),
+                self.required_schedule_name(OBJECT_TYPE, &entry_name, &entry, "schedule_day_name"),
             ) else {
                 entries_valid = false;
                 continue;
@@ -11506,7 +11506,7 @@ impl<'a> Compiler<'a> {
         }
 
         for (name, object) in objects {
-            let schedule_type_limits = match self.optional_string(
+            let schedule_type_limits = match self.optional_schedule_name(
                 OBJECT_TYPE,
                 &name,
                 &object,
@@ -11614,7 +11614,7 @@ impl<'a> Compiler<'a> {
         }
 
         for (name, object) in objects {
-            let schedule_type_limits = match self.optional_string(
+            let schedule_type_limits = match self.optional_schedule_name(
                 OBJECT_TYPE,
                 &name,
                 &object,
@@ -11742,12 +11742,15 @@ impl<'a> Compiler<'a> {
         }
 
         for (instance_key, object) in objects {
-            let Some(schedule_name) =
-                self.required_string(OBJECT_TYPE, &instance_key, &object, SCHEDULE_NAME_FIELD)
-            else {
+            let Some(schedule_name) = self.required_schedule_name(
+                OBJECT_TYPE,
+                &instance_key,
+                &object,
+                SCHEDULE_NAME_FIELD,
+            ) else {
                 continue;
             };
-            let schedule_type_limits = match self.optional_string(
+            let schedule_type_limits = match self.optional_schedule_name(
                 OBJECT_TYPE,
                 &schedule_name,
                 &object,
@@ -11956,7 +11959,7 @@ impl<'a> Compiler<'a> {
             };
             let entry_name = format!("{object_name}[{index}]");
             let Some(schedule_week_name) =
-                self.required_string(OBJECT_TYPE, &entry_name, &entry, "schedule_week_name")
+                self.required_schedule_name(OBJECT_TYPE, &entry_name, &entry, "schedule_week_name")
             else {
                 ranges_valid = false;
                 continue;
@@ -13753,18 +13756,22 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let schedule =
-                match self.optional_string("OtherEquipment", &name, &object, "schedule_name") {
-                    Some(schedule_name) => self.resolve_name(
-                        &model.schedule_names,
-                        "OtherEquipment",
-                        &name,
-                        "schedule_name",
-                        &schedule_name,
-                        "Schedule",
-                    ),
-                    None => None,
-                };
+            let schedule = match self.optional_schedule_name(
+                "OtherEquipment",
+                &name,
+                &object,
+                "schedule_name",
+            ) {
+                Some(schedule_name) => self.resolve_name(
+                    &model.schedule_names,
+                    "OtherEquipment",
+                    &name,
+                    "schedule_name",
+                    &schedule_name,
+                    "Schedule",
+                ),
+                None => None,
+            };
             let Some(id_value) =
                 self.checked_id("OtherEquipment", &name, model.other_equipment.len())
             else {
@@ -15080,7 +15087,7 @@ impl<'a> Compiler<'a> {
         object: &RawObject,
         field: &str,
     ) -> Option<ScheduleId> {
-        let schedule_name = self.required_string(object_type, object_name, object, field)?;
+        let schedule_name = self.required_schedule_name(object_type, object_name, object, field)?;
         self.resolve_name(
             &model.schedule_names,
             object_type,
@@ -15099,7 +15106,7 @@ impl<'a> Compiler<'a> {
         object: &RawObject,
         field: &str,
     ) -> Option<ScheduleId> {
-        let schedule_name = self.optional_string(object_type, object_name, object, field)?;
+        let schedule_name = self.optional_schedule_name(object_type, object_name, object, field)?;
         self.resolve_name(
             &model.schedule_names,
             object_type,
@@ -15108,6 +15115,57 @@ impl<'a> Compiler<'a> {
             &schedule_name,
             "Schedule",
         )
+    }
+
+    // InputProcessor alpha blanks use string.empty(), not Unicode whitespace.
+    // Keep this exception on the explicit Source schedule-reference route;
+    // old generic string/default/type diagnostics remain the fallback.
+    fn required_schedule_name(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<String> {
+        if self.source_file_declarations
+            && let Some(RawValue::String(value)) = field_value(object, field)
+            && !value.is_empty()
+        {
+            return Some(value.clone());
+        }
+        self.required_string(object_type, object_name, object, field)
+    }
+
+    fn optional_schedule_name(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<String> {
+        if self.source_file_declarations
+            && let Some(RawValue::String(value)) = field_value(object, field)
+            && !value.is_empty()
+        {
+            return Some(value.clone());
+        }
+        self.optional_string(object_type, object_name, object, field)
+    }
+
+    fn optional_schedule_name_checked(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<Option<String>> {
+        if self.source_file_declarations
+            && let Some(RawValue::String(value)) = field_value(object, field)
+            && !value.is_empty()
+        {
+            return Some(Some(value.clone()));
+        }
+        self.optional_reference_name_checked(object_type, object_name, object, field)
     }
 
     fn required_string(

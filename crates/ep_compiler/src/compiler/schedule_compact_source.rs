@@ -20,7 +20,7 @@ impl Compiler<'_> {
     ) -> Option<ScheduleTypeLimitId> {
         const FIELD: &str = "schedule_type_limits_name";
         let reference =
-            self.optional_reference_name_checked(object_type, object_name, object, FIELD)?;
+            self.optional_schedule_name_checked(object_type, object_name, object, FIELD)?;
         let Some(reference) = reference else {
             self.warning(
                 "MissingScheduleTypeLimits",

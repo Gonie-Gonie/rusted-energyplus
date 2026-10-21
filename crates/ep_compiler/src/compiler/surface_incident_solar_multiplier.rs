@@ -31,7 +31,7 @@ impl Compiler<'_> {
                 (0.0, true),
                 (1.0, true),
             );
-            let schedule = match self.optional_reference_name_checked(
+            let schedule = match self.optional_schedule_name_checked(
                 OBJECT_TYPE,
                 &declaration_name,
                 &object,

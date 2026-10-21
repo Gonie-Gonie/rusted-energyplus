@@ -106,7 +106,8 @@ impl Compiler<'_> {
             if let Some(layer_count) = expected_layer_count {
                 for layer in 1..=layer_count {
                     let field = schedule_field(layer);
-                    let schedule_name = self.required_string(OBJECT_TYPE, &name, &object, &field);
+                    let schedule_name =
+                        self.required_schedule_name(OBJECT_TYPE, &name, &object, &field);
                     let schedule = schedule_name.as_deref().and_then(|target_name| {
                         self.resolve_name(
                             &model.schedule_names,
@@ -142,7 +143,7 @@ impl Compiler<'_> {
                     let field = schedule_field(layer);
                     if layer == 1 || field_value(&object, &field).is_some() {
                         let schedule_name =
-                            self.required_string(OBJECT_TYPE, &name, &object, &field);
+                            self.required_schedule_name(OBJECT_TYPE, &name, &object, &field);
                         if let Some(target_name) = schedule_name.as_deref() {
                             let _ = self.resolve_name(
                                 &model.schedule_names,

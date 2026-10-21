@@ -490,6 +490,124 @@ fn rejects_short_and_non_numeric_selected_columns() -> Result<(), Box<dyn std::e
         value.id
     );
     assert!(names.file_schedules.is_empty());
+    // The explicit Source route preserves every nonempty schedule-reference
+    // string, including RE2-nonwhitespace VT and Unicode whitespace identities.
+    for (exact, escaped) in [
+        ("\u{b}", "\\u000b"),
+        ("\u{a0}", "\\u00a0"),
+        ("\u{85}", "\\u0085"),
+        ("\u{2003}", "\\u2003"),
+        ("\u{2028}", "\\u2028"),
+    ] {
+        let mut raw = parse_epjson_str(&format!(
+            r#"{{
+            "Zone":{{"Z":{{}}}},
+            "ScheduleTypeLimits":{{"{escaped}":{{"lower_limit_value":0,"upper_limit_value":20}}}},
+            "Schedule:Constant":{{"C":{{"schedule_type_limits_name":"{escaped}","hourly_value":1}}}},
+            "Schedule:File":{{"{escaped}":{{}}}},
+            "Schedule:Day:Hourly":{{"{escaped}":{{"schedule_type_limits_name":"{escaped}","hour_1":1}}}},
+            "Schedule:Week:Daily":{{"{escaped}":{{}}}},
+            "Schedule:Week:Compact":{{"W":{{"data":[{{"daytype_list":"AllDays","schedule_day_name":"{escaped}"}}]}}}},
+            "Schedule:Year":{{"Y":{{"schedule_type_limits_name":"{escaped}","schedule_weeks":[{{"schedule_week_name":"{escaped}","start_month":1,"start_day":1,"end_month":12,"end_day":31}}]}}}},
+            "ThermostatSetpoint:DualSetpoint":{{"T":{{"heating_setpoint_temperature_schedule_name":"{escaped}","cooling_setpoint_temperature_schedule_name":"C"}}}},
+            "People":{{"P":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people":1,"number_of_people_schedule_name":"{escaped}"}}}},
+            "OtherEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","design_level":1,"schedule_name":"{escaped}"}}}}
+        }}"#
+        ))?;
+        let week = raw
+            .objects
+            .get_mut(&ObjectType("Schedule:Week:Daily".into()))
+            .and_then(|rows| rows.get_mut(&ObjectName(exact.into())))
+            .ok_or("exact Week")?;
+        for field in [
+            "sunday_schedule_day_name",
+            "monday_schedule_day_name",
+            "tuesday_schedule_day_name",
+            "wednesday_schedule_day_name",
+            "thursday_schedule_day_name",
+            "friday_schedule_day_name",
+            "saturday_schedule_day_name",
+            "holiday_schedule_day_name",
+            "summerdesignday_schedule_day_name",
+            "winterdesignday_schedule_day_name",
+            "customday1_schedule_day_name",
+            "customday2_schedule_day_name",
+        ] {
+            week.fields
+                .insert(FieldName(field.into()), RawValue::String(exact.into()));
+        }
+        let compiled = compile_raw_model_for_source(&raw);
+        assert!(
+            !compiled.has_errors(),
+            "{exact:?}: {:?}",
+            compiled.report.diagnostics
+        );
+        let model = compiled.model.ok_or("Source nonempty schedule graph")?;
+        let file = &model.source_file_schedule_declarations[0];
+        assert_eq!(file.source_object_name, exact);
+        assert_eq!(file.name.0, exact);
+        assert_eq!(model.schedule_names.resolve(exact), Some(file.id));
+        assert_eq!(
+            model.schedules[0].schedule_type_limits,
+            model.schedule_type_limit_names.resolve(exact)
+        );
+        assert_eq!(model.day_schedules[0].name.0, exact);
+        assert_eq!(
+            model.day_schedules[0].schedule_type_limits,
+            model.schedule_type_limit_names.resolve(exact)
+        );
+        assert_eq!(model.week_schedules[0].name.0, exact);
+        assert_eq!(
+            model.week_schedules[0].day_schedules,
+            [model.day_schedules[0].id; 12]
+        );
+        assert_eq!(
+            model.week_compact_schedules[0].day_schedules,
+            [model.day_schedules[0].id; 12]
+        );
+        assert_eq!(
+            model.year_schedules[0].week_schedules,
+            [model.week_schedules[0].id; 366]
+        );
+        assert_eq!(
+            model.people[0].number_of_people_schedule,
+            Some(ep_model::PeopleScheduleReference::User(file.id))
+        );
+        assert_eq!(model.other_equipment[0].schedule, Some(file.id));
+        assert_eq!(
+            model.thermostat_dual_setpoints[0].heating_setpoint_schedule,
+            file.id
+        );
+    }
+    for (text, code) in [
+        ("", "MissingRequiredField"),
+        (" \t\r\u{c}", "MissingReference"),
+    ] {
+        let mut raw = parse_epjson_str(
+            r#"{"Schedule:Constant":{"C":{"hourly_value":1}},"ThermostatSetpoint:DualSetpoint":{"T":{"heating_setpoint_temperature_schedule_name":"C","cooling_setpoint_temperature_schedule_name":"C"}}}"#,
+        )?;
+        raw.objects
+            .get_mut(&ObjectType("ThermostatSetpoint:DualSetpoint".into()))
+            .and_then(|rows| rows.get_mut(&ObjectName("T".into())))
+            .ok_or("required schedule fixture")?
+            .fields
+            .insert(
+                FieldName("heating_setpoint_temperature_schedule_name".into()),
+                RawValue::String(text.into()),
+            );
+        let result = compile_raw_model_for_source(&raw);
+        assert!(result.has_errors());
+        assert!(result.report.diagnostics.iter().any(|row| row.code == code
+            && row.field.as_deref() == Some("heating_setpoint_temperature_schedule_name")));
+        let legacy = compile_raw_model(&raw);
+        assert!(
+            legacy
+                .report
+                .diagnostics
+                .iter()
+                .any(|row| row.code == "MissingRequiredField")
+        );
+    }
     // A missing exact name must not fall back to the trimmed existing name.
     names_raw
         .objects
