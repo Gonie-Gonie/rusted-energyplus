@@ -45,7 +45,11 @@ impl SourceErrorBackend<'_> {
             }
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, super::SourceErrorLevel::Fatal, message);
+            callback(
+                self.state,
+                super::SourceErrorLevel::Fatal,
+                message.as_bytes(),
+            );
         }
         Err(HeatBalanceInputError::Fatal(super::SourceFatalStop::Fatal(
             super::SourceFatalError {

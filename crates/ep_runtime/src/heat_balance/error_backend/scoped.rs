@@ -41,7 +41,7 @@ impl SourceErrorSqlite for SqliteBorrow<'_, '_> {
         self.sqlite
             .create_error_record(simulation_index, error_type, message, count)
     }
-    fn update_error_record(&mut self, message: &str) -> io::Result<()> {
+    fn update_error_record(&mut self, message: &[u8]) -> io::Result<()> {
         self.sqlite.update_error_record(message)
     }
     fn within_transaction(&mut self) -> io::Result<bool> {
@@ -84,7 +84,7 @@ impl SourceErrorBackend<'_> {
             move |state: &mut SourceErrorState, message: &str| (**callback)(state, message)
         });
         let mut error_callback = self.error_callback.as_mut().map(|callback| {
-            move |state: &mut SourceErrorState, level: SourceErrorLevel, message: &str| {
+            move |state: &mut SourceErrorState, level: SourceErrorLevel, message: &[u8]| {
                 (**callback)(state, level, message);
             }
         });

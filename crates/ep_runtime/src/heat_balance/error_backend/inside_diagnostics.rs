@@ -120,11 +120,15 @@ impl SourceErrorBackend<'_> {
             if let Some(sqlite) = self.sqlite.as_deref_mut() {
                 effect(
                     "SQLite update timestamp continue",
-                    sqlite.update_error_record(&text),
+                    sqlite.update_error_record(text.as_bytes()),
                 )?;
             }
             if let Some(callback) = self.error_callback.as_deref_mut() {
-                callback(self.state, super::SourceErrorLevel::Continue, &text);
+                callback(
+                    self.state,
+                    super::SourceErrorLevel::Continue,
+                    text.as_bytes(),
+                );
             }
         } else {
             let postfix = format!(
@@ -139,12 +143,20 @@ impl SourceErrorBackend<'_> {
             if let Some(sqlite) = self.sqlite.as_deref_mut() {
                 effect(
                     "SQLite update timestamp continue",
-                    sqlite.update_error_record(message),
+                    sqlite.update_error_record(message.as_bytes()),
                 )?;
             }
             if let Some(callback) = self.error_callback.as_deref_mut() {
-                callback(self.state, super::SourceErrorLevel::Continue, message);
-                callback(self.state, super::SourceErrorLevel::Continue, &postfix);
+                callback(
+                    self.state,
+                    super::SourceErrorLevel::Continue,
+                    message.as_bytes(),
+                );
+                callback(
+                    self.state,
+                    super::SourceErrorLevel::Continue,
+                    postfix.as_bytes(),
+                );
             }
         }
         Ok(())
@@ -300,11 +312,15 @@ impl SourceErrorBackend<'_> {
                     if let Some(sqlite) = self.sqlite.as_deref_mut() {
                         effect(
                             "SQLite update recurring continue",
-                            sqlite.update_error_record(&row.message),
+                            sqlite.update_error_record(row.message.as_bytes()),
                         )?;
                     }
                     if let Some(callback) = self.error_callback.as_deref_mut() {
-                        callback(self.state, super::SourceErrorLevel::Continue, &row.message);
+                        callback(
+                            self.state,
+                            super::SourceErrorLevel::Continue,
+                            row.message.as_bytes(),
+                        );
                     }
                 } else {
                     let warning = row.message.starts_with(" ** Warning ** ");
@@ -347,9 +363,9 @@ impl SourceErrorBackend<'_> {
                             } else {
                                 super::SourceErrorLevel::Warning
                             },
-                            &row.message,
+                            row.message.as_bytes(),
                         );
-                        callback(self.state, super::SourceErrorLevel::Continue, "");
+                        callback(self.state, super::SourceErrorLevel::Continue, b"");
                     }
                 }
                 let mut statistics = String::new();

@@ -168,7 +168,8 @@ fn guard_uses_first_reached_cold_surface_and_actual_severity_state()
     ];
     let names = ["threshold", "actual cold name", "must not be visited"];
     let mut calls = Vec::new();
-    let mut callback = |_: &mut SourceErrorState, level: SourceErrorLevel, text: &str| {
+    let mut callback = |_: &mut SourceErrorState, level: SourceErrorLevel, text: &[u8]| {
+        let text = std::str::from_utf8(text).expect("existing cold-surface UTF-8 diagnostic");
         calls.push((level, text.to_owned()));
     };
     let result = {

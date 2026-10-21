@@ -108,8 +108,8 @@ pub trait SourceErrorSqlite {
         message: &str,
         count: i32,
     ) -> io::Result<()>;
-    /// Calls the actual owner's updateSQLiteErrorRecord with the raw argument.
-    fn update_error_record(&mut self, message: &str) -> io::Result<()>;
+    /// Calls the actual owner's updateSQLiteErrorRecord with the complete raw bytes.
+    fn update_error_record(&mut self, message: &[u8]) -> io::Result<()>;
     /// Reads the actual owner's sqliteWithinTransaction result.
     fn within_transaction(&mut self) -> io::Result<bool>;
     /// Calls the actual owner's sqliteCommit boundary.
@@ -201,8 +201,8 @@ impl std::error::Error for SourceFatalStop {
 
 /// Actual mutable callbacks can affect the same supplied state before later reads.
 pub type SourceMessageCallback<'a> = dyn FnMut(&mut SourceErrorState, &str) + 'a;
-/// Error callbacks receive the original level and unformatted message.
-pub type SourceErrorCallback<'a> = dyn FnMut(&mut SourceErrorState, SourceErrorLevel, &str) + 'a;
+/// Error callbacks receive the original level and complete unformatted std::string bytes.
+pub type SourceErrorCallback<'a> = dyn FnMut(&mut SourceErrorState, SourceErrorLevel, &[u8]) + 'a;
 
 /// Borrowed backend owners; optional presence is an explicit caller obligation.
 pub struct SourceErrorBackend<'a> {
@@ -293,15 +293,33 @@ impl SourceErrorBackend<'_> {
         )
     }
 
+    fn write_error_message<'error_object, 'output1_object, 'output2_object>(
+        state: &mut SourceErrorState,
+        error_stream: Option<&mut (dyn Write + 'error_object)>,
+        console: &mut dyn Write,
+        out_unit1: Option<&mut (dyn Write + 'output1_object)>,
+        out_unit2: Option<&mut (dyn Write + 'output2_object)>,
+        message: &str,
+    ) -> Result<(), SourceErrorBackendFailure> {
+        Self::write_error_message_bytes(
+            state,
+            error_stream,
+            console,
+            out_unit1,
+            out_unit2,
+            message.as_bytes(),
+        )
+    }
+
     // Keep the explicit short mutable stream reborrow at the error-output boundary.
     #[allow(clippy::needless_option_as_deref)]
-    fn write_error_message<'error_object, 'output1_object, 'output2_object>(
+    fn write_error_message_bytes<'error_object, 'output1_object, 'output2_object>(
         state: &mut SourceErrorState,
         mut error_stream: Option<&mut (dyn Write + 'error_object)>,
         console: &mut dyn Write,
         out_unit1: Option<&mut (dyn Write + 'output1_object)>,
         out_unit2: Option<&mut (dyn Write + 'output2_object)>,
-        message: &str,
+        message: &[u8],
     ) -> Result<(), SourceErrorBackendFailure> {
         if state.output_error_header {
             if let Some(stream) = error_stream.as_deref_mut() {
@@ -318,16 +336,37 @@ impl SourceErrorBackend<'_> {
         }
         if !state.doing_input_processing {
             if let Some(stream) = error_stream.as_deref_mut() {
-                effect("error message", writeln!(stream, "  {message}"))?;
+                effect(
+                    "error message",
+                    stream
+                        .write_all(b"  ")
+                        .and_then(|()| stream.write_all(message))
+                        .and_then(|()| stream.write_all(b"\n")),
+                )?;
             }
         } else if state.print_console_output {
-            effect("input-processing console", writeln!(console, "{message}"))?;
+            effect(
+                "input-processing console",
+                console
+                    .write_all(message)
+                    .and_then(|()| console.write_all(b"\n")),
+            )?;
         }
         if let Some(stream) = out_unit1 {
-            effect("optional output1", write!(stream, "  {message}"))?;
+            effect(
+                "optional output1",
+                stream
+                    .write_all(b"  ")
+                    .and_then(|()| stream.write_all(message)),
+            )?;
         }
         if let Some(stream) = out_unit2 {
-            effect("optional output2", write!(stream, "  {message}"))?;
+            effect(
+                "optional output2",
+                stream
+                    .write_all(b"  ")
+                    .and_then(|()| stream.write_all(message)),
+            )?;
         }
         Ok(())
     }
@@ -386,7 +425,7 @@ impl SourceErrorBackend<'_> {
             )?;
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Info, message);
+            callback(self.state, SourceErrorLevel::Info, message.as_bytes());
         }
         Ok(())
     }
@@ -410,7 +449,7 @@ impl SourceErrorBackend<'_> {
             )?;
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Warning, message);
+            callback(self.state, SourceErrorLevel::Warning, message.as_bytes());
         }
         Ok(())
     }
@@ -435,7 +474,7 @@ impl SourceErrorBackend<'_> {
             )?;
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Severe, message);
+            callback(self.state, SourceErrorLevel::Severe, message.as_bytes());
         }
         Ok(())
     }
@@ -451,7 +490,7 @@ impl SourceErrorBackend<'_> {
         )?;
         self.write_warning_error(message)?;
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Warning, message);
+            callback(self.state, SourceErrorLevel::Warning, message.as_bytes());
         }
         Ok(())
     }
@@ -524,7 +563,7 @@ impl SourceErrorBackend<'_> {
         )?;
         self.write_severe_error_using(message, write_message)?;
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Severe, message);
+            callback(self.state, SourceErrorLevel::Severe, message.as_bytes());
         }
         Ok(())
     }
@@ -575,7 +614,24 @@ impl SourceErrorBackend<'_> {
 
     /// Genuine continued output, optional SQLite update and final callback.
     pub fn show_continue_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
-        self.show_error_message(&format!(" **   ~~~   ** {message}"))?;
+        self.show_continue_error_bytes(message.as_bytes())
+    }
+
+    /// UtilityRoutines870-889 retains every byte of the original std::string.
+    pub(crate) fn show_continue_error_bytes(
+        &mut self,
+        message: &[u8],
+    ) -> Result<(), SourceErrorBackendFailure> {
+        let mut formatted = b" **   ~~~   ** ".to_vec();
+        formatted.extend_from_slice(message);
+        Self::write_error_message_bytes(
+            self.state,
+            self.error_stream.as_deref_mut(),
+            self.console,
+            self.out_unit1.as_deref_mut(),
+            self.out_unit2.as_deref_mut(),
+            &formatted,
+        )?;
         if let Some(sqlite) = self.sqlite.as_deref_mut() {
             effect(
                 "SQLite update continue",
@@ -635,7 +691,7 @@ impl SourceErrorBackend<'_> {
             }
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
-            callback(self.state, SourceErrorLevel::Fatal, message);
+            callback(self.state, SourceErrorLevel::Fatal, message.as_bytes());
         }
         Err(SourceFatalStop::Fatal(SourceFatalError {
             message: message.to_owned(),

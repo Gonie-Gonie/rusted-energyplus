@@ -243,7 +243,16 @@ impl Caller {
             let ordinal = rows.len() + 1;
             rows.push(json!({"actual_ordinal":ordinal,"kind":"messageCallback","actual_level":null,"actual_message":text}));
         };
-        let mut error = |_: &mut SourceErrorState, level: SourceErrorLevel, text: &str| {
+        let mut error = |_: &mut SourceErrorState, level: SourceErrorLevel, text: &[u8]| {
+            let text = match std::str::from_utf8(text) {
+                Ok(text) => text,
+                Err(error) => {
+                    let mut rows = callbacks.borrow_mut();
+                    let ordinal = rows.len() + 1;
+                    rows.push(json!({"actual_ordinal":ordinal,"kind":"qualityFailure","operation":"errorCallback UTF-8 text projection","actual_level":level as i32,"error":error.to_string(),"actual_message_bytes":text}));
+                    return;
+                }
+            };
             let mut rows = callbacks.borrow_mut();
             let ordinal = rows.len() + 1;
             rows.push(json!({"actual_ordinal":ordinal,"kind":"errorCallback","actual_level":level as i32,"actual_message":text}));

@@ -6,6 +6,7 @@ use super::external_data::{
 };
 use super::minute::SourceScheduleMinuteDiagnostic::{Continue, Severe, Warning};
 use super::*;
+use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
 use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as Input;
 use crate::heat_balance::source_initialization::SourceExternalInputFiles;
 use std::{io::Write, path::Path};
@@ -54,11 +55,16 @@ fn parser_diagnostics(
     flags: Option<&SourceDiagnosticFlags<'_>>,
 ) -> Result<(), SelectedScheduleError> {
     for diagnostic in diagnostics {
-        let text = std::str::from_utf8(&diagnostic.message)
-            .map_err(|_| unavailable("actual non-UTF8 external-file diagnostic byte output"))?;
         if diagnostic.continued {
-            schedule_diagnostic(backend, flags, Continue, text)?;
+            let backend = backend
+                .as_deref_mut()
+                .ok_or_else(|| unavailable("actual Compact minute diagnostic backend"))?;
+            backend
+                .show_continue_error_bytes(&diagnostic.message)
+                .map_err(HeatBalanceInputError::from)?;
         } else {
+            let text = std::str::from_utf8(&diagnostic.message)
+                .map_err(|_| unavailable("actual non-UTF8 external-file diagnostic byte output"))?;
             custom(backend, flags, warning, name, text)?;
         }
     }

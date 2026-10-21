@@ -664,7 +664,9 @@ mod temperature_diagnostic_tests {
                 .push(format!("create:{simulation}:{kind}:{message}:{count}"));
             Ok(())
         }
-        fn update_error_record(&mut self, message: &str) -> std::io::Result<()> {
+        fn update_error_record(&mut self, message: &[u8]) -> std::io::Result<()> {
+            let message = std::str::from_utf8(message)
+                .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
             self.0.push(format!("update:{message}"));
             Ok(())
         }
@@ -701,7 +703,9 @@ mod temperature_diagnostic_tests {
         let mut callbacks = Vec::new();
         {
             let mut callback =
-                |_: &mut SourceErrorState, level: SourceErrorLevel, message: &str| {
+                |_: &mut SourceErrorState, level: SourceErrorLevel, message: &[u8]| {
+                    let message = std::str::from_utf8(message)
+                        .expect("existing surface-temperature UTF-8 diagnostic");
                     callbacks.push((level, message.to_owned()));
                 };
             let mut b = backend(&mut f.state, &mut f.error, &mut f.console);

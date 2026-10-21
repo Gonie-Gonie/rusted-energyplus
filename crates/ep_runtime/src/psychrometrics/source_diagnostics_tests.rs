@@ -291,7 +291,9 @@ fn source_psat_keeps_miss_failure_prefix_and_same_cell_callback_reentry() {
         let mut caller = Caller::new();
         let called = Cell::new(false);
         let events = RefCell::new(Vec::new());
-        let mut callback = |_: &mut SourceErrorState, level, message: &str| {
+        let mut callback = |_: &mut SourceErrorState, level, message: &[u8]| {
+            let message =
+                std::str::from_utf8(message).expect("existing psychrometric UTF-8 diagnostic");
             events.borrow_mut().push((level, message.to_owned()));
             if !called.replace(true) {
                 //75 and300 share the direct-map cell, with different tags.

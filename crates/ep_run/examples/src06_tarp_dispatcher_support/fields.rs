@@ -182,7 +182,16 @@ impl Caller {
         let mut error_callback =
             move |_: &mut SourceErrorState,
                   level: ep_runtime::heat_balance::error_backend::SourceErrorLevel,
-                  message: &str| {
+                  message: &[u8]| {
+                let message = match std::str::from_utf8(message) {
+                    Ok(text) => text,
+                    Err(error) => {
+                        let mut rows = error_log.borrow_mut();
+                        let ordinal = rows.len() + 1;
+                        rows.push(json!({"actual_ordinal":ordinal,"kind":"qualityFailure","operation":"errorCallback UTF-8 text projection","level":level as i32,"error":error.to_string(),"message_bytes":message}));
+                        return;
+                    }
+                };
                 let mut rows = error_log.borrow_mut();
                 let ordinal = rows.len() + 1;
                 rows.push(json!({"actual_ordinal":ordinal,"kind":"errorCallback","level":level as i32,"message":message}));

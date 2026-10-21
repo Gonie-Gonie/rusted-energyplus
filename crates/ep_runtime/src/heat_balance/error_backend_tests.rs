@@ -56,9 +56,9 @@ fn backend<'a>(
 
 /// Explicit test double for the borrowed database call interface, not SQLite parity.
 struct TestSqlite {
-    calls: Rc<RefCell<Vec<String>>>,
+    calls: Rc<RefCell<Vec<Vec<u8>>>>,
     transaction: bool,
-    fail_create: bool,
+    fail_record: bool,
 }
 impl SourceErrorSqlite for TestSqlite {
     fn create_error_record(
@@ -70,22 +70,27 @@ impl SourceErrorSqlite for TestSqlite {
     ) -> io::Result<()> {
         self.calls
             .borrow_mut()
-            .push(format!("create:{simulation}:{kind}:{message}:{count}"));
-        if self.fail_create {
+            .push(format!("create:{simulation}:{kind}:{message}:{count}").into_bytes());
+        if self.fail_record {
             return Err(io::Error::other("authored database adapter failure"));
         }
         Ok(())
     }
-    fn update_error_record(&mut self, message: &str) -> io::Result<()> {
-        self.calls.borrow_mut().push(format!("update:{message}"));
+    fn update_error_record(&mut self, message: &[u8]) -> io::Result<()> {
+        let mut call = b"update:".to_vec();
+        call.extend_from_slice(message);
+        self.calls.borrow_mut().push(call);
+        if self.fail_record {
+            return Err(io::Error::other("authored database adapter failure"));
+        }
         Ok(())
     }
     fn within_transaction(&mut self) -> io::Result<bool> {
-        self.calls.borrow_mut().push("transaction".into());
+        self.calls.borrow_mut().push(b"transaction".to_vec());
         Ok(self.transaction)
     }
     fn commit(&mut self) -> io::Result<()> {
-        self.calls.borrow_mut().push("commit".into());
+        self.calls.borrow_mut().push(b"commit".to_vec());
         Ok(())
     }
 }
@@ -102,21 +107,25 @@ fn fatal_writes_real_prefix_callbacks_database_then_returns_only_fatal()
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: true,
-        fail_create: false,
+        fail_record: false,
     };
     let f_calls = calls.clone();
     let m_calls = calls.clone();
     let e_calls = calls.clone();
     let mut f = move |_: &mut SourceErrorState, message: &str| {
-        f_calls.borrow_mut().push(format!("f:{message}"))
+        f_calls
+            .borrow_mut()
+            .push(format!("f:{message}").into_bytes())
     };
     let mut m = move |_: &mut SourceErrorState, message: &str| {
-        m_calls.borrow_mut().push(format!("message:{message}"))
-    };
-    let mut e = move |_: &mut SourceErrorState, level: SourceErrorLevel, message: &str| {
-        e_calls
+        m_calls
             .borrow_mut()
-            .push(format!("error:{}:{message}", level as i32))
+            .push(format!("message:{message}").into_bytes())
+    };
+    let mut e = move |_: &mut SourceErrorState, level: SourceErrorLevel, message: &[u8]| {
+        let mut call = format!("error:{}:", level as i32).into_bytes();
+        call.extend_from_slice(message);
+        e_calls.borrow_mut().push(call)
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -138,7 +147,13 @@ fn fatal_writes_real_prefix_callbacks_database_then_returns_only_fatal()
     assert_eq!(optional1, b"   **  Fatal  ** stop   ...Summary of Errors that led to program termination:   ..... Reference severe error count=7   ..... Last severe error=prior severe");
     assert_eq!(optional2, optional1);
     assert_eq!(
-        *calls.borrow(),
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
         [
             "f:**FATAL:stop",
             "message:**FATAL:stop",
@@ -347,12 +362,12 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: false,
-        fail_create: false,
+        fail_record: false,
     };
-    let mut e = move |_: &mut SourceErrorState, level: SourceErrorLevel, message: &str| {
-        e_calls
-            .borrow_mut()
-            .push(format!("callback:{}:{message}", level as i32))
+    let mut e = move |_: &mut SourceErrorState, level: SourceErrorLevel, message: &[u8]| {
+        let mut call = format!("callback:{}:", level as i32).into_bytes();
+        call.extend_from_slice(message);
+        e_calls.borrow_mut().push(call)
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -362,7 +377,13 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
         actual.show_continue_error(" details")?;
     }
     assert_eq!(
-        *calls.borrow(),
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
         [
             "create:1:0:warning:1",
             "callback:2:warning",
@@ -382,7 +403,12 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
         actual.show_severe_message("Deprecated summary severe")?;
     }
     assert_eq!(
-        &calls.borrow()[4..],
+        calls.borrow()[4..]
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
         [
             "create:1:0:Deprecated summary warning:0",
             "callback:2:Deprecated summary warning",
@@ -413,7 +439,12 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
         actual.show_message("")?;
     }
     assert_eq!(
-        &calls.borrow()[8..],
+        calls.borrow()[8..]
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
         [
             "create:1:-1:Setup volume note:0",
             "callback:1:Setup volume note"
@@ -424,6 +455,65 @@ fn warning_then_continue_preserve_raw_callback_sqlite_arguments_and_counts()
         String::from_utf8(error)?
             .ends_with("   ************* Setup volume note\n   *************\n")
     );
+
+    // The byte route retains FF and embedded NUL through ERR/optional streams,
+    // the borrowed SQLite update and the final callback, in that exact order.
+    let raw = b"raw:\xff\0suffix";
+    for (input_processing, print_console) in [(false, true), (true, true), (true, false)] {
+        let mut raw_state = state.clone();
+        raw_state.doing_input_processing = input_processing;
+        raw_state.print_console_output = print_console;
+        let prior = raw_state.tracking.clone();
+        let (mut raw_error, mut raw_console, mut first, mut second) =
+            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        let raw_calls = Rc::new(RefCell::new(Vec::new()));
+        let mut raw_sqlite = TestSqlite {
+            calls: raw_calls.clone(),
+            transaction: false,
+            fail_record: false,
+        };
+        let callback_calls = raw_calls.clone();
+        let mut callback =
+            move |actual: &mut SourceErrorState, level: SourceErrorLevel, message: &[u8]| {
+                assert_eq!(level, SourceErrorLevel::Continue);
+                assert_eq!(actual.tracking.total_warning_errors, 4);
+                let mut call = b"callback:0:".to_vec();
+                call.extend_from_slice(message);
+                callback_calls.borrow_mut().push(call);
+            };
+        {
+            let mut actual = backend(&mut raw_state, &mut raw_error, &mut raw_console);
+            actual.out_unit1 = Some(&mut first);
+            actual.out_unit2 = Some(&mut second);
+            actual.sqlite = Some(&mut raw_sqlite);
+            actual.error_callback = Some(&mut callback);
+            actual.show_continue_error_bytes(raw)?;
+        }
+        let mut formatted = b"   **   ~~~   ** ".to_vec();
+        formatted.extend_from_slice(raw);
+        assert_eq!(first, formatted);
+        assert_eq!(second, formatted);
+        let mut line = formatted.clone();
+        line.push(b'\n');
+        if input_processing {
+            assert!(raw_error.is_empty());
+            let expected = if print_console {
+                line[2..].to_vec()
+            } else {
+                Vec::new()
+            };
+            assert_eq!(raw_console, expected);
+        } else {
+            assert_eq!(raw_error, line);
+            assert!(raw_console.is_empty());
+        }
+        let mut update = b"update:".to_vec();
+        update.extend_from_slice(raw);
+        let mut callback = b"callback:0:".to_vec();
+        callback.extend_from_slice(raw);
+        assert_eq!(*raw_calls.borrow(), [update, callback]);
+        assert_eq!(raw_state.tracking, prior);
+    }
     Ok(())
 }
 
@@ -481,6 +571,40 @@ fn first_sink_failure_preserves_state_and_never_claims_source_fatal() {
     assert!(state.output_error_header);
     assert!(console.is_empty());
     assert_eq!(state.tracking.total_severe_errors, 7);
+    // A later optional sink failure preserves the already-written raw ERR
+    // bytes, but must stop before output2, SQLite or the callback.
+    let mut raw_state = state.clone();
+    raw_state.output_error_header = false;
+    let prior = raw_state.tracking.clone();
+    let (mut raw_error, mut raw_console, mut optional2) = (Vec::new(), Vec::new(), Vec::new());
+    let calls = Rc::new(RefCell::new(Vec::new()));
+    let mut sqlite = TestSqlite {
+        calls: calls.clone(),
+        transaction: false,
+        fail_record: false,
+    };
+    let cb_calls = calls.clone();
+    let mut callback = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &[u8]| {
+        cb_calls.borrow_mut().push(b"unreached callback".to_vec());
+    };
+    let mut failed = FailingWriter;
+    {
+        let mut actual = backend(&mut raw_state, &mut raw_error, &mut raw_console);
+        actual.out_unit1 = Some(&mut failed);
+        actual.out_unit2 = Some(&mut optional2);
+        actual.sqlite = Some(&mut sqlite);
+        actual.error_callback = Some(&mut callback);
+        assert!(matches!(
+            actual.show_continue_error_bytes(b"raw:\xff\0suffix"),
+            Err(SourceErrorBackendFailure::Effect {
+                operation: "optional output1",
+                ..
+            })
+        ));
+    }
+    assert_eq!(raw_error, b"   **   ~~~   ** raw:\xff\0suffix\n");
+    assert!(raw_console.is_empty() && optional2.is_empty() && calls.borrow().is_empty());
+    assert_eq!(raw_state.tracking, prior);
 }
 
 #[test]
@@ -494,10 +618,10 @@ fn database_failure_retains_written_prefix_but_not_final_error_callback_or_fatal
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: true,
-        fail_create: true,
+        fail_record: true,
     };
-    let mut e = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &str| {
-        e_calls.borrow_mut().push("unexpected callback".into())
+    let mut e = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &[u8]| {
+        e_calls.borrow_mut().push(b"unexpected callback".to_vec())
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -514,8 +638,49 @@ fn database_failure_retains_written_prefix_but_not_final_error_callback_or_fatal
         ));
     }
     assert!(String::from_utf8(error)?.ends_with("   ..... Last severe error=prior severe\n"));
-    assert_eq!(*calls.borrow(), ["create:1:2:stop:1"]);
+    assert_eq!(
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
+        ["create:1:2:stop:1"]
+    );
     assert_eq!(console, b"**FATAL:stop\n");
+
+    // Database update failure occurs after the complete raw line but before
+    // the final callback; a test double records the original unformatted bytes.
+    let mut raw_state = state.clone();
+    let prior = raw_state.tracking.clone();
+    let (mut raw_error, mut raw_console) = (Vec::new(), Vec::new());
+    let raw_calls = Rc::new(RefCell::new(Vec::new()));
+    let mut sqlite = TestSqlite {
+        calls: raw_calls.clone(),
+        transaction: false,
+        fail_record: true,
+    };
+    let cb_calls = raw_calls.clone();
+    let mut callback = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &[u8]| {
+        cb_calls.borrow_mut().push(b"unreached callback".to_vec());
+    };
+    {
+        let mut actual = backend(&mut raw_state, &mut raw_error, &mut raw_console);
+        actual.sqlite = Some(&mut sqlite);
+        actual.error_callback = Some(&mut callback);
+        assert!(matches!(
+            actual.show_continue_error_bytes(b"raw:\xff\0suffix"),
+            Err(SourceErrorBackendFailure::Effect {
+                operation: "SQLite update continue",
+                ..
+            })
+        ));
+    }
+    assert_eq!(raw_error, b"   **   ~~~   ** raw:\xff\0suffix\n");
+    assert_eq!(*raw_calls.borrow(), [b"update:raw:\xff\0suffix".to_vec()]);
+    assert!(raw_console.is_empty());
+    assert_eq!(raw_state.tracking, prior);
     Ok(())
 }
 
@@ -528,7 +693,7 @@ fn fatal_without_transaction_does_not_commit() {
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: false,
-        fail_create: false,
+        fail_record: false,
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -538,7 +703,16 @@ fn fatal_without_transaction_does_not_commit() {
             Err(SourceFatalStop::Fatal(_))
         ));
     }
-    assert_eq!(*calls.borrow(), ["create:1:2:stop:1", "transaction"]);
+    assert_eq!(
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
+        ["create:1:2:stop:1", "transaction"]
+    );
 }
 
 #[test]
@@ -573,15 +747,15 @@ fn severe_retains_real_counter_last_text_and_database_before_callback()
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: false,
-        fail_create: false,
+        fail_record: false,
     };
     let callback_calls = calls.clone();
-    let mut callback = move |state: &mut SourceErrorState, level: SourceErrorLevel, text: &str| {
-        assert_eq!(state.tracking.last_severe_error, text);
+    let mut callback = move |state: &mut SourceErrorState, level: SourceErrorLevel, text: &[u8]| {
+        assert_eq!(state.tracking.last_severe_error.as_bytes(), text);
         assert_eq!(state.tracking.total_severe_errors, 8);
-        callback_calls
-            .borrow_mut()
-            .push(format!("callback:{}:{text}", level as i32));
+        let mut call = format!("callback:{}:", level as i32).into_bytes();
+        call.extend_from_slice(text);
+        callback_calls.borrow_mut().push(call);
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -594,7 +768,13 @@ fn severe_retains_real_counter_last_text_and_database_before_callback()
     assert_eq!(state.tracking.total_severe_errors_during_sizing, 2);
     assert_eq!(state.tracking.total_warning_errors, 3);
     assert_eq!(
-        *calls.borrow(),
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
         [
             "create:1:1:Deprecated severe:1",
             "callback:3:Deprecated severe"
@@ -639,13 +819,13 @@ fn severe_database_failure_retains_new_last_text_and_no_callback()
     let mut sqlite = TestSqlite {
         calls: calls.clone(),
         transaction: false,
-        fail_create: true,
+        fail_record: true,
     };
     let callback_calls = calls.clone();
-    let mut callback = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &str| {
+    let mut callback = move |_: &mut SourceErrorState, _: SourceErrorLevel, _: &[u8]| {
         callback_calls
             .borrow_mut()
-            .push("unreached callback".into());
+            .push(b"unreached callback".to_vec());
     };
     {
         let mut actual = backend(&mut state, &mut error, &mut console);
@@ -660,7 +840,16 @@ fn severe_database_failure_retains_new_last_text_and_no_callback()
         ));
     }
     assert_eq!(state.tracking.last_severe_error, "new severe");
-    assert_eq!(*calls.borrow(), ["create:1:1:new severe:1"]);
+    assert_eq!(
+        calls
+            .borrow()
+            .iter()
+            .map(|message| std::str::from_utf8(message)
+                .expect("original authored UTF-8 call")
+                .to_owned())
+            .collect::<Vec<_>>(),
+        ["create:1:1:new severe:1"]
+    );
     assert!(String::from_utf8(error)?.ends_with("   ** Severe  ** new severe\n"));
     Ok(())
 }

@@ -405,7 +405,16 @@ impl Fixture {
         let events = Rc::clone(&self.callbacks);
         let mut error_callback = move |_: &mut SourceErrorState,
                                        level: SourceErrorLevel,
-                                       message: &str| {
+                                       message: &[u8]| {
+            let message = match std::str::from_utf8(message) {
+                Ok(text) => text,
+                Err(error) => {
+                    let mut rows = events.borrow_mut();
+                    let ordinal = rows.len() + 1;
+                    rows.push(json!({"actual_ordinal":ordinal,"kind":"qualityFailure","operation":"errorCallback UTF-8 text projection","level":level as i32,"error":error.to_string(),"message_bytes":message}));
+                    return;
+                }
+            };
             let mut v = events.borrow_mut();
             let ordinal = v.len() + 1;
             v.push(json!({"actual_ordinal":ordinal,"kind":"errorCallback","level":level as i32,"message":message}));

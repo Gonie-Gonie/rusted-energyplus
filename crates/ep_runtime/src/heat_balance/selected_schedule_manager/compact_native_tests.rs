@@ -3828,6 +3828,84 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
             && !ip.is_object_unused("Schedule:File", "Bad")
     );
     assert!(!std::str::from_utf8(&files.audit)?.contains("Processing Schedule Input -- Complete"));
+
+    // The same real warning-file producer now crosses the raw-byte continued
+    // diagnostic route. Reuse its annual data; no second schedule matrix.
+    let blank = b"1,,2\n";
+    let at = warning_bytes
+        .windows(blank.len())
+        .position(|row| row == blank)
+        .ok_or("actual old warning row")?;
+    let mut raw_warning_bytes = warning_bytes.clone();
+    drop(raw_warning_bytes.splice(at..at + blank.len(), b"\xff,3,2,\0extra\n".iter().copied()));
+    std::fs::write(directory.join(&warning_name), &raw_warning_bytes)?;
+    let definition = raw["Schedule:File"]["Good"].clone();
+    let raw_byte_model = serde_json::json!({"ScheduleTypeLimits":{"Any Number":{}},"Schedule:File":{"Raw":definition}});
+    file_fixture["object_order"]["Schedule:File"] = serde_json::json!(["Raw"]);
+    std::fs::write(&input_path, serde_json::to_vec(&raw_byte_model)?)?;
+    let mut ip = processor(&file_fixture, &raw_byte_model)?;
+    let mut declarations = schedule_declarations(&file_fixture, &raw_byte_model)?;
+    declarations.source_is_epjson = Some(true);
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let mut files = ReportFiles {
+        external: Some(
+            crate::heat_balance::source_initialization::SourceExternalInputFiles::new(&input_path)?,
+        ),
+        ..Default::default()
+    };
+    let mut search = crate::heat_balance::source_initialization::SourceFileSearchState::default();
+    let (mut state, mut raw_errors, mut console) =
+        (interpolation_error_state(), Vec::new(), Vec::new());
+    {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut raw_errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend_clock_and_files(
+            &mut ip,
+            &declarations,
+            4,
+            &mut files,
+            &mut backend,
+            &flags,
+            &clock,
+            &mut search,
+        )?;
+    }
+    assert_eq!(
+        raw_errors,
+        b"Program Version,authored caller,authored input\n   ** Warning ** ProcessScheduleInput: Schedule:File = RAW\n   **   ~~~   ** CsvParser - Line 3 - Expected 3 columns, got 4. Ignored extra columns. Error in following line.\n   **   ~~~   ** \xff,3,2,\0extra\n"
+    );
+    assert_eq!(
+        (
+            state.tracking.total_warning_errors,
+            state.tracking.total_severe_errors
+        ),
+        (1, 0)
+    );
+    assert_eq!(manager.unique_processed_external_files.len(), 1);
+    assert_eq!(manager.day_schedules.len(), 366);
+    assert_eq!(manager.week_schedules.len(), 365);
+    assert!(!ip.is_object_unused("Schedule:File", "Raw"));
+    let raw_schedule = manager
+        .get_source_schedule("RAW")?
+        .ok_or("actual raw-byte File")?;
+    manager.update_source_schedule_values(&file_clock, &file_environment)?;
+    assert_eq!(
+        manager
+            .source_current_schedule_value(raw_schedule)?
+            .to_bits(),
+        2.0_f64.to_bits()
+    );
+    assert!(std::str::from_utf8(&files.audit)?.contains("Processing Schedule Input -- Complete"));
     // Failed missing-path diagnostics must retain the preceding successful
     // TempFullFilePath until CheckForActualFilePath has returned its empty path.
     let common = serde_json::json!({"schedule_type_limits_name":"Any Number","file_name":csv_name,
