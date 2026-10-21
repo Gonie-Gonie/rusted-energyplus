@@ -37,6 +37,7 @@ pub(crate) enum SourceHvacChild {
     ManageWater,
     UpdatePlantNodeThermalHistory,
     CalculateHeatEmissionReport,
+    WriteWarmupEnvironmentStamp,
     CalculateMoreNodeInfo,
     CalculatePollution,
     InitializeEnergyReports,

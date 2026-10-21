@@ -301,6 +301,11 @@ impl<
             C::CheckConcurrentEirPlantLoopHeatPumpOperation => {
                 manager.check_source_concurrent_eir_heat_pumps()
             }
+            C::WriteWarmupEnvironmentStamp => manager.write_source_hvac_warmup_environment_stamp(
+                o,
+                output.report_flags,
+                output.dictionary_host,
+            ),
             C::CalculateMoreNodeInfo => o.equipment.calculate_source_more_node_info(
                 o.environment,
                 &*output.registration,

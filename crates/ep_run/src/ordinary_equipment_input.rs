@@ -882,6 +882,11 @@ mod tests {
                     vec![Some("DisplayZoneAirHeatBalanceOffBalance")],
                     false,
                 ),
+                (
+                    Some(r#"[{"key":"ReportDuringWarmup"},{"key":"reportduringwarmup"}]"#),
+                    vec![Some("ReportDuringWarmup"), Some("reportduringwarmup")],
+                    false,
+                ),
                 (Some(r#"[{}]"#), vec![None], false),
                 (
                     Some(r#"[{}, {"key":"DisplayUnusedObjects"}, {}]"#),
@@ -1006,6 +1011,7 @@ mod tests {
                         None,
                         Some("DisplayUnusedObjects"),
                         Some("DisplayAdvancedReportVariables"),
+                        Some("ReportDuringWarmup"),
                     ] {
                         let key_field =
                             key.map_or_else(String::new, |key| format!(r#""key":"{key}","#));
@@ -1142,7 +1148,7 @@ mod tests {
             }
             for entries in [
                 r#"[{"key":"ReportDuringHVACSizingSimulation"}]"#,
-                r#"[{"key":"ReportDuringWarmup","ignored":1}]"#,
+                r#"[{"key":"DoNotMirrorAttachedShading","ignored":1}]"#,
                 r#"[{"key":""}]"#,
                 r#"[{"key":" "}]"#,
                 r#"[{"key":1}]"#,

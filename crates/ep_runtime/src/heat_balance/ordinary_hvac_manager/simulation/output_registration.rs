@@ -50,6 +50,8 @@ impl SourceRealOutputOwners for SourceHvacOutputOwners<'_> {
 /// Report/IP/backend/EIO/clock operands are borrowed afresh per actual declaration call.
 pub(crate) struct SourceHvacOutputContext<'a, H, D> {
     pub(crate) registration: &'a mut SourceOutputRegistration,
+    pub(crate) report_flags:
+        &'a mut crate::heat_balance::radiation::ordinary::source_children::SourceSolarReportFlags,
     pub(crate) output_control:
         &'a crate::heat_balance::ordinary_output_control::SourceOutputControl,
     pub(crate) tabular_raw: &'a crate::heat_balance::ordinary_tabular_reports::SelectedTabularInput,

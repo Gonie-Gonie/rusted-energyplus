@@ -80,7 +80,8 @@ fn validate_stamp(
     fields: &[String],
     stream: Stream,
     line: usize,
-) -> Result<(), SourceReportedError> {
+    allow_warmup_day_zero: bool,
+) -> Result<Option<bool>, SourceReportedError> {
     let expected = match kind {
         StampKind::Interval => 8,
         StampKind::Daily => 5,
@@ -95,9 +96,19 @@ fn validate_stamp(
         ));
     }
     let integer = |i: usize| number(fields[i].as_str(), stream, line);
+    // Only actual day-indexed tuples identify a phase. Annual year-only rows
+    // and environment headers remain unclassified, with every raw field kept.
+    let phase = match kind {
+        StampKind::Annual => None,
+        _ => Some(integer(0)? == 0),
+    };
+    let day_is_valid = || -> Result<bool, SourceReportedError> {
+        let day = integer(0)?;
+        Ok(day >= 1 || (day == 0 && allow_warmup_day_zero))
+    };
     match kind {
         StampKind::Interval | StampKind::Daily => {
-            if integer(0)? < 1
+            if !day_is_valid()?
                 || !(1..=12).contains(&integer(1)?)
                 || !(1..=31).contains(&integer(2)?)
                 || !(0..=1).contains(&integer(3)?)
@@ -124,7 +135,7 @@ fn validate_stamp(
             }
         }
         StampKind::Monthly => {
-            if integer(0)? < 1 || !(1..=12).contains(&integer(1)?) {
+            if !day_is_valid()? || !(1..=12).contains(&integer(1)?) {
                 return Err(invalid(stream, line, "invalid monthly tuple"));
             }
         }
@@ -137,7 +148,7 @@ fn validate_stamp(
             integer(0)?;
         }
     }
-    Ok(())
+    Ok(phase)
 }
 pub(super) fn read_stream(
     path: &Path,
@@ -268,6 +279,10 @@ pub(super) fn read_stream(
     let mut environments = Vec::<ReportEnvironment>::new();
     let mut stamps = Vec::<ReportStamp>::new();
     let mut current_stamp = None;
+    // Transient witnesses belong to the current physical environment record,
+    // never to a guessed WeatherManager ordinal or a copied scientific owner.
+    let mut allow_warmup_day_zero = false;
+    let mut environment_phase = None;
     let mut data_count = 0u64;
     let mut end_seen = false;
     let mut footer_seen = false;
@@ -381,6 +396,21 @@ pub(super) fn read_stream(
             for field in &tail[1..] {
                 real(field, stream, n)?;
             }
+            // Native writes exactly "Warmup {positive decimal N} ", followed
+            // by the original environment name (which may itself be empty).
+            // A regular authored name may have this prefix too: only a real
+            // day-zero tuple under the actual catalog flag is warmup evidence.
+            allow_warmup_day_zero = c.report_during_warmup
+                && tail[0]
+                    .strip_prefix("Warmup {")
+                    .and_then(|title| title.split_once("} "))
+                    .is_some_and(|(day, _)| {
+                        day.as_bytes()
+                            .first()
+                            .is_some_and(|first| matches!(*first, b'1'..=b'9'))
+                            && day.bytes().all(|byte| byte.is_ascii_digit())
+                    });
+            environment_phase = None;
             environments.push(ReportEnvironment {
                 ordinal: environments.len() + 1,
                 fields: tail,
@@ -398,7 +428,16 @@ pub(super) fn read_stream(
                 ));
             }
             let fields = payload.split(',').map(str::to_owned).collect::<Vec<_>>();
-            validate_stamp(kind, &fields, stream, n)?;
+            if let Some(phase) = validate_stamp(kind, &fields, stream, n, allow_warmup_day_zero)? {
+                if environment_phase.is_some_and(|previous| previous != phase) {
+                    return Err(invalid(
+                        stream,
+                        n,
+                        "reported warmup/regular day phase changed without a new physical environment record",
+                    ));
+                }
+                environment_phase = Some(phase);
+            }
             current_stamp = Some(stamps.len());
             stamps.push(ReportStamp {
                 report_id: id,

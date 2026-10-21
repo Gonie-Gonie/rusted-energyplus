@@ -120,6 +120,185 @@ fn scheduled_filter_completed_parser_retains_dictionary_and_zero_sample_series()
     std::fs::write(&eso, physical(&c)?)?;
     // A missing unscheduled report remains invalid even beside an emitted report.
     assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
+
+    // This authored closed-stream child checks parser custody, not successful
+    // ManageSimulation execution. Every warmup/regular row remains in order.
+    let mut warmup = catalog(vec![declaration(7, None), declaration(8, Some("OFF"))], 4);
+    warmup.report_during_warmup = true;
+    let original_body =
+        "1,AUTHORED,39.74,-105.18,-7.00,1829.00\n2,1,1,1,0,1,0.00,60.00,Tuesday\n7,-4.5\n";
+    let phase_body = concat!(
+        "1,Warmup {1} ,39.74,-105.18,-7.00,1829.00\n",
+        "2,0,1,1,0,1,0.00,60.00,Tuesday\n7,-4.50\n",
+        "1,Warmup {2} AUTHORED,39.74,-105.18,-7.00,1829.00\n",
+        "2,0,1,1,0,1,0.00,60.00,Tuesday\n7,-3.250\n",
+        // An ordinary name can look like the warmup prefix, even with the flag.
+        "1,Warmup {7} AUTHORED,39.74,-105.18,-7.00,1829.00\n",
+        "2,1,1,1,0,1,0.00,60.00,Tuesday\n7,-2.0\n",
+        "2,2,1,2,0,1,0.00,60.00,Wednesday\n7,-1.00\n",
+        "1,Warmup {9} HEADER ONLY,39.74,-105.18,-7.00,1829.00\n",
+    );
+    let warmup_bytes = physical(&warmup)?
+        .replace(original_body, phase_body)
+        .replace(
+            "Number of Records Written=           1",
+            "Number of Records Written=           4",
+        );
+    std::fs::write(&eso, &warmup_bytes)?;
+    let result = read_completed_source_reports(&eso, &mtr, &warmup)?;
+    assert_eq!(result.eso.record_count, 4);
+    assert_eq!(result.eso.environments.len(), 4);
+    assert_eq!(result.eso.environments[0].fields[0], "Warmup {1} ");
+    assert_eq!(
+        result.eso.environments[3].fields[0],
+        "Warmup {9} HEADER ONLY"
+    );
+    assert_eq!(
+        result
+            .eso
+            .stamps
+            .iter()
+            .map(|row| row.environment_ordinal)
+            .collect::<Vec<_>>(),
+        [1, 2, 3, 3]
+    );
+    assert_eq!(
+        result
+            .eso
+            .stamps
+            .iter()
+            .map(|row| row.fields[0].as_str())
+            .collect::<Vec<_>>(),
+        ["0", "0", "1", "2"]
+    );
+    let samples = &result.eso.series[0].samples;
+    assert_eq!(
+        samples
+            .iter()
+            .map(|row| row.reported_fields[0].as_str())
+            .collect::<Vec<_>>(),
+        ["-4.50", "-3.250", "-2.0", "-1.00"]
+    );
+    assert_eq!(
+        samples
+            .iter()
+            .map(|row| row.stream_data_ordinal)
+            .collect::<Vec<_>>(),
+        [1, 2, 3, 4]
+    );
+    for (index, sample) in samples.iter().enumerate() {
+        assert_eq!(sample.stamp_index, index);
+        let raw_sample = format!("7,{}", sample.reported_fields[0]);
+        assert_eq!(
+            warmup_bytes.lines().nth(sample.physical_line - 1),
+            Some(raw_sample.as_str())
+        );
+    }
+    assert!(result.eso.series[1].samples.is_empty());
+    write_source_reported_artifacts(&directory.0.join("warmup-export"), &result)?;
+    let json: serde_json::Value = serde_json::from_slice(&std::fs::read(
+        directory
+            .0
+            .join("warmup-export/source-reported-results.json"),
+    )?)?;
+    assert_eq!(
+        json["schema"],
+        "rusted-energyplus.source-reported-streams.v1"
+    );
+    assert_eq!(
+        json["eso"]["environment_tuples"]
+            .as_array()
+            .ok_or("environment tuples")?
+            .len(),
+        4
+    );
+    assert_eq!(json["eso"]["timestamp_tuples"][0]["fields"][0], "0");
+    assert_eq!(
+        json["eso"]["series"][0]["samples"][3]["stream_data_ordinal"],
+        4
+    );
+    let csv = std::fs::read_to_string(directory.0.join("warmup-export/source-eso.csv"))?;
+    assert!(csv.contains("Warmup {1} ") && csv.contains("-4.50") && csv.contains("-1.00"));
+    warmup.report_during_warmup = false;
+    assert!(read_completed_source_reports(&eso, &mtr, &warmup).is_err());
+    warmup.report_during_warmup = true;
+    for invalid in [
+        warmup_bytes.replace("Warmup {1} ", "Warmup {0} "),
+        warmup_bytes.replace("Warmup {1} ", "Warmup {01} "),
+        warmup_bytes.replace("Warmup {1} ", "Warmup {+1} "),
+        warmup_bytes.replace("Warmup {1} ", "Warmup 1 "),
+        warmup_bytes.replace("Warmup {1} ", "warmup {1} "),
+        warmup_bytes.replace("2,0,1,1,0,1,", "2,-1,1,1,0,1,"),
+        // A title is not a license for an in-place zero/positive transition.
+        warmup_bytes.replace("2,2,1,2,0,1,", "2,0,1,2,0,1,"),
+        warmup_bytes.replace("7,-4.50\n", "7,-4.50\n2,1,1,1,0,2,0.00,60.00,Tuesday\n"),
+        warmup_bytes.replace(
+            "Number of Records Written=           4",
+            "Number of Records Written=           3",
+        ),
+    ] {
+        std::fs::write(&eso, invalid)?;
+        assert!(read_completed_source_reports(&eso, &mtr, &warmup).is_err());
+    }
+    let regular_prefix = catalog(vec![declaration(7, None)], 1);
+    std::fs::write(
+        &eso,
+        physical(&regular_prefix)?.replace("1,AUTHORED,", "1,Warmup {9} AUTHORED,"),
+    )?;
+    assert!(read_completed_source_reports(&eso, &mtr, &regular_prefix).is_ok());
+    // Native can emit Daily/Monthly zero at warmup end-of-day/month. Annual
+    // rows contain only a year: their environment is retained without a phase
+    // inference. RunPeriod still requires its original positive cumulative day.
+    for (frequency, stamp, operands, accepted) in [
+        (
+            Frequency::Daily,
+            "3,0,12,31,0,Tuesday",
+            "1,1,1,0,2,1,0",
+            true,
+        ),
+        (Frequency::Monthly, "4,0,12", "1,1,31,1,0,2,31,1,0", true),
+        (
+            Frequency::Annual,
+            "6,2026",
+            "1,1,12,31,1,0,2,12,31,1,0",
+            true,
+        ),
+        (
+            Frequency::RunPeriod,
+            "5,0",
+            "1,1,12,31,1,0,2,12,31,1,0",
+            false,
+        ),
+    ] {
+        let mut row = declaration(7, None);
+        row.frequency = frequency;
+        let mut period = catalog(vec![row], 1);
+        period.report_during_warmup = true;
+        let period_body = format!(
+            "1,Warmup {{1}} ,39.74,-105.18,-7.00,1829.00\n{stamp}\n7,{operands}\n1,UNCLASSIFIED HEADER ONLY,39.74,-105.18,-7.00,1829.00\n"
+        );
+        let period_bytes = physical(&period)?.replace(original_body, &period_body);
+        std::fs::write(&eso, &period_bytes)?;
+        let parsed = read_completed_source_reports(&eso, &mtr, &period);
+        assert_eq!(parsed.is_ok(), accepted, "{frequency:?}");
+        if accepted {
+            let parsed = parsed?;
+            assert_eq!(parsed.eso.environments.len(), 2);
+            assert_eq!(
+                parsed.eso.stamps[0].fields.join(","),
+                stamp.split_once(',').ok_or("stamp")?.1
+            );
+            assert_eq!(
+                parsed.eso.series[0].samples[0].reported_fields.join(","),
+                operands
+            );
+        }
+        period.report_during_warmup = false;
+        assert_eq!(
+            read_completed_source_reports(&eso, &mtr, &period).is_ok(),
+            frequency == Frequency::Annual
+        );
+    }
     Ok(())
 }
 

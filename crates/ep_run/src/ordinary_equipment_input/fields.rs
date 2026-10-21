@@ -622,6 +622,7 @@ pub(super) fn admitted_field(
                                             "DisplayUnusedSchedules",
                                             "DisplayWeatherMissingDataWarnings",
                                             "DisplayZoneAirHeatBalanceOffBalance",
+                                            "ReportDuringWarmup",
                                         ],
                                     ))
                             }

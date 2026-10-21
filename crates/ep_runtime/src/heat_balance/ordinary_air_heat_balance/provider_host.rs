@@ -103,6 +103,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
         let mut children = SourceHvacProviderHost {
             output: SourceHvacOutputContext {
                 registration: o.registration,
+                report_flags: o.report_flags,
                 output_control: o.output_control,
                 tabular_raw: o.tabular_raw,
                 sizing_raw: o.sizing_raw,

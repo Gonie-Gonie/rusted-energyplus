@@ -167,13 +167,6 @@ pub(crate) fn read_completed_source_reports(
     mtr_path: &Path,
     catalog: &SourceReportedCatalog,
 ) -> Result<SourceReportedStreams, SourceReportedError> {
-    if catalog.report_during_warmup {
-        return Err(invalid(
-            Stream::Eso,
-            0,
-            "warmup-report phase has no unambiguous phase partition in the retained ESO tuples",
-        ));
-    }
     if !catalog.unresolved_requests.is_empty() {
         return Err(invalid(
             Stream::Eso,

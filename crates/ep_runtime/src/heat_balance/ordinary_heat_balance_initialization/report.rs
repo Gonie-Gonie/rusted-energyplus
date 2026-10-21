@@ -83,6 +83,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
         let o = &mut self.owners;
         let mut output = SourceHvacOutputContext {
             registration: o.registration,
+            report_flags: o.report_flags,
             output_control: o.output_control,
             tabular_raw: o.tabular_raw,
             sizing_raw: o.sizing_raw,

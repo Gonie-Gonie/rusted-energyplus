@@ -70,7 +70,7 @@ pub(crate) fn source_fixed_7_2_upper(value: f64) -> String {
         format!("{signed:<7}")
     }
 }
-fn warmup_environment_stamp(
+pub(crate) fn warmup_environment_stamp(
     environment: &WeatherEnvironmentState,
     report_flags: &SourceSolarReportFlags,
 ) -> String {
