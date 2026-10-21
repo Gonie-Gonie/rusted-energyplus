@@ -178,7 +178,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         return false;
     }
     // Known field types/enums were validated first. No-model auxiliaries stay
-    // unconsumed; this positive branch connects only genuine scheduled Fanger.
+    // unconsumed; this positive branch connects genuine Fanger clothing inputs.
     let mut fanger = false;
     for name in [
         "thermal_comfort_model_1_type",
@@ -205,7 +205,11 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         ) || !selected(
             object,
             "clothing_insulation_calculation_method",
-            &["ClothingInsulationSchedule"],
+            &[
+                "ClothingInsulationSchedule",
+                "DynamicClothingModelASHRAE55",
+                "CalculationMethodSchedule",
+            ],
         ))
     {
         return false;
@@ -236,9 +240,22 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     if fanger {
         required_schedules.extend([
             "work_efficiency_schedule_name",
-            "clothing_insulation_schedule_name",
             "air_velocity_schedule_name",
         ]);
+        if selected(
+            object,
+            "clothing_insulation_calculation_method",
+            &["ClothingInsulationSchedule"],
+        ) {
+            required_schedules.push("clothing_insulation_schedule_name");
+        } else if field(object, "clothing_insulation_calculation_method")
+            .is_some_and(|value| text_is(value, &["CalculationMethodSchedule"]))
+        {
+            required_schedules.push("clothing_insulation_calculation_method_schedule_name");
+            // A12 is consumed only if the real method schedule hasVal(1).
+            // Raw admission cannot substitute current values or min/max here.
+        }
+        // Dynamic clothing consumes neither the method nor clothing schedule.
         // Native validates any nonempty A21 even when AnkleDraft is false.
         if text(object, "ankle_level_air_velocity_schedule_name").is_some_and(|s| !s.is_empty()) {
             required_schedules.push("ankle_level_air_velocity_schedule_name");

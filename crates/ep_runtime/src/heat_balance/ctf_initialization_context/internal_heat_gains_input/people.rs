@@ -406,7 +406,7 @@ impl SelectedInternalHeatGains {
         }
         Ok(())
     }
-    /// Actual IHG617-810 additional-input branch for scheduled Fanger only.
+    /// Actual IHG617-810 additional-input branch for supported Fanger clothing.
     /// Defaults and blank flags come from the genuine schema/IP getter.
     fn read_fanger_comfort(
         &mut self,
@@ -480,50 +480,91 @@ impl SelectedInternalHeatGains {
                 "CALCULATIONMETHODSCHEDULE" => 2,
                 _ => -1,
             };
-            if row.clothing_type != 0 {
-                return Err(unavailable("positive Fanger non-scheduled clothing inputs"));
-            }
-            row.clothing_sched = owners.schedules.get_source_schedule(&alphas[11])?;
-            let clothing = row.clothing_sched;
-            if first_space {
-                let message = if local.alpha_field_blanks[11] {
-                    Some(format!(
-                        "{} cannot be empty when {} = {}.",
-                        local.alpha_field_names[11], local.alpha_field_names[9], alphas[9]
-                    ))
-                } else if clothing.is_none() {
-                    Some(format!(
-                        "{} = {}, item not found.",
-                        local.alpha_field_names[11], alphas[11]
-                    ))
-                } else if !owners.schedules.source_check_min_with_clock(
-                    clothing.ok_or_else(|| unavailable("actual Fanger clothing schedule"))?,
-                    0.0,
-                    clock,
-                )? {
-                    Some(format!(
-                        "{} = {}, schedule contains values that are < 0",
-                        local.alpha_field_names[11], alphas[11]
-                    ))
-                } else {
-                    None
-                };
-                if let Some(message) = message {
-                    self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
-                } else {
-                    let max_ok = owners.schedules.source_max_with_clock(
-                        clothing.ok_or_else(|| unavailable("actual Fanger clothing maximum"))?,
-                        clock,
-                    )? - 2.0
-                        <= f64::from(f32::EPSILON);
-                    if !max_ok {
-                        let message = format!(
-                            "{} = {}, schedule contains values that are > 2",
-                            local.alpha_field_names[11], alphas[11]
-                        );
-                        self.people_comfort_diagnostic(alphas, &message, None, false, owners)?;
+            match row.clothing_type {
+                0 => {
+                    row.clothing_sched = owners.schedules.get_source_schedule(&alphas[11])?;
+                    let clothing = row.clothing_sched;
+                    if first_space {
+                        let message = if local.alpha_field_blanks[11] {
+                            Some(format!(
+                                "{} cannot be empty when {} = {}.",
+                                local.alpha_field_names[11], local.alpha_field_names[9], alphas[9]
+                            ))
+                        } else if clothing.is_none() {
+                            Some(format!(
+                                "{} = {}, item not found.",
+                                local.alpha_field_names[11], alphas[11]
+                            ))
+                        } else if !owners.schedules.source_check_min_with_clock(
+                            clothing
+                                .ok_or_else(|| unavailable("actual Fanger clothing schedule"))?,
+                            0.0,
+                            clock,
+                        )? {
+                            Some(format!(
+                                "{} = {}, schedule contains values that are < 0",
+                                local.alpha_field_names[11], alphas[11]
+                            ))
+                        } else {
+                            None
+                        };
+                        if let Some(message) = message {
+                            self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+                        } else {
+                            let max_ok = owners.schedules.source_max_with_clock(
+                                clothing
+                                    .ok_or_else(|| unavailable("actual Fanger clothing maximum"))?,
+                                clock,
+                            )? - 2.0
+                                <= f64::from(f32::EPSILON);
+                            if !max_ok {
+                                let message = format!(
+                                    "{} = {}, schedule contains values that are > 2",
+                                    local.alpha_field_names[11], alphas[11]
+                                );
+                                self.people_comfort_diagnostic(
+                                    alphas, &message, None, false, owners,
+                                )?;
+                            }
+                        }
                     }
                 }
+                1 => {} // Native DynamicAshrae55 consumes no A11/A12 here.
+                2 => {
+                    row.clothing_method_sched =
+                        owners.schedules.get_source_schedule(&alphas[10])?;
+                    let method = row.clothing_method_sched;
+                    if first_space && method.is_none() {
+                        let message = format!(
+                            "{} = {}, item not found.",
+                            local.alpha_field_names[10], alphas[10]
+                        );
+                        self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+                    }
+                    // Native next dereferences the method pointer. A null one
+                    // is an explicit undefined-owner boundary after its Severe.
+                    let method = method.ok_or_else(|| {
+                        unavailable("actual Fanger clothing-method pointer before hasVal")
+                    })?;
+                    if owners.schedules.source_has_value(method, 1.0, clock)? {
+                        let row = self
+                            .allocations
+                            .people
+                            .rows
+                            .get_mut(person)
+                            .ok_or_else(|| unavailable("same Fanger selected clothing row"))?;
+                        row.clothing_sched = owners.schedules.get_source_schedule(&alphas[11])?;
+                        if first_space && row.clothing_sched.is_none() {
+                            let message = format!(
+                                "{} = {}, item not found.",
+                                local.alpha_field_names[11], alphas[11]
+                            );
+                            self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+                        }
+                    }
+                    // Native adds no method-range or clothing min/max check.
+                }
+                _ => return Err(unavailable("invalid Fanger clothing input key")),
             }
         }
         let row = self

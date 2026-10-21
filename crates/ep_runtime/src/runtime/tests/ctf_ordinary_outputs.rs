@@ -3006,6 +3006,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             SourceInputFamily::Objects(vec![
                                 shape("Activity"),
                                 shape("Unused People Auxiliary"),
+                                shape("Fanger Method Two"),
                             ]),
                         ),
                         (
@@ -3040,6 +3041,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 name: "UNUSED PEOPLE AUXILIARY".into(),
                                 type_name: Some("ACTIVITY TYPE".into()),
                                 value: 0.125,
+                            },
+                            SourceConstantScheduleInput {
+                                object_name: "Fanger Method Two".into(),
+                                name: "FANGER METHOD TWO".into(),
+                                type_name: Some("ACTIVITY TYPE".into()),
+                                value: 2.0,
                             },
                         ],
                     },
@@ -4553,9 +4560,21 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     };
                     use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as ComfortError;
                     use crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams;
-                    for (all_unoccupied, fanger_enabled) in
-                        [(false, false), (true, false), (false, true)]
-                    {
+                    for (all_unoccupied, fanger_mode) in [
+                        (false, None),
+                        (true, None),
+                        (false, Some(("ClothingInsulationSchedule", "Constant-1.0"))),
+                        (
+                            false,
+                            Some(("DynamicClothingModelASHRAE55", "missing unused method")),
+                        ),
+                        (false, Some(("CalculationMethodSchedule", "Constant-1.0"))),
+                        (
+                            false,
+                            Some(("CalculationMethodSchedule", "Fanger Method Two")),
+                        ),
+                    ] {
+                        let fanger_enabled = fanger_mode.is_some();
                         let mut comfort_reports = if all_unoccupied || fanger_enabled {
                             people_getter_base.clone()
                         } else {
@@ -4608,6 +4627,31 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 first
                                     .fields
                                     .insert(field.into(), ProjectInputValue::String(value.into()));
+                            }
+                        }
+                        if let Some((method, calculation)) = fanger_mode {
+                            let first = &mut comfort_reports
+                                .heat_balance_input
+                                .as_mut()
+                                .ok_or("clothing raw input")?
+                                .objects
+                                .get_mut("People")
+                                .ok_or("clothing raw People")?[0];
+                            first.fields.insert(
+                                "clothing_insulation_calculation_method".into(),
+                                ProjectInputValue::String(method.into()),
+                            );
+                            first.fields.insert(
+                                "clothing_insulation_calculation_method_schedule_name".into(),
+                                ProjectInputValue::String(calculation.into()),
+                            );
+                            if method == "DynamicClothingModelASHRAE55"
+                                || calculation == "Fanger Method Two"
+                            {
+                                first.fields.insert(
+                                    "clothing_insulation_schedule_name".into(),
+                                    ProjectInputValue::String("missing unused clothing".into()),
+                                );
                             }
                         }
                         if all_unoccupied {
@@ -4686,7 +4730,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             };
                             let mut run_comfort = |initialize_only, current: &mut SourceThermalComfort,
                                                clock: &crate::weather::day::WeatherGlobalState,
-                                               air: &crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance| {
+                                               air: &crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance,
+                                               environment: &crate::weather::day::WeatherEnvironmentState| {
                             let mut dictionary = SourceOutputDictionaryStreams {
                                 eso: Some(&mut comfort_eso), sqlite_present: comfort_reports.source_sqlite.present(),
                                 results_framework_output_variables: &mut comfort_reports.source_results_output_variables,
@@ -4696,7 +4741,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 schedules: comfort_reports.selected_schedule_manager.as_ref().ok_or(ComfortError::Unavailable("comfort genuine schedules"))?,
                                 zones: comfort_reports.selected_zone_input.as_ref().ok_or(ComfortError::Unavailable("comfort genuine Zones"))?,
                                 control: &comfort_reports.heat_balance_input_state, globals: comfort_globals,
-                                clock, environment: &comfort_environment, hvac: &comfort_hvac, air,
+                                clock, environment, hvac: &comfort_hvac, air,
                                 developer: &comfort_reports.selected_project_data.as_ref().ok_or(ComfortError::Unavailable("comfort actual project"))?.system.developer_flag,
                                 controller: &comfort_controller, fan: &mut comfort_fan,
                                 radiation: comfort_reports.ordinary_solar_radiation.as_ref().ok_or(ComfortError::Unavailable("comfort actual retained radiation"))?,
@@ -4712,7 +4757,13 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 predefined_summary: &mut comfort_summary,
                             })
                         };
-                            run_comfort(true, &mut comfort, &comfort_clock, &comfort_air)?;
+                            run_comfort(
+                                true,
+                                &mut comfort,
+                                &comfort_clock,
+                                &comfort_air,
+                                &comfort_environment,
+                            )?;
                             assert!(!comfort.first_time_flag);
                             assert_eq!(
                                 comfort
@@ -4726,8 +4777,13 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 // This fixture reran the real Zone getter, producing a new
                                 // Space with ctor0 enclosure identity. No fabricated link
                                 // is inserted after the six genuine registrations.
-                                let reached =
-                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                let reached = run_comfort(
+                                    false,
+                                    &mut comfort,
+                                    &comfort_clock,
+                                    &comfort_air,
+                                    &comfort_environment,
+                                );
                                 assert!(
                                     matches!(
                                         &reached,
@@ -4773,6 +4829,75 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                         U::Clo,
                                     ),
                                 ];
+                                let (method, calculation) =
+                                    fanger_mode.ok_or("actual selected Fanger clothing test")?;
+                                if method == "DynamicClothingModelASHRAE55" {
+                                    // Manage(true), not a direct scratch-field assignment,
+                                    // writes the actual clock-selected six-AM weather operand.
+                                    for (temperature, expected) in [
+                                        (-10.0, 1.0),
+                                        (-5.0, 1.0),
+                                        (0.0, 0.818),
+                                        (5.0, 0.6360628048372603),
+                                        (25.0, 0.4693534343171951),
+                                        (26.0, 0.46),
+                                    ] {
+                                        let mut weather = comfort_environment.clone();
+                                        weather.current_weather.out_dry_bulb_temp = temperature;
+                                        let mut clock = comfort_clock.clone();
+                                        clock.day_of_sim = 2;
+                                        clock.hour_of_day = 7;
+                                        clock.time_step = 1;
+                                        run_comfort(
+                                            true,
+                                            &mut comfort,
+                                            &clock,
+                                            &comfort_air,
+                                            &weather,
+                                        )?;
+                                        assert_eq!(
+                                            comfort.temporary_six_am_temperature,
+                                            temperature
+                                        );
+                                        comfort.calc_source_dynamic_clothing()?;
+                                        assert!(
+                                            (comfort
+                                                .thermal_comfort_data
+                                                .as_ref()
+                                                .ok_or("dynamic row")?[0]
+                                                .clothing_value
+                                                - expected)
+                                                .abs()
+                                                < 1.0e-12
+                                        );
+                                        // Later timesteps retain the real six-AM cell despite
+                                        // an unrelated current weather change.
+                                        clock.time_step = 2;
+                                        weather.current_weather.out_dry_bulb_temp = 40.0;
+                                        run_comfort(
+                                            true,
+                                            &mut comfort,
+                                            &clock,
+                                            &comfort_air,
+                                            &weather,
+                                        )?;
+                                        assert_eq!(
+                                            comfort.temporary_six_am_temperature,
+                                            temperature
+                                        );
+                                    }
+                                    let mut first_day = comfort_clock.clone();
+                                    first_day.day_of_sim = 1;
+                                    first_day.hour_of_day = 6;
+                                    run_comfort(
+                                        true,
+                                        &mut comfort,
+                                        &first_day,
+                                        &comfort_air,
+                                        &comfort_environment,
+                                    )?;
+                                    assert_eq!(comfort.temporary_six_am_temperature, 1.868132);
+                                }
                                 let mut prior = None;
                                 for (name, field, units) in declarations {
                                     let at = comfort_reports
@@ -4792,7 +4917,16 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                         (row.units, row.store_type, row.time_step_type),
                                         (units, S::Average, TimeStepKind::Zone)
                                     );
-                                    assert_eq!(*comfort.real_output(field, 1)?, 0.0);
+                                    assert_eq!(
+                                        *comfort.real_output(field, 1)?,
+                                        if field == F::PeopleClothingValue
+                                            && method == "DynamicClothingModelASHRAE55"
+                                        {
+                                            0.46
+                                        } else {
+                                            0.0
+                                        }
+                                    );
                                 }
                                 assert_eq!(U::Clo.symbol(), "clo");
                                 let first = &comfort_reports
@@ -4803,10 +4937,26 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 assert!(
                                     first.fanger
                                         && first.work_eff_sched.is_some()
-                                        && first.clothing_sched.is_some()
                                         && first.air_velocity_sched.is_some()
                                 );
-                                assert_eq!((first.mrt_calc_type, first.clothing_type), (0, 0));
+                                let expected_type = match method {
+                                    "ClothingInsulationSchedule" => 0,
+                                    "DynamicClothingModelASHRAE55" => 1,
+                                    "CalculationMethodSchedule" => 2,
+                                    _ => return Err("authored clothing test enum".into()),
+                                };
+                                assert_eq!(
+                                    (first.mrt_calc_type, first.clothing_type),
+                                    (0, expected_type)
+                                );
+                                assert_eq!(
+                                    first.clothing_sched.is_some(),
+                                    expected_type == 0 || calculation == "Constant-1.0"
+                                );
+                                assert_eq!(
+                                    first.clothing_method_sched.is_some(),
+                                    expected_type == 2
+                                );
                                 assert!(!comfort.first_time_flag);
                                 // Original ThermalComfort.unit.cc2079-2116 scalar fixtures,
                                 // executed against the real shared Psat state/backend. They
@@ -4857,8 +5007,13 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 air.ztav_comf = temperature;
                                 air.mrt = temperature;
                                 air.air_hum_rat_avg_comf = humidity;
-                                let reached =
-                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                let reached = run_comfort(
+                                    false,
+                                    &mut comfort,
+                                    &comfort_clock,
+                                    &comfort_air,
+                                    &comfort_environment,
+                                );
                                 assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same Zone thermostat setpoint"))),
                                 "the real SimpleASH child precedes the fixture's absent thermostat owner: {reached:?}");
                                 let row = &comfort
@@ -4907,8 +5062,13 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 air.mrt = 18.0;
                                 air.air_hum_rat_avg_comf = 0.006;
                                 comfort_clock.end_design_day_envrns_flag = step == 3;
-                                let reached =
-                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                let reached = run_comfort(
+                                    false,
+                                    &mut comfort,
+                                    &comfort_clock,
+                                    &comfort_air,
+                                    &comfort_environment,
+                                );
                                 assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("actual same Zone thermostat setpoint"))), "comfort report prefix: {reached:?}");
                             }
                         }

@@ -27,7 +27,7 @@ impl SourceThermalComfort {
         self.people_num = 1;
         while self.people_num <= o.gains.totals[0] {
             let at = index(self.people_num)?;
-            let (fanger, zone, activity, work, clothing_type, clothing, velocity) = {
+            let (fanger, zone, activity, work, clothing_type, method, clothing, velocity) = {
                 let people = o
                     .gains
                     .allocations
@@ -40,6 +40,7 @@ impl SourceThermalComfort {
                     people.activity_level_sched,
                     people.work_eff_sched,
                     people.clothing_type,
+                    people.clothing_method_sched,
                     people.clothing_sched,
                     people.air_velocity_sched,
                 )
@@ -106,19 +107,86 @@ impl SourceThermalComfort {
                 self.work_eff = o.schedules.source_current_schedule_value(
                     work.ok_or(Error::Unavailable("actual Fanger work efficiency schedule"))?,
                 )? * self.act_level;
-                if clothing_type != 0 {
-                    return Err(Error::Unavailable(
-                        "positive Fanger dynamic/calculation clothing branch594",
-                    ));
+                match clothing_type {
+                    0 => {
+                        self.clo_unit =
+                            o.schedules
+                                .source_current_schedule_value(clothing.ok_or(
+                                    Error::Unavailable("actual Fanger clothing schedule"),
+                                )?)?;
+                        self.thermal_comfort_data
+                            .as_mut()
+                            .and_then(|rows| rows.get_mut(at))
+                            .ok_or(Error::Unavailable("actual Fanger clothing output owner"))?
+                            .clothing_value = self.clo_unit;
+                    }
+                    1 => {
+                        let comfort = self
+                            .thermal_comfort_data
+                            .as_mut()
+                            .and_then(|rows| rows.get_mut(at))
+                            .ok_or(Error::Unavailable("actual dynamic clothing retained row"))?;
+                        comfort.thermal_comfort_op_temp = (self.rad_temp + self.air_temp) / 2.0;
+                        comfort.clothing_value = self.clo_unit;
+                        self.calc_source_dynamic_clothing()?;
+                        self.clo_unit = self
+                            .thermal_comfort_data
+                            .as_ref()
+                            .and_then(|rows| rows.get(at))
+                            .ok_or(Error::Unavailable("actual dynamic clothing result"))?
+                            .clothing_value;
+                    }
+                    2 => {
+                        let intermediate =
+                            o.schedules.source_current_schedule_value(method.ok_or(
+                                Error::Unavailable("actual clothing calculation method schedule"),
+                            )?)?;
+                        if intermediate == 1.0 {
+                            self.clo_unit =
+                                o.schedules.source_current_schedule_value(clothing.ok_or(
+                                    Error::Unavailable("actual method1 clothing schedule"),
+                                )?)?;
+                            self.thermal_comfort_data
+                                .as_mut()
+                                .and_then(|rows| rows.get_mut(at))
+                                .ok_or(Error::Unavailable("actual method1 clothing retained row"))?
+                                .clothing_value = self.clo_unit;
+                        } else if intermediate == 2.0 {
+                            let comfort = self
+                                .thermal_comfort_data
+                                .as_mut()
+                                .and_then(|rows| rows.get_mut(at))
+                                .ok_or(Error::Unavailable(
+                                    "actual method2 clothing retained row",
+                                ))?;
+                            comfort.thermal_comfort_op_temp = (self.rad_temp + self.air_temp) / 2.0;
+                            comfort.clothing_value = self.clo_unit;
+                            self.calc_source_dynamic_clothing()?;
+                            self.clo_unit = self
+                                .thermal_comfort_data
+                                .as_ref()
+                                .and_then(|rows| rows.get(at))
+                                .ok_or(Error::Unavailable("actual method2 clothing result"))?
+                                .clothing_value;
+                        } else {
+                            // Native reads the schedule, warns on every such call, and
+                            // does not assign comfort.ClothingValue on this fallback.
+                            self.clo_unit =
+                                o.schedules.source_current_schedule_value(clothing.ok_or(
+                                    Error::Unavailable("actual fallback clothing schedule"),
+                                )?)?;
+                            let name = &o
+                                .gains
+                                .allocations
+                                .people
+                                .get(at)
+                                .ok_or(Error::Unavailable("actual fallback People name"))?
+                                .name;
+                            o.backend.show_warning_error(&format!("PEOPLE=\"{name}\", Scheduled clothing value will be used rather than clothing calculation method."))?;
+                        }
+                    }
+                    _ => return Err(Error::Unavailable("actual bounded Fanger clothing enum")),
                 }
-                self.clo_unit = o.schedules.source_current_schedule_value(
-                    clothing.ok_or(Error::Unavailable("actual Fanger clothing schedule"))?,
-                )?;
-                self.thermal_comfort_data
-                    .as_mut()
-                    .and_then(|rows| rows.get_mut(at))
-                    .ok_or(Error::Unavailable("actual Fanger clothing output owner"))?
-                    .clothing_value = self.clo_unit;
                 self.air_vel = o.schedules.source_current_schedule_value(
                     velocity.ok_or(Error::Unavailable("actual Fanger air speed schedule"))?,
                 )?;
@@ -211,6 +279,32 @@ impl SourceThermalComfort {
             self.rad_temp -= 273.15;
         }
         Ok(self.rad_temp)
+    }
+
+    /// Native DynamicClothingModel3190-3211 writes only the current retained
+    /// row. ManageThermalComfort owns the actual six-AM weather state update.
+    #[allow(
+        clippy::manual_range_contains,
+        reason = "Preserve Native ordered bounds and NaN no-assignment path"
+    )]
+    pub(crate) fn calc_source_dynamic_clothing(&mut self) -> Result<(), Error> {
+        let temperature = self.temporary_six_am_temperature;
+        let comfort = self
+            .thermal_comfort_data
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index(self.people_num).ok()?))
+            .ok_or(Error::Unavailable("actual DynamicClothingModel People row"))?;
+        if temperature < -5.0 {
+            comfort.clothing_value = 1.0;
+        } else if temperature >= -5.0 && temperature < 5.0 {
+            comfort.clothing_value = 0.818 - 0.0364 * temperature;
+        } else if temperature >= 5.0 && temperature < 26.0 {
+            let temporary = -0.1635 - 0.0066 * temperature;
+            comfort.clothing_value = 10.0_f64.powf(temporary);
+        } else if temperature >= 26.0 {
+            comfort.clothing_value = 0.46;
+        }
+        Ok(())
     }
 
     /// Same scalar child as Native CalcFangerPMV676, over the real property state.

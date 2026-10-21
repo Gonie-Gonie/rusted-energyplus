@@ -242,7 +242,7 @@
     ],
     "People": [
       "Direct-Zone People uses the real single implicit Space, raw/IP defaults and counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select the actual numeric operand and Space floor area, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts explicit numeric values or omitted, empty and Autocalculate defaults; automatic sensible uses the same live Space MAT, retained Mixing RoomAir, Native polynomial and ordered clamps. Getter occupant totals, devices, rates/energy, Which bindings, nominal reporting and mandatory SimpleASH55 remain connected. Auxiliary comfort operands stay unconsumed when no optional model is selected, with the original count-sensitive warnings.",
-      "Fanger reporting connects EnclosureAveraged MRT, ClothingInsulationSchedule, actual work/clothing/air-velocity schedules, averaged Zone air and humidity, the same radiant enclosure and HVAC-to-person arrays, and stateful RH/Psat diagnostics. It writes real People temperature/RH and six People-keyed Zone/Average PMV, PPD, clothing-surface, MRT, operative-temperature and clothing-value outputs, including when current occupancy is zero. Same-input A/B evidence retains all earlier policies and separately checks these six outputs; earlier direct/density/area sizing and numeric/automatic sensible proofs remain retained. Connected-owner checks distinguish design totals from signed/zero current occupancy and preserve reached failure prefixes. The other six comfort models, SurfaceWeighted/AngleFactor MRT, dynamic or calculation-schedule clothing, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups and positive non-Mixing RoomAir remain unsupported. This is bounded support, not full People input-domain completion."
+      "Fanger reporting connects EnclosureAveraged MRT with ClothingInsulationSchedule, DynamicClothingModelASHRAE55 or CalculationMethodSchedule. Dynamic clothing uses the retained six-AM temperature owner and ordered Native formula, without auxiliary method/clothing lookups. Calculation schedules use current1 for scheduled clothing and current2 for Dynamic; the genuine hasVal(1) traversal controls the getter clothing lookup, with no invented method-range or clothing bounds. Other current method values retain the Native warning/fallback and reached missing-pointer boundaries. Actual work/air-velocity schedules, averaged Zone air/humidity, radiant enclosure/HVAC-to-person arrays and stateful RH/Psat feed real People temperature/RH and six People-keyed Zone/Average comfort outputs, even at zero occupancy. Same-input A/B evidence covers Dynamic and mixed1/2 schedules with every retained policy; earlier sizing, sensible and scheduled-clothing evidence remains. Connected-owner checks preserve signed/zero occupancy and failure prefixes. The other six comfort models, SurfaceWeighted/AngleFactor MRT, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups and positive non-Mixing RoomAir remain unsupported. This is bounded support, not full People input-domain completion."
     ]
   },
   "verification": {
@@ -259,18 +259,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-fanger-clippy-52b.log",
-        "sha256": "1bdc6f2d38e152ee1dbb84389b2ced34b9c9b30019a3100499892a6860b12bca",
-        "bytes": 490
+        "path": ".runtime/object-expansion/people-clothing-clippy-53b.log",
+        "sha256": "9b9d0f01bf6babd0b98524ae46f188e83b8bdfd47c5b5d6fb521ca29dad11872",
+        "bytes": 580
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/people-fanger-docs-52.log",
-        "sha256": "ec8a295db5abbd6dad049ff0a98d1a6d10013349076b33e52e0c28564df40af9",
+        "path": ".runtime/object-expansion/people-clothing-docs-53.log",
+        "sha256": "f05708f8053333443187b7d303ed26c1a0cf6ba2b6dbe0a6f6c3957b975c69a7",
         "bytes": 354
       },
-      "clippy_through_build": "people-fanger-52",
+      "clippy_through_build": "people-clothing-53",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -4861,12 +4861,148 @@
           "passed": true
         },
         "effective_state": "Current Source52 same-input Fanger-only comparison against its own sole initial-True Native52, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "people-clothing-a",
+        "group": "people_clothing",
+        "source_build": "people-clothing-53",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-clothing-a/calibration-01/input.epJSON",
+          "sha256": "2291fc5b32d7e1e03a54070c863b8caaa82d3738b5fe68e132a80775989c2400",
+          "bytes": 54335
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-clothing-a/calibration-01/receipt.json",
+          "sha256": "8c05da5e087ab6325802d2db6f42214e7a0b3402d7b57737011b5add53c601bc",
+          "bytes": 20929
+        },
+        "Native_calibration_unit": 53,
+        "Native53_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-clothing-a-53/people-clothing-a/receipt.json",
+          "sha256": "0414ba4694ff2357e6befcd32dc76d9685c4a975c148f865a4fcf9d046d60093",
+          "bytes": 4344
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-clothing-a-53/run-summary.json",
+          "sha256": "1be2ef4b7fd23a428c9b0c97115121de501104dfee52dc0110c08bd4ab671e0a",
+          "bytes": 52457
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/eplus-rs.exe",
+          "sha256": "b2e82be81c560c4320067197dfba0991abbdc23779a55bec656ae65223f75796",
+          "bytes": 76189331
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/24/24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263",
+          "sha256": "24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/receipt.json",
+          "sha256": "f12f7118bbe4ba84ed7f453fb7e218da93671a48a87b6a1ef09c67369e57e90f",
+          "bytes": 5087
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-clothing-a-comparisons-53/people-clothing-a/comparison.json",
+          "sha256": "88babbff5679e31cf143f4c201c854cd63f7189ab214a7335938942ad5c9a5ff",
+          "bytes": 917052
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-clothing-a-53-launch/people-clothing-a/request.json",
+          "sha256": "fc681103d8cb5f07bc489144f8a850b7cef56ed64c292a4b8e557d294b5db5a3",
+          "bytes": 3304
+        },
+        "totals": {
+          "series": 124,
+          "samples": 11616,
+          "raw_operand_unequal": 79,
+          "parsed_binary64_unequal": 79,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source53 same-input Fanger clothing comparison against its own sole initial-True Native53, unchanged124/110 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "people-clothing-b",
+        "group": "people_clothing",
+        "source_build": "people-clothing-53",
+        "scope": "B",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-clothing-b/calibration-01/input.idf",
+          "sha256": "8c0ec7e3e33a6b8721b8b02d7b5d1812ed32bedbb74d6995bc68c6c1657de568",
+          "bytes": 16036
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-clothing-b/calibration-01/receipt.json",
+          "sha256": "16153d78c9ced5bac7b1bbbf33ea6d37e958e2991d8679b844c1ebdebd952b73",
+          "bytes": 20175
+        },
+        "Native_calibration_unit": 53,
+        "Native53_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-clothing-b-53/people-clothing-b/receipt.json",
+          "sha256": "fa588f5b2c4df50dc2efc89a61bc09314bece9532eaacde70ecd3ecb062e7319",
+          "bytes": 4230
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-clothing-b-53/run-summary.json",
+          "sha256": "f4779cd5154bedee89cd9ebef4d8f23f3825aabc7616ef5f08f8f75db7555614",
+          "bytes": 63080
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/eplus-rs.exe",
+          "sha256": "b2e82be81c560c4320067197dfba0991abbdc23779a55bec656ae65223f75796",
+          "bytes": 76189331
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/24/24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263",
+          "sha256": "24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/receipt.json",
+          "sha256": "f12f7118bbe4ba84ed7f453fb7e218da93671a48a87b6a1ef09c67369e57e90f",
+          "bytes": 5087
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-clothing-b-comparisons-53/people-clothing-b/comparison.json",
+          "sha256": "b5b40ff164f3ef24071b99be75d41f70f1b49604e281fd1d1815610125f50f96",
+          "bytes": 473575
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-clothing-b-53-launch/people-clothing-b/request.json",
+          "sha256": "43a31dc1067d0cf2a4985e47e3eb1d54feb99c64d4fc308ed42862d3d6d653f7",
+          "bytes": 3188
+        },
+        "totals": {
+          "series": 110,
+          "samples": 10560,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source53 same-input Fanger clothing comparison against its own sole initial-True Native53, unchanged124/110 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
       }
     ],
     "totals": {
-      "paired_cases": 82,
-      "reported_samples": 631974,
-      "raw_operand_unequal": 167920,
+      "paired_cases": 84,
+      "reported_samples": 654150,
+      "raw_operand_unequal": 167999,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -5755,12 +5891,35 @@
           "sha256": "873e868739a95adc8661cf309a77c9a950c0492453656e57ff661fa1c87b4d63",
           "bytes": 76174427
         }
+      },
+      {
+        "id": "people-clothing-53",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/receipt.json",
+          "sha256": "f12f7118bbe4ba84ed7f453fb7e218da93671a48a87b6a1ef09c67369e57e90f",
+          "bytes": 5087
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/24/24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263",
+          "sha256": "24912d48143218debfe408a728437a0661815dfe780d4a0dc063699491203263"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-53/eplus-rs.exe",
+          "sha256": "b2e82be81c560c4320067197dfba0991abbdc23779a55bec656ae65223f75796",
+          "bytes": 76189331
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "All existing owner-body checks are contained in the current full workspace milestone."
+      "passed": 2,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/people-clothing-focused-53.log",
+          "sha256": "fa986f4fdab6e2cff13ca763c42513a5f422cb2329418e99e3b3a6f41bbf506f",
+          "bytes": 1218
+        }
+      ],
+      "scope": "Two existing raw-ingress and connected gain/comfort owner bodies passed after the retained full workspace52 milestone. No new test bodies or cohorts."
     }
   },
   "additional_native_type_calibrations": [

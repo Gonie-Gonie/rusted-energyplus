@@ -204,16 +204,31 @@ impl SelectedInternalHeatGains {
                     || people.cooling_effect_ash55
                     || people.ankle_draft_ash55
                     || people.mrt_calc_type != 0
-                    || people.clothing_type != 0
                 {
                     return Err(unavailable(
                         "actual unsupported People nominal MRT/work/clothing branch2793",
                     ));
                 }
+                let clothing_type = match people.clothing_type {
+                    0 => "Clothing Insulation Schedule",
+                    1 => "Dynamic Clothing Model ASHRAE55",
+                    2 => "Calculation Method Schedule",
+                    _ => return Err(unavailable("invalid People nominal clothing type")),
+                };
+                let method_name = if people.clothing_type == 2 {
+                    let method = people.clothing_method_sched.ok_or_else(|| {
+                        unavailable("actual People nominal clothing-method pointer")
+                    })?;
+                    optional_schedule_name(owners.schedules, Some(method))?
+                } else {
+                    "N/A"
+                };
                 write!(
                     owners.eio,
-                    "Zone Averaged,{},Clothing Insulation Schedule,N/A,{},{},Yes,No,No,No,No",
+                    "Zone Averaged,{},{},{},{},{},Yes,No,No,No,No",
                     optional_schedule_name(owners.schedules, people.work_eff_sched)?,
+                    clothing_type,
+                    method_name,
                     optional_schedule_name(owners.schedules, people.clothing_sched)?,
                     optional_schedule_name(owners.schedules, people.air_velocity_sched)?,
                 )?;

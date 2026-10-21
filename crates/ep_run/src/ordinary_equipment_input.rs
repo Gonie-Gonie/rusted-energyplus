@@ -2586,8 +2586,6 @@ mod source_a_compact_ingress {
                 for (old, new) in [
                     ("EnclosureAveraged", "SurfaceWeighted"),
                     ("EnclosureAveraged", "AngleFactor"),
-                    ("ClothingInsulationSchedule", "DynamicClothingModelASHRAE55"),
-                    ("ClothingInsulationSchedule", "CalculationMethodSchedule"),
                     (
                         "\"ankle_level_air_velocity_schedule_name\":\"ankle\"",
                         "\"ankle_level_air_velocity_schedule_name\":\"missing ankle\"",
@@ -2599,6 +2597,75 @@ mod source_a_compact_ingress {
                     assert!(resolve_source_a(&raw).is_err());
                     assert!(resolve_source_b(&raw).is_err());
                 }
+            }
+        }
+        // Clothing selection controls which raw references the real getter
+        // consumes. CalculationSchedule defers A12 to its actual hasVal(1).
+        for (method, method_schedule, clothing_schedule) in [
+            (
+                "DynamicClothingModelASHRAE55",
+                "missing unused method",
+                Some("missing unused clothing"),
+            ),
+            ("DynamicClothingModelASHRAE55", "", None),
+            (
+                "CalculationMethodSchedule",
+                "method one",
+                Some("wide clothes"),
+            ),
+            ("CalculationMethodSchedule", "method two", None),
+        ] {
+            let clothing_member = clothing_schedule.map_or_else(String::new, |name| {
+                format!(r#","clothing_insulation_schedule_name":"{name}""#)
+            });
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}},"work":{{"hourly_value":0.2}},"velocity":{{"hourly_value":0.1}},"method one":{{"hourly_value":1}},"method two":{{"hourly_value":2}},"wide clothes":{{"hourly_value":3}}}},"People":{{"Clothing person":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2,"sensible_heat_fraction":0.6,"thermal_comfort_model_1_type":"Fanger","mean_radiant_temperature_calculation_type":"EnclosureAveraged","work_efficiency_schedule_name":"work","air_velocity_schedule_name":"velocity","clothing_insulation_calculation_method":"{method}","clothing_insulation_calculation_method_schedule_name":"{method_schedule}"{clothing_member}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            let compiled = ep_compiler::compile_raw_model(&raw);
+            assert!(
+                !compiled.has_errors(),
+                "clothing {method}: {:?}",
+                compiled.report.diagnostics
+            );
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                let original = ip.source_raw_object_fields("People", "Clothing person")?;
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                let row = &hb.objects["People"][0];
+                for (field, value) in [
+                    ("clothing_insulation_calculation_method", method),
+                    (
+                        "clothing_insulation_calculation_method_schedule_name",
+                        method_schedule,
+                    ),
+                ] {
+                    assert_eq!(original.get(field), Some(&V::String(value.into())));
+                    assert_eq!(row.fields.get(field), Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(value.into())));
+                }
+                let field = "clothing_insulation_schedule_name";
+                if let Some(name) = clothing_schedule {
+                    assert_eq!(original.get(field), Some(&V::String(name.into())));
+                    assert_eq!(row.fields.get(field), Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(name.into())));
+                } else {
+                    assert!(original.get(field).is_none());
+                    assert!(!row.fields.contains_key(field));
+                }
+            }
+            if method == "CalculationMethodSchedule" {
+                let changed = text.replace(
+                    &format!(r#""clothing_insulation_calculation_method_schedule_name":"{method_schedule}""#),
+                    r#""clothing_insulation_calculation_method_schedule_name":"absent method""#,
+                );
+                assert_ne!(changed, text);
+                let invalid = ep_raw_model::parse_epjson_str(&changed)?;
+                assert!(resolve_source_a(&invalid).is_err());
+                assert!(resolve_source_b(&invalid).is_err());
             }
         }
         for (field, value) in [
