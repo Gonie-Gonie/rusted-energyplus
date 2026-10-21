@@ -183,8 +183,10 @@ impl RawModel {
     /// its errors. Direct epJSON uses the pinned Windows doj comparator: signed
     /// bytes, ASCII digits, and wrapping 32-bit unsigned number accumulation.
     /// Only finite name sets with a strict pairwise order are available here.
-    /// NUL names, comparator aliases, and non-strict or cyclic relations remain
-    /// an explicit Source boundary; parsing never coalesces distinct raw keys.
+    /// The explicit Source parser coalesces comparator-equivalent JSON keys.
+    /// Distinct aliases in legacy or programmatically built models and any
+    /// non-strict or cyclic relation remain an explicit Source boundary.
+    /// A single retained NUL name is compared by its literal C-string prefix.
     pub fn source_ordered_instances(
         &self,
         object_type: &str,
@@ -201,7 +203,8 @@ impl RawModel {
     ///
     /// Direct DOM readers such as the reporting pre-scan never apply the IDF
     /// declaration overlay used by getObjectItem. The same strict finite-order
-    /// checks apply to both input formats; no raw names are coalesced.
+    /// checks apply to both input formats. This method never coalesces names;
+    /// token-order coalescence belongs only to the explicit Source parser.
     pub fn source_json_instances(
         &self,
         object_type: &str,
@@ -211,36 +214,16 @@ impl RawModel {
         };
         let unavailable = || {
             format!(
-                "SourceObjectOrderUnavailable: {object_type} requires a strict finite pinned Windows doj name order; NUL and distinct comparator aliases are not available"
+                "SourceObjectOrderUnavailable: {object_type} requires a strict finite pinned Windows doj name order; distinct comparator aliases are not available"
             )
         };
-        let mut ordered: Vec<(&ObjectName, &RawObject)> = Vec::with_capacity(instances.len());
-        for row in instances {
-            if row.0.0.as_bytes().contains(&0) {
-                return Err(unavailable());
-            }
-            // Insertion does not require the comparator to implement Rust Ord
-            // or a sorting algorithm's strict-weak-order precondition.
-            let index = ordered
+        source_windows_doj_strict_order(
+            instances
                 .iter()
-                .position(|other| {
-                    source_windows_doj_compare(row.0.0.as_bytes(), other.0.0.as_bytes()) < 0
-                })
-                .unwrap_or(ordered.len());
-            ordered.insert(index, row);
-        }
-        // Check every pair, including the reverse relation. This rejects
-        // aliases, wrapping antipodes, and cycles instead of guessing an order.
-        for (index, left) in ordered.iter().enumerate() {
-            for right in &ordered[index + 1..] {
-                if source_windows_doj_compare(left.0.0.as_bytes(), right.0.0.as_bytes()) >= 0
-                    || source_windows_doj_compare(right.0.0.as_bytes(), left.0.0.as_bytes()) <= 0
-                {
-                    return Err(unavailable());
-                }
-            }
-        }
-        Ok(ordered)
+                .map(|(name, object)| (name.0.as_str(), (name, object))),
+        )
+        .map(|ordered| ordered.into_iter().map(|(_, row)| row).collect())
+        .ok_or_else(unavailable)
     }
 
     /// Returns true when one object type has a recovered IDF declaration order.
@@ -260,6 +243,33 @@ impl RawModel {
             object_type_counts: self.object_type_counts(),
         }
     }
+}
+
+// Insertion does not require Rust Ord or a sort's strict-weak-order contract.
+// Every surviving pair must agree in both directions, including pairs that
+// would expose wrapping antipodes or a cycle. Distinct aliases must already
+// have been coalesced by the Source parser; generic RawModel maps stay intact.
+fn source_windows_doj_strict_order<'a, T>(
+    rows: impl IntoIterator<Item = (&'a str, T)>,
+) -> Option<Vec<(&'a str, T)>> {
+    let mut ordered: Vec<(&str, T)> = Vec::new();
+    for row in rows {
+        let index = ordered
+            .iter()
+            .position(|other| source_windows_doj_compare(row.0.as_bytes(), other.0.as_bytes()) < 0)
+            .unwrap_or(ordered.len());
+        ordered.insert(index, row);
+    }
+    for (index, left) in ordered.iter().enumerate() {
+        for right in &ordered[index + 1..] {
+            if source_windows_doj_compare(left.0.as_bytes(), right.0.as_bytes()) >= 0
+                || source_windows_doj_compare(right.0.as_bytes(), left.0.as_bytes()) <= 0
+            {
+                return None;
+            }
+        }
+    }
+    Some(ordered)
 }
 
 // Literal non-locale doj::alphanum_impl for the pinned Windows ABI. This is
@@ -342,6 +352,15 @@ pub enum EpJsonError {
     Io(std::io::Error),
     /// JSON parsing failed.
     Json(serde_json::Error),
+    /// A parsed Source JSON map has no strict finite pinned comparator order.
+    SourceMapOrderUnavailable,
+    /// A retained key requires comparator-aware Source family or field lookup.
+    SourceLookupUnavailable {
+        /// Current exact-lookup consumer whose key cannot be projected.
+        kind: &'static str,
+        /// First decoded key spelling retained by the Native JSON map.
+        key: String,
+    },
     /// Staged IDF read failed while recovering declaration order.
     IdfIo {
         /// IDF path that could not be read.
@@ -372,6 +391,14 @@ impl Display for EpJsonError {
         match self {
             Self::Io(error) => write!(formatter, "failed to read epJSON: {error}"),
             Self::Json(error) => write!(formatter, "failed to parse epJSON: {error}"),
+            Self::SourceMapOrderUnavailable => write!(
+                formatter,
+                "SourceMapOrderUnavailable: parsed JSON object requires a strict finite pinned Windows doj comparator quotient"
+            ),
+            Self::SourceLookupUnavailable { kind, key } => write!(
+                formatter,
+                "SourceLookupUnavailable: retained {kind} key {key:?} requires comparator-aware lookup; current Source consumers use exact keys"
+            ),
             Self::IdfIo { path, source } => write!(
                 formatter,
                 "failed to read staged IDF {} for declaration-order recovery: {source}",
@@ -410,7 +437,9 @@ impl std::error::Error for EpJsonError {
             Self::Json(error) => Some(error),
             Self::IdfIo { source, .. } => Some(source),
             Self::IdfOrder(error) => Some(error),
-            Self::TopLevelNotObject
+            Self::SourceMapOrderUnavailable
+            | Self::SourceLookupUnavailable { .. }
+            | Self::TopLevelNotObject
             | Self::ObjectTypeNotObject { .. }
             | Self::ObjectInstanceNotObject { .. } => None,
         }
@@ -441,6 +470,14 @@ pub fn load_epjson_file(path: impl AsRef<Path>) -> Result<RawModel, EpJsonError>
     parse_epjson_str(&contents)
 }
 
+/// Loads direct epJSON using the explicit Source DOM key semantics.
+///
+/// Generic/legacy loading and converted-IDF declaration recovery stay separate.
+pub fn load_epjson_file_for_source(path: impl AsRef<Path>) -> Result<RawModel, EpJsonError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_epjson_str_for_source(&contents)
+}
+
 /// Loads converted epJSON and overlays configured declaration order from staged IDF.
 ///
 /// The default target set covers source-order-sensitive special days and construction families.
@@ -460,6 +497,24 @@ pub fn load_epjson_file_with_idf_order(
 
 /// Parses epJSON text into a RawModel.
 pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
+    parse_epjson_str_with_source_dom(contents, false)
+}
+
+/// Parses direct epJSON with the pinned Native DOM member identity.
+///
+/// Each map retains the first decoded key spelling and the last whole value
+/// for comparator-equivalent keys. Schedule reference strings are untouched.
+/// Retained family/field NUL keys stay an explicit lookup boundary, and finite
+/// comparator quotients must be strict. This is not a general Native JSON or
+/// schema implementation; generic syntax/number admission stays unchanged.
+pub fn parse_epjson_str_for_source(contents: &str) -> Result<RawModel, EpJsonError> {
+    parse_epjson_str_with_source_dom(contents, true)
+}
+
+fn parse_epjson_str_with_source_dom(
+    contents: &str,
+    source_dom: bool,
+) -> Result<RawModel, EpJsonError> {
     let contents = contents.trim_start_matches('\u{feff}');
     // Keep the existing complete semantic validation first. In particular,
     // an out-of-range number in an overwritten duplicate must still fail.
@@ -468,6 +523,7 @@ pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
     let RawValue::Object(root) = ValidatedJsonLexemes {
         contents,
         cursor: 0,
+        source_dom,
     }
     .value()?
     else {
@@ -480,8 +536,20 @@ pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
                 object_type: object_type_name,
             });
         };
+        if source_dom && object_type_name.contains('\0') {
+            return Err(EpJsonError::SourceLookupUnavailable {
+                kind: "object type",
+                key: object_type_name,
+            });
+        }
         let mut raw_instances = BTreeMap::new();
         for (FieldName(object_name), fields_value) in instances {
+            // This semantic fence applies only to the final retained tree.
+            // A stale overwritten subtree is still token-validated, but its
+            // family/field operands must not be admitted or rejected as live.
+            if source_dom && matches!(&fields_value, RawValue::Object(_)) {
+                validate_source_field_keys(&fields_value)?;
+            }
             let RawValue::Object(fields) = fields_value else {
                 return Err(EpJsonError::ObjectInstanceNotObject {
                     object_type: object_type_name.clone(),
@@ -512,6 +580,32 @@ pub fn parse_epjson_str_with_idf_order(epjson: &str, idf: &str) -> Result<RawMod
     Ok(model)
 }
 
+// Exact Source field readers do not implement JSON-map alias lookup. Reject
+// retained NUL field keys before they could be silently ignored or defaulted.
+// Values, including full schedule reference strings, are never normalized.
+fn validate_source_field_keys(value: &RawValue) -> Result<(), EpJsonError> {
+    match value {
+        RawValue::Object(fields) => {
+            for (name, value) in fields {
+                if name.0.contains('\0') {
+                    return Err(EpJsonError::SourceLookupUnavailable {
+                        kind: "field",
+                        key: name.0.clone(),
+                    });
+                }
+                validate_source_field_keys(value)?;
+            }
+        }
+        RawValue::Array(values) => {
+            for value in values {
+                validate_source_field_keys(value)?;
+            }
+        }
+        RawValue::Null | RawValue::Bool(_) | RawValue::Number(_) | RawValue::String(_) => {}
+    }
+    Ok(())
+}
+
 // This cursor is private and is used only after the full serde_json::Value
 // validation above. It does not broaden JSON syntax, finite-number admission,
 // depth, BOM or comment behavior. Strings still use the same serde decoder;
@@ -519,6 +613,9 @@ pub fn parse_epjson_str_with_idf_order(epjson: &str, idf: &str) -> Result<RawMod
 struct ValidatedJsonLexemes<'a> {
     contents: &'a str,
     cursor: usize,
+    // Transient lexical-parser context only: no RawModel or runtime state,
+    // physics layout, dependency, or scientific default is added.
+    source_dom: bool,
 }
 
 impl ValidatedJsonLexemes<'_> {
@@ -548,7 +645,7 @@ impl ValidatedJsonLexemes<'_> {
         serde_json::from_str(&self.contents[begin..self.cursor])
     }
 
-    fn value(&mut self) -> Result<RawValue, serde_json::Error> {
+    fn value(&mut self) -> Result<RawValue, EpJsonError> {
         self.whitespace();
         match self.contents.as_bytes().get(self.cursor) {
             Some(b'n') => {
@@ -563,7 +660,7 @@ impl ValidatedJsonLexemes<'_> {
                 self.cursor += 5;
                 Ok(RawValue::Bool(false))
             }
-            Some(b'"') => self.string().map(RawValue::String),
+            Some(b'"') => Ok(RawValue::String(self.string()?)),
             Some(b'[') => {
                 self.cursor += 1;
                 self.whitespace();
@@ -584,7 +681,7 @@ impl ValidatedJsonLexemes<'_> {
             Some(b'{') => {
                 self.cursor += 1;
                 self.whitespace();
-                let mut values = BTreeMap::new();
+                let mut values: BTreeMap<FieldName, RawValue> = BTreeMap::new();
                 if self.contents.as_bytes().get(self.cursor) != Some(&b'}') {
                     loop {
                         self.whitespace();
@@ -592,9 +689,26 @@ impl ValidatedJsonLexemes<'_> {
                         self.whitespace();
                         self.cursor += 1; // Validated colon.
                         let value = self.value()?;
-                        // Decode keys before insertion; a duplicate replaces
-                        // its entire earlier subtree, exactly Value's map.
-                        values.insert(FieldName(name), value);
+                        if self.source_dom {
+                            // Native SAX key() selects operator[](decoded key),
+                            // then handle_value() replaces the whole mapped
+                            // value. An equivalent key never changes the first
+                            // stored spelling. This scan uses no Rust Ord
+                            // implementation of the non-strict Native relation.
+                            let retained = values.iter_mut().find(|(key, _)| {
+                                source_windows_doj_compare(key.0.as_bytes(), name.as_bytes()) == 0
+                                    && source_windows_doj_compare(name.as_bytes(), key.0.as_bytes())
+                                        == 0
+                            });
+                            if let Some((_, retained_value)) = retained {
+                                *retained_value = value;
+                            } else {
+                                values.insert(FieldName(name), value);
+                            }
+                        } else {
+                            // Generic parsing preserves its exact-key map.
+                            values.insert(FieldName(name), value);
+                        }
                         self.whitespace();
                         if self.contents.as_bytes().get(self.cursor) == Some(&b'}') {
                             break;
@@ -603,6 +717,14 @@ impl ValidatedJsonLexemes<'_> {
                     }
                 }
                 self.cursor += 1;
+                if self.source_dom
+                    && source_windows_doj_strict_order(
+                        values.keys().map(|name| (name.0.as_str(), ())),
+                    )
+                    .is_none()
+                {
+                    return Err(EpJsonError::SourceMapOrderUnavailable);
+                }
                 Ok(RawValue::Object(values))
             }
             _ => {
@@ -813,6 +935,149 @@ mod tests {
         assert!(
             matches!(parse_epjson_str(r#"{"X":{"Y":[]}}"#),Err(super::EpJsonError::ObjectInstanceNotObject{object_type,object_name})if object_type=="X"&&object_name=="Y")
         );
+
+        // Explicit Source DOM parsing coalesces in token order. Generic
+        // parsing above and the legacy BTree view retain their old semantics.
+        let source = super::parse_epjson_str_for_source(
+            r#"{"Schedule:File":{
+                "Kept":{"stale":true,"file_name":"old.csv"},
+                "Kept\u0000tail":{"file_name":"new.csv","n":-0e0,
+                    "nested":[{"value":-0,"value\u0000tail":-0.0}],
+                    "reference":"Target\u0000suffix"}
+            }}"#,
+        )?;
+        let files = &source.objects[&ObjectType("Schedule:File".into())];
+        assert_eq!(files.len(), 1);
+        assert_eq!(files.keys().next(), Some(&ObjectName("Kept".into())));
+        let kept = &files[&ObjectName("Kept".into())].fields;
+        assert!(!kept.contains_key(&FieldName("stale".into())));
+        assert_eq!(
+            kept.get(&FieldName("file_name".into())),
+            Some(&RawValue::String("new.csv".into()))
+        );
+        assert_eq!(
+            kept.get(&FieldName("n".into())),
+            Some(&RawValue::Number("-0e0".into()))
+        );
+        assert_eq!(
+            kept.get(&FieldName("nested".into())),
+            Some(&RawValue::Array(vec![RawValue::Object(BTreeMap::from([
+                (FieldName("value".into()), RawValue::Number("-0.0".into()),)
+            ]))]))
+        );
+        assert_eq!(
+            kept.get(&FieldName("reference".into())),
+            Some(&RawValue::String("Target\0suffix".into()))
+        );
+        let reversed = super::parse_epjson_str_for_source(
+            r#"{"Schedule:File":{"Kept\u0000tail":{"n":0},"Kept":{"n":1E+0}}}"#,
+        )?;
+        let reversed_files = &reversed.objects[&ObjectType("Schedule:File".into())];
+        assert_eq!(
+            reversed_files.keys().next(),
+            Some(&ObjectName("Kept\0tail".into()))
+        );
+        assert_eq!(
+            reversed_files[&ObjectName("Kept\0tail".into())]
+                .fields
+                .get(&FieldName("n".into())),
+            Some(&RawValue::Number("1E+0".into()))
+        );
+        assert_eq!(
+            reversed.source_json_instances("Schedule:File")?[0].0.0,
+            "Kept\0tail"
+        );
+        // Singleton NUL names are also well-defined for legacy/programmatic
+        // views. Distinct aliases in such uncoalesced maps still fail below.
+        let singleton = parse_epjson_str(r#"{"Schedule:File":{"x\u0000tail":{}}}"#)?;
+        assert_eq!(singleton.source_json_instances("Schedule:File")?.len(), 1);
+        for (text, first) in [
+            (
+                r#"{"Schedule:Constant":{"0000000000":{"n":"stale"},"4294967296":{"n":-0.0}}}"#,
+                "0000000000",
+            ),
+            (
+                r#"{"Schedule:Constant":{"4294967296":{"n":"stale"},"0000000000":{"n":-0.0}}}"#,
+                "4294967296",
+            ),
+        ] {
+            let generic = parse_epjson_str(text)?;
+            assert_eq!(generic.object_count(), 2);
+            assert!(generic.source_json_instances("Schedule:Constant").is_err());
+            let parsed = super::parse_epjson_str_for_source(text)?;
+            let constants = &parsed.objects[&ObjectType("Schedule:Constant".into())];
+            assert_eq!(constants.len(), 1);
+            assert_eq!(constants.keys().next(), Some(&ObjectName(first.into())));
+            assert_eq!(
+                constants[&ObjectName(first.into())]
+                    .fields
+                    .get(&FieldName("n".into())),
+                Some(&RawValue::Number("-0.0".into()))
+            );
+        }
+        let leading_zero =
+            super::parse_epjson_str_for_source(r#"{"Schedule:Constant":{"01":{},"1":{}}}"#)?;
+        assert_eq!(leading_zero.object_count(), 2);
+        assert_eq!(
+            leading_zero
+                .source_json_instances("Schedule:Constant")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["01", "1"]
+        );
+        // Folding applies at the family, field, and nested-map levels too.
+        // Later whole values replace stale semantic operands, not merge them.
+        let final_tree = super::parse_epjson_str_for_source(
+            r#"{"Schedule:File":{"Old":{"bad\u0000field":0}},
+                "Schedule:File\u0000tail":{"Kept":{
+                    "file_name":"old.csv","file_name\u0000tail":"new.csv",
+                    "data":{"discard\u0000field":0},"data\u0000tail":[-0e0]}}}"#,
+        )?;
+        assert_eq!(final_tree.object_count(), 1);
+        let final_fields = &final_tree.objects[&ObjectType("Schedule:File".into())]
+            [&ObjectName("Kept".into())]
+            .fields;
+        assert_eq!(
+            final_fields.get(&FieldName("file_name".into())),
+            Some(&RawValue::String("new.csv".into()))
+        );
+        assert_eq!(
+            final_fields.get(&FieldName("data".into())),
+            Some(&RawValue::Array(vec![RawValue::Number("-0e0".into())]))
+        );
+        for text in [
+            r#"{"Schedule:File\u0000tail":{"Kept":{}},"Schedule:File":{"Kept":{}}}"#,
+            r#"{"Schedule:File":{"Kept":{"file_name\u0000tail":"old","file_name":"new"}}}"#,
+            r#"{"Schedule:File":{"Kept":{"data":[{"field\u0000tail":0}]}}}"#,
+        ] {
+            assert!(matches!(
+                super::parse_epjson_str_for_source(text),
+                Err(super::EpJsonError::SourceLookupUnavailable { .. })
+            ));
+        }
+        for text in [
+            r#"{"Schedule:File":{"0":{},"2147483648":{}}}"#,
+            r#"{"Schedule:File":{"0":{},"1431655765":{},"2863311530":{}}}"#,
+            r#"{"Schedule:File":{"Kept":{"nested":{"0":0,"2147483648":0}}}}"#,
+        ] {
+            assert!(matches!(
+                super::parse_epjson_str_for_source(text),
+                Err(super::EpJsonError::SourceMapOrderUnavailable)
+            ));
+        }
+        for text in [
+            r#"{"Schedule:File":{"Kept":{"n":1e9999,"n\u0000tail":0}}}"#,
+            r#"{"Schedule:File":{"Kept":{"n":1e9999},"Kept\u0000tail":{}}}"#,
+            r#"{"Schedule:File":{"Kept":{"n":1e9999}},"Schedule:File\u0000tail":{}}"#,
+            r#"{"Schedule:File":{"Kept":{"n":NaN},"Kept\u0000tail":{}}}"#,
+            r#"{"Schedule:File":{"Kept":{"n":1.},"Kept\u0000tail":{}}}"#,
+        ] {
+            assert!(matches!(
+                super::parse_epjson_str_for_source(text),
+                Err(super::EpJsonError::Json(_))
+            ));
+        }
 
         Ok(())
     }

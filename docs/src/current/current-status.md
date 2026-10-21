@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-10-20
+last_reviewed: 2026-10-22
 ---
 
 # Current Status
@@ -35,6 +35,14 @@ policies and accepted evidence. The completed task packet is historical material
 at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 
 ## Running And Comparing
+
+The [example-object union](../generated/example-object-union.md) contains 111
+object types; legal-value completion remains tracked per object. Direct Source
+epJSON now retains the first comparator-equivalent member spelling and last
+whole subtree. Two Native convert-only observations and existing dry-run loader
+assertions verify this input behavior. The [input-domain evidence](../../validation/evidence/object-input-domains.json)
+keeps these checks separate from the 114 paired physical cases, whose latest
+accepted Build69 predates this parser change.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

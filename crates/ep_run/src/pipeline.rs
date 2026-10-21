@@ -17,7 +17,9 @@ use ep_compare::{
 use ep_compiler::{CompileReport, compile_raw_model, compile_raw_model_for_source};
 use ep_model::{AutosizeOrNumber, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
-use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
+use ep_raw_model::{
+    RawModel, load_epjson_file, load_epjson_file_for_source, load_epjson_file_with_idf_order,
+};
 use ep_runtime::weather::day::{ProductionWeatherTimestepSeries, WeatherEnvironmentConfiguration};
 use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
@@ -1116,6 +1118,11 @@ fn run_with_optional_porting_scope_impl(
             &prepared_input.converted_epjson_path,
             &prepared_input.original_path,
         ),
+        OracleInputKind::EpJson
+            if matches!(scope, Some(crate::PortingScope::A | crate::PortingScope::B)) =>
+        {
+            load_epjson_file_for_source(&prepared_input.converted_epjson_path)
+        }
         OracleInputKind::EpJson => load_epjson_file(&prepared_input.converted_epjson_path),
     };
     let raw_model = match raw_model_result {

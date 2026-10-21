@@ -772,7 +772,7 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
     let output_dir = case_dir.join("out");
     write_text(&input_path, ONE_ZONE_EPJSON)?;
 
-    let outcome = run_arbitrary_idf(&RunConfig {
+    let config = RunConfig {
         input_path,
         weather_path: None,
         output_dir: output_dir.clone(),
@@ -790,7 +790,8 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
         json_stdout: false,
         oracle_root: None,
         hours: Some(2),
-    })?;
+    };
+    let outcome = run_arbitrary_idf(&config)?;
 
     assert_eq!(outcome.exit_code, RunExitCode::Success);
     assert_eq!(
@@ -826,6 +827,61 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
             .join("compare-summary.json")
             .exists()
     );
+    // Exercise the real direct-epJSON loader selection before any runtime work.
+    // Each first subtree is schema-invalid, but valid JSON; Source must replace it whole.
+    for (order, epjson) in [
+        (
+            "forward",
+            r#"{"Schedule:Constant":{"0000000000":{"hourly_value":"overwritten"},"4294967296":{"hourly_value":0.75}}}"#,
+        ),
+        (
+            "reverse",
+            r#"{"Schedule:Constant":{"4294967296":{"hourly_value":"overwritten"},"0000000000":{"hourly_value":0.75}}}"#,
+        ),
+    ] {
+        let alias_input = case_dir.join(format!("alias-{order}.epJSON"));
+        write_text(&alias_input, epjson)?;
+        for scope in [
+            None,
+            Some(ep_run::PortingScope::A),
+            Some(ep_run::PortingScope::B),
+        ] {
+            let lane = match scope {
+                None => "legacy",
+                Some(ep_run::PortingScope::A) => "source-a",
+                Some(ep_run::PortingScope::B) => "source-b",
+            };
+            let alias_output = case_dir.join(format!("alias-{order}-{lane}"));
+            let alias_config = RunConfig {
+                input_path: alias_input.clone(),
+                output_dir: alias_output.clone(),
+                oracle_baseline: false,
+                compare_oracle: false,
+                hours: None,
+                ..config.clone()
+            };
+            let alias_outcome = match scope {
+                None => run_arbitrary_idf(&alias_config)?,
+                Some(scope) => ep_run::run_bounded_porting(&alias_config, scope)?,
+            };
+            assert_ne!(alias_outcome.exit_code, RunExitCode::ImportParse);
+            let raw_summary = read_json(&alias_output.join("model/raw-model-summary.json"))?;
+            assert_eq!(
+                raw_summary["object_type_counts"]["Schedule:Constant"],
+                if scope.is_some() { 1 } else { 2 },
+                "{order} {lane}"
+            );
+            for staged in ["input/original.epJSON", "input/converted.epJSON"] {
+                assert_eq!(std::fs::read(alias_output.join(staged))?, epjson.as_bytes());
+            }
+            let alias_summary = read_json(&alias_output.join("run-summary.json"))?;
+            assert!(alias_summary["rust_runtime"].is_null());
+            assert!(alias_summary["oracle"].is_null());
+            assert!(alias_summary["comparison"].is_null());
+            assert!(!alias_output.join("results/result-store.json").exists());
+            assert!(!alias_output.join("oracle/eplusout.eso").exists());
+        }
+    }
     Ok(())
 }
 

@@ -1083,8 +1083,9 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["0", "A", "a", "x01", "x1", "x2", "x10"]
         );
-        // Ordinary wrapped arithmetic is retained, while aliases, antipodes,
-        // cycles, and NUL-c_str ambiguity are explicit unavailable boundaries.
+        // Ordinary wrapped arithmetic is retained. Distinct aliases,
+        // antipodes, and cycles in uncoalesced maps stay unavailable.
+        // Singleton NUL names are covered by the existing lexical parser body.
         let wrapped = parse_epjson_str(r#"{"Schedule:File":{"4294967296":{},"1":{}}}"#)?;
         assert_eq!(
             wrapped
@@ -1095,7 +1096,6 @@ mod tests {
             ["4294967296", "1"]
         );
         for text in [
-            r#"{"Schedule:File":{"x\u0000tail":{}}}"#,
             r#"{"Schedule:File":{"0000000000":{},"4294967296":{}}}"#,
             r#"{"Schedule:File":{"0":{},"2147483648":{}}}"#,
             r#"{"Schedule:File":{"0":{},"1431655765":{},"2863311530":{}}}"#,

@@ -1,6 +1,6 @@
 {
   "schema": "object-input-domain-verification.v1",
-  "reviewed_on": "2026-10-21",
+  "reviewed_on": "2026-10-22",
   "corpus": {
     "input_files": 188,
     "idf_files": 176,
@@ -253,11 +253,11 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/unit69-prep/schedule-dom-workspace-tests69.log",
-        "sha256": "8de12425d8d74f5ec1b5aeb316dcb0a207c284af2287a1562fb53dfbdbe95c38",
-        "bytes": 773488
+        "path": ".runtime/object-expansion/unit70-prep/main-json-workspace-tests70.log",
+        "sha256": "604ce20e004ee77252532a9da33d277d4e822971c0c6e398f314d4f22e1e0a55",
+        "bytes": 773594
       },
-      "scope": "Actual default workspace69 after the complete Source DOM/getter-order correction; quality is excluded from physical totals."
+      "scope": "Actual default workspace70 after Source-only JSON member coalescence and six existing-body loader assertions; quality is excluded from physical totals."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
@@ -269,7 +269,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit69-prep/unicode-name-docs-check-69.log",
+        "path": ".runtime/object-expansion/unit70-prep/main-json-docs-check-70.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -473,6 +473,194 @@
         "optional_Native_compile_rerun": false,
         "optional_Native_feature_history_retained_through": "schedule-file-byte-diagnostics-64",
         "scope": "Existing-body nonempty name, finite comparator and direct-DOM shape/pre-scan versus genuine IDF getter-order checks; no new cohort or universal ordering claim."
+      },
+      "source_main_epjson_member_identity": {
+        "schema": "input-processing-source-main-epjson-member-identity.v1",
+        "scope": "Explicit Source A/B direct epJSON parser and pipeline only; generic parsing and converted-IDF declaration overlay retain their prior routes.",
+        "baseline_git_commit": "a7bf0778adc379e509b0eacc4ebeb9eb3ac7c33e",
+        "source_proposal": {
+          "path": ".runtime/object-expansion/unit70-prep/runtime-prepared-01/manifest.json",
+          "sha256": "334b4379a60b1e9d5316625e1475ea1db5913b039a09e1a68669242d9f8fe4f6",
+          "bytes": 17611
+        },
+        "source_patch": {
+          "path": ".runtime/object-expansion/unit70-prep/runtime-prepared-01/source-main-epjson-key-coalescence70.patch",
+          "sha256": "1aa5803a6ff76c8140625178382ce29df4ada9314fb9ec7a94d94fffd65f9e21",
+          "bytes": 23982
+        },
+        "pipeline_existing_body_proposal": {
+          "path": ".runtime/object-expansion/unit70-prep/pipeline-test-prepared-01/manifest.json",
+          "sha256": "04be4dc4dfd561eedef4fe643ae65fac27f77ba3012877fef9338c2a75b7f3f7",
+          "bytes": 2259
+        },
+        "pipeline_existing_body_patch": {
+          "path": ".runtime/object-expansion/unit70-prep/pipeline-test-prepared-01/source-loader-integration70.patch",
+          "sha256": "1d6197ae899d707b84cf2aa630abf8faa7203082e4024a89536f328cfd9e3f67",
+          "bytes": 3295
+        },
+        "current_source_files": [
+          {
+            "path": "crates/ep_raw_model/src/idf_order.rs",
+            "sha256": "1c7e19a2e188e0a6e1361963f7f0374b2c517e63e1a5960addff4f84d0d0f3ac",
+            "bytes": 80113
+          },
+          {
+            "path": "crates/ep_raw_model/src/lib.rs",
+            "sha256": "8ad97e096fabd41004853182384c5871b3f2f88cdadaa76dd7871707dc27c5c9",
+            "bytes": 42376
+          },
+          {
+            "path": "crates/ep_run/src/pipeline.rs",
+            "sha256": "cdcaad8c24fde1c88038f99f6d4997041cfc076398bcd19e59760e4d8f6e5d48",
+            "bytes": 842872
+          },
+          {
+            "path": "crates/ep_run/tests/arbitrary_run.rs",
+            "sha256": "dd54c30c7fc8e44384c4a856b203636e7f6d1495bb66284c1258ac5404210b9f",
+            "bytes": 40201
+          }
+        ],
+        "quality": {
+          "path": ".runtime/object-expansion/unit70-prep/main-json-quality70.json",
+          "sha256": "fe45e902fc7aac9b9fccc1e3e35aa459d6b5f02d537cdcbc202adcf0d1c84779",
+          "bytes": 2593
+        },
+        "commands": [
+          {
+            "name": "main-json-fmt70",
+            "command": [
+              "cargo",
+              "fmt",
+              "--all",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 9.702656500041485,
+            "log": {
+              "path": ".runtime/object-expansion/unit70-prep/main-json-fmt70.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "main-json-clippy70",
+            "command": [
+              "cargo",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--locked",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 99.62479620001977,
+            "log": {
+              "path": ".runtime/object-expansion/unit70-prep/main-json-clippy70.log",
+              "sha256": "81f233f96f28874d5540d5b7281c6dd14d7ea27f27feb73bda2407beb0378d54",
+              "bytes": 904
+            }
+          },
+          {
+            "name": "main-json-workspace-tests70",
+            "command": [
+              "cargo",
+              "test",
+              "--workspace",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 189.12389769998845,
+            "log": {
+              "path": ".runtime/object-expansion/unit70-prep/main-json-workspace-tests70.log",
+              "sha256": "604ce20e004ee77252532a9da33d277d4e822971c0c6e398f314d4f22e1e0a55",
+              "bytes": 773594
+            }
+          }
+        ],
+        "native_input_observations": [
+          {
+            "variant": "A",
+            "result": {
+              "path": ".runtime/object-expansion/unit70-prep/native-main-json-equivalence-a-01/result.json",
+              "sha256": "90e5fa6e15af3f256ffa3f58b56c980ad3d2251ac1bba7b844f014cbb28dc8a4",
+              "bytes": 16178
+            },
+            "converted_IDF": {
+              "path": ".runtime/object-expansion/unit70-prep/native-main-json-equivalence-a-01/output/input.idf",
+              "sha256": "9ff5b0c49d5a224390b12e8a237efb9a198d3f77c706f48900d0214825c5a28d",
+              "bytes": 19189
+            },
+            "observed_retained_name": "0000000000",
+            "observed_type_limits": "Fraction",
+            "observed_hourly_value_text": "0.75"
+          },
+          {
+            "variant": "B",
+            "result": {
+              "path": ".runtime/object-expansion/unit70-prep/native-main-json-equivalence-b-01/result.json",
+              "sha256": "9402cb163b1ce77a1d969ea1ec3853fce6f5d53c29976ee4cd8bba3c2603ab07",
+              "bytes": 16178
+            },
+            "converted_IDF": {
+              "path": ".runtime/object-expansion/unit70-prep/native-main-json-equivalence-b-01/output/input.idf",
+              "sha256": "93abab7d12628756711cfaa4851f2532f508bd90dd42fe6926964247041279cc",
+              "bytes": 19189
+            },
+            "observed_retained_name": "4294967296",
+            "observed_type_limits": "Fraction",
+            "observed_hourly_value_text": "0.75"
+          }
+        ],
+        "primary_source_refs": [
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+            "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+            "bytes": 122929
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FileSystem.cc",
+            "sha256": "d63d42179e8d96a90fd1651f20c0f87f720322ed04b45941397f38d421213c9d",
+            "bytes": 17648
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/third_party/nlohmann/json.hpp",
+            "sha256": "8baba4ddf871e448b8ecceb0e8add3c883c42311659e0a1fa517394f34460e75",
+            "bytes": 953482
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/third_party/doj/alphanum.hpp",
+            "sha256": "0ded396abd0116d34eab3228b0aa02e74851ab53c7bde450cbf9661c55ee9db6",
+            "bytes": 9998
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/IdfParser.cc",
+            "sha256": "fdbab72d01cbce4d33ef06fecc4a57eddd17a9c8c30fb82e64a91ff92df38a78",
+            "bytes": 30215
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+            "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+            "bytes": 187792
+          }
+        ],
+        "role_counts": {
+          "production_or_mixed": 2,
+          "existing_test_body_only": 2,
+          "new_test_attributes": 0,
+          "new_modules": 0,
+          "new_dependencies": 0
+        },
+        "pipeline_assertions": "Both lexical encounter orders pass actual generic/Source A/Source B dry runs: generic raw count2 and Source raw count1, with exact staged bytes and no runtime/oracle/comparison outputs. Incomplete dry-run fixtures do not establish thermal support.",
+        "semantics": "Decoded comparator-equivalent members retain the first spelling and last whole subtree at every object depth. Numeric lexemes and scalar/reference strings stay exact. Full token validation still includes overwritten subtrees.",
+        "layout_and_API": "Private transient lexical parser gains one bool. Public EpJsonError gains two variants, including a string-bearing lookup error; external exhaustive matches may require updating. Persistent RawModel/runtime/DTO fields are unchanged; public error-enum layout equality is not claimed.",
+        "native_convert_only_calls": 2,
+        "new_physical_comparison_cases": 0,
+        "new_compared_samples": 0,
+        "new_recorded_source_build_rows": 0,
+        "qualification": "Accepted Build69 paired physical evidence predates this parser change. These input-only observations add no physical support claim. Arbitrary ignored JSON metadata is not exposed by getObjectNames/IDF; whole-subtree replacement follows the pinned SAX assignment. Retained NUL family/field lookup, non-strict/cyclic comparator sets and broader Native JSON syntax remain explicit boundaries."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -26147,7 +26335,7 @@
     "focused_since_workspace": {
       "passed": 0,
       "logs": [],
-      "scope": "Reset at actual full workspace69; no duplicate focused cohort."
+      "scope": "Reset at actual full workspace70; no duplicate focused cohort."
     },
     "retained_failed_Source_attempts": [
       {
