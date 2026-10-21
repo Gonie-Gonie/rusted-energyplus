@@ -242,7 +242,7 @@
     ],
     "People": [
       "Direct-Zone People uses the real single implicit Space, raw/IP defaults and counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select the actual numeric operand and Space floor area, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts explicit numeric values or omitted, empty and Autocalculate defaults; automatic sensible uses the same live Space MAT, retained Mixing RoomAir, Native polynomial and ordered clamps. Getter occupant totals, devices, rates/energy, Which bindings, nominal reporting and mandatory SimpleASH55 remain connected. Auxiliary comfort operands stay unconsumed when no optional model is selected, with the original count-sensitive warnings.",
-      "Fanger reporting connects EnclosureAveraged, SurfaceWeighted or AngleFactor MRT with ClothingInsulationSchedule, DynamicClothingModelASHRAE55 or CalculationMethodSchedule. Dynamic clothing uses the retained six-AM temperature owner and ordered Native formula without auxiliary method/clothing lookups. Calculation schedules use current value 1 for scheduled clothing and 2 for Dynamic; genuine hasVal(1) controls the getter clothing lookup, with no invented method-range or clothing bounds. Other method values retain Native warning/fallback and reached missing-pointer boundaries. SurfaceWeighted resolves the real selected Surface and radiant enclosure, retains separate Surface AE/enclAESum and comfort first-use/error flags, and uses ordered other-surface area-times-inside-absorptance weights with actual history temperatures. Selected-surface averaging, radReCalc and the first-warning-only Space MAT fallback preserve Native behavior; AngleFactor processes all lists in retained raw order with original blank/case identities and independent IDF delimiter/value counts, preserving the two Fatal stages around People association. Its ordered construction-absorptance-times-factor Kelvin fourth-power ratio uses genuine term1 histories. The common radiant-HVAC correction follows all three MRT methods. Actual work/air-velocity schedules, averaged Zone air/humidity and stateful RH/Psat feed real People temperature/RH and six People-keyed Zone/Average comfort outputs even at zero occupancy. AnkleDraftASH55 independently loops People without an occupancy filter and rereads genuine ASHRAE inputs using body area 1.8258, strict applicability, relative air velocity and Native PMV/logistic arithmetic. Its separate empty-unit Zone/Average PPD output retains -1 outside applicability. Same-input A/B evidence covers both-model and Ankle-only cases. With Fanger unselected, its six Fanger/common registrations are genuinely absent from ESO and RDD; every original pre-Fanger policy and the existing ankle criterion stays unchanged. The ASH route keeps its own clothing/operative writes without inventing Fanger report rows or People temperature/RH updates. Existing owner checks preserve the genuine fresh-Space CTF stop separately from physical closure. Real extra-warning controls and recurring storage preserve conditional diagnostics, without claiming those warnings ran in the physical pairs. The other five comfort models, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups, positive non-Mixing RoomAir and positive Kiva/windows/shading remain unsupported. This is bounded support, not full People input-domain completion."
+      "Fanger reporting connects EnclosureAveraged, SurfaceWeighted or AngleFactor MRT with ClothingInsulationSchedule, DynamicClothingModelASHRAE55 or CalculationMethodSchedule. Dynamic clothing uses the retained six-AM temperature owner and ordered Native formula without auxiliary method/clothing lookups. Calculation schedules use current value 1 for scheduled clothing and 2 for Dynamic; genuine hasVal(1) controls the getter clothing lookup, with no invented method-range or clothing bounds. Other method values retain Native warning/fallback and reached missing-pointer boundaries. SurfaceWeighted resolves the real selected Surface and radiant enclosure, retains separate Surface AE/enclAESum and comfort first-use/error flags, and uses ordered other-surface area-times-inside-absorptance weights with actual history temperatures. Selected-surface averaging, radReCalc and the first-warning-only Space MAT fallback preserve Native behavior; AngleFactor processes all lists in retained raw order with original blank/case identities and independent IDF delimiter/value counts, preserving the two Fatal stages around People association. Its ordered construction-absorptance-times-factor Kelvin fourth-power ratio uses genuine term1 histories. The common radiant-HVAC correction follows all three MRT methods. Actual work/air-velocity schedules, averaged Zone air/humidity and stateful RH/Psat feed real People temperature/RH and six People-keyed Zone/Average comfort outputs even at zero occupancy. AnkleDraftASH55 independently loops People without an occupancy filter and rereads genuine ASHRAE inputs using body area 1.8258, strict applicability, relative air velocity and Native PMV/logistic arithmetic. Its separate empty-unit Zone/Average PPD output retains -1 outside applicability. Same-input A/B evidence covers both-model and Ankle-only cases. With Fanger unselected, its six Fanger/common registrations are genuinely absent from ESO and RDD; every original pre-Fanger policy and the existing ankle criterion stays unchanged. The ASH route keeps its own clothing/operative writes without inventing Fanger report rows or People temperature/RH updates. Existing owner checks preserve the genuine fresh-Space CTF stop separately from physical closure. DisplayExtraWarnings reaches the same live project/global flag. Same-input A/B evidence compares complete ERR/END, including actual ankle recurring warnings, per-call totals, phase counts and extrema. Independent air/met/clothing checks retain Native comparisons, call order and literal units; other global extra-warning producers remain visible. NoSizing/NoLimit and empty monthly bounds remain. The other five comfort models, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups, positive non-Mixing RoomAir and positive Kiva/windows/shading remain unsupported. This is bounded support, not full People input-domain completion."
     ],
     "ComfortViewFactorAngles": [
       "ComfortViewFactorAngles remains RawOnly and uses the genuine Source A/B raw/IP getter without a TypedModel arena. Original blank, whitespace and case-variant names, JSON or declaration order, optional partial rows and harmless instance/row metadata retain raw custody; reserved IDF metadata stays separate. Six shared arrays reset within actual schema-derived capacity, preserving numeric origins, field names, blank flags, counts and exact usage identities. IDF delimiter and parsed-value events retain independent fixed/extensible counts and the true-EOF unattached-array behavior. Every list, including unused lists, reaches ordered Surface/enclosure and sum checks before the first Fatal; first retained uppercase-name People association precedes the second Fatal. Actual construction absorptance, angle factors and term1 surface histories feed AngleFactor MRT and the shared radiant-HVAC correction. Same-input A/B evidence bounds these paths; arbitrary list/model combinations and full family completion remain outside this claim."
@@ -262,18 +262,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-ankle-draft-clippy-56.log",
-        "sha256": "5048cb7ce6df8c47509f9e4f045d480e4945ab32ee9fa4d94193f9de95458e87",
-        "bytes": 740
+        "path": ".runtime/object-expansion/people-ankle-extra-warnings-clippy-58.log",
+        "sha256": "ae2604eaca97369a01ed5c6c75bf40bdec3a64dc97a9d04a79eddde79186d6aa",
+        "bytes": 580
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/people-ankle-only-docs-57.log",
+        "path": ".runtime/object-expansion/people-ankle-extra-warnings-docs-58.log",
         "sha256": "00dec98dd03bae1c0fa704171654aea2f1a4d6ca801ba841ec486524e7000367",
         "bytes": 354
       },
-      "clippy_through_build": "people-ankle-draft-56",
+      "clippy_through_build": "people-ankle-extra-warnings-58",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -5550,12 +5550,154 @@
           "passed": true
         },
         "effective_state": "Current Source57 Ankle-only same-input proof reuses unchanged actual Build56 and requires its own sole initial-True Native57. Before outcomes, exactly six now-unregistered Fanger/common requests and policy rows are removed. Exact originalNative51 A118/B104 plus unchanged56 None/Zone/Average ankle96 criteria yield119/105. Actual ESO/RDD absence and three retained raw96/binary observations are proved without phantom Fanger outputs, changed thresholds or report/physics seeds. Normal SourceB IDF staging is actual production; no new Source build or code change occurs."
+      },
+      {
+        "id": "people-ankle-extra-warnings-a",
+        "group": "people_ankle_extra_warnings",
+        "source_build": "people-ankle-extra-warnings-58",
+        "scope": "A",
+        "actual_Source_build_reused": false,
+        "current58_changed_source_path_count": 2,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-people-ankle-extra-warnings-a/calibration-01/input.epJSON",
+          "sha256": "93419644d27557cfab140a8990b6b6d5e2c47f09ee457b0ba19e6a880806ed50",
+          "bytes": 55980
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-ankle-extra-warnings-a/calibration-01/receipt.json",
+          "sha256": "248998a7271071bb9ba0295883b21a78167426775dda9da1c54512c5482c1e57",
+          "bytes": 33631
+        },
+        "Native_calibration_unit": 58,
+        "Native58_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-ankle-extra-warnings-a-58/people-ankle-extra-warnings-a/receipt.json",
+          "sha256": "3ffa4bf8624db7e63c0fe36850755375e2ac51fa74d14ce6beebdc6f861977ab",
+          "bytes": 3698
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-ankle-extra-warnings-a-58/run-summary.json",
+          "sha256": "547bddf522233817f896bb40b7632427a61b4a7d527df38289d03df99015e4a0",
+          "bytes": 51215
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/eplus-rs.exe",
+          "sha256": "853efc90e6ae4c9644424188553cf58d4781b6b16d6a7ea3cfaf5d6542aabdd7",
+          "bytes": 76317842
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e",
+          "sha256": "1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/receipt.json",
+          "sha256": "c753460aee2784d7e066a7dbf1029071e528af0fcb42f16b0076134b39bb9705",
+          "bytes": 4369
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-ankle-extra-warnings-a-comparisons-58/people-ankle-extra-warnings-a/comparison.json",
+          "sha256": "2fe63f450c995163dbf952eddda60f19851151ec4e4cd3546ac7273bf8e07ce6",
+          "bytes": 730714
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-ankle-extra-warnings-a-58-launch/people-ankle-extra-warnings-a/request.json",
+          "sha256": "19b069984937c89c47754796278fae37959ecd77f456dc5860cb6619ad88feb5",
+          "bytes": 3412
+        },
+        "totals": {
+          "series": 119,
+          "samples": 11136,
+          "raw_operand_unequal": 3449,
+          "parsed_binary64_unequal": 3449,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native58 and same-input Source58 use genuine new actual Build58. The private Source-only diagnostics admission reaches the actual ProjectData/global writer; legacy retains its original two keys. Exact selected57 policies/origins remain A119/B105 with only People2/Ankle1 raw96/binary observations and real six-registration absence. Targeted thirteen-phase Compact activity/body-air and B scheduled-clothing operands are inputs only. Actual warning/recurrence/phase/extrema/order, whole diagnostics and physical outputs are freshly observed without prescribed counts, valid segments, -1 values, warmup days or seeds. Native57 is archive-only ancestry; normal SourceB staging remains actual production. Existing geometry/NoSizing/NoLimit/Mixing/EMS/other-model bounds remain."
+      },
+      {
+        "id": "people-ankle-extra-warnings-b",
+        "group": "people_ankle_extra_warnings",
+        "source_build": "people-ankle-extra-warnings-58",
+        "scope": "B",
+        "actual_Source_build_reused": false,
+        "current58_changed_source_path_count": 2,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-people-ankle-extra-warnings-b/calibration-01/input.idf",
+          "sha256": "5b7a94883bf25a4daf6a54fa8045d7ddae2cff03632cfe571cedf7c5d90e28b8",
+          "bytes": 17053
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-ankle-extra-warnings-b/calibration-01/receipt.json",
+          "sha256": "58cc7c8a94eb63ff931abdd2dab2a6e9751d6b1fec9286b4a8db28897ea18095",
+          "bytes": 33729
+        },
+        "Native_calibration_unit": 58,
+        "Native58_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-ankle-extra-warnings-b-58/people-ankle-extra-warnings-b/receipt.json",
+          "sha256": "a3ff104e315bb6a77337ee2ba3c188f447e6a59e0ae4471150eb31bb7db4e9cc",
+          "bytes": 3585
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-ankle-extra-warnings-b-58/run-summary.json",
+          "sha256": "00562caae88fbf68011e85f2bacb2f4016dc08fb9597d472b314bf216f192ae9",
+          "bytes": 61838
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/eplus-rs.exe",
+          "sha256": "853efc90e6ae4c9644424188553cf58d4781b6b16d6a7ea3cfaf5d6542aabdd7",
+          "bytes": 76317842
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e",
+          "sha256": "1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/receipt.json",
+          "sha256": "c753460aee2784d7e066a7dbf1029071e528af0fcb42f16b0076134b39bb9705",
+          "bytes": 4369
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-ankle-extra-warnings-b-comparisons-58/people-ankle-extra-warnings-b/comparison.json",
+          "sha256": "d4f7dc8a75e44b2021d345a5e819b4c8d0d7e607c04ad3a501a8b6628894486f",
+          "bytes": 416488
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-ankle-extra-warnings-b-58-launch/people-ankle-extra-warnings-b/request.json",
+          "sha256": "cfcbbdc05c774828f7fbcd19a75bc47403fbeada2f9882e385278a3c36c6b1c5",
+          "bytes": 3296
+        },
+        "totals": {
+          "series": 105,
+          "samples": 10080,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native58 and same-input Source58 use genuine new actual Build58. The private Source-only diagnostics admission reaches the actual ProjectData/global writer; legacy retains its original two keys. Exact selected57 policies/origins remain A119/B105 with only People2/Ankle1 raw96/binary observations and real six-registration absence. Targeted thirteen-phase Compact activity/body-air and B scheduled-clothing operands are inputs only. Actual warning/recurrence/phase/extrema/order, whole diagnostics and physical outputs are freshly observed without prescribed counts, valid segments, -1 values, warmup days or seeds. Native57 is archive-only ancestry; normal SourceB staging remains actual production. Existing geometry/NoSizing/NoLimit/Mixing/EMS/other-model bounds remain."
       }
     ],
     "totals": {
-      "paired_cases": 92,
-      "reported_samples": 742086,
-      "raw_operand_unequal": 168299,
+      "paired_cases": 94,
+      "reported_samples": 763302,
+      "raw_operand_unequal": 171748,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -6512,12 +6654,35 @@
           "sha256": "322506292dc194acdd77af4eb9dd48c474fc1b92c46d21cad5b6317d898e1360",
           "bytes": 76321426
         }
+      },
+      {
+        "id": "people-ankle-extra-warnings-58",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/receipt.json",
+          "sha256": "c753460aee2784d7e066a7dbf1029071e528af0fcb42f16b0076134b39bb9705",
+          "bytes": 4369
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e",
+          "sha256": "1b0decace48ea8cd669ab9dce842969684844f2193196eeb51e9cf5b6d5db59e"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-58/eplus-rs.exe",
+          "sha256": "853efc90e6ae4c9644424188553cf58d4781b6b16d6a7ea3cfaf5d6542aabdd7",
+          "bytes": 76317842
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "The current full workspace milestone covers the earlier focused bodies."
+      "passed": 1,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/people-ankle-extra-warnings-focused-58.log",
+          "sha256": "2f3982e3aff68603cb9b73d9d30183f3b71f4bad6b6624d3974168dd84570f66",
+          "bytes": 812
+        }
+      ],
+      "scope": "One existing Raw admission/IP/project-data body after the retained full workspace milestone; actual warning flow is covered by the separate same-input pairs."
     }
   },
   "additional_native_type_calibrations": [

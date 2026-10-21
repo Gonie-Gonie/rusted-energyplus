@@ -173,7 +173,7 @@ fn resolve_raw(
                 return Err(format!("blank ordinary {} name", family.0));
             }
             for (field, value) in &object.fields {
-                if !admitted_field(&family.0, &field.0, value)
+                if !admitted_field(&family.0, &field.0, value, source_calendar_ingress)
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
                     && !(source_people_family && people::admitted_field(&field.0, value))
@@ -812,6 +812,116 @@ mod tests {
         ] {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
+        }
+        // Source-only diagnostics retain exact raw keys through both actual
+        // admission/IP routes and the real project-data projection. This is
+        // input custody; GetProjectData owns the later global flag write.
+        for (entries, keys) in [
+            (
+                r#"[{"key":"DisplayExtraWarnings"}]"#,
+                vec!["DisplayExtraWarnings"],
+            ),
+            (
+                r#"[{"key":"displayextrawarnings"},{"key":"DisplayExtraWarnings"}]"#,
+                vec!["displayextrawarnings", "DisplayExtraWarnings"],
+            ),
+            (
+                r#"[{"key":"ReportDetailedWarmupConvergence"},{"key":"DisplayExtraWarnings"},{"key":"DisplayAdvancedReportVariables"}]"#,
+                vec![
+                    "ReportDetailedWarmupConvergence",
+                    "DisplayExtraWarnings",
+                    "DisplayAdvancedReportVariables",
+                ],
+            ),
+        ] {
+            let raw = parse_epjson_str(&format!(
+                r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":{entries}}}}}}}"#
+            ))?;
+            assert!(resolve(&raw).is_err(), "legacy diagnostic fence: {entries}");
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            for source_b in [false, true] {
+                let zone_raw = parse_epjson_str(&format!("{{{base}}}"))?;
+                let input = if source_b {
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?
+                } else {
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?
+                };
+                let zone_input = if source_b {
+                    crate::ordinary_input_processor::resolve_source_b(&zone_raw)?
+                } else {
+                    crate::ordinary_input_processor::resolve_source_a(&zone_raw)?
+                };
+                use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
+                let expected = V::Array(
+                    keys.iter()
+                        .map(|key| {
+                            V::Object(std::collections::BTreeMap::from([(
+                                "key".into(),
+                                V::String((*key).into()),
+                            )]))
+                        })
+                        .collect(),
+                );
+                assert_eq!(input.get_num_objects_found("Output:Diagnostics"), 1);
+                assert_eq!(
+                    input
+                        .source_raw_object_fields("Output:Diagnostics", "actual diagnostics")?
+                        .get("diagnostics"),
+                    Some(&expected),
+                    "raw diagnostic spelling/order: SourceB={source_b}"
+                );
+                assert_eq!(
+                    input.source_raw_object_fields("Zone", "actual zone")?,
+                    zone_input.source_raw_object_fields("Zone", "actual zone")?,
+                    "same actual Zone operands, no fabricated defaults"
+                );
+                let project = crate::ordinary_project_data::resolve(&raw, raw.is_epjson(), &input)?;
+                let zone_project = crate::ordinary_project_data::resolve(
+                    &zone_raw,
+                    zone_raw.is_epjson(),
+                    &zone_input,
+                )?;
+                assert_eq!(project.objects, zone_project.objects);
+                assert_eq!(
+                    project.diagnostics,
+                    vec![
+                        ep_runtime::heat_balance::selected_project_data::ProjectDiagnosticsObject {
+                            object_name: "actual diagnostics".into(),
+                            keys: keys.iter().map(|key| Some((*key).into())).collect(),
+                        }
+                    ]
+                );
+                assert!(
+                    input.is_object_unused("Output:Diagnostics", "actual diagnostics"),
+                    "projection cannot mark the genuine getter as called"
+                );
+            }
+        }
+        for entries in [
+            r#"[{"key":"DisplayAllWarnings"}]"#,
+            r#"[{"key":"DisplayExtraWarnings","ignored":1}]"#,
+            r#"[{"key":1}]"#,
+            r#"[{"key":true}]"#,
+            r#"[{"key":null}]"#,
+            r#"[{"key":[]}]"#,
+            r#"[{"key":{}}]"#,
+            r#"["DisplayExtraWarnings"]"#,
+            r#"{"key":"DisplayExtraWarnings"}"#,
+        ] {
+            let raw = parse_epjson_str(&format!(
+                r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":{entries}}}}}}}"#
+            ))?;
+            assert!(
+                resolve_source_a(&raw).is_err(),
+                "SourceA strict diagnostic shape: {entries}"
+            );
+            assert!(
+                resolve_source_b(&raw).is_err(),
+                "SourceB strict diagnostic shape: {entries}"
+            );
+            assert!(crate::ordinary_input_processor::resolve_source_a(&raw).is_err());
+            assert!(crate::ordinary_input_processor::resolve_source_b(&raw).is_err());
         }
         for value in [-2.0, 0.0, 3.0] {
             let addition = format!(

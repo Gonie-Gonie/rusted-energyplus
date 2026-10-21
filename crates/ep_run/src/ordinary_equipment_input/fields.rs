@@ -6,7 +6,12 @@ mod ground;
 // These literal matches are the finite 26.1 field grammar, not a runtime schema
 // engine. Existing compiler, geometry, schedules and thermal validation still
 // run. The Source-reviewed branch restrictions below are deliberately narrower.
-pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+pub(super) fn admitted_field(
+    family: &str,
+    name: &str,
+    value: &RawValue,
+    source_ingress: bool,
+) -> bool {
     if let Some(admitted) = ground::admitted_field(family, name, value) {
         return admitted;
     }
@@ -595,7 +600,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["vertex_x_coordinate", "vertex_y_coordinate", "vertex_z_coordinate"].contains(&key.0.as_str())) && row.get(&FieldName("vertex_x_coordinate".into())).is_some_and(|value| number(value).is_some()) && row.get(&FieldName("vertex_y_coordinate".into())).is_some_and(|value| number(value).is_some()) && row.get(&FieldName("vertex_z_coordinate".into())).is_some_and(|value| number(value).is_some()))))
         }
         ("Output:Diagnostics", "diagnostics") => {
-            matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["key"].contains(&key.0.as_str())) && row.get(&FieldName("key".into())).is_some_and(|value| text_is(value, &["DisplayAdvancedReportVariables", "ReportDetailedWarmupConvergence"])))))
+            matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["key"].contains(&key.0.as_str())) && row.get(&FieldName("key".into())).is_some_and(|value| text_is(value, &["DisplayAdvancedReportVariables", "ReportDetailedWarmupConvergence"]) || (source_ingress && text_is(value, &["DisplayExtraWarnings"]))))))
         }
         ("Output:VariableDictionary", "key_field") => {
             blank(value) || text_is(value, &["", "IDF", "regular"])
