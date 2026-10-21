@@ -18,7 +18,7 @@ fn resolve_ordered(
 ) -> Result<SourceReportingPreScanInput, String> {
     let mut input = SourceReportingPreScanInput::default();
     let variables = if source_order {
-        raw.source_ordered_instances("Output:Variable")?
+        raw.source_json_instances("Output:Variable")?
     } else {
         raw.objects
             .get(&ObjectType("Output:Variable".into()))
@@ -44,7 +44,7 @@ fn resolve_ordered(
         });
     }
     let summaries = if source_order {
-        raw.source_ordered_instances("Output:Table:SummaryReports")?
+        raw.source_json_instances("Output:Table:SummaryReports")?
     } else {
         raw.objects
             .get(&ObjectType("Output:Table:SummaryReports".into()))

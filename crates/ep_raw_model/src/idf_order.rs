@@ -1125,6 +1125,24 @@ mod tests {
                 staged.ordered_instances(family)?
             );
         }
+        // Direct DOM readers keep JSON map order for converted IDF too;
+        // this must not silently become the getObjectItem declaration overlay.
+        assert_eq!(
+            staged
+                .source_json_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["A File", "Z File"]
+        );
+        assert_eq!(
+            staged
+                .source_ordered_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Z File", "A File"]
+        );
         let mut invalid_overlay = staged.clone();
         invalid_overlay
             .objects

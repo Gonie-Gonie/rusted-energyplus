@@ -34,7 +34,7 @@ impl SourceSupportAdmission {
             return None;
         }
         if !raw
-            .source_ordered_instances("Output:Variable")
+            .source_json_instances("Output:Variable")
             .ok()?
             .iter()
             .zip(&reporting.variables)

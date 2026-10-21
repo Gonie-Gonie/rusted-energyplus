@@ -194,6 +194,18 @@ impl RawModel {
                 .ordered_instances(object_type)
                 .map_err(|error| error.to_string());
         }
+        self.source_json_instances(object_type)
+    }
+
+    /// Returns the pinned Source JSON map order, including for converted IDF.
+    ///
+    /// Direct DOM readers such as the reporting pre-scan never apply the IDF
+    /// declaration overlay used by getObjectItem. The same strict finite-order
+    /// checks apply to both input formats; no raw names are coalesced.
+    pub fn source_json_instances(
+        &self,
+        object_type: &str,
+    ) -> Result<Vec<(&ObjectName, &RawObject)>, String> {
         let Some(instances) = self.objects.get(&ObjectType(object_type.into())) else {
             return Ok(Vec::new());
         };

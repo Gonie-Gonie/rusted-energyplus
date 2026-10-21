@@ -127,7 +127,61 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             .is_some_and(|input| input.family("oversized").is_some()),
         "input must remain retained when allocation sizing stops"
     );
-    // Direct-JSON pre-scan keeps lexical spelling separately from getter alphas.
+    // The same sole IP and pre-scan must agree on Native DOM order, including
+    // numeric names whose BTree order differs. First inserted spelling is an
+    // observable consequence, rather than only a comparison of two adapters.
+    let ordered_raw = parse_epjson_str(&format!(
+        r#"{{{base},"Output:Variable":{{
+        "request10":{{"variable_name":"cASE vAR","key_value":"KEY","reporting_frequency":"Hourly"}},
+        "request2":{{"variable_name":"Case Var [W]","key_value":"Key","reporting_frequency":"Hourly"}}
+    }}}}"#
+    ))?;
+    let ordered_projection = resolve_reporting_prescan_source(&ordered_raw)?;
+    assert_eq!(
+        ordered_projection
+            .variables
+            .iter()
+            .map(|row| row.object_name.as_str())
+            .collect::<Vec<_>>(),
+        ["request2", "request10"]
+    );
+    for input in [
+        resolve_source_a(&ordered_raw)?,
+        resolve_source_b(&ordered_raw)?,
+    ] {
+        let Some(SourceInputFamily::Objects(shapes)) = input.family("Output:Variable") else {
+            return Err("Source DOM shapes missing".into());
+        };
+        assert_eq!(
+            shapes
+                .iter()
+                .map(|row| row.object_name.as_str())
+                .collect::<Vec<_>>(),
+            ["request2", "request10"]
+        );
+        let mut prescan =
+            ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+        prescan.pre_scan_reporting_variables(&input, &ordered_projection)?;
+        let first = &prescan.output_variables_for_simulation["case var"];
+        assert_eq!(first.variable_name, "Case Var");
+        assert_eq!(first.keys["key"].key, "Key");
+        assert_eq!(prescan.num_considered_output_variables, 2);
+        let mut mismatched = ordered_projection.clone();
+        mismatched.variables.swap(0, 1);
+        assert!(
+            prescan
+                .pre_scan_reporting_variables(&input, &mismatched)
+                .is_err()
+        );
+    }
+    let legacy = resolve_reporting_prescan(&ordered_raw)?;
+    assert_eq!(legacy.variables[0].object_name, "request10");
+    let legacy_input = resolve(&ordered_raw)?;
+    let mut legacy_prescan =
+        ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    legacy_prescan.pre_scan_reporting_variables(&legacy_input, &legacy)?;
+
+    // Direct-JSON pre-scan keeps original spelling separately from getter alphas.
     let raw = parse_epjson_str(&format!(
         r#"{{{base},"Output:Variable":{{
         "z":{{"variable_name":"case var [W]","key_value":"key"}},
