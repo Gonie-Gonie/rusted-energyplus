@@ -599,9 +599,36 @@ pub(super) fn admitted_field(
         ("BuildingSurface:Detailed", "vertices") => {
             matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["vertex_x_coordinate", "vertex_y_coordinate", "vertex_z_coordinate"].contains(&key.0.as_str())) && row.get(&FieldName("vertex_x_coordinate".into())).is_some_and(|value| number(value).is_some()) && row.get(&FieldName("vertex_y_coordinate".into())).is_some_and(|value| number(value).is_some()) && row.get(&FieldName("vertex_z_coordinate".into())).is_some_and(|value| number(value).is_some()))))
         }
-        ("Output:Diagnostics", "diagnostics") => {
-            matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["key"].contains(&key.0.as_str())) && row.get(&FieldName("key".into())).is_some_and(|value| text_is(value, &["DisplayAdvancedReportVariables", "ReportDetailedWarmupConvergence"]) || (source_ingress && text_is(value, &["DisplayExtraWarnings"]))))))
-        }
+        ("Output:Diagnostics", "diagnostics") => match value {
+            RawValue::Array(rows) => rows.iter().all(|entry| match entry {
+                RawValue::Object(row) => {
+                    (source_ingress || row.keys().all(|key| key.0 == "key"))
+                        && match row.get(&FieldName("key".into())) {
+                            None => source_ingress,
+                            Some(value) => {
+                                text_is(
+                                    value,
+                                    &[
+                                        "DisplayAdvancedReportVariables",
+                                        "ReportDetailedWarmupConvergence",
+                                    ],
+                                ) || (source_ingress
+                                    && text_is(
+                                        value,
+                                        &[
+                                            "DisplayExtraWarnings",
+                                            "DisplayAllWarnings",
+                                            "DisplayUnusedObjects",
+                                            "DisplayUnusedSchedules",
+                                        ],
+                                    ))
+                            }
+                        }
+                }
+                _ => false,
+            }),
+            _ => false,
+        },
         ("Output:VariableDictionary", "key_field") => {
             blank(value) || text_is(value, &["", "IDF", "regular"])
         }

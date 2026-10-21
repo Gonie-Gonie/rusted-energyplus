@@ -262,18 +262,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-ankle-extra-warnings-clippy-58.log",
-        "sha256": "ae2604eaca97369a01ed5c6c75bf40bdec3a64dc97a9d04a79eddde79186d6aa",
+        "path": ".runtime/object-expansion/people-unused-diagnostics-clippy-59.log",
+        "sha256": "83bd670a57319d0c84bfc6047e3a5c1588a159532bf3a93eeb774773c7df29f4",
         "bytes": 580
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/people-ankle-extra-warnings-docs-58.log",
-        "sha256": "00dec98dd03bae1c0fa704171654aea2f1a4d6ca801ba841ec486524e7000367",
+        "path": ".runtime/object-expansion/diagnostics-unused-docs-59.log",
+        "sha256": "a366baa1c46fb026f3fc9b2b2ce0b09d4967798e67b7799d9ed2dfd39be29a3f",
         "bytes": 354
       },
-      "clippy_through_build": "people-ankle-extra-warnings-58",
+      "clippy_through_build": "diagnostics-unused-59",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -5692,12 +5692,154 @@
           "passed": true
         },
         "effective_state": "Current own-initial-True Native58 and same-input Source58 use genuine new actual Build58. The private Source-only diagnostics admission reaches the actual ProjectData/global writer; legacy retains its original two keys. Exact selected57 policies/origins remain A119/B105 with only People2/Ankle1 raw96/binary observations and real six-registration absence. Targeted thirteen-phase Compact activity/body-air and B scheduled-clothing operands are inputs only. Actual warning/recurrence/phase/extrema/order, whole diagnostics and physical outputs are freshly observed without prescribed counts, valid segments, -1 values, warmup days or seeds. Native57 is archive-only ancestry; normal SourceB staging remains actual production. Existing geometry/NoSizing/NoLimit/Mixing/EMS/other-model bounds remain."
+      },
+      {
+        "id": "diagnostics-unused-a",
+        "group": "diagnostics_unused",
+        "source_build": "diagnostics-unused-59",
+        "scope": "A",
+        "actual_Source_build_reused": false,
+        "current59_changed_source_path_count": 2,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-diagnostics-unused-a/calibration-01/input.epJSON",
+          "sha256": "4650af05bc6a9b27c8c4a93e45f6ab40990694b3716b8283b98fc4e642160c79",
+          "bytes": 58235
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-diagnostics-unused-a/calibration-01/receipt.json",
+          "sha256": "5d95a85d48a2a54075ec4bc370bcb6837d2eba162a29ada8822dfd8f016f2f12",
+          "bytes": 38027
+        },
+        "Native_calibration_unit": 59,
+        "Native59_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-diagnostics-unused-a-59/diagnostics-unused-a/receipt.json",
+          "sha256": "a1673f596c39e5c6aff096a0e978b969c88128827acf0b60002c6019ca255234",
+          "bytes": 3644
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/diagnostics-unused-a-59/run-summary.json",
+          "sha256": "4263cfb0d9604e8dd861e2943d50e4d935fe1106d57bfc7a241870ce84b99c3d",
+          "bytes": 50971
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/eplus-rs.exe",
+          "sha256": "ae92f739d09a0a80cf1a2bdcc41f165336b8600a18d9fc6e9feb9d8f7510f05e",
+          "bytes": 76317088
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a",
+          "sha256": "1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/receipt.json",
+          "sha256": "350a1f404cfbf5d3ab2033102e484d101949969e60c7295423a3bb9e76781f63",
+          "bytes": 4368
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-diagnostics-unused-a-comparisons-59/diagnostics-unused-a/comparison.json",
+          "sha256": "8952cdbc9dfd984d8a36de6aed73048079678001cd56aca478718895a7ba04a2",
+          "bytes": 738765
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-diagnostics-unused-a-59-launch/diagnostics-unused-a/request.json",
+          "sha256": "993e33f006fbd8a708d0bb388af96f869efdc77b3e5721e81befd4a9f588cb80",
+          "bytes": 3331
+        },
+        "totals": {
+          "series": 119,
+          "samples": 11136,
+          "raw_operand_unequal": 3449,
+          "parsed_binary64_unequal": 3449,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native59 and same-input Source59 require actual new Build59. Source diagnostics use six known keys, actual missing key/None, ignored row/instance metadata and exact singleton name through the same IP/project/global owners. Legacy and all reserved/other-family fences remain. All selected57 policies/origins remain A119/B105 with People2/Ankle1 raw96/binary and real six Fanger/common ESO/RDD absences. Actual orphan/extra diagnostics, names/counts/order/phases/extrema and whole reports are freshly observed without prescribed inventories, warnings, valid segments, values or parent answers. Immediate Native58 identity ancestry stays separate from Native56 policy proof; Source58 history is archive-only. NoSizing/NoLimit/empty monthly/Mixing/EMS/other-model/spatial/user-fluid bounds and normal SourceB staging remain."
+      },
+      {
+        "id": "diagnostics-unused-b",
+        "group": "diagnostics_unused",
+        "source_build": "diagnostics-unused-59",
+        "scope": "B",
+        "actual_Source_build_reused": false,
+        "current59_changed_source_path_count": 2,
+        "new_Source_build_created": true,
+        "input": {
+          "path": ".runtime/object-expansion/native-diagnostics-unused-b/calibration-01/input.idf",
+          "sha256": "cc98c205008cb94959649771469bf5bf862ff1d3f9d509740b3f958229dbbf8b",
+          "bytes": 17107
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-diagnostics-unused-b/calibration-01/receipt.json",
+          "sha256": "71304e26cef41de01abd6d4718848b6c466773e1fe9a613dc1ab2746a99291d5",
+          "bytes": 38517
+        },
+        "Native_calibration_unit": 59,
+        "Native59_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-diagnostics-unused-b-59/diagnostics-unused-b/receipt.json",
+          "sha256": "bb9be698c8dd2b17ad5230a35be30e22614ccc3088f30d89375b6e87e33419db",
+          "bytes": 3531
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/diagnostics-unused-b-59/run-summary.json",
+          "sha256": "6792765baba571712572bcf7f6554fe50e7e74f2daf37db4a46386ca06ee3aa8",
+          "bytes": 61596
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/eplus-rs.exe",
+          "sha256": "ae92f739d09a0a80cf1a2bdcc41f165336b8600a18d9fc6e9feb9d8f7510f05e",
+          "bytes": 76317088
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a",
+          "sha256": "1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/receipt.json",
+          "sha256": "350a1f404cfbf5d3ab2033102e484d101949969e60c7295423a3bb9e76781f63",
+          "bytes": 4368
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-diagnostics-unused-b-comparisons-59/diagnostics-unused-b/comparison.json",
+          "sha256": "bf33766ec0fcc083d1b8c0f000fd60977c48c1f907e67e6114d27e87c0dece10",
+          "bytes": 419445
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-diagnostics-unused-b-59-launch/diagnostics-unused-b/request.json",
+          "sha256": "b69feb21b97e33c0ab51b533069c2b629ae276ecd775a5031f8baa33ade6c233",
+          "bytes": 3215
+        },
+        "totals": {
+          "series": 105,
+          "samples": 10080,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current own-initial-True Native59 and same-input Source59 require actual new Build59. Source diagnostics use six known keys, actual missing key/None, ignored row/instance metadata and exact singleton name through the same IP/project/global owners. Legacy and all reserved/other-family fences remain. All selected57 policies/origins remain A119/B105 with People2/Ankle1 raw96/binary and real six Fanger/common ESO/RDD absences. Actual orphan/extra diagnostics, names/counts/order/phases/extrema and whole reports are freshly observed without prescribed inventories, warnings, valid segments, values or parent answers. Immediate Native58 identity ancestry stays separate from Native56 policy proof; Source58 history is archive-only. NoSizing/NoLimit/empty monthly/Mixing/EMS/other-model/spatial/user-fluid bounds and normal SourceB staging remain."
       }
     ],
     "totals": {
-      "paired_cases": 94,
-      "reported_samples": 763302,
-      "raw_operand_unequal": 171748,
+      "paired_cases": 96,
+      "reported_samples": 784518,
+      "raw_operand_unequal": 175197,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -6671,18 +6813,40 @@
           "sha256": "853efc90e6ae4c9644424188553cf58d4781b6b16d6a7ea3cfaf5d6542aabdd7",
           "bytes": 76317842
         }
+      },
+      {
+        "id": "diagnostics-unused-59",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/receipt.json",
+          "sha256": "350a1f404cfbf5d3ab2033102e484d101949969e60c7295423a3bb9e76781f63",
+          "bytes": 4368
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a",
+          "sha256": "1ba001b0cf344c7ea1249c757941fed59460f400e3e724452786c7a606b8d11a"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-59/eplus-rs.exe",
+          "sha256": "ae92f739d09a0a80cf1a2bdcc41f165336b8600a18d9fc6e9feb9d8f7510f05e",
+          "bytes": 76317088
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 1,
+      "passed": 2,
       "logs": [
         {
           "path": ".runtime/object-expansion/people-ankle-extra-warnings-focused-58.log",
           "sha256": "2f3982e3aff68603cb9b73d9d30183f3b71f4bad6b6624d3974168dd84570f66",
           "bytes": 812
+        },
+        {
+          "path": ".runtime/object-expansion/people-unused-diagnostics-focused-59.log",
+          "sha256": "8a703c5079d6d995b3086a4fb1f0bd2181e2e38e8e51f1e0729c779170e93b18",
+          "bytes": 812
         }
       ],
-      "scope": "One existing Raw admission/IP/project-data body after the retained full workspace milestone; actual warning flow is covered by the separate same-input pairs."
+      "scope": "Two successful existing Raw admission/IP/project-data body runs after the retained full workspace milestone; actual global flags, completion warnings and physical flow are covered by the separate same-input pairs."
     }
   },
   "additional_native_type_calibrations": [

@@ -169,6 +169,7 @@ fn resolve_raw(
                         | "Output:Meter:MeterFileOnly"
                 )
                 && !source_angle_family
+                && !(source_calendar_ingress && family.0 == "Output:Diagnostics")
             {
                 return Err(format!("blank ordinary {} name", family.0));
             }
@@ -190,6 +191,7 @@ fn resolve_raw(
                         )
                         && match family.0.as_str() {
                             "People" if source_people_family => !people::known_field(&field.0),
+                            "Output:Diagnostics" => field.0 != "diagnostics",
                             "ScheduleTypeLimits" => !matches!(
                                 field.0.as_str(),
                                 "lower_limit_value"
@@ -813,115 +815,362 @@ mod tests {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
         }
-        // Source-only diagnostics retain exact raw keys through both actual
-        // admission/IP routes and the real project-data projection. This is
-        // input custody; GetProjectData owns the later global flag write.
-        for (entries, keys) in [
-            (
-                r#"[{"key":"DisplayExtraWarnings"}]"#,
-                vec!["DisplayExtraWarnings"],
-            ),
-            (
-                r#"[{"key":"displayextrawarnings"},{"key":"DisplayExtraWarnings"}]"#,
-                vec!["displayextrawarnings", "DisplayExtraWarnings"],
-            ),
-            (
-                r#"[{"key":"ReportDetailedWarmupConvergence"},{"key":"DisplayExtraWarnings"},{"key":"DisplayAdvancedReportVariables"}]"#,
-                vec![
-                    "ReportDetailedWarmupConvergence",
-                    "DisplayExtraWarnings",
-                    "DisplayAdvancedReportVariables",
-                ],
-            ),
-        ] {
-            let raw = parse_epjson_str(&format!(
-                r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":{entries}}}}}}}"#
-            ))?;
-            assert!(resolve(&raw).is_err(), "legacy diagnostic fence: {entries}");
-            resolve_source_a(&raw)?;
-            resolve_source_b(&raw)?;
-            for source_b in [false, true] {
-                let zone_raw = parse_epjson_str(&format!("{{{base}}}"))?;
-                let input = if source_b {
-                    crate::ordinary_input_processor::resolve_source_b(&raw)?
-                } else {
-                    crate::ordinary_input_processor::resolve_source_a(&raw)?
-                };
-                let zone_input = if source_b {
-                    crate::ordinary_input_processor::resolve_source_b(&zone_raw)?
-                } else {
-                    crate::ordinary_input_processor::resolve_source_a(&zone_raw)?
-                };
-                use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
-                let expected = V::Array(
-                    keys.iter()
-                        .map(|key| {
-                            V::Object(std::collections::BTreeMap::from([(
-                                "key".into(),
-                                V::String((*key).into()),
-                            )]))
-                        })
-                        .collect(),
-                );
-                assert_eq!(input.get_num_objects_found("Output:Diagnostics"), 1);
-                assert_eq!(
-                    input
-                        .source_raw_object_fields("Output:Diagnostics", "actual diagnostics")?
-                        .get("diagnostics"),
-                    Some(&expected),
-                    "raw diagnostic spelling/order: SourceB={source_b}"
-                );
-                assert_eq!(
-                    input.source_raw_object_fields("Zone", "actual zone")?,
-                    zone_input.source_raw_object_fields("Zone", "actual zone")?,
-                    "same actual Zone operands, no fabricated defaults"
-                );
-                let project = crate::ordinary_project_data::resolve(&raw, raw.is_epjson(), &input)?;
-                let zone_project = crate::ordinary_project_data::resolve(
-                    &zone_raw,
-                    zone_raw.is_epjson(),
-                    &zone_input,
-                )?;
-                assert_eq!(project.objects, zone_project.objects);
-                assert_eq!(
-                    project.diagnostics,
+        // Source diagnostics keep exact raw names/keys and genuine missing
+        // keys. The project projection does not invoke GetProjectData or mark
+        // this object used; its later real getter owns warnings/global writes.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
+            for (entries, keys, legacy_accepted) in [
+                (
+                    Some(r#"[{"key":"DisplayExtraWarnings"}]"#),
+                    vec![Some("DisplayExtraWarnings")],
+                    false,
+                ),
+                (
+                    Some(r#"[{"key":"displayextrawarnings"},{"key":"DisplayExtraWarnings"}]"#),
+                    vec![Some("displayextrawarnings"), Some("DisplayExtraWarnings")],
+                    false,
+                ),
+                (
+                    Some(
+                        r#"[{"key":"ReportDetailedWarmupConvergence"},{"key":"DisplayExtraWarnings"},{"key":"DisplayAdvancedReportVariables"}]"#,
+                    ),
                     vec![
-                        ep_runtime::heat_balance::selected_project_data::ProjectDiagnosticsObject {
-                            object_name: "actual diagnostics".into(),
-                            keys: keys.iter().map(|key| Some((*key).into())).collect(),
-                        }
-                    ]
+                        Some("ReportDetailedWarmupConvergence"),
+                        Some("DisplayExtraWarnings"),
+                        Some("DisplayAdvancedReportVariables"),
+                    ],
+                    false,
+                ),
+                (
+                    Some(r#"[{"key":"DisplayAllWarnings"}]"#),
+                    vec![Some("DisplayAllWarnings")],
+                    false,
+                ),
+                (
+                    Some(r#"[{"key":"DisplayUnusedObjects"}]"#),
+                    vec![Some("DisplayUnusedObjects")],
+                    false,
+                ),
+                (
+                    Some(r#"[{"key":"DisplayUnusedSchedules"}]"#),
+                    vec![Some("DisplayUnusedSchedules")],
+                    false,
+                ),
+                (
+                    Some(
+                        r#"[{"key":"displayallwarnings"},{"key":"DisplayUnusedObjects"},{"key":"DisplayUnusedSchedules"},{"key":"DisplayExtraWarnings"},{"key":"ReportDetailedWarmupConvergence"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAllWarnings"}]"#,
+                    ),
+                    vec![
+                        Some("displayallwarnings"),
+                        Some("DisplayUnusedObjects"),
+                        Some("DisplayUnusedSchedules"),
+                        Some("DisplayExtraWarnings"),
+                        Some("ReportDetailedWarmupConvergence"),
+                        Some("DisplayAdvancedReportVariables"),
+                        Some("DisplayAllWarnings"),
+                    ],
+                    false,
+                ),
+                (Some(r#"[{}]"#), vec![None], false),
+                (
+                    Some(r#"[{}, {"key":"DisplayUnusedObjects"}, {}]"#),
+                    vec![None, Some("DisplayUnusedObjects"), None],
+                    false,
+                ),
+                (Some("[]"), vec![], true),
+                (None, vec![], true),
+            ] {
+                let fields = entries
+                    .map_or_else(String::new, |entries| format!(r#""diagnostics":{entries}"#));
+                let raw = parse_epjson_str(&format!(
+                    r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{{fields}}}}}}}"#
+                ))?;
+                assert_eq!(
+                    resolve(&raw).is_ok(),
+                    legacy_accepted,
+                    "legacy diagnostics: {entries:?}"
                 );
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                for source_b in [false, true] {
+                    let zone_raw = parse_epjson_str(&format!("{{{base}}}"))?;
+                    let input = if source_b {
+                        crate::ordinary_input_processor::resolve_source_b(&raw)?
+                    } else {
+                        crate::ordinary_input_processor::resolve_source_a(&raw)?
+                    };
+                    let zone_input = if source_b {
+                        crate::ordinary_input_processor::resolve_source_b(&zone_raw)?
+                    } else {
+                        crate::ordinary_input_processor::resolve_source_a(&zone_raw)?
+                    };
+                    let expected = V::Array(
+                        keys.iter()
+                            .map(|key| {
+                                V::Object(match key {
+                                    Some(key) => std::collections::BTreeMap::from([(
+                                        "key".into(),
+                                        V::String((*key).into()),
+                                    )]),
+                                    None => std::collections::BTreeMap::new(),
+                                })
+                            })
+                            .collect(),
+                    );
+                    assert_eq!(input.get_num_objects_found("Output:Diagnostics"), 1);
+                    assert_eq!(
+                        input
+                            .source_raw_object_fields("Output:Diagnostics", "actual diagnostics")?
+                            .get("diagnostics"),
+                        entries.map(|_| &expected),
+                        "row/key omission/order: SourceB={source_b}"
+                    );
+                    assert_eq!(
+                        input.source_raw_object_fields("Zone", "actual zone")?,
+                        zone_input.source_raw_object_fields("Zone", "actual zone")?
+                    );
+                    let project =
+                        crate::ordinary_project_data::resolve(&raw, raw.is_epjson(), &input)?;
+                    let zone_project = crate::ordinary_project_data::resolve(
+                        &zone_raw,
+                        zone_raw.is_epjson(),
+                        &zone_input,
+                    )?;
+                    assert_eq!(project.objects, zone_project.objects);
+                    assert_eq!(project.diagnostics, vec![ep_runtime::heat_balance::selected_project_data::ProjectDiagnosticsObject {
+                        object_name: "actual diagnostics".into(), keys: keys.iter().map(|key| key.map(str::to_owned)).collect(),
+                    }]);
+                    assert!(input.is_object_unused("Output:Diagnostics", "actual diagnostics"));
+                }
+            }
+            // Unknown nested and instance members are genuine ignored input.
+            // Lowercase unit cases check Source admission/custody, not Native
+            // direct-JSON case-sensitive enum conformance. SourceA keeps
+            // its statistics-only scalar projection; SourceB retains full raw
+            // numeric/bool values. Neither transfer is widened for diagnostics.
+            for (metadata, expected_a, expected_b) in [
+                ("null", V::Null, V::Null),
+                ("true", V::OtherScalar, V::Bool(true)),
+                ("1.25", V::OtherScalar, V::Number("1.25".into())),
+                (
+                    r#""retained""#,
+                    V::String("retained".into()),
+                    V::String("retained".into()),
+                ),
+                (
+                    r#"[null,false,2,"retained"]"#,
+                    V::Array(vec![
+                        V::Null,
+                        V::OtherScalar,
+                        V::OtherScalar,
+                        V::String("retained".into()),
+                    ]),
+                    V::Array(vec![
+                        V::Null,
+                        V::Bool(false),
+                        V::Number("2".into()),
+                        V::String("retained".into()),
+                    ]),
+                ),
+                (
+                    r#"{"nested":"retained","items":[1,2]}"#,
+                    V::Object(std::collections::BTreeMap::from([
+                        ("nested".into(), V::String("retained".into())),
+                        (
+                            "items".into(),
+                            V::Array(vec![V::OtherScalar, V::OtherScalar]),
+                        ),
+                    ])),
+                    V::Object(std::collections::BTreeMap::from([
+                        ("nested".into(), V::String("retained".into())),
+                        (
+                            "items".into(),
+                            V::Array(vec![V::Number("1".into()), V::Number("2".into())]),
+                        ),
+                    ])),
+                ),
+            ] {
+                for instance_metadata in [false, true] {
+                    for key in [
+                        None,
+                        Some("DisplayUnusedObjects"),
+                        Some("DisplayAdvancedReportVariables"),
+                    ] {
+                        let key_field =
+                            key.map_or_else(String::new, |key| format!(r#""key":"{key}","#));
+                        let bare_row = key
+                            .map_or_else(|| "{}".to_owned(), |key| format!(r#"{{"key":"{key}"}}"#));
+                        let row = if instance_metadata {
+                            bare_row.clone()
+                        } else {
+                            format!(r#"{{{key_field}"retained":{metadata}}}"#)
+                        };
+                        let instance_field = if instance_metadata {
+                            format!(r#", "instance_metadata":{metadata}"#)
+                        } else {
+                            String::new()
+                        };
+                        let raw = parse_epjson_str(&format!(
+                            r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":[{row}]{instance_field}}}}}}}"#
+                        ))?;
+                        let without_metadata = parse_epjson_str(&format!(
+                            r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":[{bare_row}]}}}}}}"#
+                        ))?;
+                        assert!(resolve(&raw).is_err(), "legacy ignored-member fence");
+                        for source_b in [false, true] {
+                            let input = if source_b {
+                                crate::ordinary_input_processor::resolve_source_b(&raw)?
+                            } else {
+                                crate::ordinary_input_processor::resolve_source_a(&raw)?
+                            };
+                            let baseline = if source_b {
+                                crate::ordinary_input_processor::resolve_source_b(
+                                    &without_metadata,
+                                )?
+                            } else {
+                                crate::ordinary_input_processor::resolve_source_a(
+                                    &without_metadata,
+                                )?
+                            };
+                            let expected_metadata = if source_b {
+                                expected_b.clone()
+                            } else {
+                                expected_a.clone()
+                            };
+                            let mut expected = std::collections::BTreeMap::new();
+                            if !instance_metadata {
+                                expected.insert("retained".into(), expected_metadata.clone());
+                            }
+                            if let Some(key) = key {
+                                expected.insert("key".into(), V::String(key.into()));
+                            }
+                            assert_eq!(
+                                input
+                                    .source_raw_object_fields(
+                                        "Output:Diagnostics",
+                                        "actual diagnostics"
+                                    )?
+                                    .get("diagnostics"),
+                                Some(&V::Array(vec![V::Object(expected)]))
+                            );
+                            assert_eq!(
+                                input
+                                    .source_raw_object_fields(
+                                        "Output:Diagnostics",
+                                        "actual diagnostics"
+                                    )?
+                                    .get("instance_metadata"),
+                                instance_metadata.then_some(&expected_metadata)
+                            );
+                            let mut actual_stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                            let mut baseline_stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                            input.report_source_idf_records_stats(&mut actual_stats)?;
+                            baseline.report_source_idf_records_stats(&mut baseline_stats)?;
+                            assert_eq!(
+                                actual_stats, baseline_stats,
+                                "ignored metadata cannot change real schema statistics"
+                            );
+                            let project = crate::ordinary_project_data::resolve(
+                                &raw,
+                                raw.is_epjson(),
+                                &input,
+                            )?;
+                            assert_eq!(project.diagnostics, vec![ep_runtime::heat_balance::selected_project_data::ProjectDiagnosticsObject {
+                            object_name:"actual diagnostics".into(),keys:vec![key.map(str::to_owned)],
+                        }]);
+                            assert!(
+                                input.is_object_unused("Output:Diagnostics", "actual diagnostics")
+                            );
+                        }
+                    }
+                }
+            }
+            // The outer empty family was already accepted before59. Exact
+            // blank singleton names are Source-only, with no invented identity.
+            let empty = parse_epjson_str(&format!(r#"{{{base},"Output:Diagnostics":{{}}}}"#))?;
+            resolve(&empty)?;
+            for source_b in [false, true] {
+                let input = if source_b {
+                    crate::ordinary_input_processor::resolve_source_b(&empty)?
+                } else {
+                    crate::ordinary_input_processor::resolve_source_a(&empty)?
+                };
+                assert_eq!(input.get_num_objects_found("Output:Diagnostics"), 0);
                 assert!(
-                    input.is_object_unused("Output:Diagnostics", "actual diagnostics"),
-                    "projection cannot mark the genuine getter as called"
+                    crate::ordinary_project_data::resolve(&empty, empty.is_epjson(), &input)?
+                        .diagnostics
+                        .is_empty()
                 );
             }
-        }
-        for entries in [
-            r#"[{"key":"DisplayAllWarnings"}]"#,
-            r#"[{"key":"DisplayExtraWarnings","ignored":1}]"#,
-            r#"[{"key":1}]"#,
-            r#"[{"key":true}]"#,
-            r#"[{"key":null}]"#,
-            r#"[{"key":[]}]"#,
-            r#"[{"key":{}}]"#,
-            r#"["DisplayExtraWarnings"]"#,
-            r#"{"key":"DisplayExtraWarnings"}"#,
-        ] {
-            let raw = parse_epjson_str(&format!(
-                r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":{entries}}}}}}}"#
-            ))?;
-            assert!(
-                resolve_source_a(&raw).is_err(),
-                "SourceA strict diagnostic shape: {entries}"
-            );
-            assert!(
-                resolve_source_b(&raw).is_err(),
-                "SourceB strict diagnostic shape: {entries}"
-            );
-            assert!(crate::ordinary_input_processor::resolve_source_a(&raw).is_err());
-            assert!(crate::ordinary_input_processor::resolve_source_b(&raw).is_err());
+            for (name_json, name) in [(r#""""#, ""), (r#""   ""#, "   ")] {
+                for (entries, key) in [
+                    (
+                        r#"[{"key":"DisplayAdvancedReportVariables"}]"#,
+                        Some("DisplayAdvancedReportVariables"),
+                    ),
+                    ("[{}]", None),
+                ] {
+                    let raw = parse_epjson_str(&format!(
+                        r#"{{{base},"Output:Diagnostics":{{{name_json}:{{"diagnostics":{entries}}}}}}}"#
+                    ))?;
+                    assert!(resolve(&raw).is_err(), "legacy blank-name fence");
+                    for source_b in [false, true] {
+                        let input = if source_b {
+                            crate::ordinary_input_processor::resolve_source_b(&raw)?
+                        } else {
+                            crate::ordinary_input_processor::resolve_source_a(&raw)?
+                        };
+                        assert_eq!(input.get_num_objects_found("Output:Diagnostics"), 1);
+                        assert!(input.has_object("Output:Diagnostics", name));
+                        assert!(input.is_object_unused("Output:Diagnostics", name));
+                        assert_eq!(crate::ordinary_project_data::resolve(&raw,raw.is_epjson(),&input)?.diagnostics,vec![ep_runtime::heat_balance::selected_project_data::ProjectDiagnosticsObject {
+                            object_name:name.into(),keys:vec![key.map(str::to_owned)],
+                        }]);
+                    }
+                }
+            }
+            for entries in [
+                r#"[{"key":"DisplayWeatherMissingDataWarnings"}]"#,
+                r#"[{"key":"ReportDuringWarmup","ignored":1}]"#,
+                r#"[{"key":""}]"#,
+                r#"[{"key":" "}]"#,
+                r#"[{"key":1}]"#,
+                r#"[{"key":true}]"#,
+                r#"[{"key":null}]"#,
+                r#"[{"key":[]}]"#,
+                r#"[{"key":{}}]"#,
+                r#"["DisplayUnusedObjects"]"#,
+                r#"{"key":"DisplayUnusedObjects"}"#,
+                "null",
+            ] {
+                let raw = parse_epjson_str(&format!(
+                    r#"{{{base},"Output:Diagnostics":{{"actual diagnostics":{{"diagnostics":{entries},"instance_metadata":1}}}}}}"#
+                ))?;
+                assert!(
+                    resolve_source_a(&raw).is_err(),
+                    "SourceA strict known key/type: {entries}"
+                );
+                assert!(
+                    resolve_source_b(&raw).is_err(),
+                    "SourceB strict known key/type: {entries}"
+                );
+                assert!(crate::ordinary_input_processor::resolve_source_a(&raw).is_err());
+                assert!(crate::ordinary_input_processor::resolve_source_b(&raw).is_err());
+            }
+            for addition in [
+                r#""Output:Diagnostics":{"a":{},"b":{}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_order":1}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_max_fields":1}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_max_extensible_fields":1}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_order":"bad"}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_max_fields":"bad"}}"#,
+                r#""Output:Diagnostics":{"actual diagnostics":{"idf_max_extensible_fields":"bad"}}"#,
+            ] {
+                let raw = parse_epjson_str(&format!("{{{base},{addition}}}"))?;
+                assert!(resolve_source_a(&raw).is_err());
+                assert!(resolve_source_b(&raw).is_err());
+            }
         }
         for value in [-2.0, 0.0, 3.0] {
             let addition = format!(
