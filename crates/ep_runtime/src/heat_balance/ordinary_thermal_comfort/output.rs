@@ -35,6 +35,7 @@ impl SourceThermalComfort {
         };
         match field {
             PeopleFangerPmv => Ok(&people()?.fanger_pmv),
+            PeopleAnkleDraftPpd => Ok(&people()?.ankle_draft_ppdash55),
             PeopleFangerPpd => Ok(&people()?.fanger_ppd),
             PeopleClothingSurfaceTemperature => Ok(&people()?.clo_surf_temp),
             PeopleMeanRadiantTemperature => Ok(&people()?.thermal_comfort_mrt),
@@ -72,7 +73,7 @@ impl SourceThermalComfort {
         key: &str,
     ) -> Result<(), Error> {
         let (units, store_type) = match field {
-            Field::PeopleFangerPmv => (
+            Field::PeopleFangerPmv | Field::PeopleAnkleDraftPpd => (
                 SourceOutputUnits::Dimensionless,
                 SourceOutputStoreType::Average,
             ),

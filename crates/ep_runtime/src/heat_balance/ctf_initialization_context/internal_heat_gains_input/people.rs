@@ -285,11 +285,14 @@ impl SelectedInternalHeatGains {
                     {
                         if model == "FANGER" {
                             row.fanger = true;
+                        } else if model == "ANKLEDRAFTASH55" {
+                            row.ankle_draft_ash55 = true;
+                            owners.control.any_thermal_comfort_ankle_draft_model = true;
                         } else if !model.is_empty() {
                             return Err(unavailable("positive unsupported People comfort model"));
                         }
                     }
-                    if row.fanger {
+                    if row.fanger || row.ankle_draft_ash55 {
                         self.read_fanger_comfort(
                             count,
                             position == 0,
@@ -684,14 +687,35 @@ impl SelectedInternalHeatGains {
         if !alphas[20].is_empty() {
             row.ankle_air_velocity_sched = owners.schedules.get_source_schedule(&alphas[20])?;
         }
-        // The selected AnkleDraft flag is false, but Native still validates a
-        // nonblank A21 lookup. There is deliberately no minimum check here.
-        if first_space && !local.alpha_field_blanks[20] && row.ankle_air_velocity_sched.is_none() {
-            let message = format!(
-                "{} = {}, item not found.",
-                local.alpha_field_names[20], alphas[20]
-            );
-            self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+        // Native resolves nonempty A21 even for Fanger-only. Actual blank
+        // requires AnkleDraft; neither branch imposes a minimum/range check.
+        let ankle = row.ankle_draft_ash55;
+        let ankle_schedule = row.ankle_air_velocity_sched;
+        if first_space {
+            if local.alpha_field_blanks[20] {
+                if ankle {
+                    // The Native overload passes A21 as the optional dependent
+                    // field name. This schema has no A21 default.
+                    let dependency = if alphas[20].is_empty() {
+                        String::new()
+                    } else {
+                        format!(" when {} = ", alphas[20])
+                    };
+                    let message = format!(
+                        "{} cannot be empty{}.",
+                        local.alpha_field_names[20], dependency
+                    );
+                    self.people_comfort_diagnostic(alphas, &message,
+                        Some("Required when Thermal Comfort Model Type is one of \"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\""),
+                        true, owners)?;
+                }
+            } else if ankle_schedule.is_none() {
+                let message = format!(
+                    "{} = {}, item not found.",
+                    local.alpha_field_names[20], alphas[20]
+                );
+                self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+            }
         }
         Ok(())
     }

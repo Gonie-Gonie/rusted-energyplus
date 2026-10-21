@@ -198,11 +198,10 @@ impl SelectedInternalHeatGains {
                 || people.cooling_effect_ash55
                 || people.ankle_draft_ash55
             {
-                if !people.fanger
+                if !(people.fanger || people.ankle_draft_ash55)
                     || people.pierce
                     || people.ksu
                     || people.cooling_effect_ash55
-                    || people.ankle_draft_ash55
                 {
                     return Err(unavailable(
                         "actual unsupported People nominal MRT/work/clothing branch2793",
@@ -234,13 +233,26 @@ impl SelectedInternalHeatGains {
                 };
                 write!(
                     owners.eio,
-                    "{},{},{},{},{},{},Yes,No,No,No,No",
+                    "{},{},{},{},{},{},{},{},{},{},{}",
                     mrt_type,
                     optional_schedule_name(owners.schedules, people.work_eff_sched)?,
                     clothing_type,
                     method_name,
                     optional_schedule_name(owners.schedules, people.clothing_sched)?,
                     optional_schedule_name(owners.schedules, people.air_velocity_sched)?,
+                    if people.fanger { "Yes" } else { "No" },
+                    if people.pierce { "Yes" } else { "No" },
+                    if people.ksu { "Yes" } else { "No" },
+                    if people.cooling_effect_ash55 {
+                        "Yes"
+                    } else {
+                        "No"
+                    },
+                    if people.ankle_draft_ash55 {
+                        "Yes"
+                    } else {
+                        "No"
+                    },
                 )?;
             }
             writeln!(owners.eio)?;

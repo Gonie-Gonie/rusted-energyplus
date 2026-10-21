@@ -2603,6 +2603,104 @@ mod source_a_compact_ingress {
                 }
             }
         }
+        // Either supported model consumes genuine shared auxiliaries. Ankle
+        // can occupy every model slot, alone or alongside Fanger; duplicates
+        // preserve the same raw operands rather than inventing extra objects.
+        let mut ankle_models = Vec::new();
+        for slot in 1..=7 {
+            for with_fanger in [false, true] {
+                let mut models =
+                    format!("\"thermal_comfort_model_{slot}_type\":\"AnkleDraftASH55\"");
+                if with_fanger {
+                    let fanger_slot = if slot == 7 { 1 } else { slot + 1 };
+                    models.push_str(&format!(
+                        ",\"thermal_comfort_model_{fanger_slot}_type\":\"Fanger\""
+                    ));
+                }
+                ankle_models.push(models);
+            }
+        }
+        ankle_models.push(
+            (1..=7)
+                .map(|slot| format!("\"thermal_comfort_model_{slot}_type\":\"AnkleDraftASH55\""))
+                .collect::<Vec<_>>()
+                .join(","),
+        );
+        for models in ankle_models {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}},"work":{{"hourly_value":0.2}},"clothes":{{"hourly_value":0.5}},"velocity":{{"hourly_value":0.1}},"ankle":{{"hourly_value":-0.4}}}},"People":{{"Ankle person":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2,"sensible_heat_fraction":0.6,"work_efficiency_schedule_name":"work","clothing_insulation_schedule_name":"clothes","air_velocity_schedule_name":"velocity","ankle_level_air_velocity_schedule_name":"ankle",{models}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                let original = ip.source_raw_object_fields("People", "Ankle person")?;
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                for (name, expected) in [
+                    ("work_efficiency_schedule_name", "work"),
+                    ("clothing_insulation_schedule_name", "clothes"),
+                    ("air_velocity_schedule_name", "velocity"),
+                    ("ankle_level_air_velocity_schedule_name", "ankle"),
+                ] {
+                    assert_eq!(original.get(name), Some(&V::String(expected.into())));
+                    assert_eq!(
+                        hb.objects["People"][0].fields.get(name),
+                        Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(expected.into()))
+                    );
+                }
+                for slot in 1..=7 {
+                    let field = format!("thermal_comfort_model_{slot}_type");
+                    if let Some(V::String(model)) = original.get(&field) {
+                        assert!(model == "AnkleDraftASH55" || model == "Fanger");
+                        assert_eq!(hb.objects["People"][0].fields.get(&field),
+                            Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(model.clone())));
+                    }
+                }
+            }
+            // Check the required A21 boundary once, after a genuine selected
+            // model and all other references have passed both actual IP gates.
+            if models == "\"thermal_comfort_model_1_type\":\"AnkleDraftASH55\"" {
+                for replacement in [
+                    "",
+                    ",\"ankle_level_air_velocity_schedule_name\":\"\"",
+                    ",\"ankle_level_air_velocity_schedule_name\":\"missing ankle\"",
+                    ",\"ankle_level_air_velocity_schedule_name\":null",
+                ] {
+                    let changed = text.replace(
+                        ",\"ankle_level_air_velocity_schedule_name\":\"ankle\"",
+                        replacement,
+                    );
+                    assert_ne!(changed, text);
+                    let raw = ep_raw_model::parse_epjson_str(&changed)?;
+                    assert!(resolve_source_a(&raw).is_err());
+                    assert!(resolve_source_b(&raw).is_err());
+                    assert!(crate::ordinary_input_processor::resolve_source_a(&raw).is_err());
+                    assert!(crate::ordinary_input_processor::resolve_source_b(&raw).is_err());
+                }
+                let changed = text.replace(&format!(",{models}"), "").replace(
+                    "\"ankle_level_air_velocity_schedule_name\":\"ankle\"",
+                    "\"ankle_level_air_velocity_schedule_name\":\"unused missing ankle\"",
+                );
+                let raw = ep_raw_model::parse_epjson_str(&changed)?;
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                for ip in [
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                ] {
+                    let original = ip.source_raw_object_fields("People", "Ankle person")?;
+                    assert_eq!(
+                        original.get("ankle_level_air_velocity_schedule_name"),
+                        Some(&V::String("unused missing ankle".into()))
+                    );
+                    crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                }
+            }
+        }
         // Clothing selection controls which raw references the real getter
         // consumes. CalculationSchedule defers A12 to its actual hasVal(1).
         for (method, method_schedule, clothing_schedule) in [

@@ -230,7 +230,7 @@ impl SourceThermalComfort {
         Ok(())
     }
 
-    fn calc_source_fanger_rad_temp<H, D>(
+    pub(super) fn calc_source_fanger_rad_temp<H, D>(
         &mut self,
         o: &mut SourceThermalComfortOwners<'_, '_, H, D>,
         people_at: usize,

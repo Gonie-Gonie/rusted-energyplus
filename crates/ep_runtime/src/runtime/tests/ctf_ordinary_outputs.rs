@@ -4876,26 +4876,43 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     };
                     use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as ComfortError;
                     use crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams;
-                    for (all_unoccupied, fanger_mode) in [
-                        (false, None),
-                        (true, None),
-                        (false, Some(("ClothingInsulationSchedule", "Constant-1.0"))),
+                    for (all_unoccupied, fanger_mode, ankle_enabled) in [
+                        (false, None, false),
+                        (true, None, false),
+                        (
+                            false,
+                            Some(("ClothingInsulationSchedule", "Constant-1.0")),
+                            false,
+                        ),
                         (
                             false,
                             Some(("DynamicClothingModelASHRAE55", "missing unused method")),
+                            false,
                         ),
-                        (false, Some(("CalculationMethodSchedule", "Constant-1.0"))),
+                        (
+                            false,
+                            Some(("CalculationMethodSchedule", "Constant-1.0")),
+                            false,
+                        ),
                         (
                             false,
                             Some(("CalculationMethodSchedule", "Fanger Method Two")),
+                            false,
+                        ),
+                        (false, None, true),
+                        (
+                            false,
+                            Some(("ClothingInsulationSchedule", "Constant-1.0")),
+                            true,
                         ),
                     ] {
                         let fanger_enabled = fanger_mode.is_some();
-                        let mut comfort_reports = if all_unoccupied || fanger_enabled {
-                            people_getter_base.clone()
-                        } else {
-                            people_reports.clone()
-                        };
+                        let mut comfort_reports =
+                            if all_unoccupied || fanger_enabled || ankle_enabled {
+                                people_getter_base.clone()
+                            } else {
+                                people_reports.clone()
+                            };
                         let (
                             mut comfort_state,
                             mut comfort_errors,
@@ -4916,8 +4933,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         comfort_clock.hour_of_day = 1;
                         comfort_clock.time_step = 1;
                         comfort_clock.num_of_day_in_envrn = 1;
-                        if fanger_enabled {
-                            // Only raw declared Fanger inputs change. The actual getter
+                        if fanger_enabled || ankle_enabled {
+                            // Only raw declared comfort inputs change. The actual getter
                             // resolves all schedules and retains genuine constructor owners.
                             let first = &mut comfort_reports
                                 .heat_balance_input
@@ -4927,7 +4944,14 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 .get_mut("People")
                                 .ok_or("Fanger raw People")?[0];
                             for (field, value) in [
-                                ("thermal_comfort_model_1_type", "Fanger"),
+                                (
+                                    "thermal_comfort_model_1_type",
+                                    if fanger_enabled {
+                                        "Fanger"
+                                    } else {
+                                        "AnkleDraftASH55"
+                                    },
+                                ),
                                 (
                                     "mean_radiant_temperature_calculation_type",
                                     "EnclosureAveraged",
@@ -4944,6 +4968,25 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                     .fields
                                     .insert(field.into(), ProjectInputValue::String(value.into()));
                             }
+                        }
+                        if ankle_enabled {
+                            let first = &mut comfort_reports
+                                .heat_balance_input
+                                .as_mut()
+                                .ok_or("ankle raw input")?
+                                .objects
+                                .get_mut("People")
+                                .ok_or("ankle raw People")?[0];
+                            if fanger_enabled {
+                                first.fields.insert(
+                                    "thermal_comfort_model_2_type".into(),
+                                    ProjectInputValue::String("AnkleDraftASH55".into()),
+                                );
+                            }
+                            first.fields.insert(
+                                "ankle_level_air_velocity_schedule_name".into(),
+                                ProjectInputValue::String("Constant-0.0".into()),
+                            );
                         }
                         if let Some((method, calculation)) = fanger_mode {
                             let first = &mut comfort_reports
@@ -4987,7 +5030,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 );
                             }
                         }
-                        if all_unoccupied || fanger_enabled {
+                        if all_unoccupied || fanger_enabled || ankle_enabled {
                             CtfInitializationContext {
                                 reports: &mut comfort_reports,
                                 eio: &mut comfort_eio,
@@ -5058,6 +5101,15 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             &mut comfort_history,
                         )?;
                         let mut comfort = SourceThermalComfort::default();
+                        assert_eq!(
+                            (
+                                comfort.act_met,
+                                comfort.ankle_draft_air_vel_warning_ind,
+                                comfort.ankle_draft_clo_unit_warning_ind,
+                                comfort.ankle_draft_act_met_warning_ind
+                            ),
+                            (0.0, 0, 0, 0)
+                        );
                         let mut comfort_summary = SourceComfortPredefinedSummary::default();
                         {
                             let mut comfort_backend = SourceErrorBackend {
@@ -5118,10 +5170,10 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                     .len(),
                                 2
                             );
-                            if fanger_enabled {
+                            if fanger_enabled || ankle_enabled {
                                 // This fixture reran the real Zone getter, producing a new
                                 // Space with ctor0 enclosure identity. No fabricated link
-                                // is inserted after the six genuine registrations.
+                                // is inserted after the genuine selected registrations.
                                 let reached = run_comfort(
                                     false,
                                     &mut comfort,
@@ -5136,12 +5188,63 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                             "positive actual ThermalComfort ordinal"
                                         ))
                                     ),
-                                    "actual positive Fanger prefix: {reached:?}"
+                                    "actual positive comfort prefix: {reached:?}"
                                 );
                                 use crate::heat_balance::source_output_registration::{
                                     SourceComfortOutputField as F, SourceOutputStoreType as S,
                                     SourceOutputUnits as U, TimeStepKind,
                                 };
+                                let check_ankle = |reports: &CtfInitializationReports, current: &SourceThermalComfort| -> Result<(), Box<dyn std::error::Error>> {
+                                    let ankle = reports.output_registration.dictionary_variables.iter()
+                                        .find(|row| row.name == "Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD")
+                                        .ok_or("genuine ankle dictionary registration")?;
+                                    assert_eq!((ankle.units, ankle.store_type, ankle.time_step_type),
+                                        (U::Dimensionless, S::Average, TimeStepKind::Zone));
+                                    let row = &current.thermal_comfort_data.as_ref().ok_or("actual ankle row")?[0];
+                                    assert!(std::ptr::eq(current.real_output(F::PeopleAnkleDraftPpd,1)?, &row.ankle_draft_ppdash55));
+                                    assert_eq!(row.ankle_draft_ppdash55, 0.0, "fresh Space0 stops before any computed ankle output");
+                                    let person = &reports.selected_internal_heat_gains.allocations.people.rows[0];
+                                    assert!(person.ankle_draft_ash55 && person.ankle_air_velocity_sched.is_some());
+                                    assert_eq!(person.fanger, fanger_enabled);
+                                    assert!(reports.heat_balance_input_state.any_thermal_comfort_ankle_draft_model);
+                                    assert_eq!((current.ankle_draft_air_vel_warning_ind, current.ankle_draft_clo_unit_warning_ind,
+                                        current.ankle_draft_act_met_warning_ind), (0,0,0));
+                                    Ok(())
+                                };
+                                if !fanger_enabled {
+                                    // End the genuine mutable owner borrow before inspecting
+                                    // the ankle-only dictionary and then leaving this case.
+                                    check_ankle(&comfort_reports, &comfort)?;
+                                    for name in [
+                                        "Zone Thermal Comfort Fanger Model PMV",
+                                        "Zone Thermal Comfort Fanger Model PPD",
+                                        "Zone Thermal Comfort Clothing Surface Temperature",
+                                        "Zone Thermal Comfort Mean Radiant Temperature",
+                                        "Zone Thermal Comfort Operative Temperature",
+                                        "Zone Thermal Comfort Clothing Value",
+                                    ] {
+                                        assert!(
+                                            !comfort_reports
+                                                .output_registration
+                                                .dictionary_variables
+                                                .iter()
+                                                .any(|row| row.name == name)
+                                        );
+                                    }
+                                    let person = &comfort_reports
+                                        .selected_internal_heat_gains
+                                        .allocations
+                                        .people
+                                        .rows[0];
+                                    assert_eq!(
+                                        (
+                                            person.temperature_in_zone,
+                                            person.relative_humidity_in_zone
+                                        ),
+                                        (0.0, 0.0)
+                                    );
+                                    continue;
+                                }
                                 let declarations = [
                                     (
                                         "Zone Thermal Comfort Fanger Model PMV",
@@ -5242,6 +5345,11 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                         &comfort_environment,
                                     )?;
                                     assert_eq!(comfort.temporary_six_am_temperature, 1.868132);
+                                }
+                                // Last Manage(true) use above has completed. Inspection
+                                // must not overlap the closure's mutable owner captures.
+                                if ankle_enabled {
+                                    check_ankle(&comfort_reports, &comfort)?;
                                 }
                                 let mut prior = None;
                                 for (name, field, units) in declarations {

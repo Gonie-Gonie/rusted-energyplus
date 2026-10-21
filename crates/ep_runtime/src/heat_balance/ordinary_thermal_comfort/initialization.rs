@@ -111,9 +111,13 @@ impl SourceThermalComfort {
                 ));
             }
             if ankle_draft_ash55 {
-                return Err(Error::Unavailable(
-                    "actual positive AnkleDraft registration369",
-                ));
+                self.register(
+                    o,
+                    Field::PeopleAnkleDraftPpd,
+                    number,
+                    "Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD",
+                    &name,
+                )?;
             }
         }
         self.thermal_comfort_in_ash55 = Some(vec![

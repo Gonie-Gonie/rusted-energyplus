@@ -389,6 +389,7 @@ impl CtfInitializationContext<'_> {
                 raw,
                 input,
                 globals,
+                control: &mut reports.heat_balance_input_state,
                 zones,
                 geometry: &reports.surface_geometry_input,
                 radiation: reports.ordinary_solar_radiation.as_ref().ok_or_else(|| {

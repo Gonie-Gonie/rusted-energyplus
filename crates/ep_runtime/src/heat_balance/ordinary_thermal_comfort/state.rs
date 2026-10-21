@@ -89,6 +89,7 @@ pub(crate) struct SourceThermalComfort {
     pub(crate) rad_temp: f64,                // Native RadTemp
     pub(crate) rel_hum: f64,                 // Native RelHum
     pub(crate) act_level: f64,               // Native ActLevel
+    pub(crate) act_met: f64,                 // Native ActMet ctor0
     pub(crate) work_eff: f64,                // Native WorkEff
     pub(crate) clo_unit: f64,                // Native CloUnit
     pub(crate) air_vel: f64,                 // Native AirVel
@@ -114,6 +115,10 @@ pub(crate) struct SourceThermalComfort {
     pub(crate) resp_heat_loss: f64,          // Native RespHeatLoss
     pub(crate) therm_sens_trans_coef: f64,   // Native ThermSensTransCoef
     pub(crate) iter_num: i32,                // Native IterNum
+    /// Native module-wide AnkleDraft warning indices, each ctor0.
+    pub(crate) ankle_draft_air_vel_warning_ind: i32,
+    pub(crate) ankle_draft_clo_unit_warning_ind: i32,
+    pub(crate) ankle_draft_act_met_warning_ind: i32,
     pub(crate) first_time_flag: bool,
     /// Separate Native ThermalComfort.hh254/370 state, not InitThermalComfort readiness.
     pub(crate) first_time_surface_weighted_flag: bool,
@@ -150,6 +155,7 @@ impl Default for SourceThermalComfort {
             rad_temp: 0.0,
             rel_hum: 0.0,
             act_level: 0.0,
+            act_met: 0.0,
             work_eff: 0.0,
             clo_unit: 0.0,
             air_vel: 0.0,
@@ -175,6 +181,9 @@ impl Default for SourceThermalComfort {
             resp_heat_loss: 0.0,
             therm_sens_trans_coef: 0.0,
             iter_num: 0,
+            ankle_draft_air_vel_warning_ind: 0,
+            ankle_draft_clo_unit_warning_ind: 0,
+            ankle_draft_act_met_warning_ind: 0,
             first_time_flag: true,
             first_time_surface_weighted_flag: true,
             first_time_surface_weighted_error: true,

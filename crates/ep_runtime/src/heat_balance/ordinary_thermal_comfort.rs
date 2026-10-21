@@ -27,6 +27,7 @@ use crate::psychrometrics::{SourcePsychrometricAccess, SourcePsychrometricOwners
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::ReportInputs;
 use std::io::Write;
+mod ankle;
 mod fanger;
 mod initialization;
 mod output;
@@ -170,9 +171,7 @@ impl SourceThermalComfort {
                 ));
             }
             if o.control.any_thermal_comfort_ankle_draft_model {
-                return Err(Error::Unavailable(
-                    "actual CalcThermalComfortAnkleDraftASH positive model",
-                ));
+                self.calc_source_ankle_draft(o)?;
             }
             self.calc_source_simple_ash55(o)?;
             self.calc_source_if_setpoint_met(o)?;

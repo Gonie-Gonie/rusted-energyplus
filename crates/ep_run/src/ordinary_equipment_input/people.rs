@@ -178,8 +178,9 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         return false;
     }
     // Known field types/enums were validated first. No-model auxiliaries stay
-    // unconsumed; this positive branch connects genuine Fanger clothing inputs.
+    // unconsumed; either supported model consumes the real auxiliary inputs.
     let mut fanger = false;
+    let mut ankle = false;
     for name in [
         "thermal_comfort_model_1_type",
         "thermal_comfort_model_2_type",
@@ -192,12 +193,15 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         if let Some(value) = field(object, name) {
             if text_is(value, &["Fanger"]) {
                 fanger = true;
+            } else if text_is(value, &["AnkleDraftASH55"]) {
+                ankle = true;
             } else if !matches!(value, RawValue::String(s) if s.is_empty()) {
                 return false;
             }
         }
     }
-    if fanger
+    let additional_inputs = fanger || ankle;
+    if additional_inputs
         && (!selected(
             object,
             "mean_radiant_temperature_calculation_type",
@@ -214,7 +218,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     {
         return false;
     }
-    if fanger
+    if additional_inputs
         && field(object, "mean_radiant_temperature_calculation_type")
             .is_some_and(|value| text_is(value, &["SurfaceWeighted"]))
         && !text(object, "surface_name_angle_factor_list_name").is_some_and(|name| {
@@ -225,7 +229,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     {
         return false;
     }
-    if fanger
+    if additional_inputs
         && field(object, "mean_radiant_temperature_calculation_type")
             .is_some_and(|value| text_is(value, &["AngleFactor"]))
     {
@@ -267,7 +271,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         "number_of_people_schedule_name",
         "activity_level_schedule_name",
     ];
-    if fanger {
+    if additional_inputs {
         required_schedules.extend([
             "work_efficiency_schedule_name",
             "air_velocity_schedule_name",
@@ -287,7 +291,9 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         }
         // Dynamic clothing consumes neither the method nor clothing schedule.
         // Native validates any nonempty A21 even when AnkleDraft is false.
-        if text(object, "ankle_level_air_velocity_schedule_name").is_some_and(|s| !s.is_empty()) {
+        if ankle
+            || text(object, "ankle_level_air_velocity_schedule_name").is_some_and(|s| !s.is_empty())
+        {
             required_schedules.push("ankle_level_air_velocity_schedule_name");
         }
     }

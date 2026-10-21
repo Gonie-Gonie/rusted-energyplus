@@ -58,6 +58,7 @@ pub(crate) enum SourceAirOutputField {
 pub(crate) enum SourceComfortOutputField {
     PeopleFangerPmv,
     PeopleFangerPpd,
+    PeopleAnkleDraftPpd,
     PeopleClothingSurfaceTemperature,
     PeopleMeanRadiantTemperature,
     PeopleOperativeTemperature,

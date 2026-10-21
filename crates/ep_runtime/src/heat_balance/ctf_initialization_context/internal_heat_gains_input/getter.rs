@@ -6,7 +6,7 @@ use super::{
 use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
-    SelectedHeatBalanceInput, zone::SelectedZoneInputOwners,
+    SelectedHeatBalanceInput, SelectedHeatBalanceInputState, zone::SelectedZoneInputOwners,
 };
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputFamily, SourceInputProcessorShortCut,
@@ -38,6 +38,7 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) raw: &'a SelectedHeatBalanceInput,
     pub(super) input: &'a mut SelectedInputProcessor,
     pub(super) globals: &'a SelectedHeatBalanceGlobals,
+    pub(super) control: &'a mut SelectedHeatBalanceInputState,
     pub(super) zones: &'a mut SelectedZoneInputOwners,
     pub(super) geometry:
         &'a crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState,
